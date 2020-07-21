@@ -1,0 +1,22 @@
+$header-height: 40px;
+$height-without-header: calc( 100vh - calc(#{$header-height})  );
+$sidebar-width: 300px;
+$sidebar-item-height: 40px;
+$inputs-border: 6px solid red;
+$main-font: Segoe UI;
+$main-font-bold: Segoe UI Bold;
+$main-font-size: 14px;
+$button-height: 30px;
+
+//farby
+$main-background-color: #F2F1F1;
+$sidebar-background-color: #F7F7F7;
+$form-background-color: #faf9f8;
+$main-font-color: #3C3C3C;
+$muted-font-color: #BDBDBD;
+$contrasting-font-color: #494949;
+$header-color: #004578;
+$basic-button-color: #0078D4;
+$muted-gray: #d9d8d8;
+$sidebar-item-color: #DCECF9;
+$table-lines: #f1f1f1;

@@ -1,0 +1,20 @@
+@import "variables";
+.width-half{
+    .form-group{
+      padding:5px 10px;
+    }
+}
+
+.title-input{
+  font-weight: 600 !important;
+  font-size: 2.25rem !important;
+}
+
+.project-table-fixed{
+  min-width: 900px !important;
+  width: auto !important;
+}
+
+.fit-with-header-commandbar-info{
+  	height: calc(  #{$height-without-header} - 156px );
+}

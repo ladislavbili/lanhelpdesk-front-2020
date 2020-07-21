@@ -1,0 +1,27 @@
+.cke_top {
+    border-bottom: none !important;
+    background: white !important;
+}
+
+.cke_bottom {
+    border-top: none !important;
+    background: white !important;
+    display: none !important;
+}
+
+.cke_chrome {
+    border: 1px solid rgba(0,0,0,.1) !important;
+}
+
+.cke_editable{
+  line-height: 1;
+}
+
+// PRE CKeditor 5
+
+.ck-editor__editable {
+    min-height: 150px;
+    p{
+      margin-bottom: 5px;
+    }
+}
