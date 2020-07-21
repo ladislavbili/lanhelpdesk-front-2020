@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_UNITS, STORAGE_HELP_UNITS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  unitsActive:false,
-  unitsLoaded:false,
+  unitsActive:true,
+  unitsLoaded:true,
   units:[]
 };
 

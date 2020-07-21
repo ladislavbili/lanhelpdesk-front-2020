@@ -4,14 +4,5 @@ import {snapshotToArray} from '../../../helperFunctions';
 
 
 export const storageHelpSupplierInvoicesStart = () => {
-  return (dispatch) => {
-
-    database.collection('help-supplier_invoices').onSnapshot(querySnapshot => {
-      dispatch({ type: STORAGE_HELP_SUPPLIER_INVOICES,supplierInvoices:snapshotToArray(querySnapshot)});
-      }, err => {
-      console.log(`Encountered error: ${err}`);
-    });
-
-    dispatch({ type: STORAGE_HELP_SUPPLIER_INVOICES_ACTIVE });
-  };
+  return (dispatch) => {};
 };

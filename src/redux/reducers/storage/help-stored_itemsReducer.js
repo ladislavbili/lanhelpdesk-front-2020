@@ -1,8 +1,8 @@
 import {STORAGE_HELP_STORED_ITEMS, STORAGE_HELP_STORED_ITEMS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  storedItemsActive:false,
-  storedItemsLoaded:false,
+  storedItemsActive:true,
+  storedItemsLoaded:true,
   storedItems:[]
 };
 

@@ -1,8 +1,8 @@
 import {STORAGE_HELP_TASK_WORK_TRIPS, STORAGE_HELP_TASK_WORK_TRIPS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  workTripsActive:false,
-  workTripsLoaded:false,
+  workTripsActive:true,
+  workTripsLoaded:true,
   workTrips:[]
 };
 

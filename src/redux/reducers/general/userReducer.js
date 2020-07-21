@@ -1,9 +1,9 @@
 import { SET_USER_DATA, SET_USER_ID, DELETE_USER_DATA, SET_USER_NOTIFICATIONS, SET_USER_STATUSES } from '../../types'
 
 const initialState = {
-  id:null,
-  loggedIn:false,
-  userData:null,
+  id: 666,
+  loggedIn: true,
+  userData: {role: {value: 4, label: "Admin"}},
   notifications:[],
   statuses:[]
 };

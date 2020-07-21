@@ -1,8 +1,8 @@
 import { STORAGE_SET_ERROR_MESSAGES, STORAGE_ERROR_MESSAGES_ACTIVE, DELETE_USER_DATA } from '../../types'
 
 const initialState = {
-  errorMessagesActive: false,
-  errorMessagesLoaded: false,
+  errorMessagesActive: true,
+  errorMessagesLoaded: true,
   errorMessages:[]
 };
 

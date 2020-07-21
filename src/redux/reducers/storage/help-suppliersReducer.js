@@ -1,8 +1,8 @@
 import {STORAGE_HELP_SUPPLIERS, STORAGE_HELP_SUPPLIERS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  suppliersActive:false,
-  suppliersLoaded:false,
+  suppliersActive:true,
+  suppliersLoaded:true,
   suppliers:[]
 };
 

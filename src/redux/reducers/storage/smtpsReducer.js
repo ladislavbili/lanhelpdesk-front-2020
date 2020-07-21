@@ -1,8 +1,8 @@
 import {STORAGE_SET_SMTPS, STORAGE_SMTPS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  smtpsActive:false,
-  smtpsLoaded:false,
+  smtpsActive:true,
+  smtpsLoaded:true,
   smtps:[]
 };
 

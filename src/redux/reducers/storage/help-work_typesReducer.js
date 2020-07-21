@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_WORK_TYPES, STORAGE_HELP_WORK_TYPES_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  workTypesActive:false,
-  workTypesLoaded:false,
+  workTypesActive:true,
+  workTypesLoaded:true,
   workTypes:[]
 };
 

@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_STATUSES, STORAGE_HELP_STATUSES_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  statusesActive:false,
-  statusesLoaded:false,
+  statusesActive:true,
+  statusesLoaded:true,
   statuses:[]
 };
 

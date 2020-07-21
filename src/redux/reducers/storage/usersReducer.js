@@ -1,8 +1,8 @@
 import {STORAGE_USERS, STORAGE_USERS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  usersActive:false,
-  usersLoaded:false,
+  usersActive:true,
+  usersLoaded:true,
   users:[]
 };
 

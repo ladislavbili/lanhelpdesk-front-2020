@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_TAGS, STORAGE_HELP_TAGS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  tagsActive:false,
-  tagsLoaded:false,
+  tagsActive:true,
+  tagsLoaded:true,
   tags:[]
 };
 

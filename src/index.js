@@ -2,36 +2,47 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter, Route} from 'react-router-dom';
 import { Provider } from 'react-redux';
-import firebase from 'firebase';
 import Rebase from 're-base';
 
-import Navigation from './navigation';
+import Navigation from 'navigation';
+import Login from 'components/login';
 
-import config from './firebase';
-import createStore from './redux/store';
+import createStore from 'redux/store';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import "./scss/index.scss";
+import "scss/index.scss";
+
+import gql from "graphql-tag";
+import { ApolloProvider, useQuery } from "@apollo/react-hooks";
+import createClient from 'apollo/createClient';
+
+export const database = {};
+export const rebase = {};
+
+const IS_LOGGED_IN = gql`
+  query IsUserLoggedIn {
+    isLoggedIn @client
+  }
+`;
+
+function IsLoggedIn() {
+  const { data } = useQuery(IS_LOGGED_IN);
+  return data.isLoggedIn ? <Navigation /> : <Login />;
+}
+
+const client = createClient();
 
 const store=createStore();
-const app = firebase.initializeApp(config);
-let db = firebase.firestore(app);
-const settings = { };
-db.settings(settings);
-export let rebase = Rebase.createClass(db);
-export let database = db;
 
 const Root = () => {
   return(
     <div>
-      <Provider store={store}>
-      <BrowserRouter>
-        <div>
-          <Route path='/' component={Navigation} />
-        </div>
-      </BrowserRouter>
-    </Provider>
+      <ApolloProvider client={client}>
+        <Provider store={store}>
+          <IsLoggedIn />
+        </Provider>
+      </ApolloProvider>
     </div>
   )
 }

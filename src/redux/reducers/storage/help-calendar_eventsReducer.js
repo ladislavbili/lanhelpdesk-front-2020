@@ -1,8 +1,8 @@
 import {STORAGE_HELP_CALENDAR_EVENTS, STORAGE_HELP_CALENDAR_EVENTS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  calendarEventsActive:false,
-  calendarEventsLoaded:false,
+  calendarEventsActive:true,
+  calendarEventsLoaded:true,
   calendarEvents:[]
 };
 

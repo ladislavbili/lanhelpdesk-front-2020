@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_COMPANY_INVOICES, STORAGE_HELP_COMPANY_INVOICES_ACTIVE, DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  companyInvoicesActive:false,
-  companyInvoicesLoaded:false,
+  companyInvoicesActive:true,
+  companyInvoicesLoaded:true,
   companyInvoices:[]
 };
 

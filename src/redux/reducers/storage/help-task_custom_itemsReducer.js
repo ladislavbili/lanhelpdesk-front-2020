@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_TASK_CUSTOM_ITEMS, STORAGE_HELP_TASK_CUSTOM_ITEMS_ACTIVE, DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  customItemsActive:false,
-  customItemsLoaded:false,
+  customItemsActive:true,
+  customItemsLoaded:true,
   customItems:[]
 };
 

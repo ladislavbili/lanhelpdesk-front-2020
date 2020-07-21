@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_MILESTONES, STORAGE_HELP_MILESTONES_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  milestonesActive:false,
-  milestonesLoaded:false,
+  milestonesActive:true,
+  milestonesLoaded:true,
   milestones:[]
 };
 

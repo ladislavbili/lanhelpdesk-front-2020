@@ -1,8 +1,8 @@
 import {STORAGE_SET_METADATA, STORAGE_METADATA_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  metadataActive:false,
-  metadataLoaded:false,
+  metadataActive:true,
+  metadataLoaded:true,
   metadata:null
 };
 

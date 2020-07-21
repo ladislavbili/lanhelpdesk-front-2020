@@ -1,8 +1,8 @@
 import {STORAGE_HELP_SUPPLIER_INVOICES, STORAGE_HELP_SUPPLIER_INVOICES_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  supplierInvoicesActive:false,
-  supplierInvoicesLoaded:false,
+  supplierInvoicesActive:true,
+  supplierInvoicesLoaded:true,
   supplierInvoices:[]
 };
 

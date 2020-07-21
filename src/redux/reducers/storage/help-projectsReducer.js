@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_PROJECTS, STORAGE_HELP_PROJECTS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  projectsActive:false,
-  projectsLoaded:false,
+  projectsActive:true,
+  projectsLoaded:true,
   projects:[]
 };
 

@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_FILTERS, STORAGE_HELP_FILTERS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  filtersActive:false,
-  filtersLoaded:false,
+  filtersActive:true,
+  filtersLoaded:true,
   filters:[]
 };
 

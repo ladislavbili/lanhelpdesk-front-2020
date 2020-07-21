@@ -1,8 +1,8 @@
 import {STORAGE_HELP_INVOICE_ITEMS, STORAGE_HELP_INVOICE_ITEMS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  invoiceItemsActive:false,
-  invoiceItemsLoaded:false,
+  invoiceItemsActive:true,
+  invoiceItemsLoaded:true,
   invoiceItems:[]
 };
 

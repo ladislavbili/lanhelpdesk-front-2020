@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 
+
 export const testing = false;
 
 export const toSelArr = (arr,index = 'title')=> arr.map((item)=>{return {...item,value:item.id,label:item[index]}})
@@ -32,6 +33,10 @@ export const timestampToDate = (timestamp) => {
 export const timestampToHoursAndMinutes = (timestamp) => {
   let date = (new Date(timestamp));
   return date.getHours()+":"+(date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+}
+
+export const afterNow = (unix) => {
+  return unix > moment().unix()
 }
 
 export const toFloat = (number) => parseFloat(parseFloat(number).toFixed(2))

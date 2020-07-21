@@ -1,8 +1,8 @@
 import {STORAGE_IMAPS, STORAGE_IMAPS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  imapsActive:false,
-  imapsLoaded:false,
+  imapsActive:true,
+  imapsLoaded:true,
   imaps:[]
 };
 

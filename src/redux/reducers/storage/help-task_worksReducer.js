@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_TASK_WORKS, STORAGE_SET_HELP_TASK_WORKS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  taskWorksActive:false,
-  taskWorksLoaded:false,
+  taskWorksActive:true,
+  taskWorksLoaded:true,
   taskWorks:[]
 };
 

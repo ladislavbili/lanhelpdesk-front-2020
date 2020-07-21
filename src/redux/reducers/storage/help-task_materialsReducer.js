@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_TASK_MATERIALS, STORAGE_SET_HELP_TASK_MATERIALS_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  materialsActive:false,
-  materialsLoaded:false,
+  materialsActive:true,
+  materialsLoaded:true,
   materials:[]
 };
 

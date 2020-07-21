@@ -1,8 +1,8 @@
 import {STORAGE_SET_COMPANIES, STORAGE_COMPANIES_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  companiesActive:false,
-  companiesLoaded:false,
+  companiesActive:true,
+  companiesLoaded:true,
   companies:[]
 };
 

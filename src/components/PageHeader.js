@@ -96,47 +96,6 @@ class PageHeader extends Component {
             Úlohy
           </Link>
           {
-            ((this.props.currentUser.userData && this.props.currentUser.userData.role.value > 0) || testing) && <Link to={{
-                  pathname: `/lanwiki/i/all`
-                }} className={"header-link" + (
-                  URL.includes("lanwiki")
-                  ? " header-link-active"
-                  : "")}>
-                Návody
-              </Link>
-          }
-          {
-            ((this.props.currentUser.userData && this.props.currentUser.userData.role.value > 0) || testing) && <Link to={{
-                  pathname: `/cmdb/i/all`
-                }} className={"header-link" + (
-                  URL.includes("cmdb")
-                  ? " header-link-active"
-                  : "")}>
-                CMDB
-              </Link>
-          }
-          {
-            ((this.props.currentUser.userData && this.props.currentUser.userData.role.value > 0) || testing) && <Link to={{
-                  pathname: `/passmanager`
-                }} className={"header-link" + (
-                  URL.includes("passmanager")
-                  ? " header-link-active"
-                  : "")}>
-                Heslá
-              </Link>
-          }
-          {
-            ((this.props.currentUser.userData && this.props.currentUser.userData.role.value > 1) || testing) && <Link to={{
-                  pathname: `/expenditures`
-                }} className={"header-link" + (
-                  URL.includes("expenditures")
-                  ? " header-link-active"
-                  : "")}>
-                Náklady
-              </Link>
-          }
-
-          {
             ((this.props.currentUser.userData && this.props.currentUser.userData.role.value > 1) || testing) && <Link to={{
                   pathname: `/reports`
                 }} className={"header-link" + (
@@ -145,27 +104,7 @@ class PageHeader extends Component {
                   : "")}>
                 Vykazy
               </Link>
-          }
-          {
-            ((this.props.currentUser.userData && this.props.currentUser.userData.role.value > 0) || testing) && <Link to={{
-                  pathname: `/projects`
-                }} className={"header-link" + (
-                  URL.includes("projects")
-                  ? " header-link-active"
-                  : "")}>
-                Projekty
-              </Link>
-          }
-          {
-            ((this.props.currentUser.userData && this.props.currentUser.userData.role.value > 0) || testing) && <Link to={{
-                  pathname: `/monitoring`
-                }} className={"header-link" + (
-                  URL.includes("monitoring")
-                  ? " header-link-active"
-                  : "")}>
-                Monitoring
-              </Link>
-          }
+          }   
         </div>
         <div className="ml-auto center-hor row">
           <i

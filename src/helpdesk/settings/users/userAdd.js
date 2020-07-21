@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { Button, FormGroup, Label,Input } from 'reactstrap';
 import Select from 'react-select';
-import firebase from 'firebase';
 import {rebase} from '../../../index';
 import {isEmail} from '../../../helperFunctions';
 import {selectStyle} from "configs/components/select";
-import config from '../../../firebase';
 
 import { connect } from "react-redux";
 import {storageCompaniesStart} from '../../../redux/actions';
@@ -133,44 +131,7 @@ class UserAdd extends Component{
           </FormGroup>
 
               <Button className="btn" disabled={this.state.saving || this.state.companies.length===0 || !isEmail(this.state.email) || this.state.password.length < 6 } onClick={()=>{
-                  this.setState({saving:true});
-                  var secondaryApp = firebase.initializeApp(config, "Secondary");
-                  secondaryApp.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then((user) => {
-                    secondaryApp.auth().signOut();
-                    secondaryApp.delete();
-                    let newUser = {
-                      username:this.state.username,
-                      name:this.state.name,
-                      surname:this.state.surname,
-                      email:this.state.email,
-                      company: this.state.company.id,
-                      role:this.state.role,
-                      mailNotifications:this.state.mailNotifications,
-                      signature:this.state.signature,
-                    };
-                    rebase.addToCollection('/users', newUser, user.user.uid)
-                    .then(()=>{
-                      let company = {...this.state.companies[0],label:this.state.companies[0].title,value:this.state.companies[0].id};
-                      this.setState({
-                        username:'',
-                        name:'',
-                        surname:'',
-                        email:'',
-                        company,
-                        password:'',
-                        role:roles[0],
-                        signature:'',
-                        mailNotifications:true,
-                        saving:false
-                      }, () => {
-                        if (this.props.userAdd){
-                          this.props.addUser({...newUser, id: user.user.id, value: user.user.id, label: newUser.email});
-                          this.props.close();
-                        }
-                      }
-                    );
-                    });
-                  });
+                  this.setState({saving:true});                  
                 }}>{this.state.saving?'Adding...':'Add user'}</Button>
 
               {this.props.close &&

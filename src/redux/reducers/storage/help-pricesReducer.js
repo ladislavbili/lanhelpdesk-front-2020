@@ -1,8 +1,8 @@
 import {STORAGE_SET_HELP_PRICES, STORAGE_HELP_PRICES_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  pricesActive:false,
-  pricesLoaded:false,
+  pricesActive:true,
+  pricesLoaded:true,
   prices:[]
 };
 

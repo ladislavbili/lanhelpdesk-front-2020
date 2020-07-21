@@ -1,8 +1,8 @@
 import {STORAGE_HELP_TRIP_TYPES, STORAGE_HELP_TRIP_TYPES_ACTIVE,DELETE_USER_DATA} from '../../types'
 
 const initialState = {
-  tripTypesActive:false,
-  tripTypesLoaded:false,
+  tripTypesActive:true,
+  tripTypesLoaded:true,
   tripTypes:[]
 };
 
