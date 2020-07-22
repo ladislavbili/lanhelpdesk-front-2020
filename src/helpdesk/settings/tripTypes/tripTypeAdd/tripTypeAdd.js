@@ -14,8 +14,6 @@ export default class TripTypeAdd extends Component{
   }
 
   render(){
-    const { client } = this.props;
-
     return (
       <div className="p-20 scroll-visible fit-with-header-and-commandbar">
 
@@ -27,28 +25,31 @@ export default class TripTypeAdd extends Component{
           <Label for="order">Order</Label>
           <Input type="number" name="order" id="order" placeholder="Lower means first" value={this.state.order} onChange={(e)=>this.setState({order:e.target.value})} />
         </FormGroup>
-        <Button className="btn" disabled={this.state.saving} onClick={()=>{
-            this.setState({saving: true});
-            let order = this.state.order!==''?parseInt(this.state.order):0;
-            if(isNaN(order)){
-              order=0;
-            }
-            this.props.addTripType({ variables: {
-              title: this.state.title,
-              order: parseInt(this.state.order),
-            } }).then( ( response ) => {
-              const allTripTypes = client.readQuery({query: GET_TRIP_TYPES}).tripTypes;
-              console.log(response);
-              const newTripType = {...response.data.addTripType, __typename: "TripType"};
-              console.log(newTripType);
-              client.writeQuery({ query: GET_TRIP_TYPES, data: {tripTypes: [...allTripTypes, newTripType ] } });
-              this.props.history.goBack();
-            }).catch( (err) => {
-              console.log(err.message);
-            });
-            this.setState({saving: false});
-          }}>{this.state.saving?'Adding...':'Add trip type'}</Button>
+        <Button className="btn" disabled={this.state.saving} onClick={this.addTripType.bind(this)}>{this.state.saving?'Adding...':'Add trip type'}</Button>
     </div>
     );
   }
+
+  addTripType(){
+      const { client } = this.props;
+
+      this.setState({saving: true});
+      let order = this.state.order!==''?parseInt(this.state.order):0;
+      if(isNaN(order)){
+        order=0;
+      }
+      this.props.addTripType({ variables: {
+        title: this.state.title,
+        order: parseInt(this.state.order),
+      } }).then( ( response ) => {
+        const allTripTypes = client.readQuery({query: GET_TRIP_TYPES}).tripTypes;
+        const newTripType = {...response.data.addTripType, __typename: "TripType"};
+        client.writeQuery({ query: GET_TRIP_TYPES, data: {tripTypes: [...allTripTypes, newTripType ] } });
+        this.props.history.push('/helpdesk/settings/tripTypes/' + newTripType.id)
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+      this.setState({saving: false});
+  }
+
 }
