@@ -1,59 +1,71 @@
 import React, { Component } from 'react';
 import { Button, FormGroup, Label,Input } from 'reactstrap';
 import Select from 'react-select';
-import {rebase} from '../../../index';
-import {isEmail} from '../../../helperFunctions';
 import {selectStyle} from "configs/components/select";
 
-import { connect } from "react-redux";
-import {storageCompaniesStart} from '../../../redux/actions';
-import {sameStringForms, toSelArr} from '../../../helperFunctions';
-import Checkbox from '../../../components/checkbox';
+import {isEmail, sameStringForms, toSelArr} from 'helperFunctions';
+import Checkbox from 'components/checkbox';
 
-let roles=[
-  {label:'Guest',value:-1},
-  {label:'User',value:0},
-  {label:'Agent',value:1},
-  {label:'Manager',value:2},
-  {label:'Admin',value:3},
-]
+import {  GET_USERS } from '../index';
 
-class UserAdd extends Component{
+export default class UserAdd extends Component{
   constructor(props){
     super(props);
     this.state={
-      username:'',
-      name:'',
-      surname:'',
-      email:'',
-      company:null,
-      saving:false,
-      password:'',
-      companies:[],
-      mailNotifications: true,
-      role:roles[1],
+      id: 0,
+      createdAt: "",
+      updatedAt: "",
+      active: false,
+      username: "",
+      email: "",
+      name: "",
+      surname: "",
+      password: "",
+      receiveNotifications: false,
+      signature: "",
+      role: null,
+      company: null,
 
-      signature:'',
+      roles: [],
+      companies: [],
+
       signatureChanged:false,
+      saving:false,
     }
+    this.setData.bind(this);
+    this.storageLoaded.bind(this);
+  }
+
+  storageLoaded(props){
+    return !props.rolesData.loading &&
+    !props.companiesData.loading
   }
 
   componentWillReceiveProps(props){
-    if(!sameStringForms(props.companies,this.props.companies)){
-      this.setState({companies:toSelArr(props.companies)})
-    }
-    if(!this.props.companiesLoaded&&props.companiesLoaded){
-      let companies = toSelArr(props.companies);
-      this.setState({companies,company:companies.length===0 ? null :companies[0]});
+    if ((this.storageLoaded(props) && !this.storageLoaded(this.props))
+        ||
+        (this.props.match.params.id !== props.match.params.id)){
+      this.setData(props);
     }
   }
 
   componentWillMount(){
-    if(!this.props.companiesActive){
-      this.props.storageCompaniesStart();
+    if(this.storageLoaded(this.props)){
+      this.setData(this.props);
     }
-    let companies = toSelArr(this.props.companies);
-    this.setState({companies,company:companies.length===0 ? null :companies[0]});
+  }
+
+  setData(props){
+    if( props.rolesData.data && props.companiesData.data ){
+      const roles = toSelArr(props.rolesData.data.roles);
+      const companies = toSelArr(props.companiesData.data.companies);
+
+      this.setState({
+        roles,
+        companies,
+        loading: false,
+      })
+    }
   }
 
   render(){
@@ -63,7 +75,7 @@ class UserAdd extends Component{
             <Label for="role">Role</Label>
             <Select
               styles={selectStyle}
-              options={roles.filter( (role) => role.value <= this.props.role )}
+              options={this.state.roles /*roles.filter( (role) => role.value <= this.props.role )*/}
               value={this.state.role}
               onChange={role => this.setState({ role })}
               />
@@ -130,23 +142,44 @@ class UserAdd extends Component{
             <Input type="textarea" name="signature" id="signature" placeholder="Enter signature" value={this.state.signature} onChange={(e)=>this.setState({signature:e.target.value,signatureChanged:true})} />
           </FormGroup>
 
-              <Button className="btn" disabled={this.state.saving || this.state.companies.length===0 || !isEmail(this.state.email) || this.state.password.length < 6 } onClick={()=>{
-                  this.setState({saving:true});                  
-                }}>{this.state.saving?'Adding...':'Add user'}</Button>
+          <Button
+            className="btn"
+            disabled={this.state.saving || (this.state.companies ? this.state.companies.length === 0 : false) || !isEmail(this.state.email) || this.state.password.length < 6 }
+            onClick={this.addUser.bind(this)}
+            >
+            {this.state.saving?'Adding...':'Add user'}
+          </Button>
 
-              {this.props.close &&
-              <Button className="btn-link"
-                onClick={()=>{this.props.close()}}>Cancel</Button>
-              }
+          {this.props.close &&
+          <Button className="btn-link"
+            onClick={()=>{this.props.close()}}>Cancel</Button>
+          }
       </div>
     );
   }
+
+  addUser(){
+      this.setState({saving:true});
+      this.props.registerUser({ variables: {
+        active: this.state.active,
+        username: this.state.username,
+        email: this.state.email,
+        name: this.state.name,
+        surname: this.state.surname,
+        password: this.state.password,
+        receiveNotifications: this.state.receiveNotifications,
+        signature: (this.state.signature ? this.state.signature : null),
+        roleId: this.state.role.id,
+        companyId: this.state.company.id,
+      } }).then( ( response ) => {
+        const { client } = this.props;
+        const allUsers = client.readQuery({query: GET_USERS}).users;
+        let newUser = {...response.data.registerUser,  __typename: "User"}
+        client.writeQuery({ query: GET_USERS, data: {users: [...allUsers, newUser]} });
+        this.props.history.push('/helpdesk/settings/users/' + newUser.id)
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+      this.setState({saving: false});
+  }
 }
-
-const mapStateToProps = ({ storageCompanies, userReducer}) => {
-  const { companiesActive, companies, companiesLoaded } = storageCompanies;
-  const role = userReducer.userData ? userReducer.userData.role.value : 0;
-  return { companiesActive, companies, companiesLoaded, role };
-};
-
-export default connect(mapStateToProps, { storageCompaniesStart })(UserAdd);

@@ -41,7 +41,7 @@ export default class TripTypeEdit extends Component{
     if( props.tripTypeData.data ){
       const tripType = props.tripTypeData.data.tripType;
       this.setState({
-        id:tripType.id,
+        id: tripType.id,
         title: tripType.title,
         order: tripType.order,
       })
@@ -51,7 +51,7 @@ export default class TripTypeEdit extends Component{
 
 
   render(){
-    const { loading, data } = this.props.tripTypeData;
+    const { loading } = this.props.tripTypeData;
     const { client } = this.props;
 
     return (
@@ -97,7 +97,7 @@ export default class TripTypeEdit extends Component{
   deleteTripType(){
     if(window.confirm("Are you sure?")){
       const { client } = this.props;
-      
+
       this.props.deleteTripType({ variables: {
         id: this.state.id,
       } }).then( ( response ) => {
