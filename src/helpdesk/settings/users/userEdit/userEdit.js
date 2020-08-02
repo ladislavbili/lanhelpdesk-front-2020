@@ -9,7 +9,7 @@ import Checkbox from 'components/checkbox';
 
 import { REST_URL } from 'configs/restAPI';
 
-import {  GET_USERS } from '../index';
+import { GET_USERS } from '../index';
 
 
 export default class UserEdit extends Component{

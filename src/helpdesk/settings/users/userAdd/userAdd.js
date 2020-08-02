@@ -15,7 +15,7 @@ export default class UserAdd extends Component{
       id: 0,
       createdAt: "",
       updatedAt: "",
-      active: false,
+      active: true,
       username: "",
       email: "",
       name: "",
@@ -66,6 +66,12 @@ export default class UserAdd extends Component{
         loading: false,
       })
     }
+  }
+
+  cannotAddUser(){
+    let cond1 = this.state.saving || (this.state.companies ? this.state.companies.length === 0 : false)  ;
+    let cond2 = !this.state.username || !this.state.name || !this.state.surname || !isEmail(this.state.email) || this.state.password.length < 6 || !this.state.role || !this.state.company;
+    return cond1 || cond2;
   }
 
   render(){
@@ -144,7 +150,7 @@ export default class UserAdd extends Component{
 
           <Button
             className="btn"
-            disabled={this.state.saving || (this.state.companies ? this.state.companies.length === 0 : false) || !isEmail(this.state.email) || this.state.password.length < 6 }
+            disabled={this.cannotAddUser()}
             onClick={this.addUser.bind(this)}
             >
             {this.state.saving?'Adding...':'Add user'}
@@ -159,6 +165,7 @@ export default class UserAdd extends Component{
   }
 
   addUser(){
+    console.log(this.state.company);
       this.setState({saving:true});
       this.props.registerUser({ variables: {
         active: this.state.active,
