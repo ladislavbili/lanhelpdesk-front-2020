@@ -42,8 +42,8 @@ export default function UserListContainer(props){
   const { data: userData, loading: userLoading, error: userError } = useQuery(GET_USERS);
   const { data: roleData, loading: roleLoading, error: rolerError } = useQuery(GET_ROLES);
 
-  const USERS = ( userLoading || true ? [] : userData.users);
-  const ROLES = ( roleLoading || true ? [] : toSelArr(roleData.roles) );
+  const USERS = ( userLoading ? [] : userData.users);
+  const ROLES = ( roleLoading ? [] : toSelArr(roleData.roles) );
 
   // state
   const [ userFilter, setUserFilter ] = React.useState("");
@@ -91,17 +91,17 @@ export default function UserListContainer(props){
                   value={ allRolesSelected ? [{ id:'All', label: 'All'}, ...ROLES] : selectedRoles }
                   label={ "Filter users by roles" }
                   onChange={ ( role ) => {
-                    let selectedRoles = [ ...selectedRoles ];
+                    let selected = [ ...selectedRoles ];
                     if (role.id === 'All' && !allRolesSelected ){
-                        selectedRoles = [...ROLES];
+                        selected = [...ROLES];
                     } else {
-                      if ( selectedRoles.some(sr => sr.id === role.id) ){
-                        selectedRoles = selectedRoles.filter( sr => sr.id !== role.id );
+                      if ( selected.some(sr => sr.id === role.id) ){
+                        selected = selected.filter( sr => sr.id !== role.id );
                       } else {
-                        selectedRoles = [...selectedRoles, role];
+                        selected = [...selected, role];
                       }
                     }
-                    setSelectedRoles(selectedRoles);
+                    setSelectedRoles(selected);
                   } }
                   />
               </div>

@@ -1,36 +1,31 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
 import {Button } from 'reactstrap';
 import TagAdd from './tagAdd';
 import TagEdit from './tagEdit';
+import Loading from 'components/loading';
 
-import { connect } from "react-redux";
-import {storageHelpTagsStart} from '../../../redux/actions';
-import {sameStringForms} from '../../../helperFunctions';
-
-class TagList extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      tags:[],
-      tagFilter:''
-    }
+export const GET_TAGS = gql`
+query {
+  tags {
+    title
+    id
+    order
   }
+}
+`;
 
-  componentWillReceiveProps(props){
-    if(!sameStringForms(props.tags,this.props.tags)){
-      this.setState({tags:props.tags})
-    }
-  }
+export default function TagsList(props){
+    // state
+    const [ tagFilter, setTagFilter ] = React.useState("");
 
-  componentWillMount(){
-    if(!this.props.tagsActive){
-      this.props.storageHelpTagsStart();
-    }
-    this.setState({tags:this.props.tags});
-  }
+    //data
+    const { history, match } = props;
+    const { data, loading, error } = useQuery(GET_TAGS);
+    const TAGS = (loading || !data ? [] : data.tags);
 
-  render(){
     return (
       <div className="content">
         <div className="row m-0 p-0 taskList-container">
@@ -44,29 +39,29 @@ class TagList extends Component{
                   <input
                     type="text"
                     className="form-control search-text"
-                    value={this.state.tagFilter}
-                    onChange={(e)=>this.setState({tagFilter:e.target.value})}
+                    value={tagFilter}
+                    onChange={(e) => setTagFilter(e.target.value)}
                     placeholder="Search"
                     />
                 </div>
               </div>
               <Button
                 className="btn-link center-hor"
-                onClick={()=>this.props.history.push('/helpdesk/settings/tags/add')}>
+                onClick={()=>history.push('/helpdesk/settings/tags/add')}>
                 <i className="fa fa-plus p-l-5 p-r-5"/> Tag
               </Button>
             </div>
             <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
               <h2 className=" p-l-10 p-b-10 ">
-  							Tag
+  							Tags
   						</h2>
               <table className="table table-hover">
                 <tbody>
-                  {this.state.tags.filter((item)=>item.title.toLowerCase().includes(this.state.tagFilter.toLowerCase())).map((tag)=>
+                  {TAGS.filter((item)=>item.title.toLowerCase().includes(tagFilter.toLowerCase())).map((tag)=>
                     <tr
                       key={tag.id}
-                      className={"clickable" + (this.props.match.params.id === tag.id ? " active":"")}
-                      onClick={()=>this.props.history.push('/helpdesk/settings/tags/'+tag.id)}>
+                      className={"clickable" + (parseInt(match.params.id) === tag.id ? " active":"")}
+                      onClick={()=>history.push('/helpdesk/settings/tags/'+tag.id)}>
                       <td>
                         {tag.title}
                       </td>
@@ -79,21 +74,16 @@ class TagList extends Component{
           <div className="col-lg-8">
             <div className="commandbar"></div>
             {
-              this.props.match.params.id && this.props.match.params.id==='add' && <TagAdd />
+              match.params.id && match.params.id==='add' && <TagAdd {...props} />
             }
             {
-              this.props.match.params.id && this.props.match.params.id!=='add' && this.state.tags.some((item)=>item.id===this.props.match.params.id) && <TagEdit match={this.props.match} history={this.props.history} />
+              loading && match.params.id && match.params.id!=='add' && <Loading />
+            }
+            {
+              match.params.id && match.params.id!=='add' && TAGS.some((item)=>item.id===parseInt(match.params.id)) && <TagEdit  {...{history, match}} />
             }
           </div>
         </div>
       </div>
-    );
-  }
+    )
 }
-
-const mapStateToProps = ({ storageHelpTags}) => {
-  const { tagsActive, tags } = storageHelpTags;
-  return { tagsActive, tags };
-};
-
-export default connect(mapStateToProps, { storageHelpTagsStart })(TagList);

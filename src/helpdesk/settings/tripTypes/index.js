@@ -23,9 +23,7 @@ export default function TripTypeListContainer(props){
 
   //data
   const { history, match } = props;
-  const all = useQuery(GET_TRIP_TYPES);
-  const { data, loading, error }  = all;
-  console.log(all);
+  const { data, loading, error }  = useQuery(GET_TRIP_TYPES);
 
   return (
     <div className="content">

@@ -12,7 +12,7 @@ import Checkbox from 'components/checkbox';
 
 import { REST_URL } from 'configs/restAPI';
 
-import { GET_USERS } from '../index';
+import { GET_USERS } from './index';
 
 const GET_USER = gql`
 query user($id: Int!) {
@@ -44,18 +44,18 @@ query user($id: Int!) {
 `;
 
 const UPDATE_USER = gql`
-mutation updateUser($id: Int!, $username: String, $email: String, $name: String, $surname: String, $password: String, $receiveNotifications: Boolean, $signature: String, $roleId: Int, $companyId: Int) {
+mutation updateUser($id: Int!, $username: String, $email: String, $name: String, $surname: String, $receiveNotifications: Boolean, $signature: String, $roleId: Int, $companyId: Int, $language: LanguageEnum) {
   updateUser(
     id: $id,
     username: $username,
     email: $email,
     name: $name,
     surname: $surname,
-    password: $password,
     receiveNotifications: $receiveNotifications,
     signature: $signature,
     roleId: $roleId,
     companyId: $companyId,
+    language: $language,
   ){
     id
   }
@@ -100,6 +100,10 @@ export default function UserEdit(props){
   const [updateUser, {updateData}] = useMutation(UPDATE_USER);
   const [deleteUser, {deleteData, client}] = useMutation(DELETE_USER);
 
+  const USER = ( userLoading ? [] : userData.user);
+  const ROLES = ( rolesLoading ? [] : toSelArr(rolesData.roles) );
+  const COMPANIES = ( companiesLoading ? [] : toSelArr(companiesData.companies) );
+
   //state
   const [ createdAt, setCreatedAt ] = React.useState(0);
   const [ updatedAt, setUpdatedAt ] = React.useState(0);
@@ -113,6 +117,7 @@ export default function UserEdit(props){
   const [ signature, setSignature ] = React.useState("");
   const [ role, setRole ] = React.useState({});
   const [ company, setCompany ] = React.useState({});
+  const [ language, setLanguage ] = React.useState("");
   const [ saving, setSaving ] = React.useState(false);
   const [ deletingUser, setDeletingUser ] = React.useState(false);
   const [ deactivatingUser, setDeactivatingUser ] = React.useState(false);
@@ -122,18 +127,19 @@ export default function UserEdit(props){
   // sync
   React.useEffect( () => {
     if (!userLoading){
-      setCreatedAt(userData.user.createdAt);
-      setUpdatedAt(userData.user.updatedAt);
-      setActive(userData.user.active);
-      setUsername(userData.user.username);
-      setEmail(userData.user.email);
-      setName(userData.user.name);
-      setSurname(userData.user.surname);
-      setFullName(userData.user.fullName);
-      setReceiveNotifications(userData.user.receiveNotifications);
-      setSignature((userData.user.signature ? userData.user.signature : `${userData.user.name} ${userData.user.surname}, ${userData.user.company.title}`));
-      setRole(userData.user.role);
-      setCompany(userData.user.company);
+      setCreatedAt(USER.createdAt);
+      setUpdatedAt(USER.updatedAt);
+      setActive(USER.active);
+      setUsername(USER.username);
+      setEmail(USER.email);
+      setName(USER.name);
+      setSurname(USER.surname);
+      setFullName(USER.fullName);
+      setReceiveNotifications(USER.receiveNotifications);
+      setSignature((USER.signature ? USER.signature : `${USER.name} ${USER.surname}, ${USER.company.title}`));
+      setRole( { ...USER.role, label: USER.role.title, value: USER.role.id} );
+      setCompany(  { ...USER.company, label: USER.company.title, value: USER.company.id} );
+      setLanguage(USER.language);
       }
   }, [userLoading]);
 
@@ -146,7 +152,6 @@ export default function UserEdit(props){
     setSaving( true );
     updateUser({ variables: {
       id: parseInt(match.params.id),
-      active,
       username,
       email,
       name,
@@ -155,6 +160,7 @@ export default function UserEdit(props){
       signature,
       roleId: role.id,
       companyId: company.id,
+      language,
     } }).then( ( response ) => {
       const allUsers = client.readQuery({query: GET_USERS}).users;
       let newUser = {
@@ -219,7 +225,7 @@ export default function UserEdit(props){
           <Select
             styles={ selectStyle }
             isDisabled={ true }
-            options={ rolesData.roles }
+            options={ ROLES }
             value={ role }
             onChange={ role => setRole(role) }
             />
@@ -253,7 +259,7 @@ export default function UserEdit(props){
           <Select
             styles={ selectStyle }
             isDisabled={ true }
-            options={ companiesData.companies }
+            options={ COMPANIES }
             value={ company }
             onChange={ e => this.setCompany( e ) }
             />
@@ -275,7 +281,7 @@ export default function UserEdit(props){
           <Button
             className="btn m-r-5"
             disabled={ saving || ( companiesData.companies ? companiesData.companies.length === 0 : false) || !isEmail(email) }
-            onClick={ updateUser }
+            onClick={ updateUserFunc }
             >
             { saving ? 'Saving user...' : 'Save user' }
           </Button>

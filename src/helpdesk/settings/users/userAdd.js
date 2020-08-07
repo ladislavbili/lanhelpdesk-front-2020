@@ -9,7 +9,7 @@ import {selectStyle} from "configs/components/select";
 import {isEmail, sameStringForms, toSelArr} from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 
-import {  GET_USERS } from '../index';
+import {  GET_USERS } from './index';
 
 const ADD_USER = gql`
 mutation registerUser($username: String!, $email: String!, $name: String!, $surname: String!, $password: String!, $receiveNotifications: Boolean, $signature: String, $roleId: Int!, $companyId: Int!) {
@@ -60,12 +60,12 @@ query {
 export default function UserAddContainer(props){
   // data & queries
   const { history, match } = props;
-  const all = useQuery(GET_ROLES);
-  const { data: rolesData, loading: rolesLoading, error: er1 } = all;
+  const { data: rolesData, loading: rolesLoading, error: er1 } = useQuery(GET_ROLES);
   const { data: companiesData, loading: companiesLoading, error: er2 } = useQuery(GET_COMPANIES);
   const [registerUser, {client}] = useMutation(ADD_USER);
 
-  console.log(all);
+  const ROLES = ( rolesLoading ? [] : toSelArr(rolesData.roles) );
+  const COMPANIES = ( companiesLoading ? [] : toSelArr(companiesData.companies) );
 
   //state
   const [ createdAt, setCreatedAt ] = React.useState(0);
@@ -79,8 +79,9 @@ export default function UserAddContainer(props){
   const [ receiveNotifications, setReceiveNotifications ] = React.useState(false);
   const [ signature, setSignature ] = React.useState("");
   const [ signatureChanged, setSignatureChanged ] = React.useState(false);
-  const [ role, setRole ] = React.useState({});
-  const [ company, setCompany ] = React.useState({});
+  const [ role, setRole ] = React.useState(null);
+  const [ company, setCompany ] = React.useState(null);
+  const [ language, setLanguage ] = React.useState("sk");
   const [ saving, setSaving ] = React.useState(false);
 
   const addUser = () => {
@@ -96,6 +97,7 @@ export default function UserAddContainer(props){
       signature: (signature ? signature : `${name} ${surname}, ${company.title}`),
       roleId: role.id,
       companyId: company.id,
+      language,
     } }).then( ( response ) => {
       const allUsers = client.readQuery({query: GET_USERS}).users;
       let newUser = {...response.data.registerUser,  __typename: "User"}
@@ -108,7 +110,7 @@ export default function UserAddContainer(props){
   }
 
   const cannotAddUser = () => {
-    let cond1 = saving || (companiesData.companies ? companiesData.companies.length === 0 : false)  ;
+    let cond1 = saving || (COMPANIES ? COMPANIES.length === 0 : false) ;
     let cond2 = !username || !name || !surname || !isEmail(email) || password.length < 6 || !role || !company;
     return cond1 || cond2;
   }
@@ -119,7 +121,7 @@ export default function UserAddContainer(props){
           <Label for="role">Role</Label>
           <Select
             styles={ selectStyle }
-            options={ rolesData ? rolesData.roles : [] }
+            options={ ROLES }
             value={ role }
             onChange={ role => setRole(role) }
             />
@@ -174,7 +176,7 @@ export default function UserAddContainer(props){
           <Label for="company">Company*</Label>
           <Select
             styles={ selectStyle }
-            options={ companiesData ? companiesData.companies : [] }
+            options={ COMPANIES }
             value={ company }
             onChange={ company => {
               if (signatureChanged){
@@ -204,7 +206,7 @@ export default function UserAddContainer(props){
 
         <Button
           className="btn"
-          disabled={ cannotAddUser }
+          disabled={ cannotAddUser() }
           onClick={ addUser }
           >
           { saving ? 'Adding...' : 'Add user' }

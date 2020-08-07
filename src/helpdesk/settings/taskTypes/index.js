@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
@@ -17,15 +17,13 @@ query {
 }
 `;
 
-export default function TaskTypeListContainer(props){
+export default function TaskTypeList(props){
   // state
   const [ taskTypeFilter, setTaskTypeFilter ] = React.useState("");
 
   //data
   const { history, match } = props;
-  const all = useQuery(GET_TASK_TYPES);
-  const { data, loading, error } = all;
-  console.log(all);
+  const { data, loading, error } = useQuery(GET_TASK_TYPES);
 
   return (
     <div className="content">
@@ -60,7 +58,7 @@ export default function TaskTypeListContainer(props){
               <tbody>
                 { (loading || !data ? [] : data.taskTypes).filter((item)=>item.title.toLowerCase().includes(taskTypeFilter.toLowerCase())).map((taskType)=>
                   <tr key={taskType.id}
-                    className={"clickable" + (match.params.id === taskType.id ? " active":"")}
+                    className={"clickable" + (parseInt(match.params.id) === taskType.id ? " active":"")}
                     onClick={()=>history.push('/helpdesk/settings/taskTypes/'+taskType.id)}>
                     <td>
                       {taskType.title}

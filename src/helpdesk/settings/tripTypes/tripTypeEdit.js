@@ -89,7 +89,7 @@ export default function TripTypeEdit(props){
        id: parseInt(match.params.id),
      } }).then( ( response ) => {
        const allTripTypes = client.readQuery({query: GET_TRIP_TYPES}).tripTypes;
-       client.writeQuery({ query: GET_TRIP_TYPES, data: {tripTypes: allTripTypes.filter( tripType => tripType.id !== match.params.id,)} });
+       client.writeQuery({ query: GET_TRIP_TYPES, data: {tripTypes: allTripTypes.filter( tripType => tripType.id !== parseInt(match.params.id),)} });
        history.goBack();
      }).catch( (err) => {
        console.log(err.message);
