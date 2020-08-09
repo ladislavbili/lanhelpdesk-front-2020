@@ -1,26 +1,31 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import {Button } from 'reactstrap';
 import ProjectAdd from './projectAdd';
-import { connect } from "react-redux";
 import ProjectEdit from './projectEdit';
-import {storageHelpProjectsStart} from '../../../redux/actions';
+import Loading from 'components/loading';
 
-class ProjectList extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      projectFilter:''
-    }
+export const GET_PROJECTS = gql`
+query {
+  projects {
+    title
+    id
+    order
   }
+}
+`;
 
-  componentWillMount(){
-    if(!this.props.projectsActive){
-      this.props.storageHelpProjectsStart();
-    }
-  }
+export default function ProjectsList(props){
+    // state
+    const [ projectFilter, setProjectFilter ] = React.useState("");
 
+    //data
+    const { history, match } = props;
+    const { data, loading, error } = useQuery(GET_PROJECTS);
+    const PROJECTS = (loading || !data ? [] : data.projects);
 
-  render(){
     return (
       <div className="content">
         <div className="row m-0 p-0 taskList-container">
@@ -34,15 +39,15 @@ class ProjectList extends Component{
                   <input
                     type="text"
                     className="form-control search-text"
-                    value={this.state.projectFilter}
-                    onChange={(e)=>this.setState({projectFilter:e.target.value})}
+                    value={projectFilter}
+                    onChange={(e)=>setProjectFilter(e.target.value)}
                     placeholder="Search"
                     />
                 </div>
               </div>
               <Button
                 className="btn-link center-hor"
-                onClick={()=>this.props.history.push('/helpdesk/settings/projects/add')}>
+                onClick={()=>history.push('/helpdesk/settings/projects/add')}>
                 <i className="fa fa-plus p-l-5 p-r-5"/> Project
               </Button>
             </div>
@@ -52,16 +57,16 @@ class ProjectList extends Component{
   						</h2>
               <table className="table table-hover">
                 <tbody>
-                  {this.props.projects.filter((project)=>{
-										if(this.props.role === 3){
+                  {PROJECTS.filter((project)=>{
+										//if(this.props.role === 3){
 											return true;
-										}
+									/*	}
 										let permission = project.permissions.find((permission)=>permission.user===this.props.currUserID);
-										return permission && permission.read;
-									}).filter((item)=>item.title.toLowerCase().includes(this.state.projectFilter.toLowerCase())).map((project)=>
+										return permission && permission.read;*/
+									}).filter((item)=>item.title.toLowerCase().includes(projectFilter.toLowerCase())).map((project)=>
                     <tr key={project.id}
-                      className={"clickable" + (this.props.match.params.id === project.id ? " active":"")}
-                      onClick={()=>this.props.history.push('/helpdesk/settings/projects/'+project.id)}>
+                      className={"clickable" + (parseInt(match.params.id) === project.id ? " active":"")}
+                      onClick={()=>history.push('/helpdesk/settings/projects/'+project.id)}>
                       <td>
                         {project.title}
                       </td>
@@ -74,24 +79,16 @@ class ProjectList extends Component{
             <div className="col-lg-8">
               <div className="commandbar"></div>
               {
-                this.props.match.params.id && this.props.match.params.id==='add' && <ProjectAdd />
+                match.params.id && match.params.id==='add' && <ProjectAdd {...props}/>
               }
               {
-                this.props.match.params.id && this.props.match.params.id!=='add' && this.props.projects.some((item)=>item.id===this.props.match.params.id) && <ProjectEdit match={this.props.match} history={this.props.history} item={{id:this.props.match.params.id}} />
+                loading && match.params.id && match.params.id!=='add' && <Loading />
+              }
+              {
+              match.params.id && match.params.id!=='add' && PROJECTS.some((item)=>item.id===match.params.id) && <ProjectEdit {...{history, match}} />
               }
             </div>
           </div>
         </div>
     );
-  }
 }
-
-
-const mapStateToProps = ({ storageHelpProjects, userReducer }) => {
-  const { projectsActive, projects } = storageHelpProjects;
-  const role = userReducer.userData ? userReducer.userData.role.value : 0;
-  const currUserID = userReducer.id ;
-  return { projectsActive, projects, role, currUserID };
-};
-
-export default connect(mapStateToProps, { storageHelpProjectsStart })(ProjectList);

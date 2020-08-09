@@ -1,117 +1,218 @@
-import React, { Component } from 'react';
-import { connect } from "react-redux";
-import { Button, FormGroup, Label,Input, Alert, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
+import React from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+import { Button, FormGroup, Label,Input, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
+
+import { toSelArr } from 'helperFunctions';
 import Select from 'react-select';
+import {selectStyle} from "configs/components/select";
+import Loading from 'components/loading';
 import Switch from "react-switch";
-//import Checkbox from '../../../components/checkbox';
 
-import { rebase, database } from '../../../index';
-import { snapshotToArray, toSelArr } from '../../../helperFunctions';
-import { selectStyle } from "configs/components/select";
-import {storageHelpPricelistsStart,storageHelpPricesStart,storageHelpTaskTypesStart, storageHelpTripTypesStart} from '../../../redux/actions';
+import {  GET_PRICELISTS } from './index';
 
-class PriceEdit extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      id: "",
-      pricelistName:'',
-      afterHours:0,
-      margin:0,
-      marginExtra:0,
-      def:false,
-      loading:true,
-      saving:false,
-      taskTypes:[],
-      tripTypes:[],
-
-      wasDef:false,
-
-      companies:[],
-      openEditCompanies:false,
-
-    }
-    this.setData.bind(this);
-    this.assignDefRandomly.bind(this);
-    this.deletePricelist.bind(this);
-  }
-
-  storageLoaded(props){
-    return props.pricesLoaded && props.taskTypesLoaded && props.pricelistsLoaded && props.tripTypesLoaded
-  }
-
-  componentWillReceiveProps(props){
-    if(this.storageLoaded(props) && !this.storageLoaded(this.props)){
-      this.setData(props);
-    }
-    if((this.props.match && props.match && this.props.match.params.id !== props.match.params.id) ||
-      (this.props.listId !== props.listId) ){
-      this.setState({loading:true})
-      if(this.storageLoaded(props)){
-        this.setData(props);
+const GET_PRICELIST = gql`
+query pricelist($id: Int!) {
+  pricelist (
+    id: $id
+  ) {
+    id
+    title
+    order
+    afterHours
+    def
+    materialMargin
+    materialMarginExtra
+    prices {
+      id
+      type
+      price
+      taskType {
+        id
+        title
+      }
+      tripType {
+        id
+        title
       }
     }
+    companies {
+      id
+      title
+    }
   }
+}
+`;
 
-  componentWillMount(){
-
-    if(!this.props.pricelistsActive){
-      this.props.storageHelpPricelistsStart();
-    }
-    if(!this.props.pricesActive){
-      this.props.storageHelpPricesStart();
-    }
-    if(!this.props.taskTypesActive){
-      this.props.storageHelpTaskTypesStart();
-    }
-    if(!this.props.tripTypesActive){
-      this.props.storageHelpTripTypesStart();
-    }
-    if(this.storageLoaded(this.props)){
-      this.setData(this.props);
-    };
+const UPDATE_PRICELIST = gql`
+mutation updatePricelist($id: Int!, $title: String!, $order: Int!, $afterHours: Int!, $def: Boolean!, $materialMargin: Int!, $materialMarginExtra: Int!, $prices: [UpdatePriceInput]! ) {
+  updatePricelist(
+    id: $id,
+    title: $title,
+    order: $order,
+    afterHours: $afterHours,
+    def: $def,
+    materialMargin: $materialMargin,
+    materialMarginExtra: $materialMarginExtra,
+    prices: $prices,
+  ){
+    id
+    title
+    order
+    def
   }
+}
+`;
 
-  setData(props){
-    let id = (props.listId ? props.listId : props.match.params.id);
-    let pricelist = props.pricelists.find((pricelist)=>pricelist.id===id);
-    let prices = props.prices;
-    let taskTypes = props.taskTypes;
-    let tripTypes = props.tripTypes;
+export const DELETE_PRICELIST = gql`
+mutation deletePricelist($id: Int!, $newDefId: Int!, $newId: Int!) {
+  deletePricelist(
+    id: $id,
+    newDefId: $newDefId,
+    newId: $newId,
+  ){
+    id
+  }
+}
+`;
 
-    taskTypes = taskTypes.map((type)=>{
-      let newType={...type};
-      newType.price= prices.find((item)=>item.pricelist===id && item.type === newType.id);
-      if(newType.price===undefined){
-          newType.price={price:0};
+export default function PricelistEdit(props){
+  //data
+  const { history, match } = props;
+  const { data, loading, refetch } = useQuery(GET_PRICELIST, { variables: {id: parseInt(props.match.params.id)} });
+  const [updatePricelist, {updateData}] = useMutation(UPDATE_PRICELIST);
+  const [deletePricelist, {deleteData, client}] = useMutation(DELETE_PRICELIST);
+  const allPricelists = toSelArr(client.readQuery({query: GET_PRICELISTS}).pricelists);
+  const filteredPricelists = allPricelists.filter( pricelist => pricelist.id !== parseInt(match.params.id) );
+  const theOnlyOneLeft = allPricelists.length === 0;
+
+  //state
+  const [ title, setTitle ] = React.useState("");
+  const [ order, setOrder ] = React.useState(0);
+  const [ afterHours, setAfterHours ] = React.useState(0);
+  const [ def, setDef ] = React.useState(false);
+  const [ materialMargin, setMaterialMargin ] = React.useState(0);
+  const [ materialMarginExtra, setMaterialMarginExtra ] = React.useState(0);
+  const [ prices, setPrices ] = React.useState([]);
+  const [ companies, setCompanies ] = React.useState([]);
+
+  const [ newPricelist, setNewPricelist ] = React.useState(null);
+  const [ newDefPricelist, setNewDefPricelist ] = React.useState(null);
+  const [ choosingNewPricelist, setChooseingNewPricelist ] = React.useState(false);
+
+  const [ saving, setSaving ] = React.useState(false);
+
+  // sync
+  React.useEffect( () => {
+      if (!loading){
+        setTitle(data.pricelist.title);
+        setOrder(data.pricelist.order);
+        setAfterHours(data.pricelist.afterHours);
+        setDef(data.pricelist.def);
+        setMaterialMargin(data.pricelist.materialMargin);
+        setMaterialMarginExtra(data.pricelist.materialMarginExtra);
+        setPrices(data.pricelist.prices);
+        setCompanies(data.pricelist.companies);
       }
-      return newType;
-    });
+  }, [loading]);
 
-    tripTypes = tripTypes.map((type)=>{
-      let newType={...type};
-      newType.price= prices.find((item)=>item.pricelist===id && item.type === newType.id);
-      if(newType.price===undefined){
-          newType.price={price:0};
+  React.useEffect( () => {
+      refetch({ variables: {id: parseInt(match.params.id)} });
+  }, [match.params.id]);
+
+
+  // functions
+  const updatePricelistFunc = () => {
+    setSaving( true );
+    let newPrices = prices.map(p => {
+      return {id: p.id, price: (p.price === "" ? 0 : parseFloat(p.price))}
+    });
+    updatePricelist({ variables: {
+      id: parseInt(match.params.id),
+      title,
+      order: (order !== '' ? parseInt(order) : 0),
+      afterHours: (afterHours !== '' ? parseInt(afterHours) : 0),
+      def,
+      materialMargin: (materialMargin !== '' ? parseInt(materialMargin) : 0),
+      materialMarginExtra: (materialMarginExtra !== '' ? parseInt(materialMarginExtra) : 0),
+      prices: newPrices,
+    } }).then( ( response ) => {
+      let updatedPricelist = {...response.data.updatePricelist, __typename: "Pricelist"};
+      let newPL = filteredPricelists;
+      if (def) {
+        newPL = newPL.map(pl => ({...pl, def: false}));
       }
-      return newType;
+      client.writeQuery({ query: GET_PRICELISTS, data: {pricelists: [...newPL, updatedPricelist ] } });
+    }).catch( (err) => {
+      console.log(err.message);
     });
 
-    this.setState({
-      id,
-      pricelistName:pricelist.title,
-      afterHours:pricelist.afterHours,
-      margin: pricelist.materialMargin,
-      marginExtra: pricelist.materialMarginExtra,
-      taskTypes,
-      tripTypes,
-      loading:false,
-      def: pricelist.def === true,
-      wasDef: pricelist.def === true,
+     setSaving( false );
+  /*
+    this.state.taskTypes.concat(this.state.tripTypes).filter((item)=>item.price.id!==undefined).map((type)=>
+      rebase.updateDoc('/help-prices/'+type.price.id, {price:parseFloat(type.price.price === "" ? "0": type.price.price)})
+    );
+
+    this.state.taskTypes.filter((item)=>item.price.id===undefined).map((type)=>
+      rebase.addToCollection('/help-prices', {pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price)}).then((response)=>{
+        let index = this.state.taskTypes.findIndex((item)=>item.id===type.id);
+        let newTaskTypes=[...this.state.taskTypes];
+        let newTaskType = {...newTaskTypes[index]};
+        newTaskType.price={pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price), id:response.id};
+        newTaskTypes[index] = newTaskType;
+        this.setState({taskTypes:newTaskTypes});
+      })
+    )
+    this.state.tripTypes.filter((item)=>item.price.id===undefined).map((type)=>
+      rebase.addToCollection('/help-prices', {pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price)}).then((response)=>{
+        let index = this.state.tripTypes.findIndex((item)=>item.id===type.id);
+        let newTripTypes=[...this.state.tripTypes];
+        let newTripType = {...newTripTypes[index]};
+        newTripType.price={pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price), id:response.id};
+        newTripTypes[index] = newTripType;
+        this.setState({tripTypes:newTripTypes});
+      })
+    )
+
+
+    rebase.updateDoc('/help-pricelists/'+(this.props.listId ? this.props.listId : this.props.match.params.id),
+    {
+      title:this.state.pricelistName,
+      def:this.state.def,
+      afterHours:parseFloat(this.state.afterHours===''?'0':this.state.afterHours),
+      materialMargin:parseFloat(this.state.margin===''?'0':this.state.margin),
+      materialMarginExtra:parseFloat(this.state.marginExtra===''?'0':this.state.marginExtra)
+    })
+      .then(()=>
+        this.setState({saving:false}, () => {if (this.props.changedName) this.props.changedName(this.state.pricelistName)})
+      ); */
+}
+
+const deletePricelistFunc = () => {
+  setChooseingNewPricelist(false);
+
+  if(window.confirm("Are you sure?")){
+    deletePricelist({ variables: {
+      id: parseInt(match.params.id),
+      newDefId: ( newDefPricelist ? parseInt(newDefPricelist.id) : null ),
+      newId: ( newPricelist ? parseInt(newPricelist.id) : null ),
+    } }).then( ( response ) => {
+      if (def) {
+        client.writeQuery({ query: GET_PRICELISTS, data: {pricelists: filteredPricelists.map(pl => {return {...pl, def: (pl.id === parseInt(newDefPricelist.id)) }} )} });
+      } else {
+        client.writeQuery({ query: GET_PRICELISTS, data: {pricelists: filteredPricelists} });
+      }
+      history.push('/helpdesk/settings/pricelists/add');
+    }).catch( (err) => {
+      console.log(err.message);
+      console.log(err);
     });
   }
+};
 
-  deletePricelistPopup(){
+
+  /*deletePricelistPopup(){
     if(window.confirm("Are you sure you want to delete this pricelist?")){
       database.collection('companies').where("pricelist", "==", (this.props.match ? this.props.match.params.id : this.props.listId)).get()
 			.then((data)=>{
@@ -139,246 +240,162 @@ class PriceEdit extends Component{
       this.props.history.goBack();
     }
   }
+*/
 
-  assignDefRandomly(){
-    let newDefPricelist = this.props.pricelists.find((pricelist)=>pricelist.id !== (this.props.match ? this.props.match.params.id : this.props.listId));
-    if(newDefPricelist){
-      rebase.updateDoc('/help-pricelists/'+newDefPricelist.id,{def:true});
-    }
+  if (loading) {
+    return <Loading />
   }
 
-  render(){
-    return (
-      <div>
-          {
-            this.state.loading &&
-            <Alert color="success">
-              Loading data...
-            </Alert>
-          }
+  return (
+    <div>
+        <label>
+          <Switch
+            checked={def}
+            onChange={ () => setDef(!def) }
+            height={22}
+            checkedIcon={<span className="switchLabel">YES</span>}
+            uncheckedIcon={<span className="switchLabel">NO</span>}
+            onColor={"#0078D4"} />
+          <span className="m-l-10">Default</span>
+        </label>
 
-          <label>
-            <Switch
-              checked={this.state.def}
-              onChange={()=>{
-                this.setState({def:!this.state.def})
-              }}
-              height={22}
-              checkedIcon={<span className="switchLabel">YES</span>}
-              uncheckedIcon={<span className="switchLabel">NO</span>}
-              onColor={"#0078D4"} />
-            <span className="m-l-10">Default</span>
-          </label>
+        <FormGroup className="row m-b-10">
+          <div className="m-r-10 w-20">
+            <Label for="name">Pricelist name</Label>
+          </div>
+          <div className="flex">
+            <Input type="text" name="name" id="name" placeholder="Enter pricelist name" value={title} onChange={ (e) => setTitle(e.target.value) }/>
+          </div>
+        </FormGroup>
 
+        <h3>Ceny úloh</h3>
+        <div className="p-t-10 p-b-10">
+          {prices.filter(item => item.type === "TaskType" )
+            .map((item, i) =>
+            <FormGroup key={i} className="row m-b-10">
+              <div className="m-r-10 w-20">
+                <Label for={item.type}>{item.taskType ? item.taskType.title : "Unnamed"}</Label>
+              </div>
+              <div className="flex">
+                <Input
+                  type="text"
+                  name={item.type}
+                  id={item.type}
+                  placeholder="Enter price"
+                  value={item.price}
+                  onChange={(e)=>{
+                    let newPrices = prices.map(p => {
+                      if (p.id === item.id){
+                        return {...p, price: e.target.value.replace(",", ".")}
+                      } else {
+                        return {...p};
+                      }
+                    });
+                    setPrices(newPrices);
+                  }} />
+              </div>
+            </FormGroup>
+          )}
+        </div>
+
+        <h3>Ceny Výjazdov</h3>
+        <div className="p-t-10 p-b-10">
+          {prices.filter(item => item.type === "TripType" )
+            .map((item, i) =>
+            <FormGroup key={i} className="row m-b-10">
+              <div className="m-r-10 w-20">
+                <Label for={item.type}>{item.tripType ? item.tripType.title : "Unnamed"}</Label>
+              </div>
+              <div className="flex">
+                <Input type="text" name={item.type} id={item.type} placeholder="Enter price" value={item.price} onChange={(e)=>{
+                  let newPrices = prices.map(p => {
+                    if (p.id === item.id){
+                      return {...p, price: e.target.value.replace(",", ".")}
+                    } else {
+                      return {...p};
+                    }
+                  });
+                  setPrices(newPrices);
+                  }} />
+              </div>
+            </FormGroup>
+          )}
+        </div>
+
+        <h3>Všeobecné prirážky</h3>
+        <div className="p-t-10 p-b-10">
           <FormGroup className="row m-b-10">
             <div className="m-r-10 w-20">
-              <Label for="name">Pricelist name</Label>
+              <Label for="afterPer">After hours percentage</Label>
             </div>
             <div className="flex">
-              <Input
-                type="text"
-                name="name"
-                id="name"
-                placeholder="Enter pricelist name"
-                value={this.state.pricelistName}
-                onChange={(e) => this.setState({pricelistName:e.target.value})} />
+              <Input type="text" name="afterPer" id="afterPer" placeholder="Enter after hours percentage" value={afterHours} onChange={(e)=>setAfterHours(e.target.value.replace(",", "."))} />
             </div>
           </FormGroup>
+          <FormGroup className="row m-b-10">
+            <div className="m-r-10 w-20">
+              <Label for="materMarg">Materials margin percentage 50-</Label>
+            </div>
+            <div className="flex">
+              <Input type="text" name="materMarg" id="materMarg" placeholder="Enter materials margin percentage" value={materialMargin} onChange={(e)=>setMaterialMargin(e.target.value.replace(",", "."))} />
+            </div>
+          </FormGroup>
+          <FormGroup className="row m-b-10">
+            <div className="m-r-10 w-20">
+              <Label for="materMarg+">Materials margin percentage 50+</Label>
+            </div>
+            <div className="flex">
+              <Input type="text" name="materMarg+" id="materMarg+" placeholder="Enter materials margin percentage" value={materialMarginExtra} onChange={(e)=>setMaterialMarginExtra(e.target.value.replace(",", "."))}/>
+            </div>
+          </FormGroup>
+        </div>
 
-          <h3>Ceny úloh</h3>
-          <div className="p-t-10 p-b-10">
-            {
-              this.state.taskTypes.map((item,index)=>
-              <FormGroup key={index} className="row m-b-10">
-                <div className="m-r-10 w-20">
-                  <Label for={item.title}>{item.title}</Label>
-                </div>
-                <div className="flex">
-                  <Input type="text" name={item.title} id={item.title} placeholder="Enter price" value={item.price.price} onChange={(e)=>{
-                      let newTaskTypes=[...this.state.taskTypes];
-                      let newTaskType = {...newTaskTypes[index]};
-                      newTaskType.price.price=e.target.value;
-                      newTaskTypes[index] = newTaskType;
-                      this.setState({taskTypes:newTaskTypes});
-                    }} />
-                </div>
+        <Modal isOpen={choosingNewPricelist}>
+          <ModalHeader>
+            Please choose a pricelist to replace this one
+          </ModalHeader>
+          <ModalBody>
+            <FormGroup>
+              { def && <Label>A replacement pricelist</Label> }
+              <Select
+                styles={selectStyle}
+                options={filteredPricelists}
+                value={newPricelist}
+                onChange={s => setNewPricelist(s)}
+                />
+            </FormGroup>
+
+            {def &&
+              <FormGroup>
+                <Label>New default pricelist</Label>
+                <Select
+                  styles={selectStyle}
+                  options={filteredPricelists}
+                  value={newDefPricelist}
+                  onChange={s => setNewDefPricelist(s)}
+                  />
               </FormGroup>
-              )
             }
-          </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button className="btn-link mr-auto"onClick={() => setChooseingNewPricelist(false)}>
+              Cancel
+            </Button>
+            <Button className="btn ml-auto" disabled={!newPricelist || (def ? !newDefPricelist : false)} onClick={deletePricelistFunc}>
+              Complete deletion
+            </Button>
+          </ModalFooter>
+        </Modal>
 
-          <h3>Ceny Výjazdov</h3>
-          <div className="p-t-10 p-b-10">
-            {
-              this.state.tripTypes.map((item,index)=>
-              <FormGroup key={index} className="row m-b-10">
-                <div className="m-r-10 w-20">
-                  <Label for={item.title}>{item.title}</Label>
-                </div>
-                <div className="flex">
-                  <Input type="text" name={item.title} id={item.title} placeholder="Enter price" value={item.price.price} onChange={(e)=>{
-                      let newTripTypes=[...this.state.tripTypes];
-                      let newTripType = {...newTripTypes[index]};
-                      newTripType.price.price=e.target.value;
-                      newTripTypes[index] = newTripType;
-                      this.setState({tripTypes:newTripTypes});
-                    }} />
-                </div>
-              </FormGroup>
-              )
-            }
-          </div>
+        <div className="row">
+            <Button
+              className="btn"
+              disabled={saving}
+              onClick={updatePricelistFunc}>{saving?'Saving prices...':'Save prices'}</Button>
 
-          <h3>Všeobecné prirážky</h3>
-          <div className="p-t-10 p-b-10">
-            <FormGroup className="row m-b-10">
-              <div className="m-r-10 w-20">
-                <Label for="afterPer">After hours percentage</Label>
-              </div>
-              <div className="flex">
-                <Input type="text" name="afterPer" id="afterPer" placeholder="Enter after hours percentage" value={this.state.afterHours} onChange={(e)=>this.setState({afterHours:e.target.value})} />
-              </div>
-            </FormGroup>
-            <FormGroup className="row m-b-10">
-              <div className="m-r-10 w-20">
-                <Label for="materMarg">Materials margin percentage 50-</Label>
-              </div>
-              <div className="flex">
-                <Input type="text" name="materMarg" id="materMarg" placeholder="Enter materials margin percentage" value={this.state.margin} onChange={(e)=>this.setState({margin:e.target.value})} />
-              </div>
-            </FormGroup>
-            <FormGroup className="row m-b-10">
-              <div className="m-r-10 w-20">
-                <Label for="materMarg+">Materials margin percentage 50+</Label>
-              </div>
-              <div className="flex">
-                <Input type="text" name="materMarg+" id="materMarg+" placeholder="Enter materials margin percentage" value={this.state.marginExtra} onChange={(e)=>this.setState({marginExtra:e.target.value})} />
-              </div>
-            </FormGroup>
-          </div>
-          <div className="row">
-              <Button className="btn" disabled={this.state.saving} onClick={()=>{
-                  this.setState({saving:true});
-                  if(!this.state.def && this.state.wasDef){
-                    this.setState({wasDef:false});
-                    this.assignDefRandomly();
-                  }else if(this.state.def && !this.state.wasDef){
-                    this.setState({wasDef: true});
-                    let prevDef = this.props.pricelists.find((pricelist)=>pricelist.def);
-                    if(prevDef){
-                      rebase.updateDoc('/help-pricelists/'+prevDef.id,{def:false});
-                    }
-                  }
+            <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChooseingNewPricelist(true)}>Delete price list</Button>
+        </div>
 
-                  this.state.taskTypes.concat(this.state.tripTypes).filter((item)=>item.price.id!==undefined).map((type)=>
-                    rebase.updateDoc('/help-prices/'+type.price.id, {price:parseFloat(type.price.price === "" ? "0": type.price.price)})
-                  );
-                  this.state.taskTypes.filter((item)=>item.price.id===undefined).map((type)=>
-                    rebase.addToCollection('/help-prices', {pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price)}).then((response)=>{
-                      let index = this.state.taskTypes.findIndex((item)=>item.id===type.id);
-                      let newTaskTypes=[...this.state.taskTypes];
-                      let newTaskType = {...newTaskTypes[index]};
-                      newTaskType.price={pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price), id:response.id};
-                      newTaskTypes[index] = newTaskType;
-                      this.setState({taskTypes:newTaskTypes});
-                    })
-                  )
-
-                  this.state.tripTypes.filter((item)=>item.price.id===undefined).map((type)=>
-                    rebase.addToCollection('/help-prices', {pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price)}).then((response)=>{
-                      let index = this.state.tripTypes.findIndex((item)=>item.id===type.id);
-                      let newTripTypes=[...this.state.tripTypes];
-                      let newTripType = {...newTripTypes[index]};
-                      newTripType.price={pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price), id:response.id};
-                      newTripTypes[index] = newTripType;
-                      this.setState({tripTypes:newTripTypes});
-                    })
-                  )
-
-
-                  rebase.updateDoc('/help-pricelists/'+(this.props.listId ? this.props.listId : this.props.match.params.id),
-                  {
-                    title:this.state.pricelistName,
-                    def:this.state.def,
-                    afterHours:parseFloat(this.state.afterHours===''?'0':this.state.afterHours),
-                    materialMargin:parseFloat(this.state.margin===''?'0':this.state.margin),
-                    materialMarginExtra:parseFloat(this.state.marginExtra===''?'0':this.state.marginExtra)
-                  })
-                    .then(()=>
-                      this.setState({saving:false}, () => {if (this.props.changedName) this.props.changedName(this.state.pricelistName)})
-                    );
-                }}>{this.state.saving?'Saving prices...':'Save prices'}</Button>
-
-              <Button className="btn-red m-l-5" disabled={this.state.saving || this.props.deletedList} onClick={this.deletePricelistPopup.bind(this)}>Delete price list</Button>
-          </div>
-          <Modal isOpen={this.state.openEditCompanies} >
-            <ModalHeader>Edit companies</ModalHeader>
-            <ModalBody>
-              <h4 style={{color:'#FF4500'}}>Please update these companies, they use this pricelist</h4>
-              <table className="table">
-								<thead>
-									<tr>
-                    <th>Company name</th>
-                    <th>Pricelist</th>
-									</tr>
-								</thead>
-								<tbody>
-                  { this.state.companies.map((company)=>
-                    <tr key={company.id}>
-                      <td>
-                        {company.title}
-                      </td>
-                      <td>
-                        <Select
-                          id="pricelist"
-                          name="pricelist"
-                          styles={selectStyle}
-                          options={toSelArr(this.props.pricelists).filter((pricelist)=>pricelist.id !== (this.props.match ? this.props.match.params.id : this.props.listId) )}
-                          value={company.pricelist}
-                          onChange={ pricelist =>{
-                            let newCompanies = [...this.state.companies];
-                            newCompanies.find((item)=>item.id===company.id).pricelist = pricelist;
-                            this.setState({companies: newCompanies })
-                          }}
-                          />
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                className="mr-auto"
-                disabled={this.state.companies.some((company)=>company.pricelist===null)}
-                onClick={()=>{
-                  Promise.all(this.state.companies.map((company)=>rebase.updateDoc('/companies/'+company.id, {pricelist:company.pricelist.id}))).then(()=>{
-                    this.setState({openEditCompanies:false})
-                    this.deletePricelist();
-                  });
-                }}>
-                Save companies and delete pricelist
-              </Button>
-              <Button className="btn-link" onClick={()=>this.setState({openEditCompanies:false})}>Cancel</Button>
-            </ModalFooter>
-          </Modal>
-      </div>
+    </div>
     );
-  }
 }
-
-const mapStateToProps = ({ storageHelpPricelists,storageHelpPrices, storageHelpTaskTypes, storageHelpTripTypes}) => {
-  const { pricelistsActive, pricelists, pricelistsLoaded } = storageHelpPricelists;
-  const { pricesActive, prices, pricesLoaded } = storageHelpPrices;
-	const { taskTypesLoaded, taskTypesActive, taskTypes } = storageHelpTaskTypes;
-  const { tripTypesActive, tripTypes, tripTypesLoaded } = storageHelpTripTypes;
-
-  return {
-    pricelistsActive, pricelists, pricelistsLoaded,
-    pricesActive, prices, pricesLoaded,
-    taskTypesLoaded, taskTypesActive, taskTypes,
-		tripTypesActive, tripTypes, tripTypesLoaded,
-  };
-};
-
-export default connect(mapStateToProps, { storageHelpPricelistsStart,storageHelpPricesStart,storageHelpTaskTypesStart, storageHelpTripTypesStart })(PriceEdit);

@@ -1,36 +1,32 @@
- import React, { Component } from 'react';
+import React from 'react';
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+import {Button } from 'reactstrap';
 import PriceAdd from './priceAdd';
 import PriceEdit from './priceEdit';
-import {Button } from 'reactstrap';
+import Loading from 'components/loading';
 
-import { connect } from "react-redux";
-import {storageHelpPricelistsStart} from '../../../redux/actions';
-import {sameStringForms} from '../../../helperFunctions';
-
-
-class PriceList extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      pricelist:[],
-      pricelistFilter:''
-    }
+export const GET_PRICELISTS = gql`
+query {
+  pricelists {
+    title
+    id
+    order
+    def
   }
+}
+`;
 
-  componentWillReceiveProps(props){
-    if(!sameStringForms(props.pricelists,this.props.pricelists)){
-      this.setState({pricelists:props.pricelists})
-    }
-  }
+export default function PricelistsList(props){
+    // state
+    const [ pricelistFilter, setPricelistFilter ] = React.useState("");
 
-  componentWillMount(){
-    if(!this.props.pricelistsActive){
-      this.props.storageHelpPricelistsStart();
-    }
-    this.setState({pricelists:this.props.pricelists});
-  }
+    //data
+    const { history, match } = props;
+    const { data, loading, error } = useQuery(GET_PRICELISTS);
+    const PRICELISTS = (loading || !data ? [] : data.pricelists);
 
-  render(){
     return (
       <div className="content">
           <div className="row m-0 p-0 taskList-container">
@@ -44,14 +40,15 @@ class PriceList extends Component{
                     <input
                       type="text"
                       className="form-control search-text search"
-                      onChange={(e)=>this.setState({pricelistFilter:e.target.value})}
+                      value={pricelistFilter}
+                      onChange={(e)=>setPricelistFilter(e.target.value)}
                       placeholder="Search"
                       />
                   </div>
                 </div>
                 <Button
                   className="btn-link center-hor"
-                  onClick={()=>this.props.history.push('/helpdesk/settings/pricelists/add')}>
+                  onClick={()=>history.push('/helpdesk/settings/pricelists/add')}>
                   <i className="fa fa-plus p-l-5 p-r-5"/> Price list
                   </Button>
                 </div>
@@ -61,10 +58,10 @@ class PriceList extends Component{
     						</h2>
                 <table className="table table-hover">
                   <tbody>
-                    {this.state.pricelists.filter((item)=>item.title.toLowerCase().includes(this.state.pricelistFilter.toLowerCase())).map((pricelist)=>
+                    {PRICELISTS.filter((item)=>item.title.toLowerCase().includes(pricelistFilter.toLowerCase())).map((pricelist)=>
                       <tr key={pricelist.id}
-                        className={"clickable" + (this.props.match.params.id === pricelist.id ? " active":"")}
-                        onClick={()=>{this.props.history.push('/helpdesk/settings/pricelists/'+pricelist.id)}}>
+                        className={"clickable" + (parseInt(match.params.id) === pricelist.id ? " active":"")}
+                        onClick={()=>{history.push('/helpdesk/settings/pricelists/'+pricelist.id)}}>
                         <td>
                           {pricelist.title}
                         </td>
@@ -82,22 +79,17 @@ class PriceList extends Component{
               </div>
               <div className="p-20 scroll-visible fit-with-header-and-commandbar">
                 {
-                  this.props.match.params.id && this.props.match.params.id==='add' && <PriceAdd />
+                  match.params.id && match.params.id==='add' && <PriceAdd {...props} />
                 }
                 {
-                  this.props.match.params.id && this.props.match.params.id!=='add' && this.state.pricelists.some((item)=>item.id===this.props.match.params.id) && <PriceEdit match={this.props.match} history={this.props.history}/>
+                  loading && match.params.id && match.params.id!=='add' && <Loading />
+                }
+                {
+                  match.params.id && match.params.id!=='add' && PRICELISTS.some((item)=>item.id===parseInt(match.params.id)) && <PriceEdit {...{history, match}} />
                 }
               </div>
             </div>
           </div>
         </div>
     );
-  }
 }
-
-const mapStateToProps = ({ storageHelpPricelists}) => {
-  const { pricelistsActive, pricelists } = storageHelpPricelists;
-  return { pricelistsActive, pricelists };
-};
-
-export default connect(mapStateToProps, { storageHelpPricelistsStart })(PriceList);

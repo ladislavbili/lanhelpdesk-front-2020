@@ -1,100 +1,119 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, Label,Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import React from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+import { Button, FormGroup, Label,Input, Alert, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import Checkbox from '../../../components/checkbox';
+import { toSelArr } from 'helperFunctions';
 import Select from 'react-select';
-
 import {selectStyle} from "configs/components/select";
-import {toSelArr} from 'helperFunctions';
-import {rebase } from 'index';
-import { connect } from "react-redux";
-import { storageImapsStart, storageHelpProjectsStart } from 'redux/actions';
 
-const noProject = { id: null, title: 'No project', value: null, label: 'No project' }
+import {  GET_IMAPS } from './index';
 
-class ImapAdd extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      title:'',
-      project: noProject,
-      host: "",
-      port: 993,
-      user: '',
-      password: '',
-      tls: true,
-      rejectUnauthorized: false,
-      def:false,
+const ADD_IMAP = gql`
+mutation addImap($title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $tsl: Boolean!) {
+  addImap(
+    title: $title,
+    order: $order,
+    def: $def,
+    host: $host,
+    port: $port,
+    username: $username,
+    password: $password,
+    rejectUnauthorized: $rejectUnauthorized,
+    tsl: $tsl,
+  ){
+    id
+    title
+    order
+    def
+    host
+    port
+    username
+  }
+}
+`;
 
-      saving:false,
-      showPass:false
-    }
+export default function IMAPAdd(props){
+  //data
+  const { history, match } = props;
+  const [addImap, {client}] = useMutation(ADD_IMAP);
+
+  //state
+  const [ title, setTitle ] = React.useState("");
+  const [ order, setOrder ] = React.useState(0);
+  const [ def, setDef ] = React.useState(false);
+  const [ host, setHost ] = React.useState("");
+  const [ port, setPort ] = React.useState(465);
+  const [ username, setUsername ] = React.useState("");
+  const [ password, setPassword ] = React.useState("");
+  const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState(false);
+  const [ tsl, setTsl ] = React.useState(true);
+
+  const [ showPass, setShowPass ] = React.useState(false);
+
+  const [ saving, setSaving ] = React.useState(false);
+
+  //functions
+  const addIMAPFunc = () => {
+    setSaving( true );
+    addImap({ variables: {
+      title,
+      order: (order !== '' ? parseInt(order) : 0),
+      def,
+      host,
+      port: (port !== '' ? parseInt(port) : 465),
+      username,
+      password,
+      rejectUnauthorized,
+      tsl,
+    } }).then( ( response ) => {
+      const allIMAPs = client.readQuery({query: GET_IMAPS}).imaps;
+      const newIMAP = {...response.data.addImap, __typename: "Imap"};
+      client.writeQuery({ query: GET_IMAPS, data: {imaps: [...allIMAPs.filter( IMAP => IMAP.id !== parseInt(match.params.id) ), newIMAP ] } });
+  //    history.push('/helpdesk/settings/imaps/' + newIMAP.id)
+    }).catch( (err) => {
+      console.log(err.message);
+    });
+    setSaving( false );
   }
 
-  componentWillMount(){
-    if(!this.props.imapsActive){
-      this.props.storageImapsStart();
-    }
-    if(!this.props.projectsActive){
-      this.props.storageHelpProjectsStart();
-    }
-  }
 
-  canSave(){
-    return this.state.title!=='' &&
-    this.state.host!=='' &&
-    this.state.port!=='' &&
-    this.state.user!=='' &&
-    this.props.imapsLoaded &&
-    this.props.projectsLoaded
-  }
+    const cannotSave = saving || title === '' ||  host === '' || port === '' || username === '';
 
 
-  render(){
     return (
       <div className="p-20 scroll-visible fit-with-header-and-commandbar">
         <Checkbox
           className = "m-b-5 p-l-0"
-          value = { this.state.def }
-          onChange={()=>{
-            this.setState({def:!this.state.def})
-          }}
+          value = { def }
+          onChange={ () => setDef(!def) }
           label = "Default"
           />
 
         <FormGroup>
           <Label for="name">Title</Label>
-          <Input type="text" name="name" id="name" placeholder="Enter title" value={this.state.title} onChange={(e)=>this.setState({title:e.target.value})} />
-        </FormGroup>
-        <FormGroup>
-          <Label for="project">Default project</Label>
-          <Select
-            id="project"
-            name="project"
-            styles={selectStyle}
-            options={toSelArr([noProject, ...this.props.projects])}
-            value={this.state.project}
-            onChange={ project => this.setState({ project }) }
-            />
+          <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
         </FormGroup>
         <FormGroup>
           <Label for="name">Host</Label>
-          <Input type="text" name="name" id="host" placeholder="Enter host" value={this.state.host} onChange={(e)=>this.setState({host:e.target.value})} />
+          <Input type="text" name="name" id="host" placeholder="Enter host" value={host} onChange={ (e) => setHost(e.target.value) }/>
         </FormGroup>
         <FormGroup>
           <Label for="name">Port</Label>
-          <Input type="number" name="name" id="port" placeholder="Enter port" value={this.state.port} onChange={(e)=>this.setState({port:e.target.value})} />
+          <Input type="number" name="name" id="port" placeholder="Enter port"  value={port} onChange={ (e) => setPort(e.target.value) } />
         </FormGroup>
         <FormGroup>
           <Label for="name">Username</Label>
-          <Input type="text" name="name" id="user" placeholder="Enter user" value={this.state.user} onChange={(e)=>this.setState({user:e.target.value})} />
+          <Input type="text" name="name" id="user" placeholder="Enter user" value={username} onChange={ (e) => setUsername(e.target.value) } />
         </FormGroup>
         <FormGroup>
           <Label>Password</Label>
           <InputGroup>
-            <Input type={this.state.showPass?'text':"password"} className="from-control" placeholder="Enter password" value={this.state.password} onChange={(e)=>this.setState({password:e.target.value})} />
-            <InputGroupAddon addonType="append" className="clickable" onClick={()=>this.setState({showPass:!this.state.showPass})}>
+            <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={password} onChange={ (e) => setPassword(e.target.value) } />
+            <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
               <InputGroupText>
-                <i className={"mt-auto mb-auto "+ (!this.state.showPass ?'fa fa-eye':'fa fa-eye-slash')}/>
+                <i className={"mt-auto mb-auto "+ (!showPass ?'fa fa-eye':'fa fa-eye-slash')}/>
               </InputGroupText>
             </InputGroupAddon>
           </InputGroup>
@@ -102,66 +121,19 @@ class ImapAdd extends Component{
 
         <Checkbox
           className = "m-b-5 p-l-0"
-          value = { this.state.tls }
-          onChange={()=>{
-            this.setState({tls:!this.state.tls})
-          }}
+          value = { tsl }
+          onChange={ () => setTsl(!tsl) }
           label = "TLS"
           />
 
         <Checkbox
           className = "m-b-5 p-l-0"
-          value = { this.state.rejectUnauthorized }
-          onChange={()=>{
-            this.setState({rejectUnauthorized:!this.state.rejectUnauthorized})
-          }}
+          value = { rejectUnauthorized }
+          onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
           label = "Reject unauthorized"
           />
 
-        <Button className="btn" disabled={this.state.saving|| !this.canSave()} onClick={()=>{
-            this.setState({saving:true});
-            rebase.addToCollection('/imaps', {
-              title:this.state.title ,
-              project: this.state.project !== null ? this.state.project.id : null,
-              host:this.state.host ,
-              port:this.state.port ,
-              user:this.state.user ,
-              password:this.state.password ,
-              tls:this.state.tls ,
-              rejectUnauthorized:this.state.rejectUnauthorized ,
-              def:this.state.def,
-            }).then((response)=>{
-              if(this.state.def){
-                this.props.imaps.filter((imap)=>imap.id!==response.id && imap.def).forEach((item)=>{
-                  rebase.updateDoc('/imaps/'+item.id,{def:false})
-                })
-              }
-              this.setState({
-                title:'',
-                host: "",
-                port: 993,
-                user: '',
-                password: '',
-                tls: true,
-                rejectUnauthorized: false,
-                def:false,
-                saving:false,
-                project: null,
-              })
-            });
-          }}>{this.state.saving?'Adding...':'Add Imap'}</Button>
-        </div>
-      );
-    }
+        <Button className="btn" disabled={cannotSave} onClick={addIMAPFunc}>{saving?'Adding...':'Add Imap'}</Button>
+      </div>
+    );
   }
-
-  const mapStateToProps = ({ storageImaps, storageHelpProjects }) => {
-    const { imapsLoaded,imapsActive, imaps } = storageImaps;
-    const { projectsLoaded, projectsActive, projects } = storageHelpProjects;
-    return {
-      imapsLoaded, imapsActive, imaps,
-      projectsLoaded, projectsActive, projects,
-    };
-  };
-
-  export default connect(mapStateToProps, { storageImapsStart, storageHelpProjectsStart })(ImapAdd);

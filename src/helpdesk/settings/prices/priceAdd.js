@@ -1,117 +1,155 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, Label,Input, Alert } from 'reactstrap';
-import Checkbox from '../../../components/checkbox';
+import React from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
-import {rebase } from '../../../index';
-import { connect } from "react-redux";
-import {storageHelpTaskTypesStart, storageHelpTripTypesStart, storageHelpPricelistsStart} from '../../../redux/actions';
+import { Button, FormGroup, Label,Input } from 'reactstrap';
+import Switch from "react-switch";
+import Loading from 'components/loading';
 
-class PriceAdd extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      pricelistName:'',
-      afterHours:0,
-      margin:0,
-      marginExtra:0,
-      loading:true,
-      saving:false,
-      def:false,
-      taskTypes:[],
-      tripTypes:[],
-    }
-    this.setData.bind(this);
+import {  GET_PRICELISTS } from './index';
+
+const ADD_PRICELIST = gql`
+mutation addPricelist($title: String!, $order: Int!, $afterHours: Int!, $def: Boolean!, $materialMargin: Int!, $materialMarginExtra: Int!, $prices: [CreatePriceInput]! ) {
+  addPricelist(
+    title: $title,
+    order: $order,
+    afterHours: $afterHours,
+    def: $def,
+    materialMargin: $materialMargin,
+    materialMarginExtra: $materialMarginExtra,
+    prices: $prices,
+  ){
+    id
+    title
+    order
+    def
   }
+}
+`;
 
-  storageLoaded(props){
-    return props.tripTypesLoaded && props.taskTypesLoaded && props.pricelistsLoaded
+export const GET_TASK_TYPES = gql`
+query {
+  taskTypes {
+    title
+    id
+    order
   }
+}
+`;
 
-  componentWillReceiveProps(props){
-    if(this.storageLoaded(props) && !this.storageLoaded(this.props)){
-      this.setData(props);
-    }
+export const GET_TRIP_TYPES = gql`
+query {
+  tripTypes {
+    title
+    id
+    order
   }
+}
+`;
 
-  componentWillMount(){
-    if(!this.props.tripTypesActive){
-      this.props.storageHelpTripTypesStart();
-    }
-    if(!this.props.taskTypesActive){
-      this.props.storageHelpTaskTypesStart();
-    }
-    if(!this.props.pricelistsActive){
-      this.props.storageHelpPricelistsStart();
-    }
-    if(this.storageLoaded(this.props)){
-      this.setData(this.props);
-    };
-  }
+export default function PricelistAdd(props){
+  //data
+  const { history, match } = props;
+  const { data: taskTypesData, loading: taskTypesLoading, error: taskTypesError } = useQuery(GET_TASK_TYPES);
+  const { data: tripTypesData, loading: tripTypesLoading, error: tripTypesError } = useQuery(GET_TRIP_TYPES);
+  const [ addPricelist, {client} ] = useMutation(ADD_PRICELIST);
 
-  setData(props){
-    let taskTypes = props.taskTypes.map((type)=>{
-      let newType={...type};
-      newType.price={price:0};
-      return newType;
+  const TASK_TYPES = ( taskTypesLoading ? [] : taskTypesData.taskTypes);
+  const TRIP_TYPES = ( tripTypesLoading ? [] : tripTypesData.tripTypes);
+
+  //state
+  const [ title, setTitle ] = React.useState("");
+  const [ order, setOrder ] = React.useState(0);
+  const [ afterHours, setAfterHours ] = React.useState(0);
+  const [ def, setDef ] = React.useState(false);
+  const [ materialMargin, setMaterialMargin ] = React.useState(0);
+  const [ materialMarginExtra, setMaterialMarginExtra ] = React.useState(0);
+
+  const [ prices, setPrices ] = React.useState([]);
+  const [ companies, setCompanies ] = React.useState([]);
+
+  const [ saving, setSaving ] = React.useState(false);
+  // sync
+  React.useEffect( () => {
+      if (!taskTypesLoading && ! tripTypesLoading){
+        setPrices(taskTypesData.taskTypes.concat(tripTypesData.tripTypes));
+      }
+  }, [taskTypesLoading, tripTypesLoading]);
+
+  //functions
+  const addPricelistFunc = () => {
+    setSaving( true );
+    let newPrices = prices.map(p => {
+      return {type: p.__typename, typeId: p.id, price: (p.price === "" || p.price === undefined ? 0 : parseFloat(p.price))}
     });
-
-    let tripTypes = props.tripTypes.map((type)=>{
-      let newType={...type};
-      newType.price={price:0};
-      return newType;
+    addPricelist({ variables: {
+      title,
+      order: (order !== '' ? parseFloat(order) : 0),
+      afterHours: (afterHours !== '' ? parseFloat(afterHours) : 0),
+      def,
+      materialMargin: (materialMargin !== '' ? parseFloat(materialMargin) : 0),
+      materialMarginExtra: (materialMarginExtra !== '' ? parseFloat(materialMarginExtra) : 0),
+      prices: newPrices,
+    } }).then( ( response ) => {
+      const allPricelists = client.readQuery({query: GET_PRICELISTS}).pricelists;
+      const newPricelist = {...response.data.addPricelist, __typename: "Pricelist"};
+      client.writeQuery({ query: GET_PRICELISTS, data: {pricelists: [...allPricelists, newPricelist ] } });
+      history.push('/helpdesk/settings/pricelists/' + newPricelist.id)
+    }).catch( (err) => {
+      console.log(err.message);
     });
-
-    this.setState({
-      taskTypes,
-      tripTypes,
-      pricelistName: props.name,
-      loading:false
-    });
+    setSaving( false );
   }
 
-  render(){
+  if (taskTypesLoading || tripTypesLoading) {
+    return <Loading />
+  }
     return (
       <div>
-          {
-            this.state.loading &&
-            <Alert color="success">
-              Loading data...
-            </Alert>
-          }
-
-          <Checkbox
-            className = "m-b-5 p-l-0"
-            value = { this.state.def }
-            onChange={()=>{
-              this.setState({def:!this.state.def})
-            }}
-            label = "Default"
-            />
+        <label>
+          <Switch
+            checked={def}
+            onChange={ () => setDef(!def) }
+            height={22}
+            checkedIcon={<span className="switchLabel">YES</span>}
+            uncheckedIcon={<span className="switchLabel">NO</span>}
+            onColor={"#0078D4"} />
+          <span className="m-l-10">Default</span>
+        </label>
 
           <FormGroup className="row m-b-10">
             <div className="m-r-10 w-20">
               <Label for="name">Pricelist name</Label>
             </div>
             <div className="flex">
-              <Input type="text" name="name" id="name" placeholder="Enter pricelist name" value={this.state.pricelistName} onChange={(e)=>this.setState({pricelistName:e.target.value})} />
+              <Input type="text" name="name" id="name" placeholder="Enter pricelist name" value={title} onChange={ (e) => setTitle(e.target.value) } />
             </div>
           </FormGroup>
 
           <h3>Ceny úloh</h3>
           <div className="p-t-10 p-b-10">
             {
-              this.state.taskTypes.map((item,index)=>
+              TASK_TYPES.map((item,index)=>
               <FormGroup key={index} className="row m-b-10">
                 <div className="m-r-10 w-20">
                   <Label for={item.title}>{item.title}</Label>
                 </div>
                 <div className="flex">
-                  <Input type="text" name={item.title} id={item.title} placeholder="Enter price" value={item.price.price} onChange={(e)=>{
-                      let newTaskTypes=[...this.state.taskTypes];
-                      let newTaskType = {...newTaskTypes[index]};
-                      newTaskType.price.price=e.target.value;
-                      newTaskTypes[index] = newTaskType;
-                      this.setState({taskTypes:newTaskTypes});
+                  <Input
+                    type="text"
+                    name={item.title}
+                    id={item.title}
+                    placeholder="Enter price"
+                    value={item.price}
+                    onChange={(e)=>{
+                      let newPrices = prices.map(p => {
+                        if (p.__typename === "TaskType" && p.id === item.id){
+                          return ({...p, price: e.target.value.replace(",", ".")});
+                        } else {
+                          return p;
+                        }
+                      });
+                      setPrices(newPrices);
                     }} />
                 </div>
               </FormGroup>
@@ -122,18 +160,27 @@ class PriceAdd extends Component{
           <h3>Ceny Výjazdov</h3>
             <div className="p-t-10 p-b-10">
               {
-                this.state.tripTypes.map((item,index)=>
+                TRIP_TYPES.map((item,index)=>
                 <FormGroup key={index} className="row m-b-10">
                   <div className="m-r-10 w-20">
                     <Label for={item.title}>{item.title}</Label>
                   </div>
                   <div className="flex">
-                    <Input type="text" name={item.title} id={item.title} placeholder="Enter price" value={item.price.price} onChange={(e)=>{
-                        let newTripTypes=[...this.state.tripTypes];
-                        let newTripType = {...newTripTypes[index]};
-                        newTripType.price.price=e.target.value;
-                        newTripTypes[index] = newTripType;
-                        this.setState({tripTypes:newTripTypes});
+                    <Input
+                      type="text"
+                      name={item.title}
+                      id={item.title}
+                      placeholder="Enter price"
+                      value={item.price}
+                      onChange={(e)=>{
+                        let newPrices = prices.map(p => {
+                          if (p.__typename === "TripType" && p.id === item.id){
+                            return ({...p, price: e.target.value.replace(",", ".")});
+                          } else {
+                            return p;
+                          }
+                        });
+                        setPrices(newPrices);
                       }} />
                   </div>
                 </FormGroup>
@@ -148,7 +195,7 @@ class PriceAdd extends Component{
                 <Label for="afterPer">After hours percentage</Label>
               </div>
               <div className="flex">
-                <Input type="text" name="afterPer" id="afterPer" placeholder="Enter after hours percentage" value={this.state.afterHours} onChange={(e)=>this.setState({afterHours:e.target.value})} />
+                <Input type="text" name="afterPer" id="afterPer" placeholder="Enter after hours percentage" value={afterHours} onChange={(e)=>setAfterHours(e.target.value.replace(",", "."))} />
               </div>
             </FormGroup>
             <FormGroup className="row m-b-10">
@@ -156,70 +203,20 @@ class PriceAdd extends Component{
                 <Label for="materMarg">Materials margin percentage 50-</Label>
               </div>
               <div className="flex">
-                <Input type="text" name="materMarg" id="materMarg" placeholder="Enter materials margin percentage" value={this.state.margin} onChange={(e)=>this.setState({margin:e.target.value})} />
+                <Input type="text" name="materMarg" id="materMarg" placeholder="Enter materials margin percentage" value={materialMargin} onChange={(e)=>setMaterialMargin(e.target.value.replace(",", "."))} />
               </div>
             </FormGroup>
             <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
-                <Label for="materMarg">Materials margin percentage 50+</Label>
+                <Label for="materMarg+">Materials margin percentage 50+</Label>
               </div>
               <div className="flex">
-                <Input type="text" name="materMarg" id="materMarg" placeholder="Enter materials margin percentage" value={this.state.marginExtra} onChange={(e)=>this.setState({marginExtra:e.target.value})} />
+                <Input type="text" name="materMarg+" id="materMarg+" placeholder="Enter materials margin percentage" value={materialMarginExtra} onChange={(e)=>setMaterialMarginExtra(e.target.value.replace(",", "."))}/>
               </div>
             </FormGroup>
           </div>
 
-          <Button className="btn" disabled={this.state.saving} onClick={()=>{
-              this.setState({saving:true});
-              rebase.addToCollection('/help-pricelists',
-              {
-                title:this.state.pricelistName,
-                afterHours:parseFloat(this.state.afterHours===''?'0':this.state.afterHours),
-                materialMargin:parseFloat(this.state.margin===''?'0':this.state.margin),
-                materialMarginExtra:parseFloat(this.state.marginExtra===''?'0':this.state.marginExtra)
-              })
-                .then((listResponse)=>{
-                  if(this.state.def){
-
-                    rebase.updateDoc('/help-pricelists/'+this.props.pricelists.find((item)=>item.default).id,{def:false})
-                  }
-                  this.state.taskTypes.map((taskType,index)=>
-                    rebase.addToCollection('/help-prices', {pricelist:listResponse.id,type:taskType.id,price:parseFloat(taskType.price.price === "" ? "0": taskType.price.price)})
-                  );
-                  this.state.tripTypes.map((tripType,index)=>
-                    rebase.addToCollection('/help-prices', {pricelist:listResponse.id,type:tripType.id,price:parseFloat(tripType.price.price === "" ? "0": tripType.price.price)})
-                  );
-                  this.setState({saving:false,
-                    pricelistName:'',
-                    afterHours:0,
-                    margin:0,
-                    taskType:this.props.taskTypes.map((type)=>{
-                      let newType={...type};
-                      newType.price={price:0};
-                      return newType;
-                    }),
-                    tripTypes: this.props.tripTypes.map((type)=>{
-                      let newType={...type};
-                      newType.price={price:0};
-                      return newType;
-                    })
-                  });
-                });
-            }}>{this.state.saving?'Saving prices...':'Save prices'}</Button>
+          <Button className="btn" disabled={saving} onClick={addPricelistFunc}>{saving?'Saving prices...':'Save prices'}</Button>
       </div>
     );
-  }
 }
-
-const mapStateToProps = ({ storageHelpTaskTypes, storageHelpTripTypes, storageHelpPricelists}) => {
-	const { taskTypesLoaded, taskTypesActive, taskTypes } = storageHelpTaskTypes;
-  const { tripTypesActive, tripTypes, tripTypesLoaded } = storageHelpTripTypes;
-    const { pricelistsLoaded ,pricelistsActive, pricelists } = storageHelpPricelists;
-  return {
-    taskTypesLoaded, taskTypesActive, taskTypes,
-		tripTypesActive, tripTypes, tripTypesLoaded,
-    pricelistsLoaded, pricelistsActive, pricelists,
-  };
-};
-
-export default connect(mapStateToProps, { storageHelpTaskTypesStart, storageHelpTripTypesStart, storageHelpPricelistsStart })(PriceAdd);

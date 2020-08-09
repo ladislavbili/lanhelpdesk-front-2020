@@ -207,7 +207,7 @@ export const specificRules = [
   },
   {
     name: 'Types',
-    value: 'types',
+    value: 'taskTypes',
   },
   {
     name: 'Trip types',

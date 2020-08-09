@@ -1,35 +1,31 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import {Button } from 'reactstrap';
 import StatusAdd from './statusAdd';
 import StatusEdit from './statusEdit';
+import Loading from 'components/loading';
 
-import { connect } from "react-redux";
-import {storageHelpStatusesStart} from '../../../redux/actions';
-import {sameStringForms} from '../../../helperFunctions';
-
-class StatusesList extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      statuses:[],
-      statusFilter:''
-    }
+export const GET_STATUSES = gql`
+query {
+  statuses {
+    title
+    id
+    order
   }
+}
+`;
 
-  componentWillReceiveProps(props){
-    if(!sameStringForms(props.statuses,this.props.statuses)){
-      this.setState({statuses:props.statuses})
-    }
-  }
+export default function StatusesList(props){
+    // state
+    const [ statusFilter, setStatusFilter ] = React.useState("");
 
-  componentWillMount(){
-    if(!this.props.statusesActive){
-      this.props.storageHelpStatusesStart();
-    }
-    this.setState({statuses:this.props.statuses});
-  }
+    //data
+    const { history, match } = props;
+    const { data, loading, error } = useQuery(GET_STATUSES);
+    const statuses = (loading || !data ? [] : data.statuses);
 
-  render(){
     return (
       <div className="content">
         <div className="row m-0 p-0 taskList-container">
@@ -43,15 +39,15 @@ class StatusesList extends Component{
                   <input
                     type="text"
                     className="form-control search-text"
-                    value={this.state.statusFilter}
-                    onChange={(e)=>this.setState({statusFilter:e.target.value})}
+                    value={statusFilter}
+                    onChange={ (e) => setStatusFilter(e.target.value) }
                     placeholder="Search"
                     />
                 </div>
               </div>
               <Button
                 className="btn-link center-hor"
-                onClick={()=>this.props.history.push('/helpdesk/settings/statuses/add')}>
+                onClick={()=>history.push('/helpdesk/settings/statuses/add')}>
                 <i className="fa fa-plus p-l-5 p-r-5"/>Status
               </Button>
             </div>
@@ -61,10 +57,10 @@ class StatusesList extends Component{
               </h2>
               <table className="table table-hover">
                 <tbody>
-                  {this.state.statuses.filter((item)=>item.title.toLowerCase().includes(this.state.statusFilter.toLowerCase())).map((status)=>
+                  {statuses.filter((item)=>item.title.toLowerCase().includes(statusFilter.toLowerCase())).map((status)=>
                     <tr key={status.id}
-                       className={"clickable" + (this.props.match.params.id === status.id ? " active":"")}
-                       onClick={()=>this.props.history.push('/helpdesk/settings/statuses/'+status.id)}>
+                       className={"clickable" + (parseInt(match.params.id) === status.id ? " active":"")}
+                       onClick={()=>history.push('/helpdesk/settings/statuses/'+status.id)}>
                       <td>
                         {status.title}
                       </td>
@@ -80,21 +76,13 @@ class StatusesList extends Component{
           <div className="col-lg-8">
             <div className="commandbar"></div>
             {
-              this.props.match.params.id && this.props.match.params.id==='add' && <StatusAdd />
+              match.params.id && match.params.id==='add' && <StatusAdd  {...props}/>
             }
             {
-              this.props.match.params.id && this.props.match.params.id!=='add' && this.state.statuses.some((item)=>item.id===this.props.match.params.id) && <StatusEdit match={this.props.match} history={this.props.history} />
+              match.params.id && match.params.id!=='add' && statuses.some((item)=>item.id===parseInt(match.params.id)) && <StatusEdit {...{history, match}} />
             }
           </div>
         </div>
       </div>
     );
-  }
 }
-
-const mapStateToProps = ({ storageHelpStatuses}) => {
-  const { statusesActive, statuses } = storageHelpStatuses;
-  return { statusesActive, statuses };
-};
-
-export default connect(mapStateToProps, { storageHelpStatusesStart })(StatusesList);

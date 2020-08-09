@@ -1,27 +1,32 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import {Button } from 'reactstrap';
 import RoleAdd from './roleAdd';
 import RoleEdit from './roleEdit';
+import Loading from 'components/loading';
 
-import { roles } from 'configs/constants/roles';
-import { connect } from "react-redux";
-
-class RolesList extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      roles:[],
-      roleFilter: "",
-    }
+export const GET_ROLES = gql`
+query {
+  roles {
+    title
+    id
+    order
+    level
   }
+}
+`;
 
-  componentWillReceiveProps(props){
-  }
+export default function RolesList(props){
+    // state
+    const [ roleFilter, setRoleFilter ] = React.useState("");
 
-  componentWillMount(){
-  }
+    //data
+    const { history, match } = props;
+    const { data, loading, error } = useQuery(GET_ROLES);
+    const ROLES = (loading || !data ? [] : data.roles);
 
-  render(){
     return (
 			<div className="content">
         <div className="row m-0 p-0 taskList-container">
@@ -35,15 +40,15 @@ class RolesList extends Component{
                   <input
                     type="text"
                     className="form-control search-text"
-                    value={this.state.roleFilter}
-                    onChange={(e)=>this.setState({roleFilter:e.target.value})}
+                    value={roleFilter}
+                    onChange={(e)=>setRoleFilter(e.target.value)}
                     placeholder="Search"
                     />
                 </div>
               </div>
               <Button
                 className="btn-link center-hor"
-                onClick={()=> this.props.history.push('/helpdesk/settings/roles/add')}>
+                onClick={()=> history.push('/helpdesk/settings/roles/add')}>
                 <i className="fa fa-plus p-l-5 p-r-5"/> Role
               </Button>
             </div>
@@ -52,18 +57,15 @@ class RolesList extends Component{
                 <h2 className="">
     							Roles
     						</h2>
-                <span className="center-hor ml-auto bolder info">
-                  This list is just informational
-                </span>
               </div>
               <table className="table table-hover">
                 <tbody>
-                  {roles.map((role)=>
+                  {ROLES.map((role)=>
                     <tr
                       key={role.id}
-                      className={"clickable" + (this.props.match.params.id === role.id ? " active":"")}
+                      className={"clickable" + (parseInt(match.params.id) === role.id ? " active":"")}
                       style={{whiteSpace: "nowrap",  overflow: "hidden"}}
-                      onClick={()=>this.props.history.push('/helpdesk/settings/roles/'+role.id)}>
+                      onClick={()=>history.push('/helpdesk/settings/roles/'+role.id)}>
                       <td
                         style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
                         {role.title}
@@ -77,20 +79,19 @@ class RolesList extends Component{
           <div className="col-lg-8">
             <div className="commandbar"></div>
             {
-              this.props.match.params.id && this.props.match.params.id==='add' && <RoleAdd />
+              match.params.id && match.params.id==='add' && <RoleAdd {...props}/>
             }
             {
-              this.props.match.params.id &&
-              this.props.match.params.id!=='add' &&
-              roles.some( (role) => role.id === this.props.match.params.id ) &&
-              <RoleEdit match={this.props.match} history={this.props.history}/>
+              loading && match.params.id && match.params.id!=='add' && <Loading />
+            }
+            {
+              match.params.id &&
+              match.params.id!=='add' &&
+              ROLES.some( (role) => role.id === parseInt(match.params.id) ) &&
+              <RoleEdit {...{history, match}} />
             }
           </div>
         </div>
       </div>
     );
-  }
 }
-
-
-export default connect()(RolesList);

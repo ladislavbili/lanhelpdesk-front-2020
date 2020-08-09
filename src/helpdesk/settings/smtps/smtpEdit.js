@@ -1,186 +1,277 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, Label,Input, Alert, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
-import {rebase} from '../../../index';
+import React from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+import { Button, FormGroup, Label,Input, Alert, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import Loading from 'components/loading';
 import Checkbox from '../../../components/checkbox';
+import { toSelArr } from 'helperFunctions';
+import Select from 'react-select';
+import {selectStyle} from "configs/components/select";
 
-import { connect } from "react-redux";
-import {storageSmtpsStart} from '../../../redux/actions';
-import {sameStringForms} from '../../../helperFunctions';
+import {  GET_SMTPS } from './index';
 
-class SMTPEdit extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      loading:true,
-      saving:false,
-      smtps:[],
-      isDefault:false,
-      showPass:false,
-
-      title:'',
-      host: "",
-      port: 465,
-      secure: true,
-      user: '',
-      pass: '',
-      rejectUnauthorized: false,
-      def:false,
-    }
-    this.setData.bind(this);
-  }
-
-  canSave(){
-    return this.state.title!=='' &&
-      this.state.host!=='' &&
-      this.state.port!=='' &&
-      this.state.user!=='' &&
-      this.props.smtpsLoaded
-  }
-
-  componentWillReceiveProps(props){
-    if(!sameStringForms(props.smtps,this.props.smtps)){
-      this.setState({smtps:props.smtps})
-    }
-    if(!this.props.smtpsLoaded && props.smtpsLoaded){
-      this.setData(props.smtps,props.match.params.id);
-    }
-    if(this.props.match.params.id!==props.match.params.id){
-      this.setState({loading:true})
-      if(props.smtpsLoaded){
-        this.setData(props.smtps,props.match.params.id);
-      }
-    }
-  }
-
-  componentWillMount(){
-    if(!this.props.smtpsActive){
-      this.props.storageSmtpsStart();
-    }
-    if(this.props.smtpsLoaded){
-      this.setData(this.props.smtps,this.props.match.params.id);
-    }
-  }
-
-  setData(smtps,id){
-    let smtp=smtps.find((item)=>item.id===id);
-    this.setState({
-      loading:false,
-      smtps,
-      isDefault:smtp.def,
-      showPass:false,
-
-      title: smtp.title,
-      host: smtp.host ,
-      port: smtp.port ,
-      secure: smtp.secure ,
-      user: smtp.user ,
-      pass: smtp.pass ,
-      rejectUnauthorized: smtp.rejectUnauthorized,
-      def:smtp.def,
-      })
-  }
-
-  render(){
-    return (
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-        {
-          this.state.loading &&
-          <Alert color="success">
-            Loading data...
-          </Alert>
-        }
-
-        <Checkbox
-          className = "m-b-5 p-l-0"
-          value = { this.state.def }
-          onChange={()=>{
-            this.setState({def:!this.state.def})
-          }}
-          label = "Default"
-          />
-
-        <FormGroup>
-          <Label for="name">Title</Label>
-          <Input type="text" name="name" id="name" placeholder="Enter title" value={this.state.title} onChange={(e)=>this.setState({title:e.target.value})} />
-        </FormGroup>
-        <FormGroup>
-          <Label for="name">Host</Label>
-          <Input type="text" name="name" id="host" placeholder="Enter host" value={this.state.host} onChange={(e)=>this.setState({host:e.target.value})} />
-        </FormGroup>
-        <FormGroup>
-          <Label for="name">Port</Label>
-          <Input type="number" name="name" id="port" placeholder="Enter port" value={this.state.port} onChange={(e)=>this.setState({port:e.target.value})} />
-        </FormGroup>
-        <Checkbox
-          className = "m-b-5 p-l-0"
-          value = { this.state.secure }
-          onChange={()=>{
-            this.setState({secure:!this.state.secure})
-          }}
-          label = "Secure"
-          />
-        <FormGroup>
-          <Label for="name">Username</Label>
-          <Input type="text" name="name" id="user" placeholder="Enter user" value={this.state.user} onChange={(e)=>this.setState({user:e.target.value})} />
-        </FormGroup>
-        <FormGroup>
-          <Label>Password</Label>
-          <InputGroup>
-            <Input type={this.state.showPass?'text':"password"} className="from-control" placeholder="Enter password" value={this.state.pass} onChange={(e)=>this.setState({pass:e.target.value})} />
-            <InputGroupAddon addonType="append" className="clickable" onClick={()=>this.setState({showPass:!this.state.showPass})}>
-              <InputGroupText>
-                <i className={"mt-auto mb-auto "+ (!this.state.showPass ?'fa fa-eye':'fa fa-eye-slash')}/>
-              </InputGroupText>
-            </InputGroupAddon>
-          </InputGroup>
-        </FormGroup>
-        <Checkbox
-          className = "m-b-5 p-l-0"
-          value = { this.state.rejectUnauthorized }
-          onChange={()=>{
-            this.setState({rejectUnauthorized:!this.state.rejectUnauthorized})
-          }}
-          label = "Reject unauthorized"
-          />
-
-        <div className="row">
-            <Button className="btn" disabled={this.state.saving|| !this.canSave()} onClick={()=>{
-              this.setState({saving:true});
-              rebase.updateDoc('/smtps/'+this.props.match.params.id, {
-                title:this.state.title,
-                host:this.state.host ,
-                port:this.state.port ,
-                secure:this.state.secure ,
-                user:this.state.user ,
-                pass:this.state.pass ,
-                rejectUnauthorized:this.state.rejectUnauthorized ,
-                def:this.state.def,
-              }).then((response)=>{
-                if(this.state.def && !this.state.isDefault){
-                  this.state.smtps.filter((smtp)=>smtp.id!==this.props.match.params.id && smtp.def).forEach((item)=>{
-                    rebase.updateDoc('/smtps/'+item.id,{def:false})
-                  })
-                }
-                this.setState({saving:false});
-              });
-            }}>{this.state.saving?'Saving SMTP...':'Save SMTP'}</Button>
-
-          <Button className="btn-red m-l-5" disabled={this.state.saving} onClick={()=>{
-              if(window.confirm("Are you sure?")){
-                rebase.removeDoc('/smtps/'+this.props.match.params.id).then(()=>{
-                  this.props.history.goBack();
-                });
-              }
-              }}>Delete</Button>
-          </div>
-        </div>
-    );
+const GET_SMTP = gql`
+query smtp($id: Int!) {
+  smtp (
+    id: $id
+  ) {
+    id
+    title
+    order
+    def
+    host
+    port
+    username
+    password
+    rejectUnauthorized
+    secure
   }
 }
+`;
 
-const mapStateToProps = ({ storageSmtps }) => {
-  const { smtpsActive, smtps, smtpsLoaded } = storageSmtps;
-  return { smtpsActive, smtps, smtpsLoaded };
-};
+const UPDATE_SMTP = gql`
+mutation updateSmtp($id: Int!, $title: String, $order: Int, $def: Boolean, $host: String, $port: Int, $username: String, $password: String, $rejectUnauthorized: Boolean, $secure: Boolean) {
+  updateSmtp(
+    id: $id,
+    title: $title,
+    order: $order,
+    def: $def,
+    host: $host,
+    port: $port,
+    username: $username,
+    password: $password,
+    rejectUnauthorized: $rejectUnauthorized,
+    secure: $secure,
+  ){
+    id
+    title
+    order
+    def
+    host
+    port
+    username
+  }
+}
+`;
 
-export default connect(mapStateToProps, { storageSmtpsStart })(SMTPEdit);
+export const DELETE_SMTP = gql`
+mutation deleteSmtp($id: Int!, $newDefId: Int!, $newId: Int!) {
+  deleteSmtp(
+    id: $id,
+    newDefId: $newDefId,
+    newId: $newId,
+  ){
+    id
+  }
+}
+`;
+
+export default function SMTPEdit(props){
+  //data
+  const { history, match } = props;
+  const { data, loading, refetch } = useQuery(GET_SMTP, { variables: {id: parseInt(props.match.params.id)} });
+  const [updateSmtp, {updateData}] = useMutation(UPDATE_SMTP);
+  const [deleteSmtp, {deleteData, client}] = useMutation(DELETE_SMTP);
+  const allSMTPs = toSelArr(client.readQuery({query: GET_SMTPS}).smtps);
+  const filteredSMTPs = allSMTPs.filter( SMTP => SMTP.id !== parseInt(match.params.id) );
+  const theOnlyOneLeft = allSMTPs.length === 0;
+
+  //state
+  const [ title, setTitle ] = React.useState("");
+  const [ order, setOrder ] = React.useState(0);
+  const [ def, setDef ] = React.useState(false);
+  const [ host, setHost ] = React.useState("");
+  const [ port, setPort ] = React.useState(465);
+  const [ username, setUsername ] = React.useState("");
+  const [ password, setPassword ] = React.useState("");
+  const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState(false);
+  const [ secure, setSecure ] = React.useState(true);
+
+  const [ showPass, setShowPass ] = React.useState(false);
+
+  const [ saving, setSaving ] = React.useState(false);
+  const [ newSMTP, setNewSMTP ] = React.useState(null);
+  const [ choosingNewSMTP, setChooseingNewSMTP ] = React.useState(false);
+  const [ newDefSMTP, setNewDefSMTP ] = React.useState(null);
+
+  // sync
+  React.useEffect( () => {
+      if (!loading){
+        setTitle(data.smtp.title);
+        setOrder(data.smtp.order);
+        setDef(data.smtp.def);
+        setHost(data.smtp.host);
+        setPort(data.smtp.port);
+        setUsername(data.smtp.username);
+        setPassword(data.smtp.password);
+        setRejectUnauthorized(data.smtp.rejectUnauthorized);
+        setSecure(data.smtp.secure);
+      }
+  }, [loading]);
+
+  React.useEffect( () => {
+      refetch({ variables: {id: parseInt(match.params.id)} });
+  }, [match.params.id]);
+
+  // functions
+  const updateSMTPFunc = () => {
+    setSaving( true );
+    updateSmtp({ variables: {
+      id: parseInt(match.params.id),
+      title,
+      order: (order !== '' ? parseInt(order) : 0),
+      def,
+      host,
+      port: (port !== '' ? parseInt(port) : 0),
+      username,
+      password,
+      rejectUnauthorized,
+      secure,
+    } }).then( ( response ) => {
+      const updatedSMTP = {...response.data.updateSmtp};
+      if (def){
+        client.writeQuery({ query: GET_SMTPS, data: {smtps: [...allSMTPs.map( SMTP => {
+          if (SMTP.id === parseInt(match.params.id)) {
+            return ({...updatedSMTP, def: true});
+          } else {
+            return({...SMTP, def: false});
+          }
+        } ) ] } });
+      } else {
+        client.writeQuery({ query: GET_SMTPS, data: {smtps: [...allSMTPs.filter( SMTP => SMTP.id !== parseInt(match.params.id) ), updatedSMTP ] } });
+      }
+    }).catch( (err) => {
+      console.log(err.message);
+    });
+
+     setSaving( false );
+  };
+
+  const deleteSMTPFunc = () => {
+    setChooseingNewSMTP(false);
+
+    if(window.confirm("Are you sure?")){
+      deleteSmtp({ variables: {
+        id: parseInt(match.params.id),
+        newDefId: ( newDefSMTP ? parseInt(newDefSMTP.id) : null ),
+        newId: ( newSMTP ? parseInt(newSMTP.id) : null ),
+      } }).then( ( response ) => {
+        if (def) {
+          client.writeQuery({ query: GET_SMTPS, data: {smtps: filteredSMTPs.map(smtp => {return {...smtp, def: (smtp.id === parseInt(newDefSMTP.id)) }} )} });
+        } else {
+          client.writeQuery({ query: GET_SMTPS, data: {smtps: filteredSMTPs} });
+        }
+        history.push('/helpdesk/settings/smtps/add');
+      }).catch( (err) => {
+        console.log(err.message);
+        console.log(err);
+      });
+    }
+  };
+
+  const cannotSave = saving || title === '' ||  host === '' || port === '' || username === '';
+
+  if (loading) {
+    return <Loading />
+  }
+
+  return (
+    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+      <Checkbox
+        className = "m-b-5 p-l-0"
+        value = { def }
+        onChange={ () => setDef(!def) }
+        label = "Default"
+        />
+
+      <FormGroup>
+        <Label for="name">Title</Label>
+        <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
+      </FormGroup>
+
+      <FormGroup>
+        <Label for="name">Host</Label>
+        <Input type="text" name="name" id="host" placeholder="Enter host" value={host} onChange={ (e) => setHost(e.target.value) } />
+      </FormGroup>
+
+      <FormGroup>
+        <Label for="name">Port</Label>
+        <Input type="number" name="name" id="port" placeholder="Enter port" value={port} onChange={ (e) => setPort(e.target.value) } />
+      </FormGroup>
+
+      <Checkbox
+        className = "m-b-5 p-l-0"
+        value = { secure }
+        onChange={ () => setSecure(!secure) }
+        label = "Secure"
+        />
+
+      <FormGroup>
+        <Label for="name">Username</Label>
+        <Input type="text" name="name" id="user" placeholder="Enter user" value={username} onChange={ (e) => setUsername(e.target.value) } />
+      </FormGroup>
+
+      <FormGroup>
+        <Label>Password</Label>
+        <InputGroup>
+          <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={password} onChange={ (e) => setPassword(e.target.value) } />
+          <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
+            <InputGroupText>
+              <i className={"mt-auto mb-auto "+ ( !showPass ?' fa fa-eye':'fa fa-eye-slash') }/>
+            </InputGroupText>
+          </InputGroupAddon>
+        </InputGroup>
+      </FormGroup>
+
+      <Checkbox
+        className = "m-b-5 p-l-0"
+        value = { rejectUnauthorized }
+        onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
+        label = "Reject unauthorized"
+        />
+
+      <Modal isOpen={choosingNewSMTP}>
+        <ModalHeader>
+          Please choose an SMTP to replace this one
+        </ModalHeader>
+        <ModalBody>
+          <FormGroup>
+            { def && <Label>A replacement SMTP</Label> }
+            <Select
+              styles={selectStyle}
+              options={filteredSMTPs}
+              value={newSMTP}
+              onChange={s => setNewSMTP(s)}
+              />
+          </FormGroup>
+
+          {def &&
+            <FormGroup>
+              <Label>New default SMTP</Label>
+              <Select
+                styles={selectStyle}
+                options={filteredSMTPs}
+                value={newDefSMTP}
+                onChange={s => setNewDefSMTP(s)}
+                />
+            </FormGroup>
+          }
+        </ModalBody>
+        <ModalFooter>
+          <Button className="btn-link mr-auto"onClick={() => setChooseingNewSMTP(false)}>
+            Cancel
+          </Button>
+          <Button className="btn ml-auto" disabled={!newSMTP || (def ? !newDefSMTP : false)} onClick={deleteSMTPFunc}>
+            Complete deletion
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      <div className="row">
+          <Button className="btn" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</Button>
+          <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={ () => setChooseingNewSMTP(true) }>Delete</Button>
+      </div>
+    </div>
+  );
+}

@@ -1,36 +1,34 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import {Button } from 'reactstrap';
 import CompanyAdd from './companyAdd';
 import CompanyEdit from './companyEdit';
+import Loading from 'components/loading';
 
-import { connect } from "react-redux";
-import {storageCompaniesStart} from '../../../redux/actions';
-import {sameStringForms} from '../../../helperFunctions';
-
-class CompaniesList extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      companies:[],
-      companyFilter:'',
-      sortBy: "0",
-    }
+export const GET_COMPANIES = gql`
+query {
+  companies {
+    title
+    id
+    monthlyPausal
+    taskWorkPausal
+    taskTripPausal
   }
+}
+`;
 
-  componentWillReceiveProps(props){
-    if(!sameStringForms(props.companies,this.props.companies)){
-      this.setState({companies:props.companies})
-    }
-  }
+export default function CompanysList(props){
+    // state
+    const [ companyFilter, setCompanyFilter ] = React.useState("");
+    const [ sortBy, setSortBy ] = React.useState("");
 
-  componentWillMount(){
-    if(!this.props.companiesActive){
-      this.props.storageCompaniesStart();
-    }
-    this.setState({companies:this.props.companies});
-  }
+    //data
+    const { history, match } = props;
+    const { data, loading, error } = useQuery(GET_COMPANIES);
+    const COMPANIES = (loading || !data ? [] : data.companies);
 
-  render(){
     return (
       <div className="content">
         <div className="row m-0 p-0 taskList-container">
@@ -44,15 +42,15 @@ class CompaniesList extends Component{
                   <input
                     type="text"
                     className="form-control search-text"
-                    value={this.state.companyFilter}
-                    onChange={(e)=>this.setState({companyFilter:e.target.value})}
+                    value={companyFilter}
+                    onChange={(e)=>setCompanyFilter(e.target.value)}
                     placeholder="Search"
                     />
                 </div>
               </div>
               <Button
                 className="btn-link center-hor"
-                onClick={()=>this.props.history.push('/helpdesk/settings/companies/add')}>
+                onClick={()=>history.push('/helpdesk/settings/companies/add')}>
                 <i className="fa fa-plus p-l-5 p-r-5"/> Company
               </Button>
             </div>
@@ -67,9 +65,9 @@ class CompaniesList extends Component{
       							Sort by
       						</div>
                   <select
-    								value={this.state.sortBy}
+    								value={sortBy}
     								className="invisible-select text-bold text-highlight"
-    								onChange={(e)=> this.setState({sortBy: e.target.value})}>
+    								onChange={(e) => setSortBy(e.target.value)}>
     									<option value={0} key={0}>All</option>
       								<option value={1} key={1}>Contracted</option>
         							<option value={2} key={2}>Non-contracted</option>
@@ -79,21 +77,21 @@ class CompaniesList extends Component{
               <table className="table table-hover">
                 <tbody>
                     {
-                      this.state.companies.filter((item) => {
+                      COMPANIES.filter((item) => {
                         let cond = true;
-                        if (this.state.sortBy === "1"){
-                          cond = parseInt(item.drivePausal) > 0 || parseInt(item.workPausal) > 0;
-                        } else if (this.state.sortBy === "2"){
-                          cond = !(parseInt(item.drivePausal) > 0 || parseInt(item.workPausal) > 0);
+                        if (sortBy === "1"){
+                          cond = parseFloat(item.taskWorkPausal) > 0 || parseFloat(item.taskTripPausal) > 0;
+                        } else if (sortBy === "2"){
+                          cond = !(parseFloat(item.taskWorkPausal) > 0 || parseFloat(item.taskTripPausal) > 0);
                         }
 
-                        return cond && item.title.toLowerCase().includes(this.state.companyFilter.toLowerCase());
+                        return cond && item.title.toLowerCase().includes(companyFilter.toLowerCase());
                       })
                         .map((company)=>
                           <tr
                             key={company.id}
-                            className={"clickable" + (this.props.match.params.id === company.id ? " active":"")}
-                            onClick={()=>this.props.history.push('/helpdesk/settings/companies/'+company.id)}>
+                            className={"clickable" + (match.params.id === company.id ? " active":"")}
+                            onClick={()=>history.push('/helpdesk/settings/companies/'+company.id)}>
                             <td>
                               {company.title}
                             </td>
@@ -110,21 +108,16 @@ class CompaniesList extends Component{
           <div className="col-lg-8">
             <div className="commandbar"></div>
             {
-              this.props.match.params.id && this.props.match.params.id==='add' && <CompanyAdd {...this.props}/>
+              match.params.id && match.params.id==='add' && <CompanyAdd {...props}/>
             }
             {
-              this.props.match.params.id && this.props.match.params.id!=='add' && this.state.companies.some((item)=>item.id===this.props.match.params.id) && <CompanyEdit match={this.props.match} history = {this.props.history} />
+              loading && match.params.id && match.params.id!=='add' && <Loading />
+            }
+            {
+              match.params.id && match.params.id!=='add' && COMPANIES.some((item)=>item.id===match.params.id) && <CompanyEdit {...{history, match}} />
             }
           </div>
         </div>
       </div>
-);
+    );
 }
-}
-
-const mapStateToProps = ({ storageCompanies}) => {
-  const { companiesActive, companies } = storageCompanies;
-  return { companiesActive, companies };
-};
-
-export default connect(mapStateToProps, { storageCompaniesStart })(CompaniesList);

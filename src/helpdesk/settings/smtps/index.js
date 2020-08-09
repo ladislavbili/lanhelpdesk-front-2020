@@ -1,40 +1,39 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import {Button } from 'reactstrap';
 import SMTPAdd from './smtpAdd';
 import SMTPEdit from './smtpEdit';
+import Loading from 'components/loading';
 
-import firebase from 'firebase';
-import { connect } from "react-redux";
-import {storageSmtpsStart} from 'redux/actions';
-import {sameStringForms} from 'helperFunctions';
-import { REST_URL } from 'configs/restAPI';
-
-class SMTPsList extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      smtps:[],
-      smtpFilter:'',
-      smtpTesting: false,
-    }
+export const GET_SMTPS = gql`
+query {
+  smtps {
+    title
+    id
+    order
+    host
+    port
+    username
+    def
   }
+}
+`;
 
-  componentWillReceiveProps(props){
-    if(!sameStringForms(props.smtps,this.props.smtps)){
-      this.setState({smtps:props.smtps})
-    }
-  }
+export default function SMTPsList(props){
+    // state
+    const [ SMTPFilter, setSMTPFilter ] = React.useState("");
+    const [ smtpTesting, setSmtpTesting ] = React.useState(false);
 
-  componentWillMount(){
-    if(!this.props.smtpsActive){
-      this.props.storageSmtpsStart();
-    }
-    this.setState({smtps:this.props.smtps});
-  }
+    //data
+    const { history, match } = props;
+    const { data, loading, error } = useQuery(GET_SMTPS);
+    const SMTPS = (loading || !data ? [] : data.smtps);
 
-  testSMTPs(){
-    this.setState({ smtpTesting: true })
-    firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then((token)=>{
+  const testSMTPs = () => {
+    setSmtpTesting(true);
+    /*firebase.auth().currentUser.getIdToken(true).then((token)=>{
       fetch(`${REST_URL}/test-smtps`,{
         headers: {
           'Content-Type': 'application/json'
@@ -44,129 +43,122 @@ class SMTPsList extends Component{
           token
         }),
       })
-    })
+    })*/
   }
 
-  render(){
-    return (
-      <div className="content">
-        <div className="row m-0 p-0 taskList-container">
-          <div className="col-lg-4">
-            <div className="commandbar">
-              <div className="search-row">
-                <div className="search">
-                  <button className="search-btn" type="button">
-                    <i className="fa fa-search" />
-                  </button>
-                  <input
-                    type="text"
-                    className="form-control search-text"
-                    value={this.state.smtpFilter}
-                    onChange={(e)=>this.setState({smtpFilter:e.target.value})}
-                    placeholder="Search"
-                    />
-                </div>
+  return (
+    <div className="content">
+      <div className="row m-0 p-0 taskList-container">
+        <div className="col-lg-4">
+          <div className="commandbar">
+            <div className="search-row">
+              <div className="search">
+                <button className="search-btn" type="button">
+                  <i className="fa fa-search" />
+                </button>
+                <input
+                  type="text"
+                  className="form-control search-text"
+                  value={SMTPFilter}
+                  onChange={ (e) => setSMTPFilter(e.target.value) }
+                  placeholder="Search"
+                  />
               </div>
-              <Button
-                className="btn-link center-hor"
-                onClick={()=>this.props.history.push('/helpdesk/settings/smtps/add')}>
-                <i className="fa fa-plus p-l-5 p-r-5"/> SMTP
-              </Button>
             </div>
-            <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
-              <div className="row">
-                <h2 className=" p-l-10 p-b-10">
-                  SMTPs
-                </h2>
-                { this.props.role === 3 && !this.state.smtpTesting &&
-                  <Button
-                    disabled={ this.props.role !== 3 || this.state.smtpTesting }
-                    className="btn-primary center-hor ml-auto"
-                    onClick={this.testSMTPs.bind(this)}
-                    >
-                    Test SMTPs
-                  </Button>
-                }
-                { this.props.role === 3 && this.state.smtpTesting &&
-                  <div className="center-hor ml-auto">
-                    Testing SMTPs...
-                  </div>
-                }
-              </div>
-              <table className="table table-hover">
-                <thead>
-                  <tr className="clickable">
-                    <th>Title</th>
-                    <th>Host</th>
-                    <th>Port</th>
-                    <th>Username</th>
-                    <th>Default</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.smtps.filter((item)=>
-                    item.title.toLowerCase().includes(this.state.smtpFilter.toLowerCase())||
-                    item.host.toLowerCase().includes(this.state.smtpFilter.toLowerCase())||
-                    item.port.toString().toLowerCase().includes(this.state.smtpFilter.toLowerCase())||
-                    item.user.toLowerCase().includes(this.state.smtpFilter.toLowerCase())
-                  ).map((smtp)=>
-                    <tr
-                      key={smtp.id}
-                      className={"clickable" + (this.props.match.params.id === smtp.id ? " active":"")}
-                      onClick={()=>this.props.history.push('/helpdesk/settings/smtps/'+smtp.id)}>
-                      <td>
-                        {smtp.title}
-                      </td>
-                      <td>
-                        {smtp.host}
-                      </td>
-                      <td>
-                        {smtp.port}
-                      </td>
-                      <td>
-                        {smtp.user}
-                      </td>
-                      <td>
-                        {smtp.def.toString()}
-                      </td>
-                      <td>
-                        {
-                          smtp.working === false ?
-                          <i style={{color:'red'}}
-                            className="far fa-times-circle"
-                            />
-                          :
-                          <i style={{color:'green'}}
-                            className="far fa-check-circle"
-                            />
-                        }
-                      </td>
-                    </tr>
-                    )}
-                </tbody>
-              </table>
-            </div>
+            <Button
+              className="btn-link center-hor"
+              onClick={()=>history.push('/helpdesk/settings/smtps/add')}>
+              <i className="fa fa-plus p-l-5 p-r-5"/> SMTP
+            </Button>
           </div>
-          <div className="col-lg-8">
-            <div className="commandbar"></div>
-            {
-              this.props.match.params.id && this.props.match.params.id==='add' && <SMTPAdd />
-            }
-            {
-              this.props.match.params.id && this.props.match.params.id!=='add' && this.state.smtps.some((item)=>item.id===this.props.match.params.id) && <SMTPEdit match={this.props.match} history={this.props.history} />
-            }
+          <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
+            <div className="row">
+              <h2 className=" p-l-10 p-b-10">
+                SMTPs
+              </h2>
+              { false && props.role === 3 && !smtpTesting &&
+                <Button
+                  disabled={ props.role !== 3 || smtpTesting }
+                  className="btn-primary center-hor ml-auto"
+                  onClick={testSMTPs}
+                  >
+                  Test SMTPs
+                </Button>
+              }
+              { false && props.role === 3 && smtpTesting &&
+                <div className="center-hor ml-auto">
+                  Testing SMTPs...
+                </div>
+              }
+            </div>
+            <table className="table table-hover">
+              <thead>
+                <tr className="clickable">
+                  <th>Title</th>
+                  <th>Host</th>
+                  <th>Port</th>
+                  <th>Username</th>
+                  <th>Default</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {SMTPS.filter((item)=>
+                  item.title.toLowerCase().includes(SMTPFilter.toLowerCase())||
+                  item.host.toLowerCase().includes(SMTPFilter.toLowerCase())||
+                  item.port.toString().toLowerCase().includes(SMTPFilter.toLowerCase())||
+                  item.user.toLowerCase().includes(SMTPFilter.toLowerCase())
+                ).map((smtp)=>
+                  <tr
+                    key={smtp.id}
+                    className={"clickable" + (parseInt(match.params.id) === smtp.id ? " active":"")}
+                    onClick={()=>history.push('/helpdesk/settings/smtps/'+smtp.id)}>
+                    <td>
+                      {smtp.title}
+                    </td>
+                    <td>
+                      {smtp.host}
+                    </td>
+                    <td>
+                      {smtp.port}
+                    </td>
+                    <td>
+                      {smtp.username}
+                    </td>
+                    <td>
+                      {smtp.def ? "Yes" : "No"}
+                    </td>
+                    <td>
+                      {
+                        smtp.working === false ?
+                        <i style={{color:'red'}}
+                          className="far fa-times-circle"
+                          />
+                        :
+                        <i style={{color:'green'}}
+                          className="far fa-check-circle"
+                          />
+                      }
+                    </td>
+                  </tr>
+                  )}
+              </tbody>
+            </table>
           </div>
         </div>
+        <div className="col-lg-8">
+          <div className="commandbar"></div>
+          {
+            match.params.id && match.params.id==='add' && <SMTPAdd {...props} />
+          }
+          {
+            loading && match.params.id && match.params.id!=='add' && <Loading />
+          }
+          {
+            match.params.id && match.params.id!=='add' && SMTPS.some((item)=>item.id===parseInt(match.params.id)) && <SMTPEdit {...{history, match}} />
+          }
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
-
-const mapStateToProps = ({ storageSmtps, userReducer }) => {
-  const { smtpsActive, smtps } = storageSmtps;
-  const role = userReducer.userData ? userReducer.userData.role.value : 0;
-  return { smtpsActive, smtps, role };
-};
-
-export default connect(mapStateToProps, { storageSmtpsStart })(SMTPsList);

@@ -1,33 +1,35 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import {Button } from 'reactstrap';
 import ImapAdd from './imapAdd';
 import ImapEdit from './imapEdit';
-import { connect } from "react-redux";
-import {storageImapsStart} from '../../../redux/actions';
-import {sameStringForms} from '../../../helperFunctions';
+import Loading from 'components/loading';
 
-class ImapsList extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      imaps:[],
-      imapFilter:''
-    }
+export const GET_IMAPS = gql`
+query {
+  imaps {
+    title
+    id
+    order
+    host
+    port
+    def
+    username
   }
-  componentWillReceiveProps(props){
-    if(!sameStringForms(props.imaps,this.props.imaps)){
-      this.setState({imaps:props.imaps})
-    }
-  }
+}
+`;
 
-  componentWillMount(){
-    if(!this.props.imapsActive){
-      this.props.storageImapsStart();
-    }
-    this.setState({imaps:this.props.imaps});
-  }
+export default function IMAPsList(props){
+    // state
+    const [ imapFilter, setImapFilter ] = React.useState("");
 
-  render(){
+    //data
+    const { history, match } = props;
+    const { data, loading, error } = useQuery(GET_IMAPS);
+    const IMAPS = (loading || !data ? [] : data.imaps);
+
     return (
       <div className="content">
           <div className="row m-0 p-0 taskList-container">
@@ -41,15 +43,15 @@ class ImapsList extends Component{
                     <input
                       type="text"
                       className="form-control search-text"
-                      value={this.state.imapFilter}
-                      onChange={(e)=>this.setState({imapFilter:e.target.value})}
+                      value={imapFilter}
+                      onChange={ (e) => setImapFilter(e.target.value) }
                       placeholder="Search"
                       />
                   </div>
                 </div>
                 <Button
                   className="btn-link center-hor"
-                  onClick={()=>this.props.history.push('/helpdesk/settings/imaps/add')}>
+                  onClick={()=>history.push('/helpdesk/settings/imaps/add')}>
                   <i className="fa fa-plus p-l-5 p-r-5"/> IMAP
                 </Button>
               </div>
@@ -64,20 +66,21 @@ class ImapsList extends Component{
                       <th>Host</th>
                       <th>Port</th>
                       <th>Username</th>
+                      <th>Default</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {this.state.imaps.filter((item)=>
-                      item.title.toLowerCase().includes(this.state.imapFilter.toLowerCase())||
-                      item.host.toLowerCase().includes(this.state.imapFilter.toLowerCase())||
-                      item.port.toString().toLowerCase().includes(this.state.imapFilter.toLowerCase())||
-                      item.user.toLowerCase().includes(this.state.imapFilter.toLowerCase())
+                    {IMAPS.filter((item)=>
+                      item.title.toLowerCase().includes(imapFilter.toLowerCase())||
+                      item.host.toLowerCase().includes(imapFilter.toLowerCase())||
+                      item.port.toString().toLowerCase().includes(imapFilter.toLowerCase())||
+                      item.user.toLowerCase().includes(imapFilter.toLowerCase())
                     ).map((imap)=>
                       <tr
                         key={imap.id}
-                        className={"clickable" + (this.props.match.params.id === imap.id ? " active":"")}
-                        onClick={()=>this.props.history.push('/helpdesk/settings/imaps/'+imap.id)}>
+                        className={"clickable" + (match.params.id === imap.id ? " active":"")}
+                        onClick={()=>history.push('/helpdesk/settings/imaps/'+imap.id)}>
                         <td>
                           {imap.title}
                         </td>
@@ -88,7 +91,10 @@ class ImapsList extends Component{
                           {imap.port}
                         </td>
                         <td>
-                          {imap.user}
+                          {imap.username}
+                        </td>
+                        <td>
+                          {imap.def ? "Yes" : "No"}
                         </td>
                         <td>
                           {
@@ -112,21 +118,16 @@ class ImapsList extends Component{
               <div className="commandbar">
               </div>
             {
-              this.props.match.params.id && this.props.match.params.id==='add' && <ImapAdd />
+              match.params.id && match.params.id==='add' && <ImapAdd {...props} />
             }
             {
-              this.props.match.params.id && this.props.match.params.id!=='add' && this.state.imaps.some((item)=>item.id===this.props.match.params.id) && <ImapEdit match={this.props.match} history={this.props.history} />
+              loading && match.params.id && match.params.id!=='add' && <Loading />
+            }
+            {
+              match.params.id && match.params.id!=='add' && IMAPS.some((item)=>item.id===parseInt(match.params.id)) && <ImapEdit {...{history, match}} />
             }
           </div>
         </div>
       </div>
     );
-  }
 }
-
-const mapStateToProps = ({ storageImaps }) => {
-  const { imapsActive, imaps } = storageImaps;
-  return { imapsActive, imaps };
-};
-
-export default connect(mapStateToProps, { storageImapsStart })(ImapsList);

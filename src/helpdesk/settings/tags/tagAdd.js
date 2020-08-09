@@ -35,13 +35,11 @@ export default function TagAdd(props){
   //functions
   const addTagFunc = () => {
     setSaving( true );
-    console.log("add tags func");
     addTag({ variables: {
       title,
       color,
       order: (order !== '' ? parseInt(order) : 0),
     } }).then( ( response ) => {
-      console.log("aaaaaaaaaa");
       const allTags = client.readQuery({query: GET_TAGS}).tags;
       const newTag = {...response.data.addTag, __typename: "Tag"};
       client.writeQuery({ query: GET_TAGS, data: {tags: [...allTags, newTag ] } });
