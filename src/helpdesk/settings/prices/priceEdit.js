@@ -80,11 +80,11 @@ mutation deletePricelist($id: Int!, $newDefId: Int!, $newId: Int!) {
 export default function PricelistEdit(props){
   //data
   const { history, match } = props;
-  const { data, loading, refetch } = useQuery(GET_PRICELIST, { variables: {id: parseInt(props.match.params.id)} });
+  const { data, loading, refetch } = useQuery(GET_PRICELIST, { variables: {id: (props.listId ? props.listId : parseInt(props.match.params.id))} });
   const [updatePricelist, {updateData}] = useMutation(UPDATE_PRICELIST);
   const [deletePricelist, {deleteData, client}] = useMutation(DELETE_PRICELIST);
   const allPricelists = toSelArr(client.readQuery({query: GET_PRICELISTS}).pricelists);
-  const filteredPricelists = allPricelists.filter( pricelist => pricelist.id !== parseInt(match.params.id) );
+  const filteredPricelists = allPricelists.filter( pricelist => pricelist.id !== (props.listId ? props.listId : parseInt(props.match.params.id)) );
   const theOnlyOneLeft = allPricelists.length === 0;
 
   //state
@@ -118,8 +118,8 @@ export default function PricelistEdit(props){
   }, [loading]);
 
   React.useEffect( () => {
-      refetch({ variables: {id: parseInt(match.params.id)} });
-  }, [match.params.id]);
+      refetch({ variables: {id: (props.listId ? props.listId : parseInt(props.match.params.id))} });
+  }, [(props.listId ? props.listId : parseInt(props.match.params.id))]);
 
 
   // functions
@@ -129,7 +129,7 @@ export default function PricelistEdit(props){
       return {id: p.id, price: (p.price === "" ? 0 : parseFloat(p.price))}
     });
     updatePricelist({ variables: {
-      id: parseInt(match.params.id),
+      id: (props.listId ? props.listId : parseInt(props.match.params.id)),
       title,
       order: (order !== '' ? parseInt(order) : 0),
       afterHours: (afterHours !== '' ? parseInt(afterHours) : 0),
@@ -149,44 +149,6 @@ export default function PricelistEdit(props){
     });
 
      setSaving( false );
-  /*
-    this.state.taskTypes.concat(this.state.tripTypes).filter((item)=>item.price.id!==undefined).map((type)=>
-      rebase.updateDoc('/help-prices/'+type.price.id, {price:parseFloat(type.price.price === "" ? "0": type.price.price)})
-    );
-
-    this.state.taskTypes.filter((item)=>item.price.id===undefined).map((type)=>
-      rebase.addToCollection('/help-prices', {pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price)}).then((response)=>{
-        let index = this.state.taskTypes.findIndex((item)=>item.id===type.id);
-        let newTaskTypes=[...this.state.taskTypes];
-        let newTaskType = {...newTaskTypes[index]};
-        newTaskType.price={pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price), id:response.id};
-        newTaskTypes[index] = newTaskType;
-        this.setState({taskTypes:newTaskTypes});
-      })
-    )
-    this.state.tripTypes.filter((item)=>item.price.id===undefined).map((type)=>
-      rebase.addToCollection('/help-prices', {pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price)}).then((response)=>{
-        let index = this.state.tripTypes.findIndex((item)=>item.id===type.id);
-        let newTripTypes=[...this.state.tripTypes];
-        let newTripType = {...newTripTypes[index]};
-        newTripType.price={pricelist:(this.props.match ? this.props.match.params.id : this.props.listId),type:type.id,price:parseFloat(type.price.price === "" ? "0": type.price.price), id:response.id};
-        newTripTypes[index] = newTripType;
-        this.setState({tripTypes:newTripTypes});
-      })
-    )
-
-
-    rebase.updateDoc('/help-pricelists/'+(this.props.listId ? this.props.listId : this.props.match.params.id),
-    {
-      title:this.state.pricelistName,
-      def:this.state.def,
-      afterHours:parseFloat(this.state.afterHours===''?'0':this.state.afterHours),
-      materialMargin:parseFloat(this.state.margin===''?'0':this.state.margin),
-      materialMarginExtra:parseFloat(this.state.marginExtra===''?'0':this.state.marginExtra)
-    })
-      .then(()=>
-        this.setState({saving:false}, () => {if (this.props.changedName) this.props.changedName(this.state.pricelistName)})
-      ); */
 }
 
 const deletePricelistFunc = () => {
@@ -194,7 +156,7 @@ const deletePricelistFunc = () => {
 
   if(window.confirm("Are you sure?")){
     deletePricelist({ variables: {
-      id: parseInt(match.params.id),
+      id: (props.listId ? props.listId : parseInt(props.match.params.id)),
       newDefId: ( newDefPricelist ? parseInt(newDefPricelist.id) : null ),
       newId: ( newPricelist ? parseInt(newPricelist.id) : null ),
     } }).then( ( response ) => {
@@ -210,37 +172,6 @@ const deletePricelistFunc = () => {
     });
   }
 };
-
-
-  /*deletePricelistPopup(){
-    if(window.confirm("Are you sure you want to delete this pricelist?")){
-      database.collection('companies').where("pricelist", "==", (this.props.match ? this.props.match.params.id : this.props.listId)).get()
-			.then((data)=>{
-        let companies = snapshotToArray(data);
-        if(companies.length === 0){
-          this.deletePricelist();
-        }else{
-          this.setState({ companies:companies.map((company)=>({...company,pricelist:null})), openEditCompanies:true })
-        }
-			});
-    }
-  }
-
-  deletePricelist(){
-    rebase.removeDoc('/help-pricelists/'+(this.props.match ? this.props.match.params.id : this.props.listId));
-    if(this.state.wasDef){
-      this.assignDefRandomly();
-    }
-    this.state.taskTypes.filter((item)=>item.price.id!==undefined).map((taskType)=>
-      rebase.removeDoc('/help-prices/'+taskType.price.id)
-    );
-    if (this.props.listId) {
-      this.props.deletedList();
-    } else {
-      this.props.history.goBack();
-    }
-  }
-*/
 
   if (loading) {
     return <Loading />

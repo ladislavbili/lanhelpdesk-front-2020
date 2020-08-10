@@ -1,385 +1,379 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, Label,Input, Alert } from 'reactstrap';
-import Switch from "react-switch";
-import {rebase} from '../../../index';
-import {toSelArr} from '../../../helperFunctions';
+import React from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 
-import { connect } from "react-redux";
-import {
-  storageHelpPricelistsStart,
-  storageMetadataStart,
-  storageCompaniesStart,
-  storageHelpTaskTypesStart,
-  storageHelpTripTypesStart,
-  storageHelpProjectsStart,
-  storageHelpTasksStart,
-} from '../../../redux/actions';
-import {sameStringForms, isEmail} from '../../../helperFunctions';
+import { Button, FormGroup, Label, Input } from 'reactstrap';
+import Switch from "react-switch";
+import {toSelArr} from '../../../helperFunctions';
+import Select from 'react-select';
+import {selectStyle} from "configs/components/select";
+
+import { isEmail } from '../../../helperFunctions';
 import CompanyRents from './companyRents';
 import CompanyPriceList from './companyPriceList';
-import { noDef } from 'configs/constants/projects';
-const projectNoCompany = noDef.company;
+import Loading from 'components/loading';
 
-class CompanyEdit extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      pricelists:[{label: "Nový cenník", value: "0"}],
-      pricelist:{},
-      oldPricelist: {},
-      priceName: "",
-      taskTypes: [],
-      tripTypes: [],
-      title:'',
-      oldTitle: "",
-      ICO: "",
-      oldICO: "",
-      DIC: "",
-      oldDIC: "",
-      IC_DPH: "",
-      oldIC_DPH: "",
-      country: "",
-      oldCountry: "",
-      city: "",
-      oldCity: "",
-      street: "",
-      oldStreet: "",
-      PSC: "",
-      oldPSC: "",
-      mail: "",
-      oldMail: "",
-      phone: "",
-      oldPhone: "",
-      description: "",
-      oldDescription: "",
-      workPausal:0,
-      oldWorkPausal:0,
-      pausalPrice:0,
-      oldPausalPrice:0,
-      drivePausal:0,
-      oldDrivePausal:0,
-      pausal:0,
-      oldPausal: 0,
-      rented:[],
-      oldRented:[],
-      dph:20,
-      oldDph:20,
-      monthlyPausal:false,
-      oldMonthlyPausal:false,
-      fakeID:0,
-      oldFakeID:0,
-      newData: false,
-      loading:true,
-      saving:false,
-      clearCompanyRents:false,
-      deletingCompany: false,
-    }
-    this.getFakeID.bind(this);
-    this.savePriceList.bind(this);
-    this.setData.bind(this);
-    this.submit.bind(this);
-    this.cancel.bind(this);
-  }
+import {  GET_COMPANIES } from './index';
+import {  GET_PRICELISTS } from '../prices/index';
+import {  ADD_PRICELIST } from '../prices/priceAdd';
 
-  getFakeID(){
-    let fakeID = this.state.fakeID;
-    this.setState({fakeID:fakeID+1})
-    return fakeID;
-  }
-
-  storageLoaded(props){
-    return props.pricelistsLoaded &&
-      props.metadataLoaded &&
-      props.companiesLoaded &&
-      props.tripTypesLoaded &&
-      props.taskTypesLoaded &&
-      props.projectsLoaded &&
-      props.tasksLoaded
-  }
-  componentWillReceiveProps(props){
-    if(!sameStringForms(props.pricelists,this.props.pricelists)){
-      this.setState({pricelists: [{label: "Nový cenník", value: "0"}, ...toSelArr(props.pricelists)]})
-    }
-    if(!this.storageLoaded(this.props) && this.storageLoaded(props)){
-      this.setData(props);
-    }
-    if(this.props.match.params.id!==props.match.params.id){
-      this.setState({loading:true})
-      if(this.storageLoaded(props)){
-        this.setData(props);
-      }
-    }
-  }
-
-  componentWillMount(){
-    if(this.storageLoaded(this.props)){
-      this.setData(this.props);
-    }
-    if(!this.props.metadataActive){
-      this.props.storageMetadataStart();
-    }
-    if(!this.props.pricelistsActive){
-      this.props.storageHelpPricelistsStart();
-    }
-    if(!this.props.companiesActive){
-      this.props.storageCompaniesStart();
-    }
-    if(!this.props.tripTypesActive){
-      this.props.storageHelpTripTypesStart();
-    }
-    if(!this.props.taskTypesActive){
-      this.props.storageHelpTaskTypesStart();
-    }
-    if(!this.props.projectsActive){
-      this.props.storageHelpProjectsStart();
-    }
-    if(!this.props.tasksActive){
-      this.props.storageHelpTasksStart();
-    }
-  }
-
-  setData(props){
-    let pricelists = [{label: "Nový cenník", value: "0"}, ...toSelArr(props.pricelists)];
-    let meta = props.metadata;
-    let company = props.companies.find((company)=>company.id===props.match.params.id);
-    let pricelist=pricelists.find((item)=>item.id===company.pricelist);
-    if(pricelist===undefined){
-      pricelist=pricelists.find((item)=>item.id===meta.defaultPricelist);
-      if(pricelist===undefined && pricelists.length>0){
-        pricelist=pricelists[0];
-      }
-    }
-    let taskTypes = props.taskTypes.map((type)=>{
-      let newType={...type};
-      newType.price={price:0};
-      return newType;
-    });
-
-    let tripTypes = props.tripTypes.map((type)=>{
-      let newType={...type};
-      newType.price={price:0};
-      return newType;
-    });
-    let rented = company.rented||[];
-    let fakeID = 0;
-    if(rented.length!==0){
-      fakeID = rented.sort((item1,item2)=>item1.id < item2.id?1:-1)[0].id+1;
-    }
-
-    this.setState({
-      title: company.title,
-      pausal: company.pausal || 0,
-      workPausal: company.workPausal || 0,
-      pausalPrice: company.pausalPrice || 0,
-      drivePausal: company.drivePausal || 0,
-      rented,
-      fakeID,
-      ICO: company.ICO || "",
-      DIC: company.DIC || "",
-      IC_DPH: company.IC_DPH || "",
-      country: company.country || "",
-      city: company.city || "",
-      street: company.street || "",
-      PSC: company.PSC || "",
-      mail: company.mail || "",
-      phone: company.phone || "",
-      description: company.description || "",
-      dph:company.dph || 0,
-      monthlyPausal: company.monthlyPausal === true,
-      pricelists,
-      pricelist,
-      taskTypes,
-      tripTypes,
-
-      oldPausal: company.pausal || 0,
-      oldWorkPausal: company.workPausal || 0,
-      oldPausalPrice: company.pausalPrice || 0,
-      oldDrivePausal: company.drivePausal || 0,
-      oldRented:rented,
-      oldFakeID:fakeID,
-      oldPricelist: pricelist,
-      oldTitle: company.title,
-      oldICO: company.ICO || "",
-      oldDIC: company.DIC || "",
-      oldIC_DPH: company.IC_DPH || "",
-      oldCountry: company.country || "",
-      oldCity: company.city || "",
-      oldStreet: company.street || "",
-      oldPSC: company.PSC || "",
-      oldMail: company.mail || "",
-      oldPhone: company.phone || "",
-      oldDescription: company.description || "",
-      oldDph:company.dph || 0,
-      oldMonthlyPausal: company.monthlyPausal === true,
-      loading:false,
-      newData: false,
-    })
-  }
-
-  submit(){
-      this.setState({saving:true});
-      rebase.updateDoc('/companies/'+this.props.match.params.id,
-      { title:this.state.title,
-        workPausal:this.state.workPausal,
-        pausalPrice: this.state.pausalPrice,
-        drivePausal:this.state.drivePausal,
-        rented:this.state.rented.map((rent)=>{
-          return{
-            id:rent.id,
-            title:rent.title,
-            quantity:isNaN(parseInt(rent.quantity))?0:rent.quantity,
-            unitCost:isNaN(parseFloat(rent.unitCost))?0:rent.unitCost,
-            unitPrice:isNaN(parseFloat(rent.unitPrice))?0:rent.unitPrice,
-            totalPrice:isNaN(parseFloat(rent.totalPrice))?0:rent.totalPrice,
+const GET_COMPANY = gql`
+query company($id: Int!) {
+  company (
+    id: $id
+  ) {
+      title
+      dph
+      ico
+      dic
+      ic_dph
+      country
+      city
+      street
+      zip
+      email
+      phone
+      description
+      pricelist {
+        id
+        title
+        order
+        afterHours
+        def
+        materialMargin
+        materialMarginExtra
+        prices {
+          id
+          type
+          price
+          taskType {
+            id
+            title
           }
-        }),
-        pausal:this.state.pausal,
-        pricelist:this.state.pricelist.id,
-        ICO: this.state.ICO,
-        DIC: this.state.DIC,
-        IC_DPH: this.state.IC_DPH,
-        country: this.state.country,
-        city: this.state.city,
-        street: this.state.street,
-        PSC: this.state.PSC,
-        mail: this.state.mail,
-        phone: this.state.phone,
-        monthlyPausal:this.state.monthlyPausal,
-        description: this.state.description,
-        dph:isNaN(parseInt(this.state.dph))?0:parseInt(this.state.dph),
-      })
-        .then(()=>{this.setState({
-          saving:false,
-          newData: false,
-          rented:this.state.rented.map((rent)=>{
-            return{
-              id:rent.id,
-              title:rent.title,
-              quantity:isNaN(parseInt(rent.quantity))?0:rent.quantity,
-              unitCost:isNaN(parseFloat(rent.unitCost))?0:rent.unitCost,
-              unitPrice:isNaN(parseFloat(rent.unitPrice))?0:rent.unitPrice,
-              totalPrice:isNaN(parseFloat(rent.totalPrice))?0:rent.totalPrice,
-            }
-          }),
+          tripType {
+            id
+            title
+          }
+        }
+      }
+      monthly
+      monthlyPausal
+      taskWorkPausal
+      taskTripPausal
+      companyRents {
+        id
+        title
+        quantity
+        cost
+        price
+      }
+    }
+}
+`;
+const UPDATE_COMPANY = gql`
+mutation updateCompany($id: Int!, $title: String, $dph: Int, $ico: String, $dic: String, $ic_dph: String, $country: String, $city: String, $street: String, $zip: String, $email: String, $phone: String, $description: String, $pricelistId: Int!, $monthly: Boolean, $monthlyPausal: Float, $taskWorkPausal: Float, $taskTripPausal: Float, $rents: [CompanyRentUpdateInput]) {
+  updateCompany(
+    id: $id,
+    title: $title,
+    dph: $dph,
+    ico: $ico,
+    dic: $dic,
+    ic_dph: $ic_dph,
+    country: $country,
+    city: $city,
+    street: $street,
+    zip: $zip,
+    email: $email,
+    phone: $phone,
+    description: $description,
+    pricelistId: $pricelistId,
+    monthly: $monthly,
+    monthlyPausal: $monthlyPausal,
+    taskWorkPausal: $taskWorkPausal,
+    taskTripPausal: $taskTripPausal,
+    rents: $rents,
+  ){
+    id
+    title
+    monthlyPausal
+    taskWorkPausal
+    taskTripPausal
+  }
+}
+`;
 
-          oldWorkPausal:this.state.workPausal,
-          oldPausalPrice: this.state.pausalPrice,
-          oldDrivePausal:this.state.drivePausal,
-          oldRented:this.state.rented,
-          oldFakeID:this.state.fakeID,
-          oldPricelist: this.state.pricelist,
-          oldTitle: this.state.title,
-          oldICO: this.state.ICO,
-          oldDIC: this.state.DIC,
-          oldIC_DPH: this.state.IC_DPH,
-          oldCountry: this.state.country,
-          oldCity: this.state.city,
-          oldStreet: this.state.street,
-          oldPSC: this.state.PSC,
-          oldMail: this.state.mail,
-          oldPhone: this.state.phone,
-          oldDescription: this.state.description,
-          oldPausal: this.state.pausal,
-          oldDph: this.state.dph,
-          oldMonthlyPausal: this.state.monthlyPausal,
-        })});
+export const DELETE_COMPANY = gql`
+mutation deleteCompany($id: Int!, $newId: Int!) {
+  deleteCompany(
+    id: $id,
+    newId: $newId,
+  ){
+    id
+  }
+}
+`;
+
+export default function CompanyEdit(props){
+  //data
+  const { history, match } = props;
+  const { data, loading, refetch } = useQuery(GET_COMPANY, { variables: {id: parseInt(match.params.id)} });
+  const [updateCompany, {updateData}] = useMutation(UPDATE_COMPANY);
+  const [deleteCompany, {deleteData, client}] = useMutation(DELETE_COMPANY);
+
+  const [ addPricelist ] = useMutation(ADD_PRICELIST);
+  const { data: pricelistsData, loading: pricelistsLoading } = useQuery(GET_PRICELISTS);
+  let pl = (pricelistsLoading || !pricelistsData ? [] : pricelistsData.pricelists);
+  pl = [{label: "Nový cenník", value: "0"}, ...toSelArr(pl)];
+  const [ pricelists, setPricelists ] = React.useState(pl);
+
+  const allCompanies = toSelArr(client.readQuery({query: GET_COMPANIES}).companies);
+  const filteredCompanies = allCompanies.filter( comp => comp.id !== parseInt(match.params.id) );
+  const theOnlyOneLeft = allCompanies.length === 0;
+
+  //state
+  const [ title, setTitle ] = React.useState("");
+  const [ oldTitle, setOldTitle ] = React.useState("");
+
+    const [ dph, setDph ] = React.useState(0);
+    const [ oldDph, setOldDph ] = React.useState(0);
+
+  const [ ico, setIco ] = React.useState("");
+  const [ oldIco, setOldIco ] = React.useState("");
+
+  const [ dic, setDic ] = React.useState("");
+  const [ oldDic, setOldDic ] = React.useState("");
+
+  const [ ic_dph, setIcDph ] = React.useState("");
+  const [ oldIcDph, setOldIcDph ] = React.useState("");
+
+  const [ country, setCountry ] = React.useState("");
+  const [ oldCountry, setOldCountry ] = React.useState("");
+
+  const [ city, setCity ] = React.useState("");
+  const [ oldCity, setOldCity ] = React.useState("");
+
+  const [ street, setStreet ] = React.useState("");
+  const [ oldStreet, setOldStreet ] = React.useState("");
+
+  const [ zip, setZip ] = React.useState("");
+  const [ oldZip, setOldZip ] = React.useState("");
+
+  const [ email, setEmail ] = React.useState("");
+  const [ oldEmail, setOldEmail ] = React.useState("");
+
+  const [ phone, setPhone ] = React.useState("");
+  const [ oldPhone, setOldPhone ] = React.useState("");
+
+  const [ description, setDescription ] = React.useState("");
+  const [ oldDescription, setOldDescription ] = React.useState("");
+
+  const [ monthly, setMonthly ] = React.useState(false);
+  const [ oldMonthly, setOldMonthly ] = React.useState(false);
+
+  const [ monthlyPausal, setMonthlyPausal ] = React.useState(0);
+  const [ oldMonthlyPausal, setOldMonthlyPausal ] = React.useState(0);
+
+  const [ taskWorkPausal, setTaskWorkPausal ] = React.useState(0);
+  const [ oldTaskWorkPausal, setOldTaskWorkPausal ] = React.useState(0);
+
+  const [ taskTripPausal, setTaskTripPausal ] = React.useState(0);
+  const [ oldTaskTripPausal, setOldTaskTripPausal ] = React.useState(0);
+
+  const [ pricelist, setPricelist ] = React.useState({});
+  const [ oldPricelist, setOldPricelist ] = React.useState({});
+  const [ pricelistName, setPricelistName ] = React.useState("");
+
+  const [ saving, setSaving ] = React.useState(false);
+  const [ deleting, setDeleting] = React.useState(false);
+  const [ newData, setNewData ] = React.useState(false);
+  const [ clearCompanyRents, setClearCompanyRents ] = React.useState(false);
+  const [ fakeID, setFakeID ] = React.useState(0);
+
+  const [ newCompany, setNewCompany ] = React.useState(null);
+  const [ choosingNewCompany, setChooseingNewCompany ] = React.useState(false);
+
+  const [ rents, setRents ] = React.useState([]);
+
+  const getFakeID = () => {
+    let fake = fakeID;
+    setFakeID(fakeID+1);
+    return fake;
   }
 
-  deleteCompany(){
-    const companyID = this.props.match.params.id;
-    const tasks = this.props.tasks.filter( (task) => task.company === companyID );
-    const projects = this.props.projects.filter( (project) => project.def && project.def.company && project.def.company.value === companyID );
-    const message = `There are ${tasks.length > 0 ? `some (${tasks.length})` : 'no'} tasks and ${projects.length > 0 ? `some (${projects.length})` : 'no'} projects depended on this company.
-    Are you sure you want to delete it?
+  //sync
+  React.useEffect( () => {
+      if (!pricelistsLoading){
+        let pl = [{label: "Nový cenník", value: "0"}, ...toSelArr(pricelistsData.pricelists)];
+        setPricelists(pl);
+      }
+  }, [pricelistsLoading]);
 
-    This will reset projects settings and tasks to no company.`
-      if(window.confirm(message)){
-        this.setState({deletingCompany: true })
-        Promise.all([
-          ...projects.map( (project) => rebase.updateDoc(`/help-projects/${project.id}`,{
-            def: {
-              ...project.def,
-              company: {
-                ...projectNoCompany
-              }
-            }
-          })),
-          ...tasks.map((task) => rebase.updateDoc(`/help-tasks/${task.id}`, { company: null }) ),
-          rebase.removeDoc('/companies/'+ companyID)
-        ])
-        .then(()=>{
-          this.props.history.goBack();
+  React.useEffect( () => {
+      if (!loading){
+        setTitle(data.company.title);
+        setDph(data.company.dph);
+        setIco(data.company.ico);
+        setDic(data.company.dic);
+        setIcDph(data.company.ic_dph);
+        setCountry(data.company.country);
+        setCity(data.company.city);
+        setStreet(data.company.street);
+        setZip(data.company.zip);
+        setEmail(data.company.email);
+        setPhone(data.company.phone);
+        setDescription(data.company.description);
+        setMonthly(data.company.monthly);
+        setMonthlyPausal(data.company.monthlyPausal);
+        setTaskWorkPausal(data.company.taskWorkPausal);
+        setTaskTripPausal(data.company.taskTripPausal);
+        let pl = {...data.company.pricelist, value: data.company.pricelist.id, label: data.company.pricelist.title};
+        setPricelist(pl);
+        setOldPricelist(pl);
+        let r = data.company.companyRents.map(re => {
+          return {
+            id: re.id,
+            title: re.title,
+            quantity: re.quantity,
+            unitPrice: re.price,
+            unitCost: re.cost,
+            totalPrice: parseInt(re.quantity)*parseFloat(re.price),
+          }
+        })
+        setRents(r);
+      }
+  }, [loading]);
+
+  React.useEffect( () => {
+      refetch({ variables: {id: parseInt(match.params.id)} });
+  }, [match.params.id]);
+
+    // functions
+    const updateCompanyFunc = () => {
+      setSaving( true );
+
+      let newRents = rents.map(r => {
+        let newRent = {
+          title: r.title,
+          quantity: isNaN(parseInt(r.quantity)) ? 0 : parseInt(r.quantity),
+          cost: isNaN(parseInt(r.unitCost)) ? 0 : parseInt(r.unitCost),
+          price: isNaN(parseInt(r.unitPrice)) ? 0 : parseInt(r.unitPrice)
+        };
+        if (r.id){
+          newRent.id = r.id;
+        }
+        return newRent;
+      });
+
+      updateCompany({ variables: {
+        id: parseInt(match.params.id),
+        title,
+        dph: (dph === "" ? 0 : parseInt(dph)),
+        ico,
+        dic,
+        ic_dph,
+        country,
+        city,
+        street,
+        zip,
+        email,
+        phone,
+        description,
+        pricelistId: pricelist.id,
+        monthly,
+        monthlyPausal: (monthlyPausal === "" ? 0 : parseFloat(monthlyPausal)),
+        taskWorkPausal: (taskWorkPausal === "" ? 0 : parseFloat(taskWorkPausal)),
+        taskTripPausal: (taskTripPausal === "" ? 0 : parseFloat(taskTripPausal)),
+        rents: newRents,
+      } }).then( ( response ) => {
+      /*  let updatedRole = {...response.data.updateRole, __typename: "Role"};
+        client.writeQuery({ query: GET_ROLES, data: {roles: [...allRoles.filter( role => role.id !== parseInt(match.params.id) ), updatedRole ] } });*/
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+
+       setSaving( false );
+       setNewData( false );
+    };
+
+    const deleteCompanyFunc = () => {
+      setChooseingNewCompany(false);
+
+      if(window.confirm("Are you sure?")){
+        deleteCompany({ variables: {
+          id: parseInt(match.params.id),
+          newId: parseInt(newCompany.id),
+        } }).then( ( response ) => {
+          client.writeQuery({ query: GET_COMPANIES, data: {companies: filteredCompanies} });
+          history.push('/helpdesk/settings/companies/add');
+        }).catch( (err) => {
+          console.log(err.message);
+          console.log(err);
         });
       }
+    };
+
+    const savePriceList = () => {
+      setSaving( true );
+
+      addPricelist({ variables: {
+        title: pricelistName,
+        order: 0,
+        afterHours: 0,
+        def: false,
+        materialMargin: 0,
+        materialMarginExtra: 0,
+        prices: [],
+      } }).then( ( response ) => {
+        let newPricelist = response.data.addPricelist;
+        setPricelist(newPricelist);
+        let newPricelists = pricelists.concat([newPricelist]);
+        setPricelists(newPricelists);
+
+        updateCompanyFunc();
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+      setSaving( false );
     }
 
-  savePriceList(){
-    this.setState({saving:true});
-    rebase.addToCollection('/help-pricelists',
-    {
-      title: this.state.priceName,
-      afterHours:'0',
-      materialMargin:'0',
-      materialMarginExtra:'0'
-    })
-      .then((listResponse)=>{
-        this.state.taskTypes.map((taskType,index)=>
-          rebase.addToCollection('/help-prices', {pricelist:listResponse.id,type:taskType.id,price:"0"})
-        );
-        this.state.tripTypes.map((tripType,index)=>
-          rebase.addToCollection('/help-prices', {pricelist:listResponse.id,type:tripType.id,price:"0"})
-        );
-        this.setState({
-          saving:false,
-          pricelist: {label: this.state.priceName, value: listResponse.id, id: listResponse.id},
-          newData: false,
-        }, () => this.submit());
-      });
+    const cancel = () => {
+      setTitle(oldTitle);
+      setIco(oldIco);
+      setDic(oldDic);
+      setIcDph(oldIcDph);
+      setCountry(oldCountry);
+      setCity(oldCity);
+      setStreet(oldStreet);
+      setZip(oldZip);
+      setEmail(oldEmail);
+      setPhone(oldPhone);
+      setDescription(oldDescription);
+      setMonthly(oldMonthly);
+      setMonthlyPausal(oldMonthlyPausal);
+      setTaskWorkPausal(oldTaskWorkPausal);
+      setTaskTripPausal(oldTaskTripPausal);
+      setPricelist(oldPricelist);
+
+      setClearCompanyRents(true);
+      setNewData(false);
+      setPricelistName("");
+    }
+
+  const attributes = [title, ico, email];
+  const cannotSave = saving || attributes.some(attr => attr === "") || (pricelist.value === "0" && pricelistName === "");
+
+  if (loading) {
+    return <Loading />
   }
 
-  cancel(){
-    this.setState({
-      pricelist: this.state.oldPricelist,
-      title: this.state.oldTitle,
-      ICO: this.state.oldICO,
-      DIC: this.state.oldDIC,
-      IC_DPH: this.state.oldIC_DPH,
-      country: this.state.oldCountry,
-      city: this.state.oldCity,
-      street: this.state.oldStreet,
-      PSC: this.state.oldPSC,
-      mail: this.state.oldMail,
-      phone: this.state.oldPhone,
-      description: this.state.oldDescription,
-      pausal: this.state.oldPausal,
-      workPausal: this.state.oldWorkPausal,
-      pausalPrice: this.state.oldPausalPrice,
-      drivePausal: this.state.oldDrivePausal,
-      rented:this.state.oldRented,
-      dph:this.state.oldDph,
-      monthlyPausal:this.state.monthlyPausal,
-
-      clearCompanyRents:true,
-      newData: false,
-    })
-  }
-
-  render(){
     return (
       <div className="fit-with-header-and-commandbar">
-        {this.state.newData &&
-        <div style={{position: "fixed", zIndex: "999", backgroundColor: "rgba(255,255,255,0.5)", top: "0", left: "0", width: "100%", height: "100vh"}}></div>
-      }
-
-      <h2 className="p-t-10 p-l-20 p-b-5" style={(this.state.newData ? {position: "relative", zIndex: "99999"} : {})}>Edit company</h2>
-      <hr style={(this.state.newData ? {position: "relative", zIndex: "99999"} : {})}/>
-
-        {
-          this.state.loading &&
-          <Alert color="success">
-            Loading data...
-          </Alert>
+        {newData &&
+          <div style={{position: "fixed", zIndex: "999", backgroundColor: "rgba(255,255,255,0.5)", top: "0", left: "0", width: "100%", height: "100vh"}}></div>
         }
+
+      <h2 className="p-t-10 p-l-20 p-b-5" style={(newData ? {position: "relative", zIndex: "99999"} : {})}>Edit company</h2>
+      <hr style={(newData ? {position: "relative", zIndex: "99999"} : {})}/>
 
         <div className="form-body-highlighted scroll-visible">
           <div className="p-20">
@@ -393,8 +387,11 @@ class CompanyEdit extends Component{
                   id="name"
                   type="text"
                   placeholder="Enter company name"
-                  value={this.state.title}
-                  onChange={(e)=>this.setState({title: e.target.value, newData: true, })}
+                  value={title}
+                  onChange={(e)=> {
+                    setTitle(e.target.value);
+                    setNewData( true );
+                  }}
                   />
               </div>
             </FormGroup>
@@ -409,8 +406,11 @@ class CompanyEdit extends Component{
                 id="dph"
                 type="number"
                 placeholder="Enter DPH"
-                value={this.state.dph}
-                onChange={(e)=>this.setState({dph: e.target.value, newData: true })  }
+                value={dph}
+                onChange={(e)=>{
+                  setDph(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
@@ -425,8 +425,11 @@ class CompanyEdit extends Component{
                 id="ico"
                 type="text"
                 placeholder="Enter ICO"
-                value={this.state.ICO}
-                onChange={(e)=>this.setState({ICO: e.target.value, newData: true })  }
+                value={ico}
+                onChange={(e)=>{
+                  setIco(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
@@ -441,8 +444,11 @@ class CompanyEdit extends Component{
                 id="dic"
                 type="text"
                 placeholder="Enter DIC"
-                value={this.state.DIC}
-                onChange={(e)=>this.setState({DIC: e.target.value, newData: true }) }
+                value={dic}
+                onChange={(e)=>{
+                  setDic(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
@@ -457,8 +463,11 @@ class CompanyEdit extends Component{
                 id="ic_dph"
                 type="text"
                 placeholder="Enter IC DPH"
-                value={this.state.IC_DPH}
-                onChange={(e)=>this.setState({IC_DPH: e.target.value, newData: true }) }
+                value={ic_dph}
+                onChange={(e)=>{
+                  setIcDph(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
@@ -473,8 +482,11 @@ class CompanyEdit extends Component{
                 id="country"
                 type="text"
                 placeholder="Enter country"
-                value={this.state.country}
-                onChange={(e)=>this.setState({country: e.target.value, newData: true })}
+                value={country}
+                onChange={(e)=>{
+                  setCountry(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
@@ -489,8 +501,11 @@ class CompanyEdit extends Component{
                 id="city"
                 type="text"
                 placeholder="Enter city"
-                value={this.state.city}
-                onChange={(e)=>this.setState({city: e.target.value, newData: true})}
+                value={city}
+                onChange={(e)=>{
+                  setCity(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
@@ -505,8 +520,11 @@ class CompanyEdit extends Component{
                 id="street"
                 type="text"
                 placeholder="Enter street"
-                value={this.state.street}
-                onChange={(e)=>this.setState({street: e.target.value, newData: true})}
+                value={street}
+                onChange={(e)=>{
+                  setStreet(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
@@ -521,8 +539,11 @@ class CompanyEdit extends Component{
                 id="psc"
                 type="text"
                 placeholder="Enter PSČ"
-                value={this.state.PSC}
-                onChange={(e)=>this.setState({PSC: e.target.value, newData: true})}
+                value={zip}
+                onChange={(e)=>{
+                  setZip(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
@@ -535,11 +556,14 @@ class CompanyEdit extends Component{
               <Input
                 name="mail"
                 id="mail"
-                className={(this.state.mail.length > 0 && !isEmail(this.state.mail)) ? "form-control-warning" : ""}
+                className={(email.length > 0 && !isEmail(email)) ? "form-control-warning" : ""}
                 type="text"
                 placeholder="Enter e-mail"
-                value={this.state.mail}
-                onChange={(e)=>this.setState({mail: e.target.value, newData: true})}
+                value={email}
+                onChange={(e)=>{
+                  setEmail(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
@@ -554,8 +578,11 @@ class CompanyEdit extends Component{
                  id="phone"
                  type="text"
                  placeholder="Enter phone"
-                 value={this.state.phone}
-                onChange={(e)=>this.setState({phone: e.target.value, newData: true})}
+                 value={phone}
+                 onChange={(e)=>{
+                   setPhone(e.target.value);
+                   setNewData( true );
+                 }}
                 />
             </div>
             </FormGroup>
@@ -570,34 +597,37 @@ class CompanyEdit extends Component{
                 id="description"
                 type="text"
                 placeholder="Enter description"
-                value={this.state.description}
-                onChange={(e)=>this.setState({description: e.target.value, newData: true})}
+                value={description}
+                onChange={(e)=>{
+                  setDescription(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
             </FormGroup>
 
           </div>
 
-          { this.props.role > 1 && <div className="p-20 table-highlight-background">
-            <div className="row">
-              <span>
-                <h3 className="m-r-5 m-b-10">Mesačný paušál</h3>
-              </span>
-
-              <label>
-                <Switch
-                  checked={this.state.monthlyPausal}
-                  onChange={()=>{
-                    this.setState({monthlyPausal:!this.state.monthlyPausal, newData: true })
-                  }}
-                  height={22}
-                  checkedIcon={<span className="switchLabel">YES</span>}
-                  uncheckedIcon={<span className="switchLabel">NO</span>}
-                  onColor={"#0078D4"} />
-                <span className="m-l-10"></span>
-              </label>
-            </div>
-            { this.state.monthlyPausal && <div>
+        <div className="p-20 table-highlight-background">
+          <div className="row">
+            <span className="m-r-5">
+              <h3>Mesačný paušál</h3>
+            </span>
+            <label>
+              <Switch
+                checked={monthly}
+                onChange={()=> {
+                  setMonthly(!monthly);
+                  setNewData( true );
+                }}
+                height={22}
+                checkedIcon={<span className="switchLabel">YES</span>}
+                uncheckedIcon={<span className="switchLabel">NO</span>}
+                onColor={"#0078D4"} />
+              <span className="m-l-10"></span>
+            </label>
+          </div>
+            { monthly && <div>
               <FormGroup className="row m-b-10 m-t-20">
                 <div className="m-r-10 w-20">
                   <Label for="pausal">Mesačná</Label>
@@ -608,159 +638,124 @@ class CompanyEdit extends Component{
                     id="pausal"
                     type="number"
                     placeholder="Enter work pausal"
-                    value={this.state.pausalPrice}
-                    onChange={(e)=>this.setState({pausalPrice:e.target.value, newData: true,})}
+                    value={monthlyPausal}
+                    onChange={(e)=>{
+                      setMonthlyPausal(e.target.value);
+                      setNewData( true );
+                    }}
                     />
                 </div>
                 <div className="m-l-10">
                   <Label for="pausal">EUR bez DPH/mesiac</Label>
                 </div>
               </FormGroup>
-            <FormGroup className="row m-b-10">
-              <div className="m-r-10 w-20">
-              <Label for="pausal">Paušál práce</Label>
-              </div>
+              <FormGroup className="row m-b-10">
+                <div className="m-r-10 w-20">
+                  <Label for="pausal">Paušál práce</Label>
+                </div>
                 <div className="flex">
-              <Input
-                name="pausal"
-                id="pausal"
-                type="number"
-                placeholder="Enter work pausal"
-                value={this.state.workPausal}
-                onChange={(e)=>this.setState({workPausal:e.target.value, newData: true,})}
-                />
-            </div>
-            </FormGroup>
-            <FormGroup className="row">
-              <div className="m-r-10 w-20">
-              <Label for="pausal">Paušál výjazdy</Label>
-              </div>
+                  <Input
+                    name="pausal"
+                    id="pausal"
+                    type="number"
+                    placeholder="Enter work pausal"
+                    value={taskWorkPausal}
+                    onChange={(e) => {
+                      setTaskWorkPausal(e.target.value);
+                      setNewData( true );
+                    }}
+                    />
+                </div>
+              </FormGroup>
+              <FormGroup className="row m-b-10">
+                <div className="m-r-10 w-20">
+                  <Label for="pausal">Paušál výjazdy</Label>
+                </div>
                 <div className="flex">
-              <Input
-                name="pausal"
-                id="pausal"
-                type="number"
-                placeholder="Enter drive pausal"
-                value={this.state.drivePausal}
-                onChange={(e)=>this.setState({drivePausal:e.target.value, newData: true,})}
-                />
-            </div>
-            </FormGroup>
+                  <Input
+                    name="pausal"
+                    id="pausal"
+                    type="number"
+                    placeholder="Enter drive pausal"
+                    value={taskTripPausal}
+                    onChange={(e)=> {
+                      setTaskTripPausal(e.target.value);
+                      setNewData( true );
+                    }}
+                    />
+                </div>
+              </FormGroup>
 
-          <CompanyRents
-            clearForm={this.state.clearCompanyRents}
-            setClearForm={()=>this.setState({clearCompanyRents:false})}
-            data={this.state.rented}
-            updateRent={(rent)=>{
-              let newRents=[...this.state.rented];
-              newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
-              this.setState({rented:newRents, newData:true });
-            }}
-            addRent={(rent)=>{
-              let newRents=[...this.state.rented];
-              newRents.push({...rent,id:this.getFakeID()})
-              this.setState({rented:newRents, newData:true });
-            }}
-            removeRent={(rent)=>{
-              let newRents=[...this.state.rented];
-              newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
-              this.setState({rented:newRents, newData:true });
-            }}
-          />
-      </div>}
+              <div className="p-20">
+                <h3 className="m-b-15">Mesačný prenájom licencií a hardware</h3>
+                <CompanyRents
+                  clearForm={clearCompanyRents}
+                  setClearForm={()=>setClearCompanyRents(false)}
+                  data={rents}
+                  updateRent={(rent)=>{
+                    let newRents=[...rents];
+                    newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
+                    setRents( newRents );
+                    setNewData( true );
+                  }}
+                  addRent={(rent)=>{
+                    let newRents=[...rents];
+                    newRents.push({...rent, id: getFakeID()})
+                    setRents( newRents );
+                    setNewData( true );
+                  }}
+                  removeRent={(rent)=>{
+                    let newRents=[...rents];
+                    newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
+                    setRents( newRents );
+                    setNewData( true );
+                  }}
+                  />
+              </div>
 
-      <CompanyPriceList
-        pricelists={this.state.pricelists}
-        pricelist={this.state.pricelist}
-        oldPricelist={this.state.oldPricelist}
-        priceName={this.state.priceName}
-        newData={this.state.newData}
-        cancel={() => this.cancel()}
-        setData={(data) => {
-          let newState = {...this.state};
-          Object.keys(data).forEach((key, i) => {
-            newState[key] = data[key];
-          });
-          newState.newData = true;
-          this.setState({
-            ...newState
-          })}} />
+            </div>}
 
-        </div>}
+            <CompanyPriceList
+              pricelists={pricelists}
+              pricelist={pricelist}
+              oldPricelist={oldPricelist}
+              pricelistName={pricelistName}
+              newData={newData}
+              cancel={() => cancel()}
+              setPricelist={(pl) => setPricelist(pl)}
+              setOldPricelist={(pl) => setOldPricelist(pl)}
+              setNewData={(e) => setNewData(e)}
+              setPricelistName={(n) => setPricelistName(n)}
+              match={match}
+               />
+          </div>
       </div>
 
         <div
           className="form-footer row"
-          style={(this.state.newData ? {zIndex: "99999"} : {})}>
+          style={(newData ? {zIndex: "99999"} : {})}>
 
-          {this.state.newData &&
+          {newData &&
             <Button
               className="btn m-r-5"
-              disabled={this.state.saving || this.state.title.length === 0 || (this.state.pricelist.value === "0" &&
-                                                                              (this.state.priceName === "")) }
+              disabled={ cannotSave }
               onClick={()=>{
-                if (this.state.pricelist.value === "0" && this.state.priceName !== ""){
-                  this.savePriceList();
+                if (pricelist.value === "0" && pricelistName !== ""){
+                  savePriceList();
                 } else {
-                  this.submit()
+                  updateCompanyFunc();
                 }
-            }}>{this.state.saving?'Saving...':'Save changes'}</Button>
+            }}>{saving?'Saving...':'Save changes'}</Button>
           }
+           <Button className="btn-red" disabled={saving || deleting} onClick={deleteCompanyFunc}>Delete</Button>
 
-           <Button className="btn-red" disabled={this.state.saving || this.state.deletingCompany} onClick={this.deleteCompany.bind(this)}>Delete</Button>
-
-
-          {this.state.newData &&
+          {newData &&
             <Button
               className="btn-link"
-              disabled={this.state.saving}
-              onClick={() => this.cancel()}>Cancel changes</Button>
+              disabled={saving}
+              onClick={cancel}>Cancel changes</Button>
           }
-
         </div>
-
       </div>
     );
   }
-}
-
-
-const mapStateToProps = ({
-  storageMetadata,
-  storageHelpPricelists,
-  storageCompanies,
-  storageHelpTaskTypes,
-  storageHelpTripTypes,
-  userReducer,
-  storageHelpTasks,
-  storageHelpProjects,
- }) => {
-  const { taskTypesLoaded, taskTypesActive, taskTypes } = storageHelpTaskTypes;
-  const { tripTypesActive, tripTypes, tripTypesLoaded } = storageHelpTripTypes;
-  const { metadataActive, metadata, metadataLoaded } = storageMetadata;
-  const { pricelistsActive, pricelists, pricelistsLoaded } = storageHelpPricelists;
-  const { companiesActive, companies, companiesLoaded } = storageCompanies;
-	const { tasksActive, tasksLoaded, tasks } = storageHelpTasks;
-	const { projectsActive, projectsLoaded, projects } = storageHelpProjects;
-  const role = userReducer.userData ? userReducer.userData.role.value : 0;
-  return {
-    taskTypesLoaded, taskTypesActive, taskTypes,
-    tripTypesActive, tripTypes, tripTypesLoaded,
-    metadataActive, metadata, metadataLoaded,
-    pricelistsActive, pricelists, pricelistsLoaded,
-    companiesActive, companies, companiesLoaded,
-    tasksActive, tasksLoaded, tasks,
-    projectsActive, projectsLoaded, projects,
-    role,
-  };
-};
-
-export default connect(mapStateToProps, {
-  storageHelpPricelistsStart,
-  storageMetadataStart,
-  storageCompaniesStart,
-  storageHelpTaskTypesStart,
-  storageHelpTripTypesStart,
-  storageHelpProjectsStart,
-  storageHelpTasksStart,
-})(CompanyEdit);

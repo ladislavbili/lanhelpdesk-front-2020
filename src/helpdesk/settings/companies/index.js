@@ -114,7 +114,7 @@ export default function CompanysList(props){
               loading && match.params.id && match.params.id!=='add' && <Loading />
             }
             {
-              match.params.id && match.params.id!=='add' && COMPANIES.some((item)=>item.id===match.params.id) && <CompanyEdit {...{history, match}} />
+              match.params.id && match.params.id!=='add' && COMPANIES.some((item)=>item.id===parseInt(match.params.id)) && <CompanyEdit {...{history, match}} />
             }
           </div>
         </div>

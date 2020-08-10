@@ -1,249 +1,246 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, Label,Input, Alert } from 'reactstrap';
+import React from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+import { Button, FormGroup, Label, Input } from 'reactstrap';
 import Switch from "react-switch";
 import {toSelArr} from '../../../helperFunctions';
-import {rebase} from '../../../index';
+import Select from 'react-select';
+import {selectStyle} from "configs/components/select";
+import Loading from 'components/loading';
 
-import { connect } from "react-redux";
-import {storageHelpPricelistsStart } from '../../../redux/actions';
 import {sameStringForms, isEmail} from '../../../helperFunctions';
 import CompanyRents from './companyRents';
 import CompanyPriceList from './companyPriceList';
 
 import classnames from "classnames";
 
-class CompanyAdd extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      pricelists:[{label: "Nový cenník", value: "0"}],
-      pricelist: {},
-      oldPricelist: {},
-      priceName: "",
-      title:'',
-      oldTitle: "",
-      ICO: "",
-      oldICO: "",
-      DIC: "",
-      oldDIC: "",
-      IC_DPH: "",
-      oldIC_DPH: "",
-      country: "",
-      oldCountry: "",
-      city: "",
-      oldCity: "",
-      street: "",
-      oldStreet: "",
-      PSC: "",
-      oldPSC: "",
-      mail: "",
-      oldMail: "",
-      phone: "",
-      oldPhone: "",
-      description: "",
-      oldDescription: "",
-      workPausal:0,
-      oldWorkPausal:0,
-      pausalPrice:0,
-      oldPausalPrice:0,
-      drivePausal:0,
-      oldDrivePausal:0,
-      pausal:0,
-      oldPausal: 0,
-      rented:[],
-      oldRented:[],
-      dph:20,
-      oldDph:20,
-      monthlyPausal:false,
-      oldMonthlyPausal:false,
-      fakeID:0,
-      newData: false,
-      loading:false,
-      saving:false,
-      clearCompanyRents:false,
-    }
-    this.savePriceList.bind(this);
-    this.getFakeID.bind(this);
-    this.setData.bind(this);
-    this.submit.bind(this);
-    this.cancel.bind(this);
+import {  GET_COMPANIES } from './index';
+import {  GET_PRICELISTS } from '../prices/index';
+import {  ADD_PRICELIST } from '../prices/priceAdd';
+
+const ADD_COMPANY = gql`
+mutation addCompany($title: String!, $dph: Int!, $ico: String!, $dic: String!, $ic_dph: String!, $country: String!, $city: String!, $street: String!, $zip: String!, $email: String!, $phone: String!, $description: String!, $pricelistId: Int!, $monthly: Boolean!, $monthlyPausal: Float!, $taskWorkPausal: Float!, $taskTripPausal: Float!, $rents: [CompanyRentCreateInput]!) {
+  addCompany(
+    title: $title,
+    dph: $dph,
+    ico: $ico,
+    dic: $dic,
+    ic_dph: $ic_dph,
+    country: $country,
+    city: $city,
+    street: $street,
+    zip: $zip,
+    email: $email,
+    phone: $phone,
+    description: $description,
+    pricelistId: $pricelistId,
+    monthly: $monthly,
+    monthlyPausal: $monthlyPausal,
+    taskWorkPausal: $taskWorkPausal,
+    taskTripPausal: $taskTripPausal,
+    rents: $rents,
+  ){
+    id
+    title
+    monthlyPausal
+    taskWorkPausal
+    taskTripPausal
+  }
+}
+`;
+
+export default function CompanyAdd(props){
+  //data
+  const { history, match } = props;
+  const [addCompany, {client}] = useMutation(ADD_COMPANY);
+  const [ addPricelist ] = useMutation(ADD_PRICELIST);
+  const { data, loading: pricelistsLoading } = useQuery(GET_PRICELISTS);
+  const PRICELISTS = (pricelistsLoading || !data ? [] : data.pricelists);
+  let pl = [{label: "Nový cenník", value: "0"}, ...toSelArr(PRICELISTS)];
+  const [ pricelists, setPricelists ] = React.useState(pl);
+
+  //state
+  const [ title, setTitle ] = React.useState("");
+  const [ oldTitle, setOldTitle ] = React.useState("");
+
+    const [ dph, setDph ] = React.useState(0);
+    const [ oldDph, setOldDph ] = React.useState(0);
+
+  const [ ico, setIco ] = React.useState("");
+  const [ oldIco, setOldIco ] = React.useState("");
+
+  const [ dic, setDic ] = React.useState("");
+  const [ oldDic, setOldDic ] = React.useState("");
+
+  const [ ic_dph, setIcDph ] = React.useState("");
+  const [ oldIcDph, setOldIcDph ] = React.useState("");
+
+  const [ country, setCountry ] = React.useState("");
+  const [ oldCountry, setOldCountry ] = React.useState("");
+
+  const [ city, setCity ] = React.useState("");
+  const [ oldCity, setOldCity ] = React.useState("");
+
+  const [ street, setStreet ] = React.useState("");
+  const [ oldStreet, setOldStreet ] = React.useState("");
+
+  const [ zip, setZip ] = React.useState("");
+  const [ oldZip, setOldZip ] = React.useState("");
+
+  const [ email, setEmail ] = React.useState("");
+  const [ oldEmail, setOldEmail ] = React.useState("");
+
+  const [ phone, setPhone ] = React.useState("");
+  const [ oldPhone, setOldPhone ] = React.useState("");
+
+  const [ description, setDescription ] = React.useState("");
+  const [ oldDescription, setOldDescription ] = React.useState("");
+
+  const [ monthly, setMonthly ] = React.useState(false);
+  const [ oldMonthly, setOldMonthly ] = React.useState(false);
+
+  const [ monthlyPausal, setMonthlyPausal ] = React.useState(0);
+  const [ oldMonthlyPausal, setOldMonthlyPausal ] = React.useState(0);
+
+  const [ taskWorkPausal, setTaskWorkPausal ] = React.useState(0);
+  const [ oldTaskWorkPausal, setOldTaskWorkPausal ] = React.useState(0);
+
+  const [ taskTripPausal, setTaskTripPausal ] = React.useState(0);
+  const [ oldTaskTripPausal, setOldTaskTripPausal ] = React.useState(0);
+
+  const [ pricelist, setPricelist ] = React.useState({});
+  const [ oldPricelist, setOldPricelist ] = React.useState({});
+  const [ pricelistName, setPricelistName ] = React.useState("");
+
+  const [ saving, setSaving ] = React.useState(false);
+  const [ loading, setLoading ] = React.useState(false);
+  const [ newData, setNewData ] = React.useState(false);
+  const [ clearCompanyRents, setClearCompanyRents ] = React.useState(false);
+  const [ fakeID, setFakeID ] = React.useState(0);
+
+  const [ rents, setRents ] = React.useState([]);
+
+  const getFakeID = () => {
+    let fake = fakeID;
+    setFakeID(fakeID+1);
+    return fake;
   }
 
-  getFakeID(){
-    let fakeID = this.state.fakeID;
-    this.setState({fakeID:fakeID+1})
-    return fakeID;
-  }
-
-  storageLoaded(props){
-    return props.pricelistsLoaded;
-  }
-
-  componentWillReceiveProps(props){
-    if(!sameStringForms(props.pricelists,this.props.pricelists) && this.storageLoaded(this.props) ){
-      this.setState({pricelists: [{label: "Nový cenník", value: "0"}, ...toSelArr(props.pricelists)]})
-    }
-    if(!this.storageLoaded(this.props) && this.storageLoaded(props)){
-      this.setData(props);
-    }
-  }
-
-  componentWillMount(){
-    if(!this.props.pricelistsActive){
-      this.props.storageHelpPricelistsStart();
-    }
-    if(this.storageLoaded(this.props)){
-      this.setData(this.props);
-    }
-  }
-
-  setData(props){
-    let pricelists = [{label: "Nový cenník", value: "0"}, ...toSelArr(props.pricelists)];
-    //  let meta = props.metadata;
-    let pricelist = pricelists.find((pricelist)=>pricelist.def);
-    if(pricelist === undefined){
-      if(pricelists.length>1){
-        pricelist = pricelists[1];
-      }else{
-        pricelist = null;
+  //sync
+  React.useEffect( () => {
+      if (!pricelistsLoading){
+        let pl = [{label: "Nový cenník", value: "0"}, ...toSelArr(data.pricelists)];
+        setPricelists(pl);
+        let def = pl.find((p)=>p.def);
+        setPricelist(def);
+        setOldPricelist(def);
       }
-    }
+  }, [pricelistsLoading]);
 
-    this.setState({
-      pricelists,
-      pricelist,
-      loading:false})
-    }
+  //functions
+  const addCompanyFunc = () => {
+    setSaving( true );
+    let newRents = rents.map(r => ({
+      title: r.title,
+      quantity: isNaN(parseInt(r.quantity)) ? 0 : parseInt(r.quantity),
+      cost: isNaN(parseFloat(r.unitCost)) ? 0 : parseInt(r.unitCost),
+      price: isNaN(parseFloat(r.unitPrice)) ? 0 : parseInt(r.unitPrice)
+    }));
 
-  submit(){
-      if (this.state.title === "") {
-        return;
-      }
-      this.setState({saving:true});
-      let newCompany = {
-        title:this.state.title,
-        pausal:this.state.pausal,
-        rented:this.state.rented.map((rent)=>{
-          return{
-            id:rent.id,
-            title:rent.title,
-            quantity:isNaN(parseInt(rent.quantity))?0:rent.quantity,
-            unitCost:isNaN(parseFloat(rent.unitCost))?0:rent.unitCost,
-            unitPrice:isNaN(parseFloat(rent.unitPrice))?0:rent.unitPrice,
-            totalPrice:isNaN(parseFloat(rent.totalPrice))?0:rent.totalPrice,
-          }
-        }),
-        workPausal:this.state.workPausal,
-        pausalPrice:this.state.pausalPrice,
-        drivePausal:this.state.drivePausal,
-        monthlyPausal:this.state.monthlyPausal,
-        pricelist:this.state.pricelist.id,
-        ICO: this.state.ICO,
-        DIC: this.state.DIC,
-        IC_DPH: this.state.IC_DPH,
-        country: this.state.country,
-        city: this.state.city,
-        street: this.state.street,
-        PSC: this.state.PSC,
-        mail: this.state.mail,
-        phone: this.state.phone,
-        description: this.state.description,
-        dph:isNaN(parseInt(this.state.dph))?0:parseInt(this.state.dph),
-      };
-      rebase.addToCollection('/companies', newCompany)
-      .then((comp)=>{
-        this.setState({
-          title:'',
-          pricelist:this.state.pricelists.length>0?this.state.pricelists[0]:null,
-          ICO: "",
-          DIC: "",
-          IC_DPH: "",
-          country: "",
-          city: "",
-          street: "",
-          PSC: "",
-          mail: "",
-          phone: "",
-          description: "",
-          rented:[],
-          dph:20,
-          newData: false,
-          priceName: "",
-          monthlyPausal: false,
-          saving:false}, () => {
-            if (this.props.addCompany){
-              this.props.addCompany({...newCompany, id: comp.id, label: newCompany.title, value: comp.id});
-              this.props.close();
-            } else {
-              this.props.history.push(`/helpdesk/settings/companies/${comp.id}`)
-            }
-          }
-        )
-      });
-    }
-
-  savePriceList(){
-      this.setState({saving:true});
-      rebase.addToCollection('/help-pricelists',{
-        title: this.state.priceName,
-        afterHours:'0',
-        materialMargin:'0',
-        materialMarginExtra:'0'
-      })
-      .then((listResponse)=>{
-      this.setState({
-        saving:false,
-        pricelist: {label: this.state.priceName, value: listResponse.id, id: listResponse.id},
-        newData: false,
-      }, () => this.submit());
+    addCompany({ variables: {
+      title,
+      dph: (dph === "" ? 0 : parseInt(dph)),
+      ico,
+      dic,
+      ic_dph,
+      country,
+      city,
+      street,
+      zip,
+      email,
+      phone,
+      description,
+      pricelistId: pricelist.id,
+      monthly,
+      monthlyPausal: (monthlyPausal === "" ? 0 : parseFloat(monthlyPausal)),
+      taskWorkPausal: (taskWorkPausal === "" ? 0 : parseFloat(taskWorkPausal)),
+      taskTripPausal: (taskTripPausal === "" ? 0 : parseFloat(taskTripPausal)),
+      rents: newRents,
+    } }).then( ( response ) => {
+      const allCompanies = client.readQuery({query: GET_COMPANIES}).companies;
+      const newCompany = {...response.data.addCompany, __typename: "Company"};
+      client.writeQuery({ query: GET_COMPANIES, data: {companies: [...allCompanies, newCompany ] } });
+      history.push('/helpdesk/settings/companies/' + newCompany.id)
+    }).catch( (err) => {
+      console.log(err.message);
     });
+    setSaving( false );
   }
 
-  cancel(){
-    this.setState({
-      pricelist: this.state.oldPricelist,
-      oldPricelist: this.state.oldPricelist,
-      title: this.state.oldTitle,
-      ICO: this.state.oldICO,
-      DIC: this.state.oldDIC,
-      IC_DPH: this.state.oldIC_DPH,
-      country: this.state.oldCountry,
-      city: this.state.oldCity,
-      street: this.state.oldStreet,
-      PSC: this.state.oldPSC,
-      mail: this.state.oldMail,
-      phone: this.state.oldPhone,
-      description: this.state.oldDescription,
-      pausal: this.state.oldPausal,
-      workPausal: this.state.oldWorkPausal,
-      pausalPrice: this.state.oldPausalPrice,
-      drivePausal: this.state.oldDrivePausal,
-      rented:this.state.oldRented,
-      dph:this.state.oldDph,
-      monthlyPausal:this.state.oldMonthlyPausal,
+  const savePriceList = () => {
+    setSaving( true );
 
-      clearCompanyRents:true,
-      newData: false,
-      priceName: "",
-    })
+    addPricelist({ variables: {
+      title: pricelistName,
+      order: 0,
+      afterHours: 0,
+      def: false,
+      materialMargin: 0,
+      materialMarginExtra: 0,
+      prices: [],
+    } }).then( ( response ) => {
+      let newPricelist = response.data.addPricelist;
+      setPricelist(newPricelist);
+      let newPricelists = pricelists.concat([newPricelist]);
+      setPricelists(newPricelists);
+
+      addCompanyFunc();
+    }).catch( (err) => {
+      console.log(err.message);
+    });
+    setSaving( false );
   }
 
-  render(){
+  const cancel = () => {
+    setTitle(oldTitle);
+    setIco(oldIco);
+    setDic(oldDic);
+    setIcDph(oldIcDph);
+    setCountry(oldCountry);
+    setCity(oldCity);
+    setStreet(oldStreet);
+    setZip(oldZip);
+    setEmail(oldEmail);
+    setPhone(oldPhone);
+    setDescription(oldDescription);
+    setMonthly(oldMonthly);
+    setMonthlyPausal(oldMonthlyPausal);
+    setTaskWorkPausal(oldTaskWorkPausal);
+    setTaskTripPausal(oldTaskTripPausal);
+    setPricelist(oldPricelist);
+
+    setClearCompanyRents(true);
+    setNewData(false);
+    setPricelistName("");
+  }
+
+  const attributes = [title, ico, email];
+  const cannotSave = saving || attributes.some(attr => attr === "") || (pricelist.value === "0" && pricelistName === "");
+
+  if (pricelistsLoading) {
+    return <Loading />
+  }
+
   return (
     <div className="fit-with-header-and-commandbar">
-      {this.state.newData &&
+      {newData &&
         <div style={{position: "fixed", zIndex: "999", backgroundColor: "rgba(255,255,255,0.5)", top: "0", left: "0", width: "100%", height: "100vh"}}></div>
       }
 
-      <h2 className="p-t-10 p-l-20" style={(this.state.newData ? {position: "relative", zIndex: "99999"} : {})}>Add new company</h2>
-      <hr style={(this.state.newData ? {position: "relative", zIndex: "99999"} : {})}/>
+      <h2 className="p-t-10 p-l-20" style={(newData ? {position: "relative", zIndex: "99999"} : {})}>Add new company</h2>
+      <hr style={(newData ? {position: "relative", zIndex: "99999"} : {})}/>
 
-      {
-        this.state.loading &&
-        <Alert color="success">
-          Loading data...
-        </Alert>
-      }
       <div className="form-body-highlighted scroll-visible">
         <div className="p-20">
           <FormGroup className="row m-b-10">
@@ -256,8 +253,11 @@ class CompanyAdd extends Component{
                 id="name"
                 type="text"
                 placeholder="Enter company name"
-                value={this.state.title}
-                onChange={(e)=>this.setState({title: e.target.value, newData: true, })}
+                value={title}
+                onChange={(e)=> {
+                  setTitle(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -272,8 +272,11 @@ class CompanyAdd extends Component{
                 id="dph"
                 type="number"
                 placeholder="Enter DPH"
-                value={this.state.dph}
-                onChange={(e)=>this.setState({dph: e.target.value, newData: true })  }
+                value={dph}
+                onChange={(e)=>{
+                  setDph(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -288,8 +291,11 @@ class CompanyAdd extends Component{
                 id="ico"
                 type="text"
                 placeholder="Enter ICO"
-                value={this.state.ICO}
-                onChange={(e)=>this.setState({ICO: e.target.value, newData: true })  }
+                value={ico}
+                onChange={(e)=>{
+                  setIco(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -304,8 +310,11 @@ class CompanyAdd extends Component{
                 id="dic"
                 type="text"
                 placeholder="Enter DIC"
-                value={this.state.DIC}
-                onChange={(e)=>this.setState({DIC: e.target.value, newData: true }) }
+                value={dic}
+                onChange={(e)=>{
+                  setDic(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -320,8 +329,11 @@ class CompanyAdd extends Component{
                 id="ic_dph"
                 type="text"
                 placeholder="Enter IC DPH"
-                value={this.state.IC_DPH}
-                onChange={(e)=>this.setState({IC_DPH: e.target.value, newData: true }) }
+                value={ic_dph}
+                onChange={(e)=>{
+                  setIcDph(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -336,8 +348,11 @@ class CompanyAdd extends Component{
                 id="country"
                 type="text"
                 placeholder="Enter country"
-                value={this.state.country}
-                onChange={(e)=>this.setState({country: e.target.value, newData: true })}
+                value={country}
+                onChange={(e)=>{
+                  setCountry(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -352,8 +367,11 @@ class CompanyAdd extends Component{
                 id="city"
                 type="text"
                 placeholder="Enter city"
-                value={this.state.city}
-                onChange={(e)=>this.setState({city: e.target.value, newData: true})}
+                value={city}
+                onChange={(e)=>{
+                  setCity(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -368,8 +386,11 @@ class CompanyAdd extends Component{
                 id="street"
                 type="text"
                 placeholder="Enter street"
-                value={this.state.street}
-                onChange={(e)=>this.setState({street: e.target.value, newData: true})}
+                value={street}
+                onChange={(e)=>{
+                  setStreet(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -384,8 +405,11 @@ class CompanyAdd extends Component{
                 id="psc"
                 type="text"
                 placeholder="Enter PSČ"
-                value={this.state.PSC}
-                onChange={(e)=>this.setState({PSC: e.target.value, newData: true})}
+                value={zip}
+                onChange={(e)=>{
+                  setZip(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -398,11 +422,14 @@ class CompanyAdd extends Component{
               <Input
                 name="mail"
                 id="mail"
-                className={(this.state.mail.length > 0 && !isEmail(this.state.mail)) ? "form-control-warning" : ""}
+                className={(email.length > 0 && !isEmail(email)) ? "form-control-warning" : ""}
                 type="text"
                 placeholder="Enter e-mail"
-                value={this.state.mail}
-                onChange={(e)=>this.setState({mail: e.target.value, newData: true})}
+                value={email}
+                onChange={(e)=>{
+                  setEmail(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -417,8 +444,11 @@ class CompanyAdd extends Component{
                 id="phone"
                 type="text"
                 placeholder="Enter phone"
-                value={this.state.phone}
-                onChange={(e)=>this.setState({phone: e.target.value, newData: true})}
+                value={phone}
+                onChange={(e)=>{
+                  setPhone(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
@@ -433,23 +463,27 @@ class CompanyAdd extends Component{
                 id="description"
                 type="text"
                 placeholder="Enter description"
-                value={this.state.description}
-                onChange={(e)=>this.setState({description: e.target.value, newData: true})}
+                value={description}
+                onChange={(e)=>{
+                  setDescription(e.target.value);
+                  setNewData( true );
+                }}
                 />
             </div>
           </FormGroup>
 
         </div>
-        {this.props.role > 1 && <div className="p-20 table-highlight-background">
+        <div className="p-20 table-highlight-background">
           <div className="row">
             <span className="m-r-5">
               <h3>Mesačný paušál</h3>
             </span>
             <label>
               <Switch
-                checked={this.state.monthlyPausal}
-                onChange={()=>{
-                  this.setState({monthlyPausal:!this.state.monthlyPausal })
+                checked={monthly}
+                onChange={()=> {
+                  setMonthly(!monthly);
+                  setNewData( true );
                 }}
                 height={22}
                 checkedIcon={<span className="switchLabel">YES</span>}
@@ -458,7 +492,7 @@ class CompanyAdd extends Component{
               <span className="m-l-10"></span>
             </label>
           </div>
-            { this.state.monthlyPausal && <div>
+            { monthly && <div>
               <FormGroup className="row m-b-10 m-t-20">
                 <div className="m-r-10 w-20">
                   <Label for="pausal">Mesačná</Label>
@@ -469,8 +503,11 @@ class CompanyAdd extends Component{
                     id="pausal"
                     type="number"
                     placeholder="Enter work pausal"
-                    value={this.state.pausalPrice}
-                    onChange={(e)=>this.setState({pausalPrice:e.target.value, newData: true,})}
+                    value={monthlyPausal}
+                    onChange={(e)=>{
+                      setMonthlyPausal(e.target.value);
+                      setNewData( true );
+                    }}
                     />
                 </div>
                 <div className="m-l-10">
@@ -487,8 +524,11 @@ class CompanyAdd extends Component{
                     id="pausal"
                     type="number"
                     placeholder="Enter work pausal"
-                    value={this.state.workPausal}
-                    onChange={(e)=>this.setState({workPausal:e.target.value, newData: true,})}
+                    value={taskWorkPausal}
+                    onChange={(e) => {
+                      setTaskWorkPausal(e.target.value);
+                      setNewData( true );
+                    }}
                     />
                 </div>
               </FormGroup>
@@ -502,91 +542,85 @@ class CompanyAdd extends Component{
                     id="pausal"
                     type="number"
                     placeholder="Enter drive pausal"
-                    value={this.state.drivePausal}
-                    onChange={(e)=>this.setState({drivePausal:e.target.value, newData: true,})}
+                    value={taskTripPausal}
+                    onChange={(e)=> {
+                      setTaskTripPausal(e.target.value);
+                      setNewData( true );
+                    }}
                     />
                 </div>
               </FormGroup>
 
-              {!this.props.addCompany &&
+              {!props.addCompany &&
                 <div className="p-20">
                   <h3 className="m-b-15">Mesačný prenájom licencií a hardware</h3>
                   <CompanyRents
-                    clearForm={this.state.clearCompanyRents}
-                    setClearForm={()=>this.setState({clearCompanyRents:false})}
-                    data={this.state.rented}
+                    clearForm={clearCompanyRents}
+                    setClearForm={()=>setClearCompanyRents(false)}
+                    data={rents}
                     updateRent={(rent)=>{
-                      let newRents=[...this.state.rented];
+                      let newRents=[...rents];
                       newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
-                      this.setState({rented:newRents, newData:true });
+                      setRents( newRents );
+                      setNewData( true );
                     }}
                     addRent={(rent)=>{
-                      let newRents=[...this.state.rented];
-                      newRents.push({...rent,id:this.getFakeID()})
-                      this.setState({rented:newRents, newData:true });
+                      let newRents=[...rents];
+                      newRents.push({...rent, id: getFakeID()})
+                      setRents( newRents );
+                      setNewData( true );
                     }}
                     removeRent={(rent)=>{
-                      let newRents=[...this.state.rented];
+                      let newRents=[...rents];
                       newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
-                      this.setState({rented:newRents, newData:true });
+                      setRents( newRents );
+                      setNewData( true );
                     }}
                     />
                 </div>
               }
             </div>}
+
             <CompanyPriceList
-              pricelists={this.state.pricelists}
-              pricelist={this.state.pricelist}
-              oldPricelist={this.state.oldPricelist}
-              priceName={this.state.priceName}
-              newData={this.state.newData}
-              cancel={() => this.cancel()}
-              setData={(data) => {
-                let newState = {...this.state};
-                Object.keys(data).forEach((key, i) => {
-                  newState[key] = data[key];
-                });
-                newState.newData = true;
-                this.setState({
-                  ...newState
-                })}} />
-          </div>}
+              pricelists={pricelists}
+              pricelist={pricelist}
+              oldPricelist={oldPricelist}
+              pricelistName={pricelistName}
+              newData={newData}
+              cancel={() => cancel()}
+              setPricelist={(pl) => setPricelist(pl)}
+              setOldPricelist={(pl) => setOldPricelist(pl)}
+              setNewData={(e) => setNewData(e)}
+              setPricelistName={(n) => setPricelistName(n)}
+              match={match}
+               />
+          </div>
         </div>
 
         <div
-          className={classnames({ "form-footer": this.state.newData || this.props.addCompany}, "row")}
-          style={(this.state.newData ? {zIndex: "99999"} : {})}>
-          {(this.state.newData  || this.props.addCompany) &&
+          className={classnames({ "form-footer": newData || props.addCompany}, "row")}
+          style={(newData ? {zIndex: "99999"} : {})}>
+          {(newData  || props.addCompany) &&
             <Button
               className="btn"
-              disabled={this.state.saving || this.state.title.length === 0 || (this.state.pricelist.value === "0" && this.state.priceName === "") }
+              disabled={cannotSave}
               onClick={()=>{
-                if (this.state.pricelist.value === "0" && this.state.priceName !== ""){
-                  this.savePriceList();
+                if (pricelist.value === "0" && pricelistName !== ""){
+                  savePriceList();
                 } else {
-                  this.submit()
+                  addCompanyFunc();
                 }
-              }}>{(this.state.pricelist.value === "0" && this.state.priceName !== "" ? "Save changes" : (this.state.saving?'Adding...':'Add company'))}</Button>
+              }}>{(pricelist.value === "0" && pricelistName !== "" ? "Save changes" : (saving?'Adding...':'Add company'))}</Button>
             }
 
-          { (this.state.newData  || this.props.addCompany) &&
+          { (newData  || props.addCompany) &&
             <Button
               className="btn-link"
-              disabled={this.state.saving}
-              onClick={() => this.cancel()}>Cancel changes</Button>
+              disabled={saving}
+              onClick={cancel}>Cancel changes</Button>
           }
 
         </div>
-
       </div>
     );
-  }
 }
-
-const mapStateToProps = ({ storageHelpPricelists, userReducer}) => {
-  const { pricelistsActive, pricelists, pricelistsLoaded } = storageHelpPricelists;
-  const role = userReducer.userData ? userReducer.userData.role.value : 0;
-  return { pricelistsActive, pricelists, pricelistsLoaded, role };
-};
-
-export default connect(mapStateToProps, { storageHelpPricelistsStart  })(CompanyAdd);

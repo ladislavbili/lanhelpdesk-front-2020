@@ -8,7 +8,7 @@ import Loading from 'components/loading';
 
 import {  GET_PRICELISTS } from './index';
 
-const ADD_PRICELIST = gql`
+export const ADD_PRICELIST = gql`
 mutation addPricelist($title: String!, $order: Int!, $afterHours: Int!, $def: Boolean!, $materialMargin: Int!, $materialMarginExtra: Int!, $prices: [CreatePriceInput]! ) {
   addPricelist(
     title: $title,

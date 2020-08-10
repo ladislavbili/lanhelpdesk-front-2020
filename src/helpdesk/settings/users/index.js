@@ -39,7 +39,7 @@ query {
 export default function UserListContainer(props){
   //data
   const { history, match } = props;
-  const { data: userData, loading: userLoading, error: userError } = useQuery(GET_USERS);
+  const { data: userData, loading: userLoading, error: userError, refetch: usersRefetch } = useQuery(GET_USERS);
   const { data: roleData, loading: roleLoading, error: rolerError } = useQuery(GET_ROLES);
 
   const USERS = ( userLoading ? [] : userData.users);
@@ -53,6 +53,14 @@ export default function UserListContainer(props){
   const FILTERED_USERS = USERS.filter( user => selectedRoles.some(sr => sr.id === user.role.id) );
 
   const allRolesSelected = selectedRoles.length === ROLES.length;
+
+  // sync
+  React.useEffect( () => {
+      if (!roleLoading){
+        setSelectedRoles(toSelArr(roleData.roles));
+        usersRefetch();
+      }
+  }, [roleLoading]);
 
   return (
     <div className="content">
