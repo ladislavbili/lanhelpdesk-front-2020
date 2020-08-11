@@ -1,313 +1,487 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, Label, Input } from 'reactstrap';
-import { connect } from "react-redux";
-import {storageHelpStatusesStart, storageHelpTagsStart, storageUsersStart, storageHelpTaskTypesStart, storageCompaniesStart, storageHelpProjectsStart, setProject, storageHelpTasksStart} from '../../../redux/actions';
-import {rebase, database} from '../../../index';
-import firebase from 'firebase';
+import React from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
+import { Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import {toSelArr, sameStringForms, snapshotToArray,testing} from '../../../helperFunctions';
 import Permissions from "../../components/projects/permissions";
 import ProjectDefaultValues from "../../components/projects/defaultValues";
 import booleanSelects from 'configs/constants/boolSelect'
 import { noDef } from 'configs/constants/projects';
+import Select from 'react-select';
+import {selectStyle} from "configs/components/select";
+import Loading from 'components/loading';
 
-class ProjectEdit extends Component{
-	constructor(props){
-		super(props);
-		this.state={
-			title: '',
-			description: '',
-			statuses:[],
-			allTags:[],
-			users:[],
-			types:[],
-			companies:[],
-			permissions:[],
-			lockedRequester: false,
+import {  GET_PROJECTS } from './index';
 
-			...noDef,
-			saving: false,
-			loaded: false,
-		}
-	}
-
-	storageLoaded(props){
-		return props.statusesLoaded &&
-			props.tagsLoaded &&
-			props.usersLoaded &&
-			props.taskTypesLoaded &&
-			props.companiesLoaded &&
-			props.projectsLoaded &&
-			props.tasksLoaded
-	}
-
-  componentWillReceiveProps(props){
-    if (this.props.item.id !== props.item.id){
-			this.setProjectsData(props);
-    }
-
-		if(this.storageLoaded(props) && !this.storageLoaded(this.props)){
-			this.setData(props);
-			this.setProjectsData(props);
-		}
-
-		if(!sameStringForms(props.statuses,this.props.statuses) &&
-			!sameStringForms(props.tags,this.props.tags) &&
-			!sameStringForms(props.users,this.props.users) &&
-			!sameStringForms(props.taskTypes,this.props.taskTypes) &&
-			!sameStringForms(props.companies,this.props.companies) &&
-			!sameStringForms(props.projects,this.props.projects) &&
-			!sameStringForms(props.tasks,this.props.tasks)
-		){
-				this.setData(props);
+export const GET_PROJECT = gql`
+query project($id: Int!) {
+  project(
+		id: $id,
+  ){
+    id
+    title
+    descrption
+    lockedRequester
+    projectRights {
+			read
+			write
+			delete
+			internal
+			admin
+			user {
+				id
 			}
+		}
+    def {
+			assignedTo {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			company {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			overtime {
+				def
+				fixed
+				show
+				value
+			}
+			pausal {
+				def
+				fixed
+				show
+				value
+			}
+			requester {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			status {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			tag {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			taskType {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+		}
   }
+}
+`;
 
-	componentWillMount(){
-		if(!this.props.statusesActive){
-			this.props.storageHelpStatusesStart();
-		}
+export const UPDATE_PROJECT = gql`
+mutation updateProject($id: Int!, $title: String, $descrption: String, $lockedRequester: Boolean, $projectRights: [ProjectRightInput], $def: ProjectDefaultsInput) {
+  updateProject(
+		id: $id,
+    title: $title,
+    descrption: $descrption,
+    lockedRequester: $lockedRequester,
+    projectRights: $projectRights,
+    def: $def,
+  ){
+    id
+    title
+  }
+}
+`;
 
-		if(!this.props.tagsActive){
-			this.props.storageHelpTagsStart();
-		}
+export const DELETE_PROJECT = gql`
+mutation deleteProject($id: Int!, $newId: Int!) {
+  deleteProject(
+    id: $id,
+    newId: $newId,
+  ){
+    id
+  }
+}
+`;
 
-		if(!this.props.usersActive){
-			this.props.storageUsersStart();
-		}
+const GET_STATUSES = gql`
+query {
+  statuses{
+    id
+    title
+  }
+}
+`;
 
-		if(!this.props.taskTypesActive){
-			this.props.storageHelpTaskTypesStart();
-		}
+const GET_COMPANIES = gql`
+query {
+  companies{
+    id
+    title
+  }
+}
+`;
 
-		if(!this.props.companiesActive){
-			this.props.storageCompaniesStart();
-		}
+const GET_USERS = gql`
+query {
+  users{
+    id
+    email
+  }
+}
+`;
 
-		if(!this.props.tasksActive){
-			this.props.storageHelpTasksStart();
-		}
+const GET_TAGS = gql`
+query {
+  tags{
+    id
+    title
+  }
+}
+`;
 
-		if(!this.props.projectsActive){
-			this.props.storageHelpProjectsStart();
-		}
-		this.setData(this.props);
-		this.setProjectsData(this.props);
-	}
+const GET_TASK_TYPES = gql`
+query {
+  taskTypes{
+    id
+    title
+  }
+}
+`;
 
-	setProjectsData(props){
-		if(!this.storageLoaded(props)){
-			return;
-		}
+export default function ProjectAdd(props){
+  //data & queries
+  const { history, match } = props;
+  const { data: projectData, loading: projectLoading, refetch } = useQuery(GET_PROJECT, { variables: {id: parseInt(match.params.id)} });
+  const [updateProject, {updateData}] = useMutation(UPDATE_PROJECT);
+  const [deleteProject, {deleteData, client}] = useMutation(DELETE_PROJECT);
+  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
+  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
+  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS);
+  const { data: allTagsData, loading: allTagsLoading } = useQuery(GET_TAGS);
+  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES);
 
-		let project = props.projects.find((project)=>project.id===props.item.id);
-		let statuses = toSelArr(props.statuses);
-		let allTags = toSelArr(props.tags);
-		let users = toSelArr(props.users,'email');
-		let types = toSelArr(props.taskTypes);
-		let companies = toSelArr(props.companies);
+  const allProjects = toSelArr(client.readQuery({query: GET_PROJECTS}).projects);
+  const filteredProjects = allProjects.filter( project => project.id !== parseInt(match.params.id) );
+  const theOnlyOneLeft = allProjects.length === 0;
 
-		let status = statuses.find(item=> project.def && item.id===project.def.status.value);
-		let tags = allTags.filter(item=> project.def && project.def.tags.value.includes(item.id));
-		let assignedTo = users.filter(item=> project.def && project.def.assignedTo.value.includes(item.id));
-		let type = types.find(item=> project.def && item.id===project.def.type.value);
-		let requester = users.find(item=> project.def && item.id===project.def.requester.value);
-		let company = companies.find(item=> project.def && item.id===project.def.company.value);
-		let pausal = booleanSelects.find(item=> project.def && project.def.pausal && item.value===project.def.pausal.value);
-		let overtime = booleanSelects.find(item=> project.def && project.def.overtime && item.value===project.def.overtime.value);
-		let permissions = project.permissions?project.permissions:[];
-		permissions = permissions.map((permission)=>{
-			return {
-				...permission,
-				user:users.find((user)=>user.id===permission.user)
+  //state
+  const [ title, setTitle ] = React.useState("");
+  const [ descrption, setDescription ] = React.useState("");
+  const [ lockedRequester, setLockedRequester ] = React.useState(true);
+  const [ projectRights, setProjectRights ] = React.useState([]);
+
+  const [ assignedTo, setAssignedTo ] = React.useState({
+    fixed: false,
+    def: false,
+    show: true,
+    value: []
+  });
+  const [ company, setCompany ] = React.useState({
+    fixed: false,
+    def: false,
+    show: true,
+    value: null,
+  });
+  const [ overtime, setOvertime ] = React.useState({
+    fixed: false,
+    def: false,
+    show: true,
+    value: {value: false, label: 'No'}
+  });
+  const [ pausal, setPausal ] = React.useState({
+    fixed: false,
+    def: false,
+    show: true,
+    value: {value: false, label: 'No'}
+  });
+  const [ requester, setRequester ] = React.useState({
+    fixed: false,
+    def: false,
+    show: true,
+    value: null
+  });
+  const [ status, setStatus ] = React.useState({
+    fixed: false,
+    def: false,
+    show: true,
+    value: null
+  });
+  const [ tag, setTag ] = React.useState({
+    fixed: false,
+    def: false,
+    show: true,
+    value: []
+  });
+  const [ taskType, setTaskType ] = React.useState({
+    fixed: false,
+    def: false,
+    show: true,
+    value: null
+  });
+
+  const [ saving, setSaving ] = React.useState(false);
+  const [ newProject, setNewProject ] = React.useState(null);
+  const [ choosingNewProject, setChooseingNewProject ] = React.useState(false);
+
+	// sync
+	React.useEffect( () => {
+			if (!projectLoading){
+				console.log(projectData);
+				setTitle(projectData.project.title);
+				setDescription(projectData.project.description);
+				setLockedRequester(projectData.project.lockedRequester);
+				setProjectRights(projectData.project.projectRights);
+				setOvertime((projectData.project.def.overtime ? {value: true, label: 'Yes'} :{value: false, label: 'No'}));			setPausal((projectData.project.def.pausal ? {value: true, label: 'Yes'} :{value: false, label: 'No'}));
 			}
-		})
-		let def = project.def;
+	}, [projectLoading]);
 
-		this.setState({
-			title:project.title,
-			description:project.description?project.description:'',
-			lockedRequester: project.lockedRequester ? project.lockedRequester : false,
-			permissions,
-
-			status:status?				{...def.status,value:status}					:{def:false, fixed:false, value: null, show:true },
-			tags:def?							{...def.tags,value:tags}							:{def:false, fixed:false, value: [], show:true },
-			assignedTo:def?				{...def.assignedTo,value:assignedTo}	:{def:false, fixed:false, value: [], show:true },
-			type:type?						{...def.type,value:type}							:{def:false, fixed:false, value: null, show:true },
-			requester:requester?	{...def.requester,value:requester}		:{def:false, fixed:false, value: null, show:true },
-			company:company?			{...def.company,value:company}				:{def:false, fixed:false, value: null, show:true },
-			pausal:pausal?				{...def.pausal,value:pausal}					:{def:false, fixed:false, value: booleanSelects[0], show: true },
-			overtime:overtime?		{...def.overtime,value:overtime}			:{def:false, fixed:false, value: booleanSelects[0], show: true },
-		});
-	}
-
-	setData(props){
-		if(!this.storageLoaded(props)){
-			return;
-		}
-
-		this.setState({
-      statuses:toSelArr(props.statuses),
-      allTags: toSelArr(props.tags),
-      users: toSelArr(props.users,'email'),
-      types: toSelArr(props.taskTypes),
-      companies: toSelArr(props.companies),
-    });
-	}
-
-	deleteProject(){
-		let projectID = this.props.item.id;
-		if(window.confirm("Are you sure?")){
-			this.props.tasks.filter((task)=>task.project===projectID).map((task)=>this.deleteTask(task));
-			rebase.removeDoc('/help-projects/'+projectID).then(()=>{
-				this.props.setProject(null);
-			});
-		}
-	}
-
-	deleteTask(task){
-		let taskID = task.id;
-		Promise.all(
-			[
-				database.collection('help-task_materials').where("task", "==", taskID).get(),
-				database.collection('help-task_custom_items').where("task", "==", taskID).get(),
-				database.collection('help-task_works').where("task", "==", taskID).get(),
-				database.collection('help-repeats').doc(taskID).get(),
-				database.collection('help-comments').where("task", "==", taskID).get()
-		]).then(([taskMaterials,customItems, taskWorks,repeat,comments])=>{
-
-			let storageRef = firebase.storage().ref();
-			task.attachments.map((attachment)=>storageRef.child(attachment.path).delete());
-
-			rebase.removeDoc('/help-tasks/'+taskID);
-			snapshotToArray(taskMaterials).forEach((material)=>rebase.removeDoc('/help-task_materials/'+material.id))
-			snapshotToArray(customItems).forEach((item)=>rebase.removeDoc('/help-task_custom_items/'+item.id))
-			snapshotToArray(taskWorks).forEach((work)=>rebase.removeDoc('/help-task_works/'+work.id))
-			if(repeat.exists){
-				rebase.removeDoc('/help-repeats/'+taskID);
+	React.useEffect( () => {
+			if (!projectLoading && !usersLoading){
+				let users = toSelArr(usersData.users, 'email');
+				let newAssignedTo = projectData.propject.def.assignedTo.map(user => users.find(u => u.id === user.id));
+				setAssignedTo(newAssignedTo);
+				let newRequester = users.find(u => u.id === projectData.project.def.requester.id);
+				setRequester(newRequester);
 			}
-			snapshotToArray(comments).forEach((item)=>rebase.removeDoc('/help-comments/'+item.id));
-			database.collection('help-calendar_events').where("taskID", "==", taskID).get()
-			.then((data)=>{
-				snapshotToArray(data).forEach((item)=>rebase.removeDoc('/help-calendar_events/'+item.id));
-			});
-		});
-	}
+	}, [projectLoading, usersLoading]);
 
-  render(){
-		let canReadUserIDs = this.state.permissions.map((permission)=>permission.user.id);
-		let canBeAssigned = this.state.users.filter((user)=>canReadUserIDs.includes(user.id));
+	React.useEffect( () => {
+			if (!projectLoading && !companiesLoading){
+				let companies = toSelArr(companiesData.companies);
+				let newCompany = companies.find(c => c.id === projectData.project.def.company);
+				setCompany(newCompany);
+			}
+	}, [projectLoading, companiesLoading]);
+
+	React.useEffect( () => {
+			if (!projectLoading && !statusesLoading){
+				let statuses = toSelArr(statusesData.statuses);
+				let newStatus = statuses.find(c => c.id === projectData.project.def.status);
+				setStatus(newStatus);
+			}
+	}, [projectLoading, statusesLoading]);
+
+	React.useEffect( () => {
+			if (!projectLoading && !allTagsLoading){
+				let tags = toSelArr(allTagsData.tags);
+				let newTag = tags.find(c => c.id === projectData.project.def.tag);
+				setTag(newTag);
+			}
+	}, [projectLoading, allTagsLoading]);
+
+	React.useEffect( () => {
+			if (!projectLoading && !taskTypesLoading){
+				let taskTypes = toSelArr(taskTypesData.taskTypes);
+				let newTaskType = taskTypes.find(c => c.id === projectData.project.def.taskType);
+				setTaskType(newTaskType);
+			}
+	}, [projectLoading, taskTypesLoading]);
+
+	React.useEffect( () => {
+			refetch({ variables: {id: parseInt(match.params.id)} });
+	}, [match.params.id]);
+
+	// functions
+	const updateProjectFunc = () => {
+		setSaving( true );
+
+		let newProjectRights = projectRights.map(r => ({
+			read: r.read,
+			write: r.write,
+			delete: r.delete,
+			internal: r.internal,
+			admin: r.admin,
+			UserId: r.user.id
+		}));
+		let newDef = {
+			assignedTo: {...assignedTo, value: assignedTo.value.map(u => u.id)},
+			company: {...company, value: (company.value ? company.value.id : null)},
+			overtime: {...overtime, value: overtime.value.value },
+			pausal: {...pausal, value: pausal.value.value},
+			requester: {...requester, value: (requester.value ? requester.value.id : null)},
+			status: {...status, value: (status.value ? status.value.id : null)},
+			tag: {...tag, value: tag.value.map(u => u.id)},
+			taskType: {...taskType, value: (taskType.value ? taskType.value.id : null)},
+		}
+
+		updateProject({ variables: {
+			id: parseInt(match.params.id),
+			title,
+      descrption,
+      lockedRequester,
+      projectRights: newProjectRights,
+      def: newDef,
+		} }).then( ( response ) => {
+			const updatedProject = {...response.data.updateProject};
+			client.writeQuery({ query: GET_PROJECTS, data: {projects: [...allProjects.filter( project => project.id !== parseInt(match.params.id) ), updatedProject ] } });
+		}).catch( (err) => {
+			console.log(err.message);
+		});
+
+		 setSaving( false );
+	};
+
+
+  const deleteProjectFunc = () => {
+    setChooseingNewProject(false);
+    if(window.confirm("Are you sure?")){
+      deleteProject({ variables: {
+        id: parseInt(match.params.id),
+        newId: ( newProject ? parseInt(newProject.id) : null ),
+      } }).then( ( response ) => {
+        client.writeQuery({ query: GET_PROJECTS, data: {projects: filteredProjects} });
+        history.push('/helpdesk/settings/projects/add');
+      }).catch( (err) => {
+        console.log(err.message);
+        console.log(err);
+      });
+    }
+  };
+
+	/*	let canReadUserIDs = this.state.permissions.map((permission)=>permission.user.id);
+		let canBeAssigned = this.state.users.filter((user)=>canReadUserIDs.includes(user.id));*/
+		if (projectLoading || statusesLoading || companiesLoading || usersLoading || allTagsLoading || taskTypesLoading) {
+	    return <Loading />
+	  }
+
+	  const cannotSave = saving || title==="" || (company.value === null && company.fixed) || (status.value === null && status.fixed) || (assignedTo.value.length === 0 && assignedTo.fixed) || (taskType.value === null && taskType.fixed);
 
     return (
       <div className="p-20 fit-with-header-and-commandbar scroll-visible">
 				<FormGroup>
-					<Label>Project name</Label>
-					<Input type="text" className="from-control" placeholder="Enter project name" value={this.state.title} onChange={(e)=>this.setState({title:e.target.value})} />
+					<Label for="name">Project name</Label>
+					<Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
 				</FormGroup>
 
 				<FormGroup>
-					<Label htmlFor="body">Popis</Label>
-					<Input type="textarea" className="form-control" id="body" placeholder="Zadajte text" value={this.state.description} onChange={(e) => this.setState({description: e.target.value})}/>
+					<Label htmlFor="description">Popis</Label>
+					<Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={descrption} onChange={(e) => setDescription( e.target.value )}/>
 				</FormGroup>
 
 				<Permissions
 					addUser={(user)=>{
-						this.setState({
-							permissions:[...this.state.permissions,{user,read:true,write:false,delete:false,isAdmin:false}]
-						})
+            let newProjectRights = [...projectRights, {user, read: true, write: false, delete: false, internal: false, admin: false}];
+						setProjectRights(newProjectRights);
 					}}
-					givePermission={(user,permission)=>{
-						let permissions=[...this.state.permissions];
-						let index = permissions.findIndex((permission)=>permission.user.id===user.id);
-						let item = permissions[index];
-						item.read=permission.read;
-						item.write=permission.write;
-						item.delete=permission.delete;
-						item.isAdmin=permission.isAdmin;
+					givePermission={(user, right)=>{
+						let newProjectRights=[...projectRights];
+						let index = projectRights.findIndex((r)=>r.user.id === user.id);
+						let item = newProjectRights[index];
+						item.read = right.read;
+						item.write = right.write;
+						item.delete = right.delete;
+						item.internal= right.internal;
+						item.admin = right.admin;
+
 						if(!item.read){
-							permissions.splice(index,1);
-							this.setState({permissions,assignedTo:{...this.state.assignedTo,value:this.state.assignedTo.value.filter((user)=>user.id!==item.user.id)}});
+							newProjectRights.splice(index,1);
+              setProjectRights(newProjectRights);
+              if (lockedRequester){
+                let newAssignedTo = {...assignedTo};
+                newAssignedTo.value = newAssignedTo.value.filter(u => u.id !== item.user.id);
+                setAssignedTo(newAssignedTo);
+              }
 						}else{
-							this.setState({permissions});
+            setProjectRights(newProjectRights);
 						}
 					}}
-					permissions={this.state.permissions}
-					userID={this.props.currentUser.id}
-					isAdmin={this.props.currentUser.userData.role.value===3||testing}
-					lockedRequester={this.state.lockedRequester}
-					lockRequester={() => this.setState({lockedRequester: !this.state.lockedRequester})}
+          users={(usersLoading ? [] : toSelArr(usersData.users, 'email'))}
+					permissions={projectRights}
+					userID={0}
+					isAdmin={true}
+					lockedRequester={lockedRequester}
+					lockRequester={() => setLockedRequester( !lockedRequester) }
 					/>
 
 					<ProjectDefaultValues
-						updateState={(newState)=>this.setState(newState)}
-						state={this.state}
-						canBeAssigned={canBeAssigned}
+		        assignedTo={assignedTo}
+		        setAssignedTo={setAssignedTo}
+		        company={company}
+		        setCompany={setCompany}
+		        overtime={overtime}
+		        setOvertime={setOvertime}
+		        pausal={pausal}
+		        setPausal={setPausal}
+		        requester={requester}
+		        setRequester={setRequester}
+		        status={status}
+		        setStatus={setStatus}
+		        tag={tag}
+		        setTag={setTag}
+		        taskType={taskType}
+		        setTaskType={setTaskType}
+		        statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
+		        companies={(companiesLoading ? [] : toSelArr(companiesData.companies))}
+		        canBeAssigned={(usersLoading ? [] : toSelArr(usersData.users, 'email'))}
+		        users={lockedRequester ? (projectRights.map(r => r.user)) : (usersLoading ? [] : toSelArr(usersData.users, 'email'))}
+		        allTags={(allTagsLoading ? [] : toSelArr(allTagsData.tags))}
+		        taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
 						/>
 
-					{((this.state.company.value===null&&this.state.company.fixed)||(this.state.status.value===null&&this.state.status.fixed)||(this.state.assignedTo.value.length===0 && this.state.assignedTo.fixed)||(this.state.type.value===null&&this.state.type.fixed)) && <div className="red" style={{color:'red'}}>
+					{ (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) || ( taskType.value === null && taskType.fixed)) &&
+						<div className="red" style={{color:'red'}}>
 						Status, assigned to, task type and company can't be empty if they are fixed!
-					</div>}
+					</div>
+				}
+
+				<Modal isOpen={choosingNewProject}>
+					<ModalHeader>
+						Please choose an project to replace this one
+					</ModalHeader>
+					<ModalBody>
+						<FormGroup>
+							<Select
+								styles={selectStyle}
+								options={filteredProjects}
+								value={newProject}
+								onChange={s => setNewProject(s)}
+								/>
+						</FormGroup>
+					</ModalBody>
+					<ModalFooter>
+						<Button className="btn-link mr-auto"onClick={() => setChooseingNewProject(false)}>
+							Cancel
+						</Button>
+						<Button className="btn ml-auto" disabled={!newProject} onClick={deleteProjectFunc}>
+							Complete deletion
+						</Button>
+					</ModalFooter>
+				</Modal>
 
 					<div className="row">
 					<Button
 						className="btn"
-						disabled={this.state.saving||this.state.title===""||(this.state.company.value===null&&this.state.company.fixed)||(this.state.status.value===null&&this.state.status.fixed)||(this.state.assignedTo.value.length===0 && this.state.assignedTo.fixed)||(this.state.type.value===null&&this.state.type.fixed)}
-						onClick={()=>{
-							this.setState({saving:true});
-							let body = {
-								title: this.state.title,
-								description: this.state.description,
-								lockedRequester: this.state.lockedRequester,
-								def:{
-									status:this.state.status.value?{...this.state.status,value:this.state.status.value.id}:{def:false,fixed:false, value: null, show:true },
-									tags:this.state.tags.value?{...this.state.tags,value:this.state.tags.value.map(item=>item.id)}:{def:false,fixed:false, value: [], show:true },
-									assignedTo:this.state.assignedTo.value?{...this.state.assignedTo,value:this.state.assignedTo.value.map(item=>item.id)}:{def:false,fixed:false, value: [], show:true },
-									type:this.state.type.value?{...this.state.type,value:this.state.type.value.id}:{def:false,fixed:false, value: null, show:true },
-									requester:this.state.requester.value?{...this.state.requester,value:this.state.requester.value.id}:{def:false,fixed:false, value: null, show:true },
-									company:this.state.company.value?{...this.state.company,value:this.state.company.value.id}:{def:false,fixed:false, value: null, show:true },
-									pausal:this.state.pausal.value?{...this.state.pausal,value:this.state.pausal.value.value}:{def:false,fixed:false, value: false, show:true},
-									overtime:this.state.overtime.value?{...this.state.overtime,value:this.state.overtime.value.value}:{def:false,fixed:false, value: false, show:true},
-								},
-								permissions:this.state.permissions.map((permission)=>{
-									return {
-										...permission,
-										user:permission.user.id,
-									}
-								})
-							};
-							rebase.updateDoc(`/help-projects/${this.props.item.id}`, body)
-										.then(()=>{
-											this.setState({saving:false, opened: false});
-									});
-					}}>
-						{(this.state.saving?'Saving...':'Save project')}
+						disabled={cannotSave}
+						onClick={updateProject}>
+						{(saving?'Saving...':'Save project')}
 					</Button>
-					<Button className="btn-red m-l-5" disabled={this.state.saving} onClick={this.deleteProject.bind(this)}>
+					<Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChooseingNewProject(true)}>
 						Delete
 					</Button>
 				</div>
       </div>
     );
   }
-}
-
-const mapStateToProps = ({ storageHelpStatuses, storageHelpTags, storageUsers, storageHelpTaskTypes, storageCompanies, storageHelpProjects, storageHelpTasks,userReducer }) => {
-	const { statusesActive, statuses, statusesLoaded } = storageHelpStatuses;
-	const { tagsActive, tags, tagsLoaded } = storageHelpTags;
-	const { usersActive, users, usersLoaded } = storageUsers;
-	const { taskTypesActive, taskTypes, taskTypesLoaded } = storageHelpTaskTypes;
-	const { companiesActive, companies, companiesLoaded } = storageCompanies;
-	const { projectsActive, projects, projectsLoaded } = storageHelpProjects;
-	const { tasksActive, tasks, tasksLoaded } = storageHelpTasks;
-	return {
-		currentUser:userReducer,
-		statusesActive, statuses, statusesLoaded,
-		tagsActive, tags, tagsLoaded,
-		usersActive, users, usersLoaded,
-		taskTypesActive, taskTypes, taskTypesLoaded,
-		companiesActive, companies, companiesLoaded,
-		projectsActive, projects, projectsLoaded,
-		tasksActive, tasks, tasksLoaded,
-	 };
-};
-
-export default connect(mapStateToProps, { storageHelpStatusesStart, storageHelpTagsStart, storageUsersStart, storageHelpTaskTypesStart, storageCompaniesStart, storageHelpProjectsStart, setProject, storageHelpTasksStart })(ProjectEdit);

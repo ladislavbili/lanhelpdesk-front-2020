@@ -70,7 +70,7 @@ mutation deleteImap($id: Int!, $newDefId: Int!, $newId: Int!) {
 export default function IMAPEdit(props){
   //data
   const { history, match } = props;
-  const { data, loading, refetch } = useQuery(GET_IMAP, { variables: {id: parseInt(props.match.params.id)} });
+  const { data, loading, refetch } = useQuery(GET_IMAP, { variables: {id: parseInt(match.params.id)} });
   const [updateImap, {updateData}] = useMutation(UPDATE_IMAP);
   const [deleteImap, {deleteData, client}] = useMutation(DELETE_IMAP);
   const allIMAPs = toSelArr(client.readQuery({query: GET_IMAPS}).imaps);

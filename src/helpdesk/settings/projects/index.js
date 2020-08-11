@@ -12,7 +12,6 @@ query {
   projects {
     title
     id
-    order
   }
 }
 `;
@@ -26,6 +25,7 @@ export default function ProjectsList(props){
     const { data, loading, error } = useQuery(GET_PROJECTS);
     const PROJECTS = (loading || !data ? [] : data.projects);
 
+      console.log("WWW");
     return (
       <div className="content">
         <div className="row m-0 p-0 taskList-container">
@@ -85,7 +85,7 @@ export default function ProjectsList(props){
                 loading && match.params.id && match.params.id!=='add' && <Loading />
               }
               {
-              match.params.id && match.params.id!=='add' && PROJECTS.some((item)=>item.id===match.params.id) && <ProjectEdit {...{history, match}} />
+              match.params.id && match.params.id!=='add' && PROJECTS.some((item)=>item.id===parseInt(match.params.id)) && <ProjectEdit {...{history, match}} />
               }
             </div>
           </div>

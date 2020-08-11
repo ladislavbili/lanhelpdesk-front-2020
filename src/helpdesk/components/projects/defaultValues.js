@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Select from 'react-select';
 import {invisibleSelectStyle} from 'configs/components/select';
 import Checkbox from '../../../components/checkbox';
 import booleanSelects from 'configs/constants/boolSelect'
 
-export default class ProjectDefaultValues extends Component {
-
-  render(){
+export default function ProjectDefaultValues(props) {
+  //data
+  const { history, match, assignedTo, setAssignedTo, company, setCompany, status, setStatus, requester, setRequester, tag, setTag, taskType, setTaskType, pausal, setPausal, overtime, setOvertime, canBeAssigned, statuses, users, allTags, companies, taskTypes } = props;
+//console.log(canBeAssigned);
     return (
       <div>
         <h3 className="m-t-20"> Default values </h3>
@@ -26,9 +27,9 @@ export default class ProjectDefaultValues extends Component {
                   <label className="col-3 col-form-label">Status</label>
                   <div className="col-9">
                     <Select
-                      value={this.props.state.status.value}
-                      onChange={(status)=>this.props.updateState({status:{...this.props.state.status,value:status}})}
-                      options={this.props.state.statuses}
+                      value={status.value}
+                      onChange={(e)=>setStatus({...status, value:e})}
+                      options={statuses}
                       styles={invisibleSelectStyle}
                       />
                   </div>
@@ -38,26 +39,26 @@ export default class ProjectDefaultValues extends Component {
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.status.def }
-                  onChange={(e)=>this.props.updateState({status:{...this.props.state.status,def:!this.props.state.status.def}})}
-                  disabled={this.props.state.status.fixed || !this.props.state.status.show}
+                  value = { status.def }
+                  onChange={(e)=>setStatus({...status,def:!status.def})}
+                  disabled={status.fixed || !status.show}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.status.fixed }
-                  onChange={(e)=>this.props.updateState({status:{...this.props.state.status,fixed:!this.props.state.status.fixed, def: !this.props.state.status.fixed ? true : this.props.state.status.def }})}
-                  disabled={!this.props.state.status.show}
+                  value = { status.fixed }
+                  onChange={(e)=>setStatus({...status,fixed:!status.fixed, def: !status.fixed ? true : status.def })}
+                  disabled={!status.show}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.status.show }
-                  onChange={(e)=>this.props.updateState({status:{...this.props.state.status, show:!this.props.state.status.show, def: true, fixed: true }})}
+                  value = { status.show }
+                  onChange={(e)=>setStatus({...status, show:!status.show, def: true, fixed: true })}
                   />
               </td>
             </tr>
@@ -69,9 +70,9 @@ export default class ProjectDefaultValues extends Component {
                   <div className="col-9">
                     <Select
                       isMulti
-                      value={this.props.state.tags.value}
-                      onChange={(tags)=>this.props.updateState({tags:{...this.props.state.tags,value:tags}})}
-                      options={this.props.state.allTags}
+                      value={tag.value}
+                      onChange={(e)=>setTag({...tag,value:e})}
+                      options={allTags}
                       styles={invisibleSelectStyle}
                       />
                   </div>
@@ -81,25 +82,25 @@ export default class ProjectDefaultValues extends Component {
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.tags.def }
-                  onChange={(e)=>this.props.updateState({tags:{...this.props.state.tags,def:!this.props.state.tags.def}})}
-                  disabled={this.props.state.tags.fixed}
+                  value = { tag.def }
+                  onChange={(e)=>setTag({...tag,def:!tag.def})}
+                  disabled={tag.fixed}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.tags.fixed }
-                  onChange={(e)=>this.props.updateState({tags:{...this.props.state.tags,fixed:!this.props.state.tags.fixed, def: !this.props.state.tags.fixed ? true : this.props.state.tags.def }})}
+                  value = { tag.fixed }
+                  onChange={(e)=>setTag({...tag,fixed:!tag.fixed, def: !tag.fixed ? true : tag.def })}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.tags.show }
-                  onChange={(e)=>this.props.updateState({tags:{...this.props.state.tags, show:!this.props.state.tags.show }})}
+                  value = { tag.show }
+                  onChange={(e)=>setTag({...tag, show:!tag.show })}
                   />
               </td>
             </tr>
@@ -111,9 +112,9 @@ export default class ProjectDefaultValues extends Component {
                   <div className="col-9">
                     <Select
                       isMulti
-                      value={this.props.state.assignedTo.value}
-                      onChange={(assignedTo)=>this.props.updateState({assignedTo:{...this.props.state.assignedTo,value:assignedTo}})}
-                      options={this.props.canBeAssigned}
+                      value={assignedTo.value}
+                      onChange={(e)=>setAssignedTo({...assignedTo,value:e})}
+                      options={canBeAssigned}
                       styles={invisibleSelectStyle}
                       />
                   </div>
@@ -123,26 +124,26 @@ export default class ProjectDefaultValues extends Component {
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.assignedTo.def }
-                  onChange={(e)=>this.props.updateState({assignedTo:{...this.props.state.assignedTo,def:!this.props.state.assignedTo.def}})}
-                  disabled={this.props.state.assignedTo.fixed || !this.props.state.assignedTo.show}
+                  value = { assignedTo.def }
+                  onChange={(e)=>setAssignedTo({...assignedTo,def:!assignedTo.def})}
+                  disabled={assignedTo.fixed || !assignedTo.show}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.assignedTo.fixed }
-                  onChange={(e)=>this.props.updateState({assignedTo:{...this.props.state.assignedTo,fixed:!this.props.state.assignedTo.fixed, def: !this.props.state.assignedTo.fixed ? true : this.props.state.assignedTo.def }})}
-                  disabled={!this.props.state.assignedTo.show}
+                  value = { assignedTo.fixed }
+                  onChange={(e)=>setAssignedTo({...assignedTo,fixed:!assignedTo.fixed, def: !assignedTo.fixed ? true : assignedTo.def })}
+                  disabled={!assignedTo.show}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.assignedTo.show }
-                  onChange={(e)=>this.props.updateState({assignedTo:{...this.props.state.assignedTo, show:!this.props.state.assignedTo.show, def:true, fixed:true }})}
+                  value = { assignedTo.show }
+                  onChange={(e)=>setAssignedTo({...assignedTo, show:!assignedTo.show, def:true, fixed:true })}
                   />
               </td>
             </tr>
@@ -150,12 +151,12 @@ export default class ProjectDefaultValues extends Component {
             <tr>
               <td>
                 <div className="row">
-                  <label className="col-3 col-form-label">Type</label>
+                  <label className="col-3 col-form-label">Task type</label>
                   <div className="col-9">
                     <Select
-                      value={this.props.state.type.value}
-                      onChange={(type)=>this.props.updateState({type:{...this.props.state.type,value:type}})}
-                      options={this.props.state.types}
+                      value={taskType.value}
+                      onChange={(e)=>setTaskType({...taskType,value:e})}
+                      options={taskTypes}
                       styles={invisibleSelectStyle}
                       />
                   </div>
@@ -165,26 +166,26 @@ export default class ProjectDefaultValues extends Component {
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.type.def }
-                  onChange={(e)=>this.props.updateState({type:{...this.props.state.type,def:!this.props.state.type.def}})}
-                  disabled={this.props.state.type.fixed || !this.props.state.type.show }
+                  value = { taskType.def }
+                  onChange={(e)=>setTaskType({...taskType,def:!taskType.def})}
+                  disabled={taskType.fixed || !taskType.show }
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.type.fixed }
-                  onChange={(e)=>this.props.updateState({type:{...this.props.state.type,fixed:!this.props.state.type.fixed, def: !this.props.state.type.fixed ? true : this.props.state.type.def }})}
-                  disabled={ !this.props.state.type.show }
+                  value = { taskType.fixed }
+                  onChange={(e)=>setTaskType({...taskType,fixed:!taskType.fixed, def: !taskType.fixed ? true : taskType.def })}
+                  disabled={ !taskType.show }
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.type.show }
-                  onChange={(e)=>this.props.updateState({type:{...this.props.state.type, show:!this.props.state.type.show, def:true, fixed:true }})}
+                  value = { taskType.show }
+                  onChange={(e)=>setTaskType({...taskType, show:!taskType.show, def:true, fixed:true })}
                   />
               </td>
             </tr>
@@ -195,9 +196,9 @@ export default class ProjectDefaultValues extends Component {
                   <label className="col-3 col-form-label">Requester</label>
                   <div className="col-9">
                     <Select
-                      value={this.props.state.requester.value}
-                      onChange={(requester)=>this.props.updateState({requester:{...this.props.state.requester,value:requester}})}
-                      options={this.props.state.users}
+                      value={requester.value}
+                      onChange={(e)=>setRequester({...requester,value:e})}
+                      options={users}
                       styles={invisibleSelectStyle}
                       />
                   </div>
@@ -207,37 +208,38 @@ export default class ProjectDefaultValues extends Component {
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.requester.def }
-                  onChange={(e)=>this.props.updateState({requester:{...this.props.state.requester,def:!this.props.state.requester.def}})}
-                  disabled={this.props.state.requester.fixed}
+                  value = { requester.def }
+                  onChange={(e)=>setRequester({...requester,def:!requester.def})}
+                  disabled={requester.fixed}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.requester.fixed }
-                  onChange={(e)=>this.props.updateState({requester:{...this.props.state.requester,fixed:!this.props.state.requester.fixed, def: !this.props.state.requester.fixed ? true : this.props.state.requester.def }})}
+                  value = { requester.fixed }
+                  onChange={(e)=>setRequester({...requester,fixed:!requester.fixed, def: !requester.fixed ? true : requester.def })}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.requester.show }
-                  onChange={(e)=>this.props.updateState({requester:{...this.props.state.requester, show:!this.props.state.requester.show }})}
+                  value = { requester.show }
+                  onChange={(e)=>setRequester({...requester, show:!requester.show })}
                   />
               </td>
             </tr>
+
             <tr>
               <td>
                 <div className="row">
                   <label className="col-3 col-form-label">Company</label>
                   <div className="col-9">
                     <Select
-                      value={this.props.state.company.value}
-                      onChange={(company)=>this.props.updateState({company:{...this.props.state.company,value:company}})}
-                      options={this.props.state.companies}
+                      value={company.value}
+                      onChange={(e)=>setCompany({...company,value:e})}
+                      options={companies}
                       styles={invisibleSelectStyle}
                       />
                   </div>
@@ -247,26 +249,26 @@ export default class ProjectDefaultValues extends Component {
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.company.def }
-                  onChange={(e)=>this.props.updateState({company:{...this.props.state.company,def:!this.props.state.company.def}})}
-                  disabled={this.props.state.company.fixed || !this.props.state.company.show }
+                  value = { company.def }
+                  onChange={(e)=>setCompany({...company,def:!company.def})}
+                  disabled={company.fixed || !company.show }
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.company.fixed }
-                  onChange={(e)=>this.props.updateState({company:{...this.props.state.company,fixed:!this.props.state.company.fixed, def: !this.props.state.company.fixed ? true : this.props.state.company.def }})}
-                  disabled={ !this.props.state.company.show }
+                  value = { company.fixed }
+                  onChange={(e)=>setCompany({...company,fixed:!company.fixed, def: !company.fixed ? true : company.def })}
+                  disabled={ !company.show }
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.company.show }
-                  onChange={(e)=>this.props.updateState({company:{...this.props.state.company, show:!this.props.state.company.show, def:true, fixed:true }})}
+                  value = { company.show }
+                  onChange={(e)=>setCompany({...company, show:!company.show, def:true, fixed:true })}
                   />
               </td>
             </tr>
@@ -277,8 +279,8 @@ export default class ProjectDefaultValues extends Component {
                   <label className="col-3 col-form-label">Pausal</label>
                   <div className="col-9">
                     <Select
-                      value={this.props.state.pausal.value}
-                      onChange={(pausal)=>this.props.updateState({pausal:{...this.props.state.pausal,value:pausal}})}
+                      value={pausal.value}
+                      onChange={(e)=>setPausal({...pausal,value:e})}
                       options={booleanSelects}
                       styles={invisibleSelectStyle}
                       />
@@ -289,26 +291,26 @@ export default class ProjectDefaultValues extends Component {
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.pausal.def }
-                  onChange={(e)=>this.props.updateState({pausal:{...this.props.state.pausal,def:!this.props.state.pausal.def}})}
-                  disabled={this.props.state.pausal.fixed || !this.props.state.pausal.show}
+                  value = { pausal.def }
+                  onChange={(e)=>setPausal({...pausal,def:!pausal.def})}
+                  disabled={pausal.fixed || !pausal.show}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.pausal.fixed }
-                  onChange={(e)=>this.props.updateState({pausal:{...this.props.state.pausal,fixed:!this.props.state.pausal.fixed, def: !this.props.state.pausal.fixed ? true : this.props.state.pausal.def }})}
-                  disabled={!this.props.state.pausal.show}
+                  value = { pausal.fixed }
+                  onChange={(e)=>setPausal({...pausal,fixed:!pausal.fixed, def: !pausal.fixed ? true : pausal.def })}
+                  disabled={!pausal.show}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.pausal.show }
-                  onChange={(e)=>this.props.updateState({pausal:{...this.props.state.pausal, show:!this.props.state.pausal.show, def:true, fixed:true }})}
+                  value = { pausal.show }
+                  onChange={(e)=>setPausal({...pausal, show:!pausal.show, def:true, fixed:true })}
                   />
               </td>
             </tr>
@@ -319,8 +321,8 @@ export default class ProjectDefaultValues extends Component {
                   <label className="col-3 col-form-label">Mimo pracovných hodín</label>
                   <div className="col-9">
                     <Select
-                      value={this.props.state.overtime.value}
-                      onChange={(overtime)=>this.props.updateState({overtime:{...this.props.state.overtime,value:overtime}})}
+                      value={overtime.value}
+                      onChange={(e)=>setOvertime({...overtime,value:e})}
                       options={booleanSelects}
                       styles={invisibleSelectStyle}
                       />
@@ -331,43 +333,43 @@ export default class ProjectDefaultValues extends Component {
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.overtime.def }
-                  onChange={(e)=>this.props.updateState({overtime:{...this.props.state.overtime,def:!this.props.state.overtime.def}})}
-                  disabled={this.props.state.overtime.fixed || !this.props.state.overtime.show}
+                  value = { overtime.def }
+                  onChange={(e)=>setOvertime({...overtime,def:!overtime.def})}
+                  disabled={overtime.fixed || !overtime.show}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.overtime.fixed }
-                  onChange={(e)=>this.props.updateState({overtime:{...this.props.state.overtime,fixed:!this.props.state.overtime.fixed, def: !this.props.state.overtime.fixed ? true : this.props.state.overtime.def }})}
-                  disabled={!this.props.state.overtime.show}
+                  value = { overtime.fixed }
+                  onChange={(e)=>setOvertime({...overtime,fixed:!overtime.fixed, def: !overtime.fixed ? true : overtime.def })}
+                  disabled={!overtime.show}
                   />
               </td>
               <td>
                 <Checkbox
                   centerHor
                   centerVer
-                  value = { this.props.state.overtime.show }
-                  onChange={(e)=>this.props.updateState({overtime:{...this.props.state.overtime, show:!this.props.state.overtime.show, def:true, fixed:true }})}
+                  value = { overtime.show }
+                  onChange={(e)=>setOvertime({...overtime, show:!overtime.show, def:true, fixed:true })}
                   />
               </td>
             </tr>
+
           </tbody>
         </table>
         {
           (
-            (this.props.state.company.value===null && this.props.state.company.fixed) ||
-            (this.props.state.status.value===null && this.props.state.status.fixed) ||
-            (this.props.state.assignedTo.value.length===0 && this.props.state.assignedTo.fixed) ||
-            (this.props.state.type.value===null && this.props.state.type.fixed)
+            (company.value===null && company.fixed) ||
+            (status.value===null && status.fixed) ||
+            (assignedTo.value && assignedTo.value.length===0 && assignedTo.fixed) ||
+            (taskType.value===null && taskType.fixed)
           ) &&
           <div className="red" style={{color:'red'}}>
-            Status, assigned to, task type and company can't be empty if they are fixed!
+            Status, assigned to, task taskType and company can't be empty if they are fixed!
           </div>
         }
       </div>
-    )
-  }
+    );
 }

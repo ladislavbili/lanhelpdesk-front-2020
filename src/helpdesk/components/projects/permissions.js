@@ -1,36 +1,17 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Button } from 'reactstrap';
-import { connect } from "react-redux";
-import {storageUsersStart} from '../../../redux/actions';
+
 import Select from "react-select";
 import {selectStyle} from "configs/components/select";
 import {toSelArr} from '../../../helperFunctions';
 import Checkbox from '../../../components/checkbox';
 
-class Permissions extends Component {
-	constructor(props) {
-		super();
-		this.state = {
-			users: [],
-			chosenUser: null,
-		};
-	}
+export default function Permissions(props) {
+  //data
+  const { history, match, users, addUser, givePermission, permissions, userID, isAdmin, lockedRequester, lockRequester } = props;
 
-	componentWillMount(){
-		if(!this.props.usersActive){
-			this.props.storageUsersStart();
-		}
-		this.setState({users:toSelArr(this.props.users,'email')})
-	}
+	const [ chosenUser, setChosenUser ] = React.useState({});
 
-
-	componentWillReceiveProps(props){
-	  if(props.usersLoaded && !this.props.usersLoaded){
-	    this.setState({users:toSelArr(props.users,'email')})
-	  }
-	}
-
-	render() {
 		return (
 			<div >
 				<h3 className="m-t-20 m-b-20"> Prístupové práva </h3>
@@ -42,18 +23,25 @@ class Permissions extends Component {
 					</div>
 					<div className="flex m-r-10">
 						<Select
-							value={this.state.chosenUser}
+							value={chosenUser}
 							styles={selectStyle}
-							onChange={(e)=> this.setState({chosenUser: e})}
-							options={this.state.users.filter((user)=> user.role.value > -1 && !this.props.permissions.map((permission)=>permission.user.id).includes(user.id))}
+							onChange={(e)=> setChosenUser(e)}
+							options={users.filter((user)=> !permissions.map((permission)=>permission.user.id).includes(user.id))}
 							/>
 					</div>
 					<div>
-						<Button className="btn" disabled={this.state.chosenUser===null} onClick={() => {this.props.addUser(this.state.chosenUser);this.setState({chosenUser:null})}}>Pridať</Button>
+						<Button
+							className="btn"
+							disabled={chosenUser===null}
+							onClick={() => {
+								addUser(chosenUser);
+								setChosenUser(null);
+							}}
+							>Pridať</Button>
 					</div>
 				</div>
 
-				{	this.props.permissions.length > 0
+				{	permissions.length > 0
 					&&
 					<table className="table m-t-10">
 						<thead>
@@ -70,7 +58,7 @@ class Permissions extends Component {
 
 						<tbody>
 							{
-								this.props.permissions.map(permission =>
+								permissions.map(permission =>
 								<tr key={permission.user.id}>
 									<td> {permission.user.email} </td>
 										<td>
@@ -78,16 +66,16 @@ class Permissions extends Component {
 				                className = "m-l-5 m-r-5"
 												centerVer
 												centerHor
-												disabled = {this.props.userID===permission.user.id && !this.props.isAdmin}
+												disabled = {userID===permission.user.id && !isAdmin}
 												value = { permission.read }
 												onChange={()=>{
 													let permissions = null;
 													if(permission.read){
-														permissions={read:false, write:false, delete:false, isAdmin:false, internal: permission.internal }
+														permissions={read:false, write:false, delete:false, admin: false, internal: permission.internal }
 													}else{
-														permissions={read:true, write:false, delete:false, isAdmin:false, internal: permission.internal }
+														permissions={read:true, write:false, delete:false, admin: false, internal: permission.internal }
 													}
-													this.props.givePermission(permission.user,permissions);
+													givePermission(permission.user,permissions);
 												}}
 				                />
 										</td>
@@ -98,15 +86,15 @@ class Permissions extends Component {
 												centerVer
 												centerHor
 				                value = { permission.write }
-												disabled={ this.props.userID===permission.user.id && !this.props.isAdmin }
+												disabled={ userID===permission.user.id && !isAdmin }
 												onChange={()=>{
 													let permissions = null;
 													if(permission.write){
-														permissions={read:true, write:false, delete:false, isAdmin:false, internal: permission.internal }
+														permissions={read:true, write:false, delete:false, admin: false, internal: permission.internal }
 													}else{
-														permissions={read:true, write:true, delete:false, isAdmin:false, internal: permission.internal }
+														permissions={read:true, write:true, delete:false, admin: false, internal: permission.internal }
 													}
-													this.props.givePermission(permission.user,permissions);
+													givePermission(permission.user,permissions);
 												}}
 				                />
 										</td>
@@ -117,15 +105,15 @@ class Permissions extends Component {
 												centerVer
 												centerHor
 				                value = { permission.delete }
-				                disabled={this.props.userID===permission.user.id && !this.props.isAdmin}
+				                disabled={userID===permission.user.id && !isAdmin}
 												onChange={()=>{
 													let permissions = null;
 													if(permission.delete){
-														permissions={read:true, write:true, delete:false, isAdmin:false, internal: permission.internal }
+														permissions={read:true, write:true, delete:false, admin: false, internal: permission.internal }
 													}else{
-														permissions={read:true, write:true, delete:true, isAdmin:false, internal: permission.internal }
+														permissions={read:true, write:true, delete:true, admin: false, internal: permission.internal }
 													}
-													this.props.givePermission(permission.user,permissions);
+													givePermission(permission.user,permissions);
 												}}
 				                />
 										</td>
@@ -134,16 +122,16 @@ class Permissions extends Component {
 				                className = "m-l-5 m-r-5"
 												centerVer
 												centerHor
-				                value = { permission.isAdmin }
-												disabled={this.props.userID===permission.user.id && !this.props.isAdmin}
+				                value = { permission.admin }
+												disabled={userID===permission.user.id && !isAdmin}
 												onChange={()=>{
 													let permissions = null;
-													if(permission.isAdmin){
-														permissions={read:true, write:true, delete:true, isAdmin:false, internal: permission.internal }
+													if(permission.admin){
+														permissions={read:true, write:true, delete:true, admin: false, internal: permission.internal }
 													}else{
-														permissions={read:true, write:true, delete:true, isAdmin:true, internal: permission.internal }
+														permissions={read:true, write:true, delete:true, admin: true, internal: permission.internal }
 													}
-													this.props.givePermission(permission.user,permissions);
+													givePermission(permission.user,permissions);
 												}}
 				                />
 										</td>
@@ -152,18 +140,18 @@ class Permissions extends Component {
 				                className = "m-l-5 m-r-5"
 												centerVer
 												centerHor
-												disabled={this.props.userID===permission.user.id && !this.props.isAdmin}
+												disabled={userID===permission.user.id && !isAdmin}
 				                value = { permission.internal }
 												onChange={()=>{
-													let permissions = {read:permission.read, write:permission.write, delete:permission.delete, isAdmin:permission.isAdmin, internal: !permission.internal };
-													this.props.givePermission(permission.user,permissions);
+													let permissions = {read:permission.read, write:permission.write, delete:permission.delete, admin: permission.admin, internal: !permission.internal };
+													givePermission(permission.user,permissions);
 												}}
 				                />
 										</td>
 										<td>
-											<button className="btn btn-link waves-effect" disabled={(this.props.userID===permission.user.id && !this.props.isAdmin) || this.props.disabled} onClick={()=>{
+											<button className="btn btn-link waves-effect" disabled={(userID===permission.user.id && !isAdmin)} onClick={()=>{
 													if(window.confirm('Are you sure?')){
-														this.props.givePermission(permission.user,{read:false, write:false, delete:false, isAdmin:false, internal:false});
+														givePermission(permission.user,{read:false, write:false, delete:false, isAdmin:false, internal:false});
 													}
 												}}>
 												<i className="fa fa-times"  />
@@ -180,20 +168,11 @@ class Permissions extends Component {
 						className = "m-l-5 m-r-5"
 						centerHor
 						disabled={false}
-						value = { this.props.lockedRequester}
-						onChange={()=> this.props.lockRequester()}
+						value = { lockedRequester}
+						onChange={() => lockRequester()}
 						/> A requester can be only a user with rights to this project.
 				</div>
 
 			</div>
 		);
 	}
-}
-
-
-const mapStateToProps = ({ storageUsers}) => {
-  const { usersActive, users, usersLoaded } = storageUsers;
-  return { usersActive, users, usersLoaded };
-};
-
-export default connect(mapStateToProps, { storageUsersStart })(Permissions);
