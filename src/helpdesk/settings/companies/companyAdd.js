@@ -5,11 +5,9 @@ import gql from "graphql-tag";
 import { Button, FormGroup, Label, Input } from 'reactstrap';
 import Switch from "react-switch";
 import {toSelArr} from '../../../helperFunctions';
-import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
 import Loading from 'components/loading';
 
-import {sameStringForms, isEmail} from '../../../helperFunctions';
+import { isEmail} from '../../../helperFunctions';
 import CompanyRents from './companyRents';
 import CompanyPriceList from './companyPriceList';
 

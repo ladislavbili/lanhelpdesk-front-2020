@@ -6,8 +6,8 @@ import booleanSelects from 'configs/constants/boolSelect'
 
 export default function ProjectDefaultValues(props) {
   //data
-  const { history, match, assignedTo, setAssignedTo, company, setCompany, status, setStatus, requester, setRequester, tag, setTag, taskType, setTaskType, pausal, setPausal, overtime, setOvertime, canBeAssigned, statuses, users, allTags, companies, taskTypes } = props;
-//console.log(canBeAssigned);
+  const { assignedTo, setAssignedTo, company, setCompany, status, setStatus, requester, setRequester, tag, setTag, taskType, setTaskType, pausal, setPausal, overtime, setOvertime, canBeAssigned, statuses, users, allTags, companies, taskTypes } = props;
+
     return (
       <div>
         <h3 className="m-t-20"> Default values </h3>

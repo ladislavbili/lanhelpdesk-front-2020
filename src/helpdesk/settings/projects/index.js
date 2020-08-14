@@ -25,7 +25,6 @@ export default function ProjectsList(props){
     const { data, loading, error } = useQuery(GET_PROJECTS);
     const PROJECTS = (loading || !data ? [] : data.projects);
 
-      console.log("WWW");
     return (
       <div className="content">
         <div className="row m-0 p-0 taskList-container">

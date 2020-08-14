@@ -1,36 +1,54 @@
-import React, {Component} from 'react';
+import React from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 import {Dropdown, DropdownItem, DropdownMenu, DropdownToggle} from 'reactstrap';
 import {Link} from 'react-router-dom';
-import {connect} from "react-redux";
-import firebase from 'firebase';
 import classnames from 'classnames';
-import {rebase} from 'index';
-import { deleteUserData, storageHelpTasksStart, storageErrorMessagesStart } from 'redux/actions';
 import {testing} from 'helperFunctions';
 
-class PageHeader extends Component {
-  constructor() {
-    super();
-    this.state = {
-      companies: [],
-      notificationsOpen: false,
-      settingsOpen: false
-    };
-    this.processNotifications.bind(this);
-    this.getLocation.bind(this);
-  }
-
-  componentWillMount() {
-    if (!this.props.tasksActive) {
-      this.props.storageHelpTasksStart();
+const GET_MY_DATA = gql`
+query {
+  getMyData{
+    id
+    role {
+      accessRights {
+        users
+        companies
+        pausals
+        projects
+        statuses
+        units
+        prices
+        suppliers
+        tags
+        invoices
+        roles
+        taskTypes
+        tripTypes
+        imaps
+        smtps
+      }
     }
-    if (!this.props.errorMessagesActive) {
-      this.props.storageErrorMessagesStart();
-    }
   }
+}
+`;
 
-  getLocation() {
-    let url = this.props.history.location.pathname;
+export default function PageHeader(props) {
+  //data & queries
+  const { history, match, settings, layout, showLayoutSwitch, setLayout, dndLayout, calendarLayout } = props;
+  const { data, loading } = useQuery(GET_MY_DATA);
+  //state
+  const [ notificationsOpen, setNotificationsOpen ] = React.useState(false);
+  const [ layoutOpen, setLayoutOpen ] = React.useState(false);
+  const [ settingsOpen, setSettingsOpen ] = React.useState(false);
+  const [ errorMessages, setErrorMessages ] = React.useState([]);
+  const [ unreadNotifications, setUnreadNotifications ] = React.useState([]);
+
+  const currentUser = data ? data.getMyData : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+
+  const getLocation = () => {
+    let url = history.location.pathname;
     if (url.includes('cmdb')) {
       return '/cmdb';
     } else if (url.includes('helpdesk')) {
@@ -50,8 +68,8 @@ class PageHeader extends Component {
     }
   }
 
-  getLayoutIcon() {
-    switch (this.props.layout) {
+  const getLayoutIcon = () => {
+    switch (layout) {
       case 0:
         return "fa-columns";
       case 1:
@@ -65,9 +83,11 @@ class PageHeader extends Component {
     }
   }
 
-  processNotifications() {
-    return this.props.currentUser.notifications.map((notification) => {
-      let task = this.props.tasks.find((task) => task.id === notification.task);
+  const processNotifications = () => {
+    return [];
+    /*
+    return data.getMyData.notifications.map((notification) => {
+      let task = props.tasks.find((task) => task.id === notification.task);
       return {
         ...notification,
         task: task !== undefined
@@ -77,13 +97,13 @@ class PageHeader extends Component {
             title: 'Unknown task'
           }
       }
-    })
+    })*/
   }
 
-  render() {
-    const errorMessages = this.props.errorMessages.filter((message) => !message.read )
-    let unreadNotifications = [...this.props.currentUser.notifications].splice(5, this.props.currentUser.notifications.length - 1).filter((notification) => !notification.read);
-    const URL = this.props.history.location.pathname;
+/*    const errorMessages = props.errorMessages.filter((message) => !message.read )
+    let unreadNotifications = [...props.currentUser.notifications].splice(5, props.currentUser.notifications.length - 1).filter((notification) => !notification.read);*/
+    const URL = getLocation();
+
     return (<div className="page-header flex">
       <div className="d-flex full-height p-l-10">
         <div className="center-hor">
@@ -96,7 +116,7 @@ class PageHeader extends Component {
             Úlohy
           </Link>
           {
-            ((this.props.currentUser.userData && this.props.currentUser.userData.role.value > 1) || testing) && <Link to={{
+            (true) && <Link to={{
                   pathname: `/reports`
                 }} className={"header-link" + (
                   URL.includes("reports")
@@ -104,45 +124,43 @@ class PageHeader extends Component {
                   : "")}>
                 Vykazy
               </Link>
-          }   
+          }
         </div>
         <div className="ml-auto center-hor row">
           <i
             className={classnames({ "danger-color": errorMessages.length > 0 }, "header-icon fas fa-exclamation-triangle center-hor clickable")}
             style={{marginRight: 6}}
-            onClick={() => this.props.history.push(`${this.getLocation()}/errorMessages/`)}
+            onClick={() => history.push(`${this.getLocation()}/errorMessages/`)}
             />
           <span className={classnames({ "danger-color": errorMessages.length > 0 },"header-icon-text clickable")}>{errorMessages.length}</span>
 
-          { this.props.showLayoutSwitch &&
+          { showLayoutSwitch &&
             <Dropdown className="center-hor"
-              isOpen={this.state.layoutOpen}
-              toggle={() => this.setState({
-                layoutOpen: !this.state.layoutOpen
-              })}>
+              isOpen={layoutOpen}
+              toggle={() => setLayoutOpen(!layoutOpen)}>
               <DropdownToggle className="header-dropdown">
-                <i className={"header-icon fa " + this.getLayoutIcon()}/>
+                <i className={"header-icon fa " + getLayoutIcon()}/>
               </DropdownToggle>
               <DropdownMenu right>
                 <div className="btn-group-vertical" data-toggle="buttons">
-                  <label className={classnames({'active':this.props.layout === 0}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" onChange={() => this.props.setLayout(0)} checked={this.props.layout === 0}/>
+                  <label className={classnames({'active':layout === 0}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                    <input type="radio" name="options" onChange={() => setLayout(0)} checked={layout === 0}/>
                     <i className="fa fa-columns"/>
                   </label>
-                  <label className={classnames({'active':this.props.layout === 1}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" checked={this.props.layout === 1} onChange={() => this.props.setLayout(1)}/>
+                  <label className={classnames({'active':layout === 1}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                    <input type="radio" name="options" checked={layout === 1} onChange={() => setLayout(1)}/>
                     <i className="fa fa-list"/>
                   </label>
-                  { this.props.dndLayout &&
-                    <label className={classnames({'active':this.props.layout === 2}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => this.props.setLayout(2)} checked={this.props.layout === 2}/>
+                  { dndLayout &&
+                    <label className={classnames({'active':layout === 2}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                      <input type="radio" name="options" onChange={() => setLayout(2)} checked={layout === 2}/>
                       <i className="fa fa-map"/>
                     </label>
                   }
 
-                  { this.props.calendarLayout &&
-                    <label className={classnames({'active':this.props.layout === 3}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => this.props.setLayout(3)} checked={this.props.layout === 3}/>
+                  { calendarLayout &&
+                    <label className={classnames({'active':layout === 3}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                      <input type="radio" name="options" onChange={() => setLayout(3)} checked={layout === 3}/>
                       <i className="fa fa-calendar-alt"/>
                     </label>
                   }
@@ -151,20 +169,18 @@ class PageHeader extends Component {
             </Dropdown>
           }
 
-          <Dropdown className="center-hor" isOpen={this.state.notificationsOpen} toggle={() => this.setState({
-              notificationsOpen: !this.state.notificationsOpen
-            })}>
+          <Dropdown className="center-hor" isOpen={notificationsOpen} toggle={() => setNotificationsOpen(!notificationsOpen)}>
             <DropdownToggle className="header-dropdown">
               <i className="header-icon-with-text fa fa fa-envelope"/>
             </DropdownToggle>
             <DropdownMenu right>
               <DropdownItem header={true}>Notifications</DropdownItem>
-              <DropdownItem divider={true}/> {this.props.currentUser.notifications.length === 0 && <DropdownItem>You have no notifications!</DropdownItem>}
+              <DropdownItem divider={true}/> {currentUser.notifications && currentUser.notifications.length === 0 && <DropdownItem>You have no notifications!</DropdownItem>}
               {
-                this.processNotifications().splice(0, 5).map((notification) => <DropdownItem key={notification.id} onClick={() => {
-                    this.props.history.push('/helpdesk/notifications/' + notification.id + '/' + notification.task.id)
+                processNotifications().splice(0, 5).map((notification) => <DropdownItem key={notification.id} onClick={() => {
+                    history.push('/helpdesk/notifications/' + notification.id + '/' + notification.task.id)
                     if (!notification.read) {
-                      rebase.updateDoc('user_notifications/' + notification.id, {read: true});
+                  //    rebase.updateDoc('user_notifications/' + notification.id, {read: true});
                     }
                   }} className={classnames({
                     'notification-read-small': notification.read,
@@ -184,7 +200,7 @@ class PageHeader extends Component {
                 </DropdownItem>)
               }
               <DropdownItem divider={true}/>
-              <DropdownItem onClick={() => this.props.history.push('/helpdesk/notifications/')}>
+              <DropdownItem onClick={() => history.push('/helpdesk/notifications/')}>
                 <span style={{
                     fontWeight: 'bold'
                   }}>Go to notifications</span>
@@ -199,30 +215,32 @@ class PageHeader extends Component {
           <span className="header-icon-text clickable">{unreadNotifications.length}</span>
 
           {
-            ((this.props.currentUser.userData && this.props.currentUser.userData.role.value > 0) || testing) && this.props.settings && this.props.settings.length > 0 && <Dropdown className="center-hor" isOpen={this.state.settingsOpen} toggle={() => this.setState({
-                  settingsOpen: !this.state.settingsOpen
-                })}>
+            (currentUser) && settings && settings.length > 0 && <Dropdown className="center-hor" isOpen={settingsOpen} toggle={() =>setSettingsOpen(!settingsOpen)}>
                 <DropdownToggle className="header-dropdown">
                   <i className="header-icon fa fa-cog"/>
                 </DropdownToggle>
                 <DropdownMenu right>
                   <DropdownItem header={true}>Settings</DropdownItem>
-                  <DropdownItem divider={true} /> {this.props.settings.filter((setting) => setting.minimalRole <= this.props.currentUser.userData.role.value).map((item, index) => <DropdownItem key={index} onClick={() => this.props.history.push(this.getLocation() + '/settings/' + item.link)}>{item.title}</DropdownItem>)}
+                  <DropdownItem divider={true} /> {
+                      settings.filter((setting) => accessRights[setting.value]
+                    ).map((item, index) =>
+                    <DropdownItem
+                      key={index}
+                      onClick={() => history.push(getLocation() + '/settings/' + item.link)}>{item.title}
+                    </DropdownItem>
+                  )}
                 </DropdownMenu>
               </Dropdown>
           }
           <i className="header-icon clickable fa fa-sign-out-alt center-hor" onClick={() => {
               if (window.confirm('Are you sure you want to log out?')) {
-                this.props.deleteUserData();
-                firebase.auth().signOut();
               }
             }}/>
         </div>
       </div>
     </div>);
   }
-}
-
+/*
 const mapStateToProps = ({userReducer, storageHelpTasks, storageErrorMessages}) => {
   const {tasksActive, tasks} = storageHelpTasks;
   const { errorMessagesActive, errorMessages } = storageErrorMessages;
@@ -231,6 +249,4 @@ const mapStateToProps = ({userReducer, storageHelpTasks, storageErrorMessages}) 
     tasksActive, tasks,
     errorMessagesActive, errorMessages,
   };
-};
-
-export default connect(mapStateToProps, {deleteUserData, storageHelpTasksStart, storageErrorMessagesStart})(PageHeader);
+};*/

@@ -5,7 +5,6 @@ import gql from "graphql-tag";
 import {Button } from 'reactstrap';
 import StatusAdd from './statusAdd';
 import StatusEdit from './statusEdit';
-import Loading from 'components/loading';
 
 export const GET_STATUSES = gql`
 query {
@@ -23,7 +22,7 @@ export default function StatusesList(props){
 
     //data
     const { history, match } = props;
-    const { data, loading, error } = useQuery(GET_STATUSES);
+    const { data, loading } = useQuery(GET_STATUSES);
     const statuses = (loading || !data ? [] : data.statuses);
 
     return (

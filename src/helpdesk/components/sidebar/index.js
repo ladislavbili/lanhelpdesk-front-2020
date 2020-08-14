@@ -10,6 +10,7 @@ import ProjectEdit from '../projects/projectEdit';
 import ProjectAdd from '../projects/projectAdd';
 import MilestoneEdit from '../milestones/milestoneEdit';
 import MilestoneAdd from '../milestones/milestoneAdd';
+import SettingsSidebar from './settingsSidebar';
 import { toSelArr, sameStringForms,testing } from 'helperFunctions';
 import {
 	setProject,
@@ -26,7 +27,6 @@ import {
 import { getEmptyFilter } from 'configs/fixedFilters';
 import {sidebarSelectStyle} from 'configs/components/select';
 import { dashboard, addProject, allMilestones, addMilestone } from 'configs/constants/sidebar';
-import settings from 'configs/constants/settings';
 import classnames from "classnames";
 
 class Sidebar extends Component {
@@ -359,14 +359,7 @@ class Sidebar extends Component {
 
 	getSettingsSidebar(){
 		return (
-			<Nav vertical>
-				{settings.filter((setting)=>setting.minimalRole <= this.props.currentUser.userData.role.value).map((setting)=>
-					<NavItem key={setting.link}>
-						<Link className="sidebar-align sidebar-menu-item"
-							to={{ pathname:'/helpdesk/settings/'+setting.link }}>{setting.title}</Link>
-					</NavItem>
-				)}
-			</Nav>
+			<SettingsSidebar {...this.props} />
 		)
 	}
 }

@@ -31,6 +31,7 @@ query project($id: Int!) {
 			admin
 			user {
 				id
+        email
 			}
 		}
     def {
@@ -249,21 +250,40 @@ export default function ProjectAdd(props){
 	// sync
 	React.useEffect( () => {
 			if (!projectLoading){
-				console.log(projectData);
 				setTitle(projectData.project.title);
-				setDescription(projectData.project.description);
+				setDescription(projectData.project.descrption);
 				setLockedRequester(projectData.project.lockedRequester);
 				setProjectRights(projectData.project.projectRights);
-				setOvertime((projectData.project.def.overtime ? {value: true, label: 'Yes'} :{value: false, label: 'No'}));			setPausal((projectData.project.def.pausal ? {value: true, label: 'Yes'} :{value: false, label: 'No'}));
+        let newOvertime = {
+          def: projectData.project.def.overtime.def,
+          fixed: projectData.project.def.overtime.fixed,
+          show: projectData.project.def.overtime.show,
+          value:  (projectData.project.def.overtime.value ? {value: true, label: 'Yes'} :{value: false, label: 'No'})};
+				setOvertime(newOvertime);
+        let newPausal = {
+          def: projectData.project.def.pausal.def,
+          fixed: projectData.project.def.pausal.fixed,
+          show: projectData.project.def.pausal.show,
+          value:  (projectData.project.def.pausal.value ? {value: true, label: 'Yes'} :{value: false, label: 'No'})};
+        setPausal(newPausal);
 			}
 	}, [projectLoading]);
 
 	React.useEffect( () => {
 			if (!projectLoading && !usersLoading){
 				let users = toSelArr(usersData.users, 'email');
-				let newAssignedTo = projectData.propject.def.assignedTo.map(user => users.find(u => u.id === user.id));
+				let newAssignedTo = {
+          def: projectData.project.def.assignedTo.def,
+          fixed: projectData.project.def.assignedTo.fixed,
+          show: projectData.project.def.assignedTo.show,
+          value: projectData.project.def.assignedTo.value.map(user => users.find(u => u.id === user.id))};
 				setAssignedTo(newAssignedTo);
-				let newRequester = users.find(u => u.id === projectData.project.def.requester.id);
+				let newRequester = {
+          def: projectData.project.def.requester.def,
+          fixed: projectData.project.def.requester.fixed,
+          show: projectData.project.def.requester.show,
+          value: (projectData.project.def.requester.value ? users.find(u => u.id === projectData.project.def.requester.value.id) : null)
+        };
 				setRequester(newRequester);
 			}
 	}, [projectLoading, usersLoading]);
@@ -271,7 +291,12 @@ export default function ProjectAdd(props){
 	React.useEffect( () => {
 			if (!projectLoading && !companiesLoading){
 				let companies = toSelArr(companiesData.companies);
-				let newCompany = companies.find(c => c.id === projectData.project.def.company);
+				let newCompany = {
+          def: projectData.project.def.company.def,
+          fixed: projectData.project.def.company.fixed,
+          show: projectData.project.def.company.show,
+          value: (projectData.project.def.company.value ? companies.find(c => c.id === projectData.project.def.company.value.id) : null)
+        };
 				setCompany(newCompany);
 			}
 	}, [projectLoading, companiesLoading]);
@@ -279,7 +304,12 @@ export default function ProjectAdd(props){
 	React.useEffect( () => {
 			if (!projectLoading && !statusesLoading){
 				let statuses = toSelArr(statusesData.statuses);
-				let newStatus = statuses.find(c => c.id === projectData.project.def.status);
+				let newStatus = {
+          def: projectData.project.def.status.def,
+          fixed: projectData.project.def.status.fixed,
+          show: projectData.project.def.status.show,
+          value: (projectData.project.def.status.value ? statuses.find(c => c.id === projectData.project.def.status.value.id) : null)
+        };
 				setStatus(newStatus);
 			}
 	}, [projectLoading, statusesLoading]);
@@ -287,7 +317,13 @@ export default function ProjectAdd(props){
 	React.useEffect( () => {
 			if (!projectLoading && !allTagsLoading){
 				let tags = toSelArr(allTagsData.tags);
-				let newTag = tags.find(c => c.id === projectData.project.def.tag);
+        let ids = projectData.project.def.tag.value.map(v => v.id);
+        let newValue = tags.filter(t => ids.includes(t.id));
+				let newTag =  {
+          def: projectData.project.def.tag.def,
+          fixed: projectData.project.def.tag.fixed,
+          show: projectData.project.def.tag.show,
+          value: newValue};
 				setTag(newTag);
 			}
 	}, [projectLoading, allTagsLoading]);
@@ -295,7 +331,12 @@ export default function ProjectAdd(props){
 	React.useEffect( () => {
 			if (!projectLoading && !taskTypesLoading){
 				let taskTypes = toSelArr(taskTypesData.taskTypes);
-				let newTaskType = taskTypes.find(c => c.id === projectData.project.def.taskType);
+				let newTaskType = {
+          def: projectData.project.def.taskType.def,
+          fixed: projectData.project.def.taskType.fixed,
+          show: projectData.project.def.taskType.show,
+          value: (projectData.project.def.taskType.value ? taskTypes.find(c => c.id === projectData.project.def.taskType.value.id) : null)
+        };
 				setTaskType(newTaskType);
 			}
 	}, [projectLoading, taskTypesLoading]);
@@ -316,6 +357,7 @@ export default function ProjectAdd(props){
 			admin: r.admin,
 			UserId: r.user.id
 		}));
+
 		let newDef = {
 			assignedTo: {...assignedTo, value: assignedTo.value.map(u => u.id)},
 			company: {...company, value: (company.value ? company.value.id : null)},
@@ -367,7 +409,7 @@ export default function ProjectAdd(props){
 	    return <Loading />
 	  }
 
-	  const cannotSave = saving || title==="" || (company.value === null && company.fixed) || (status.value === null && status.fixed) || (assignedTo.value.length === 0 && assignedTo.fixed) || (taskType.value === null && taskType.fixed);
+	  const cannotSave = saving || title==="" || (company && company.value === null && company.fixed) || (status && status.value === null && status.fixed) || (assignedTo && assignedTo.value.length === 0 && assignedTo.fixed) || (taskType && taskType.value === null && taskType.fixed);
 
     return (
       <div className="p-20 fit-with-header-and-commandbar scroll-visible">
@@ -436,7 +478,7 @@ export default function ProjectAdd(props){
 		        statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
 		        companies={(companiesLoading ? [] : toSelArr(companiesData.companies))}
 		        canBeAssigned={(usersLoading ? [] : toSelArr(usersData.users, 'email'))}
-		        users={lockedRequester ? (projectRights.map(r => r.user)) : (usersLoading ? [] : toSelArr(usersData.users, 'email'))}
+		        users={lockedRequester ? (toSelArr(projectRights.map(r => r.user), 'email')) : (usersLoading ? [] : toSelArr(usersData.users, 'email'))}
 		        allTags={(allTagsLoading ? [] : toSelArr(allTagsData.tags))}
 		        taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
 						/>
@@ -475,7 +517,7 @@ export default function ProjectAdd(props){
 					<Button
 						className="btn"
 						disabled={cannotSave}
-						onClick={updateProject}>
+						onClick={updateProjectFunc}>
 						{(saving?'Saving...':'Save project')}
 					</Button>
 					<Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChooseingNewProject(true)}>
