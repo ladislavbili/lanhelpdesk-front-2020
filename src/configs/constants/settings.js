@@ -16,7 +16,7 @@ export default [
 	{ title: 'Users', link: 'users', minimalRole: 1, component: UserList, value: 'users' },
 	{ title: 'Companies', link: 'companies', minimalRole: 1, component: CompanyList, value: 'companies' },
 	{ title: 'Public filters', link: 'publicFilters', minimalRole: 1, component: PublicFiltersList, value: 'filters' },
-	{ title: 'Service level agreements', link: 'sla', minimalRole: 3, component: SLAList, value: 'pausals' },
+	{ title: 'Service level agreements', link: 'pausals', minimalRole: 3, component: SLAList, value: 'pausals' },
 	{ title: 'Projects', link: 'projects', minimalRole: 2, component: ProjectList, value: 'projects' },
 	{ title: 'Statuses', link: 'statuses', minimalRole: 3, component: StatusList, value: 'statuses' },
 	{ title: 'Price lists', link: 'pricelists', minimalRole: 2, component: PriceList, value: 'prices' },

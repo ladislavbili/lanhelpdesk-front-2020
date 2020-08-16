@@ -12,9 +12,7 @@ query {
   companies {
     title
     id
-    monthlyPausal
-    taskWorkPausal
-    taskTripPausal
+    monthly
   }
 }
 `;
@@ -80,9 +78,9 @@ export default function CompanysList(props){
                       COMPANIES.filter((item) => {
                         let cond = true;
                         if (sortBy === "1"){
-                          cond = parseFloat(item.taskWorkPausal) > 0 || parseFloat(item.taskTripPausal) > 0;
+                          cond = item.monthly;
                         } else if (sortBy === "2"){
-                          cond = !(parseFloat(item.taskWorkPausal) > 0 || parseFloat(item.taskTripPausal) > 0);
+                          cond = !item.monthly;
                         }
 
                         return cond && item.title.toLowerCase().includes(companyFilter.toLowerCase());
@@ -96,7 +94,7 @@ export default function CompanysList(props){
                               {company.title}
                             </td>
                             <td width="10%">
-                              {company.monthlyPausal  ? "Zmluvný" : "Nezmluvný"}
+                              {company.monthly  ? "Zmluvný" : "Nezmluvný"}
                             </td>
                           </tr>
                       )

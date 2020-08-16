@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useQuery, useMutation } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import { Route } from 'react-router-dom';
-import { connect } from "react-redux";
 import {testing} from '../helperFunctions';
-import {setTasklistLayout} from '../redux/actions';
-import {rebase} from '../index';
 import settings from 'configs/constants/settings';
 
 import Sidebar from './components/sidebar';
@@ -12,31 +12,90 @@ import ErrorMessages from 'components/errorMessages';
 import PageHeader from '../components/PageHeader';
 import SelectPage from '../components/SelectPage';
 
+import AccessDenied from 'components/accessDenied';
+
 import TaskList from './task';
 
 import NotificationList from './notifications';
 
-class Navigation extends Component {
-	constructor(props){
-		super(props);
-		this.setLayout.bind(this);
+const GET_MY_DATA = gql`
+query {
+  getMyData{
+    id
+		tasklistLayout
+    role {
+      accessRights {
+        users
+        companies
+        pausals
+        projects
+        statuses
+        units
+        prices
+        suppliers
+        tags
+        invoices
+        roles
+        taskTypes
+        tripTypes
+        imaps
+        smtps
+      }
+    }
+  }
+}
+`;
+
+
+const UPDATE_USER = gql`
+mutation updateUser($id: Int!, $tasklistLayout: TasklistLayoutEnum) {
+  updateUser(
+    id: $id,
+    tasklistLayout: $tasklistLayout,
+  ){
+    id
+  }
+}
+`;
+
+
+export default function Navigation (props) {
+  //data & queries
+  const { history, match, layout } = props;
+  const { data, loading } = useQuery(GET_MY_DATA);
+  const [updateUser, {updateData}] = useMutation(UPDATE_USER);
+
+  const currentUser = data ? data.getMyData : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+  const tasklistLayout = currentUser.tasklistLayout ? currentUser.tasklistLayout  : 0;
+
+	const setLayout = (value) => {
+		updateUserFunc(value);
+		props.setTasklistLayout(value);
 	}
 
-	setLayout(layout){
-		rebase.updateDoc('/users/'+this.props.currentUser.id, {tasklistLayout:layout})
-		this.props.setTasklistLayout(layout);
-	}
+	// functions
+	const updateUserFunc = (value) => {
+		updateUser({ variables: {
+			id: parseInt(match.params.id),
+			tasklistLayout: value,
+		} }).then( ( response ) => {
+		}).catch( (err) => {
+			console.log(err.message);
+		});
+	};
 
-	render() {
+//	accessRights["users"] = false;
+
 		return (
 			<div>
 				<div className="page-header">
 					<div className="center-ver row center flex">
 						<SelectPage />
-						<PageHeader {...this.props}
+						<PageHeader {...props}
 							showLayoutSwitch={true}
-							setLayout={this.setLayout.bind(this)}
-							layout={this.props.layout}
+							setLayout={(value) => setLayout(value)}
+							layout={layout}
 							dndLayout={true}
 							calendarLayout={true}
 							settings={settings} />
@@ -44,7 +103,7 @@ class Navigation extends Component {
 				</div>
 
 				<div className="row center center-ver h-100vh">
-						<Sidebar {...this.props} />
+						<Sidebar {...props} />
 						<div className="main">
 							<Route exact path="/helpdesk/errorMessages" component={ErrorMessages} />
 
@@ -56,22 +115,21 @@ class Navigation extends Component {
 							<Route exact path="/helpdesk/notifications/:notificationID/:taskID" component={NotificationList} />
 
 							{ /* SETTINGS */ }
-							{ settings.map( (item) =>
-									<Route exact key={item.link} path={`/helpdesk/settings/${item.link}`} component={item.component} />
-							)}
-							{ settings.map( (item) =>
-									<Route exact key={item.link} path={`/helpdesk/settings/${item.link}/:id`} component={item.component} />
-							)}
+							{ settings.map( (item) => {
+									if (accessRights[item.value]){
+										return (<Route exact key={item.link} path={`/helpdesk/settings/${item.link}`} component={item.component} />);
+									}
+									return (<Route exact key={item.link} path={`/helpdesk/settings/${item.link}`} component={AccessDenied} />);
+								})}
+							{ settings.map( (item) =>{
+									if (accessRights[item.value]){
+										return (<Route exact key={item.link} path={`/helpdesk/settings/${item.link}/:id`} component={item.component} />);
+									}
+									return (<Route exact key={item.link} path={`/helpdesk/settings/${item.link}/:id`} component={AccessDenied} />);
+								})}
 
 					</div>
 			</div>
 		</div>
 	);
 }
-}
-
-const mapStateToProps = ({taskReducer, userReducer}) => {
-	return {layout:taskReducer.tasklistLayout, currentUser:userReducer };
-};
-
-export default connect(mapStateToProps, { setTasklistLayout })(Navigation);
