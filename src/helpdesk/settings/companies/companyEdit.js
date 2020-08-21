@@ -285,8 +285,6 @@ export default function CompanyEdit(props){
         taskTripPausal: (taskTripPausal === "" ? 0 : parseFloat(taskTripPausal)),
         rents: newRents,
       } }).then( ( response ) => {
-      /*  let updatedRole = {...response.data.updateRole, __typename: "Role"};
-        client.writeQuery({ query: GET_ROLES, data: {roles: [...allRoles.filter( role => role.id !== parseInt(match.params.id) ), updatedRole ] } });*/
       }).catch( (err) => {
         console.log(err.message);
       });
