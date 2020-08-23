@@ -21,6 +21,7 @@ query {
       title
     }
     company {
+      id
       title
     }
   }

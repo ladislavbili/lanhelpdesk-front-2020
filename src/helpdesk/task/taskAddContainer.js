@@ -1,13 +1,185 @@
-import React, { Component } from 'react';
-import { connect } from "react-redux";
+import React from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 import {toSelArr, sameStringForms } from '../../helperFunctions';
 import { Modal, ModalBody, Button } from 'reactstrap';
-import TaskAdd from './taskAddCombined';
-import {storageHelpStatusesStart, storageHelpProjectsStart, storageUsersStart, storageCompaniesStart, storageHelpWorkTypesStart, storageHelpUnitsStart, storageHelpPricesStart, storageHelpPricelistsStart, storageHelpTagsStart, storageHelpTaskTypesStart, storageMetadataStart, storageHelpMilestonesStart, storageHelpTripTypesStart} from '../../redux/actions';
+import TaskAdd from './taskAdd';
+/*
+import {
+      storageHelpStatusesStart,
+  storageHelpProjectsStart,
+      storageUsersStart,
+        storageCompaniesStart,
+  storageHelpWorkTypesStart,
+  storageHelpUnitsStart,
+  storageHelpPricesStart,
+      storageHelpPricelistsStart,
+      storageHelpTagsStart,
+      storageHelpTaskTypesStart,
+  storageMetadataStart,
+  storageHelpMilestonesStart,
+      storageHelpTripTypesStart} from '../../redux/actions';*/
 import { noMilestone } from 'configs/constants/sidebar';
 
-class TaskAddContainer extends Component{
-  constructor(props){
+import { GET_TASK_TYPES } from 'helpdesk/settings/taskTypes';
+import { GET_TRIP_TYPES } from 'helpdesk/settings/tripTypes';
+import { GET_PRICELISTS } from 'helpdesk/settings/prices';
+
+const GET_STATUSES = gql`
+query {
+  statuses {
+    title
+    id
+    order
+    color
+    action
+  }
+}
+`;
+
+const GET_TAGS = gql`
+query {
+  tags {
+    title
+    id
+    order
+    color
+  }
+}
+`;
+
+const GET_PROJECTS = gql`
+query {
+  projects {
+    title
+    id
+    lockedRequester
+    projectRights {
+			read
+			write
+			delete
+			internal
+			admin
+			user {
+				id
+			}
+		}
+    def {
+			assignedTo {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			company {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			overtime {
+				def
+				fixed
+				show
+				value
+			}
+			pausal {
+				def
+				fixed
+				show
+				value
+			}
+			requester {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			status {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			tag {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			taskType {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+    }
+  }
+}
+`;
+
+const GET_COMPANIES = gql`
+query {
+  companies {
+    title
+    id
+    dph
+    taskWorkPausal
+    pricelist {
+      id
+      title
+      materialMargin
+    }
+  }
+}
+`;
+
+const GET_USERS = gql`
+query {
+  users{
+    id
+    email
+    role {
+      level
+    }
+    company {
+      id
+    }
+  }
+}
+`;
+
+export default function TaskAddContainer (props){
+  //data & queries
+  const { history, match } = props;
+  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
+  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
+  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS);
+  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES);
+  const { data: tripTypesData, loading: tripTypesLoading } = useQuery(GET_TRIP_TYPES);
+  const { data: pricesData, loading: pricesLoading } = useQuery(GET_PRICELISTS);
+  const { data: tagsData, loading: tagsLoading } = useQuery(GET_TAGS);
+  const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
+
+  //state
+  const [ hidden, setHidden ] = React.useState(false);
+  const [ openAddTaskModal, setOpenAddTaskModal ] = React.useState(false);
+
+  const [ newID, setNewID ] = React.useState(0); //ked budu tasky, toto bude max task.id + 1
+
+  /*constructor(props){
     super(props);
     this.state={
 			openAddTaskModal: false,
@@ -29,8 +201,8 @@ class TaskAddContainer extends Component{
       add: 0,
     }
     this.setData.bind(this);
-  }
-
+  }*/
+/*
   storageLoaded(props){
     return props.statusesLoaded &&
     props.projectsLoaded &&
@@ -171,27 +343,35 @@ class TaskAddContainer extends Component{
 
         defaultUnit
       });
-    }
+    }*/
 
-  render(){
+    const loading = statusesLoading  || companiesLoading || usersLoading || taskTypesLoading || tripTypesLoading || pricesLoading || tagsLoading || projectsLoading;
+
 	  return (
 			<div className="display-inline">
 			{
-				!this.props.task &&
+				!props.task &&
 				<Button
 					className="btn sidebar-btn"
-					onClick={()=>{this.setState({openAddTaskModal:true,hidden:false})}}
+					onClick={() => {
+            setOpenAddTaskModal(true);
+            setHidden(false);
+          }}
 				>  Add task
 				</Button>
 			}
 
 			{
-				this.props.task &&
+				props.task &&
 				<button
 					type="button"
 					className="btn btn-link-reversed waves-effect"
-					disabled={this.props.disabled}
-					onClick={()=>{this.setState({openAddTaskModal:true,hidden:false})}}>
+					disabled={props.disabled}
+					onClick={()=> {
+            setOpenAddTaskModal(true);
+            setHidden(false);
+          }}
+          >
 					<i
 						className="far fa-copy"
 						/> Copy
@@ -199,25 +379,24 @@ class TaskAddContainer extends Component{
 			}
 
 
-			<Modal isOpen={this.state.openAddTaskModal}  >
+			<Modal isOpen={openAddTaskModal}  >
 					<ModalBody className="scrollable" >
-            {  this.state.openAddTaskModal && this.storageLoaded(this.props) &&
-						   <TaskAdd {...this.props}
-                 loading={this.state.loading}
-                 statuses={this.state.statuses}
-                 projects={this.state.projects}
-                 users={this.state.users}
-                 companies={this.state.companies}
-                 workTypes={this.state.workTypes}
-                 taskTypes={this.state.taskTypes}
-                 allTags={this.state.allTags}
-                 units={this.state.units}
-                 tripTypes={this.state.tripTypes}
-                 milestones={this.state.milestones}
-                 defaultUnit={this.state.defaultUnit}
-                 newID = {this.state.newID}
-                 closeModal={ () => this.setState({openAddTaskModal: false,})}
-                 switch={() => this.switch()}
+            {  openAddTaskModal && !loading &&
+						   <TaskAdd {...props}
+                 loading={loading}
+                 statuses={ toSelArr(statusesData.statuses) }
+                 projects={ toSelArr(projectsData.projects) }
+                 users={ usersData ? toSelArr(usersData.users, 'email') : [] }
+                 companies={ toSelArr(companiesData.companies) }
+                 workTypes={[]}
+                 taskTypes={ toSelArr(taskTypesData.taskTypes) }
+                 allTags={ toSelArr(tagsData.tags) }
+                 units={[]}
+                 tripTypes={ toSelArr(tripTypesData.tripTypes) }
+                 milestones={[noMilestone]}
+                 defaultUnit={null}
+                 newID = {newID}
+                 closeModal={ () => setOpenAddTaskModal(false)}
                  />
              }
 					</ModalBody>
@@ -225,8 +404,8 @@ class TaskAddContainer extends Component{
 		</div>
     );
   }
-}
 
+/*
 const mapStateToProps = ({userReducer, filterReducer, taskReducer, storageHelpStatuses, storageHelpProjects,storageUsers,storageCompanies,storageHelpWorkTypes,storageHelpUnits,storageHelpPrices,storageHelpPricelists,storageHelpTags,storageHelpTaskTypes, storageMetadata, storageHelpMilestones, storageHelpTripTypes }) => {
 	const { project } = filterReducer;
 	const { orderBy, ascending } = taskReducer;
@@ -263,3 +442,4 @@ const mapStateToProps = ({userReducer, filterReducer, taskReducer, storageHelpSt
 };
 
 export default connect(mapStateToProps, { storageHelpStatusesStart, storageHelpProjectsStart, storageUsersStart, storageCompaniesStart, storageHelpWorkTypesStart, storageHelpUnitsStart, storageHelpPricesStart, storageHelpPricelistsStart, storageHelpTagsStart, storageHelpTaskTypesStart, storageMetadataStart, storageHelpMilestonesStart, storageHelpTripTypesStart})(TaskAddContainer);
+*/

@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
+import { useMutation, useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import Select from 'react-select';
 import {rebase} from '../../index';
 import firebase from 'firebase';
 import { Label, Button } from 'reactstrap';
 import DatePicker from 'react-datepicker';
+
 import moment from 'moment';
 
 import Subtasks from '../components/subtasks';
@@ -13,7 +17,6 @@ import Attachments from '../components/attachments';
 import VykazyTable from '../components/vykazyTable';
 
 import classnames from "classnames";
-
 
 import CKEditor5 from '@ckeditor/ckeditor5-react';
 import ck5config from 'configs/components/ck5config';
@@ -25,8 +28,15 @@ import booleanSelects from 'configs/constants/boolSelect'
 import { noMilestone } from 'configs/constants/sidebar';
 import { noDef } from 'configs/constants/projects';
 
-export default class TaskAdd extends Component{
-	constructor(props){
+export default function TaskAdd (props){
+  //data & queries
+  const { history, match } = props;
+
+  //state
+  const [ layout, setLayout ] = React.useState(1);
+
+
+	/*constructor(props){
 		super(props);
 		let requester=this.props.users?this.props.users.find((user)=>user.id===this.props.currentUser.id):null;
 		this.state={
@@ -150,12 +160,6 @@ export default class TaskAdd extends Component{
 				delete item['id'];
 				rebase.addToCollection('help-task_work_trips',{task:newID,...item});
 			})
-			/*
-			this.state.subtasks.forEach((item)=>{
-			delete item['id'];
-			rebase.addToCollection('help-task_subtasks',{task:newID,...item});
-			})
-			*/
 
 
 			let storageRef = firebase.storage().ref();
@@ -340,9 +344,10 @@ export default class TaskAdd extends Component{
 				hidden: false,
 			},() => this.setDefaults(this.props.project, false));
 		}
+*/
 
-	render(){
-
+// not in db so far
+/*
 		let workTrips= this.state.workTrips.map((trip)=>{
 			let assignedTo=trip.assignedTo?this.state.users.find((item)=>item.id===trip.assignedTo):null;
 			return {
@@ -373,76 +378,83 @@ export default class TaskAdd extends Component{
 				...customItem,
 				unit:this.state.units.find((unit)=>unit.id===customItem.unit)
 			}
-		});
+		});*/
+
 		return (
-			<div className={classnames("scrollable", { "p-20": this.state.layout === '1'}, { "row": this.state.layout === '2'})}>
+			<div className={classnames("scrollable", { "p-20": layout === 1}, { "row": layout === 2})}>
 
-				<div className={classnames({ "task-edit-left p-l-20 p-r-20 p-b-15 p-t-15": this.state.layout === '2'})}>
+				<div className={classnames({ "task-edit-left p-l-20 p-r-20 p-b-15 p-t-15": layout === 2})}>
 
-					{ this.renderTitle() }
+					{ renderTitle() }
 
 					<hr className="m-t-15 m-b-10"/>
 
-					{ this.state.layout === "1" && this.renderSelectsLayout1() }
+          { layout === 1 && this.renderSelectsLayout1() }
 
-					{ this.renderPopis() }
+          { this.renderPopis() }
 
-					{ this.state.layout === "1" && this.state.defaultFields.tags.show && this.renderTags() }
+          { layout === 1 && this.state.defaultFields.tags.show && this.renderTags() }
 
-					{ this.renderAttachments() }
+          { this.renderAttachments() }
 
-					{ !this.state.viewOnly && !this.state.hidden && false && this.renderSubtasks() }
+          { !this.state.viewOnly && !this.state.hidden && false && this.renderSubtasks() }
 
-					{ !this.state.viewOnly && this.renderVykazyTable(taskWorks, workTrips, taskMaterials, customItems) }
+          { !this.state.viewOnly && this.renderVykazyTable(taskWorks, workTrips, taskMaterials, customItems) }
 
-					{ this.renderButtons() }
+          { this.renderButtons() }
 
-				</div>
+          </div>
 
-				{ this.state.layout === "2" && this.renderSelectsLayout2() }
+          { layout === 2 && this.renderSelectsLayout2() }
 
 				</div>
 			);
 		}
 
+const [ title, setTitle ] = React.useState("");
+const [ status, setStaus ] = React.useState({});
+const [ closeDate, setCloseDate ] = React.useState(null);
+const [ pendingDate, setPendingDate ] = React.useState(null);
+const [ viewOnly, setViewOnly ] = React.useState(true);
 
+console.log(props);
 
-		renderTitle(){
+	const	renderTitle = () => {
 			return (
 				<div className="row m-b-15">
 					<span className="center-hor flex m-r-15">
 						<input type="text"
-							 value={this.state.title}
+							 value={title}
 							 className="task-title-input text-extra-slim hidden-input"
-							 onChange={(e)=>this.setState({title:e.target.value})}
+							 onChange={ (e) => setTitle(e.target.value) }
 							 placeholder="ENTER NEW TASK NAME" />
 					</span>
-					{ this.state.status && (['close','pending','invalid']).includes(this.state.status.action) && <div className="ml-auto center-hor">
+					{ status && (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) && <div className="ml-auto center-hor">
 						<span>
-							{ (this.state.status.action==='close' || this.state.status.action==='invalid') &&
+							{ (status.action==='CloseDate' || status.action==='CloseInvalid') &&
 								<span className="text-muted">
 									Close date:
 									<DatePicker
 										className="form-control hidden-input"
-										selected={this.state.closeDate}
-										disabled={this.state.viewOnly}
+										selected={closeDate}
+										disabled={viewOnly}
 										onChange={date => {
-											this.setState({ closeDate: date });
+											setCloseDate(date);
 										}}
 										placeholderText="No close date"
 										{...datePickerConfig}
 										/>
 								</span>
 							}
-							{ this.state.status.action==='pending' &&
+							{ status.action==='PendingDate' &&
 								<span className="text-muted">
 									Pending date:
 									<DatePicker
 										className="form-control hidden-input"
-										selected={this.state.pendingDate}
-										disabled={this.state.viewOnly}
+										selected={pendingDate}
+										disabled={viewOnly}
 										onChange={date => {
-											this.setState({ pendingDate: date });
+											setPendingDate(date);
 										}}
 										placeholderText="No pending date"
 										{...datePickerConfig}
@@ -454,14 +466,14 @@ export default class TaskAdd extends Component{
 					<button
 						type="button"
 						className="btn btn-link waves-effect ml-auto asc"
-						onClick={() => this.setState({layout: (this.state.layout === "1" ? "2" : "1")})}>
+						onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
 						Switch layout
 					</button>
 				</div>
 
 			)
-		}
 
+/*
 		renderSelectsLayout1(){
 			const USERS_WITH_PERMISSIONS = this.state.users.filter((user)=>this.state.project && this.state.project.permissions.some((permission)=>permission.user===user.id));
 			const REQUESTERS =  (this.state.project && this.state.project.lockedRequester ? USERS_WITH_PERMISSIONS : this.state.users);
@@ -514,7 +526,10 @@ export default class TaskAdd extends Component{
 						}
 
 				{!this.state.viewOnly && <div className="col-lg-12">
-					<div className="col-lg-12">{/*NUTNE !! INAK AK NIE JE ZOBRAZENY ASSIGNED SELECT TAK SA VZHLAD POSUVA*/}
+					<div className="col-lg-12">
+					{
+					//NUTNE !! INAK AK NIE JE ZOBRAZENY ASSIGNED SELECT TAK SA VZHLAD POSUVA
+					}
 						<div className="col-lg-4">
 							<div className="row p-r-10">
 								<Label className="col-3 col-form-label">Projekt</Label>
@@ -696,7 +711,6 @@ export default class TaskAdd extends Component{
 							{false && <div className="row p-r-10">
 								<Label className="col-3 col-form-label">Pending</Label>
 								<div className="col-9">
-									{/*className='form-control hidden-input'*/}
 									<DatePicker
 										className="form-control hidden-input"
 										selected={this.state.pendingDate}
@@ -811,7 +825,9 @@ export default class TaskAdd extends Component{
 							</div>
 						}
 
-						{/*NUTNE !! INAK AK NIE JE ZOBRAZENY ASSIGNED SELECT TAK SA VZHLAD POSUVA*/}
+						{
+						//NUTNE !! INAK AK NIE JE ZOBRAZENY ASSIGNED SELECT TAK SA VZHLAD POSUVA
+					}
 				{!this.state.viewOnly &&
 							<div className="">
 								<Label className="col-form-label-2">Projekt</Label>
@@ -953,7 +969,7 @@ export default class TaskAdd extends Component{
 							</div>}
 
 							{this.state.defaultFields.tags.show &&
-								<div className=""> {/*Tags*/}
+								<div className="">
 									<Label className="col-form-label-2">Tagy: </Label>
 									<div className="col-form-value-2">
 										<Select
@@ -1019,7 +1035,6 @@ export default class TaskAdd extends Component{
 							{false && <div className="">
 								<Label className="col-form-label-2">Pending</Label>
 								<div className="col-form-value-2">
-									{/*className='form-control hidden-input'*/}
 									<DatePicker
 										className="form-control hidden-input"
 										selected={this.state.pendingDate}
@@ -1090,7 +1105,7 @@ export default class TaskAdd extends Component{
 
 		renderTags(){
 			return (
-				<div className="row m-t-10"> {/*Tags*/}
+				<div className="row m-t-10">
 					<div className="center-hor">
 						<Label className="center-hor">Tagy: </Label>
 					</div>
@@ -1315,5 +1330,5 @@ export default class TaskAdd extends Component{
 					</button>
 				</div>
 			)
-		}
+		}*/
 	}

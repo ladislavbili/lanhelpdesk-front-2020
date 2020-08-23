@@ -28,6 +28,7 @@ query {
     title
     descrption
     lockedRequester
+    updatedAt
     projectRights {
 			read
 			write
@@ -108,7 +109,11 @@ const GET_MY_DATA = gql`
 query {
   getMyData{
     id
+    company{
+      id
+    }
     role {
+      level
       accessRights {
         addProjects
         projects
@@ -120,7 +125,7 @@ query {
 
 export default function TasksSidebar(props) {
   //data & queries
-  const { history, match } = props;
+  const { history, match, location } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
   const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
 
@@ -129,7 +134,6 @@ export default function TasksSidebar(props) {
 
   //state
   const [ openAddStatusModal, setOpenAddStatusModal ] = React.useState(false);
-  const [ openAddTaskModal, setOpenAddTaskModal ] = React.useState(false);
   const [ openProjectAdd, setOpenProjectAdd ] = React.useState(false);
   const [ openMilestoneAdd, setOpenMilestoneAdd ] = React.useState(false);
   const [ isColumn, setIsColumn ] = React.useState(false);
@@ -138,6 +142,7 @@ export default function TasksSidebar(props) {
   const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? toSelArr([dashboard,addProject]) : toSelArr([dashboard]) ) );
   const [ currentProject, setCurrentProject ] = React.useState( projects[0] );
   const [ milestones, setMilestones ] = React.useState( toSelArr([allMilestones]) );
+  const [ managesProjects, setManagesProjects ] = React.useState(false);
 
   // sync
   React.useEffect( () => {
@@ -147,6 +152,11 @@ export default function TasksSidebar(props) {
       setCurrentProject( projects[0] );
     }
   }, [projectsLoading]);
+
+  const filters = [];
+  const filterState = null;
+  const milestoneState = {id: 0};
+  const projectState = {id: 0};
 
   return (
     <div>
@@ -204,6 +214,117 @@ export default function TasksSidebar(props) {
           <hr className="m-l-15 m-r-15"/>
         </div>
       }
+
+      <TaskAdd
+        history={history}
+        projectID={projects.map((item)=>item.id).includes(currentProject.id) ? currentProject.id : null}
+        triggerDate={ parseInt(currentProject.updatedAt) }
+        currentUser={currentUser}
+        />
+
+      {	activeTab !== 1 &&
+        <div
+          className="sidebar-btn"
+          >
+          <div
+            onClick={() => {
+              history.push(`/helpdesk/taskList/i/all`);
+              setActiveTab( (activeTab === 0 ? 1 : 0) );
+              //CHANGE LOCAL CACHE
+              //this.props.setHelpSidebarFilter(null);
+              //this.props.setFilter(getEmptyFilter());
+            }}
+            >
+            <i className="fa fa-plus pull-right m-r-5 m-t-5 clickable" />
+          </div>
+          <div>
+            <img
+              className="m-r-5"
+              style={{color: "#212121", height: "17px", marginBottom: "3px"}}
+              src={require('scss/icons/filter.svg')}
+              alt="Generic placeholder XX"
+              />
+            Filters
+          </div>
+        </div>
+      }
+
+      <TabContent activeTab={activeTab}>
+        <TabPane tabId={0} >
+          <Nav vertical>
+            { filters.map((item)=>
+              <NavItem key={item.id} className="row">
+                <Link
+                  className="sidebar-menu-item"
+                  to={{ pathname: `/helpdesk/taskList/i/`+item.id }}
+                  onClick={()=>{
+
+                    //LOCAL cache
+                    /*
+                    this.props.setHelpSidebarFilter(item);
+                    this.props.setFilter({
+                      ...item.filter,
+                      statusDateFrom: isNaN(parseInt(item.filter.statusDateFrom)) ? null : parseInt(item.filter.statusDateFrom),
+                      statusDateTo: isNaN(parseInt(item.filter.statusDateTo)) ? null : parseInt(item.filter.statusDateTo),
+                      pendingDateFrom: isNaN(parseInt(item.filter.pendingDateFrom)) ? null : parseInt(item.filter.pendingDateFrom),
+                      pendingDateTo: isNaN(parseInt(item.filter.pendingDateTo)) ? null : parseInt(item.filter.pendingDateTo),
+                      closeDateFrom: isNaN(parseInt(item.filter.closeDateFrom)) ? null : parseInt(item.filter.closeDateFrom),
+                      closeDateTo: isNaN(parseInt(item.filter.closeDateTo)) ? null : parseInt(item.filter.closeDateTo),
+                      updatedAt:(new Date()).getTime()
+                    });*/
+                  }}
+                  >
+                  {item.title}
+                </Link>
+
+                <div
+                  className={classnames("sidebar-icon", "clickable" , {"active" : location.pathname.includes(item.id)})}
+                  onClick={() => {
+                    if (location.pathname.includes(item.id)){
+                      history.push(`/helpdesk/taskList/i/`+item.id);
+                      //LOCAL CACHE
+                      /*
+                      this.props.setHelpSidebarFilter(item);
+                      this.props.setFilter({
+                        ...item.filter,
+                        updatedAt:(new Date()).getTime()
+                      });*/
+                      setActiveTab(1);
+                    }
+                  }}
+                  >
+                  <i className="fa fa-cog"/>
+                </div>
+              </NavItem>
+            )}
+
+          </Nav>
+        </TabPane>
+        <TabPane tabId={1}>
+          <Filter
+            filterID={filterState?filterState.id:null}
+            history={history}
+            filterData={filterState}
+            resetFilter={()=>{/*this.props.setHelpSidebarFilter(null)*/}}
+            close={ () => setActiveTab(0)}
+            />
+        </TabPane>
+      </TabContent>
+
+      { openProjectAdd &&
+        <ProjectAdd close={() => setOpenProjectAdd(false)}/>
+      }
+      { managesProjects &&
+        <ProjectEdit item={projectState} triggerChange={()=>{/*this.setState({projectChangeDate:(new Date()).getTime()})*/}}/>
+      }
+      { openMilestoneAdd &&
+        <MilestoneAdd close={() => setOpenMilestoneAdd(false)}/>
+      }
+      { managesProjects && milestoneState.id &&
+        milestones.map((item)=>item.id).includes(milestoneState.id) &&
+        <MilestoneEdit item={milestoneState}/>
+      }
+
     </div>
   );
 }

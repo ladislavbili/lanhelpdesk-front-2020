@@ -15,7 +15,6 @@ query {
     id
     role {
       accessRights {
-        addProjects
         users
         companies
         pausals
@@ -52,10 +51,10 @@ export default function Sidebar(props) {
      <div className="sidebar">
        <div className="scrollable fit-with-header">
          {!showSettings &&
-           <TasksSidebar />
+           <TasksSidebar {...props}/>
          }
          {showSettings &&
-           <SettingsSidebar />
+           <SettingsSidebar {...props}/>
          }
        </div>
      </div>
