@@ -141,6 +141,16 @@ query {
       id
       title
       materialMargin
+      prices {
+        type
+        price
+        taskType {
+          id
+        }
+        tripType {
+          id
+        }
+      }
     }
   }
 }

@@ -862,6 +862,7 @@ const renderSelectsLayout2 = () => {
 			)
 	}
 
+
 	const renderVykazyTable = (taskWorks, workTrips, taskMaterials, customItems) => {
 		return(
 			<VykazyTable
@@ -1006,7 +1007,7 @@ const renderSelectsLayout2 = () => {
 
 				{ renderAttachments() }
 
-				{ !viewOnly && renderVykazyTable([]/*taskWorks*/, []/*workTrips*/, []/*taskMaterials*/, []/*customItems*/) }
+				{ !viewOnly && renderVykazyTable(taskWorks, workTrips, taskMaterials, customItems) }
 
 				{ renderButtons() }
 
