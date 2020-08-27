@@ -3,8 +3,6 @@ import { useMutation, useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Select from 'react-select';
-import {rebase} from '../../index';
-import firebase from 'firebase';
 import { Label, Button } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
@@ -27,9 +25,37 @@ import booleanSelects from 'configs/constants/boolSelect'
 import { noMilestone } from 'configs/constants/sidebar';
 import { noDef } from 'configs/constants/projects';
 
+export const ADD_TASK = gql`
+mutation addTask($title: String!, $closeDate: Int!, $assignedTo: [Int]!, $company: Int!, $deadline: Int, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: Int, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput ) {
+  addTask(
+    title: $title,
+    closeDate: $closeDate,
+    assignedTo: $assignedTo,
+    company: $company,
+    deadline: $deadline,
+    description: $description,
+    milestone: $milestone,
+    overtime: $overtime,
+    pausal: $pausal,
+    pendingChangable: $pendingChangable,
+    pendingDate: $pendingDate,
+    project: $project,
+    requester: $requester,
+    status: $status,
+    tags: $tags,
+    taskType: $taskType,
+    repeat: $repeat,
+  ){
+    id
+    title
+  }
+}
+`;
+
 export default function TaskAdd (props){
   //data & queries
   const { history, match, loading, newID, projectID, currentUser, projects, users, allTags, taskTypes, tripTypes, milestones, companies, statuses, units, defaultUnit, closeModal } = props;
+  const [ addTask, {client} ] = useMutation(ADD_TASK);
 
   //state
   const [ layout, setLayout ] = React.useState(1);
@@ -48,7 +74,7 @@ export default function TaskAdd (props){
   const [ overtime, setOvertime ] = React.useState(booleanSelects[0]);
   const [ pausal, setPausal ] = React.useState(booleanSelects[0]);
   const [ pendingDate, setPendingDate ] = React.useState(null);
-  const [ pendingChangeable, setPendingChangeable ] = React.useState(false);
+  const [ pendingChangable, setPendingChangable ] = React.useState(false);
   const [ project, setProject ] = React.useState(projectID ? projects.find(p => p.id === projectID) : null);
   const [ reminder, setReminder ] = React.useState(null);
   const [ repeat, setRepeat ] = React.useState(null);
@@ -103,7 +129,7 @@ export default function TaskAdd (props){
 		let newCompany = def.company && (def.company.fixed || def.company.def) ? companies.find((item)=> item.id === def.company.value) : (companies && newRequester ? companies.find((company) => company.id === currentUser.company.id) : null);
 		setCompany(newCompany);
 
-		let newRequester = def.requester&& (def.requester.fixed || def.requester.def) ? users.find((item)=> item.id === def.requester.value.id) : maybeRequester;
+		let newRequester = def.requester && (def.requester.fixed || def.requester.def) ? users.find((item)=> item.id === def.requester.value.id) : maybeRequester;
 		setRequester(newRequester);
 
 		let newStatus = def.status && (def.status.fixed || def.status.def) ? statuses.find((item)=> item.id === def.status.value.is) : statuses[0];
@@ -132,6 +158,30 @@ export default function TaskAdd (props){
 
 	const addTaskFunc = () => {
 		setSaving(true);
+    addTask({ variables: {
+      title,
+      closeDate: closeDate ? closeDate.unix() : 0,
+      assignedTo: assignedTo.map(user => user.id),
+      company: company.id,
+      deadline: deadline ?  deadline.unix() : null,
+      description,
+      milestone: milestone ? milestone.id : null,
+      overtime: overtime.value,
+      pausal: pausal.value,
+      pendingChangable,
+      pendingDate: pendingDate ? pendingDate.unix() : null,
+      project: project.id,
+      requester: requester ? requester.id : null,
+      status: status.id,
+      tags: tags.map(tag => tag.id),
+      taskType: taskType ? taskType.id: null,
+      repeat: repeat ? {...repeat, startsAt: repeat.startsAt + "", repeatEvery: repeat.repeatEvery + ""} : null
+    } }).then( ( response ) => {
+      console.log(response);
+      closeModal();
+    }).catch( (err) => {
+      console.log(err.message);
+    });
 		setSaving(false);
 	}
 
@@ -367,10 +417,10 @@ const renderSelectsLayout1 = () => {
   										if(milestone.startsAt !== null){
   											setMilestone(milestone);
   											setPendingDate(moment(milestone.startsAt));
-  											setPendingChangeable(false);
+  											setPendingChangable(false);
   										}else{
   											setMilestone(milestone);
-  											setPendingChangeable(true);
+  											setPendingChangable(true);
   										}
   									}else{
   										setMilestone(milestone);
@@ -654,10 +704,10 @@ const renderSelectsLayout2 = () => {
 										if(milestone.startsAt !== null){
 											setMilestone(milestone);
 											setPendingDate(moment(milestone.startsAt));
-											setPendingChangeable(false);
+											setPendingChangable(false);
 										}else{
 											setMilestone(milestone);
-											setPendingChangeable(true);
+											setPendingChangable(true);
 										}
 									}else{
 										setMilestone(milestone);

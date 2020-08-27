@@ -6,19 +6,11 @@ import { Modal, ModalBody, Button } from 'reactstrap';
 import TaskAdd from './taskAdd';
 /*
 import {
-      storageHelpStatusesStart,
-  storageHelpProjectsStart,
-      storageUsersStart,
-        storageCompaniesStart,
   storageHelpWorkTypesStart,
   storageHelpUnitsStart,
-  storageHelpPricesStart,
-      storageHelpPricelistsStart,
-      storageHelpTagsStart,
-      storageHelpTaskTypesStart,
   storageMetadataStart,
   storageHelpMilestonesStart,
-      storageHelpTripTypesStart} from '../../redux/actions';*/
+      } from '../../redux/actions';*/
 import { noMilestone } from 'configs/constants/sidebar';
 
 import { GET_TASK_TYPES } from 'helpdesk/settings/taskTypes';

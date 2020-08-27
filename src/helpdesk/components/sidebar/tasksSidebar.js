@@ -142,7 +142,6 @@ export default function TasksSidebar(props) {
   const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? toSelArr([dashboard,addProject]) : toSelArr([dashboard]) ) );
   const [ currentProject, setCurrentProject ] = React.useState( projects[0] );
   const [ milestones, setMilestones ] = React.useState( toSelArr([allMilestones]) );
-  const [ managesProjects, setManagesProjects ] = React.useState(false);
 
   // sync
   React.useEffect( () => {
@@ -156,7 +155,6 @@ export default function TasksSidebar(props) {
   const filters = [];
   const filterState = null;
   const milestoneState = {id: 0};
-  const projectState = {id: 0};
 
   return (
     <div>
@@ -314,13 +312,13 @@ export default function TasksSidebar(props) {
       { openProjectAdd &&
         <ProjectAdd close={() => setOpenProjectAdd(false)}/>
       }
-      { managesProjects &&
-        <ProjectEdit item={projectState} triggerChange={()=>{/*this.setState({projectChangeDate:(new Date()).getTime()})*/}}/>
+      { accessRights.projects && false && 
+        <ProjectEdit item={currentProject} triggerChange={()=>{/*this.setState({projectChangeDate:(new Date()).getTime()})*/}}/>
       }
       { openMilestoneAdd &&
         <MilestoneAdd close={() => setOpenMilestoneAdd(false)}/>
       }
-      { managesProjects && milestoneState.id &&
+      { accessRights.projects && milestoneState.id &&
         milestones.map((item)=>item.id).includes(milestoneState.id) &&
         <MilestoneEdit item={milestoneState}/>
       }

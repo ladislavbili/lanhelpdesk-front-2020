@@ -14,7 +14,7 @@ constructor(props) {
   super(props);
   this.state = {
     open: false,
-    startAt:null,
+    startsAt:null,
     repeatEvery:1,
     repeatInterval:intervals[0],
   };
@@ -26,7 +26,7 @@ componentWillReceiveProps(props){
     this.setState({open: false});
     if(props.repeat===null){
       this.setState({
-        startAt:null,
+        startsAt:null,
         repeatEvery:1,
         repeatInterval:intervals[0],
       });
@@ -35,7 +35,7 @@ componentWillReceiveProps(props){
   if((this.props.repeat===null && props.repeat!==null)|| (this.props.repeat!==null && props.repeat!==null && props.repeat.id!==this.props.repeat.id)){
       let repeatInterval = intervals.find((interval)=>interval.title===props.repeat.repeatInterval);
       this.setState({
-        startAt:toMomentInput(props.repeat.startAt),
+        startsAt:toMomentInput(props.repeat.startsAt),
         repeatEvery:props.repeat.repeatEvery/repeatInterval.value,
         repeatInterval,
       });
@@ -91,9 +91,9 @@ render() {
               <Label>Start date *</Label>
               <DatePicker
                 className="form-control hidden-input"
-                selected={this.state.startAt}
-                onChange={startAt => {
-                  this.setState({ startAt });
+                selected={this.state.startsAt}
+                onChange={startsAt => {
+                  this.setState({ startsAt });
                 }}
                 placeholderText="No start date"
                 {...datePickerConfig}
@@ -131,12 +131,12 @@ render() {
               <div className="flex">
                 <Button type="button"
                   onClick={()=>{
-                     if(this.state.repeatInterval.value===null || this.state.repeatEvery <= 0 || isNaN(this.state.repeatEvery) || this.state.startAt === null ){
+                     if(this.state.repeatInterval.value===null || this.state.repeatEvery <= 0 || isNaN(this.state.repeatEvery) || this.state.startsAt === null ){
                        if(this.props.repeat!==null){
                          this.props.deleteRepeat();
                        }
                      }else{
-                       this.props.submitRepeat({startAt:fromMomentToUnix(this.state.startAt),repeatEvery:this.state.repeatEvery*this.state.repeatInterval.value,repeatInterval:this.state.repeatInterval.title});
+                       this.props.submitRepeat({startsAt:fromMomentToUnix(this.state.startsAt),repeatEvery:this.state.repeatEvery*this.state.repeatInterval.value,repeatInterval:this.state.repeatInterval.title});
                      }
                     this.setState({open:false});
                   }}>
