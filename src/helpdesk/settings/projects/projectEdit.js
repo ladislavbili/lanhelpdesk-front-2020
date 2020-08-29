@@ -172,21 +172,38 @@ query {
 }
 `;
 
+const GET_MY_DATA = gql`
+query {
+  getMyData{
+    id
+    role {
+      accessRights {
+        projects
+      }
+    }
+  }
+}
+`;
+
 export default function ProjectEdit(props){
   //data & queries
-  const { history, match, closeModal } = props;
-  const { data: projectData, loading: projectLoading, refetch } = useQuery(GET_PROJECT, { variables: {id: parseInt(match.params.id)} });
+  const { history, match, closeModal, projectID } = props;
+  const { data, loading } = useQuery(GET_MY_DATA);
+  const { data: projectData, loading: projectLoading, refetch } = useQuery(GET_PROJECT, { variables: {id: (projectID ? projectID : parseInt(match.params.id))}, options: { fetchPolicy: 'network-only' } });
   const [updateProject, {updateData}] = useMutation(UPDATE_PROJECT);
   const [deleteProject, {deleteData, client}] = useMutation(DELETE_PROJECT);
-  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
-  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
-  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS);
-  const { data: allTagsData, loading: allTagsLoading } = useQuery(GET_TAGS);
-  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES);
+  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
+  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES, { options: { fetchPolicy: 'network-only' }});
+  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS, { options: { fetchPolicy: 'network-only' }});
+  const { data: allTagsData, loading: allTagsLoading } = useQuery(GET_TAGS, { options: { fetchPolicy: 'network-only' }});
+  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES, { options: { fetchPolicy: 'network-only' }});
 
   const allProjects = toSelArr(client.readQuery({query: GET_PROJECTS}).projects);
-  const filteredProjects = allProjects.filter( project => project.id !== parseInt(match.params.id) );
+  const filteredProjects = allProjects.filter( project => project.id !== (projectID ? projectID : parseInt(match.params.id)) );
   const theOnlyOneLeft = allProjects.length === 0;
+
+  const currentUser = data ? data.getMyData : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   //state
   const [ title, setTitle ] = React.useState("");
@@ -345,6 +362,10 @@ export default function ProjectEdit(props){
 			refetch({ variables: {id: parseInt(match.params.id)} });
 	}, [match.params.id]);
 
+  React.useEffect( () => {
+      refetch({ variables: {id: projectID} });
+  }, [projectID]);
+
 	// functions
 	const updateProjectFunc = () => {
 		setSaving( true );
@@ -370,7 +391,7 @@ export default function ProjectEdit(props){
 		}
 
 		updateProject({ variables: {
-			id: parseInt(match.params.id),
+			id: (projectID ? projectID : parseInt(match.params.id)),
 			title,
       descrption,
       lockedRequester,
@@ -378,7 +399,10 @@ export default function ProjectEdit(props){
       def: newDef,
 		} }).then( ( response ) => {
 			const updatedProject = {...response.data.updateProject};
-			client.writeQuery({ query: GET_PROJECTS, data: {projects: [...allProjects.filter( project => project.id !== parseInt(match.params.id) ), updatedProject ] } });
+			client.writeQuery({ query: GET_PROJECTS, data: {projects: [...allProjects.filter( project => project.id !== (projectID ? projectID : parseInt(match.params.id)) ), updatedProject ] } });
+      if (closeModal){
+        closeModal();
+      }
 		}).catch( (err) => {
 			console.log(err.message);
 		});
@@ -391,11 +415,15 @@ export default function ProjectEdit(props){
     setChooseingNewProject(false);
     if(window.confirm("Are you sure?")){
       deleteProject({ variables: {
-        id: parseInt(match.params.id),
+        id: (projectID ? projectID : parseInt(match.params.id)),
         newId: ( newProject ? parseInt(newProject.id) : null ),
       } }).then( ( response ) => {
         client.writeQuery({ query: GET_PROJECTS, data: {projects: filteredProjects} });
-        history.push('/helpdesk/settings/projects/add');
+        if (closeModal){
+          closeModal();
+        } else {
+          history.push('/helpdesk/settings/projects/add');
+        }
       }).catch( (err) => {
         console.log(err.message);
         console.log(err);
@@ -403,13 +431,22 @@ export default function ProjectEdit(props){
     }
   };
 
-	/*	let canReadUserIDs = this.state.permissions.map((permission)=>permission.user.id);
-		let canBeAssigned = this.state.users.filter((user)=>canReadUserIDs.includes(user.id));*/
 		if (projectLoading || statusesLoading || companiesLoading || usersLoading || allTagsLoading || taskTypesLoading) {
 	    return <Loading />
 	  }
 
 	  const cannotSave = saving || title==="" || (company && company.value === null && company.fixed) || (status && status.value === null && status.fixed) || (assignedTo && assignedTo.value.length === 0 && assignedTo.fixed) || (taskType && taskType.value === null && taskType.fixed);
+
+    const rights = projectRights.findIndex(p => p.user.id === currentUser.id);
+    const isAdmin = rights >= 0 ? projectRights[rights].admin : false;
+    
+    let canReadUserIDs = [];
+    let canBeAssigned = [];
+
+    if (!usersLoading) {
+      canReadUserIDs = projectRights.map((permission)=>permission.user.id);
+      canBeAssigned = toSelArr(usersData.users, 'email').filter((user)=>canReadUserIDs.includes(user.id));
+    }
 
     return (
       <div className="p-20 fit-with-header-and-commandbar scroll-visible">
@@ -452,8 +489,8 @@ export default function ProjectEdit(props){
 					}}
           users={(usersLoading ? [] : toSelArr(usersData.users, 'email'))}
 					permissions={projectRights}
-					userID={0}
-					isAdmin={true}
+					userID={currentUser.id}
+					isAdmin={isAdmin}
 					lockedRequester={lockedRequester}
 					lockRequester={() => setLockedRequester( !lockedRequester) }
 					/>
@@ -477,7 +514,7 @@ export default function ProjectEdit(props){
 		        setTaskType={setTaskType}
 		        statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
 		        companies={(companiesLoading ? [] : toSelArr(companiesData.companies))}
-		        canBeAssigned={(usersLoading ? [] : toSelArr(usersData.users, 'email'))}
+		        canBeAssigned={canBeAssigned}
 		        users={lockedRequester ? (toSelArr(projectRights.map(r => r.user), 'email')) : (usersLoading ? [] : toSelArr(usersData.users, 'email'))}
 		        allTags={(allTagsLoading ? [] : toSelArr(allTagsData.tags))}
 		        taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
@@ -524,7 +561,7 @@ export default function ProjectEdit(props){
 						Delete
 					</Button>
           {closeModal &&
-            <Button className="btn-link" onClick={closeModal()}>
+            <Button className="btn-link ml-auto" onClick={() => closeModal()}>
               Close
             </Button>}
 				</div>

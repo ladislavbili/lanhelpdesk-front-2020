@@ -12,8 +12,8 @@ import {testing} from 'helperFunctions';
 
 import TaskAdd from '../../task/taskAddContainer';
 import Filter from '../filter';
-import ProjectEdit from '../projects/projectEdit';
-import ProjectAdd from '../projects/projectAdd';
+import ProjectEdit from '../projects/projectEditContainer';
+import ProjectAdd from '../projects/projectAddContainer';
 import MilestoneEdit from '../milestones/milestoneEdit';
 import MilestoneAdd from '../milestones/milestoneAdd';
 
@@ -127,7 +127,7 @@ export default function TasksSidebar(props) {
   //data & queries
   const { history, match, location } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
-  const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
+  const { data: projectsData, loading: projectsLoading, refetch: projectsRefetch } = useQuery(GET_PROJECTS, { options: { fetchPolicy: 'network-only' }});
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
@@ -139,18 +139,35 @@ export default function TasksSidebar(props) {
   const [ isColumn, setIsColumn ] = React.useState(false);
   const [ search, setSearch ] = React.useState("");
   const [ activeTab, setActiveTab ] = React.useState(0);
-  const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? toSelArr([dashboard,addProject]) : toSelArr([dashboard]) ) );
+  const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ) );
   const [ currentProject, setCurrentProject ] = React.useState( projects[0] );
   const [ milestones, setMilestones ] = React.useState( toSelArr([allMilestones]) );
 
   // sync
   React.useEffect( () => {
     if (!projectsLoading){
-      const pro = (accessRights.addProjects ? toSelArr([dashboard,addProject]) : toSelArr([dashboard]) ).concat(projectsData.projects);
+      const pro = (accessRights.addProjects ? [dashboard, addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
       setProjects(pro);
       setCurrentProject( projects[0] );
     }
   }, [projectsLoading]);
+
+  React.useEffect( () => {
+    if (!projectsLoading){
+      projectsRefetch();
+      const pro = (accessRights.addProjects ? [dashboard, addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
+      setProjects(pro);
+      const index = pro.findIndex(p => p.id === currentProject.id);
+      setCurrentProject( (index >= 0 ? pro[index] : [dashboard]) );
+    }
+  }, [projectsData]);
+
+  const addNewProject = (newProject) => {
+      projectsRefetch();
+      const pro = (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
+      setProjects(pro);
+      setCurrentProject( newProject );
+  }
 
   const filters = [];
   const filterState = null;
@@ -172,7 +189,12 @@ export default function TasksSidebar(props) {
         }
         value={currentProject}
         styles={sidebarSelectStyle}
-        onChange={project => setCurrentProject(project)}
+        onChange={project => {
+          setCurrentProject(project);
+          if (project.id === -1){
+            setOpenProjectAdd(true);
+          }
+        }}
         components={{
           DropdownIndicator: ({ innerProps, isDisabled }) =>
           <div style={{marginTop: "-15px"}}>
@@ -310,18 +332,22 @@ export default function TasksSidebar(props) {
       </TabContent>
 
       { openProjectAdd &&
-        <ProjectAdd close={() => setOpenProjectAdd(false)}/>
+        <ProjectAdd open={openProjectAdd} closeModal={() => setOpenProjectAdd(false)} addProject={(e) => addNewProject(e)}/>
       }
-      { accessRights.projects && false && 
-        <ProjectEdit item={currentProject} triggerChange={()=>{/*this.setState({projectChangeDate:(new Date()).getTime()})*/}}/>
+      { accessRights.projects &&
+        currentProject.id !== null &&
+        <ProjectEdit  projectID={currentProject.id} {...props} />
       }
+
       { openMilestoneAdd &&
         <MilestoneAdd close={() => setOpenMilestoneAdd(false)}/>
       }
+      <div>hello</div>
       { accessRights.projects && milestoneState.id &&
         milestones.map((item)=>item.id).includes(milestoneState.id) &&
         <MilestoneEdit item={milestoneState}/>
       }
+      <div>hello</div>
 
     </div>
   );

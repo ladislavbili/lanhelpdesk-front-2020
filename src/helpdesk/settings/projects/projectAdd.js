@@ -21,6 +21,82 @@ mutation addProject($title: String!, $descrption: String!, $lockedRequester: Boo
   ){
     id
     title
+    descrption
+    lockedRequester
+    projectRights {
+			read
+			write
+			delete
+			internal
+			admin
+			user {
+				id
+        email
+			}
+		}
+    def {
+			assignedTo {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			company {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			overtime {
+				def
+				fixed
+				show
+				value
+			}
+			pausal {
+				def
+				fixed
+				show
+				value
+			}
+			requester {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			status {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			tag {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			taskType {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+		}
+
   }
 }
 `;
@@ -70,15 +146,32 @@ query {
 }
 `;
 
+const GET_MY_DATA = gql`
+query {
+  getMyData{
+    id
+    role {
+      accessRights {
+        addProjects
+      }
+    }
+  }
+}
+`;
+
 export default function ProjectAdd(props){
   //data & queries
-  const { history, match } = props;
+  const { history, match, closeModal } = props;
+  const { data, loading } = useQuery(GET_MY_DATA);
   const [ addProject, {client} ] = useMutation(ADD_PROJECT);
-  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
-  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
-  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS);
-  const { data: allTagsData, loading: allTagsLoading } = useQuery(GET_TAGS);
-  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES);
+  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
+  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES, { options: { fetchPolicy: 'network-only' }});
+  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS, { options: { fetchPolicy: 'network-only' }});
+  const { data: allTagsData, loading: allTagsLoading } = useQuery(GET_TAGS, { options: { fetchPolicy: 'network-only' }});
+  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES, { options: { fetchPolicy: 'network-only' }});
+
+  const currentUser = data ? data.getMyData : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   //state
   const [ title, setTitle ] = React.useState("");
@@ -170,7 +263,12 @@ export default function ProjectAdd(props){
       const allProjects = client.readQuery({query: GET_PROJECTS}).projects;
       const newProject = {...response.data.addProject, __typename: "Project"};
       client.writeQuery({ query: GET_PROJECTS, data: {projects: [...allProjects, newProject ] } });
-      history.push('/helpdesk/settings/projects/' + newProject.id)
+      if (closeModal){
+        props.addProject(newProject);
+        closeModal();
+      } else {
+        history.push('/helpdesk/settings/projects/' + newProject.id);
+      }
     }).catch( (err) => {
       console.log(err.message);
     });
@@ -179,7 +277,13 @@ export default function ProjectAdd(props){
 
   const cannotSave = saving || title==="" || (company.value === null && company.fixed) || (status.value === null && status.fixed) || (assignedTo.value.length === 0 && assignedTo.fixed) || (taskType.value === null && taskType.fixed)
 
+  let canReadUserIDs = [];
+  let canBeAssigned = [];
 
+  if (!usersLoading) {
+    canReadUserIDs = projectRights.map((permission)=>permission.user.id);
+    canBeAssigned = toSelArr(usersData.users, 'email').filter((user)=>canReadUserIDs.includes(user.id));
+  }
 
     return (
       <div className="p-20 scroll-visible fit-with-header-and-commandbar">
@@ -222,7 +326,7 @@ export default function ProjectAdd(props){
 					}}
           users={(usersLoading ? [] : toSelArr(usersData.users, 'email'))}
 					permissions={projectRights}
-					userID={0}
+					userID={currentUser.id}
 					isAdmin={true}
 					lockedRequester={lockedRequester}
 					lockRequester={() => setLockedRequester( !lockedRequester) }
@@ -247,7 +351,7 @@ export default function ProjectAdd(props){
         setTaskType={setTaskType}
         statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
         companies={(companiesLoading ? [] : toSelArr(companiesData.companies))}
-        canBeAssigned={(usersLoading ? [] : toSelArr(usersData.users, 'email'))}
+        canBeAssigned={canBeAssigned}
         users={lockedRequester ? (projectRights.map(r => r.user)) : (usersLoading ? [] : toSelArr(usersData.users, 'email'))}
         allTags={(allTagsLoading ? [] : toSelArr(allTagsData.tags))}
         taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
@@ -259,11 +363,16 @@ export default function ProjectAdd(props){
         </div>
       }
 
-			<Button className="btn"
-				disabled={cannotSave}
-				onClick={addProjectFunc}>
-				{saving?'Adding...':'Add project'}
-			</Button>
+      <div>
+  			<Button className="btn"
+  				disabled={cannotSave}
+  				onClick={addProjectFunc}>
+  				{saving?'Adding...':'Add project'}
+  			</Button>
+        { closeModal &&
+          <Button className="btn-link ml-auto" onClick={() => closeModal()}> Cancel </Button>
+        }
+      </div>
     </div>
     );
   }
