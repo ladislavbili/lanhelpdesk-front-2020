@@ -10,8 +10,8 @@ import {sidebarSelectStyle} from 'configs/components/select';
 import classnames from 'classnames';
 import {testing} from 'helperFunctions';
 
-import TaskAdd from '../../task/taskAddContainer';
 import Filter from '../filter';
+import TaskAdd from '../../task/taskAddContainer';
 import ProjectEdit from '../projects/projectEditContainer';
 import ProjectAdd from '../projects/projectAddContainer';
 import MilestoneEdit from '../milestones/milestoneEdit';
@@ -29,6 +29,10 @@ query {
     descrption
     lockedRequester
     updatedAt
+    milestones {
+      id
+      title
+    }
     projectRights {
 			read
 			write
@@ -141,7 +145,7 @@ export default function TasksSidebar(props) {
   const [ activeTab, setActiveTab ] = React.useState(0);
   const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ) );
   const [ currentProject, setCurrentProject ] = React.useState( projects[0] );
-  const [ milestones, setMilestones ] = React.useState( toSelArr([allMilestones]) );
+  const [ currentMilestone, setCurrentMilestone ] = React.useState( [allMilestones] );
 
   // sync
   React.useEffect( () => {
@@ -171,7 +175,6 @@ export default function TasksSidebar(props) {
 
   const filters = [];
   const filterState = null;
-  const milestoneState = {id: 0};
 
   return (
     <div>
@@ -214,10 +217,15 @@ export default function TasksSidebar(props) {
         currentProject.id !== null &&
         <div className="">
           <Select
-            options={[]}
-            value={{label: "Hello", value: 99999}}
+            options={toSelArr( ([allMilestones, addMilestone]).concat(currentProject.milestones) )}
+            value={currentMilestone}
             styles={sidebarSelectStyle}
-            onChange={milestone => {}}
+            onChange={milestone => {
+              setCurrentMilestone(milestone);
+              if (milestone.id === -1) {
+                setOpenMilestoneAdd(true);
+              }
+            }}
             components={{
               DropdownIndicator: ({ innerProps, isDisabled }) =>
               <div style={{marginTop: "-15px"}}>
@@ -340,13 +348,12 @@ export default function TasksSidebar(props) {
       }
 
       { openMilestoneAdd &&
-        <MilestoneAdd close={() => setOpenMilestoneAdd(false)}/>
+        <MilestoneAdd projectID={currentProject.id} open={openMilestoneAdd}  closeModal={() => setOpenMilestoneAdd(false)} />
       }
       <div>hello</div>
-      { accessRights.projects && milestoneState.id &&
-        milestones.map((item)=>item.id).includes(milestoneState.id) &&
-        <MilestoneEdit item={milestoneState}/>
-      }
+      { /*accessRights.projects && currentMilestone.id !== null &&
+        <MilestoneEdit item={{}} milestoneID={currentMilestone.id}/>
+      */}
       <div>hello</div>
 
     </div>
