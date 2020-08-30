@@ -166,14 +166,14 @@ query {
 export default function TaskAddContainer (props){
   //data & queries
   const { history, match } = props;
-  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
-  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
-  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS);
-  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES);
-  const { data: tripTypesData, loading: tripTypesLoading } = useQuery(GET_TRIP_TYPES);
-  const { data: pricesData, loading: pricesLoading } = useQuery(GET_PRICELISTS);
-  const { data: tagsData, loading: tagsLoading } = useQuery(GET_TAGS);
-  const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
+  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
+  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES, { options: { fetchPolicy: 'network-only' }});
+  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS, { options: { fetchPolicy: 'network-only' }});
+  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES, { options: { fetchPolicy: 'network-only' }});
+  const { data: tripTypesData, loading: tripTypesLoading } = useQuery(GET_TRIP_TYPES, { options: { fetchPolicy: 'network-only' }});
+  const { data: pricesData, loading: pricesLoading } = useQuery(GET_PRICELISTS, { options: { fetchPolicy: 'network-only' }});
+  const { data: tagsData, loading: tagsLoading } = useQuery(GET_TAGS, { options: { fetchPolicy: 'network-only' }});
+  const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS, { options: { fetchPolicy: 'network-only' }});
 
   //state
   const [ hidden, setHidden ] = React.useState(false);

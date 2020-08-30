@@ -19,10 +19,10 @@ export const snapshotToArray = (snapshot) => {
 
 export const toMomentInput = (unix) => ( unix !== null && unix !== undefined ) ? moment(unix) : null;
 
-export const fromMomentToUnix = (moment) => moment !== null ? moment.unix()*1000 : null;
+export const fromMomentToUnix = (moment) => moment !== null ? moment.unix() : null;
 
 export const timestampToString = (timestamp) => {
-  return moment.unix(timestamp/1000).format('HH:mm DD.MM.YYYY');
+  return moment.unix(timestamp).format('HH:mm DD.MM.YYYY');
 }
 
 export const timestampToDate = (timestamp) => {

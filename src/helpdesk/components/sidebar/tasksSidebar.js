@@ -350,11 +350,9 @@ export default function TasksSidebar(props) {
       { openMilestoneAdd &&
         <MilestoneAdd projectID={currentProject.id} open={openMilestoneAdd}  closeModal={() => setOpenMilestoneAdd(false)} />
       }
-      <div>hello</div>
       { /*accessRights.projects && currentMilestone.id !== null &&
         <MilestoneEdit item={{}} milestoneID={currentMilestone.id}/>
       */}
-      <div>hello</div>
 
     </div>
   );

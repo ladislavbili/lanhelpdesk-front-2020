@@ -48,7 +48,7 @@ query {
 
 
 const UPDATE_USER = gql`
-mutation updateUser($id: Int!, $tasklistLayout: TasklistLayoutEnum) {
+mutation updateUser($id: Int!, $tasklistLayout: Int) {
   updateUser(
     id: $id,
     tasklistLayout: $tasklistLayout,
@@ -71,18 +71,18 @@ export default function Navigation (props) {
 
 	const setLayout = (value) => {
 		updateUserFunc(value);
-		props.setTasklistLayout(value);
+		//props.setTasklistLayout(value);
 	}
 
 	// functions
-	const updateUserFunc = (value) => {
+	const updateUserFunc = (value) => {/*
 		updateUser({ variables: {
 			id: parseInt(match.params.id),
-			tasklistLayout: value,
+			tasklistLayout: parseInt(value),
 		} }).then( ( response ) => {
 		}).catch( (err) => {
 			console.log(err.message);
-		});
+		});*/
 	};
 
 //	accessRights["users"] = false;

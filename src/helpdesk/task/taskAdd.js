@@ -80,7 +80,7 @@ export default function TaskAdd (props){
   const [ repeat, setRepeat ] = React.useState(null);
   const [ requester, setRequester ] = React.useState(null);
   const [ saving, setSaving ] = React.useState(false);
-  const [ status, setStaus ] = React.useState(null);
+  const [ status, setStatus ] = React.useState(null);
   const [ subtasks, setSubtasks ] = React.useState([]);
   const [ tags, setTags ] = React.useState([]);
   const [ taskMaterials, setTaskMaterials ] = React.useState([]);
@@ -133,7 +133,7 @@ export default function TaskAdd (props){
 		setRequester(newRequester);
 
 		let newStatus = def.status && (def.status.fixed || def.status.def) ? statuses.find((item)=> item.id === def.status.value.is) : statuses[0];
-		setStaus(newStatus);
+		setStatus(newStatus);
 
 		let mappedTags = def.tag.value.map(t => t.id);
 		let newTags = def.tag&& (def.tag.fixed || def.tag.def) ? allTags.filter((item)=> mappedTags.includes(item.id)) : allTags;
@@ -370,14 +370,14 @@ const renderSelectsLayout1 = () => {
 							styles={invisibleSelectStyleNoArrowColoredRequired}
 							onChange={(status)=>{
 								if(status.action==='PendingDate'){
-									setStaus(status);
+									setStatus(status);
 									setPendingDate( moment().add(1,'d') );
 								}else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
-									setStaus(status);
+									setStatus(status);
 									setCloseDate( moment() );
 								}
 								else{
-									setStaus(status);
+									setStatus(status);
 								}
 							}}
 							options={statuses.filter((status)=>status.action!=='invoiced').sort((item1,item2)=>{
@@ -656,14 +656,14 @@ const renderSelectsLayout2 = () => {
 							styles={invisibleSelectStyleNoArrowColoredRequired}
 							onChange={(status)=>{
 								if(status.action==='PendingDate'){
-									setStaus(status);
+									setStatus(status);
 									setPendingDate( moment().add(1,'d') );
 								}else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
-									setStaus(status);
+									setStatus(status);
 									setCloseDate( moment() );
 								}
 								else{
-									setStaus(status);
+									setStatus(status);
 								}
 							}}
 							options={statuses.filter((status)=>status.action!=='invoiced').sort((item1,item2)=>{
