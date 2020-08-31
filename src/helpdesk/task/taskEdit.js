@@ -21,55 +21,21 @@ import VykazyTable from '../components/vykazyTable';
 import UserAdd from '../settings/users/userAdd';
 import CompanyAdd from '../settings/companies/companyAdd';
 
+import Loading from 'components/loading';
+
 import TaskAdd from './taskAddContainer';
 import TaskPrint from './taskPrint';
 import classnames from "classnames";
-import {rebase, database} from '../../index';
-import firebase from 'firebase';
 import ck5config from 'configs/components/ck5config';
-//import ck4config from '../../scss/ck4config';
+
 import datePickerConfig from 'configs/components/datepicker';
 import PendingPicker from '../components/pendingPicker';
-import {toSelArr, snapshotToArray, timestampToString, sameStringForms} from '../../helperFunctions';
-import { storageCompaniesStart, storageHelpPricelistsStart, storageHelpPricesStart,storageHelpProjectsStart, storageHelpStatusesStart, storageHelpTagsStart, storageHelpTaskTypesStart, storageHelpTasksStart, storageHelpUnitsStart,storageHelpWorkTypesStart, storageMetadataStart, storageUsersStart, storageHelpMilestonesStart, storageHelpTripTypesStart } from '../../redux/actions';
+import {toSelArr, snapshotToArray, timestampToString, sameStringForms, toMomentInput} from '../../helperFunctions';
 import {invisibleSelectStyleNoArrow, invisibleSelectStyleNoArrowColored,invisibleSelectStyleNoArrowColoredRequired, invisibleSelectStyleNoArrowRequired} from 'configs/components/select';
 import { REST_URL } from 'configs/restAPI';
 import booleanSelects from 'configs/constants/boolSelect';
 import { noMilestone } from 'configs/constants/sidebar';
 import { noDef } from 'configs/constants/projects';
-
-import { GET_TASK_TYPES } from 'helpdesk/settings/taskTypes';
-import { GET_TRIP_TYPES } from 'helpdesk/settings/tripTypes';
-import { GET_PRICELISTS } from 'helpdesk/settings/prices';
-
-export const UPDATE_TASK = gql`
-mutation updateTask($title: String!, $closeDate: Int!, $assignedTo: [Int]!, $company: Int!, $deadline: Int, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: Int, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput ) {
-  updateTask(
-    title: $title,
-    closeDate: $closeDate,
-    assignedTo: $assignedTo,
-    company: $company,
-    deadline: $deadline,
-    description: $description,
-    milestone: $milestone,
-    overtime: $overtime,
-    pausal: $pausal,
-    pendingChangable: $pendingChangable,
-    pendingDate: $pendingDate,
-    project: $project,
-    requester: $requester,
-    status: $status,
-    tags: $tags,
-    taskType: $taskType,
-    repeat: $repeat,
-  ){
-    id
-    title
-  }
-}
-`;
-
-
 
 const GET_TASK = gql`
 query task($id: Int!){
@@ -89,6 +55,25 @@ query task($id: Int!){
 		company {
 			id
 			title
+      dph
+      taskWorkPausal
+      monthly
+      monthlyPausal
+      pricelist {
+        id
+        title
+        materialMargin
+        prices {
+          type
+          price
+          taskType {
+            id
+          }
+          tripType {
+            id
+          }
+        }
+      }
 		}
 		createdBy {
 			id
@@ -105,7 +90,10 @@ query task($id: Int!){
 		project{
 			id
 			title
-
+      milestones{
+        id
+        title
+      }
 	    lockedRequester
 	    projectRights {
 				read
@@ -208,182 +196,49 @@ query task($id: Int!){
 }
 `;
 
-const GET_STATUSES = gql`
-query {
-  statuses {
+const UPDATE_TASK = gql`
+mutation updateTask($title: String!, $closeDate: Int!, $assignedTo: [Int]!, $company: Int!, $deadline: Int, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: Int, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput ) {
+  updateTask(
+    title: $title,
+    closeDate: $closeDate,
+    assignedTo: $assignedTo,
+    company: $company,
+    deadline: $deadline,
+    description: $description,
+    milestone: $milestone,
+    overtime: $overtime,
+    pausal: $pausal,
+    pendingChangable: $pendingChangable,
+    pendingDate: $pendingDate,
+    project: $project,
+    requester: $requester,
+    status: $status,
+    tags: $tags,
+    taskType: $taskType,
+    repeat: $repeat,
+  ){
+    id
     title
-    id
-    order
-    color
-    action
   }
 }
 `;
 
-const GET_TAGS = gql`
-query {
-  tags {
-    title
+export const DELETE_TASK = gql`
+mutation deleteTask($id: Int!) {
+  deleteTask(
+    id: $id,
+  ){
     id
-    order
-    color
-  }
-}
-`;
-
-const GET_PROJECTS = gql`
-query {
-  projects {
-    title
-    id
-    lockedRequester
-    projectRights {
-			read
-			write
-			delete
-			internal
-			admin
-			user {
-				id
-			}
-		}
-    def {
-			assignedTo {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			company {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			overtime {
-				def
-				fixed
-				show
-				value
-			}
-			pausal {
-				def
-				fixed
-				show
-				value
-			}
-			requester {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			status {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			tag {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			taskType {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-    }
-  }
-}
-`;
-
-const GET_COMPANIES = gql`
-query {
-  companies {
-    title
-    id
-    dph
-    taskWorkPausal
-    pricelist {
-      id
-      title
-      materialMargin
-      prices {
-        type
-        price
-        taskType {
-          id
-        }
-        tripType {
-          id
-        }
-      }
-    }
-  }
-}
-`;
-
-const GET_USERS = gql`
-query {
-  users{
-    id
-    email
-    role {
-      level
-    }
-    company {
-      id
-    }
-  }
-}
-`;
-
-const GET_MY_DATA = gql`
-query {
-  getMyData{
-    id
-    role {
-      accessRights {
-        projects
-      }
-    }
   }
 }
 `;
 
 export default function TaskEdit (props){
 	//data & queries
-	const { match, columns } = props;
+	const { match, history, columns, currentUser, accessRights, statuses, companies, users, allTags, projects, tasks, taskTypes, tripTypes, units, defaultUnit, subtasks, inModal, closeModal } = props;
+  const { data: taskData, loading: taskLoading, refetch: taskRefetch } = useQuery(GET_TASK, { variables: {id: parseInt(match.params.taskID)} });
   const [ updateTask, {client} ] = useMutation(UPDATE_TASK);
-	const { data, loading } = useQuery(GET_MY_DATA);
-  const { data: taskData, loading: taskLoading, refetch: taskRefetch } = useQuery(GET_TASK, { variables: {id: parseInt(props.match.params.taskID)} });
-	const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
-	const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES, { options: { fetchPolicy: 'network-only' }});
-	const { data: usersData, loading: usersLoading } = useQuery(GET_USERS, { options: { fetchPolicy: 'network-only' }});
-	const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES, { options: { fetchPolicy: 'network-only' }});
-	const { data: tripTypesData, loading: tripTypesLoading } = useQuery(GET_TRIP_TYPES, { options: { fetchPolicy: 'network-only' }});
-	const { data: pricesData, loading: pricesLoading } = useQuery(GET_PRICELISTS, { options: { fetchPolicy: 'network-only' }});
-	const { data: tagsData, loading: tagsLoading } = useQuery(GET_TAGS, { options: { fetchPolicy: 'network-only' }});
-	const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS, { options: { fetchPolicy: 'network-only' }});
-
-  const currentUser = data ? data.getMyData : {};
-  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+  const [deleteTask, {deleteData}] = useMutation(DELETE_TASK);
 
   //state
   const [ layout, setLayout ] = React.useState(1);
@@ -400,15 +255,15 @@ export default function TaskEdit (props){
   const [ deadline, setDeadline ] = React.useState(null);
   const [ description, setDescription ] = React.useState("");
   const [ descriptionVisible, setDescriptionVisible ] = React.useState(false);
-  const [ history, setHistory ] = React.useState([]);
+  const [ taskHistory, setTaskHistory ] = React.useState([]);
   const [ invoicedDate, setInvoicedDate ] = React.useState(null);
   const [ important, setImportant ] = React.useState(false);
   const [ isColumn, setIsColumn ] = React.useState(false);
   const [ milestone, setMilestone ] = React.useState([noMilestone]);
-  const [ newHistoryEntery, setNewHistoryEntery ] = React.useState(null);
+  const [ milestones, setMilestones ] = React.useState([noMilestone]);
   const [ overtime, setOvertime ] = React.useState(booleanSelects[0]);
-  const [ openUserAdd, setOopenUserAdd ] = React.useState(false);
-  const [ openCompanyAdd, setOopenCompanyAdd ] = React.useState(false);
+  const [ openUserAdd, setOpenUserAdd ] = React.useState(false);
+  const [ openCompanyAdd, setOpenCompanyAdd ] = React.useState(false);
   const [ pausal, setPausal ] = React.useState(booleanSelects[0]);
 	const [ pendingChangable, setPendingChangable ] = React.useState(false);
   const [ pendingDate, setPendingDate ] = React.useState(null);
@@ -424,7 +279,6 @@ export default function TaskEdit (props){
   const [ status, setStatus ] = React.useState(null);
   const [ statusChange, setStatusChange ] = React.useState(false);
   const [ showDescription, setShowDescription ] = React.useState(false);
-  const [ subtasks, setSubtasks ] = React.useState([]);
   const [ tags, setTags ] = React.useState([]);
   const [ taskMaterials, setTaskMaterials ] = React.useState([]);
   const [ taskType, setTaskType ] = React.useState(null);
@@ -432,47 +286,91 @@ export default function TaskEdit (props){
 	const [ title, setTitle ] = React.useState("");
   const [ toggleTab, setToggleTab ] = React.useState(1);
   const [ workTrips, setWorkTrips ] = React.useState([]);
-	//workHours:'0',
+
+  const [ viewOnly, setViewOnly ] = React.useState(true);
 
   let counter = 0;
 
 	const getNewID = () => {
 			return counter++;
-		}
-
-const userRights = project ? project.projectRights.find(r => r.user.id === currentUser.id) : false;
-
-const [ viewOnly, setViewOnly ] = React.useState(currentUser.role.level !== 0 && !userRights.write);
-
-
-	const canSave = () => {
-		return  title==="" || status===null || project === null || saving || viewOnly;
 	}
 
 // sync
 React.useEffect( () => {
     if (!taskLoading){
-			console.log(taskData);
 			setAssignedTo(taskData.task.assignedTo);
-			setCloseDate(taskData.task.closeDate);
+			setCloseDate( moment(taskData.task.closeDate) );
 			setCompany( ( taskData.task.company ? {...taskData.task.company, value: taskData.task.company.id, label: taskData.task.company.title} : null) );
 			setCreatedBy(taskData.task.createdBy);
-			setCreatedAt(taskData.task.createdAt);
-			setDeadline(taskData.task.deadline);
+			setCreatedAt( taskData.task.createdAt );
+			setDeadline(taskData.task.deadline ? moment(taskData.task.deadline) : null) ;
 			setDescription(taskData.task.description);
-			setMilestone(taskData.task.milestone);
-			setOvertime(taskData.task.overtime);
-			setPausal(taskData.task.pausal);
+      setImportant(taskData.task.important);
+      setInvoicedDate( moment(taskData.task.invoicedDate) );
+      //invoicedDate: task.invoicedDate!==null && task.invoicedDate!==undefined ?new Date(task.invoicedDate).toISOString().replace('Z',''):'',
+      const pro =  (taskData.task.project ? {...taskData.task.project, value: taskData.task.project.id, label: taskData.task.project.title} : null );
+      setMilestone(pro && pro.milestone ? {...pro.milestone, value: pro.milestone.id, label: pro.milestone.title} : null );
+			setOvertime( (taskData.task.overtime ? booleanSelects[1] : booleanSelects[0]) );
+			setPausal( (taskData.task.pausal ? booleanSelects[1] : booleanSelects[0]) );
 			setPendingChangable(taskData.task.pendingChangable);
-			setPendingDate(taskData.task.pendingDate);
-			setProject( (taskData.task.project ? {...taskData.task.project, value: taskData.task.project.id, label: taskData.task.project.title} : null ) );
+			setPendingDate( moment(taskData.task.pendingDate) );
+			setProject(pro);
 			setReminder(taskData.task.reminder);
 			setRepeat(taskData.task.repeat);
 			setRequester( (taskData.task.requester ? {...taskData.task.requester, value: taskData.task.requester.id, label: `${taskData.task.requester.name} ${taskData.task.requester.surname}`} : null)) ;
-			setStatus( (taskData.task.staus ? {...taskData.task.staus, value: taskData.task.staus.id, label: taskData.task.staus.title} : null ) );
+      const sta = (taskData.task.status ? {...taskData.task.status, value: taskData.task.status.id, label: taskData.task.status.title} : null )
+			setStatus(sta );
 			setTags(taskData.task.tags);
 			setTaskType( (taskData.task.taskType ? {...taskData.task.taskType, value: taskData.task.taskType.id, label: taskData.task.taskType.title} : null ) );
 			setTitle(taskData.task.title);
+      setCustomItems(taskData.task.customItems);
+      setTaskMaterials(taskData.task.taskMaterials);
+      setTaskWorks(taskData.task.taskWorks);
+      setWorkTrips(taskData.task.workTrips);
+
+      /*
+  		let workTrips= this.state.workTrips.map((trip)=>{
+  			let type= this.state.tripTypes.find((item)=>item.id===trip.type);
+  			let assignedTo=trip.assignedTo?this.state.users.find((item)=>item.id===trip.assignedTo):null
+
+  			return {
+  				...trip,
+  				type,
+  				assignedTo:assignedTo?assignedTo:null
+  			}
+  		});
+
+  		let taskWorks= this.state.taskWorks.map((work)=>{
+  			let assignedTo=work.assignedTo?this.state.users.find((item)=>item.id===work.assignedTo):null
+  			return {
+  				...work,
+  				type:this.state.taskTypes.find((item)=>item.id===work.type),
+  				assignedTo:assignedTo?assignedTo:null
+  			}
+  		});
+  		let taskMaterials= this.state.taskMaterials.map((material)=>{
+  			return {
+  				...material,
+  				unit:this.state.units.find((unit)=>unit.id===material.unit)
+  			}
+  		});
+
+  		let customItems = this.state.customItems.map((item)=>(
+  			{
+  				...item,
+  				unit:this.state.units.find((unit)=>unit.id===item.unit),
+  			}
+  		));*/
+
+      if (pro){
+        setDefaults(pro);
+        const userRights = pro ? pro.projectRights.find(r => r.user.id === currentUser.id) : false;
+        if (sta && sta.action==='Invoiced' && inModal && userRights.isAdmin) {
+          setViewOnly(false);
+        } else {
+          setViewOnly((sta && sta.action==='Invoiced') || (!userRights.isAdmin && !userRights.write));
+        }
+      }
     }
 }, [taskLoading]);
 
@@ -480,246 +378,72 @@ React.useEffect( () => {
     taskRefetch({ variables: {id: parseInt(match.params.taskID)} });
 }, [match.params.taskID]);
 
-/*
-	storageLoaded(props){
-		return props.companiesLoaded &&
-		props.pricelistsLoaded &&
-		props.pricesLoaded &&
-		props.projectsLoaded &&
-		props.statusesLoaded &&
-		props.tagsLoaded &&
-		props.taskTypesLoaded &&
-		props.tasksLoaded &&
-		props.unitsLoaded &&
-		props.metadataLoaded &&
-		props.usersLoaded &&
-		props.tripTypesLoaded &&
-		props.milestonesLoaded
-	}
+  const deleteTaskFunc = () => {
+    if(window.confirm("Are you sure?")){
+      deleteTask({ variables: {
+        id: parseInt(match.params.taskID),
+      } }).then( ( response ) => {
+        if(inModal){
+          closeModal();
+        }else{
+          history.goBack();
+          history.push(match.url.substring(0,match.url.length-match.params.taskID.length));
+        }
+      }).catch( (err) => {
+        console.log(err.message);
+        console.log(err);
+      });
+    }
+  }
 
-	deleteTask(){
-		if(window.confirm("Are you sure?")){
-			let taskID = this.props.match.params.taskID;
-			let storageRef = firebase.storage().ref();
-			this.state.attachments.map((attachment)=>storageRef.child(attachment.path).delete());
+  const cannotSave = () => {
+  	return  title==="" || status===null || project === null || saving || viewOnly;
+  }
 
-			rebase.removeDoc('/help-tasks/'+taskID);
-			this.state.taskMaterials.forEach((material)=>rebase.removeDoc('/help-task_materials/'+material.id))
-			this.state.customItems.forEach((item)=>rebase.removeDoc('/help-task_custom_items/'+item.id))
-			this.state.taskWorks.forEach((work)=>rebase.removeDoc('/help-task_works/'+work.id))
-			this.state.workTrips.forEach((workTrip)=>rebase.removeDoc('/help-task_work_trips/'+workTrip.id))
-			if(this.state.repeat!==null){
-				rebase.removeDoc('/help-repeats/'+taskID);
-			}
-			database.collection('help-comments').where("task", "==", taskID).get()
-			.then((data)=>{
-				snapshotToArray(data).forEach((item)=>rebase.removeDoc('/help-comments/'+item.id));
-			});
-			database.collection('help-calendar_events').where("taskID", "==", taskID).get()
-			.then((data)=>{
-				snapshotToArray(data).forEach((item)=>rebase.removeDoc('/help-calendar_events/'+item.id));
-			});
-			if(this.props.inModal){
-				this.props.closeModal();
-			}else{
-				this.props.history.goBack();
-				this.props.history.push(this.props.match.url.substring(0,this.props.match.url.length-this.props.match.params.taskID.length));
-			}
-		}
-	}
+  const	updateTaskFunc = () => {
+  		if(cannotSave()){
+  			return;
+  		}
+      setSaving(true);
 
-	submitTask(){
-		if(this.canSave()){
-			return;
-		}
-		let taskID = this.props.match.params.taskID;
-		this.setState({saving:true});
+  		let newInvoicedDate = null;
+  		if(status.action==='Invoiced'){
+  			newInvoicedDate = isNaN(invoicedDate.unix()) ? moment().unix() : invoicedDate.unix();
+  		}
 
-		let statusAction = this.state.status.action;
-		let invoicedDate = null;
-		if(statusAction==='invoiced'){
-			invoicedDate = isNaN(new Date(this.state.invoicedDate).getTime()) ? (new Date()).getTime() : new Date(this.state.invoicedDate).getTime()
-		}
+      updateTask({ variables: {
+        id: parseInt(match.params.taskID),
+        title,
+        company: company ? company.id : null,
+        requester: requester ? requester.id : null,
+        assignedTo: assignedTo.map((item)=>item.id),
+        description,
+        status: status ? status.id : null,
+        statusChange: statusChange !== null ? statusChange.unix() : null,
+        project: project ? project.id : null,
+        pausal: pausal.value,
+        overtime: overtime.value,
+        tags: tags.map((item)=>item.id),
+        taskType: taskType ? taskType.id : null,
+        repeat: repeat,
+        milestone: (milestone.id === null || milestone.id === -1 ? null : milestone.id),
+        attachments,
+        deadline: deadline !== null ? deadline.unix() : null,
+        closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix() : null,
+        pendingDate: (pendingDate !== null && status.action==='PendingDate') ? pendingDate.unix() : null,
+        pendingChangable,
+    //    invoicedDate: newInvoicedDate,
+    //    important,
+      } }).then( ( response ) => {
+      }).catch( (err) => {
+        console.log(err.message);
+      });
 
+     setSaving( false );
+  	}
 
-		let body = {
-			title: this.state.title,
-			company: this.state.company?this.state.company.id:null,
-			workHours: this.state.workHours,
-			requester: this.state.requester?this.state.requester.id:null,
-			assignedTo: this.state.assignedTo.map((item)=>item.id),
-			description: this.state.description,
-			status: this.state.status?this.state.status.id:null,
-			statusChange: this.state.statusChange,
-			project: this.state.project?this.state.project.id:null,
-			pausal: this.state.pausal.value,
-			overtime: this.state.overtime.value,
-			tags: this.state.tags.map((item)=>item.id),
-			type: this.state.type?this.state.type.id:null,
-			repeat: this.state.repeat!==null?taskID:null,
-			milestone:this.state.milestone.id,
-			attachments:this.state.attachments,
-			deadline: this.state.deadline!==null?this.state.deadline.unix()*1000:null,
-			closeDate: (this.state.closeDate!==null && (statusAction==='close'||statusAction==='invoiced'|| statusAction==='invalid'))?this.state.closeDate.unix()*1000:null,
-			pendingDate: (this.state.pendingDate!==null && statusAction==='pending')?this.state.pendingDate.unix()*1000:null,
-			pendingChangable: this.state.pendingChangable,
-			invoicedDate,
-			important:this.state.important,
-		}
-
-		rebase.updateDoc('/help-tasks/'+taskID, body).then(()=>{
-			if(this.state.newHistoryEntery!==null){
-				this.addToHistory(this.state.newHistoryEntery);
-				this.addNotification(this.state.newHistoryEntery,false);
-			}
-			this.setState({saving:false, newHistoryEntery:null});
-		});
-	}
-
-	componentWillReceiveProps(props){
-		if(this.props.match.params.taskID!==props.match.params.taskID){
-			this.setState({loading:true, extraDataLoaded:false, showDescription:false});
-			this.fetchData(props.match.params.taskID);
-		}
-		if(
-			!sameStringForms(props.companies,this.props.companies)||
-			!sameStringForms(props.pricelists,this.props.pricelists)||
-			!sameStringForms(props.prices,this.props.prices)||
-			!sameStringForms(props.projects,this.props.projects)||
-			!sameStringForms(props.statuses,this.props.statuses)||
-			!sameStringForms(props.tags,this.props.tags)||
-			!sameStringForms(props.taskTypes,this.props.taskTypes)||
-			!sameStringForms(props.tasks,this.props.tasks)||
-			!sameStringForms(props.units,this.props.units)||
-			!sameStringForms(props.metadata,this.props.metadata)||
-			!sameStringForms(props.tripTypes,this.props.tripTypes)||
-			!sameStringForms(props.users,this.props.users)||
-			!sameStringForms(props.milestones,this.props.milestones)||
-			(!this.storageLoaded(this.props) && this.storageLoaded(props))
-		){
-			this.setData(props);
-		}
-	}
-
-	componentWillMount(){
-		if(!this.props.companiesActive){
-			this.props.storageCompaniesStart();
-		}
-		if(!this.props.pricelistsActive){
-			this.props.storageHelpPricelistsStart();
-		}
-		if(!this.props.pricesActive){
-			this.props.storageHelpPricesStart();
-		}
-		if(!this.props.projectsActive){
-			this.props.storageHelpProjectsStart();
-		}
-		if(!this.props.statusesActive){
-			this.props.storageHelpStatusesStart();
-		}
-		if(!this.props.tagsActive){
-			this.props.storageHelpTagsStart();
-		}
-		if(!this.props.taskTypesActive){
-			this.props.storageHelpTaskTypesStart();
-		}
-		if(!this.props.tasksActive){
-			this.props.storageHelpTasksStart();
-		}
-		if(!this.props.unitsActive){
-			this.props.storageHelpUnitsStart();
-		}
-		if(!this.props.metadataActive){
-			this.props.storageMetadataStart();
-		}
-		if(!this.props.usersActive){
-			this.props.storageUsersStart();
-		}
-		if(!this.props.milestonesActive){
-			this.props.storageHelpMilestonesStart();
-		}
-		if(!this.props.tripTypesActive){
-			this.props.storageHelpTripTypesStart();
-		}
-		this.setData(this.props);
-	}
-
-	fetchData(taskID){*//*
-		Promise.all([
-			database.collection('help-task_work_trips').where("task", "==", taskID).get(),
-			database.collection('help-task_materials').where("task", "==", taskID).get(),
-			database.collection('help-task_custom_items').where("task", "==", taskID).get(),
-			database.collection('help-task_works').get(),
-			database.collection('help-repeats').doc(taskID).get(),
-			database.collection('help-task_history').where("task", "==", taskID).get(),
-		]).then(([workTrips,taskMaterials,customItems, taskWorks,repeat,history])=>{
-			this.setState({
-				extraData:{
-					taskWorks:snapshotToArray(taskWorks),
-					workTrips:snapshotToArray(workTrips),
-					taskMaterials:snapshotToArray(taskMaterials),
-					customItems:snapshotToArray(customItems),
-					repeat:repeat.exists ? {id:repeat.id,...repeat.data()} : null,
-				},
-				history:snapshotToArray(history).sort((item1,item2)=>item1.createdAt > item2.createdAt ? -1 : 1 ),
-				extraDataLoaded:true
-			},()=>this.setData(this.props));
-		});*/
-
-
-	const addToHistory = (event) => {/*
-		rebase.addToCollection('help-task_history',event).then((result)=>{
-			this.setState({history: [ {...event, id: Math.random() } , ...this.state.history]});
-		});*/
-	}
-
-	const addNotification = (originalEvent,internal) => {/*
-		let event = {
-			...originalEvent,
-			read:false
-		}
-		let usersToNotify=[...this.state.assignedTo.filter((user)=>!internal || this.getPermissions(user.id).internal)];
-		if( this.state.requester && (!internal || this.getPermissions(this.state.requester.id).internal) && !usersToNotify.some((user)=>user.id===this.state.requester.id)){
-			usersToNotify.push(this.state.requester);
-		}
-		usersToNotify = usersToNotify.filter((user)=>user.id!==this.props.currentUser.id);
-		usersToNotify.forEach((user)=>{
-			rebase.addToCollection('user_notifications',{ ...event, user: user.id }).then((newNotification)=>{
-				if(user.mailNotifications){
-					firebase.auth().currentUser.getIdToken(/* forceRefresh *//* true).then((token)=>{
-						fetch(`${REST_URL}/send-notification`,{
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							method: 'POST',
-							body:JSON.stringify({
-								message:`
-								<div>
-									<h4>Nové upozornenie</h4>
-									<p>Zmena: ${event.message}</p>
-									<p>V úlohe: ${event.task}: ${this.state.title}</p>
-									<p>Odkaz: https://lanhelpdesk2019.lansystems.sk/helpdesk/notifications/${newNotification.id}/${event.task}</p>
-								</div>
-								`,
-								tos:[user.email],
-								subject:`Upozornenie na zmenu: ${event.message}`,
-								token,
-							}),
-						}).then((response)=>response.json().then((response)=>{
-							if(response.error){
-							}
-						})).catch((error)=>{
-							console.log(error);
-						});
-					});
-					//end of sending mail
-				}
-			});
-		})*/
-	}
-
-	const getHistoryMessage = (type, data) => {/*
-		let user = "Používateľ " + this.props.currentUser.userData.name + ' ' + this.props.currentUser.userData.surname;
+	const getHistoryMessage = (type, data) => {
+		let user = "Používateľ " + currentUser.userData.name + ' ' + currentUser.userData.surname;
 		switch (type) {
 			case 'status':{
 				return `${user} zmenil status z ${data.oldStatus?data.oldStatus.title:''} na ${data.newStatus?data.newStatus.title:''}.`;
@@ -730,7 +454,7 @@ React.useEffect( () => {
 			default:{
 				return user + ' spravil nedefinovanú zmenu.';
 			}
-		}*/
+		}
 	}
 
 	const setDefaults = (projectID) => {
@@ -738,7 +462,7 @@ React.useEffect( () => {
 			setDefaultFields( noDef );
 			return;
 		}
-		let pro = projectsData.projects.find((p)=>p.id===projectID);
+		let pro = projects.find((p)=>p.id===projectID);
 		if(!pro){
 			setDefaultFields( noDef );
 			return;
@@ -746,264 +470,35 @@ React.useEffect( () => {
 	 setDefaultFields( {...noDef,...pro.def} );
 	}
 
-	const setData = (props) =>{/*
-		if(!this.state.extraDataLoaded || !this.storageLoaded(props)){
-			return;
+  const rights = project ? project.projectRights.find(r => r.user.id === currentUser.id) : undefined;
+  const userRights = rights === undefined ? {user: currentUser, read: false, write: false, delete: false, internal: false, isAdmin: false} : rights;
+
+	const canAdd = userRights.write || userRights.isAdmin;
+	const canDelete = userRights.delete || userRights.isAdmin;
+	const canCopy = userRights.write || userRights.isAdmin || title === "" || status === null || project === null || saving;
+
+	const availableProjects = projects.filter((p)=>{
+		let userRights = p.projectRights.find(r => r.user.id === currentUser.id);
+		if((userRights && userRights.isAdmin) || (userRights && userRights.read) || (p.id ===-1 || p.id === null)){
+			return true;
+		} else {
+			return false;
 		}
+	});
 
-		let taskWorks = this.state.extraData.taskWorks
-															.filter(work => work.task === this.props.match.params.taskID)
-															.map((work, index)=>{
-																return {
-																	title:work.title,
-																	order: !isNaN(parseInt(work.order)) ? parseInt(work.order) : index,
-																	id:work.id,
-																	done:work.done===true,
-																	type:work.type||work.workType,
-																	quantity:work.quantity,
-																	discount:work.discount,
-																	assignedTo:work.assignedTo,
-																}
-															});
-		let workTrips = this.state.extraData.workTrips.map((trip, index) => {
-			return {
-				...trip,
-				order: !isNaN(parseInt(trip.order)) ? parseInt(trip.order) : index,
-			}
-		});
-		let taskMaterials = this.state.extraData.taskMaterials.map((material, index) => {
-			return {
-				...material,
-				order: !isNaN(parseInt(material.order)) ? parseInt(material.order) : index,
-			}
-		});
-		let customItems = this.state.extraData.customItems.map((customItem, index) => {
-			return {
-				...customItem,
-				order: !isNaN(parseInt(customItem.order)) ? parseInt(customItem.order) : index,
-			}
-		});
-		let repeat = this.state.extraData.repeat;
+	const USERS_WITH_PERMISSIONS = users.filter((user)=> project && project.projectRights && project.projectRights.some((right)=>right.user.id === user.id));
 
-		let taskID = props.match.params.taskID;
-		let task = props.tasks.find((task)=>task.id===taskID);
-		let statuses = toSelArr(props.statuses);
-		let projects = toSelArr(props.projects);
-		let users = toSelArr(props.users,'email');
-		let tags = toSelArr(props.tags);
-		let units = toSelArr(props.units);
-		let subtasks = props.subtasks;
-		let defaultUnit = props.metadata.defaultUnit;
-		let prices = props.prices;
-		let taskTypes = toSelArr(props.taskTypes).map((taskType)=>{
-			let newTaskType = {...taskType, prices:prices.filter((price)=>price.type===taskType.id)}
-			return newTaskType;
-		});
-		let tripTypes = toSelArr(props.tripTypes).map((tripType)=>{
-			let newTripType = {...tripType, prices:prices.filter((price)=>price.type===tripType.id)}
-			return newTripType;
-		});
-		let pricelists = props.pricelists;
-		let companies = toSelArr(props.companies).map((company)=>{
-			let newCompany={...company,pricelist:pricelists.find((item)=>item.id===company.pricelist)};
-			if(newCompany.pricelist===undefined){
-				newCompany.pricelist=pricelists[0];
-			}
-			return newCompany;
-		}).sort((comp1, comp2) => comp1.title.toLowerCase() >= comp2.title.toLowerCase() ? 1 : -1);
+	const REQUESTERS =  (project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users);
 
-		this.setDefaults(task.project);
+  const MILESTONES = [noMilestone].concat( (project ? toSelArr( project.milestones.filter((m)=> m.id !== milestone.id) ) : []) );
 
-		let milestones = [noMilestone,...toSelArr(props.milestones)];
-		let milestone = noMilestone;
-		if(task.milestone!==undefined){
-			milestone = milestones.find((item)=>item.id===task.milestone);
-			if(milestone===undefined){
-				milestone=noMilestone;
-			}
-		}
-		let project = projects.find((item)=>item.id===task.project);
-		let status = statuses.find((item)=>item.id===task.status);
-		let company = companies.find((item)=>item.id===task.company);
-		if(company===undefined){
-			company=companies[0];
-		}
-		let requester = users.find((item)=>item.id===task.requester);
-		let assignedTo = users.filter((user)=>task.assignedTo.includes(user.id));
-
-		let type = taskTypes.find((item)=>item.id===task.type);
-		let taskTags=[];
-		if(task.tags){
-			taskTags=tags.filter((tag)=>task.tags.includes(tag.id));
-		}
-		let permission = undefined;
-		if(project.permissions){
-			permission = project.permissions.find((permission)=>permission.user===props.currentUser.id);
-		}
-		let viewOnly = false;
-		if(status && status.action==='invoiced' && props.inModal && (props.currentUser.userData.role.value===3 || permission.isAdmin)){
-			viewOnly = false;
-		}else{
-			viewOnly = ((permission === undefined || !permission.write) && props.currentUser.userData.role.value===0)||(status && status.action==='invoiced');
-		}
-
-		let newState = {
-			workTrips,
-			taskMaterials,
-			customItems,
-			toggleTab: 1, //viewOnly?"1":"3",
-			taskWorks,
-			repeat,
-
-			statuses,
-			projects,
-			users,
-			companies,
-			units,
-			tripTypes,
-			subtasks,
-			taskTypes,
-			allTags:tags,
-			task,
-
-			title:task.title,
-			pausal:task.pausal?booleanSelects[1]:booleanSelects[0],
-			overtime:task.overtime?booleanSelects[1]:booleanSelects[0],
-			status:status?status:null,
-			statusChange:task.statusChange?task.statusChange:null,
-			createdAt:task.createdAt?task.createdAt:(new Date()).getTime(),
-			deadline: task.deadline!==null?moment(task.deadline):null,
-			closeDate: task.closeDate!==null?moment(task.closeDate):null,
-			pendingDate: task.pendingDate!==null?moment(task.pendingDate):null,
-			invoicedDate: task.invoicedDate!==null && task.invoicedDate!==undefined ?new Date(task.invoicedDate).toISOString().replace('Z',''):'',
-			reminder: task.reminder?new Date(task.reminder).toISOString().replace('Z',''):'',
-			project:project?project:null,
-			company:company?company:null,
-			workHours:isNaN(parseInt(task.workHours))?0:parseInt(task.workHours),
-			requester:requester?requester:null,
-			assignedTo,
-			milestone,
-			milestones,
-			attachments:task.attachments?task.attachments:[],
-			pendingChangable:task.pendingChangable===false? false : true,
-			important:task.important===true,
-
-			viewOnly,
-			loading:false,
-			defaultUnit,
-			tags:taskTags,
-			type:type?type:null,
-			projectChangeDate:(new Date()).getTime()
-		}
-		if(this.state.loading){
-			newState.description=task.description;
-		}
-
-		this.setState(newState);*/
-	}
-
-	const getPermissions = (id) => {
-		let permission = null;
-		if(project){
-			permission = project.projectRights.find((p)=>p.user===id);
-		}
-		if(permission===undefined){
-			permission = {user:{id},read:false,write:false,delete:false,internal:false,isAdmin:false};
-		}
-		return permission;
-	}
-
-const	getRenderAttributes = () => {
-	/*	let permission = null;
-		if(this.state.project && this.state.project.permissions){
-			permission = this.state.project.permissions.find((permission)=>permission.user===this.props.currentUser.id);
-		}
-		if(!permission){
-			permission = {user:{id:this.props.currentUser.id},read:false,write:false,delete:false,internal:false,isAdmin:false};
-		}
-
-		let canAdd = this.props.currentUser.userData.role.value>0;
-		let canDelete = (permission && permission.delete)||this.props.currentUser.userData.role.value===3;
-		let canCopy = ((!permission || !permission.write) && this.props.currentUser.userData.role.value===0)||this.state.title==="" || this.state.status===null || this.state.project === null||this.state.saving;
-		let taskID = this.props.match.params.taskID;
-
-		let workTrips= this.state.workTrips.map((trip)=>{
-			let type= this.state.tripTypes.find((item)=>item.id===trip.type);
-			let assignedTo=trip.assignedTo?this.state.users.find((item)=>item.id===trip.assignedTo):null
-
-			return {
-				...trip,
-				type,
-				assignedTo:assignedTo?assignedTo:null
-			}
-		});
-
-		let taskWorks= this.state.taskWorks.map((work)=>{
-			let assignedTo=work.assignedTo?this.state.users.find((item)=>item.id===work.assignedTo):null
-			return {
-				...work,
-				type:this.state.taskTypes.find((item)=>item.id===work.type),
-				assignedTo:assignedTo?assignedTo:null
-			}
-		});
-		let taskMaterials= this.state.taskMaterials.map((material)=>{
-			return {
-				...material,
-				unit:this.state.units.find((unit)=>unit.id===material.unit)
-			}
-		});
-
-		let customItems = this.state.customItems.map((item)=>(
-			{
-				...item,
-				unit:this.state.units.find((unit)=>unit.id===item.unit),
-			}
-		));
-
-		let createdBy=null;
-		if(this.state.task&& this.state.task.createdBy){
-			createdBy = this.state.users.find((user)=>user.id===this.state.task.createdBy);
-		}
-
-		let availableProjects = this.state.projects.filter((project)=>{
-			let curr = this.props.currentUser;
-			if((curr.userData && curr.userData.role.value===3)||(project.id===-1||project.id===null)){
-				return true;
-			}
-			if(!project.permissions){
-				return false;
-			}
-			let permission = project.permissions.find((permission)=>permission.user===curr.id);
-			return permission && permission.read;
-		})
-
-		const USERS_WITH_PERMISSIONS = this.state.users.filter((user)=>this.state.project && this.state.project.permissions && this.state.project.permissions.some((permission)=>permission.user===user.id));
-		const REQUESTERS =  (this.state.project && this.state.project.lockedRequester ? USERS_WITH_PERMISSIONS : this.state.users);
-
-		return {
-			permission,
-			canAdd,
-			canDelete,
-			canCopy,
-			taskID,
-			workTrips,
-			taskWorks,
-			taskMaterials,
-			customItems,
-			createdBy,
-			availableProjects,
-			USERS_WITH_PERMISSIONS,
-			REQUESTERS,
-		}*/
-	}
-
-	const renderCommandbar = (taskID, canCopy, canDelete, taskWorks, workTrips, taskMaterials, customItems) => {
+	const renderCommandbar = () => {
 		return (
 			<div className={classnames({"commandbar-small": columns}, {"commandbar": !columns}, { "p-l-25": true})}> {/*Commandbar*/}
 				<div className={classnames("d-flex", "flex-row", "center-hor", {"m-b-10": columns})}>
 					<div className="display-inline center-hor">
 						{!columns &&
-							<button type="button" className="btn btn-link-reversed waves-effect p-l-0" onClick={() => props.history.push(`/helpdesk/taskList/i/${this.props.match.params.listID}`)}>
+							<button type="button" className="btn btn-link-reversed waves-effect p-l-0" onClick={() => history.push(`/helpdesk/taskList/i/${this.props.match.params.listID}`)}>
 								<i
 									className="fas fa-arrow-left commandbar-command-icon"
 									/>
@@ -1011,7 +506,7 @@ const	getRenderAttributes = () => {
 						}
 						{ project &&
 							<TaskAdd
-								history={history}
+								history={taskHistory}
 								project={project.id}
 								triggerDate={projectChangeDate}
 								task={taskData.task}
@@ -1022,23 +517,31 @@ const	getRenderAttributes = () => {
 					<div className="ml-auto center-hor">
 					{false &&	<TaskPrint
 							match={match}
-							taskID={taskID}
+							taskID={match.params.taskID}
 							createdBy={createdBy}
 							createdAt={createdAt}
 							taskWorks={taskWorks}
 							workTrips={workTrips}
 							taskMaterials={taskMaterials}
 							customItems={customItems}
-							isLoaded={/*this.state.extraDataLoaded && this.storageLoaded(this.props) && !this.state.loading*/ true} />
+							isLoaded={!taskLoading} />
 					}
 						{ canDelete &&
-							<button type="button" disabled={!canDelete} className="btn btn-link-reversed waves-effect" onClick={() => {/*deleteTask()*/}}>
+							<button
+                type="button"
+                disabled={!canDelete}
+                className="btn btn-link-reversed waves-effect"
+                onClick={deleteTask}>
 								<i className="far fa-trash-alt" /> Delete
 							</button>
 						}
-						<button type="button" style={{color:important ? '#ffc107' : '#0078D4'}} disabled={viewOnly} className="btn btn-link-reversed waves-effect" onClick={()=>{
+						<button
+              type="button"
+              style={{color: important ? '#ffc107' : '#0078D4'}}
+              disabled={viewOnly}
+              className="btn btn-link-reversed waves-effect" onClick={()=>{
 								setImportant(!important);
-								//submitTask();
+						//		updateTaskFunc();
 							}}>
 							<i className="far fa-star" /> Important
 						</button>
@@ -1054,12 +557,11 @@ const	getRenderAttributes = () => {
 		)
 	}
 
-
 		const	renderTitle = () => {
 			return (
-				<div className="d-flex p-2">{/* Task name row */}
+				<div className="d-flex p-2">
 					<div className="row flex">
-						<h2 className="center-hor text-extra-slim">{taskData.task.id}: </h2>
+						<h2 className="center-hor text-extra-slim">{match.params.taskID}: </h2>
 						<span className="center-hor flex m-r-15">
 							<input type="text"
 								disabled={viewOnly}
@@ -1067,7 +569,7 @@ const	getRenderAttributes = () => {
 								className="task-title-input text-extra-slim hidden-input m-l-10"
 								onChange={(e)=> {
 									setTitle(e.target.value);
-							//		this.submitTask.bind(this));
+  						//		updateTaskFunc();
 								}}
 								placeholder="Enter task name" />
 						</span>
@@ -1105,7 +607,7 @@ const	getRenderAttributes = () => {
 							disabled={!status || status.action!=='PendingDate'||viewOnly||!pendingChangable}
 							onChange={ (date) => {
 								setPendingDate(date);
-								//this.submitTask.bind(this));
+						//		updateTaskFunc();
 							}}
 							placeholderText="No pending date"
 							{...datePickerConfig}
@@ -1126,7 +628,7 @@ const	getRenderAttributes = () => {
 							disabled={!status || (status.action!=='CloseDate' && status.action!=='CloseInvalid')||viewOnly}
 							onChange={date => {
 								setCloseDate(date);
-								//this.submitTask.bind(this));
+						//		updateTaskFunc();
 							}}
 							placeholderText="No pending date"
 							{...datePickerConfig}
@@ -1144,68 +646,75 @@ const	getRenderAttributes = () => {
 		}
 
 
-		//Value Change
-
-		const changeProject = (pro) => {
-			let permissionIDs = [];
-			if(pro.projectRights){
-				pro.projectRights.map((p) => p.user.id);
-			}
-			let newAssignedTo = assignedTo.filter((user)=>permissionIDs.includes(user.id));
-
-			setProject(pro);
-			setAssignedTo(newAssignedTo);
-			setProjectChangeDate(moment());
-			setMilestone(noMilestone);
-	//		this.submitTask();
-			setDefaults(project.id);
+	//Value Change
+	const changeProject = (pro) => {
+		let permissionIDs = [];
+		if(pro.projectRights){
+			permissionIDs = pro.projectRights.map((p) => p.user.id);
 		}
+		let newAssignedTo = assignedTo.filter((user)=>permissionIDs.includes(user.id));
+		setProject(pro);
+		setAssignedTo(newAssignedTo);
+		setProjectChangeDate(moment());
+		setMilestone(noMilestone);
+//		updateTaskFunc();
+		setDefaults(project.id);
+	}
 
-			const changeStatus = (s) => {
-				let newHistoryEntery = {
-					createdAt:moment(),
-					message:getHistoryMessage('status', {newStatus:status,oldStatus:status}),
-					task:match.params.taskID,
-				};
-				if(status.action==='PendingDate'){
-					setPendingStatus(s);
-					setPendingOpen(true);
-					setNewHistoryEntery(newHistoryEntery);
-				}else if(s.action==='CloseDate'||s.action==='Invalid'){
-					setStatus(s);
-					setStatusChange(moment());
-					setImportant(false);
-						/*important:false,
-						closeDate: moment(),
-						newHistoryEntery
-					},this.submitTask.bind(this))*/
-				}
-				else{
-					setStatus(s);
-					setStatusChange(moment());
-		/*				newHistoryEntery
-					},this.submitTask.bind(this))*/
-				}
+	const changeStatus = (s) => {
+		if(status.action==='PendingDate'){
+			setPendingStatus(s);
+			setPendingOpen(true);
+		}else if(s.action==='CloseDate'||s.action==='Invalid'){
+			setStatus(s);
+			setStatusChange(moment());
+			setImportant(false);
+			setCloseDate(moment());
+    //		updateTaskFunc();
+		}
+		else{
+			setStatus(s);
+			setStatusChange(moment());
+  //		updateTaskFunc();
+		}
+	}
+
+	const changeMilestone = (mile) => {
+		if(status.action==='PendingDate'){
+			if(mile.startsAt!==null){
+        setMilestone(mile);
+        setPendingDate(moment(mile.startsAt));
+        setPendingChangable(false);
+  //		updateTaskFunc();
+			}else{
+        setMilestone(mile);
+        setPendingChangable(false);
+  //		updateTaskFunc();
 			}
+		}else{
+      setMilestone(mile);
+//		updateTaskFunc();
+		}
+	}
 
-//Renders
-/*		const {
-		permission,
-		canAdd,
-		canDelete,
-		canCopy,
-		taskID,
-		workTrips,
-		taskWorks,
-		taskMaterials,
-		customItems,
-		createdBy,
-		availableProjects,
-		USERS_WITH_PERMISSIONS,
-		REQUESTERS,
-	} = this.getRenderAttributes();*/
-	const USERS_WITH_PERMISSIONS = toSelArr(usersData.users, 'email');
-	const REQUESTERS = [];
+	const changeRequester = (req) => {
+		if (req.id === -1) {
+			setOpenUserAdd(true);
+		} else {
+      setRequester(req);
+      // updateTaskFunc();
+		}
+	}
+
+	const changeCompany = (comp) => {
+		if (comp.id === -1) {
+			setOpenCompanyAdd(true);
+		} else {
+      setCompany(comp);
+      setPausal( parseInt(comp.taskWorkPausal) > 0 ? booleanSelects[1] : booleanSelects[0] );
+			// updateTaskFunc();
+		}
+	}
 
 	const renderSelectsLayout1 = () => {
 		return (
@@ -1220,7 +729,7 @@ const	getRenderAttributes = () => {
 									isDisabled={ viewOnly }
 									value={ project }
 									onChange={(e) => changeProject(e) }
-									options={ toSelArr(projectsData.projects)/*availableProjects*/ }
+									options={ availableProjects }
 									styles={ invisibleSelectStyleNoArrowRequired }
 									/>
 							</div>
@@ -1232,16 +741,20 @@ const	getRenderAttributes = () => {
 								<Label className="col-1-5 col-form-label">Assigned</Label>
 								<div className="col-10-5">
 									<Select
-										value={assignedTo.filter((user)=>project && project.projectRights.some((permission)=>permission.user===user.id))}
+										value={assignedTo}
 										placeholder="Select"
 										isMulti
 										isDisabled={defaultFields.assignedTo.fixed||viewOnly}
 										onChange={(users)=> {
-											setAssignedTo(users);
-											//this.submitTask.bind(this))
+                      if (users.find(u => u.id === -1)){
+                        setOpenUserAdd(true);
+                      } else {
+  											setAssignedTo(users);
+                    //		updateTaskFunc();
+                      }
 										}}
 										options={
-											(/*canAdd*/ true?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[])
+											( canAdd ? [{id:-1, title:'+ Add user',body:'add', label:'+ Add user',value:null}] : [])
 											.concat(USERS_WITH_PERMISSIONS)
 										}
 										styles={invisibleSelectStyleNoArrowRequired}
@@ -1260,10 +773,10 @@ const	getRenderAttributes = () => {
 									<Select
 										placeholder="Status required"
 										value={status}
-										isDisabled={defaultFields.status.fixed||viewOnly}
+										isDisabled={defaultFields.status.fixed || viewOnly}
 										styles={invisibleSelectStyleNoArrowColoredRequired}
-										onChange={() => { /*this.changeStatus.bind(this)*/}}
-										options={toSelArr(statusesData.statuses.filter((status)=>status.action!=='Invoiced'))}
+										onChange={(s) => changeStatus(s)}
+										options={statuses.filter((status)=>status.action!=='Invoiced')}
 										/>
 								</div>
 						</div>
@@ -1277,8 +790,11 @@ const	getRenderAttributes = () => {
 										value={taskType}
 										isDisabled={defaultFields.taskType.fixed||viewOnly}
 										styles={invisibleSelectStyleNoArrowRequired}
-										onChange={(type)=> {/*this.setState({type},this.submitTask.bind(this))*/}}
-										options={toSelArr(taskTypesData.taskTypes)}
+										onChange={(type)=> {
+                      setTaskType(type);
+                //		updateTaskFunc();
+                  }}
+										options={taskTypes}
 										/>
 								</div>
 						</div>
@@ -1289,8 +805,8 @@ const	getRenderAttributes = () => {
 							<Select
 								isDisabled={viewOnly}
 								value={milestone}
-								onChange={() => {/*this.changeMilestone.bind(this)*/}}
-								options={[] /*milestones.filter((milestone)=>milestone.id===null || (project!== null && milestone.project===project.id))*/}
+								onChange={(m) => changeMilestone(m)}
+								options={MILESTONES}
 								styles={invisibleSelectStyleNoArrow}
 								/>
 						</div>
@@ -1302,9 +818,9 @@ const	getRenderAttributes = () => {
 								<Select
 									placeholder="Zadajte žiadateľa"
 									value={requester}
-									isDisabled={defaultFields.requester.fixed||viewOnly}
-									onChange={() => {/*this.changeRequester.bind(this)*/}}
-									options={(true/*canAdd*/?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(REQUESTERS)}
+									isDisabled={defaultFields.requester.fixed || viewOnly}
+									onChange={changeRequester}
+									options={(canAdd?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(REQUESTERS)}
 									styles={invisibleSelectStyleNoArrowRequired}
 									/>
 							</div>
@@ -1317,9 +833,9 @@ const	getRenderAttributes = () => {
 								<Select
 									placeholder="Zadajte firmu"
 									value={company}
-									isDisabled={defaultFields.company.fixed||viewOnly}
-									onChange={() => {/*this.changeCompany.bind(this)*/} }
-									options={(true/*canAdd*/?[{id:-1,title:'+ Add company',body:'add', label:'+ Add company',value:null}]:[]).concat(toSelArr(companiesData.companies))}
+									isDisabled={defaultFields.company.fixed || viewOnly}
+									onChange={changeCompany}
+									options={(canAdd ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
 									styles={invisibleSelectStyleNoArrowRequired}
 									/>
 							</div>
@@ -1331,11 +847,11 @@ const	getRenderAttributes = () => {
 							<div className="display-inline-block w-25 p-r-10">
 								<Select
 									value={company && parseInt(company.taskWorkPausal) === 0 && pausal.value === false ? {...pausal, label: pausal.label + " (nezmluvný)"} : pausal }
-									isDisabled={viewOnly||!company || parseInt(company.taskWorkPausal)===0||defaultFields.pausal.fixed}
+									isDisabled={viewOnly || !company || parseInt(company.taskWorkPausal) === 0 || defaultFields.pausal.fixed}
 									styles={invisibleSelectStyleNoArrowRequired}
 									onChange={(pausal)=> {
 										setPausal(pausal);
-										//this.submitTask.bind(this))
+              			// updateTaskFunc();
 									}}
 									options={booleanSelects}
 									/>
@@ -1351,7 +867,7 @@ const	getRenderAttributes = () => {
 								disabled={viewOnly}
 								onChange={date => {
 									setDeadline(date);
-								//this.submitTask.bind(this));
+            			// updateTaskFunc();
 								}}
 								placeholderText="No deadline"
 								{...datePickerConfig}
@@ -1363,11 +879,14 @@ const	getRenderAttributes = () => {
 							disabled={viewOnly}
 							taskID={match.params.taskID}
 							repeat={repeat}
-							submitRepeat={() => {/*this.changeRepeat.bind(this)*/}}
-							deleteRepeat={()=>{
-					//			rebase.removeDoc('/help-repeats/'+taskID);
-					//			this.setState({repeat:null})
-							}}
+							submitRepeat={(r) => {
+                setRepeat(r);
+          			// updateTaskFunc();
+              }}
+							deleteRepeat={()=> {
+                setRepeat(null);
+          			// updateTaskFunc();
+              }}
 							columns={columns}
 							/>
 		        </div>
@@ -1377,11 +896,11 @@ const	getRenderAttributes = () => {
 							<div className="display-inline-block w-25 p-r-10">
 								<Select
 									value={overtime}
-									isDisabled={viewOnly||defaultFields.overtime.fixed}
+									isDisabled={viewOnly || defaultFields.overtime.fixed}
 									styles={invisibleSelectStyleNoArrowRequired}
 									onChange={(overtime)=> {
 										setOvertime(overtime);
-										//this.submitTask.bind(this))
+              			// updateTaskFunc();
 									}}
 									options={booleanSelects}
 									/>
@@ -1393,281 +912,229 @@ const	getRenderAttributes = () => {
 		)
 	}
 
-
-		if (taskLoading) {
-			return <div></div>
-		}
-
+	const renderSelectsLayout2 = () => {
 		return (
-			<div className="flex">
-				{ showDescription &&
-					<div
-						style={{backgroundColor: "transparent", width: "100%", height: "100%", position: "absolute"}}
-						onClick={()=>setShowDescription(false)}
-						/>
-				}
-
-				{ renderCommandbar(taskData.task.id, true, true/*canCopy, canDelete*/, taskWorks, workTrips, taskMaterials, customItems) }
-
-				<div className={classnames({"fit-with-header-and-commandbar": !columns}, {"fit-with-header-and-commandbar-3": columns}, "scroll-visible", "bkg-white", { "row": layout === '2'})}>
-					<div className={classnames( "card-box-lanwiki", { "task-edit-left": layout === '2' && !columns, "task-edit-left-columns": layout === '2' && columns})}>
-
-						<div className="p-t-20 p-l-30 p-r-30">
-							{ renderTitle() }
-
-							<hr className="m-t-5 m-b-5"/>
-							{ layout === 1 && renderSelectsLayout1() }
-
-              {/*
-							{ this.renderPopis() }
-
-							{ this.renderAttachments(taskID) }
-
-							{ this.state.layout === "1" && this.state.defaultFields.tags.show && this.renderTags() }
-
-							{ this.renderModalUserAdd() }
-
-							{ this.renderModalCompanyAdd() }
-
-							{ this.renderPendingPicker() }
-
-							{ this.renderVykazyTable(taskWorks, workTrips, taskMaterials, customItems) }
-
-							{ this.renderComments(taskID, permission) }
-							*/}
-						</div>
-
-
-					</div>
-{/*
-					{ this.state.layout === "2" && this.renderSelectsLayout2(taskID, canAdd, USERS_WITH_PERMISSIONS, REQUESTERS, availableProjects) }
-*/}
-				</div>
-			</div>
-		);
-}
-
-/*
-
-
-	renderSelectsLayout2(taskID, canAdd, usersWithPermissions, requesters, availableProjects){
-		return (
-			<div className={"task-edit-right" + (this.props.columns ? " w-250px" : "")} >
-				{/* Projekt *//*}
+			<div className={"task-edit-right" + (columns ? " w-250px" : "")} >
 				<div>
 					<Label className="col-form-label-2">Projekt</Label>
 					<div className="col-form-value-2">
 						<Select
 							placeholder="Zadajte projekt"
-							isDisabled={this.state.viewOnly}
-							value={this.state.project}
-							onChange={this.changeProject.bind(this)}
-							options={availableProjects}
-							styles={invisibleSelectStyleNoArrowRequired}
+              isDisabled={ viewOnly }
+              value={ project }
+              onChange={(e) => changeProject(e) }
+              options={ availableProjects }
+              styles={ invisibleSelectStyleNoArrowRequired }
 							/>
 					</div>
 				</div>
-				{/* Assigned *//*}
-				{ this.state.defaultFields.assignedTo.show &&
+				{ defaultFields.assignedTo.show &&
 					<div>
 						<Label className="col-form-label-2">Assigned</Label>
 						<div className="col-form-value-2" style={{marginLeft: "-5px"}}>
 							<Select
-								value={this.state.assignedTo.filter((user)=>this.state.project && this.state.project.permissions.some((permission)=>permission.user===user.id))}
-								placeholder="Select"
-								isMulti
-								isDisabled={this.state.defaultFields.assignedTo.fixed||this.state.viewOnly}
-								onChange={(users)=>this.setState({assignedTo:users},this.submitTask.bind(this))}
-								options={
-									(canAdd?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[])
-									.concat(usersWithPermissions)
-								}
+                value={assignedTo}
+                placeholder="Select"
+                isMulti
+                isDisabled={defaultFields.assignedTo.fixed||viewOnly}
+                onChange={(users)=> {
+                  if (users.find(u => u.id === -1)){
+                    setOpenUserAdd(true);
+                  } else {
+                    setAssignedTo(users);
+                //		updateTaskFunc();
+                  }
+                }}
+                options={
+                  ( canAdd ? [{id:-1, title:'+ Add user',body:'add', label:'+ Add user',value:null}] : [])
+                  .concat(USERS_WITH_PERMISSIONS)
+                }
 								styles={invisibleSelectStyleNoArrowRequired}
 								/>
 						</div>
 					</div>
 				}
-
-				{ /* Status *//* }
-				{ this.state.defaultFields.status.show &&
+				{ defaultFields.status.show &&
 					<div>
 						<Label className="col-form-label-2">Status</Label>
 						<div className="col-form-value-2">
 							<Select
 								placeholder="Status required"
-								value={this.state.status}
-								isDisabled={this.state.defaultFields.status.fixed||this.state.viewOnly}
-								styles={invisibleSelectStyleNoArrowColoredRequired}
-								onChange={this.changeStatus.bind(this)}
-								options={this.state.statuses.filter((status)=>status.action!=='invoiced')}
+                value={status}
+                isDisabled={defaultFields.status.fixed || viewOnly}
+                styles={invisibleSelectStyleNoArrowColoredRequired}
+                onChange={(s) => changeStatus(s)}
+                options={statuses.filter((status)=>status.action!=='Invoiced')}
 								/>
 						</div>
 					</div>
 				}
-
-				{/* Type *//*}
-				{ this.state.defaultFields.type.show &&
+				{ defaultFields.taskType.show &&
 					<div>
 						<Label className="col-form-label-2">Typ</Label>
 						<div className="col-form-value-2">
 							<Select
 								placeholder="Zadajte typ"
-								value={this.state.type}
-								isDisabled={this.state.defaultFields.type.fixed||this.state.viewOnly}
-								styles={invisibleSelectStyleNoArrowRequired}
-								onChange={(type)=>this.setState({type},this.submitTask.bind(this))}
-								options={this.state.taskTypes}
+                value={taskType}
+                isDisabled={defaultFields.taskType.fixed||viewOnly}
+                styles={invisibleSelectStyleNoArrowRequired}
+                onChange={(type)=> {
+                  setTaskType(type);
+            //		updateTaskFunc();
+              }}
+                options={taskTypes}
 								/>
 						</div>
 					</div>
 				}
-
-				{/* Milestone *//*}
 				<div>
 					<Label className="col-form-label-2">Milestone</Label>
 					<div className="col-form-value-2">
 						<Select
-							isDisabled={this.state.viewOnly}
-							value={this.state.milestone}
-							onChange={this.changeMilestone.bind(this)}
-							options={this.state.milestones.filter((milestone)=>milestone.id===null || (this.state.project!== null && milestone.project===this.state.project.id))}
-							styles={invisibleSelectStyleNoArrow}
-							/>
+              isDisabled={viewOnly}
+              value={milestone}
+              onChange={(m) => changeMilestone(m)}
+              options={MILESTONES}
+              styles={invisibleSelectStyleNoArrow}
+              />
 					</div>
 				</div>
-
-				{/* Tags *//*}
-				{ this.state.defaultFields.tags.show &&
+				{ defaultFields.tag.show &&
 					<div style={{maxWidth:"250px"}}>
 						<Label className="col-form-label-2">Tagy: </Label>
 						<div className="col-form-value-2">
 							<Select
 								placeholder="Zvoľte tagy"
-								value={this.state.tags}
-								isMulti
-								onChange={(tags)=>this.setState({tags},this.submitTask.bind(this))}
-								options={this.state.allTags}
-								isDisabled={this.state.defaultFields.tags.fixed||this.state.viewOnly}
-								styles={invisibleSelectStyleNoArrowColored}
+    						value={tags}
+    						isMulti
+    						onChange={(tags)=> {
+                  setTags(tags);
+                  // updateTaskFunc();
+                }}
+    						options={allTags}
+    						isDisabled={defaultFields.tag.fixed||viewOnly}
+    						styles={invisibleSelectStyleNoArrowColored}
 								/>
 						</div>
 					</div>
 				}
-
-				{/* Requester *//*}
-				{ this.state.defaultFields.requester.show &&
+				{ defaultFields.requester.show &&
 					<div>
 						<Label className="col-form-label-2">Zadal</Label>
 						<div className="col-form-value-2">
 							<Select
 								placeholder="Zadajte žiadateľa"
-								value={this.state.requester}
-								isDisabled={ this.state.defaultFields.requester.fixed || this.state.viewOnly }
-								onChange={ this.changeRequester.bind(this) }
-								options={(canAdd?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(requesters)}
-								styles={invisibleSelectStyleNoArrowRequired}
+                value={requester}
+                isDisabled={defaultFields.requester.fixed || viewOnly}
+                onChange={changeRequester}
+                options={(canAdd?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(REQUESTERS)}
+                styles={invisibleSelectStyleNoArrowRequired}
 								/>
 						</div>
 					</div>
 				}
-
-				{/* Company *//*}
-				{ this.state.defaultFields.company.show &&
+				{ defaultFields.company.show &&
 					<div>
 						<Label className="col-form-label-2">Firma</Label>
 						<div className="col-form-value-2">
 							<Select
 								placeholder="Zadajte firmu"
-								value={this.state.company}
-								isDisabled={this.state.defaultFields.company.fixed||this.state.viewOnly}
-								onChange={this.changeCompany.bind(this)}
-								options={(canAdd?[{id:-1,title:'+ Add company',body:'add', label:'+ Add company',value:null}]:[]).concat(this.state.companies)}
-								styles={invisibleSelectStyleNoArrowRequired}
+                value={company}
+                isDisabled={defaultFields.company.fixed || viewOnly}
+                onChange={changeCompany}
+                options={(canAdd ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
+                styles={invisibleSelectStyleNoArrowRequired}
 								/>
 						</div>
 					</div>
 				}
-
-				{/* Pausal *//*}
-				{	this.state.defaultFields.pausal.show &&
+				{	defaultFields.pausal.show &&
 					<div>
 						<label className="col-form-label m-l-7">Paušál</label>
 						<div className="col-form-value-2">
 							<Select
-								value={this.state.company && parseInt(this.state.company.workPausal) === 0 && this.state.pausal.value === false ? {...this.state.pausal, label: this.state.pausal.label + " (nezmluvný)"} : this.state.pausal }
-								isDisabled={this.state.viewOnly||!this.state.company || parseInt(this.state.company.workPausal)===0||this.state.defaultFields.pausal.fixed}
-								styles={invisibleSelectStyleNoArrowRequired}
-								onChange={(pausal)=>this.setState({pausal},this.submitTask.bind(this))}
-								options={booleanSelects}
+                value={company && parseInt(company.taskWorkPausal) === 0 && pausal.value === false ? {...pausal, label: pausal.label + " (nezmluvný)"} : pausal }
+                isDisabled={viewOnly || !company || parseInt(company.taskWorkPausal) === 0 || defaultFields.pausal.fixed}
+                styles={invisibleSelectStyleNoArrowRequired}
+                onChange={(pausal)=> {
+                  setPausal(pausal);
+                  // updateTaskFunc();
+                }}
+                options={booleanSelects}
 								/>
 						</div>
 					</div>
 				}
-
-				{/* Deadline *//*}
 				<div>
 					<Label className="col-form-label m-l-7">Deadline</Label>
 					<div className="col-form-value-2" style={{marginLeft: "-1px"}}>
 						<DatePicker
 							className="form-control hidden-input"
-							selected={this.state.deadline}
-							disabled={this.state.viewOnly}
-							onChange={date => {
-								this.setState({ deadline: date },this.submitTask.bind(this));
-							}}
+              selected={deadline}
+              disabled={viewOnly}
+              onChange={date => {
+                setDeadline(date);
+                // updateTaskFunc();
+              }}
 							placeholderText="No deadline"
 							{...datePickerConfig}
 							/>
 					</div>
 				</div>
-
-				{/* Repeat *//*}
 				<Repeat
-					disabled={this.state.viewOnly}
-					taskID={taskID}
-					repeat={this.state.repeat}
-					submitRepeat={this.changeRepeat.bind(this)}
-					deleteRepeat={()=>{
-						rebase.removeDoc('/help-repeats/'+taskID);
-						this.setState({repeat:null})
-					}}
-					columns={this.props.columns}
+          disabled={viewOnly}
+          taskID={match.params.taskID}
+          repeat={repeat}
+          submitRepeat={(r) => {
+            setRepeat(r);
+            // updateTaskFunc();
+          }}
+          deleteRepeat={()=> {
+            setRepeat(null);
+            // updateTaskFunc();
+          }}
+          columns={columns}
 					vertical={true}
 					/>
-
-				{/* Overtime *//*}
-				{	this.state.defaultFields.overtime.show &&
+				{	defaultFields.overtime.show &&
 					<div>
 						<label className="col-form-label-2">Mimo PH</label>
 						<div className="col-form-value-2">
 							<Select
-								value={this.state.overtime}
-								isDisabled={this.state.viewOnly||this.state.defaultFields.overtime.fixed}
-								styles={invisibleSelectStyleNoArrowRequired}
-								onChange={(overtime)=>this.setState({overtime},this.submitTask.bind(this))}
-								options={booleanSelects}
+                value={overtime}
+                isDisabled={viewOnly || defaultFields.overtime.fixed}
+                styles={invisibleSelectStyleNoArrowRequired}
+                onChange={(overtime)=> {
+                  setOvertime(overtime);
+                  // updateTaskFunc();
+                }}
+                options={booleanSelects}
 								/>
 						</div>
 					</div>
 				}
 			</div>
-		)
-	}
+		);
+  }
 
-	renderTags(){
+
+	const renderTags = () => {
 		return (
-			<div className="row m-t-10"> {/*Tags*//*}
+			<div className="row m-t-10">
 				<div className="center-hor">
 					<Label className="center-hor">Tagy: </Label>
 				</div>
 				<div className="f-1 ">
 					<Select
 						placeholder="Zvoľte tagy"
-						value={this.state.tags}
+						value={tags}
 						isMulti
-						onChange={(tags)=>this.setState({tags},this.submitTask.bind(this))}
-						options={this.state.allTags}
-						isDisabled={this.state.defaultFields.tags.fixed||this.state.viewOnly}
+						onChange={(tags)=> {
+              setTags(tags);
+              // updateTaskFunc();
+            }}
+						options={allTags}
+						isDisabled={defaultFields.tag.fixed||viewOnly}
 						styles={invisibleSelectStyleNoArrowColored}
 						/>
 				</div>
@@ -1675,25 +1142,25 @@ const	getRenderAttributes = () => {
 		)
 	}
 
-	renderPopis(){
-		const TOTAL_PAUSAL = this.state.company ? this.state.company.pausalPrice : 0;
+	const renderPopis = () => {
+		const TOTAL_PAUSAL = company ? company.taskWorkPausal : 0;
 
 		let usedPausal = 0;
-		if (this.state.company && this.state.company.monthlyPausal){
-			let currentTasks = this.props.tasks.filter( task => {
-				let condition1 = this.state.company.id === task.company;
+		if (company && company.monthly){
+			let currentTasks = tasks.filter( task => {
+				let condition1 = company.id === task.company.id;
 
-				let currentDate = new Date();
-				let currentMonth = currentDate.getMonth();
-				let currentYear = currentDate.getFullYear();
+				let currentDate = moment();
+				let currentMonth = currentDate.month() + 1;
+				let currentYear = currentDate.year();
 
 				if (task.closeDate === null || task.closeDate === undefined){
 					return false;
 				}
 
-				let taskCloseDate = new Date(task.closeDate);
-				let taskCloseMonth = taskCloseDate.getMonth();
-				let taskCloseYear = taskCloseDate.getFullYear();
+				let taskCloseDate = moment(task.closeDate);
+				let taskCloseMonth = taskCloseDate.month() + 1;
+				let taskCloseYear = taskCloseDate.year();
 
 				let condition2 = (currentMonth === taskCloseMonth) && (currentYear === taskCloseYear);
 
@@ -1702,8 +1169,8 @@ const	getRenderAttributes = () => {
 
 			let taskIDs = currentTasks.map(task => task.id);
 
-
-			let currentTaskWorksQuantities = this.state.extraData.taskWorks.filter(work => taskIDs.includes(work.task)).map(task => task.quantity);
+      let currentTaskWorksQuantities =[];
+			//let currentTaskWorksQuantities = this.state.extraData.taskWorks.filter(work => taskIDs.includes(work.task)).map(task => task.quantity);
 
 			if (currentTaskWorksQuantities.length > 0){
 				usedPausal = currentTaskWorksQuantities.reduce((total, quantity) => total + quantity);
@@ -1711,36 +1178,37 @@ const	getRenderAttributes = () => {
 		}
 
 		let RenderDescription = null;
-		if( this.state.viewOnly ){
-			if( this.state.description.length !== 0 ){
-				RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:this.state.description }} />
+		if( viewOnly ){
+			if( description.length !== 0 ){
+				RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
 			}else{
 				RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
 			}
 		}else{
-			if( this.state.showDescription ){
-				RenderDescription = <div onClick={()=>this.setState({showDescription:true})}>
+			if( showDescription ){
+				RenderDescription = <div onClick={()=> setShowDescription(true)}>
 					<CKEditor
 						editor={ ClassicEditor }
-						data={this.state.description}
+						data={description}
 						onInit={(editor) => {
 							editor.editing.view.document.on( 'keydown', ( evt, data ) => {
 								if ( data.keyCode === 27 ) {
-									this.setState({ showDescription: false })
+									setShowDescription(false);
 									data.preventDefault();
 									evt.stop();
 								}
 							});
 						}}
 						onChange={(e,editor)=>{
-							this.setState({description: editor.getData()},this.submitTask.bind(this))
+              setDescription(editor.getData());
+              // updateTaskFunc();
 						}}
 						config={ck5config}
 						/>
 				</div>
 			}else{
-				RenderDescription = <div className="clickable task-edit-popis" onClick={()=>this.setState({showDescription:true})}>
-					<div dangerouslySetInnerHTML={{__html:this.state.description }} />
+				RenderDescription = <div className="clickable task-edit-popis" onClick={()=>setShowDescription(true)}>
+					<div dangerouslySetInnerHTML={{__html:description }} />
 					<span className="text-highlight"> <i	className="fas fa-pen"/> edit </span>
 				</div>
 			}
@@ -1749,72 +1217,59 @@ const	getRenderAttributes = () => {
 			<div style={{zIndex: "9999"}}>
 				<div>
 				<Label className="col-form-label m-t-10 m-r-20">Popis úlohy</Label>
-				{ this.state.company && this.state.company.monthlyPausal &&
+				{ company && company.monthlyPausal &&
 					<span> {`Used pausal: ${usedPausal} / Total pausal: ${TOTAL_PAUSAL}`} </span>
 				}
 				</div>
-
 				{RenderDescription}
 			</div>
 		)
 	}
 
-	renderAttachments(taskID){
+
+	const renderAttachments = () => {
 		return (
 			<Attachments
-				disabled={this.state.viewOnly}
-				taskID={this.props.match.params.taskID}
-				attachments={this.state.attachments}
+				disabled={viewOnly}
+				taskID={match.params.taskID}
+				attachments={attachments}
 				addAttachments={(newAttachments)=>{
-					let time = (new Date()).getTime();
-					let storageRef = firebase.storage().ref();
-					Promise.all([
-						...newAttachments.map((attachment)=>{
-							return storageRef.child(`help-tasks/${taskID}/${time}-${attachment.size}-${attachment.name}`).put(attachment)
-						})
-					]).then((resp)=>{
-						Promise.all([
-							...newAttachments.map((attachment)=>{
-								return storageRef.child(`help-tasks/${taskID}/${time}-${attachment.size}-${attachment.name}`).getDownloadURL()
-							})
-						]).then((urls)=>{
-							newAttachments=newAttachments.map((attachment,index)=>{
-								return {
-									title:attachment.name,
-									size:attachment.size,
-									path:`help-tasks/${taskID}/${time}-${attachment.size}-${attachment.name}`,
-									url:urls[index]
-								}
-							});
-							this.setState({attachments:[...this.state.attachments,...newAttachments]},this.submitTask.bind(this));
-						})
-					})
+					let time = moment().unix();
+					newAttachments = newAttachments.map((attachment)=>{
+						return {
+							title:attachment.name,
+							size:attachment.size,
+							time,
+							data:attachment
+						}
+					});
+					setAttachments([...attachments, ...newAttachments]);
+					// updateTaskFunc();
 				}}
 				removeAttachment={(attachment)=>{
-					let storageRef = firebase.storage().ref();
-					let newAttachments = [...this.state.attachments];
-					newAttachments.splice(newAttachments.findIndex((item)=>item.path===attachment.path),1);
-					storageRef.child(attachment.path).delete();
-					this.setState({attachments:newAttachments},this.submitTask.bind(this));
+					let newAttachments = [...attachments];
+					newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
+					setAttachments([...newAttachments]);
+					// updateTaskFunc();
 				}}
 				/>
 		)
 	}
 
-	renderModalUserAdd(){
+	const renderModalUserAdd = () => {
 		return (
-			<Modal isOpen={this.state.openUserAdd} >
+			<Modal isOpen={openUserAdd} >
 				<ModalHeader>
 					Add user
 				</ModalHeader>
 				<ModalBody>
 					<UserAdd
-						close={() => this.setState({openUserAdd: false,})}
+						close={() => setOpenUserAdd(false)}
 						addUser={(user) => {
-							let newUsers = this.state.users.concat([user]);
+			/*				let newUsers = users.concat([user]);
 							this.setState({
 								users: newUsers,
-							})
+							})*/
 						}}
 						/>
 				</ModalBody>
@@ -1822,20 +1277,17 @@ const	getRenderAttributes = () => {
 		)
 	}
 
-	renderModalCompanyAdd(){
+	const renderModalCompanyAdd = () => {
 		return (
-			<Modal isOpen={this.state.openCompanyAdd}>
-				<ModalHeader>
-					Add company
-				</ModalHeader>
+			<Modal isOpen={openCompanyAdd}>
 				<ModalBody>
 					<CompanyAdd
-						close={() => this.setState({openCompanyAdd: false,})}
+						close={() => setOpenCompanyAdd(false)}
 						addCompany={(company) => {
-							let newCompanies = this.state.companies.concat([company]);
+			/*				let newCompanies = this.state.companies.concat([company]);
 							this.setState({
 								companies: newCompanies,
-							})
+							})*/
 						}}
 						/>
 				</ModalBody>
@@ -1843,19 +1295,20 @@ const	getRenderAttributes = () => {
 		)
 	}
 
-	renderPendingPicker(){
+
+	const renderPendingPicker = () => {
 		return (
 			<PendingPicker
-				open={this.state.pendingOpen}
-				prefferedMilestone={this.state.milestone}
-				milestones={this.state.milestones.filter((milestone)=>this.state.project!== null && milestone.project===this.state.project.id && milestone.startsAt!==null)}
-				closeModal={()=>this.setState({pendingOpen:false})}
+				open={pendingOpen}
+				prefferedMilestone={milestone}
+				milestones={ (project ? toSelArr( project.milestones.filter((m)=> m.id !== milestone.id && milestone.startsAt!==null) ) : []) }
+				closeModal={()=>setPendingOpen(false)}
 				savePending={(pending)=>{
 					/*
 					database.collection('help-calendar_events').where("taskID", "==", parseInt(this.props.match.params.taskID)).get()
 					.then((data)=>{
 					snapshotToArray(data).forEach((item)=>rebase.removeDoc('/help-calendar_events/'+item.id));
-					});*//*
+					});
 					this.setState({
 						pendingOpen:false,
 						pendingStatus:null,
@@ -1864,150 +1317,196 @@ const	getRenderAttributes = () => {
 						milestone:pending.milestoneActive?pending.milestone:this.state.milestone,
 						pendingChangable:!pending.milestoneActive,
 						statusChange:(new Date().getTime()),
-					},this.submitTask.bind(this))
+					},this.submitTask.bind(this))*/
 				}}
 				/>
 		)
 	}
+/*
 
-	renderVykazyTable(taskWorks, workTrips, taskMaterials, customItems){
+  let newTaskWorks = [...taskWorks];
+  newTaskWorks.push({...newService, id: getNewID()});
+  setTaskWorks(newTaskWorks);
+*/
+
+	const renderVykazyTable = () => {
 		return (
 			<VykazyTable
-				showColumns={ (this.state.viewOnly ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
+				showColumns={ (viewOnly ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
 				showTotals={false}
-				disabled={this.state.viewOnly}
-				company={this.state.company}
-				match={this.props.match}
-				taskID={this.props.match.params.taskID}
-				taskAssigned={this.state.assignedTo}
+				disabled={viewOnly}
+				company={company}
+				match={match}
+				taskID={match.params.taskID}
+				taskAssigned={assignedTo}
 
-				showSubtasks={this.state.project ? this.state.project.showSubtasks : false}
+				showSubtasks={project ? project.showSubtasks : false}
 
-				submitService={this.submitService.bind(this)}
-				subtasks={taskWorks}
-				defaultType={this.state.type}
-				workTypes={this.state.taskTypes}
+				submitService={(newService) => {
+          setTaskWorks([ ...taskWorks, {...newService, id: getNewID()}]);
+      //		updateTaskFunc();
+        }}
+				subtasks={taskWorks ? taskWorks : []}
+				defaultType={taskType}
+        taskTypes={taskTypes}
 				updateSubtask={(id,newData)=>{
-					let extraData = {...this.state.extraData};
-					extraData.taskWorks[extraData.taskWorks.findIndex((work)=>work.id === id)] = {...extraData.taskWorks.find((work)=>work.id === id),...newData};
-					let newTaskWorks=[...this.state.taskWorks];
-					newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
-					rebase.updateDoc('help-task_works/'+id,newData);
-					this.setState({taskWorks:newTaskWorks, extraData});
+          let newTaskWorks=[...taskWorks];
+          newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
+          setTaskWorks(newTaskWorks);
+      //		updateTaskFunc();
 				}}
 				updateSubtasks={(multipleSubtasks)=>{
-					let extraData = {...this.state.extraData};
-					let newTaskWorks=[...this.state.taskWorks];
-					multipleSubtasks.forEach(({id, newData})=>{
-						extraData.taskWorks[extraData.taskWorks.findIndex((work)=>work.id === id)] = {...extraData.taskWorks.find((work)=>work.id === id),...newData};
-						newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
-						rebase.updateDoc('help-task_works/'+id,newData);
-					})
-					this.setState({taskWorks:newTaskWorks, extraData});
+          let newTaskWorks=[...taskWorks];
+          multipleSubtasks.forEach(({id, newData})=>{
+            newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
+          });
+          setTaskWorks(newTaskWorks);
+      //		updateTaskFunc();
 				}}
 				removeSubtask={(id)=>{
-					rebase.removeDoc('help-task_works/'+id).then(()=>{
-						let extraData = {...this.state.extraData};
-						extraData.taskWorks.splice(extraData.taskWorks.findIndex((work)=>work.id === id),1);
-						let newTaskWorks=[...this.state.taskWorks];
-						newTaskWorks.splice(newTaskWorks.findIndex((taskWork)=>taskWork.id===id),1);
-						this.setState({ taskWorks: newTaskWorks, extraData });
-					});
+          let newTaskWorks=[...taskWorks];
+          newTaskWorks.splice(newTaskWorks.findIndex((taskWork)=>taskWork.id===id),1);
+          setTaskWorks(newTaskWorks);
+      //		updateTaskFunc();
 				}}
-				workTrips={workTrips}
-				tripTypes={this.state.tripTypes}
-				submitTrip={this.submitWorkTrip.bind(this)}
+				workTrips={workTrips ? workTrips : []}
+				tripTypes={tripTypes ? tripTypes : []}
+        submitTrip={(newTrip)=>{
+          setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
+      //		updateTaskFunc();
+        }}
 				updateTrip={(id,newData)=>{
-					let extraData = {...this.state.extraData};
-					extraData.workTrips[extraData.workTrips.findIndex((trip)=>trip.id === id)] = {...extraData.workTrips.find((trip)=>trip.id === id),...newData};
-					let newTrips=[...this.state.workTrips];
-					newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-					rebase.updateDoc('help-task_work_trips/'+id,newData);
-					this.setState({ workTrips: newTrips, extraData });
+          let newTrips=[...workTrips];
+          newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
+          setWorkTrips(newTrips);
+      //		updateTaskFunc();
 				}}
 				updateTrips={(multipleTrips)=>{
-					let extraData = {...this.state.extraData};
-					let newTrips=[...this.state.workTrips];
-					multipleTrips.forEach(({id, newData})=>{
-						extraData.workTrips[extraData.workTrips.findIndex((trip)=>trip.id === id)] = {...extraData.workTrips.find((trip)=>trip.id === id),...newData};
-						newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-						rebase.updateDoc('help-task_work_trips/'+id,newData);
-					})
-					this.setState({ workTrips: newTrips, extraData });
+          let newTrips=[...workTrips];
+          multipleTrips.forEach(({id, newData})=>{
+            newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
+          });
+          setWorkTrips(newTrips);
+      //		updateTaskFunc();
 				}}
 				removeTrip={(id)=>{
-					rebase.removeDoc('help-task_work_trips/'+id).then(()=>{
-						let extraData = {...this.state.extraData};
-						extraData.workTrips.splice(extraData.workTrips.findIndex((trip)=>trip.id === id),1);
-						let newTrips=[...this.state.workTrips];
-						newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
-						this.setState({ workTrips:newTrips, extraData });
-					});
+          let newTrips=[...workTrips];
+          newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
+          setWorkTrips(newTrips);
+      //		updateTaskFunc();
 				}}
 
-				materials={taskMaterials}
-				submitMaterial={this.submitMaterial.bind(this)}
+				materials={taskMaterials ? taskMaterials : []}
+        submitMaterial={(newMaterial)=>{
+          setTaskMaterials([...taskMaterials,{id:getNewID(),...newMaterial}]);
+      //		updateTaskFunc();
+        }}
 				updateMaterial={(id,newData)=>{
-					let extraData = {...this.state.extraData};
-					extraData.taskMaterials[extraData.taskMaterials.findIndex((material)=>material.id === id)] = {...extraData.taskMaterials.find((material)=>material.id === id),...newData};
-					let newTaskMaterials=[...this.state.taskMaterials];
-					newTaskMaterials[newTaskMaterials.findIndex((taskWork)=>taskWork.id===id)]={...newTaskMaterials.find((taskWork)=>taskWork.id===id),...newData};
-					rebase.updateDoc('help-task_materials/'+id,newData);
-					this.setState({taskMaterials:newTaskMaterials, extraData});
+          let newTaskMaterials=[...taskMaterials];
+          newTaskMaterials[newTaskMaterials.findIndex((material)=>material.id===id)]={...newTaskMaterials.find((material)=>material.id===id),...newData};
+          setTaskMaterials(newTaskMaterials);
+      //		updateTaskFunc();
 				}}
 				updateMaterials={(multipleMaterials)=>{
-					let extraData = {...this.state.extraData};
-					let newTaskMaterials=[...this.state.taskMaterials];
-					multipleMaterials.forEach(({id, newData})=>{
-						extraData.taskMaterials[extraData.taskMaterials.findIndex((material)=>material.id === id)] = {...extraData.taskMaterials.find((material)=>material.id === id),...newData};
-						newTaskMaterials[newTaskMaterials.findIndex((taskWork)=>taskWork.id===id)]={...newTaskMaterials.find((taskWork)=>taskWork.id===id),...newData};
-						rebase.updateDoc('help-task_materials/'+id,newData);
-					})
-					this.setState({taskMaterials:newTaskMaterials, extraData});
+          let newTaskMaterials=[...taskMaterials];
+          multipleMaterials.forEach(({id, newData})=>{
+            newTaskMaterials[newTaskMaterials.findIndex((material)=>material.id===id)]={...newTaskMaterials.find((material)=>material.id===id),...newData};
+          });
+          setTaskMaterials(newTaskMaterials);
+      //		updateTaskFunc();
 				}}
 				removeMaterial={(id)=>{
-					rebase.removeDoc('help-task_materials/'+id).then(()=>{
-						let extraData = {...this.state.extraData};
-						extraData.taskMaterials.splice(extraData.taskMaterials.findIndex((material)=>material.id === id),1);
-						let newTaskMaterials=[...this.state.taskMaterials];
-						newTaskMaterials.splice(newTaskMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-						this.setState({taskMaterials:newTaskMaterials, extraData});
-					});
+          let newTaskMaterials=[...taskMaterials];
+          newTaskMaterials.splice(newTaskMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
+          setTaskMaterials(newTaskMaterials);
+      //		updateTaskFunc();
 				}}
-				customItems={customItems}
-				submitCustomItem={this.submitCustomItem.bind(this)}
+				customItems={customItems ? customItems : [] }
+        submitCustomItem={(customItem)=>{
+          setCustomItems([...customItems,{id:getNewID(),...customItem}]);
+      //		updateTaskFunc();
+        }}
 				updateCustomItem={(id,newData)=>{
-					let extraData = {...this.state.extraData};
-					extraData.customItems[extraData.customItems.findIndex((item)=>item.id === id)] = {...extraData.customItems.find((item)=>item.id === id),...newData};
-					let newCustomItems=[...this.state.customItems];
-					newCustomItems[newCustomItems.findIndex((taskWork)=>taskWork.id===id)]={...newCustomItems.find((taskWork)=>taskWork.id===id),...newData};
-					rebase.updateDoc('help-task_custom_items/'+id,newData);
-					this.setState({customItems:newCustomItems, extraData});
+          let newCustomItems=[...customItems];
+          newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
+          setCustomItems(newCustomItems);
+      //		updateTaskFunc();
 				}}
 				updateCustomItems={(multipleCustomItems)=>{
-					let extraData = {...this.state.extraData};
-					let newCustomItems=[...this.state.customItems];
-					multipleCustomItems.forEach(({id, newData})=>{
-						extraData.customItems[extraData.customItems.findIndex((item)=>item.id === id)] = {...extraData.customItems.find((item)=>item.id === id),...newData};
-						newCustomItems[newCustomItems.findIndex((taskWork)=>taskWork.id===id)]={...newCustomItems.find((taskWork)=>taskWork.id===id),...newData};
-						rebase.updateDoc('help-task_custom_items/'+id,newData);
-					})
-					this.setState({customItems:newCustomItems, extraData});
+          let newCustomItems=[...customItems];
+          multipleCustomItems.forEach(({id, newData})=>{
+            newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
+          });
+          setCustomItems(newCustomItems);
+      //		updateTaskFunc();
 				}}
 				removeCustomItem={(id)=>{
-					rebase.removeDoc('help-task_custom_items/'+id).then(()=>{
-						let extraData = {...this.state.extraData};
-						extraData.customItems.splice(extraData.customItems.findIndex((item)=>item.id === id),1);
-						let newCustomItems=[...this.state.customItems];
-						newCustomItems.splice(newCustomItems.findIndex((item)=>item.id===id),1);
-						this.setState({customItems:newCustomItems, extraData});
-					});
+          let newCustomItems=[...customItems];
+          newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
+          setCustomItems(newCustomItems);
+      //		updateTaskFunc();
 				}}
-				units={this.state.units}
-				defaultUnit={this.state.defaultUnit}
+				units={units ? units : []}
+				defaultUnit={defaultUnit}
 				/>
 		)
 	}
+
+
+	if (taskLoading) {
+		return <Loading />
+	}
+
+	return (
+		<div className="flex">
+			{ showDescription &&
+				<div
+					style={{backgroundColor: "transparent", width: "100%", height: "100%", position: "absolute"}}
+					onClick={()=>setShowDescription(false)}
+					/>
+			}
+
+			{ renderCommandbar() }
+
+			<div className={classnames({"fit-with-header-and-commandbar": !columns}, {"fit-with-header-and-commandbar-3": columns}, "scroll-visible", "bkg-white", { "row": layout === '2'})}>
+				<div className={classnames( "card-box-lanwiki", { "task-edit-left": layout === '2' && !columns, "task-edit-left-columns": layout === '2' && columns})}>
+
+					<div className="p-t-20 p-l-30 p-r-30">
+						{ renderTitle() }
+
+						<hr className="m-t-5 m-b-5"/>
+						{ layout === 1 && renderSelectsLayout1() }
+
+						{ renderPopis() }
+
+						{ renderAttachments() }
+
+						{ layout === 1 && defaultFields.tag.show && renderTags() }
+
+						{ renderModalUserAdd() }
+
+						{ renderModalCompanyAdd() }
+
+						{ renderPendingPicker() }
+
+						{ renderVykazyTable() }
+
+            {/*
+						{ this.renderComments(taskID, permission) }
+						*/}
+					</div>
+
+
+				</div>
+
+				{ layout === 2 && renderSelectsLayout2() }
+
+			</div>
+		</div>
+	);
+}
+
+/*
 
 	renderComments(taskID, permission){
 		return (
@@ -2059,138 +1558,19 @@ const	getRenderAttributes = () => {
 						<TabPane tabId="2">
 							<h3>História</h3>
 							<ListGroup>
-								{ this.state.history.map((event)=>
+								{ this.state.taskHistory.map((event)=>
 									<ListGroupItem key={event.id}>
 										({timestampToString(event.createdAt)})
 										{' ' + event.message}
 									</ListGroupItem>
 								)}
 							</ListGroup>
-							{	this.state.history.length===0 && <div>História je prázdna.</div>	}
+							{	this.state.taskHistory.length===0 && <div>História je prázdna.</div>	}
 						</TabPane>
 					}
 				</TabContent>
 			</div>
 		)
 	}
-
-	//Vykazy submits
-	submitWorkTrip(body){
-		rebase.addToCollection('help-task_work_trips',{task:this.props.match.params.taskID,...body}).then((result)=>{
-			let extraData = {...this.state.extraData};
-			extraData.workTrips = [{task:this.props.match.params.taskID,...body,id:result.id}, ...extraData.workTrips];
-			this.setState({workTrips:[...this.state.workTrips, {task:this.props.match.params.taskID,...body,id:result.id}],extraData})
-		});
-	}
-
-	submitMaterial(body){
-		rebase.addToCollection('help-task_materials',{task:this.props.match.params.taskID,...body}).then((result)=>{
-			let extraData = {...this.state.extraData};
-			extraData.taskMaterials = [{task:this.props.match.params.taskID,...body,id:result.id}, ...extraData.taskMaterials];
-			this.setState({taskMaterials:[...this.state.taskMaterials, {task:this.props.match.params.taskID,...body,id:result.id}],extraData})
-		});
-	}
-
-	submitCustomItem(body){
-		rebase.addToCollection('help-task_custom_items',{task:this.props.match.params.taskID,...body}).then((result)=>{
-			let extraData = {...this.state.extraData};
-			extraData.customItems = [{task:this.props.match.params.taskID,...body,id:result.id}, ...extraData.customItems];
-			this.setState({customItems:[...this.state.customItems, {task:this.props.match.params.taskID,...body,id:result.id}],extraData})
-		});
-	}
-
-	submitService(body){
-		rebase.addToCollection('help-task_works',{task:this.props.match.params.taskID,...body}).then((result)=>{
-			let extraData = {...this.state.extraData};
-			extraData.taskWorks = [{task:this.props.match.params.taskID,...body,id:result.id}, ...extraData.taskWorks];
-			this.setState({taskWorks:[...this.state.taskWorks, {task:this.props.match.params.taskID,...body,id:result.id}],extraData})
-		});
-	}
-
-
-
-	changeMilestone(milestone){
-		if(this.state.status.action==='pending'){
-			if(milestone.startsAt!==null){
-				this.setState({milestone,pendingDate:moment(milestone.startsAt),pendingChangable:false},this.submitTask.bind(this));
-			}else{
-				this.setState({milestone, pendingChangable:true }, this.submitTask.bind(this));
-			}
-		}else{
-			this.setState({milestone},this.submitTask.bind(this));
-		}
-	}
-
-	changeRequester(requester){
-		if (requester.id === -1) {
-			this.setState({
-				openUserAdd: true,
-			})
-		} else {
-			this.setState({requester},this.submitTask.bind(this))
-		}
-	}
-
-	changeCompany(company){
-		if (company.id === -1) {
-			this.setState({
-				openCompanyAdd: true,
-			})
-		} else {
-			this.setState({company, pausal:parseInt(company.workPausal)>0?booleanSelects[1]:booleanSelects[0]},this.submitTask.bind(this));
-		}
-	}
-
-	changeRepeat(repeat){
-		database.collection('help-repeats').doc(this.props.match.params.taskID).set({
-			...repeat,
-			task:this.props.match.params.taskID,
-			startAt:(new Date(repeat.startAt).getTime()),
-		});
-		this.setState({repeat})
-	}
-
-	changeItemValue(item, value){
-		let change = {}
-		change[item] = value;
-		this.setState(change, this.submitTask.bind(this) )
-	}
 }
-
-const mapStateToProps = ({ userReducer, storageCompanies, storageHelpPricelists, storageHelpPrices, storageHelpProjects, storageHelpStatuses, storageHelpTags, storageHelpTaskTypes, storageHelpTasks, storageHelpUnits, storageHelpWorkTypes, storageMetadata, storageUsers, storageHelpMilestones, storageHelpTripTypes }) => {
-	const { companiesLoaded, companiesActive, companies } = storageCompanies;
-	const { pricelistsLoaded, pricelistsActive, pricelists } = storageHelpPricelists;
-	const { pricesLoaded, pricesActive, prices } = storageHelpPrices;
-	const { projectsLoaded, projectsActive, projects } = storageHelpProjects;
-	const { statusesLoaded, statusesActive, statuses } = storageHelpStatuses;
-	const { tagsLoaded, tagsActive, tags } = storageHelpTags;
-	const { taskTypesLoaded, taskTypesActive, taskTypes } = storageHelpTaskTypes;
-	const { tasksLoaded, tasksActive, tasks } = storageHelpTasks;
-	const { unitsLoaded, unitsActive, units } = storageHelpUnits;
-	const { workTypesLoaded, workTypesActive, workTypes } = storageHelpWorkTypes;
-	const { metadataLoaded, metadataActive, metadata } = storageMetadata;
-	const { usersLoaded, usersActive, users } = storageUsers;
-	const { milestonesLoaded, milestonesActive, milestones } = storageHelpMilestones;
-	const { tripTypesActive, tripTypes, tripTypesLoaded } = storageHelpTripTypes;
-
-	return {
-		currentUser: userReducer,
-		companiesLoaded, companiesActive, companies,
-		pricelistsLoaded, pricelistsActive, pricelists,
-		pricesLoaded, pricesActive, prices,
-		projectsLoaded, projectsActive, projects,
-		statusesLoaded, statusesActive, statuses,
-		tagsLoaded, tagsActive, tags,
-		taskTypesLoaded, taskTypesActive, taskTypes,
-		tasksLoaded, tasksActive, tasks,
-		unitsLoaded, unitsActive, units,
-		workTypesLoaded, workTypesActive, workTypes,
-		metadataLoaded, metadataActive, metadata,
-		usersLoaded, usersActive, users,
-		milestonesLoaded, milestonesActive, milestones,
-		tripTypesActive, tripTypes, tripTypesLoaded,
-	};
-};
-
-export default connect(mapStateToProps, { storageCompaniesStart, storageHelpPricelistsStart, storageHelpPricesStart,storageHelpProjectsStart, storageHelpStatusesStart, storageHelpTagsStart, storageHelpTaskTypesStart, storageHelpTasksStart, storageHelpUnitsStart,storageHelpWorkTypesStart, storageMetadataStart, storageUsersStart, storageHelpMilestonesStart, storageHelpTripTypesStart })(TaskEdit);
 */

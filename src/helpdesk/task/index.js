@@ -6,7 +6,7 @@ import ShowData from '../../components/showData';
 import { timestampToString, sameStringForms, applyTaskFilter, snapshotToArray } from 'helperFunctions';
 import { getEmptyFilter, getFixedFilters } from 'configs/fixedFilters';
 import { allMilestones } from 'configs/constants/sidebar';
-import TaskEdit from './taskEdit';
+import TaskEdit from './taskEditContainer';
 import TaskEmpty from './taskEmpty';
 import TaskCalendar from '../calendar';
 import {rebase, database} from '../../index';

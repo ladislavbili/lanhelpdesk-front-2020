@@ -59,7 +59,7 @@ query {
 
 export default function UserAddContainer(props){
   // data & queries
-  const { history, match } = props;
+  const { history, match, addUser, close } = props;
   const { data: rolesData, loading: rolesLoading, error: er1 } = useQuery(GET_ROLES);
   const { data: companiesData, loading: companiesLoading, error: er2 } = useQuery(GET_COMPANIES);
   const [registerUser, {client}] = useMutation(ADD_USER);
@@ -84,7 +84,7 @@ export default function UserAddContainer(props){
   const [ language, setLanguage ] = React.useState("sk");
   const [ saving, setSaving ] = React.useState(false);
 
-  const addUser = () => {
+  const addUserFunc = () => {
     setSaving( true );
     registerUser({ variables: {
       active,
@@ -99,10 +99,15 @@ export default function UserAddContainer(props){
       companyId: company.id,
       language,
     } }).then( ( response ) => {
-      const allUsers = client.readQuery({query: GET_USERS}).users;
-      let newUser = {...response.data.registerUser,  __typename: "User"}
-      client.writeQuery({ query: GET_USERS, data: {users: [...allUsers, newUser]} });
-      history.push('/helpdesk/settings/users/' + newUser.id)
+      if (addUser) {
+        addUser(response);
+        close();
+      } else {
+        const allUsers = client.readQuery({query: GET_USERS}).users;
+        let newUser = {...response.data.registerUser,  __typename: "User"}
+        client.writeQuery({ query: GET_USERS, data: {users: [...allUsers, newUser]} });
+        history.push('/helpdesk/settings/users/' + newUser.id)
+      }
     }).catch( (err) => {
       console.log(err.message);
     });
@@ -207,7 +212,7 @@ export default function UserAddContainer(props){
         <Button
           className="btn"
           disabled={ cannotAddUser() }
-          onClick={ addUser }
+          onClick={ addUserFunc }
           >
           { saving ? 'Adding...' : 'Add user' }
         </Button>
