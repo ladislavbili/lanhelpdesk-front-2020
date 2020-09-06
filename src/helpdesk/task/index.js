@@ -12,17 +12,21 @@ import TaskCalendar from '../calendar';
 import {rebase, database} from '../../index';
 import { GET_TASK_TYPES } from 'helpdesk/settings/taskTypes';
 
+import {  filter, filterName, selectedProject, tasklistLayout } from 'localCache';
+
 /*
 import {setTasksOrderBy, setTasksAscending,storageCompaniesStart,storageHelpTagsStart,storageUsersStart, setUserFilterStatuses,
 	storageHelpProjectsStart,storageHelpStatusesStart,storageHelpTasksStart, storageHelpFiltersStart,
-	setTasklistLayout, storageHelpMilestonesStart, storageHelpCalendarEventsStart,
+	 storageHelpMilestonesStart, storageHelpCalendarEventsStart,
 	setHelpSidebarProject, setHelpSidebarMilestone, setHelpSidebarFilter, setFilter, setMilestone,setProject} from 'redux/actions';*/
 const fixedFilters = getFixedFilters();
 
-
-const GET_ALL_TASKS = gql`
-query {
-  allTasks{
+const GET_FILTERED_TASKS = gql`
+query filteredTasks($filter: FilterInput, $projectId: Int){
+  filteredTasks (
+    filter: $filter,
+    projectId: $projectId,
+  ){
     id
     title
 		updatedAt
@@ -32,6 +36,7 @@ query {
 			id
 			name
 			surname
+      email
 		}
 		company {
 			id
@@ -82,17 +87,17 @@ query {
 `;
 
 /*
-    overtime
-    pausal
-    pendingChangable
-    statusChange
+important
+overtime
+pausal
+pendingChangable
+statusChange
 */
 
 const GET_MY_DATA = gql`
 query {
   getMyData{
     id
-		tasklistLayout
 		statuses {
 			id
 			title
@@ -102,6 +107,7 @@ query {
     role {
       accessRights {
         projects
+        publicFilters
       }
     }
   }
@@ -121,44 +127,129 @@ query {
 }
 `;
 
+const GET_MY_FILTERS = gql`
+query {
+  myFilters {
+    title
+    id
+    createdAt
+    updatedAt
+    pub
+    global
+    dashboard
+    filter {
+      taskType {
+        id
+      }
+    }
+    project {
+      id
+    }
+    roles {
+      id
+    }
+  }
+}
+`;
+
+const GET_PUBLIC_FILTERS = gql`
+query {
+  publicFilters {
+    title
+    id
+    createdAt
+    updatedAt
+    createdBy {
+      id
+    }
+    pub
+    global
+    dashboard
+    filter {
+      taskType {
+        id
+      }
+    }
+    project {
+      id
+    }
+    roles {
+      id
+    }
+  }
+}
+`;
+
 
 export default function TasksIndex (props) {
   //data & queries
-  const { history, match, calendarEvents, /*tasklistLayout, setTasklistLayout, */orderBy, setTasksOrderBy, ascending, setTasksAscending, statuses, setUserFilterStatuses } = props;
+  const { history, match, calendarEvents, orderBy, setTasksOrderBy, ascending, setTasksAscending, statuses, setUserFilterStatuses } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
-  const { data: tasksData, loading: tasksLoading, refetch: tasksRefetch } = useQuery(GET_ALL_TASKS, { options: { fetchPolicy: 'network-only' }});
+  const { data: tasksData, loading: tasksLoading, refetch: tasksRefetch } = useQuery(GET_FILTERED_TASKS, { variables: {}, options: { fetchPolicy: 'network-only' }});
   const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
+  const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS, { options: { fetchPolicy: 'network-only' }});
+  const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
-	const [ filterName, setFilterName ] = React.useState("");
-	const [ tasklistLayout, setTasklistLayout ] = React.useState(0);
 
 	// sync
 	React.useEffect( () => {
-			getFilterName(props);
+			getFilterName();
 	}, [match.params.listID]);
 
 	React.useEffect( () => {
-			getFilterName(props);
+			getFilterName();
 	}, [props.filters]);
 
-	const getFilterName = (props) => {
-		let id = props.match.params.listID;
-		let filter = fixedFilters.find( (filter) => filter.id === id )
+	React.useEffect( () => {
+	}, [filterName]);
+
+	const getFilterName = () => {
+		let id = match.params.listID;
+		let filter = fixedFilters.find( (filter) => filter.id === id );
 		if(!id){
-			setFilterName("");
+			filterName("");
 			return;
 		}else if( filter !== undefined ){
-			setFilterName(filter.title);
+			filterName(filter.title);
 			return;
 		}
-		filter = props.filters.find((filter)=>filter.id===id);
+		filter = [...(myFiltersData ? myFiltersData.myFilters : []), ...(publicFiltersData ? publicFiltersData.publicFilters : [])].find((filter)=>filter.id===id);
 		if(filter){
-			setFilterName(filter.title);
+			filterName(filter.title);
 		}
 	}
+
+  const filterTasks = () => {
+    let ref = tasksRefetch( { variables: {filter, projectId: selectedProject.id}, options: { fetchPolicy: 'network-only' }});
+    let mah = tasksData ? tasksData.filteredTasks : [];
+  	return mah;
+  	/*
+  	if(!this.props.statusesLoaded){
+  		return [];
+  	}
+  	let newTasks=this.state.tasks.map((task)=>{
+  		const status = this.state.statuses.find( (status) => status.id === task.status );
+  		const project = this.state.projects.find( (project) => project.id === task.project );
+  		return {
+  			...task,
+  			company: this.state.companies.find( (company) => company.id === task.company ),
+  			status,
+  			project,
+  			requester: this.state.users.find( (user) => user.id === task.requester ),
+  			tags: this.state.tags.filter( (tag) => task.tags && task.tags.includes(tag.id) ),
+  			assignedTo: this.state.users.filter( (user) => task.assignedTo && task.assignedTo.includes(user.id) ),
+  			id: parseInt(task.id),
+  			viewOnly: this.getViewOnly(task, status, project),
+  		}
+  	});
+
+  	const filter = this.props.filter;
+  	return newTasks.filter( ( task ) => applyTaskFilter( task, filter, this.props.currentUser, this.props.project, this.props.milestone ) )
+  	*/
+  }
 
 const getBreadcrumsData = () => {
 /*	let project = this.props.projectState;
@@ -290,33 +381,6 @@ const displayCal = (task,showEvent) => {
 					</span>
 				</p>}
 		</div>)
-}
-
-const filterTasks = () => {
-	return tasksData ? tasksData.allTasks : [];
-	/*
-	if(!this.props.statusesLoaded){
-		return [];
-	}
-	let newTasks=this.state.tasks.map((task)=>{
-		const status = this.state.statuses.find( (status) => status.id === task.status );
-		const project = this.state.projects.find( (project) => project.id === task.project );
-		return {
-			...task,
-			company: this.state.companies.find( (company) => company.id === task.company ),
-			status,
-			project,
-			requester: this.state.users.find( (user) => user.id === task.requester ),
-			tags: this.state.tags.filter( (tag) => task.tags && task.tags.includes(tag.id) ),
-			assignedTo: this.state.users.filter( (user) => task.assignedTo && task.assignedTo.includes(user.id) ),
-			id: parseInt(task.id),
-			viewOnly: this.getViewOnly(task, status, project),
-		}
-	});
-
-	const filter = this.props.filter;
-	return newTasks.filter( ( task ) => applyTaskFilter( task, filter, this.props.currentUser, this.props.project, this.props.milestone ) )
-	*/
 }
 
 const getViewOnly = ( task, status, project ) => {
@@ -481,10 +545,9 @@ const getCalendarAllDayData = (tasks) => {/*
 	}else{
 		link = '/helpdesk/taskList'
 	}
+
 	return (
 		<ShowData
-			layout={0}
-			setLayout={() => {}}
 			data={filterTasks()}
 			filterBy={[
 				{value:'assignedTo',type:'list',func:((total,user)=>total+=user.email+' '+user.name+' '+user.surname+' ')},
@@ -550,8 +613,8 @@ const getCalendarAllDayData = (tasks) => {/*
 			listID={match.params.listID}
 			match={match}
 			isTask={true}
-			listName={filterName}
-			edit={TaskEdit}
+			listName={filterName()}
+			Edit={TaskEdit}
 			empty={TaskEmpty}
 			useBreadcrums={true}
 			breadcrumsData={getBreadcrumsData()}

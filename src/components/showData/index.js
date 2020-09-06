@@ -4,34 +4,44 @@ import TaskList from './taskList';
 import TaskListDnD from './taskListDnD';
 import { connect } from "react-redux";
 import {timestampToString} from '../../helperFunctions';
-import {setSearch, setFilter,addShowDataFilter } from '../../redux/actions';
+//import {setSearch, setFilter, addShowDataFilter } from '../../redux/actions';
 
-class ShowDataContainer extends Component {
+import { search, filter, filterName, tasklistLayout } from 'localCache';
+
+export default function ShowDataContainer (props){
+	//data
+	const { match, history, data,  filterBy, ascending, orderBy, orderByValues, displayValues, useBreadcrums, breadcrumsData, listName, empty, itemID, link, displayCol, isTask, setStatuses, statuses, allStatuses, Edit, dndGroupData, dndGroupAttribute, calendarAllDayData, calendarEventsData, checkTask, deleteTask } = props;
+
+	//state
+	const [ filterView, setFilterView ] = React.useState(false);
+	/*
 	constructor(props) {
 		super(props);
 		this.state = {
 			search: this.props.search
 		};
+		console.log("hello?");
 		this.filterData.bind(this);
 		this.addShowDataFilter.bind(this);
 		this.addShowDataFilter();
 	}
+*/
 
-	addShowDataFilter(){
-		if(this.props.filter[this.props.filterName]===undefined){
+	const addShowDataFilter = () => {
+		/*if(filter[filterName]===undefined){
 			let defaultFilter={};
 			this.props.displayValues.forEach((display)=>{
 				defaultFilter[display.value]=''
 			})
-			this.props.addShowDataFilter(this.props.filterName,defaultFilter);
-		}
-
+			this.props.addShowDataFilter(this.props.filterName, defaultFilter);
+		}*/
 	}
 
-	filterData(){
-		return this.props.data.filter((item)=>{
+	const filterData = () => {
+		return data;
+		return data.filter((item)=>{
 			let filterString="";
-			this.props.filterBy.forEach((value)=>{
+			filterBy.forEach((value)=>{
 				if(!item[value.value]){
 					return;
 				}
@@ -53,11 +63,11 @@ class ShowDataContainer extends Component {
 					filterString+= item[value.value].email+' '+item[value.value].name+' '+item[value.value].surname + " ";
 				}
 			});
-			return filterString.toLowerCase().includes(this.props.search.toLowerCase());
+			return filterString.toLowerCase().includes(search.toLowerCase());
 		}).sort((item1,item2)=>{
-			let val1 = this.getSortValue(item1);
-			let val2 = this.getSortValue(item2);
-			if(this.props.ascending){
+			let val1 = getSortValue(item1);
+			let val2 = getSortValue(item2);
+			if(ascending){
 				if(val1===null){
 					return 1;
 				}
@@ -77,8 +87,8 @@ class ShowDataContainer extends Component {
 			return 0;
 		});
 	}
-	getSortValue(item){
-		let value = this.props.orderByValues.find((val)=>val.value===this.props.orderBy);
+	const getSortValue = (item) => {
+		let value = orderByValues.find((val)=>val.value===orderBy);
 		if(value.type==='object'){
 			if (value.value === "status"){
 				return item[value.value] ? ((100 - item[value.value].order) + " " +  item.statusChange) : null;
@@ -97,120 +107,120 @@ class ShowDataContainer extends Component {
 		}
 	}
 
-	render() {
+	console.log("show index", tasklistLayout());
 
-		return (
-			<div className="content-page">
-				<div className="content" style={{ paddingTop: 0 }}>
-					<div className="row m-0">
-						{this.props.layout === 0 && (
-							<div className={'' + (this.state.filterView ? 'col-xl-9' : 'col-xl-12')}>
-								<TaskCol
-									commandBar={this.props}
-									useBreadcrums={this.props.useBreadcrums}
-									breadcrumsData={this.props.breadcrumsData}
-									listName={this.props.listName}
-									history={this.props.history}
-									empty={this.props.empty}
-									match={this.props.match}
-									data={this.filterData()}
-									itemID={this.props.itemID}
-									link={this.props.link}
-									displayCol={this.props.displayCol}
-									isTask={this.props.isTask}
-									setStatuses={this.props.setStatuses}
-									statuses={this.props.statuses}
-									allStatuses={this.props.allStatuses}
-									edit={this.props.edit}
+	return (
+		<div className="content-page">
+			<div className="content" style={{ paddingTop: 0 }}>
+				<div className="row m-0">
+					{tasklistLayout() === 0 && (
+						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
+							<TaskCol
+								commandBar={props}
+								useBreadcrums={useBreadcrums}
+								breadcrumsData={breadcrumsData}
+								listName={listName}
+								history={history}
+								empty={empty}
+								match={match}
+								data={filterData()}
+								itemID={itemID}
+								link={link}
+								displayCol={displayCol}
+								isTask={isTask}
+								setStatuses={setStatuses}
+								statuses={statuses}
+								allStatuses={allStatuses}
+								Edit={Edit}
+								/>
+						</div>
+					)}
+
+{/* filter[filterName]!==undefined &&*/}
+					{tasklistLayout() === 1 && (
+						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
+							{itemID && <Edit match={match} columns={false} history={history} />}
+							{!itemID &&
+								<TaskList
+									commandBar={props}
+									useBreadcrums={useBreadcrums}
+									breadcrumsData={breadcrumsData}
+									listName={listName}
+									history={history}
+									match={match}
+									data={filterData()}
+									displayValues={displayValues}
+									filterName={filterName}
+									isTask={isTask}
+									setStatuses={setStatuses}
+									statuses={statuses}
+									allStatuses={allStatuses}
+									link={link}
+									checkTask={checkTask}
+									deleteTask={deleteTask}
+									/>}
+						</div>
+					)}
+
+					{tasklistLayout() === 2 && (
+						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
+							{itemID && <edit match={match} columns={false} history={history} />}
+							{!itemID &&
+								<TaskListDnD
+									commandBar={props}
+									useBreadcrums={useBreadcrums}
+									breadcrumsData={breadcrumsData}
+									listName={listName}
+									history={history}
+									match={match}
+									data={filterData()}
+									displayValues={displayValues}
+									displayCol={displayCol}
+									link={link}
+									groupBy={dndGroupAttribute}
+									groupData={dndGroupData}
+									isTask={isTask}
+									setStatuses={setStatuses}
+									statuses={statuses}
+									allStatuses={allStatuses}
 									/>
-							</div>
-						)}
-
-
-						{this.props.layout === 1 && this.props.filter[this.props.filterName]!==undefined && (
-							<div className={'' + (this.state.filterView ? 'col-xl-9' : 'col-xl-12')}>
-								{this.props.itemID && <this.props.edit match={this.props.match} columns={false} history={this.props.history} />}
-								{!this.props.itemID &&
-									<TaskList
-										commandBar={this.props}
-										useBreadcrums={this.props.useBreadcrums}
-										breadcrumsData={this.props.breadcrumsData}
-										listName={this.props.listName}
-										history={this.props.history}
-										match={this.props.match}
-										data={this.filterData()}
-										displayValues={this.props.displayValues}
-										filterName={this.props.filterName}
-										isTask={this.props.isTask}
-										setStatuses={this.props.setStatuses}
-										statuses={this.props.statuses}
-										allStatuses={this.props.allStatuses}
-										link={this.props.link}
-										checkTask={this.props.checkTask}
-										deleteTask={this.props.deleteTask}
-										/>}
-							</div>
-						)}
-
-						{this.props.layout === 2 && (
-							<div className={'' + (this.state.filterView ? 'col-xl-9' : 'col-xl-12')}>
-								{this.props.itemID && <this.props.edit match={this.props.match} columns={false} history={this.props.history} />}
-								{!this.props.itemID &&
-									<TaskListDnD
-										commandBar={this.props}
-										useBreadcrums={this.props.useBreadcrums}
-										breadcrumsData={this.props.breadcrumsData}
-										listName={this.props.listName}
-										history={this.props.history}
-										match={this.props.match}
-										data={this.filterData()}
-										displayValues={this.props.displayValues}
-										displayCol={this.props.displayCol}
-										link={this.props.link}
-										groupBy={this.props.dndGroupAttribute}
-										groupData={this.props.dndGroupData}
-										isTask={this.props.isTask}
-										setStatuses={this.props.setStatuses}
-										statuses={this.props.statuses}
-										allStatuses={this.props.allStatuses}
-										/>
+							}
+						</div>
+					)}
+					{tasklistLayout() === 3 && (
+						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
+							<calendar
+								commandBar={props}
+								useBreadcrums={useBreadcrums}
+								breadcrumsData={breadcrumsData}
+								listName={listName}
+								history={history}
+								match={match}
+								data={
+									(calendarAllDayData ? calendarAllDayData(filterData()):[]).concat(
+										calendarEventsData ? calendarEventsData(filterData()):[]
+									)
 								}
-							</div>
-						)}
-						{this.props.layout === 3 && (
-							<div className={'' + (this.state.filterView ? 'col-xl-9' : 'col-xl-12')}>
-								<this.props.calendar
-									commandBar={this.props}
-									useBreadcrums={this.props.useBreadcrums}
-									breadcrumsData={this.props.breadcrumsData}
-									listName={this.props.listName}
-									history={this.props.history}
-									match={this.props.match}
-									data={
-										(this.props.calendarAllDayData ? this.props.calendarAllDayData(this.filterData()):[]).concat(
-											this.props.calendarEventsData ? this.props.calendarEventsData(this.filterData()):[]
-										)
-									}
-									link={this.props.link}
-									groupBy={this.props.dndGroupAttribute}
-									groupData={this.props.dndGroupData}
-									isTask={this.props.isTask}
-									setStatuses={this.props.setStatuses}
-									statuses={this.props.statuses}
-									allStatuses={this.props.allStatuses}
-									edit={this.props.edit}
-									/>
-							</div>
-						)}
-					</div>
+								link={link}
+								groupBy={dndGroupAttribute}
+								groupData={dndGroupData}
+								isTask={isTask}
+								setStatuses={setStatuses}
+								statuses={statuses}
+								allStatuses={allStatuses}
+								Edit={Edit}
+								/>
+						</div>
+					)}
 				</div>
 			</div>
-		);
-	}
+		</div>
+	);
 }
-
+	/*
+}
 const mapStateToProps = ({ filterReducer, showDataReducer }) => {
 	return { search:filterReducer.search ,filter:showDataReducer.filter };
 };
 
-export default connect(mapStateToProps, { setSearch, setFilter, addShowDataFilter })(ShowDataContainer);
+export default connect(mapStateToProps, { setSearch, setFilter, addShowDataFilter })(ShowDataContainer);*/

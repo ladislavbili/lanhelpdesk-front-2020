@@ -6,6 +6,8 @@ import {Link} from 'react-router-dom';
 import classnames from 'classnames';
 import {testing} from 'helperFunctions';
 
+import { tasklistLayout } from 'localCache';
+
 const GET_MY_DATA = gql`
 query {
   getMyData{
@@ -35,7 +37,7 @@ query {
 
 export default function PageHeader(props) {
   //data & queries
-  const { history, match, settings, layout, showLayoutSwitch, setLayout, dndLayout, calendarLayout } = props;
+  const { history, match, settings, showLayoutSwitch, dndLayout, calendarLayout } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
   //state
   const [ notificationsOpen, setNotificationsOpen ] = React.useState(false);
@@ -69,7 +71,7 @@ export default function PageHeader(props) {
   }
 
   const getLayoutIcon = () => {
-    switch (layout) {
+    switch (tasklistLayout()) {
       case 0:
         return "fa-columns";
       case 1:
@@ -103,7 +105,7 @@ export default function PageHeader(props) {
 /*    const errorMessages = props.errorMessages.filter((message) => !message.read )
     let unreadNotifications = [...props.currentUser.notifications].splice(5, props.currentUser.notifications.length - 1).filter((notification) => !notification.read);*/
     const URL = getLocation();
-
+console.log("layout", tasklistLayout());
     return (<div className="page-header flex">
       <div className="d-flex full-height p-l-10">
         <div className="center-hor">
@@ -143,24 +145,24 @@ export default function PageHeader(props) {
               </DropdownToggle>
               <DropdownMenu right>
                 <div className="btn-group-vertical" data-toggle="buttons">
-                  <label className={classnames({'active':layout === 0}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" onChange={() => setLayout(0)} checked={layout === 0}/>
+                  <label className={classnames({'active':tasklistLayout() === 0}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                    <input type="radio" name="options" onChange={() => {tasklistLayout(0); console.log("buuuuuuuuuuuu");}} checked={tasklistLayout() === 0}/>
                     <i className="fa fa-columns"/>
                   </label>
-                  <label className={classnames({'active':layout === 1}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" checked={layout === 1} onChange={() => setLayout(1)}/>
+                  <label className={classnames({'active':tasklistLayout() === 1}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                    <input type="radio" name="options" checked={tasklistLayout() === 1} onChange={() => {tasklistLayout(1); console.log("aaaaaaaaa");}}/>
                     <i className="fa fa-list"/>
                   </label>
                   { dndLayout &&
-                    <label className={classnames({'active':layout === 2}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => setLayout(2)} checked={layout === 2}/>
+                    <label className={classnames({'active':tasklistLayout() === 2}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                      <input type="radio" name="options" onChange={() => tasklistLayout(2)} checked={tasklistLayout() === 2}/>
                       <i className="fa fa-map"/>
                     </label>
                   }
 
                   { calendarLayout &&
-                    <label className={classnames({'active':layout === 3}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => setLayout(3)} checked={layout === 3}/>
+                    <label className={classnames({'active':tasklistLayout() === 3}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                      <input type="radio" name="options" onChange={() => tasklistLayout(3)} checked={tasklistLayout() === 3}/>
                       <i className="fa fa-calendar-alt"/>
                     </label>
                   }

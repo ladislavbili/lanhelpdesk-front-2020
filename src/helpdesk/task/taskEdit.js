@@ -197,8 +197,9 @@ query task($id: Int!){
 `;
 
 const UPDATE_TASK = gql`
-mutation updateTask($title: String!, $closeDate: Int!, $assignedTo: [Int]!, $company: Int!, $deadline: Int, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: Int, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput ) {
+mutation updateTask($id: Int!, $title: String!, $closeDate: Int!, $assignedTo: [Int]!, $company: Int!, $deadline: Int, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: Int, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput ) {
   updateTask(
+		id: $id,
     title: $title,
     closeDate: $closeDate,
     assignedTo: $assignedTo,
@@ -309,7 +310,7 @@ React.useEffect( () => {
       setInvoicedDate( moment(taskData.task.invoicedDate) );
       //invoicedDate: task.invoicedDate!==null && task.invoicedDate!==undefined ?new Date(task.invoicedDate).toISOString().replace('Z',''):'',
       const pro =  (taskData.task.project ? {...taskData.task.project, value: taskData.task.project.id, label: taskData.task.project.title} : null );
-      setMilestone(pro && pro.milestone ? {...pro.milestone, value: pro.milestone.id, label: pro.milestone.title} : null );
+      setMilestone(pro && pro.milestone ? {...pro.milestone, value: pro.milestone.id, label: pro.milestone.title} : noMilestone );
 			setOvertime( (taskData.task.overtime ? booleanSelects[1] : booleanSelects[0]) );
 			setPausal( (taskData.task.pausal ? booleanSelects[1] : booleanSelects[0]) );
 			setPendingChangable(taskData.task.pendingChangable);
@@ -419,7 +420,7 @@ React.useEffect( () => {
         assignedTo: assignedTo.map((item)=>item.id),
         description,
         status: status ? status.id : null,
-        statusChange: statusChange !== null ? statusChange.unix() : null,
+        statusChange: null, //statusChange !== null ? statusChange.unix() : null,
         project: project ? project.id : null,
         pausal: pausal.value,
         overtime: overtime.value,
@@ -429,7 +430,7 @@ React.useEffect( () => {
         milestone: (milestone.id === null || milestone.id === -1 ? null : milestone.id),
         attachments,
         deadline: deadline !== null ? deadline.unix() : null,
-        closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix() : null,
+        closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix() : 0,
         pendingDate: (pendingDate !== null && status.action==='PendingDate') ? pendingDate.unix() : null,
         pendingChangable,
     //    invoicedDate: newInvoicedDate,
@@ -498,7 +499,7 @@ React.useEffect( () => {
 				<div className={classnames("d-flex", "flex-row", "center-hor", {"m-b-10": columns})}>
 					<div className="display-inline center-hor">
 						{!columns &&
-							<button type="button" className="btn btn-link-reversed waves-effect p-l-0" onClick={() => history.push(`/helpdesk/taskList/i/${this.props.match.params.listID}`)}>
+							<button type="button" className="btn btn-link-reversed waves-effect p-l-0" onClick={() => history.push(`/helpdesk/taskList/i/${match.params.listID}`)}>
 								<i
 									className="fas fa-arrow-left commandbar-command-icon"
 									/>
@@ -541,7 +542,7 @@ React.useEffect( () => {
               disabled={viewOnly}
               className="btn btn-link-reversed waves-effect" onClick={()=>{
 								setImportant(!important);
-						//		updateTaskFunc();
+								updateTaskFunc();
 							}}>
 							<i className="far fa-star" /> Important
 						</button>
@@ -569,7 +570,7 @@ React.useEffect( () => {
 								className="task-title-input text-extra-slim hidden-input m-l-10"
 								onChange={(e)=> {
 									setTitle(e.target.value);
-  						//		updateTaskFunc();
+  								updateTaskFunc();
 								}}
 								placeholder="Enter task name" />
 						</span>
@@ -607,7 +608,7 @@ React.useEffect( () => {
 							disabled={!status || status.action!=='PendingDate'||viewOnly||!pendingChangable}
 							onChange={ (date) => {
 								setPendingDate(date);
-						//		updateTaskFunc();
+								updateTaskFunc();
 							}}
 							placeholderText="No pending date"
 							{...datePickerConfig}
@@ -628,7 +629,7 @@ React.useEffect( () => {
 							disabled={!status || (status.action!=='CloseDate' && status.action!=='CloseInvalid')||viewOnly}
 							onChange={date => {
 								setCloseDate(date);
-						//		updateTaskFunc();
+								updateTaskFunc();
 							}}
 							placeholderText="No pending date"
 							{...datePickerConfig}
@@ -657,7 +658,7 @@ React.useEffect( () => {
 		setAssignedTo(newAssignedTo);
 		setProjectChangeDate(moment());
 		setMilestone(noMilestone);
-//		updateTaskFunc();
+		updateTaskFunc();
 		setDefaults(project.id);
 	}
 
@@ -670,12 +671,12 @@ React.useEffect( () => {
 			setStatusChange(moment());
 			setImportant(false);
 			setCloseDate(moment());
-    //		updateTaskFunc();
+    		updateTaskFunc();
 		}
 		else{
 			setStatus(s);
 			setStatusChange(moment());
-  //		updateTaskFunc();
+  		updateTaskFunc();
 		}
 	}
 
@@ -685,15 +686,15 @@ React.useEffect( () => {
         setMilestone(mile);
         setPendingDate(moment(mile.startsAt));
         setPendingChangable(false);
-  //		updateTaskFunc();
+  		updateTaskFunc();
 			}else{
         setMilestone(mile);
         setPendingChangable(false);
-  //		updateTaskFunc();
+  		updateTaskFunc();
 			}
 		}else{
       setMilestone(mile);
-//		updateTaskFunc();
+		updateTaskFunc();
 		}
 	}
 
@@ -702,7 +703,7 @@ React.useEffect( () => {
 			setOpenUserAdd(true);
 		} else {
       setRequester(req);
-      // updateTaskFunc();
+       updateTaskFunc();
 		}
 	}
 
@@ -712,7 +713,7 @@ React.useEffect( () => {
 		} else {
       setCompany(comp);
       setPausal( parseInt(comp.taskWorkPausal) > 0 ? booleanSelects[1] : booleanSelects[0] );
-			// updateTaskFunc();
+			updateTaskFunc();
 		}
 	}
 
@@ -750,7 +751,7 @@ React.useEffect( () => {
                         setOpenUserAdd(true);
                       } else {
   											setAssignedTo(users);
-                    //		updateTaskFunc();
+                    		updateTaskFunc();
                       }
 										}}
 										options={
@@ -792,7 +793,7 @@ React.useEffect( () => {
 										styles={invisibleSelectStyleNoArrowRequired}
 										onChange={(type)=> {
                       setTaskType(type);
-                //		updateTaskFunc();
+                			updateTaskFunc();
                   }}
 										options={taskTypes}
 										/>
@@ -851,7 +852,7 @@ React.useEffect( () => {
 									styles={invisibleSelectStyleNoArrowRequired}
 									onChange={(pausal)=> {
 										setPausal(pausal);
-              			// updateTaskFunc();
+              			updateTaskFunc();
 									}}
 									options={booleanSelects}
 									/>
@@ -867,7 +868,7 @@ React.useEffect( () => {
 								disabled={viewOnly}
 								onChange={date => {
 									setDeadline(date);
-            			// updateTaskFunc();
+            			updateTaskFunc();
 								}}
 								placeholderText="No deadline"
 								{...datePickerConfig}
@@ -881,11 +882,11 @@ React.useEffect( () => {
 							repeat={repeat}
 							submitRepeat={(r) => {
                 setRepeat(r);
-          			// updateTaskFunc();
+          			updateTaskFunc();
               }}
 							deleteRepeat={()=> {
                 setRepeat(null);
-          			// updateTaskFunc();
+          			updateTaskFunc();
               }}
 							columns={columns}
 							/>
@@ -900,7 +901,7 @@ React.useEffect( () => {
 									styles={invisibleSelectStyleNoArrowRequired}
 									onChange={(overtime)=> {
 										setOvertime(overtime);
-              			// updateTaskFunc();
+              			updateTaskFunc();
 									}}
 									options={booleanSelects}
 									/>
@@ -942,7 +943,7 @@ React.useEffect( () => {
                     setOpenUserAdd(true);
                   } else {
                     setAssignedTo(users);
-                //		updateTaskFunc();
+										updateTaskFunc();
                   }
                 }}
                 options={
@@ -980,7 +981,7 @@ React.useEffect( () => {
                 styles={invisibleSelectStyleNoArrowRequired}
                 onChange={(type)=> {
                   setTaskType(type);
-            //		updateTaskFunc();
+            			updateTaskFunc();
               }}
                 options={taskTypes}
 								/>
@@ -1009,7 +1010,7 @@ React.useEffect( () => {
     						isMulti
     						onChange={(tags)=> {
                   setTags(tags);
-                  // updateTaskFunc();
+                  updateTaskFunc();
                 }}
     						options={allTags}
     						isDisabled={defaultFields.tag.fixed||viewOnly}
@@ -1058,7 +1059,7 @@ React.useEffect( () => {
                 styles={invisibleSelectStyleNoArrowRequired}
                 onChange={(pausal)=> {
                   setPausal(pausal);
-                  // updateTaskFunc();
+                  updateTaskFunc();
                 }}
                 options={booleanSelects}
 								/>
@@ -1074,7 +1075,7 @@ React.useEffect( () => {
               disabled={viewOnly}
               onChange={date => {
                 setDeadline(date);
-                // updateTaskFunc();
+                updateTaskFunc();
               }}
 							placeholderText="No deadline"
 							{...datePickerConfig}
@@ -1087,11 +1088,11 @@ React.useEffect( () => {
           repeat={repeat}
           submitRepeat={(r) => {
             setRepeat(r);
-            // updateTaskFunc();
+            updateTaskFunc();
           }}
           deleteRepeat={()=> {
             setRepeat(null);
-            // updateTaskFunc();
+            updateTaskFunc();
           }}
           columns={columns}
 					vertical={true}
@@ -1106,7 +1107,7 @@ React.useEffect( () => {
                 styles={invisibleSelectStyleNoArrowRequired}
                 onChange={(overtime)=> {
                   setOvertime(overtime);
-                  // updateTaskFunc();
+                  updateTaskFunc();
                 }}
                 options={booleanSelects}
 								/>
@@ -1131,7 +1132,7 @@ React.useEffect( () => {
 						isMulti
 						onChange={(tags)=> {
               setTags(tags);
-              // updateTaskFunc();
+              updateTaskFunc();
             }}
 						options={allTags}
 						isDisabled={defaultFields.tag.fixed||viewOnly}
@@ -1201,7 +1202,7 @@ React.useEffect( () => {
 						}}
 						onChange={(e,editor)=>{
               setDescription(editor.getData());
-              // updateTaskFunc();
+              updateTaskFunc();
 						}}
 						config={ck5config}
 						/>
@@ -1244,13 +1245,13 @@ React.useEffect( () => {
 						}
 					});
 					setAttachments([...attachments, ...newAttachments]);
-					// updateTaskFunc();
+					updateTaskFunc();
 				}}
 				removeAttachment={(attachment)=>{
 					let newAttachments = [...attachments];
 					newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
 					setAttachments([...newAttachments]);
-					// updateTaskFunc();
+					updateTaskFunc();
 				}}
 				/>
 		)
@@ -1344,7 +1345,7 @@ React.useEffect( () => {
 
 				submitService={(newService) => {
           setTaskWorks([ ...taskWorks, {...newService, id: getNewID()}]);
-      //		updateTaskFunc();
+      		updateTaskFunc();
         }}
 				subtasks={taskWorks ? taskWorks : []}
 				defaultType={taskType}
@@ -1353,7 +1354,7 @@ React.useEffect( () => {
           let newTaskWorks=[...taskWorks];
           newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
           setTaskWorks(newTaskWorks);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				updateSubtasks={(multipleSubtasks)=>{
           let newTaskWorks=[...taskWorks];
@@ -1361,25 +1362,25 @@ React.useEffect( () => {
             newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
           });
           setTaskWorks(newTaskWorks);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				removeSubtask={(id)=>{
           let newTaskWorks=[...taskWorks];
           newTaskWorks.splice(newTaskWorks.findIndex((taskWork)=>taskWork.id===id),1);
           setTaskWorks(newTaskWorks);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				workTrips={workTrips ? workTrips : []}
 				tripTypes={tripTypes ? tripTypes : []}
         submitTrip={(newTrip)=>{
           setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
-      //		updateTaskFunc();
+      		updateTaskFunc();
         }}
 				updateTrip={(id,newData)=>{
           let newTrips=[...workTrips];
           newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
           setWorkTrips(newTrips);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				updateTrips={(multipleTrips)=>{
           let newTrips=[...workTrips];
@@ -1387,25 +1388,25 @@ React.useEffect( () => {
             newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
           });
           setWorkTrips(newTrips);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				removeTrip={(id)=>{
           let newTrips=[...workTrips];
           newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
           setWorkTrips(newTrips);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 
 				materials={taskMaterials ? taskMaterials : []}
         submitMaterial={(newMaterial)=>{
           setTaskMaterials([...taskMaterials,{id:getNewID(),...newMaterial}]);
-      //		updateTaskFunc();
+      		updateTaskFunc();
         }}
 				updateMaterial={(id,newData)=>{
           let newTaskMaterials=[...taskMaterials];
           newTaskMaterials[newTaskMaterials.findIndex((material)=>material.id===id)]={...newTaskMaterials.find((material)=>material.id===id),...newData};
           setTaskMaterials(newTaskMaterials);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				updateMaterials={(multipleMaterials)=>{
           let newTaskMaterials=[...taskMaterials];
@@ -1413,24 +1414,24 @@ React.useEffect( () => {
             newTaskMaterials[newTaskMaterials.findIndex((material)=>material.id===id)]={...newTaskMaterials.find((material)=>material.id===id),...newData};
           });
           setTaskMaterials(newTaskMaterials);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				removeMaterial={(id)=>{
           let newTaskMaterials=[...taskMaterials];
           newTaskMaterials.splice(newTaskMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
           setTaskMaterials(newTaskMaterials);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				customItems={customItems ? customItems : [] }
         submitCustomItem={(customItem)=>{
           setCustomItems([...customItems,{id:getNewID(),...customItem}]);
-      //		updateTaskFunc();
+      		updateTaskFunc();
         }}
 				updateCustomItem={(id,newData)=>{
           let newCustomItems=[...customItems];
           newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
           setCustomItems(newCustomItems);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				updateCustomItems={(multipleCustomItems)=>{
           let newCustomItems=[...customItems];
@@ -1438,13 +1439,13 @@ React.useEffect( () => {
             newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
           });
           setCustomItems(newCustomItems);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				removeCustomItem={(id)=>{
           let newCustomItems=[...customItems];
           newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
           setCustomItems(newCustomItems);
-      //		updateTaskFunc();
+      		updateTaskFunc();
 				}}
 				units={units ? units : []}
 				defaultUnit={defaultUnit}

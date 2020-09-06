@@ -18,6 +18,8 @@ import TaskList from './task';
 
 import NotificationList from './notifications';
 
+import { tasklistLayout } from 'localCache';
+
 const GET_MY_DATA = gql`
 query {
   getMyData{
@@ -67,11 +69,12 @@ export default function Navigation (props) {
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
-  const tasklistLayout = currentUser.tasklistLayout ? currentUser.tasklistLayout  : 0;
+  tasklistLayout(1);
+//currentUser.tasklistLayout ? currentUser.tasklistLayout  : 1;
 
 	const setLayout = (value) => {
 		updateUserFunc(value);
-		//props.setTasklistLayout(value);
+    tasklistLayout(parseInt(value))
 	}
 
 	// functions

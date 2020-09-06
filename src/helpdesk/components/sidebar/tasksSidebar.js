@@ -21,6 +21,8 @@ import { getEmptyFilter } from 'configs/fixedFilters';
 import { toSelArr } from 'helperFunctions';
 import { dashboard, addProject, allMilestones, addMilestone } from 'configs/constants/sidebar';
 
+import { selectedProject } from 'localCache';
+
 const GET_PROJECTS = gql`
 query {
   projects{
@@ -153,6 +155,7 @@ export default function TasksSidebar(props) {
       const pro = (accessRights.addProjects ? [dashboard, addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
       setProjects(pro);
       setCurrentProject( projects[0] );
+      selectedProject(null);
     }
   }, [projectsLoading]);
 
@@ -163,6 +166,7 @@ export default function TasksSidebar(props) {
       setProjects(pro);
       const index = pro.findIndex(p => p.id === currentProject.id);
       setCurrentProject( (index >= 0 ? pro[index] : [dashboard]) );
+      selectedProject((index >= 0 ? pro[index] : null));
     }
   }, [projectsData]);
 
@@ -171,6 +175,7 @@ export default function TasksSidebar(props) {
       const pro = (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
       setProjects(pro);
       setCurrentProject( newProject );
+      selectedProject(newProject);  
   }
 
   const filters = [];
@@ -193,8 +198,10 @@ export default function TasksSidebar(props) {
         value={currentProject}
         styles={sidebarSelectStyle}
         onChange={project => {
-          setCurrentProject(project);
-          if (project.id === -1){
+          if (project.id !== -1){
+            setCurrentProject(project);
+            selectedProject(project);
+          } else {
             setOpenProjectAdd(true);
           }
         }}
