@@ -197,7 +197,7 @@ query task($id: Int!){
 `;
 
 const UPDATE_TASK = gql`
-mutation updateTask($id: Int!, $title: String!, $closeDate: Int!, $assignedTo: [Int]!, $company: Int!, $deadline: Int, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: Int, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput ) {
+mutation updateTask($id: Int!, $title: String!, $closeDate: Int, $assignedTo: [Int]!, $company: Int!, $deadline: Int, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: Int, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput ) {
   updateTask(
 		id: $id,
     title: $title,
@@ -300,21 +300,21 @@ export default function TaskEdit (props){
 React.useEffect( () => {
     if (!taskLoading){
 			setAssignedTo(taskData.task.assignedTo);
-			setCloseDate( moment(taskData.task.closeDate) );
+			setCloseDate( moment(taskData.task.closeDate/1000) );
 			setCompany( ( taskData.task.company ? {...taskData.task.company, value: taskData.task.company.id, label: taskData.task.company.title} : null) );
 			setCreatedBy(taskData.task.createdBy);
 			setCreatedAt( taskData.task.createdAt );
-			setDeadline(taskData.task.deadline ? moment(taskData.task.deadline) : null) ;
+			setDeadline(taskData.task.deadline ? moment(taskData.task.deadline/1000) : null) ;
 			setDescription(taskData.task.description);
       setImportant(taskData.task.important);
-      setInvoicedDate( moment(taskData.task.invoicedDate) );
+      setInvoicedDate( moment(taskData.task.invoicedDate/1000) );
       //invoicedDate: task.invoicedDate!==null && task.invoicedDate!==undefined ?new Date(task.invoicedDate).toISOString().replace('Z',''):'',
       const pro =  (taskData.task.project ? {...taskData.task.project, value: taskData.task.project.id, label: taskData.task.project.title} : null );
       setMilestone(pro && pro.milestone ? {...pro.milestone, value: pro.milestone.id, label: pro.milestone.title} : noMilestone );
 			setOvertime( (taskData.task.overtime ? booleanSelects[1] : booleanSelects[0]) );
 			setPausal( (taskData.task.pausal ? booleanSelects[1] : booleanSelects[0]) );
 			setPendingChangable(taskData.task.pendingChangable);
-			setPendingDate( moment(taskData.task.pendingDate) );
+			setPendingDate( moment(taskData.task.pendingDate/1000) );
 			setProject(pro);
 			setReminder(taskData.task.reminder);
 			setRepeat(taskData.task.repeat);
@@ -409,7 +409,7 @@ React.useEffect( () => {
 
   		let newInvoicedDate = null;
   		if(status.action==='Invoiced'){
-  			newInvoicedDate = isNaN(invoicedDate.unix()) ? moment().unix() : invoicedDate.unix();
+  			newInvoicedDate = isNaN(invoicedDate.unix()) ? moment().unix()*1000 : invoicedDate.unix()*1000;
   		}
 
       updateTask({ variables: {
@@ -420,7 +420,6 @@ React.useEffect( () => {
         assignedTo: assignedTo.map((item)=>item.id),
         description,
         status: status ? status.id : null,
-        statusChange: null, //statusChange !== null ? statusChange.unix() : null,
         project: project ? project.id : null,
         pausal: pausal.value,
         overtime: overtime.value,
@@ -428,9 +427,9 @@ React.useEffect( () => {
         taskType: taskType ? taskType.id : null,
         repeat: repeat,
         milestone: (milestone.id === null || milestone.id === -1 ? null : milestone.id),
-        attachments,
-        deadline: deadline !== null ? deadline.unix() : null,
-        closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix() : 0,
+  //      attachments,
+        deadline: deadline !== null ? deadline.unix()*1000 : null,
+        closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix()*1000 : null,
         pendingDate: (pendingDate !== null && status.action==='PendingDate') ? pendingDate.unix() : null,
         pendingChangable,
     //    invoicedDate: newInvoicedDate,

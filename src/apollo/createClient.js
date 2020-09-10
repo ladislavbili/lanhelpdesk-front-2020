@@ -10,17 +10,19 @@ import { onError } from 'apollo-link-error';
 import { afterNow } from '../helperFunctions';
 import axios from 'axios';
 
+import {REST_URL} from 'configs/restAPI';
+
 
 const cache = new InMemoryCache();
 const link = new HttpLink({
-  uri: "http://localhost:4000/graphql",
+  uri: `${REST_URL}/graphql`,
   credentials: "include"
 });
 
 async function refreshToken(){
   return axios.request(
     {
-      url: `http://localhost:4000/refresh_token`,
+      url: `${REST_URL}/refresh_token`,
       method: 'post',
       withCredentials: true
     },

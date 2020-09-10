@@ -21,9 +21,9 @@ import {setTasksOrderBy, setTasksAscending,storageCompaniesStart,storageHelpTags
 	setHelpSidebarProject, setHelpSidebarMilestone, setHelpSidebarFilter, setFilter, setMilestone,setProject} from 'redux/actions';*/
 const fixedFilters = getFixedFilters();
 
-const GET_FILTERED_TASKS = gql`
-query filteredTasks($filter: FilterInput, $projectId: Int){
-  filteredTasks (
+const GET_TASKS = gql`
+query tasks($filter: FilterInput, $projectId: Int){
+  tasks (
     filter: $filter,
     projectId: $projectId,
   ){
@@ -185,7 +185,7 @@ export default function TasksIndex (props) {
   //data & queries
   const { history, match, calendarEvents, orderBy, setTasksOrderBy, ascending, setTasksAscending, statuses, setUserFilterStatuses } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
-  const { data: tasksData, loading: tasksLoading, refetch: tasksRefetch } = useQuery(GET_FILTERED_TASKS, { variables: {}, options: { fetchPolicy: 'network-only' }});
+  const { data: tasksData, loading: tasksLoading, refetch: tasksRefetch } = useQuery(GET_TASKS, { variables: {}, options: { fetchPolicy: 'network-only' }});
   const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
   const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS, { options: { fetchPolicy: 'network-only' }});
   const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
@@ -224,7 +224,7 @@ export default function TasksIndex (props) {
 
   const filterTasks = () => {
     let ref = tasksRefetch( { variables: {filter, projectId: selectedProject.id}, options: { fetchPolicy: 'network-only' }});
-    let mah = tasksData ? tasksData.filteredTasks : [];
+    let mah = tasksData ? tasksData.tasks : [];
   	return mah;
   	/*
   	if(!this.props.statusesLoaded){
