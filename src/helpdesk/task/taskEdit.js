@@ -30,7 +30,7 @@ import ck5config from 'configs/components/ck5config';
 
 import datePickerConfig from 'configs/components/datepicker';
 import PendingPicker from '../components/pendingPicker';
-import {toSelArr, snapshotToArray, timestampToString, sameStringForms, toMomentInput} from '../../helperFunctions';
+import {toSelArr, toSelItem, snapshotToArray, timestampToString, sameStringForms, toMomentInput} from '../../helperFunctions';
 import {invisibleSelectStyleNoArrow, invisibleSelectStyleNoArrowColored,invisibleSelectStyleNoArrowColoredRequired, invisibleSelectStyleNoArrowRequired} from 'configs/components/select';
 import { REST_URL } from 'configs/restAPI';
 import booleanSelects from 'configs/constants/boolSelect';
@@ -51,6 +51,7 @@ query task($id: Int!){
 			id
 			name
 			surname
+			email
 		}
 		company {
 			id
@@ -182,6 +183,7 @@ query task($id: Int!){
 		tags {
 			id
 			title
+			color
 		}
 		taskType {
 			id
@@ -191,6 +193,82 @@ query task($id: Int!){
 			repeatEvery
 			repeatInterval
 			startsAt
+		}
+		subtasks {
+			id
+			title
+			order
+			done
+			quantity
+			discount
+			type {
+				id
+				title
+			}
+			assignedTo {
+				id
+				email
+				company {
+					id
+				}
+			}
+		}
+		workTrips {
+			id
+			order
+			done
+			quantity
+			discount
+			type {
+				id
+				title
+			}
+			assignedTo {
+				id
+				email
+				company {
+					id
+				}
+			}
+		}
+		materials {
+			id
+			title
+			order
+			done
+			quantity
+			margin
+			price
+		}
+		customItems {
+			id
+			title
+			order
+			done
+			quantity
+			price
+		}
+		comments {
+			id
+			createdAt
+			message
+			internal
+			user {
+				id
+				fullName
+				email
+			}
+			childComments {
+				id
+				createdAt
+				message
+				user{
+					id
+					fullName
+					email
+				}
+			}
+			parentCommentId
 		}
 	}
 }
@@ -234,12 +312,197 @@ mutation deleteTask($id: Int!) {
 }
 `;
 
+const ADD_SUBTASK = gql`
+mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
+  addSubtask(
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		discount: $discount,
+		type: $type,
+		task: $task,
+		assignedTo: $assignedTo,
+  ){
+    id
+  }
+}
+`;
+
+const UPDATE_SUBTASK = gql`
+mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+  updateSubtask(
+		id: $id,
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		discount: $discount,
+		type: $type,
+		assignedTo: $assignedTo,
+  ){
+    id
+    title
+  }
+}
+`;
+
+export const DELETE_SUBTASK = gql`
+mutation deleteSubtask($id: Int!) {
+  deleteSubtask(
+    id: $id,
+  ){
+    id
+  }
+}
+`;
+
+
+const ADD_WORKTRIP = gql`
+mutation addWorkTrip($order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
+  addWorkTrip(
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		discount: $discount,
+		type: $type,
+		task: $task,
+		assignedTo: $assignedTo,
+  ){
+    id
+  }
+}
+`;
+
+const UPDATE_WORKTRIP = gql`
+mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+  updateWorkTrip(
+		id: $id,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		discount: $discount,
+		type: $type,
+		assignedTo: $assignedTo,
+  ){
+    id
+  }
+}
+`;
+
+export const DELETE_WORKTRIP = gql`
+mutation deleteWorkTrip($id: Int!) {
+  deleteWorkTrip(
+    id: $id,
+  ){
+    id
+  }
+}
+`;
+
+const ADD_MATERIAL = gql`
+mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $margin: Float!, $price: Float!, $task: Int!) {
+  addMaterial(
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		margin: $margin,
+		price: $price,
+		task: $task,
+  ){
+    id
+  }
+}
+`;
+
+const UPDATE_MATERIAL = gql`
+mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $margin: Float, $price: Float) {
+  updateMaterial(
+		id: $id,
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		margin: $margin,
+		price: $price,
+  ){
+    id
+    title
+  }
+}
+`;
+
+export const DELETE_MATERIAL = gql`
+mutation deleteMaterial($id: Int!) {
+  deleteMaterial(
+    id: $id,
+  ){
+    id
+  }
+}
+`;
+
+
+const ADD_CUSTOM_ITEM = gql`
+mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $price: Float!, $task: Int!) {
+  addCustomItem(
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		price: $price,
+		task: $task,
+  ){
+    id
+  }
+}
+`;
+
+const UPDATE_CUSTOM_ITEM = gql`
+mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $price: Float) {
+  updateCustomItem(
+		id: $id,
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		price: $price,
+  ){
+    id
+    title
+  }
+}
+`;
+
+export const DELETE_CUSTOM_ITEM = gql`
+mutation deleteCustomItem($id: Int!) {
+  deleteCustomItem(
+    id: $id,
+  ){
+    id
+  }
+}
+`;
+
 export default function TaskEdit (props){
 	//data & queries
-	const { match, history, columns, currentUser, accessRights, statuses, companies, users, allTags, projects, tasks, taskTypes, tripTypes, units, defaultUnit, subtasks, inModal, closeModal } = props;
+	const { match, history, columns, currentUser, accessRights, statuses, companies, users, allTags, projects, tasks, taskTypes, tripTypes, emails, inModal, closeModal } = props;
   const { data: taskData, loading: taskLoading, refetch: taskRefetch } = useQuery(GET_TASK, { variables: {id: parseInt(match.params.taskID)} });
   const [ updateTask, {client} ] = useMutation(UPDATE_TASK);
-  const [deleteTask, {deleteData}] = useMutation(DELETE_TASK);
+  const [ deleteTask, {deleteData} ] = useMutation(DELETE_TASK);
+  const [ addSubtask ] = useMutation(ADD_SUBTASK);
+  const [ updateSubtask ] = useMutation(UPDATE_SUBTASK);
+  const [ deleteSubtask ] = useMutation(DELETE_SUBTASK);
+  const [ addWorkTrip ] = useMutation(ADD_WORKTRIP);
+  const [ updateWorkTrip ] = useMutation(UPDATE_WORKTRIP);
+  const [ deleteWorkTrip ] = useMutation(DELETE_WORKTRIP);
+  const [ addMaterial ] = useMutation(ADD_MATERIAL);
+  const [ updateMaterial ] = useMutation(UPDATE_MATERIAL);
+  const [ deleteMaterial ] = useMutation(DELETE_MATERIAL);
+  const [ addCustomItem ] = useMutation(ADD_CUSTOM_ITEM);
+  const [ updateCustomItem ] = useMutation(UPDATE_CUSTOM_ITEM);
+  const [ deleteCustomItem ] = useMutation(DELETE_CUSTOM_ITEM);
 
   //state
   const [ layout, setLayout ] = React.useState(1);
@@ -251,6 +514,7 @@ export default function TaskEdit (props){
   const [ createdBy, setCreatedBy ] = React.useState(null);
   const [ createdAt, setCreatedAt ] = React.useState(null);
   const [ closeDate, setCloseDate ] = React.useState(null);
+  const [ comments, setComments ] = React.useState([]);
   const [ company, setCompany ] = React.useState(null);
   const [ customItems, setCustomItems ] = React.useState([]);
   const [ deadline, setDeadline ] = React.useState(null);
@@ -281,9 +545,9 @@ export default function TaskEdit (props){
   const [ statusChange, setStatusChange ] = React.useState(false);
   const [ showDescription, setShowDescription ] = React.useState(false);
   const [ tags, setTags ] = React.useState([]);
-  const [ taskMaterials, setTaskMaterials ] = React.useState([]);
+  const [ materials, setMaterials ] = React.useState([]);
   const [ taskType, setTaskType ] = React.useState(null);
-  const [ taskWorks, setTaskWorks ] = React.useState([]);
+  const [ subtasks, setSubtasks ] = React.useState([]);
 	const [ title, setTitle ] = React.useState("");
   const [ toggleTab, setToggleTab ] = React.useState(1);
   const [ workTrips, setWorkTrips ] = React.useState([]);
@@ -299,8 +563,9 @@ export default function TaskEdit (props){
 // sync
 React.useEffect( () => {
     if (!taskLoading){
-			setAssignedTo(taskData.task.assignedTo);
+			setAssignedTo(toSelArr(taskData.task.assignedTo, 'email'));
 			setCloseDate( moment(taskData.task.closeDate/1000) );
+			setComments( [...taskData.task.comments.map(item => ({...item, isMail: false})), ...emails.map(item => ({...item, isMail: true}))] );
 			setCompany( ( taskData.task.company ? {...taskData.task.company, value: taskData.task.company.id, label: taskData.task.company.title} : null) );
 			setCreatedBy(taskData.task.createdBy);
 			setCreatedAt( taskData.task.createdAt );
@@ -319,49 +584,16 @@ React.useEffect( () => {
 			setReminder(taskData.task.reminder);
 			setRepeat(taskData.task.repeat);
 			setRequester( (taskData.task.requester ? {...taskData.task.requester, value: taskData.task.requester.id, label: `${taskData.task.requester.name} ${taskData.task.requester.surname}`} : null)) ;
-      const sta = (taskData.task.status ? {...taskData.task.status, value: taskData.task.status.id, label: taskData.task.status.title} : null )
+      const sta = (taskData.task.status ? toSelItem(taskData.task.status) : null )
 			setStatus(sta );
-			setTags(taskData.task.tags);
+			setTags(taskData.task.tags ? toSelArr(taskData.task.tags) : []);
 			setTaskType( (taskData.task.taskType ? {...taskData.task.taskType, value: taskData.task.taskType.id, label: taskData.task.taskType.title} : null ) );
 			setTitle(taskData.task.title);
-      setCustomItems(taskData.task.customItems);
-      setTaskMaterials(taskData.task.taskMaterials);
-      setTaskWorks(taskData.task.taskWorks);
-      setWorkTrips(taskData.task.workTrips);
+      setCustomItems( taskData.task.customItems );
+      setMaterials( taskData.task.materials );
+      setSubtasks( (taskData.task.subtasks ? taskData.task.subtasks.map(item => ({...item, assignedTo: toSelItem(item.assignedTo, 'email'), type: toSelItem(item.type)}) ) : [] ) );
+      setWorkTrips( (taskData.task.workTrips ? taskData.task.workTrips.map(item => ({...item, assignedTo: toSelItem(item.assignedTo, 'email'), type: toSelItem(item.type)}) ) : [] ) );
 
-      /*
-  		let workTrips= this.state.workTrips.map((trip)=>{
-  			let type= this.state.tripTypes.find((item)=>item.id===trip.type);
-  			let assignedTo=trip.assignedTo?this.state.users.find((item)=>item.id===trip.assignedTo):null
-
-  			return {
-  				...trip,
-  				type,
-  				assignedTo:assignedTo?assignedTo:null
-  			}
-  		});
-
-  		let taskWorks= this.state.taskWorks.map((work)=>{
-  			let assignedTo=work.assignedTo?this.state.users.find((item)=>item.id===work.assignedTo):null
-  			return {
-  				...work,
-  				type:this.state.taskTypes.find((item)=>item.id===work.type),
-  				assignedTo:assignedTo?assignedTo:null
-  			}
-  		});
-  		let taskMaterials= this.state.taskMaterials.map((material)=>{
-  			return {
-  				...material,
-  				unit:this.state.units.find((unit)=>unit.id===material.unit)
-  			}
-  		});
-
-  		let customItems = this.state.customItems.map((item)=>(
-  			{
-  				...item,
-  				unit:this.state.units.find((unit)=>unit.id===item.unit),
-  			}
-  		));*/
 
       if (pro){
         setDefaults(pro);
@@ -398,7 +630,7 @@ React.useEffect( () => {
   }
 
   const cannotSave = () => {
-  	return  title==="" || status===null || project === null || saving || viewOnly;
+  	return  title==="" || status===null || project === null || assignedTo === [] || saving || viewOnly;
   }
 
   const	updateTaskFunc = () => {
@@ -409,7 +641,7 @@ React.useEffect( () => {
 
   		let newInvoicedDate = null;
   		if(status.action==='Invoiced'){
-  			newInvoicedDate = isNaN(invoicedDate.unix()) ? moment().unix()*1000 : invoicedDate.unix()*1000;
+  			newInvoicedDate = isNaN(invoicedDate.unix()) ? moment().unix() : invoicedDate.unix();
   		}
 
       updateTask({ variables: {
@@ -428,8 +660,8 @@ React.useEffect( () => {
         repeat: repeat,
         milestone: (milestone.id === null || milestone.id === -1 ? null : milestone.id),
   //      attachments,
-        deadline: deadline !== null ? deadline.unix()*1000 : null,
-        closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix()*1000 : null,
+        deadline: deadline !== null ? deadline.unix() : null,
+        closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix() : null,
         pendingDate: (pendingDate !== null && status.action==='PendingDate') ? pendingDate.unix() : null,
         pendingChangable,
     //    invoicedDate: newInvoicedDate,
@@ -441,6 +673,228 @@ React.useEffect( () => {
 
      setSaving( false );
   	}
+
+	const	addSubtaskFunc = (sub) => {
+  		if(cannotSave()){
+  			return;
+  		}
+      setSaving(true);
+
+      addSubtask({ variables: {
+        title: sub.title,
+				order: sub.order,
+				done: sub.done,
+				discount: sub.discount,
+				quantity: sub.quantity,
+				type: sub.type.id,
+				task: parseInt(match.params.taskID),
+				assignedTo: sub.assignedTo.id,
+      } }).then( ( response ) => {
+				console.log(response);
+				setSubtasks([ ...subtasks, {...sub, id: response.data.addSubtask.id} ]);
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+
+     setSaving( false );
+  	}
+
+  const	updateSubtaskFunc = (sub) => {
+  		if(cannotSave()){
+  			return;
+  		}
+      setSaving(true);
+
+      updateSubtask({ variables: {
+        id: sub.id,
+        title: sub.title,
+				order: sub.order,
+				done: sub.done,
+				discount: sub.discount,
+				quantity: sub.quantity,
+				type: sub.type.id,
+				assignedTo: sub.assignedTo.id,
+      } }).then( ( response ) => {
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+
+     setSaving( false );
+  	}
+
+	const deleteSubtaskFunc = (id) => {
+    deleteSubtask({ variables: {
+      id,
+    } }).then( ( response ) => {
+    }).catch( (err) => {
+      console.log(err.message);
+      console.log(err);
+    });
+  }
+
+	const	addWorkTripFunc = (wt) => {
+  		if(cannotSave()){
+  			return;
+  		}
+      setSaving(true);
+
+      addWorkTrip({ variables: {
+				order: wt.order,
+				done: wt.done,
+				discount: wt.discount,
+				quantity: wt.quantity,
+				type: wt.type.id,
+				task: parseInt(match.params.taskID),
+				assignedTo: wt.assignedTo.id,
+      } }).then( ( response ) => {
+				console.log(response);
+				setWorkTrips([ ...workTrips, {...wt, id: response.data.addWorkTrip.id} ]);
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+
+     setSaving( false );
+  	}
+
+  const	updateWorkTripFunc = (item) => {
+  		if(cannotSave()){
+  			return;
+  		}
+      setSaving(true);
+
+      updateWorkTrip({ variables: {
+        id: item.id,
+				order: item.order,
+				done: item.done,
+				discount: item.discount,
+				quantity: item.quantity,
+				type: item.type.id,
+				assignedTo: item.assignedTo.id,
+      } }).then( ( response ) => {
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+
+     setSaving( false );
+  	}
+
+	const deleteWorkTripFunc = (id) => {
+    deleteWorkTrip({ variables: {
+      id,
+    } }).then( ( response ) => {
+    }).catch( (err) => {
+      console.log(err.message);
+      console.log(err);
+    });
+  }
+
+		const	addMaterialFunc = (item) => {
+	  		if(cannotSave()){
+	  			return;
+	  		}
+	      setSaving(true);
+	      addMaterial({ variables: {
+					title: item.title,
+					order: item.order,
+					done: item.done,
+					quantity: parseFloat(item.quantity),
+					margin: parseFloat(item.margin),
+					price: parseFloat(item.price),
+					task: parseInt(match.params.taskID),
+	      } }).then( ( response ) => {
+					console.log(response);
+					setMaterials([ ...materials, {...item, id: response.data.addMaterial.id} ]);
+	      }).catch( (err) => {
+	        console.log(err.message);
+	      });
+
+	     setSaving( false );
+	  	}
+
+	  const	updateMaterialFunc = (item) => {
+	  		if(cannotSave()){
+	  			return;
+	  		}
+	      setSaving(true);
+
+	      updateMaterial({ variables: {
+	        id: item.id,
+					title: item.title,
+					order: item.order,
+					done: item.done,
+					quantity: parseFloat(item.quantity),
+					margin: parseFloat(item.margin),
+					price: parseFloat(item.price),
+	      } }).then( ( response ) => {
+	      }).catch( (err) => {
+	        console.log(err.message);
+	      });
+
+	     setSaving( false );
+	  	}
+
+		const deleteMaterialFunc = (id) => {
+	    deleteMaterial({ variables: {
+	      id,
+	    } }).then( ( response ) => {
+	    }).catch( (err) => {
+	      console.log(err.message);
+	      console.log(err);
+	    });
+	  }
+
+	const	addCustomItemFunc = (item) => {
+  		if(cannotSave()){
+  			return;
+  		}
+      setSaving(true);
+      addCustomItem({ variables: {
+				title: item.title,
+				order: item.order,
+				done: item.done,
+				quantity: parseFloat(item.quantity),
+				price: parseFloat(item.price),
+				task: parseInt(match.params.taskID),
+      } }).then( ( response ) => {
+				console.log(response);
+				setCustomItems([ ...customItems, {...item, id: response.data.addCustomItem.id} ]);
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+
+     setSaving( false );
+  	}
+
+  const	updateCustomItemFunc = (item) => {
+  		if(cannotSave()){
+  			return;
+  		}
+      setSaving(true);
+
+      updateCustomItem({ variables: {
+        id: item.id,
+				title: item.title,
+				order: item.order,
+				done: item.done,
+				quantity: parseFloat(item.quantity),
+				price: parseFloat(item.price),
+      } }).then( ( response ) => {
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+
+     setSaving( false );
+  	}
+
+	const deleteCustomItemFunc = (id) => {
+    deleteCustomItem({ variables: {
+      id,
+    } }).then( ( response ) => {
+    }).catch( (err) => {
+      console.log(err.message);
+      console.log(err);
+    });
+  }
 
 	const getHistoryMessage = (type, data) => {
 		let user = "Používateľ " + currentUser.userData.name + ' ' + currentUser.userData.surname;
@@ -520,9 +974,9 @@ React.useEffect( () => {
 							taskID={match.params.taskID}
 							createdBy={createdBy}
 							createdAt={createdAt}
-							taskWorks={taskWorks}
+							taskWorks={subtasks}
 							workTrips={workTrips}
-							taskMaterials={taskMaterials}
+							taskMaterials={materials}
 							customItems={customItems}
 							isLoaded={!taskLoading} />
 					}
@@ -531,7 +985,7 @@ React.useEffect( () => {
                 type="button"
                 disabled={!canDelete}
                 className="btn btn-link-reversed waves-effect"
-                onClick={deleteTask}>
+                onClick={deleteTaskFunc}>
 								<i className="far fa-trash-alt" /> Delete
 							</button>
 						}
@@ -662,7 +1116,7 @@ React.useEffect( () => {
 	}
 
 	const changeStatus = (s) => {
-		if(status.action==='PendingDate'){
+		if(s.action==='PendingDate'){
 			setPendingStatus(s);
 			setPendingOpen(true);
 		}else if(s.action==='CloseDate'||s.action==='Invalid'){
@@ -1169,11 +1623,11 @@ React.useEffect( () => {
 
 			let taskIDs = currentTasks.map(task => task.id);
 
-      let currentTaskWorksQuantities =[];
-			//let currentTaskWorksQuantities = this.state.extraData.taskWorks.filter(work => taskIDs.includes(work.task)).map(task => task.quantity);
+      let currentSubtasksQuantities =[];
+			//let currentSubtasksQuantities = this.state.extraData.subtasks.filter(work => taskIDs.includes(work.task)).map(task => task.quantity);
 
-			if (currentTaskWorksQuantities.length > 0){
-				usedPausal = currentTaskWorksQuantities.reduce((total, quantity) => total + quantity);
+			if (currentSubtasksQuantities.length > 0){
+				usedPausal = currentSubtasksQuantities.reduce((total, quantity) => total + quantity);
 			}
 		}
 
@@ -1324,9 +1778,9 @@ React.useEffect( () => {
 	}
 /*
 
-  let newTaskWorks = [...taskWorks];
-  newTaskWorks.push({...newService, id: getNewID()});
-  setTaskWorks(newTaskWorks);
+  let newSubtasks = [...subtasks];
+  newSubtasks.push({...newService, id: getNewID()});
+  setSubtasks(newSubtasks);
 */
 
 	const renderVykazyTable = () => {
@@ -1343,115 +1797,176 @@ React.useEffect( () => {
 				showSubtasks={project ? project.showSubtasks : false}
 
 				submitService={(newService) => {
-          setTaskWorks([ ...taskWorks, {...newService, id: getNewID()}]);
-      		updateTaskFunc();
+					addSubtaskFunc(newService);
         }}
-				subtasks={taskWorks ? taskWorks : []}
+				subtasks={subtasks ? subtasks : []}
 				defaultType={taskType}
         taskTypes={taskTypes}
 				updateSubtask={(id,newData)=>{
-          let newTaskWorks=[...taskWorks];
-          newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
-          setTaskWorks(newTaskWorks);
-      		updateTaskFunc();
+          let newSubtasks=[...subtasks];
+          newSubtasks[newSubtasks.findIndex((item)=>item.id===id)]={...newSubtasks.find((item)=>item.id===id),...newData};
+          setSubtasks(newSubtasks);
+					updateSubtaskFunc({...newSubtasks.find((item)=>item.id===id),...newData});
 				}}
 				updateSubtasks={(multipleSubtasks)=>{
-          let newTaskWorks=[...taskWorks];
+          let newSubtasks=[...subtasks];
           multipleSubtasks.forEach(({id, newData})=>{
-            newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
+            newSubtasks[newSubtasks.findIndex((item)=>item.id===id)]={...newSubtasks.find((item)=>item.id===id),...newData};
+						updateSubtaskFunc({...newSubtasks.find((item)=>item.id===id),...newData});
           });
-          setTaskWorks(newTaskWorks);
-      		updateTaskFunc();
+          setSubtasks(newSubtasks);
 				}}
 				removeSubtask={(id)=>{
-          let newTaskWorks=[...taskWorks];
-          newTaskWorks.splice(newTaskWorks.findIndex((taskWork)=>taskWork.id===id),1);
-          setTaskWorks(newTaskWorks);
-      		updateTaskFunc();
+          let newSubtasks=[...subtasks];
+          newSubtasks.splice(newSubtasks.findIndex((item)=>item.id===id),1);
+          setSubtasks(newSubtasks);
+      		deleteSubtaskFunc(id);
 				}}
 				workTrips={workTrips ? workTrips : []}
 				tripTypes={tripTypes ? tripTypes : []}
         submitTrip={(newTrip)=>{
-          setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
-      		updateTaskFunc();
+      		addWorkTripFunc(newTrip);
         }}
 				updateTrip={(id,newData)=>{
           let newTrips=[...workTrips];
           newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
           setWorkTrips(newTrips);
-      		updateTaskFunc();
+      		updateWorkTripFunc({...newTrips.find((trip)=>trip.id===id),...newData});
 				}}
 				updateTrips={(multipleTrips)=>{
           let newTrips=[...workTrips];
           multipleTrips.forEach(({id, newData})=>{
             newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
+	      		updateWorkTripFunc({...newTrips.find((trip)=>trip.id===id),...newData});
           });
           setWorkTrips(newTrips);
-      		updateTaskFunc();
 				}}
 				removeTrip={(id)=>{
           let newTrips=[...workTrips];
           newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
           setWorkTrips(newTrips);
-      		updateTaskFunc();
+      		deleteWorkTripFunc(id);
 				}}
 
-				materials={taskMaterials ? taskMaterials : []}
+				materials={materials ? materials : []}
         submitMaterial={(newMaterial)=>{
-          setTaskMaterials([...taskMaterials,{id:getNewID(),...newMaterial}]);
-      		updateTaskFunc();
+      		addMaterialFunc(newMaterial);
         }}
 				updateMaterial={(id,newData)=>{
-          let newTaskMaterials=[...taskMaterials];
-          newTaskMaterials[newTaskMaterials.findIndex((material)=>material.id===id)]={...newTaskMaterials.find((material)=>material.id===id),...newData};
-          setTaskMaterials(newTaskMaterials);
-      		updateTaskFunc();
+          let newMaterials=[...materials];
+          newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
+          setMaterials(newMaterials);
+      		updateMaterialFunc({...newMaterials.find((material)=>material.id===id),...newData});
 				}}
 				updateMaterials={(multipleMaterials)=>{
-          let newTaskMaterials=[...taskMaterials];
+          let newMaterials=[...materials];
           multipleMaterials.forEach(({id, newData})=>{
-            newTaskMaterials[newTaskMaterials.findIndex((material)=>material.id===id)]={...newTaskMaterials.find((material)=>material.id===id),...newData};
+            newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
+	      		updateMaterialFunc({...newMaterials.find((material)=>material.id===id),...newData});
           });
-          setTaskMaterials(newTaskMaterials);
-      		updateTaskFunc();
+          setMaterials(newMaterials);
 				}}
 				removeMaterial={(id)=>{
-          let newTaskMaterials=[...taskMaterials];
-          newTaskMaterials.splice(newTaskMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-          setTaskMaterials(newTaskMaterials);
-      		updateTaskFunc();
+          let newMaterials=[...materials];
+          newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
+          setMaterials(newMaterials);
+      		deleteMaterialFunc(id);
 				}}
 				customItems={customItems ? customItems : [] }
         submitCustomItem={(customItem)=>{
-          setCustomItems([...customItems,{id:getNewID(),...customItem}]);
-      		updateTaskFunc();
+					addCustomItemFunc(customItem);
         }}
 				updateCustomItem={(id,newData)=>{
           let newCustomItems=[...customItems];
           newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
           setCustomItems(newCustomItems);
-      		updateTaskFunc();
+      		updateCustomItemFunc({...newCustomItems.find((customItem)=>customItem.id===id),...newData});
 				}}
 				updateCustomItems={(multipleCustomItems)=>{
           let newCustomItems=[...customItems];
           multipleCustomItems.forEach(({id, newData})=>{
             newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
+	      		updateCustomItemFunc({...newCustomItems.find((customItem)=>customItem.id===id),...newData});
           });
           setCustomItems(newCustomItems);
-      		updateTaskFunc();
 				}}
 				removeCustomItem={(id)=>{
           let newCustomItems=[...customItems];
           newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
           setCustomItems(newCustomItems);
-      		updateTaskFunc();
+      		deleteCustomItemFunc();
 				}}
-				units={units ? units : []}
-				defaultUnit={defaultUnit}
+				units={[]}
+				defaultUnit={null}
 				/>
 		)
 	}
 
+	const renderComments = () => {
+		return (
+			<div className="comments">
+				<Nav tabs className="b-0 m-b-22 m-l--10 m-t-15">
+					<NavItem>
+						<NavLink
+							className={classnames({ active: toggleTab === 1}, "clickable", "")}
+							onClick={() => setToggleTab(1) }
+							>
+							Komentáre
+						</NavLink>
+					</NavItem>
+					<NavItem>
+						<NavLink>
+							|
+						</NavLink>
+					</NavItem>
+					{ currentUser.role === 0 &&
+						<NavItem>
+							<NavLink
+								className={classnames({ active: toggleTab === 2 }, "clickable", "")}
+								onClick={() => setToggleTab(2) }
+								>
+								História
+							</NavLink>
+						</NavItem>
+					}
+				</Nav>
+
+				<TabContent activeTab={toggleTab}>
+					<TabPane tabId={1}>
+						<Comments
+							id={parseInt(match.params.taskID)}
+							comments={comments}
+							showInternal={accessRights.viewInternal || currentUser.role === 0 }
+							users={users}
+							setComments={setComments}
+							addToHistory={(internal)=>{
+								let event = {
+									message: getHistoryMessage('comment'),
+									createdAt: moment(),
+									task: parseInt(match.params.taskID)
+								}
+		//						this.addNotification(event,internal);
+							}}
+							/>
+					</TabPane>
+					{	currentUser.role === 0 &&
+						<TabPane tabId={2}>
+							<h3>História</h3>
+							<ListGroup>
+								{ taskHistory.map((event)=>
+									<ListGroupItem key={event.id}>
+										({timestampToString(event.createdAt)})
+										{' ' + event.message}
+									</ListGroupItem>
+								)}
+							</ListGroup>
+							{	taskHistory.length===0 && <div>História je prázdna.</div>	}
+						</TabPane>
+					}
+				</TabContent>
+			</div>
+		)
+	}
 
 	if (taskLoading) {
 		return <Loading />
@@ -1491,9 +2006,8 @@ React.useEffect( () => {
 
 						{ renderVykazyTable() }
 
-            {/*
-						{ this.renderComments(taskID, permission) }
-						*/}
+						{ renderComments() }
+
 					</div>
 
 
@@ -1505,72 +2019,3 @@ React.useEffect( () => {
 		</div>
 	);
 }
-
-/*
-
-	renderComments(taskID, permission){
-		return (
-			<div className="comments">
-				<Nav tabs className="b-0 m-b-22 m-l--10 m-t-15">
-					<NavItem>
-						<NavLink
-							className={classnames({ active: this.state.toggleTab === 1}, "clickable", "")}
-							onClick={() => { this.setState({toggleTab:1}); }}
-							>
-							Komentáre
-						</NavLink>
-					</NavItem>
-					<NavItem>
-						<NavLink>
-							|
-						</NavLink>
-					</NavItem>
-					{ this.props.currentUser.userData.role.value > 0 &&
-						<NavItem>
-							<NavLink
-								className={classnames({ active: this.state.toggleTab === 2 }, "clickable", "")}
-								onClick={() => { this.setState({toggleTab:2}); }}
-								>
-								História
-							</NavLink>
-						</NavItem>
-					}
-				</Nav>
-
-				<TabContent activeTab={this.state.toggleTab}>
-					<TabPane tabId="1">
-						<Comments
-							id={taskID?taskID:null}
-							showInternal={permission.internal || this.props.currentUser.userData.role.value > 1 }
-							users={this.state.users}
-							addToHistory={(internal)=>{
-								let event = {
-									message:this.getHistoryMessage('comment'),
-									createdAt:(new Date()).getTime(),
-									task:this.props.match.params.taskID
-								}
-								this.addToHistory(event);
-								this.addNotification(event,internal);
-							}}
-							/>
-					</TabPane>
-					{	this.props.currentUser.userData.role.value > 0 &&
-						<TabPane tabId="2">
-							<h3>História</h3>
-							<ListGroup>
-								{ this.state.taskHistory.map((event)=>
-									<ListGroupItem key={event.id}>
-										({timestampToString(event.createdAt)})
-										{' ' + event.message}
-									</ListGroupItem>
-								)}
-							</ListGroup>
-							{	this.state.taskHistory.length===0 && <div>História je prázdna.</div>	}
-						</TabPane>
-					}
-				</TabContent>
-			</div>
-		)
-	}
-}
-*/

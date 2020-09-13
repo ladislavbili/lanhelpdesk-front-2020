@@ -12,13 +12,10 @@ import TaskCalendar from '../calendar';
 import {rebase, database} from '../../index';
 import { GET_TASK_TYPES } from 'helpdesk/settings/taskTypes';
 
-import {  filter, filterName, selectedProject, tasklistLayout } from 'localCache';
+import {  filter, filterName, selectedProject, selectedMilestone, tasklistLayout } from 'localCache';
 
-/*
-import {setTasksOrderBy, setTasksAscending,storageCompaniesStart,storageHelpTagsStart,storageUsersStart, setUserFilterStatuses,
-	storageHelpProjectsStart,storageHelpStatusesStart,storageHelpTasksStart, storageHelpFiltersStart,
-	 storageHelpMilestonesStart, storageHelpCalendarEventsStart,
-	setHelpSidebarProject, setHelpSidebarMilestone, setHelpSidebarFilter, setFilter, setMilestone,setProject} from 'redux/actions';*/
+import moment from 'moment';
+
 const fixedFilters = getFixedFilters();
 
 const GET_TASKS = gql`
@@ -32,6 +29,10 @@ query tasks($filter: FilterInput, $projectId: Int){
 		updatedAt
 		createdAt
 		closeDate
+    overtime
+    pausal
+    pendingChangable
+    statusChange
 		assignedTo {
 			id
 			name
@@ -88,10 +89,7 @@ query tasks($filter: FilterInput, $projectId: Int){
 
 /*
 important
-overtime
-pausal
-pendingChangable
-statusChange
+
 */
 
 const GET_MY_DATA = gql`
@@ -193,7 +191,6 @@ export default function TasksIndex (props) {
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
-
 	// sync
 	React.useEffect( () => {
 			getFilterName();
@@ -201,7 +198,7 @@ export default function TasksIndex (props) {
 
 	React.useEffect( () => {
 			getFilterName();
-	}, [props.filters]);
+	}, [filter]);
 
 	React.useEffect( () => {
 	}, [filterName]);
@@ -223,72 +220,45 @@ export default function TasksIndex (props) {
 	}
 
   const filterTasks = () => {
-    let ref = tasksRefetch( { variables: {filter, projectId: selectedProject.id}, options: { fetchPolicy: 'network-only' }});
-    let mah = tasksData ? tasksData.tasks : [];
-  	return mah;
-  	/*
-  	if(!this.props.statusesLoaded){
-  		return [];
-  	}
-  	let newTasks=this.state.tasks.map((task)=>{
-  		const status = this.state.statuses.find( (status) => status.id === task.status );
-  		const project = this.state.projects.find( (project) => project.id === task.project );
-  		return {
-  			...task,
-  			company: this.state.companies.find( (company) => company.id === task.company ),
-  			status,
-  			project,
-  			requester: this.state.users.find( (user) => user.id === task.requester ),
-  			tags: this.state.tags.filter( (tag) => task.tags && task.tags.includes(tag.id) ),
-  			assignedTo: this.state.users.filter( (user) => task.assignedTo && task.assignedTo.includes(user.id) ),
-  			id: parseInt(task.id),
-  			viewOnly: this.getViewOnly(task, status, project),
-  		}
-  	});
-
-  	const filter = this.props.filter;
-  	return newTasks.filter( ( task ) => applyTaskFilter( task, filter, this.props.currentUser, this.props.project, this.props.milestone ) )
-  	*/
+    let ref = tasksRefetch( { variables: {filter: filter(), projectId: (selectedProject() ? selectedProject().id : null) }, options: { fetchPolicy: 'network-only' }});
+  	return tasksData ? tasksData.tasks.filter(task => (selectedMilestone() === null) || (task.milestone ? (task.milestone.id === selectedMilestone().id) : false ) ) : [];
   }
 
 const getBreadcrumsData = () => {
-/*	let project = this.props.projectState;
-	let milestone = this.props.milestoneState;
-	let filter = this.props.filterState;
 	return [
 		{
 			type:'project',
-			show:project!==null,
-			data:project,
-			label:project?project.title:'Invalid project',
+			show: selectedProject() !== null,
+			data: selectedProject(),
+			label: selectedProject() ? selectedProject().title : 'Invalid project',
 			onClick:()=>{
-				this.props.setHelpSidebarMilestone(allMilestones);
+	/*			this.props.setHelpSidebarMilestone(allMilestones);
 				this.props.setMilestone(null);
 				this.props.setHelpSidebarFilter(null);
-				this.props.setFilter(getEmptyFilter());
-				this.props.history.push('/helpdesk/taskList/i/all');
+				this.props.setFilter(getEmptyFilter());*/
+				history.push('/helpdesk/taskList/i/all');
 			}
 		},
 		{
 			type:'milestone',
-			show:project!==null,
-			data:milestone,
-			label:milestone?milestone.title:'Invalid milestone',
+			show: selectedProject() !== null,
+			data: selectedMilestone(),
+			label: selectedMilestone() ? selectedMilestone().title : 'Invalid milestone',
 			onClick:()=>{
-				this.props.setHelpSidebarFilter(null);
-				this.props.setFilter(getEmptyFilter());
-				this.props.history.push('/helpdesk/taskList/i/all');
+			/*	this.props.setHelpSidebarFilter(null);
+				this.props.setFilter(getEmptyFilter());*/
+				history.push('/helpdesk/taskList/i/all');
 			}
 		},
 		{
 			type:'filter',
 			show: true,
-			data: filter,
-			label: this.state.filterName,
+			data: filter(),
+			label: filterName(),
 			onClick:()=>{
 			}
 		}
-	]*/
+	]
 }
 
 const displayCol = (task) => {
@@ -311,7 +281,7 @@ const displayCol = (task) => {
 				<p className="pull-right">
 					<span>
 						<span className="attribute-label">	<i className="fa fa-star-of-life" /> </span>
-						{task.createdAt?timestampToString(task.createdAt):'None'}
+						{task.createdAt?moment(task.createdAt):'None'}
 					</span>
 				</p>
 				<p>

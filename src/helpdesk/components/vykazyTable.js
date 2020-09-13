@@ -55,14 +55,11 @@ export default function Rozpocet (props) {
 
 		const [ editedMaterialTitle, setEditedMaterialTitle ] = React.useState("");
 		const [ editedMaterialQuantity, setEditedMaterialQuantity ] = React.useState( 0);
-		const [ editedMaterialUnit, setEditedMaterialUnit ] = React.useState(null);
 		const [ editedMaterialMargin, setEditedMaterialMargin ] = React.useState(null);
 		const [ editedMaterialPrice, setEditedMaterialPrice ] = React.useState(null);
 
 		const [ newMaterialTitle, setNewMaterialTitle ] = React.useState('');
 		const [ newMaterialQuantity, setNewMaterialQuantity ] = React.useState(1);
-		const unit = units.find((item)=>item.id===defaultUnit);
-		const [ newMaterialUnit, setNewMaterialUnit ] = React.useState(unit  ? unit :null);
 		const [ newMaterialMargin, setNewMaterialMargin ] = React.useState(company && company.pricelist ? company.pricelist.materialMargin : 0);
 		const [ newMaterialPrice, setNewMaterialPrice ] = React.useState(0);
     const [ newDiscountedMaterialPrice, setNewDiscountedMaterialPrice ] = React.useState(0);
@@ -73,12 +70,10 @@ export default function Rozpocet (props) {
 
 		const [ editedCustomItemTitle, setEditedCustomItemTitle ] = React.useState("");
 		const [ editedCustomItemQuantity, setEditedCustomItemQuantity ] = React.useState(0);
-		const [ editedCustomItemUnit, setEditedCustomItemUnit ] = React.useState(null);
 		const [ editedCustomItemPrice, setEditedCustomItemPrice ] = React.useState(null);
 
 		const [ newCustomItemTitle, setNewCustomItemTitle ] = React.useState('');
 		const [ newCustomItemQuantity, setNewCustomItemQuantity ] = React.useState(1);
-		const [ newCustomItemUnit, setNewCustomItemUnit ] = React.useState(unit ? unit : null);
 		const [ newCustomItemPrice, setNewCustomItemPrice ] = React.useState(0);
 
 	const getCreationError = () => {
@@ -128,7 +123,6 @@ export default function Rozpocet (props) {
 	const onFocusMaterial = (material) => {
 		setEditedMaterialTitle(material.title);
 		setEditedMaterialQuantity(material.quantity);
-		setEditedMaterialUnit(material.unit);
 		setEditedMaterialMargin(material.margin);
 		setEditedMaterialPrice(material.price);
 		setFocusedMaterial(material.id);
@@ -137,7 +131,6 @@ export default function Rozpocet (props) {
 	const onFocusCustomItem = (customItem) => {
 		setEditedCustomItemTitle(customItem.title);
 		setEditedCustomItemQuantity(customItem.quantity);
-		setEditedCustomItemUnit(customItem.unit);
 		setEditedCustomItemPrice(customItem.price);
 		setFocusedCustomItem(customItem.id);
 	}
@@ -385,7 +378,7 @@ return (
 								<td className="p-t-15 p-l-8 p-r-8 t-a-r font-14">
 									{
 										isNaN(getTotalDiscountedPrice(subtask)) ?
-										'No pricAAAAe' :
+										'No price' :
 										getTotalDiscountedPrice(subtask) + " €"
 									}
 								</td>
@@ -1387,14 +1380,13 @@ return (
 							{showColumns.includes(8) &&
 								<td className="t-a-r">
 									<button className="btn waves-effect"
-										disabled={newMaterialUnit===null||disabled}
+										disabled={disabled}
 										onClick={()=>{
 											let body={
 												margin:newMaterialMargin!==''?newMaterialMargin:0,
 												price:newMaterialPrice!==''?newMaterialPrice:0,
 												quantity:newMaterialQuantity!==''? parseFloat(newMaterialQuantity) :0,
 												title:newMaterialTitle,
-												unit:newMaterialUnit.id,
 												done:false,
 												order: materials.length,
 											}
@@ -1494,13 +1486,12 @@ return (
 							{showColumns.includes(8) &&
 								<td className="t-a-r">
 									<button className="btn waves-effect"
-										disabled={newCustomItemUnit===null||disabled}
+										disabled={disabled}
 										onClick={()=>{
 											let body={
 												price:newCustomItemPrice!==''?newCustomItemPrice:0,
 												quantity:newCustomItemQuantity!==''? parseFloat(newCustomItemQuantity):0,
 												title:newCustomItemTitle,
-												unit:newCustomItemUnit.id,
 												done:false,
 												order:customItems.length,
 											}

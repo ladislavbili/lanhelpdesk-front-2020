@@ -9,12 +9,25 @@ import SettingsSidebar from './settingsSidebar';
 import TasksSidebar from './tasksSidebar';
 import settings from 'configs/constants/settings';
 
+import { currentUser } from 'localCache';
+
 const GET_MY_DATA = gql`
 query {
   getMyData{
     id
+    name
+    surname
+    fullName
+    email
+		statuses {
+			id
+			title
+			color
+			action
+		}
     role {
       accessRights {
+        publicFilters
         users
         companies
         pausals
@@ -41,7 +54,10 @@ export default function Sidebar(props) {
   const { history, match } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
 
-  const currentUser = data ? data.getMyData : {};
+  if (data) {
+    currentUser(data.getMyData);
+  }
+
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   const canSeeSettings = settings.some(s => accessRights[s.value]);

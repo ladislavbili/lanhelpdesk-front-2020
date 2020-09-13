@@ -11,6 +11,29 @@ mutation loginUser($email: String!, $password: String!) {
   ){
     user{
       fullName
+      email
+      name
+      surname
+      id
+      role {
+        accessRights {
+          users
+          companies
+          pausals
+          projects
+          statuses
+          units
+          prices
+          suppliers
+          tags
+          invoices
+          roles
+          taskTypes
+          tripTypes
+          imaps
+          smtps
+        }
+      }
     },
     accessToken
   }

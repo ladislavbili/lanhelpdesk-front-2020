@@ -105,7 +105,7 @@ export default function PageHeader(props) {
 /*    const errorMessages = props.errorMessages.filter((message) => !message.read )
     let unreadNotifications = [...props.currentUser.notifications].splice(5, props.currentUser.notifications.length - 1).filter((notification) => !notification.read);*/
     const URL = getLocation();
-console.log("layout", tasklistLayout());
+
     return (<div className="page-header flex">
       <div className="d-flex full-height p-l-10">
         <div className="center-hor">

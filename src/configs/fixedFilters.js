@@ -4,8 +4,8 @@ export const getEmptyFilter = () => ({
   oneOf: [],
   requester:null,
   company:null,
-  assigned:null,
-  workType:null,
+  assignedTo:null,
+  taskType:null,
   statusDateFrom: null,
   statusDateTo: null,
   closeDateFrom: null,
@@ -33,9 +33,9 @@ export const getFixedFilters = (  ) => {
       id: 'myTasks',
       filter:{
         ...getEmptyFilter(),
-        assigned: "cur",
+        assignedTo: "cur",
         requester: "cur",
-        oneOf: ['assigned', 'requester' ],
+        oneOf: ['assignedTo', 'requester' ],
       }
     },
     // assignedTasks
@@ -44,7 +44,7 @@ export const getFixedFilters = (  ) => {
       id: 'assignedTasks',
       filter:{
         ...getEmptyFilter(),
-        assigned: "cur",
+        assignedTo: "cur",
       }
     },
     // escalatedTasks
@@ -53,9 +53,9 @@ export const getFixedFilters = (  ) => {
       id: 'escalatedTasks',
       filter:{
         ...getEmptyFilter(),
-        assigned: "cur",
+        assignedTo: "cur",
         requester: "cur",
-        oneOf: ['assigned', 'requester' ],
+        oneOf: ['assignedTo', 'requester' ],
         deadlineTo: moment().unix()*1000
       }
     },

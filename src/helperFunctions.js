@@ -2,9 +2,11 @@ import React from 'react';
 import moment from 'moment';
 
 
-export const testing = false;
+export const testing = true;
 
 export const toSelArr = (arr,index = 'title')=> arr.map((item)=>{return {...item,value:item.id,label:item[index]}})
+
+export const toSelItem = (item, index = 'title') => { return {...item, value: item.id, label: item[index]} };
 
 export const isEmail = (email) => (/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(email)
 
@@ -17,12 +19,33 @@ export const snapshotToArray = (snapshot) => {
   })
 }
 
+export const orderArr = (arr, attribute = 'order', order = 1) => arr.sort((a1, a2) => (a1[attribute] > a2[attribute] ? 1*order : (-1)*order));
+
+export const sortBy = (array, byAttributes = ['title']) => {
+  if(byAttributes === []){
+    return array;
+  }
+  return array.sort( (item1, item2) => {
+    const results = byAttributes.map((attribute) => {
+      if(item1[attribute] > item2[attribute]){
+        return 1;
+      }
+      if(item1[attribute] < item2[attribute]){
+        return -1;
+      }
+      return 0;
+    })
+    let result = results.find( (res) => res !== 0 );
+    return result || 0;
+   });
+}
+
 export const toMomentInput = (unix) => ( unix !== null && unix !== undefined ) ? moment(unix) : null;
 
 export const fromMomentToUnix = (moment) => moment !== null ? moment.unix() : null;
 
 export const timestampToString = (timestamp) => {
-  return moment.unix(timestamp).format('HH:mm DD.MM.YYYY');
+  return moment.unix(timestamp/1000).format('HH:mm DD.MM.YYYY');
 }
 
 export const timestampToDate = (timestamp) => {

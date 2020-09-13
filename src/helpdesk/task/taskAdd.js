@@ -26,7 +26,7 @@ import { noMilestone } from 'configs/constants/sidebar';
 import { noDef } from 'configs/constants/projects';
 
 export const ADD_TASK = gql`
-mutation addTask($title: String!, $closeDate: Int!, $assignedTo: [Int]!, $company: Int!, $deadline: Int, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: Int, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput ) {
+mutation addTask($title: String!, $closeDate: String, $assignedTo: [Int]!, $company: Int!, $deadline: String, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: String, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput, $subtasks: [SubtaskInput], $workTrips: [WorkTripInput], $materials: [MaterialInput], $customItems: [CustomItemInput]) {
   addTask(
     title: $title,
     closeDate: $closeDate,
@@ -45,6 +45,10 @@ mutation addTask($title: String!, $closeDate: Int!, $assignedTo: [Int]!, $compan
     tags: $tags,
     taskType: $taskType,
     repeat: $repeat,
+    subtasks: $subtasks,
+    workTrips: $workTrips,
+    materials: $materials,
+    customItems: $customItems,
   ){
     id
     title
@@ -83,9 +87,8 @@ export default function TaskAdd (props){
   const [ status, setStatus ] = React.useState(null);
   const [ subtasks, setSubtasks ] = React.useState([]);
   const [ tags, setTags ] = React.useState([]);
-  const [ taskMaterials, setTaskMaterials ] = React.useState([]);
+  const [ materials, setMaterials ] = React.useState([]);
   const [ taskType, setTaskType ] = React.useState(null);
-  const [ taskWorks, setTaskWorks ] = React.useState([]);
 	const [ title, setTitle ] = React.useState("");
   const [ workTrips, setWorkTrips ] = React.useState([]);
 
@@ -160,22 +163,26 @@ export default function TaskAdd (props){
 		setSaving(true);
     addTask({ variables: {
       title,
-      closeDate: closeDate ? closeDate.unix() : 0,
+      closeDate: closeDate ? closeDate.unix().toString() : null,
       assignedTo: assignedTo.map(user => user.id),
       company: company.id,
-      deadline: deadline ?  deadline.unix() : null,
+      deadline: deadline ?  deadline.unix().toString() : null,
       description,
       milestone: milestone ? milestone.id : null,
       overtime: overtime.value,
       pausal: pausal.value,
       pendingChangable,
-      pendingDate: pendingDate ? pendingDate.unix() : null,
+      pendingDate: pendingDate ? pendingDate.unix().toString() : null,
       project: project.id,
       requester: requester ? requester.id : null,
       status: status.id,
       tags: tags.map(tag => tag.id),
       taskType: taskType ? taskType.id: null,
-      repeat: repeat ? {...repeat, startsAt: repeat.startsAt + "", repeatEvery: repeat.repeatEvery + ""} : null
+      repeat: repeat ? {...repeat, startsAt: repeat.startsAt + "", repeatEvery: repeat.repeatEvery + ""} : null,
+      subtasks:  subtasks.map(item => ({title: item.title, order: item.order, done: item.done, quantity: item.quantity, discount: item.discount, type: item.type.id, assignedTo: item.assignedTo.id})),
+      workTrips:  workTrips.map(item => ({order: item.order, done: item.done, quantity: item.quantity, discount: item.discount, type: item.type.id, assignedTo: item.assignedTo.id})),
+      materials: materials.map(item => ({title: item.title, order: item.order, done: item.done, quantity: item.quantity, margin: item.margin, price: parseFloat(item.price)})),
+      customItems:  customItems.map(item => ({title: item.title, order: item.order, done: item.done, quantity: item.quantity, price: parseFloat(item.price)})),
     } }).then( ( response ) => {
       console.log(response);
       closeModal();
@@ -261,12 +268,11 @@ const renderSelectsLayout1 = () => {
 
 								if(viewOnly){
 										setRepeat(null);
-										setTaskWorks([]);
 										setSubtasks([]);
-										setTaskMaterials([]);
+										setSubtasks([]);
+										setMaterials([]);
 										setCustomItems([]);
-									//		workTrips:[],
-									//		allTags:[],
+                    setWorkTrips([]);
 									setDeadline(null);
 									setCloseDate(null);
 									setPendingDate(null);
@@ -311,12 +317,11 @@ const renderSelectsLayout1 = () => {
 
 									if(viewOnly){
 											setRepeat(null);
-											setTaskWorks([]);
 											setSubtasks([]);
-											setTaskMaterials([]);
+											setSubtasks([]);
+											setMaterials([]);
 											setCustomItems([]);
-											//	workTrips:[],
-								//			allTags:[],
+                      setWorkTrips([]);
 											setDeadline(null);
 											setCloseDate(null);
 											setPendingDate(null);
@@ -556,13 +561,12 @@ const renderSelectsLayout2 = () => {
 									setViewOnly(currentUser.role.level !== 0 && !userRights.write);
 
 									if(viewOnly){
-											setRepeat(null);
-											setTaskWorks([]);
-											setSubtasks([]);
-											setTaskMaterials([]);
-											setCustomItems([]);
-										//		workTrips:[],
-										//		allTags:[],
+										setRepeat(null);
+										setSubtasks([]);
+										setSubtasks([]);
+										setMaterials([]);
+										setCustomItems([]);
+                    setWorkTrips([]);
 										setDeadline(null);
 										setCloseDate(null);
 										setPendingDate(null);
@@ -604,9 +608,9 @@ const renderSelectsLayout2 = () => {
 
 									if(viewOnly){
 											setRepeat(null);
-											setTaskWorks([]);
 											setSubtasks([]);
-											setTaskMaterials([]);
+											setSubtasks([]);
+											setMaterials([]);
 											setCustomItems([]);
 											setDeadline(null);
 											setCloseDate(null);
@@ -913,7 +917,7 @@ const renderSelectsLayout2 = () => {
 	}
 
 
-	const renderVykazyTable = (taskWorks, workTrips, taskMaterials, customItems) => {
+	const renderVykazyTable = (subtasks, workTrips, materials, customItems) => {
 		return(
 			<VykazyTable
           id={company ? company.id : 0}
@@ -929,27 +933,27 @@ const renderSelectsLayout2 = () => {
 					showSubtasks={project ? project.showSubtasks : false}
 
 					submitService={(newService)=>{
-						setTaskWorks([...taskWorks,{id:getNewID(), ...newService}]);
+						setSubtasks([...subtasks,{id:getNewID(), ...newService}]);
 					}}
-					subtasks={taskWorks}
+					subtasks={subtasks}
 					defaultType={taskType}
 					taskTypes={taskTypes}
 					updateSubtask={(id,newData)=>{
-						let newTaskWorks=[...taskWorks];
-						newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
-						setTaskWorks(newTaskWorks);
+						let newSubtasks=[...subtasks];
+						newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
+						setSubtasks(newSubtasks);
 					}}
 					updateSubtasks={(multipleSubtasks)=>{
-						let newTaskWorks=[...taskWorks];
+						let newSubtasks=[...subtasks];
 						multipleSubtasks.forEach(({id, newData})=>{
-							newTaskWorks[newTaskWorks.findIndex((taskWork)=>taskWork.id===id)]={...newTaskWorks.find((taskWork)=>taskWork.id===id),...newData};
+							newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
 						});
-						setTaskWorks(newTaskWorks);
+						setSubtasks(newSubtasks);
 					}}
 					removeSubtask={(id)=>{
-						let newTaskWorks=[...taskWorks];
-						newTaskWorks.splice(newTaskWorks.findIndex((taskWork)=>taskWork.id===id),1);
-						setTaskWorks(newTaskWorks);
+						let newSubtasks=[...subtasks];
+						newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
+						setSubtasks(newSubtasks);
 					}}
 					workTrips={workTrips}
 					tripTypes={tripTypes}
@@ -974,26 +978,26 @@ const renderSelectsLayout2 = () => {
 						setWorkTrips(newTrips);
 					}}
 
-					materials={taskMaterials}
+					materials={materials}
 					submitMaterial={(newMaterial)=>{
-						setTaskMaterials([...taskMaterials,{id:getNewID(),...newMaterial}]);
+						setMaterials([...materials,{id:getNewID(),...newMaterial}]);
 					}}
 					updateMaterial={(id,newData)=>{
-						let newTaskMaterials=[...taskMaterials];
-						newTaskMaterials[newTaskMaterials.findIndex((material)=>material.id===id)]={...newTaskMaterials.find((material)=>material.id===id),...newData};
-						setTaskMaterials(newTaskMaterials);
+						let newMaterials=[...materials];
+						newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
+						setMaterials(newMaterials);
 					}}
 					updateMaterials={(multipleMaterials)=>{
-						let newTaskMaterials=[...taskMaterials];
+						let newMaterials=[...materials];
 						multipleMaterials.forEach(({id, newData})=>{
-							newTaskMaterials[newTaskMaterials.findIndex((material)=>material.id===id)]={...newTaskMaterials.find((material)=>material.id===id),...newData};
+							newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
 						});
-						setTaskMaterials(newTaskMaterials);
+						setMaterials(newMaterials);
 					}}
 					removeMaterial={(id)=>{
-						let newTaskMaterials=[...taskMaterials];
-						newTaskMaterials.splice(newTaskMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-						setTaskMaterials(newTaskMaterials);
+						let newMaterials=[...materials];
+						newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
+						setMaterials(newMaterials);
 					}}
 
 					customItems={customItems}
@@ -1032,7 +1036,7 @@ const renderSelectsLayout2 = () => {
 				}
 				<button
 					className="btn pull-right"
-					disabled={title==="" || status===null || project === null || company === null || saving || loading || newID===null}
+					disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading || newID===null}
 					onClick={addTaskFunc}
 					> Create task
 				</button>
@@ -1057,7 +1061,7 @@ const renderSelectsLayout2 = () => {
 
 				{ renderAttachments() }
 
-				{ !viewOnly && renderVykazyTable(taskWorks, workTrips, taskMaterials, customItems) }
+				{ !viewOnly && renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
 				{ renderButtons() }
 

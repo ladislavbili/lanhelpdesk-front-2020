@@ -38,7 +38,7 @@ export default function ShowDataContainer (props){
 	}
 
 	const filterData = () => {
-		return data;
+		//return data;
 		return data.filter((item)=>{
 			let filterString="";
 			filterBy.forEach((value)=>{
@@ -63,7 +63,7 @@ export default function ShowDataContainer (props){
 					filterString+= item[value.value].email+' '+item[value.value].name+' '+item[value.value].surname + " ";
 				}
 			});
-			return filterString.toLowerCase().includes(search.toLowerCase());
+			return filterString.toLowerCase().includes(search().toLowerCase());
 		}).sort((item1,item2)=>{
 			let val1 = getSortValue(item1);
 			let val2 = getSortValue(item2);
@@ -106,8 +106,6 @@ export default function ShowDataContainer (props){
 			return (item[value.value].surname+' '+item[value.value].name).toLowerCase();
 		}
 	}
-
-	console.log("show index", tasklistLayout());
 
 	return (
 		<div className="content-page">

@@ -3,31 +3,34 @@ import { Modal, ModalBody } from 'reactstrap';
 import {getItemDisplayValue} from '../../helperFunctions';
 import CommandBar from './commandBar';
 import ListHeader from './listHeader';
-import { connect } from "react-redux";
-//import {setShowDataFilter } from '../../redux/actions';
 import Checkbox from '../checkbox';
 
 import MultipleTaskEdit from '../../helpdesk/task/multipleTaskEdit';
 
-import { filterName, filter } from 'localCache';
+import { filterName, filter, showDataFilter, currentUser } from 'localCache';
 
 export default function List (props) {
-	const { history, link, commandBar, listName, statuses, setStatuses, allStatuses, displayValues, data, deleteTask, checkTask, setShowDataFilter } = props;
+	const { history, link, commandBar, listName, statuses, setStatuses, allStatuses, displayValues, data, deleteTask, checkTask } = props;
 	const [ checkedAll, setCheckedAll ] = React.useState(false);
 	const [ editOpen, setEditOpen ] = React.useState(false);
 
 	const clearFilter = () => {
-	/*	if(window.confirm("Are you sure you want to clear the filter?")){
-			let defaultFilter={};
-			this.props.displayValues.forEach((display)=>{
-				defaultFilter[display.value]=''
-			})
-			this.props.setShowDataFilter(this.props.filterName,defaultFilter);
-		}*/
+		if(window.confirm("Are you sure you want to clear the filter?")){
+			showDataFilter({
+			  id: "",
+			  title: "",
+			  status: "",
+			  requester: "",
+			  company: "",
+			  assignedTo: "",
+			  createdAt: "",
+			  deadline: "",
+			});
+		}
 	}
 
-	let selectedFilter = filter()[filterName()];
-	console.log(data);
+//	const selectedFilter = showDataFilter();
+//	console.log(selectedFilter);
 	return (
 			<div>
 				<CommandBar {...commandBar} listName={listName}/>
@@ -98,19 +101,20 @@ export default function List (props) {
 														/>
 												</th>
 											}else {
+												const value = (showDataFilter()[display.value] === "cur" ? currentUser().fullName : showDataFilter()[display.value]);
 												return <th key={display.value} colSpan={((index===0 || index ===1 || displayValues[index-1].type!=='important') )?'1':'2'} >
 													<div className={(display.value === "deadline" ? "row" : "")}>
 
 														<div style={{width: "80%"}}>
 															<input
 																type="text"
-																value={selectedFilter[display.value]}
+																value={ value }
 																className="form-control hidden-input"
 																style={{fontSize: "12px", marginRight: "10px"}}
 																onChange={(e) => {
-																	let newFilterData={};
-																	newFilterData[display.value]=e.target.value;
-																	setShowDataFilter(filterName, newFilterData);
+																	let newShowDataFilter = {...showDataFilter()};
+																	newShowDataFilter[display.value] = e.target.value;
+																	showDataFilter(newShowDataFilter);
 																}}/>
 															</div>
 													{display.value === "deadline" &&
@@ -129,7 +133,7 @@ export default function List (props) {
 									)}
 								</tr>
 								{
-									(filterName() === "All tasks" ? data : data
+									data
 									.filter((item) =>
 									{
 										return displayValues
@@ -156,11 +160,10 @@ export default function List (props) {
 														if(display.value === 'checked'){
 															return true;
 														}
-														let result = value.toString().toLowerCase().includes(selectedFilter[display.value].toLowerCase());
-													//	console.log(result, value, selectedFilter[display.value]);
+														let result = value.toString().toLowerCase().includes(showDataFilter()[display.value].toLowerCase());
 														return result;
 													});
-									})).map((item)=>
+									}).map((item)=>
 										<tr
 											key={item.id}
 											className="clickable">

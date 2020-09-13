@@ -174,13 +174,34 @@ query {
 }
 `;
 
+const GET_EMAILS = gql`
+query emails($task: Int!){
+	emails(
+		task: $task
+	)  {
+		id
+		createdAt
+    subject
+    message
+    user {
+      id
+      fullName
+    }
+    toEmails
+  }
+}
+`;
+
 const GET_MY_DATA = gql`
 query {
   getMyData{
     id
     role {
+      level
       accessRights {
         projects
+        mailViaComment
+        viewInternal
       }
     }
   }
@@ -199,11 +220,12 @@ export default function TaskEditContainer(props){
   const { data: tagsData, loading: tagsLoading } = useQuery(GET_TAGS, { options: { fetchPolicy: 'network-only' }});
   const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS, { options: { fetchPolicy: 'network-only' }});
   const { data: tasksData, loading: tasksLoading } = useQuery(GET_ALL_TASKS, { options: { fetchPolicy: 'network-only' }});
+  const { data: emailsData, loading: emailsLoading } = useQuery(GET_EMAILS, { variables: {task: parseInt(match.params.taskID)}, options: { fetchPolicy: 'network-only' }});
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
-	const loading = userLoading || statusesLoading || companiesLoading || usersLoading || taskTypesLoading || tripTypesLoading || tagsLoading || projectsLoading || tasksLoading ;
+	const loading = userLoading || statusesLoading || companiesLoading || usersLoading || taskTypesLoading || tripTypesLoading || tagsLoading || projectsLoading || tasksLoading || emailsLoading ;
 
 	if (loading) {
 		return (<Loading />);
@@ -222,6 +244,7 @@ export default function TaskEditContainer(props){
 			allTags={toSelArr(tagsData.tags)}
 			projects={toSelArr(projectsData.projects)}
 			tasks={tasksData.allTasks}
+      emails={emailsData.emails ? emailsData.emails : []}
 			inModal={false}
 			 />
 	 );
