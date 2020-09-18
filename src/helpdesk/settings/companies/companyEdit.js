@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label, Input } from 'reactstrap';
+import { Button, FormGroup, Label, Input, Modal, ModalHeader, ModalFooter, ModalBody } from 'reactstrap';
 import Switch from "react-switch";
 import {toSelArr} from '../../../helperFunctions';
 import Select from 'react-select';
@@ -248,7 +248,7 @@ export default function CompanyEdit(props){
   }, [match.params.id]);
 
     // functions
-    const updateCompanyFunc = () => {
+    const updateCompanyFunc = (pricelistId = null) => {
       setSaving( true );
 
       let newRents = rents.map(r => {
@@ -278,7 +278,7 @@ export default function CompanyEdit(props){
         email,
         phone,
         description,
-        pricelistId: pricelist.id,
+        pricelistId: pricelistId ? pricelistId : pricelist.id,
         monthly,
         monthlyPausal: (monthlyPausal === "" ? 0 : parseFloat(monthlyPausal)),
         taskWorkPausal: (taskWorkPausal === "" ? 0 : parseFloat(taskWorkPausal)),
@@ -322,12 +322,15 @@ export default function CompanyEdit(props){
         materialMarginExtra: 0,
         prices: [],
       } }).then( ( response ) => {
-        let newPricelist = response.data.addPricelist;
+        const newPricelist = {...response.data.addPricelist, __typename: "Pricelist"};
         setPricelist(newPricelist);
-        let newPricelists = pricelists.concat([newPricelist]);
+        const newPricelists = pricelists.concat([newPricelist]);
         setPricelists(newPricelists);
+        setPricelistName("");
 
-        updateCompanyFunc();
+        client.writeQuery({ query: GET_PRICELISTS, data: {pricelists: [...pricelistsData.pricelists, newPricelist] } });
+
+        updateCompanyFunc(newPricelist.id);
       }).catch( (err) => {
         console.log(err.message);
       });
@@ -745,7 +748,7 @@ export default function CompanyEdit(props){
                 }
             }}>{saving?'Saving...':'Save changes'}</Button>
           }
-           <Button className="btn-red" disabled={saving || deleting} onClick={deleteCompanyFunc}>Delete</Button>
+           <Button className="btn-red" disabled={saving || deleting} onClick={() => setChooseingNewCompany(true)}>Delete</Button>
 
           {newData &&
             <Button
@@ -754,6 +757,32 @@ export default function CompanyEdit(props){
               onClick={cancel}>Cancel changes</Button>
           }
         </div>
+
+        <Modal isOpen={choosingNewCompany}>
+          <ModalHeader>
+            Please choose a company to replace this one
+          </ModalHeader>
+          <ModalBody>
+            <FormGroup>
+              <Select
+                styles={selectStyle}
+                options={filteredCompanies}
+                value={newCompany}
+                onChange={role => setNewCompany(role)}
+                />
+            </FormGroup>
+
+          </ModalBody>
+          <ModalFooter>
+            <Button className="btn-link mr-auto"onClick={() => setChooseingNewCompany(false)}>
+              Cancel
+            </Button>
+            <Button className="btn ml-auto" disabled={!newCompany} onClick={deleteCompanyFunc}>
+              Complete deletion
+            </Button>
+          </ModalFooter>
+        </Modal>
+
       </div>
     );
   }

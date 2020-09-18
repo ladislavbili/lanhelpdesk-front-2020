@@ -19,7 +19,7 @@ export const snapshotToArray = (snapshot) => {
   })
 }
 
-export const orderArr = (arr, attribute = 'order', order = 1) => arr.sort((a1, a2) => (a1[attribute] > a2[attribute] ? 1*order : (-1)*order));
+export const orderArr = (arr, attribute = 'order', order = 1) => arr.sort((a1, a2) => (a1[attribute] >= a2[attribute] ? 1*order : (-1)*order));
 
 export const sortBy = (array, byAttributes = ['title']) => {
   if(byAttributes === []){

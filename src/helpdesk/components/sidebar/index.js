@@ -9,7 +9,7 @@ import SettingsSidebar from './settingsSidebar';
 import TasksSidebar from './tasksSidebar';
 import settings from 'configs/constants/settings';
 
-import { currentUser } from 'localCache';
+//import { currentUser } from 'localCache';
 
 const GET_MY_DATA = gql`
 query {
@@ -18,6 +18,7 @@ query {
     name
     surname
     fullName
+    tasklistLayout
     email
 		statuses {
 			id
@@ -54,8 +55,10 @@ export default function Sidebar(props) {
   const { history, match } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
 
+  let currentUser = {};
+
   if (data) {
-    currentUser(data.getMyData);
+    currentUser = data.getMyData;
   }
 
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};

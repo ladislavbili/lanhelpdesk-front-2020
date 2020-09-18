@@ -2,6 +2,8 @@ import React from 'react';
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
+import Loading from 'components/loading';
+
 import ShowData from '../../components/showData';
 import { timestampToString, sameStringForms, applyTaskFilter, snapshotToArray } from 'helperFunctions';
 import { getEmptyFilter, getFixedFilters } from 'configs/fixedFilters';
@@ -183,7 +185,7 @@ export default function TasksIndex (props) {
   //data & queries
   const { history, match, calendarEvents, orderBy, setTasksOrderBy, ascending, setTasksAscending, statuses, setUserFilterStatuses } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
-  const { data: tasksData, loading: tasksLoading, refetch: tasksRefetch } = useQuery(GET_TASKS, { variables: {}, options: { fetchPolicy: 'network-only' }});
+  const { data: tasksData, loading: tasksLoading, refetch: tasksRefetch } = useQuery(GET_TASKS, { variables: {filter: null, projectId: null }, options: { fetchPolicy: 'network-only' }});
   const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
   const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS, { options: { fetchPolicy: 'network-only' }});
   const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
@@ -220,7 +222,7 @@ export default function TasksIndex (props) {
 	}
 
   const filterTasks = () => {
-    let ref = tasksRefetch( { variables: {filter: filter(), projectId: (selectedProject() ? selectedProject().id : null) }, options: { fetchPolicy: 'network-only' }});
+    //let ref = tasksRefetch( { variables: {filter: filter(), projectId: (selectedProject() ? selectedProject().id : null) }, options: { fetchPolicy: 'network-only' }});
   	return tasksData ? tasksData.tasks.filter(task => (selectedMilestone() === null) || (task.milestone ? (task.milestone.id === selectedMilestone().id) : false ) ) : [];
   }
 
@@ -514,6 +516,12 @@ const getCalendarAllDayData = (tasks) => {/*
 		link = '/helpdesk/taskList/i/'+match.params.listID;
 	}else{
 		link = '/helpdesk/taskList'
+	}
+
+  const dataLoading = loading || tasksLoading || statusesLoading || myFiltersLoading || publicFiltersLoading;
+
+	if (dataLoading) {
+		return (<Loading />);
 	}
 
 	return (

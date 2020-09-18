@@ -6,6 +6,7 @@ import {Button } from 'reactstrap';
 import TagAdd from './tagAdd';
 import TagEdit from './tagEdit';
 import Loading from 'components/loading';
+import { orderArr } from 'helperFunctions';
 
 export const GET_TAGS = gql`
 query {
@@ -24,7 +25,7 @@ export default function TagsList(props){
     //data
     const { history, match } = props;
     const { data, loading, error } = useQuery(GET_TAGS);
-    const TAGS = (loading || !data ? [] : data.tags);
+    const TAGS = (loading || !data ? [] : orderArr(data.tags));
 
     return (
       <div className="content">

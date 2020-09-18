@@ -27,6 +27,7 @@ query {
 		tasklistLayout
     role {
       accessRights {
+        publicFilters
         users
         companies
         pausals
@@ -68,7 +69,7 @@ export default function Navigation (props) {
   const [updateUser, {updateData}] = useMutation(UPDATE_USER);
 
   const currentUser = data ? data.getMyData : {};
-  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights  : {};
   tasklistLayout(1);
 //currentUser.tasklistLayout ? currentUser.tasklistLayout  : 1;
 

@@ -66,7 +66,7 @@ mutation updatePricelist($id: Int!, $title: String!, $order: Int!, $afterHours: 
 `;
 
 export const DELETE_PRICELIST = gql`
-mutation deletePricelist($id: Int!, $newDefId: Int!, $newId: Int!) {
+mutation deletePricelist($id: Int!, $newDefId: Int, $newId: Int) {
   deletePricelist(
     id: $id,
     newDefId: $newDefId,

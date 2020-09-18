@@ -24,7 +24,7 @@ import moment from 'moment';
 
 import { selectedProject, selectedMilestone, filter, filters, filterName } from 'localCache';
 
-const GET_PROJECTS = gql`
+export const GET_PROJECTS = gql`
 query {
   projects{
     id
@@ -203,7 +203,7 @@ export default function TasksSidebar(props) {
   const [ activeTab, setActiveTab ] = React.useState(0);
   const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ) );
   const [ currentProject, setCurrentProject ] = React.useState( projects[0] );
-  const [ currentMilestone, setCurrentMilestone ] = React.useState( [allMilestones] );
+  const [ currentMilestone, setCurrentMilestone ] = React.useState( allMilestones );
 
   // sync
   React.useEffect( () => {
@@ -289,7 +289,7 @@ export default function TasksSidebar(props) {
         currentProject.id !== null &&
         <div className="">
           <Select
-            options={toSelArr( ([allMilestones, addMilestone]).concat(currentProject.milestones) )}
+            options={([allMilestones, addMilestone]).concat(toSelArr( currentProject.milestones )) }
             value={currentMilestone}
             styles={sidebarSelectStyle}
             onChange={milestone => {
@@ -420,9 +420,12 @@ export default function TasksSidebar(props) {
       { openMilestoneAdd &&
         <MilestoneAdd projectID={currentProject.id} open={openMilestoneAdd}  closeModal={() => setOpenMilestoneAdd(false)} />
       }
-      { /*accessRights.projects && currentMilestone.id !== null &&
-        <MilestoneEdit item={{}} milestoneID={currentMilestone.id}/>
-      */}
+      { accessRights.projects &&
+        currentProject.id !== null &&
+        currentMilestone.id !== null &&
+        currentMilestone.id !== -1 &&
+        <MilestoneEdit milestoneID={currentMilestone.id} projectID={currentProject.id} {...props} />
+      }
 
     </div>
   );

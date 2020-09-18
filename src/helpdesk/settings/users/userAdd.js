@@ -12,7 +12,7 @@ import Checkbox from 'components/checkbox';
 import {  GET_USERS } from './index';
 
 const ADD_USER = gql`
-mutation registerUser($username: String!, $email: String!, $name: String!, $surname: String!, $password: String!, $receiveNotifications: Boolean, $signature: String, $roleId: Int!, $companyId: Int!) {
+mutation registerUser($username: String!, $email: String!, $name: String!, $language: LanguageEnum!, $surname: String!, $password: String!, $receiveNotifications: Boolean, $signature: String, $roleId: Int!, $companyId: Int!) {
   registerUser(
     username: $username,
     email: $email,
@@ -23,6 +23,7 @@ mutation registerUser($username: String!, $email: String!, $name: String!, $surn
     signature: $signature,
     roleId: $roleId,
     companyId: $companyId,
+    language: $language,
   ){
     id
     email
@@ -67,9 +68,9 @@ export default function UserAddContainer(props){
   const ROLES = ( rolesLoading ? [] : toSelArr(rolesData.roles) );
   const COMPANIES = ( companiesLoading ? [] : toSelArr(companiesData.companies) );
 
+  const languages = [{label: "SK", value: "sk"}, {label: "ENG", value: "en"}]
+
   //state
-  const [ createdAt, setCreatedAt ] = React.useState(0);
-  const [ updatedAt, setUpdatedAt ] = React.useState(0);
   const [ active, setActive ] = React.useState(true);
   const [ username, setUsername ] = React.useState("");
   const [ email, setEmail ] = React.useState("");
@@ -81,8 +82,9 @@ export default function UserAddContainer(props){
   const [ signatureChanged, setSignatureChanged ] = React.useState(false);
   const [ role, setRole ] = React.useState(null);
   const [ company, setCompany ] = React.useState(null);
-  const [ language, setLanguage ] = React.useState("sk");
+  const [ language, setLanguage ] = React.useState(languages[0]);
   const [ saving, setSaving ] = React.useState(false);
+
 
   const addUserFunc = () => {
     setSaving( true );
@@ -97,7 +99,7 @@ export default function UserAddContainer(props){
       signature: (signature ? signature : `${name} ${surname}, ${company.title}`),
       roleId: role.id,
       companyId: company.id,
-      language,
+      language: language.value,
     } }).then( ( response ) => {
       if (addUser) {
         addUser(response);
@@ -106,7 +108,7 @@ export default function UserAddContainer(props){
         const allUsers = client.readQuery({query: GET_USERS}).users;
         let newUser = {...response.data.registerUser,  __typename: "User"}
         client.writeQuery({ query: GET_USERS, data: {users: [...allUsers, newUser]} });
-        history.push('/helpdesk/settings/users/' + newUser.id)
+        history.push('/helpdesk/settings/users/' + newUser.id);
       }
     }).catch( (err) => {
       console.log(err.message);
@@ -168,6 +170,16 @@ export default function UserAddContainer(props){
         <FormGroup>
           <Label for="password">Password</Label>
           <Input type="password" name="password" id="password" placeholder="Enter password" value={ password } onChange={ (e) => setPassword(e.target.value) } />
+        </FormGroup>
+
+        <FormGroup>
+          <Label for="role">Language</Label>
+          <Select
+            styles={ selectStyle }
+            options={ languages }
+            value={ role }
+            onChange={ lang => setLanguage(lang) }
+            />
         </FormGroup>
 
         <Checkbox

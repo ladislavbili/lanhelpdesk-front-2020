@@ -80,7 +80,7 @@ class PublicFilterAdd extends Component{
         requester: this.state.requester.id,
         company: this.state.company.id,
         assigned: this.state.assigned.id,
-        workType: this.state.workType.id,
+        taskType: this.state.taskType.id,
         oneOf: this.state.oneOf.map( (item) => item.value ),
 
         statusDateFrom: this.state.statusDateFromNow ? null :  fromMomentToUnix(this.state.statusDateFrom),
@@ -328,8 +328,8 @@ class PublicFilterAdd extends Component{
             <label htmlFor="example-input-small">Typ práce</label>
             <Select
               options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(this.props.taskTypes))}
-              onChange={(newValue)=>this.setState({workType:newValue})}
-              value={this.state.workType}
+              onChange={(newValue)=>this.setState({taskType:newValue})}
+              value={this.state.taskType}
               styles={selectStyle} />
           </FormGroup>
 

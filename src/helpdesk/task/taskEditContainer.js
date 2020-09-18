@@ -212,14 +212,14 @@ export default function TaskEditContainer(props){
   //data & queries
 	const { match, history } = props;
   const { data, loading: userLoading } = useQuery(GET_MY_DATA);
-  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
-  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES, { options: { fetchPolicy: 'network-only' }});
-  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS, { options: { fetchPolicy: 'network-only' }});
-  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES, { options: { fetchPolicy: 'network-only' }});
-  const { data: tripTypesData, loading: tripTypesLoading } = useQuery(GET_TRIP_TYPES, { options: { fetchPolicy: 'network-only' }});
-  const { data: tagsData, loading: tagsLoading } = useQuery(GET_TAGS, { options: { fetchPolicy: 'network-only' }});
-  const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS, { options: { fetchPolicy: 'network-only' }});
-  const { data: tasksData, loading: tasksLoading } = useQuery(GET_ALL_TASKS, { options: { fetchPolicy: 'network-only' }});
+  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
+  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
+  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS);
+  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES);
+  const { data: tripTypesData, loading: tripTypesLoading } = useQuery(GET_TRIP_TYPES);
+  const { data: tagsData, loading: tagsLoading } = useQuery(GET_TAGS);
+  const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
+  const { data: tasksData, loading: tasksLoading } = useQuery(GET_ALL_TASKS);
   const { data: emailsData, loading: emailsLoading } = useQuery(GET_EMAILS, { variables: {task: parseInt(match.params.taskID)}, options: { fetchPolicy: 'network-only' }});
 
   const currentUser = data ? data.getMyData : {};

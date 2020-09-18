@@ -6,6 +6,7 @@ import {Button } from 'reactstrap';
 import RoleAdd from './roleAdd';
 import RoleEdit from './roleEdit';
 import Loading from 'components/loading';
+import { orderArr } from 'helperFunctions';
 
 export const GET_ROLES = gql`
 query {
@@ -25,7 +26,7 @@ export default function RolesList(props){
     //data
     const { history, match } = props;
     const { data, loading, error } = useQuery(GET_ROLES);
-    const ROLES = (loading || !data ? [] : data.roles);
+    const ROLES = (loading || !data ? [] : orderArr(data.roles));
 
     return (
 			<div className="content">

@@ -6,6 +6,7 @@ import {Button } from 'reactstrap';
 import TripTypeAdd from './tripTypeAdd';
 import TripTypeEdit from './tripTypeEdit';
 import Loading from 'components/loading';
+import { orderArr } from 'helperFunctions';
 
 export const GET_TRIP_TYPES = gql`
 query {
@@ -56,7 +57,7 @@ export default function TripTypeListContainer(props){
             </h2>
             <table className="table table-hover">
               <tbody>
-                  { (loading || !data ? [] : data.tripTypes).filter((item)=>item.title.toLowerCase().includes(tripTypeFilter.toLowerCase())).map((tripType)=>
+                  { (loading || !data ? [] : orderArr(data.tripTypes)).filter((item)=>item.title.toLowerCase().includes(tripTypeFilter.toLowerCase())).map((tripType)=>
                   <tr key={tripType.id}
                     className={"clickable" + (match.params.id === tripType.id ? " active":"")}
                     onClick={()=>history.push('/helpdesk/settings/tripTypes/'+tripType.id)}>

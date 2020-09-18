@@ -39,6 +39,7 @@ query user($id: Int!) {
       id
       title
     }
+    language
   }
 }
 `;
@@ -104,6 +105,8 @@ export default function UserEdit(props){
   const ROLES = ( rolesLoading ? [] : toSelArr(rolesData.roles) );
   const COMPANIES = ( companiesLoading ? [] : toSelArr(companiesData.companies) );
 
+  const languages = [{label: "SK", value: "sk"}, {label: "ENG", value: "en"}]
+
   //state
   const [ createdAt, setCreatedAt ] = React.useState(0);
   const [ updatedAt, setUpdatedAt ] = React.useState(0);
@@ -117,7 +120,7 @@ export default function UserEdit(props){
   const [ signature, setSignature ] = React.useState("");
   const [ role, setRole ] = React.useState({});
   const [ company, setCompany ] = React.useState({});
-  const [ language, setLanguage ] = React.useState("");
+  const [ language, setLanguage ] = React.useState(languages[0]);
   const [ saving, setSaving ] = React.useState(false);
   const [ deletingUser, setDeletingUser ] = React.useState(false);
   const [ deactivatingUser, setDeactivatingUser ] = React.useState(false);
@@ -139,7 +142,7 @@ export default function UserEdit(props){
       setSignature((USER.signature ? USER.signature : `${USER.name} ${USER.surname}, ${USER.company.title}`));
       setRole( { ...USER.role, label: USER.role.title, value: USER.role.id} );
       setCompany(  { ...USER.company, label: USER.company.title, value: USER.company.id} );
-      setLanguage(USER.language);
+      setLanguage(USER.language === "sk" ? languages[0] : languages[1]);
       }
   }, [userLoading]);
 
@@ -160,7 +163,7 @@ export default function UserEdit(props){
       signature,
       roleId: role.id,
       companyId: company.id,
-      language,
+      language: language.value,
     } }).then( ( response ) => {
       const allUsers = client.readQuery({query: GET_USERS}).users;
       let newUser = {
@@ -245,6 +248,16 @@ export default function UserEdit(props){
         <FormGroup>
           <Label for="email">E-mail</Label>
           <Input type="email" name="email" id="email" disabled={ false } placeholder="Enter email" value={ email } onChange={ (e) => setEmail(e.target.value) } />
+        </FormGroup>
+
+        <FormGroup>
+          <Label for="role">Language</Label>
+          <Select
+            styles={ selectStyle }
+            options={ languages }
+            value={ role }
+            onChange={ lang => setLanguage(lang) }
+            />
         </FormGroup>
 
         <Checkbox

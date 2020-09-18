@@ -13,6 +13,7 @@ query {
     id
     role {
       accessRights {
+        publicFilters
         users
         companies
         pausals
@@ -36,7 +37,7 @@ query {
 
 export default function SettingsSidebar(props) {
   //data & queries
-  const { history, match } = props;
+  const { history, match, location } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
 
   const currentUser = data ? data.getMyData : {};
@@ -46,7 +47,7 @@ export default function SettingsSidebar(props) {
       <Nav vertical>
 				{settings.filter((setting) => accessRights[setting.value]).map((setting)=>
 					<NavItem key={setting.link}>
-						<Link className="sidebar-align sidebar-menu-item"
+						<Link className={classnames("sidebar-align", "sidebar-menu-item" , {"active" : location.pathname.includes(setting.link)})}
 							to={{ pathname:'/helpdesk/settings/'+setting.link }}>{setting.title}</Link>
 					</NavItem>
 				)}

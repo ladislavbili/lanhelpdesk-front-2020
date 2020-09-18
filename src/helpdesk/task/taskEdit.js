@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation, useQuery, useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Select from 'react-select';
@@ -43,6 +43,7 @@ query task($id: Int!){
 		id: $id
 	)  {
 		id
+		important
 		title
 		updatedAt
 		createdAt
@@ -274,10 +275,227 @@ query task($id: Int!){
 }
 `;
 
-const UPDATE_TASK = gql`
-mutation updateTask($id: Int!, $title: String!, $closeDate: Int, $assignedTo: [Int]!, $company: Int!, $deadline: Int, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: Int, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput ) {
+const UPDATE_TASK_IMPORTANT = gql`
+mutation updateTask($id: Int!, $important: Boolean) {
   updateTask(
 		id: $id,
+    important: $important,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_TITLE = gql`
+mutation updateTask($id: Int!, $title: String) {
+  updateTask(
+		id: $id,
+    title: $title,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_CLOSE_DATE = gql`
+mutation updateTask($id: Int!, $closeDate: Int) {
+  updateTask(
+		id: $id,
+    closeDate: $closeDate,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_ASSIGNED_TO = gql`
+mutation updateTask($id: Int!, $assignedTo: [Int]!) {
+  updateTask(
+		id: $id,
+    assignedTo: $assignedTo
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_COMPANY = gql`
+mutation updateTask($id: Int!, $company: Int! ) {
+  updateTask(
+		id: $id,
+    company: $company,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_DEADLINE = gql`
+mutation updateTask($id: Int!, $deadline: Int ) {
+  updateTask(
+		id: $id,
+    deadline: $deadline,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_DESCRIPTION = gql`
+mutation updateTask($id: Int!, $description: String!) {
+  updateTask(
+		id: $id,
+    description: $description,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_MILESTONE = gql`
+mutation updateTask($id: Int!, $milestone: Int) {
+  updateTask(
+		id: $id,
+    milestone: $milestone,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_OVERTIME = gql`
+mutation updateTask($id: Int!, $overtime: Boolean!) {
+  updateTask(
+		id: $id,
+    overtime: $overtime,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_PAUSAL = gql`
+mutation updateTask($id: Int!, $pausal: Boolean!) {
+  updateTask(
+		id: $id,
+    pausal: $pausal,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_PENDING_CHANGABLE = gql`
+mutation updateTask($id: Int!, $pendingChangable: Boolean) {
+  updateTask(
+		id: $id,
+    pendingChangable: $pendingChangable,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_PENDING_DATE = gql`
+mutation updateTask($id: Int!, $pendingDate: Int) {
+  updateTask(
+		id: $id,
+    pendingDate: $pendingDate,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_PROJECT = gql`
+mutation updateTask($id: Int!, $project: Int!) {
+  updateTask(
+		id: $id,
+    project: $project,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_REQUESTER = gql`
+mutation updateTask($id: Int!, $requester: Int) {
+  updateTask(
+		id: $id,
+    requester: $requester,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_STATUS = gql`
+mutation updateTask($id: Int!, $status: Int!) {
+  updateTask(
+		id: $id,
+    status: $status,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_TAGS = gql`
+mutation updateTask($id: Int!, $tags: [Int]!) {
+  updateTask(
+		id: $id,
+    tags: $tags,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_TASK_TYPE = gql`
+mutation updateTask($id: Int!, $taskType: Int! ) {
+  updateTask(
+		id: $id,
+    taskType: $taskType,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK_REPEAT = gql`
+mutation updateTask($id: Int!, $repeat: RepeatInput ) {
+  updateTask(
+		id: $id,
+    repeat: $repeat,
+  ){
+    id
+    title
+  }
+}
+`;
+
+const UPDATE_TASK = gql`
+mutation updateTask($id: Int!, $important: Boolean, $title: String, $closeDate: String, $assignedTo: [Int], $company: Int, $deadline: String, $description: String, $milestone: Int, $overtime: Boolean, $pausal: Boolean, $pendingChangable: Boolean, $pendingDate: String, $project: Int, $requester: Int, $status: Int, $tags: [Int], $taskType: Int, $repeat: RepeatInput ) {
+  updateTask(
+		id: $id,
+		important: $important,
     title: $title,
     closeDate: $closeDate,
     assignedTo: $assignedTo,
@@ -488,8 +706,26 @@ mutation deleteCustomItem($id: Int!) {
 export default function TaskEdit (props){
 	//data & queries
 	const { match, history, columns, currentUser, accessRights, statuses, companies, users, allTags, projects, tasks, taskTypes, tripTypes, emails, inModal, closeModal } = props;
-  const { data: taskData, loading: taskLoading, refetch: taskRefetch } = useQuery(GET_TASK, { variables: {id: parseInt(match.params.taskID)} });
+  const [ getTask, {data: taskData, loading: taskLoading } ] = useLazyQuery(GET_TASK);
   const [ updateTask, {client} ] = useMutation(UPDATE_TASK);
+	const [ updateImportant ] = useMutation(UPDATE_TASK_IMPORTANT);
+	const [ updateTitle ] = useMutation(UPDATE_TASK_TITLE);
+	const [ updateCloseDate ] = useMutation(UPDATE_TASK_CLOSE_DATE);
+	const [ updateAssignedTo ] = useMutation(UPDATE_TASK_ASSIGNED_TO);
+	const [ updateCompany ] = useMutation(UPDATE_TASK_COMPANY);
+	const [ updateDeadline ] = useMutation(UPDATE_TASK_DEADLINE);
+	const [ updateDescription ] = useMutation(UPDATE_TASK_DESCRIPTION);
+	const [ updateMilestone ] = useMutation(UPDATE_TASK_MILESTONE);
+	const [ updateOvertime ] = useMutation(UPDATE_TASK_OVERTIME);
+	const [ updatePausal ] = useMutation(UPDATE_TASK_PAUSAL);
+	const [ updatePendingChangable ] = useMutation(UPDATE_TASK_PENDING_CHANGABLE);
+	const [ updatePendingDate ] = useMutation(UPDATE_TASK_PENDING_DATE);
+	const [ updateProject ] = useMutation(UPDATE_TASK_PROJECT);
+	const [ updateRequester ] = useMutation(UPDATE_TASK_REQUESTER);
+	const [ updateStatus ] = useMutation(UPDATE_TASK_STATUS);
+	const [ updateTags ] = useMutation(UPDATE_TASK_TAGS);
+	const [ updateTaskType ] = useMutation(UPDATE_TASK_TASK_TYPE);
+	const [ updateRepeat ] = useMutation(UPDATE_TASK_REPEAT);
   const [ deleteTask, {deleteData} ] = useMutation(DELETE_TASK);
   const [ addSubtask ] = useMutation(ADD_SUBTASK);
   const [ updateSubtask ] = useMutation(UPDATE_SUBTASK);
@@ -562,24 +798,23 @@ export default function TaskEdit (props){
 
 // sync
 React.useEffect( () => {
-    if (!taskLoading){
+    if (!taskLoading && taskData){
 			setAssignedTo(toSelArr(taskData.task.assignedTo, 'email'));
-			setCloseDate( moment(taskData.task.closeDate/1000) );
+			setCloseDate( timestampToString(parseInt(taskData.task.closeDate)) );
 			setComments( [...taskData.task.comments.map(item => ({...item, isMail: false})), ...emails.map(item => ({...item, isMail: true}))] );
 			setCompany( ( taskData.task.company ? {...taskData.task.company, value: taskData.task.company.id, label: taskData.task.company.title} : null) );
 			setCreatedBy(taskData.task.createdBy);
 			setCreatedAt( taskData.task.createdAt );
-			setDeadline(taskData.task.deadline ? moment(taskData.task.deadline/1000) : null) ;
+			setDeadline(taskData.task.deadline ? timestampToString(parseInt(taskData.task.deadline)) : null) ;
 			setDescription(taskData.task.description);
       setImportant(taskData.task.important);
-      setInvoicedDate( moment(taskData.task.invoicedDate/1000) );
-      //invoicedDate: task.invoicedDate!==null && task.invoicedDate!==undefined ?new Date(task.invoicedDate).toISOString().replace('Z',''):'',
+      setInvoicedDate( timestampToString(parseInt(taskData.task.invoicedDate)) );
       const pro =  (taskData.task.project ? {...taskData.task.project, value: taskData.task.project.id, label: taskData.task.project.title} : null );
       setMilestone(pro && pro.milestone ? {...pro.milestone, value: pro.milestone.id, label: pro.milestone.title} : noMilestone );
 			setOvertime( (taskData.task.overtime ? booleanSelects[1] : booleanSelects[0]) );
 			setPausal( (taskData.task.pausal ? booleanSelects[1] : booleanSelects[0]) );
 			setPendingChangable(taskData.task.pendingChangable);
-			setPendingDate( moment(taskData.task.pendingDate/1000) );
+			setPendingDate( timestampToString(parseInt(taskData.task.pendingDate)) );
 			setProject(pro);
 			setReminder(taskData.task.reminder);
 			setRepeat(taskData.task.repeat);
@@ -605,11 +840,125 @@ React.useEffect( () => {
         }
       }
     }
-}, [taskLoading]);
+	}, [taskLoading]);
 
-React.useEffect( () => {
-    taskRefetch({ variables: {id: parseInt(match.params.taskID)} });
-}, [match.params.taskID]);
+	React.useEffect( () => {
+	    getTask({ variables: {id: parseInt(match.params.taskID)} });
+	}, [match.params.taskID]);
+
+	React.useEffect(() => {
+		if (important) {
+			updateTaskFunc(["important"]);
+		}
+	}, [important]);
+
+	React.useEffect(() => {
+		if (title) {
+			updateTaskFunc(["title"]);
+		}
+	}, [title]);
+
+	React.useEffect(() => {
+		if (closeDate) {
+			updateTaskFunc(["closeDate"]);
+		}
+	}, [closeDate]);
+
+	React.useEffect(() => {
+		if (assignedTo) {
+			updateTaskFunc(["assignedTo"]);
+		}
+	}, [assignedTo]);
+
+	React.useEffect(() => {
+		if (attachments) {
+			updateTaskFunc(["attachments"]);
+		}
+	}, [attachments]);
+
+	React.useEffect(() => {
+		if (company) {
+			updateTaskFunc(["company"]);
+		}
+	}, [company]);
+
+	React.useEffect(() => {
+		if (deadline) {
+			updateTaskFunc(["deadline"]);
+		}
+	}, [deadline]);
+
+	React.useEffect(() => {
+		if (description) {
+			updateTaskFunc(["description"]);
+		}
+	}, [description]);
+
+	React.useEffect(() => {
+		if (milestone) {
+			updateTaskFunc(["milestone"]);
+		}
+	}, [milestone]);
+
+	React.useEffect(() => {
+		if (overtime) {
+			updateTaskFunc(["overtime"]);
+		}
+	}, [overtime]);
+
+	React.useEffect(() => {
+		if (pausal) {
+			updateTaskFunc(["pausal"]);
+		}
+	}, [pausal]);
+
+	React.useEffect(() => {
+		if (pendingChangable) {
+			updateTaskFunc(["pendingChangable"]);
+		}
+	}, [pendingChangable]);
+
+	React.useEffect(() => {
+		if (pendingDate) {
+			updateTaskFunc(["pendingDate"]);
+		}
+	}, [pendingDate]);
+
+	React.useEffect(() => {
+		if (project) {
+			updateTaskFunc(["project"]);
+		}
+	}, [project]);
+
+	React.useEffect(() => {
+		if (requester) {
+			updateTaskFunc(["requester"]);
+		}
+	}, [requester]);
+
+	React.useEffect(() => {
+		if (status) {
+			updateTaskFunc(["status"]);
+		}
+	}, [status]);
+
+	React.useEffect(() => {
+		if (tags) {
+			updateTaskFunc(["tags"]);
+		}
+	}, [tags]);
+
+	React.useEffect(() => {
+		if (taskType) {
+			updateTaskFunc(["taskType"]);
+		}
+	}, [taskType]);
+
+	React.useEffect(() => {
+		if (repeat) {
+			updateTaskFunc(["repeat"]);
+		}
+	}, [repeat]);
 
   const deleteTaskFunc = () => {
     if(window.confirm("Are you sure?")){
@@ -633,40 +982,76 @@ React.useEffect( () => {
   	return  title==="" || status===null || project === null || assignedTo === [] || saving || viewOnly;
   }
 
-  const	updateTaskFunc = () => {
+  const	updateTaskFunc = (what) => {
   		if(cannotSave()){
   			return;
   		}
       setSaving(true);
 
-  		let newInvoicedDate = null;
-  		if(status.action==='Invoiced'){
-  			newInvoicedDate = isNaN(invoicedDate.unix()) ? moment().unix() : invoicedDate.unix();
-  		}
+			let variables = {id: parseInt(match.params.taskID)};
 
-      updateTask({ variables: {
-        id: parseInt(match.params.taskID),
-        title,
-        company: company ? company.id : null,
-        requester: requester ? requester.id : null,
-        assignedTo: assignedTo.map((item)=>item.id),
-        description,
-        status: status ? status.id : null,
-        project: project ? project.id : null,
-        pausal: pausal.value,
-        overtime: overtime.value,
-        tags: tags.map((item)=>item.id),
-        taskType: taskType ? taskType.id : null,
-        repeat: repeat,
-        milestone: (milestone.id === null || milestone.id === -1 ? null : milestone.id),
-  //      attachments,
-        deadline: deadline !== null ? deadline.unix() : null,
-        closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix() : null,
-        pendingDate: (pendingDate !== null && status.action==='PendingDate') ? pendingDate.unix() : null,
-        pendingChangable,
-    //    invoicedDate: newInvoicedDate,
-    //    important,
-      } }).then( ( response ) => {
+			for (var i = 0; i < what.length; i++) {
+				switch(what[i]) {
+					case "important":
+						variables = {...variables, important};
+						break;
+				  case "title":
+						variables = {...variables, title};
+				    break;
+				  case "closeDate":
+						variables = {...variables, closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix().toString() : null};
+				    break;
+					case "assignedTo":
+						variables = {...variables, assignedTo: assignedTo.map((item)=>item.id)};
+				    break;
+				  case "company":
+						variables = {...variables, company: company ? company.id : null};
+				    break;
+				  case "deadline":
+						variables = {...variables, deadline: deadline !== null ? deadline.unix().toString() : null};
+				    break;
+				  case "description":
+						variables = {...variables, description};
+				    break;
+					case "milestone":
+						variables = {...variables, milestone: (milestone.id === null || milestone.id === -1 ? null : milestone.id),};
+				    break;
+				  case "overtime":
+						variables = {...variables, overtime: overtime.value};
+				    break;
+				  case "pausal":
+						variables = {...variables, pausal: pausal.value};
+				    break;
+				  case "pendingChangable":
+						variables = {...variables, pendingChangable};
+				    break;
+				  case "pendingDate":
+						variables = {...variables, pendingDate: (pendingDate !== null && status.action==='PendingDate') ? pendingDate.unix().toString() : null};
+				    break;
+				  case "project":
+						variables = {...variables, project: project ? project.id : null};
+				    break;
+				  case "requester":
+						variables = {...variables, requester: requester ? requester.id : null};
+				    break;
+				  case "status":
+						variables = {...variables, status: status ? status.id : null};
+				    break;
+				  case "tags":
+						variables = {...variables,   tags: tags.map((item)=>item.id)};
+				    break;
+				  case "taskType":
+						variables = {...variables, taskType: taskType ? taskType.id : null};
+				    break;
+				  case "repeat":
+						variables = {...variables, repeat: repeat};
+				    break;
+				  default:
+				   console.log("impossible", what[i]);
+				}
+			}
+
+      updateTask({ variables }).then( ( response ) => {
       }).catch( (err) => {
         console.log(err.message);
       });
@@ -995,7 +1380,6 @@ React.useEffect( () => {
               disabled={viewOnly}
               className="btn btn-link-reversed waves-effect" onClick={()=>{
 								setImportant(!important);
-								updateTaskFunc();
 							}}>
 							<i className="far fa-star" /> Important
 						</button>
@@ -1023,7 +1407,6 @@ React.useEffect( () => {
 								className="task-title-input text-extra-slim hidden-input m-l-10"
 								onChange={(e)=> {
 									setTitle(e.target.value);
-  								updateTaskFunc();
 								}}
 								placeholder="Enter task name" />
 						</span>
@@ -1061,7 +1444,6 @@ React.useEffect( () => {
 							disabled={!status || status.action!=='PendingDate'||viewOnly||!pendingChangable}
 							onChange={ (date) => {
 								setPendingDate(date);
-								updateTaskFunc();
 							}}
 							placeholderText="No pending date"
 							{...datePickerConfig}
@@ -1082,7 +1464,6 @@ React.useEffect( () => {
 							disabled={!status || (status.action!=='CloseDate' && status.action!=='CloseInvalid')||viewOnly}
 							onChange={date => {
 								setCloseDate(date);
-								updateTaskFunc();
 							}}
 							placeholderText="No pending date"
 							{...datePickerConfig}
@@ -1111,7 +1492,6 @@ React.useEffect( () => {
 		setAssignedTo(newAssignedTo);
 		setProjectChangeDate(moment());
 		setMilestone(noMilestone);
-		updateTaskFunc();
 		setDefaults(project.id);
 	}
 
@@ -1124,12 +1504,10 @@ React.useEffect( () => {
 			setStatusChange(moment());
 			setImportant(false);
 			setCloseDate(moment());
-    		updateTaskFunc();
 		}
 		else{
 			setStatus(s);
 			setStatusChange(moment());
-  		updateTaskFunc();
 		}
 	}
 
@@ -1139,15 +1517,12 @@ React.useEffect( () => {
         setMilestone(mile);
         setPendingDate(moment(mile.startsAt));
         setPendingChangable(false);
-  		updateTaskFunc();
 			}else{
         setMilestone(mile);
         setPendingChangable(false);
-  		updateTaskFunc();
 			}
 		}else{
       setMilestone(mile);
-		updateTaskFunc();
 		}
 	}
 
@@ -1156,7 +1531,6 @@ React.useEffect( () => {
 			setOpenUserAdd(true);
 		} else {
       setRequester(req);
-       updateTaskFunc();
 		}
 	}
 
@@ -1166,7 +1540,6 @@ React.useEffect( () => {
 		} else {
       setCompany(comp);
       setPausal( parseInt(comp.taskWorkPausal) > 0 ? booleanSelects[1] : booleanSelects[0] );
-			updateTaskFunc();
 		}
 	}
 
@@ -1204,7 +1577,6 @@ React.useEffect( () => {
                         setOpenUserAdd(true);
                       } else {
   											setAssignedTo(users);
-                    		updateTaskFunc();
                       }
 										}}
 										options={
@@ -1246,7 +1618,6 @@ React.useEffect( () => {
 										styles={invisibleSelectStyleNoArrowRequired}
 										onChange={(type)=> {
                       setTaskType(type);
-                			updateTaskFunc();
                   }}
 										options={taskTypes}
 										/>
@@ -1305,7 +1676,6 @@ React.useEffect( () => {
 									styles={invisibleSelectStyleNoArrowRequired}
 									onChange={(pausal)=> {
 										setPausal(pausal);
-              			updateTaskFunc();
 									}}
 									options={booleanSelects}
 									/>
@@ -1321,7 +1691,6 @@ React.useEffect( () => {
 								disabled={viewOnly}
 								onChange={date => {
 									setDeadline(date);
-            			updateTaskFunc();
 								}}
 								placeholderText="No deadline"
 								{...datePickerConfig}
@@ -1335,11 +1704,9 @@ React.useEffect( () => {
 							repeat={repeat}
 							submitRepeat={(r) => {
                 setRepeat(r);
-          			updateTaskFunc();
               }}
 							deleteRepeat={()=> {
                 setRepeat(null);
-          			updateTaskFunc();
               }}
 							columns={columns}
 							/>
@@ -1354,7 +1721,6 @@ React.useEffect( () => {
 									styles={invisibleSelectStyleNoArrowRequired}
 									onChange={(overtime)=> {
 										setOvertime(overtime);
-              			updateTaskFunc();
 									}}
 									options={booleanSelects}
 									/>
@@ -1396,7 +1762,6 @@ React.useEffect( () => {
                     setOpenUserAdd(true);
                   } else {
                     setAssignedTo(users);
-										updateTaskFunc();
                   }
                 }}
                 options={
@@ -1434,7 +1799,6 @@ React.useEffect( () => {
                 styles={invisibleSelectStyleNoArrowRequired}
                 onChange={(type)=> {
                   setTaskType(type);
-            			updateTaskFunc();
               }}
                 options={taskTypes}
 								/>
@@ -1463,7 +1827,6 @@ React.useEffect( () => {
     						isMulti
     						onChange={(tags)=> {
                   setTags(tags);
-                  updateTaskFunc();
                 }}
     						options={allTags}
     						isDisabled={defaultFields.tag.fixed||viewOnly}
@@ -1512,7 +1875,6 @@ React.useEffect( () => {
                 styles={invisibleSelectStyleNoArrowRequired}
                 onChange={(pausal)=> {
                   setPausal(pausal);
-                  updateTaskFunc();
                 }}
                 options={booleanSelects}
 								/>
@@ -1528,7 +1890,6 @@ React.useEffect( () => {
               disabled={viewOnly}
               onChange={date => {
                 setDeadline(date);
-                updateTaskFunc();
               }}
 							placeholderText="No deadline"
 							{...datePickerConfig}
@@ -1541,11 +1902,9 @@ React.useEffect( () => {
           repeat={repeat}
           submitRepeat={(r) => {
             setRepeat(r);
-            updateTaskFunc();
           }}
           deleteRepeat={()=> {
             setRepeat(null);
-            updateTaskFunc();
           }}
           columns={columns}
 					vertical={true}
@@ -1560,7 +1919,6 @@ React.useEffect( () => {
                 styles={invisibleSelectStyleNoArrowRequired}
                 onChange={(overtime)=> {
                   setOvertime(overtime);
-                  updateTaskFunc();
                 }}
                 options={booleanSelects}
 								/>
@@ -1585,7 +1943,6 @@ React.useEffect( () => {
 						isMulti
 						onChange={(tags)=> {
               setTags(tags);
-              updateTaskFunc();
             }}
 						options={allTags}
 						isDisabled={defaultFields.tag.fixed||viewOnly}
@@ -1655,7 +2012,6 @@ React.useEffect( () => {
 						}}
 						onChange={(e,editor)=>{
               setDescription(editor.getData());
-              updateTaskFunc();
 						}}
 						config={ck5config}
 						/>
@@ -1698,13 +2054,11 @@ React.useEffect( () => {
 						}
 					});
 					setAttachments([...attachments, ...newAttachments]);
-					updateTaskFunc();
 				}}
 				removeAttachment={(attachment)=>{
 					let newAttachments = [...attachments];
 					newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
 					setAttachments([...newAttachments]);
-					updateTaskFunc();
 				}}
 				/>
 		)
@@ -1776,12 +2130,6 @@ React.useEffect( () => {
 				/>
 		)
 	}
-/*
-
-  let newSubtasks = [...subtasks];
-  newSubtasks.push({...newService, id: getNewID()});
-  setSubtasks(newSubtasks);
-*/
 
 	const renderVykazyTable = () => {
 		return (

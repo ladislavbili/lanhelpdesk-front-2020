@@ -6,6 +6,7 @@ import {Button } from 'reactstrap';
 import TaskTypeAdd from './taskTypeAdd';
 import TaskTypeEdit from './taskTypeEdit';
 import Loading from 'components/loading';
+import { orderArr } from 'helperFunctions';
 
 export const GET_TASK_TYPES = gql`
 query {
@@ -56,7 +57,7 @@ export default function TaskTypeList(props){
             </h2>
             <table className="table table-hover">
               <tbody>
-                { (loading || !data ? [] : data.taskTypes).filter((item)=>item.title.toLowerCase().includes(taskTypeFilter.toLowerCase())).map((taskType)=>
+                { (loading || !data ? [] : orderArr(data.taskTypes)).filter((item)=>item.title.toLowerCase().includes(taskTypeFilter.toLowerCase())).map((taskType)=>
                   <tr key={taskType.id}
                     className={"clickable" + (parseInt(match.params.id) === taskType.id ? " active":"")}
                     onClick={()=>history.push('/helpdesk/settings/taskTypes/'+taskType.id)}>

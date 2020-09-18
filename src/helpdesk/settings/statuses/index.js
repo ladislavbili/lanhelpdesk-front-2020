@@ -5,6 +5,7 @@ import gql from "graphql-tag";
 import {Button } from 'reactstrap';
 import StatusAdd from './statusAdd';
 import StatusEdit from './statusEdit';
+import { orderArr } from 'helperFunctions';
 
 export const GET_STATUSES = gql`
 query {
@@ -23,7 +24,7 @@ export default function StatusesList(props){
     //data
     const { history, match } = props;
     const { data, loading } = useQuery(GET_STATUSES);
-    const statuses = (loading || !data ? [] : data.statuses);
+    const statuses = (loading || !data ? [] : orderArr(data.statuses));
 
     return (
       <div className="content">

@@ -14,6 +14,7 @@ query {
     id
     role {
       accessRights {
+        publicFilters
         users
         companies
         pausals

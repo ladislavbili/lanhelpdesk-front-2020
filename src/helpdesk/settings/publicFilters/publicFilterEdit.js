@@ -107,7 +107,7 @@ class PublicFilterEdit extends Component{
       requester: this.getItemValue( 'users', props, filter.requester ),
       company: this.getItemValue( 'companies', props, filter.company ),
       assigned: this.getItemValue( 'users', props, filter.assigned ),
-      workType: this.getItemValue( 'taskTypes', props, filter.workType ),
+      taskType: this.getItemValue( 'taskTypes', props, filter.taskType ),
       oneOf: oneOfOptions.filter( (option) => filter.oneOf.includes(option.value) ),
 
       statusDateFrom: toMomentInput(filter.statusDateFrom),
@@ -164,7 +164,7 @@ class PublicFilterEdit extends Component{
         requester: this.state.requester.id,
         company: this.state.company.id,
         assigned: this.state.assigned.id,
-        workType: this.state.workType.id,
+        taskType: this.state.taskType.id,
         oneOf: this.state.oneOf.map( (item) => item.value ),
 
         statusDateFrom: this.state.statusDateFromNow ? null :  fromMomentToUnix(this.state.statusDateFrom),
@@ -403,8 +403,8 @@ class PublicFilterEdit extends Component{
           <label htmlFor="example-input-small">Typ práce</label>
           <Select
             options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(this.props.taskTypes))}
-            onChange={(newValue)=>this.setState({workType:newValue})}
-            value={this.state.workType}
+            onChange={(newValue)=>this.setState({taskType:newValue})}
+            value={this.state.taskType}
             styles={selectStyle} />
         </FormGroup>
 

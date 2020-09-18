@@ -5,8 +5,10 @@ import gql from "graphql-tag";
 import DatePicker from 'react-datepicker';
 import { Button, FormGroup, Label,Input, Modal, ModalHeader, ModalBody, ModalFooter  } from 'reactstrap';
 
+import { GET_PROJECTS } from 'helpdesk/components/sidebar/tasksSidebar';
+
 const ADD_MILESTONE = gql`
-mutation addMilestone($title: String!, $description: String!, $startsAt: Int, $endsAt: Int, $projectId: Int!) {
+mutation addMilestone($title: String!, $description: String!, $startsAt: String, $endsAt: String, $projectId: Int!) {
   addMilestone(
     title: $title,
     description: $description,
@@ -38,11 +40,20 @@ export default function MilestoneAdd (props){
     addMilestone({ variables: {
       title,
       description,
-      startsAt: startsAt ? startsAt.unix() : null,
-      endsAt: endsAt ? endsAt.unix() : null,
+      startsAt: startsAt ? startsAt.unix().toString() : null,
+      endsAt: endsAt ? endsAt.unix().toString() : null,
       projectId: projectID,
     } }).then( ( response ) => {
-        console.log("hello");
+        let allProjects = client.readQuery({query: GET_PROJECTS}).projects;
+        const newProjects = allProjects.map(item => {
+          if (item.id !== projectID){
+            return item;
+          }
+          let newProject = {...item};
+          newProject.milestones = [...newProject.milestones, {...response.data.addMilestone, __typename: "Milestone"}];
+          return newProject;
+        });
+        client.writeQuery({ query: GET_PROJECTS, data: {projects: [...newProjects] } });
         closeModal();
     }).catch( (err) => {
       console.log(err.message);

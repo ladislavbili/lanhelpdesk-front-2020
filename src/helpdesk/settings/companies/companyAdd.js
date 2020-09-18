@@ -41,6 +41,7 @@ mutation addCompany($title: String!, $dph: Int!, $ico: String!, $dic: String!, $
   ){
     id
     title
+    monthly
     monthlyPausal
     taskWorkPausal
     taskTripPausal
