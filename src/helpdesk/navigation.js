@@ -1,9 +1,8 @@
 import React from 'react';
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import { Route } from 'react-router-dom';
-import {testing} from '../helperFunctions';
 import settings from 'configs/constants/settings';
 
 import Sidebar from './components/sidebar';
@@ -50,7 +49,7 @@ query {
 `;
 
 
-const UPDATE_USER = gql`
+/*const UPDATE_USER = gql`
 mutation updateUser($id: Int!, $tasklistLayout: Int) {
   updateUser(
     id: $id,
@@ -59,14 +58,14 @@ mutation updateUser($id: Int!, $tasklistLayout: Int) {
     id
   }
 }
-`;
+`;*/
 
 
 export default function Navigation (props) {
   //data & queries
-  const { history, match, layout } = props;
-  const { data, loading } = useQuery(GET_MY_DATA);
-  const [updateUser, {updateData}] = useMutation(UPDATE_USER);
+  const { layout } = props;
+  const { data } = useQuery(GET_MY_DATA);
+//  const [updateUser, {updateData}] = useMutation(UPDATE_USER);
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights  : {};

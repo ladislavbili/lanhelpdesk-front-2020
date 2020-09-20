@@ -3,11 +3,9 @@ import { useMutation, useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import { Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import {toSelArr, sameStringForms, snapshotToArray,testing} from '../../../helperFunctions';
+import {toSelArr} from '../../../helperFunctions';
 import Permissions from "../../components/projects/permissions";
 import ProjectDefaultValues from "../../components/projects/defaultValues";
-import booleanSelects from 'configs/constants/boolSelect'
-import { noDef } from 'configs/constants/projects';
 import Select from 'react-select';
 import {selectStyle} from "configs/components/select";
 import Loading from 'components/loading';
@@ -188,10 +186,10 @@ query {
 export default function ProjectEdit(props){
   //data & queries
   const { history, match, closeModal, projectID } = props;
-  const { data, loading } = useQuery(GET_MY_DATA);
+  const { data } = useQuery(GET_MY_DATA);
   const { data: projectData, loading: projectLoading, refetch } = useQuery(GET_PROJECT, { variables: {id: (projectID ? projectID : parseInt(match.params.id))}, options: { fetchPolicy: 'network-only' } });
-  const [updateProject, {updateData}] = useMutation(UPDATE_PROJECT);
-  const [deleteProject, {deleteData, client}] = useMutation(DELETE_PROJECT);
+  const [updateProject] = useMutation(UPDATE_PROJECT);
+  const [deleteProject, {client}] = useMutation(DELETE_PROJECT);
   const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
   const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES, { options: { fetchPolicy: 'network-only' }});
   const { data: usersData, loading: usersLoading } = useQuery(GET_USERS, { options: { fetchPolicy: 'network-only' }});
@@ -203,7 +201,6 @@ export default function ProjectEdit(props){
   const theOnlyOneLeft = allProjects.length === 0;
 
   const currentUser = data ? data.getMyData : {};
-  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   //state
   const [ title, setTitle ] = React.useState("");
@@ -439,7 +436,7 @@ export default function ProjectEdit(props){
 
     const rights = projectRights.findIndex(p => p.user.id === currentUser.id);
     const isAdmin = rights >= 0 ? projectRights[rights].admin : false;
-    
+
     let canReadUserIDs = [];
     let canBeAssigned = [];
 

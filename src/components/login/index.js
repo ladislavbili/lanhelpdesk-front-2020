@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { useMutation } from "@apollo/react-hooks";
 import Login from './login';
 import gql from "graphql-tag";
@@ -41,7 +41,7 @@ mutation loginUser($email: String!, $password: String!) {
 `;
 
 export default function LoginContainer(){
-  const [login, {data, client}] = useMutation(LOGIN_USER);
+  const [login, {client}] = useMutation(LOGIN_USER);
   return (
     <Login login={login} client={client} />
   )

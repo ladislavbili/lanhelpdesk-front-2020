@@ -51,8 +51,8 @@ export default function TagEdit(props){
   //data
   const { history, match } = props;
   const { data, loading, refetch } = useQuery(GET_TAG, { variables: {id: parseInt(props.match.params.id)} });
-  const [updateTag, {updateData}] = useMutation(UPDATE_TAG);
-  const [deleteTag, {deleteData, client}] = useMutation(DELETE_TAG);
+  const [updateTag] = useMutation(UPDATE_TAG);
+  const [deleteTag, {client}] = useMutation(DELETE_TAG);
 
   //state
   const [ title, setTitle ] = React.useState("");

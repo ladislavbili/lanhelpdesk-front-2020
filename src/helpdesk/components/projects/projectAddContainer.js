@@ -1,8 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
-
-import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from 'reactstrap';
+import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import ProjectAdd from 'helpdesk/settings/projects/projectAdd';
 
 export default function ProjecAddContainer(props){

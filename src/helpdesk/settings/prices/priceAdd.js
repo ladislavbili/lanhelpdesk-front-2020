@@ -49,9 +49,9 @@ query {
 
 export default function PricelistAdd(props){
   //data
-  const { history, match } = props;
-  const { data: taskTypesData, loading: taskTypesLoading, error: taskTypesError } = useQuery(GET_TASK_TYPES);
-  const { data: tripTypesData, loading: tripTypesLoading, error: tripTypesError } = useQuery(GET_TRIP_TYPES);
+  const { history } = props;
+  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES);
+  const { data: tripTypesData, loading: tripTypesLoading } = useQuery(GET_TRIP_TYPES);
   const [ addPricelist, {client} ] = useMutation(ADD_PRICELIST);
 
   const TASK_TYPES = ( taskTypesLoading ? [] : taskTypesData.taskTypes);
@@ -59,14 +59,13 @@ export default function PricelistAdd(props){
 
   //state
   const [ title, setTitle ] = React.useState("");
-  const [ order, setOrder ] = React.useState(0);
+  const [ order ] = React.useState(0);
   const [ afterHours, setAfterHours ] = React.useState(0);
   const [ def, setDef ] = React.useState(false);
   const [ materialMargin, setMaterialMargin ] = React.useState(0);
   const [ materialMarginExtra, setMaterialMarginExtra ] = React.useState(0);
 
   const [ prices, setPrices ] = React.useState([]);
-  const [ companies, setCompanies ] = React.useState([]);
 
   const [ saving, setSaving ] = React.useState(false);
   // sync

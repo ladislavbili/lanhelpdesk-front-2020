@@ -3,12 +3,11 @@ import { Button } from 'reactstrap';
 
 import Select from "react-select";
 import {selectStyle} from "configs/components/select";
-import {toSelArr} from '../../../helperFunctions';
 import Checkbox from '../../../components/checkbox';
 
 export default function Permissions(props) {
   //data
-  const { history, match, users, addUser, givePermission, permissions, userID, isAdmin, lockedRequester, lockRequester } = props;
+  const { users, addUser, givePermission, permissions, userID, isAdmin, lockedRequester, lockRequester } = props;
 
 	const [ chosenUser, setChosenUser ] = React.useState({});
 

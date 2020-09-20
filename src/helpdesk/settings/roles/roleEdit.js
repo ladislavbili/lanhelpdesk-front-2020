@@ -83,8 +83,8 @@ export default function RoleEdit(props){
   //data
   const { history, match } = props;
   const { data, loading, refetch } = useQuery(GET_ROLE, { variables: {id: parseInt(props.match.params.id)} });
-  const [updateRole, {updateData}] = useMutation(UPDATE_ROLE);
-  const [deleteRole, {deleteData, client}] = useMutation(DELETE_ROLE);
+  const [updateRole] = useMutation(UPDATE_ROLE);
+  const [deleteRole, {client}] = useMutation(DELETE_ROLE);
   const allRoles = toSelArr(client.readQuery({query: GET_ROLES}).roles);
   const filteredRoles = allRoles.filter( role => role.id !== parseInt(match.params.id) );
   const theOnlyOneLeft = allRoles.length === 0;
@@ -129,7 +129,6 @@ export default function RoleEdit(props){
   const [ choosingNewRole, setChooseingNewRole ] = React.useState(false);
 
   const [ saving, setSaving ] = React.useState(false);
-  const [ disabled, setDisabled ] = React.useState(false);
 
   // sync
   React.useEffect( () => {
@@ -236,6 +235,8 @@ export default function RoleEdit(props){
   if (loading) {
     return <Loading />
   }
+
+  const disabled = false;
 
   return (
     <div className="p-20 scroll-visible fit-with-header-and-commandbar">

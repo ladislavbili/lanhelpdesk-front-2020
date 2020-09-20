@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Modal, ModalBody } from 'reactstrap';
 import {getItemDisplayValue} from '../../helperFunctions';
 import CommandBar from './commandBar';
@@ -7,7 +7,7 @@ import Checkbox from '../checkbox';
 
 import MultipleTaskEdit from '../../helpdesk/task/multipleTaskEdit';
 
-import { filterName, filter, showDataFilter, currentUser } from 'localCache';
+import {/* filterName, filter, */showDataFilter, currentUser } from 'localCache';
 
 export default function List (props) {
 	const { history, link, commandBar, listName, statuses, setStatuses, allStatuses, displayValues, data, deleteTask, checkTask } = props;

@@ -1,10 +1,9 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import {Dropdown, DropdownItem, DropdownMenu, DropdownToggle} from 'reactstrap';
 import {Link} from 'react-router-dom';
 import classnames from 'classnames';
-import {testing} from 'helperFunctions';
 
 import { tasklistLayout } from 'localCache';
 
@@ -38,14 +37,14 @@ query {
 
 export default function PageHeader(props) {
   //data & queries
-  const { history, match, settings, showLayoutSwitch, dndLayout, calendarLayout } = props;
-  const { data, loading } = useQuery(GET_MY_DATA);
+  const { history, settings, showLayoutSwitch, dndLayout, calendarLayout } = props;
+  const { data } = useQuery(GET_MY_DATA);
   //state
   const [ notificationsOpen, setNotificationsOpen ] = React.useState(false);
   const [ layoutOpen, setLayoutOpen ] = React.useState(false);
   const [ settingsOpen, setSettingsOpen ] = React.useState(false);
-  const [ errorMessages, setErrorMessages ] = React.useState([]);
-  const [ unreadNotifications, setUnreadNotifications ] = React.useState([]);
+  const [ errorMessages/*, setErrorMessages*/ ] = React.useState([]);
+  const [ unreadNotifications/*, setUnreadNotifications */] = React.useState([]);
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};

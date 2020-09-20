@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { makeVar } from "@apollo/client";
-import { getFixedFilters, getEmptyFilter } from "configs/fixedFilters";
+import { getFixedFilters } from "configs/fixedFilters";
 
 export const selectedProject = makeVar(null);
 export const selectedMilestone = makeVar(null);

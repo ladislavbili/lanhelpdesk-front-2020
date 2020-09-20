@@ -3,10 +3,9 @@ import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import {Button } from 'reactstrap';
-import PublicFilterAdd from './publicFilterAdd';
-import PublicFilterEdit from './publicFilterEdit';
-import Loading from 'components/loading';
-import { roles } from 'configs/constants/roles';
+//import PublicFilterAdd from './publicFilterAdd';
+//import PublicFilterEdit from './publicFilterEdit';
+//import Loading from 'components/loading';
 import { filterIncludesText, orderArr } from 'helperFunctions';
 
 import { GET_ROLES } from 'helpdesk/settings/roles';
@@ -29,8 +28,8 @@ export default function PublicFilterListContainer(props){
 
   //data
   const { history, match } = props;
-  const { data, loading, error }  = useQuery(GET_PUBLIC_FILTERS);
-  const { data: rolesData, loading: rolesLoading, error: rolesError }  = useQuery(GET_ROLES);
+  const { data, loading }  = useQuery(GET_PUBLIC_FILTERS);
+  const { data: rolesData, loading: rolesLoading }  = useQuery(GET_ROLES);
 
   const getFilteredFilters = () => {
     console.log(data);

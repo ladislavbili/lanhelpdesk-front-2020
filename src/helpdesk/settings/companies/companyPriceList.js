@@ -7,7 +7,7 @@ import PriceEdit from "../prices/priceEdit";
 
 export default function CompanyPriceList(props)  {
   //data
-  const { pricelist, pricelists, setData, newData, priceName, cancel, history, setPricelist, setOldPricelist, setNewData, setPricelistName } = props;
+  const { pricelist, pricelists, newData, priceName, cancel, history, setPricelist, setOldPricelist, setNewData, setPricelistName } = props;
 
 	return (
 		<div>

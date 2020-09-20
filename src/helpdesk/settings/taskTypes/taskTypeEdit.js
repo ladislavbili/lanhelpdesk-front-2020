@@ -51,8 +51,8 @@ export default function TaskTypeEdit(props){
   //data
   const { history, match } = props;
   const { data, loading, refetch } = useQuery(GET_TASK_TYPE, { variables: {id: parseInt(props.match.params.id)} });
-  const [updateTaskType, {updateData}] = useMutation(UPDATE_TASK_TYPE);
-  const [deleteTaskType, {deleteData, client}] = useMutation(DELETE_TASK_TYPE);
+  const [updateTaskType] = useMutation(UPDATE_TASK_TYPE);
+  const [deleteTaskType, {client}] = useMutation(DELETE_TASK_TYPE);
   const allTaskTypes = toSelArr(client.readQuery({query: GET_TASK_TYPES}).taskTypes);
   const filteredTaskTypes = allTaskTypes.filter( taskType => taskType.id !== parseInt(match.params.id) );
   const theOnlyOneLeft = allTaskTypes.length === 0;

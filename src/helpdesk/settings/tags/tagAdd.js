@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { Button, FormGroup, Label,Input } from 'reactstrap';
 import { SketchPicker } from "react-color";
@@ -23,7 +23,7 @@ mutation addTag($title: String!, $color: String, $order: Int) {
 
 export default function TagAdd(props){
   //data & queries
-  const { history, match } = props;
+  const { history } = props;
   const [ addTag, {client} ] = useMutation(ADD_TAG);
 
   //state

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Loading from 'components/loading';
@@ -139,6 +139,7 @@ query {
     title
     id
     dph
+    monthly
     taskWorkPausal
     pricelist {
       id
@@ -210,7 +211,7 @@ query {
 
 export default function TaskEditContainer(props){
   //data & queries
-	const { match, history } = props;
+	const { match } = props;
   const { data, loading: userLoading } = useQuery(GET_MY_DATA);
   const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
   const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);

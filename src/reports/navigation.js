@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
 import { connect } from "react-redux";
 
-import {testing} from '../helperFunctions';
+//import {testing} from '../helperFunctions';
 
 import Sidebar from './Sidebar';
 import ErrorMessages from 'components/errorMessages';

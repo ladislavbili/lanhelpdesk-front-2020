@@ -117,8 +117,8 @@ export default function CompanyEdit(props){
   //data
   const { history, match } = props;
   const { data, loading, refetch } = useQuery(GET_COMPANY, { variables: {id: parseInt(match.params.id)} });
-  const [updateCompany, {updateData}] = useMutation(UPDATE_COMPANY);
-  const [deleteCompany, {deleteData, client}] = useMutation(DELETE_COMPANY);
+  const [updateCompany] = useMutation(UPDATE_COMPANY);
+  const [deleteCompany, {client}] = useMutation(DELETE_COMPANY);
 
   const [ addPricelist ] = useMutation(ADD_PRICELIST);
   const { data: pricelistsData, loading: pricelistsLoading } = useQuery(GET_PRICELISTS);
@@ -184,7 +184,7 @@ export default function CompanyEdit(props){
   const [ pricelistName, setPricelistName ] = React.useState("");
 
   const [ saving, setSaving ] = React.useState(false);
-  const [ deleting, setDeleting] = React.useState(false);
+  const [ deleting ] = React.useState(false);
   const [ newData, setNewData ] = React.useState(false);
   const [ clearCompanyRents, setClearCompanyRents ] = React.useState(false);
   const [ fakeID, setFakeID ] = React.useState(0);
@@ -211,21 +211,37 @@ export default function CompanyEdit(props){
   React.useEffect( () => {
       if (!loading){
         setTitle(data.company.title);
+        setOldTitle(data.company.title);
         setDph(data.company.dph);
+        setOldDph(data.company.dph);
         setIco(data.company.ico);
+        setOldIco(data.company.ico);
         setDic(data.company.dic);
+        setOldDic(data.company.dic);
         setIcDph(data.company.ic_dph);
+        setOldIcDph(data.company.ic_dph);
         setCountry(data.company.country);
+        setOldCountry(data.company.country);
         setCity(data.company.city);
+        setOldCity(data.company.city);
         setStreet(data.company.street);
+        setOldStreet(data.company.street);
         setZip(data.company.zip);
+        setOldZip(data.company.zip);
         setEmail(data.company.email);
+        setOldEmail(data.company.email);
         setPhone(data.company.phone);
+        setOldPhone(data.company.phone);
         setDescription(data.company.description);
+        setOldDescription(data.company.description);
         setMonthly(data.company.monthly);
+        setOldMonthly(data.company.monthly);
         setMonthlyPausal(data.company.monthlyPausal);
+        setOldMonthlyPausal(data.company.monthlyPausal);
         setTaskWorkPausal(data.company.taskWorkPausal);
+        setOldTaskWorkPausal(data.company.taskWorkPausal);
         setTaskTripPausal(data.company.taskTripPausal);
+        setOldTaskTripPausal(data.company.taskTripPausal);
         let pl = {...data.company.pricelist, value: data.company.pricelist.id, label: data.company.pricelist.title};
         setPricelist(pl);
         setOldPricelist(pl);
@@ -341,6 +357,7 @@ export default function CompanyEdit(props){
       setTitle(oldTitle);
       setIco(oldIco);
       setDic(oldDic);
+      setDph(oldDph);
       setIcDph(oldIcDph);
       setCountry(oldCountry);
       setCity(oldCity);
@@ -748,7 +765,7 @@ export default function CompanyEdit(props){
                 }
             }}>{saving?'Saving...':'Save changes'}</Button>
           }
-           <Button className="btn-red" disabled={saving || deleting} onClick={() => setChooseingNewCompany(true)}>Delete</Button>
+           <Button className="btn-red" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setChooseingNewCompany(true)}>Delete</Button>
 
           {newData &&
             <Button

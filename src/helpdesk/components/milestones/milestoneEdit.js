@@ -4,7 +4,6 @@ import gql from "graphql-tag";
 
 import { Modal, ModalBody, ModalFooter, ModalHeader, Button, FormGroup, Label, Input } from 'reactstrap';
 import DatePicker from 'react-datepicker';
-import moment from 'moment';
 import { timestampToString } from 'helperFunctions';
 
 import { GET_PROJECTS } from 'helpdesk/components/sidebar/tasksSidebar';
@@ -50,10 +49,10 @@ mutation deleteMilestone($id: Int!) {
 
 export default function MilestoneEdit (props){
   //data & queries
-  const { history, match, open, closeModal, milestoneID, projectID } = props;
+  const { closeModal, milestoneID, projectID } = props;
   const [ updateMilestone, {client} ] = useMutation(UPDATE_MILESTONE);
   const [ deleteMilestone ] = useMutation(DELETE_MILESTONE);
-  const { data, loading, refetch } = useQuery(GET_MILESTONE, { variables: {id: milestoneID} });
+  const { data, loading } = useQuery(GET_MILESTONE, { variables: {id: milestoneID} });
 
   console.log(milestoneID);
   console.log(data);

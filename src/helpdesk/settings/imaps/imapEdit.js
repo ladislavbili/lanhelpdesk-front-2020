@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input, Alert, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, FormGroup, Label,Input, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import Loading from 'components/loading';
 import Checkbox from '../../../components/checkbox';
 import { toSelArr } from 'helperFunctions';
@@ -71,8 +71,8 @@ export default function IMAPEdit(props){
   //data
   const { history, match } = props;
   const { data, loading, refetch } = useQuery(GET_IMAP, { variables: {id: parseInt(match.params.id)} });
-  const [updateImap, {updateData}] = useMutation(UPDATE_IMAP);
-  const [deleteImap, {deleteData, client}] = useMutation(DELETE_IMAP);
+  const [updateImap] = useMutation(UPDATE_IMAP);
+  const [deleteImap, {client}] = useMutation(DELETE_IMAP);
   const allIMAPs = toSelArr(client.readQuery({query: GET_IMAPS}).imaps);
   const filteredIMAPs = allIMAPs.filter( IMAP => IMAP.id !== parseInt(match.params.id) );
   const theOnlyOneLeft = allIMAPs.length === 0;

@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import React from 'react';
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Select from 'react-select';
@@ -7,7 +7,6 @@ import { Label, Button } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 
-import Subtasks from '../components/subtasks';
 import Repeat from '../components/repeat';
 import Attachments from '../components/attachments';
 
@@ -58,8 +57,8 @@ mutation addTask($title: String!, $closeDate: String, $assignedTo: [Int]!, $comp
 
 export default function TaskAdd (props){
   //data & queries
-  const { history, match, loading, newID, projectID, currentUser, projects, users, allTags, taskTypes, tripTypes, milestones, companies, statuses, units, defaultUnit, closeModal } = props;
-  const [ addTask, {client} ] = useMutation(ADD_TASK);
+  const { match, loading, newID, projectID, currentUser, projects, users, allTags, taskTypes, tripTypes, milestones, companies, statuses, units, defaultUnit, closeModal } = props;
+  const [ addTask ] = useMutation(ADD_TASK);
 
   //state
   const [ layout, setLayout ] = React.useState(1);
@@ -80,7 +79,7 @@ export default function TaskAdd (props){
   const [ pendingDate, setPendingDate ] = React.useState(null);
   const [ pendingChangable, setPendingChangable ] = React.useState(false);
   const [ project, setProject ] = React.useState(projectID ? projects.find(p => p.id === projectID) : null);
-  const [ reminder, setReminder ] = React.useState(null);
+//  const [ reminder, setReminder ] = React.useState(null);
   const [ repeat, setRepeat ] = React.useState(null);
   const [ requester, setRequester ] = React.useState(null);
   const [ saving, setSaving ] = React.useState(false);
@@ -120,7 +119,6 @@ export default function TaskAdd (props){
 			return;
 		}
 
-		let permission = pro.projectRights.find(r => r.user.id === currentUser.id);
 		let maybeRequester = users ? users.find((user)=>user.id === currentUser.id) : null;
 
 		let permissionIDs = project ? project.projectRights.map((permission) => permission.user.id) : [];
@@ -129,11 +127,12 @@ export default function TaskAdd (props){
 		let newAssignedTo = def.assignedTo && (def.assignedTo.fixed || def.assignedTo.def) ? users.filter((item)=> def.assignedTo.value.includes(item.id)) : filterredAssignedTo;
 		setAssignedTo(newAssignedTo);
 
+    let newRequester = def.requester && (def.requester.fixed || def.requester.def) ? users.find((item)=> item.id === def.requester.value.id) : maybeRequester;
+    setRequester(newRequester);
+
 		let newCompany = def.company && (def.company.fixed || def.company.def) ? companies.find((item)=> item.id === def.company.value) : (companies && newRequester ? companies.find((company) => company.id === currentUser.company.id) : null);
 		setCompany(newCompany);
 
-		let newRequester = def.requester && (def.requester.fixed || def.requester.def) ? users.find((item)=> item.id === def.requester.value.id) : maybeRequester;
-		setRequester(newRequester);
 
 		let newStatus = def.status && (def.status.fixed || def.status.def) ? statuses.find((item)=> item.id === def.status.value.is) : statuses[0];
 		setStatus(newStatus);
@@ -276,7 +275,7 @@ const renderSelectsLayout1 = () => {
 									setDeadline(null);
 									setCloseDate(null);
 									setPendingDate(null);
-									setReminder(null);
+							//		setReminder(null);
 								}
 
 								setDefaults(project.id, true);
@@ -325,7 +324,7 @@ const renderSelectsLayout1 = () => {
 											setDeadline(null);
 											setCloseDate(null);
 											setPendingDate(null);
-											setReminder(null);
+									//		setReminder(null);
 									}
 									setDefaults(project.id, true);
 								}}
@@ -570,7 +569,7 @@ const renderSelectsLayout2 = () => {
 										setDeadline(null);
 										setCloseDate(null);
 										setPendingDate(null);
-										setReminder(null);
+								//		setReminder(null);
 									}
 
 									setDefaults(project.id, true);
@@ -615,7 +614,7 @@ const renderSelectsLayout2 = () => {
 											setDeadline(null);
 											setCloseDate(null);
 											setPendingDate(null);
-											setReminder(null);
+						//					setReminder(null);
 									}
 									setDefaults(project.id, true);
 								}}

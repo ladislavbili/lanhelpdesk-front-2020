@@ -13,7 +13,7 @@ storageHelpTripTypesStart*/
 import CompanyRents from '../companies/companyRents';
 import CompanyPriceList from '../companies/companyPriceList';
 
-import {toSelArr, sameStringForms} from '../../../helperFunctions';
+import { toSelArr } from '../../../helperFunctions';
 import Loading from 'components/loading';
 
 import {  GET_PRICELISTS } from '../prices/index';
@@ -107,9 +107,9 @@ mutation updateCompany($id: Int!, $title: String, $dph: Int, $ico: String, $dic:
 
 export default function PausalEdit(props){
   //data
-  const { history, match } = props;
+  const { match } = props;
   const { data, loading, refetch } = useQuery(GET_COMPANY, { variables: {id: parseInt(match.params.id)} });
-  const [updateCompany, {updateData}] = useMutation(UPDATE_COMPANY);
+  const [updateCompany] = useMutation(UPDATE_COMPANY);
 
   const [ addPricelist ] = useMutation(ADD_PRICELIST);
   const { data: pricelistsData, loading: pricelistsLoading } = useQuery(GET_PRICELISTS);
@@ -119,22 +119,12 @@ export default function PausalEdit(props){
 
     //state
     const [ title, setTitle ] = React.useState("");
-
-    const [ monthly, setMonthly ] = React.useState(false);
-    const [ oldMonthly, setOldMonthly ] = React.useState(false);
-
     const [ monthlyPausal, setMonthlyPausal ] = React.useState(0);
-    const [ oldMonthlyPausal, setOldMonthlyPausal ] = React.useState(0);
-
     const [ taskWorkPausal, setTaskWorkPausal ] = React.useState(0);
-    const [ oldTaskWorkPausal, setOldTaskWorkPausal ] = React.useState(0);
-
     const [ taskTripPausal, setTaskTripPausal ] = React.useState(0);
-    const [ oldTaskTripPausal, setOldTaskTripPausal ] = React.useState(0);
-
-      const [ pricelist, setPricelist ] = React.useState({});
-      const [ oldPricelist, setOldPricelist ] = React.useState({});
-      const [ pricelistName, setPricelistName ] = React.useState("");
+    const [ pricelist, setPricelist ] = React.useState({});
+    const [ oldPricelist, setOldPricelist ] = React.useState({});
+    const [ pricelistName, setPricelistName ] = React.useState("");
 
     const [ rents, setRents ] = React.useState([]);
     const [ clearCompanyRents, setClearCompanyRents ] = React.useState(false);

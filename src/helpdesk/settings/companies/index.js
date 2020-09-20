@@ -24,7 +24,7 @@ export default function CompanysList(props){
 
     //data
     const { history, match } = props;
-    const { data, loading, error } = useQuery(GET_COMPANIES);
+    const { data, loading } = useQuery(GET_COMPANIES);
     const COMPANIES = (loading || !data ? [] : data.companies);
 
     return (

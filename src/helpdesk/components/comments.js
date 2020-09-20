@@ -1,14 +1,12 @@
-import React, { Component } from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import React from 'react';
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { Input, Label, Button, FormGroup, Dropdown, DropdownMenu, DropdownToggle } from 'reactstrap';
 import Checkbox from '../../components/checkbox';
-import {snapshotToArray, timestampToString} from '../../helperFunctions';
+import { timestampToString } from '../../helperFunctions';
 import { Creatable } from 'react-select';
 import CKEditor from 'ckeditor4-react';
 import {selectStyle} from 'configs/components/select';
-import { REST_URL } from 'configs/restAPI';
-import moment from 'moment';
 
 const ADD_COMMENT = gql`
 mutation addComment($message: String!, $internal: Boolean!, $parentCommentId: Int, $task: Int!) {
@@ -61,7 +59,7 @@ export default function Comments (props){
 
   const [ attachments, setAttachments ] = React.useState([]);
   const [ emailBody, setEmailBody ] = React.useState("");
-  const [ hasError, setHasError ] = React.useState(false);
+  const [ hasError ] = React.useState(false);
   const [ isEmail, setIsEmail ] = React.useState(false);
   const [ isInternal, setIsInternal ] = React.useState(false);
   const [ newComment, setNewComment ] = React.useState("");

@@ -27,7 +27,7 @@ export default function IMAPsList(props){
 
     //data
     const { history, match } = props;
-    const { data, loading, error } = useQuery(GET_IMAPS);
+    const { data, loading } = useQuery(GET_IMAPS);
     const IMAPS = (loading || !data ? [] : data.imaps);
 
     return (

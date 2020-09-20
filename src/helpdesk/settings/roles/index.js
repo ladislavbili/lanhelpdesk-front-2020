@@ -25,7 +25,7 @@ export default function RolesList(props){
 
     //data
     const { history, match } = props;
-    const { data, loading, error } = useQuery(GET_ROLES);
+    const { data, loading } = useQuery(GET_ROLES);
     const ROLES = (loading || !data ? [] : orderArr(data.roles));
 
     return (

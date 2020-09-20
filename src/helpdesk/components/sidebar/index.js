@@ -1,10 +1,6 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import {Nav, NavItem} from 'reactstrap';
-import {Link} from 'react-router-dom';
-import classnames from 'classnames';
-import {testing} from 'helperFunctions';
 import SettingsSidebar from './settingsSidebar';
 import TasksSidebar from './tasksSidebar';
 import settings from 'configs/constants/settings';
@@ -52,8 +48,8 @@ query {
 
 export default function Sidebar(props) {
   //data & queries
-  const { history, match } = props;
-  const { data, loading } = useQuery(GET_MY_DATA);
+  const { history } = props;
+  const { data } = useQuery(GET_MY_DATA);
 
   let currentUser = {};
 

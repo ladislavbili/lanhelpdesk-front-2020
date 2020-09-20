@@ -28,7 +28,7 @@ export default function SMTPsList(props){
 
     //data
     const { history, match } = props;
-    const { data, loading, error } = useQuery(GET_SMTPS);
+    const { data, loading } = useQuery(GET_SMTPS);
     const SMTPS = (loading || !data ? [] : data.smtps);
 
   const testSMTPs = () => {

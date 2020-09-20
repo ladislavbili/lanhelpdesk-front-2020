@@ -47,8 +47,8 @@ export default function TripTypeEdit(props){
   // data & queries
   const { history, match } = props;
   const { data, loading, refetch } = useQuery(GET_TRIP_TYPE, { variables: {id: parseInt(match.params.id)} });
-  const [updateTripType, {updateData}] = useMutation(UPDATE_TRIP_TYPE);
-  const [deleteTripType, {deleteData, client}] = useMutation(DELETE_TRIP_TYPE);
+  const [updateTripType] = useMutation(UPDATE_TRIP_TYPE);
+  const [deleteTripType, {client}] = useMutation(DELETE_TRIP_TYPE);
 
   //state
   const [ title, setTitle ] = React.useState("");

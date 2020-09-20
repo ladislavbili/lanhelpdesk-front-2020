@@ -24,7 +24,7 @@ export default function TaskTypeList(props){
 
   //data
   const { history, match } = props;
-  const { data, loading, error } = useQuery(GET_TASK_TYPES);
+  const { data, loading } = useQuery(GET_TASK_TYPES);
 
   return (
     <div className="content">

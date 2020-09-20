@@ -1,10 +1,8 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import { Button, FormGroup, Label,Input } from 'reactstrap';
-import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
 
 import {  GET_TASK_TYPES } from './index';
 
@@ -23,7 +21,7 @@ mutation addTaskType($title: String!, $order: Int) {
 
 export default function TaskTypeAdd(props){
   //data & queries
-  const { history, match } = props;
+  const { history } = props;
   const [ addTaskType, {client} ] = useMutation(ADD_TASK_TYPE);
 
   //state

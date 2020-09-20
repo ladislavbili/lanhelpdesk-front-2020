@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { Button, FormGroup, Label,Input } from 'reactstrap';
 import { SketchPicker } from "react-color";
@@ -27,7 +27,7 @@ mutation addStatus($title: String!, $order: Int!, $icon: String!, $color: String
 
 export default function StatusAdd(props){
   //data & queries
-  const { history, match } = props;
+  const { history } = props;
   const [ addStatus, {client} ] = useMutation(ADD_STATUS);
 
   //state

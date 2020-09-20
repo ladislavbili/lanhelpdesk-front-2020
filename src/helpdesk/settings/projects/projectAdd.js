@@ -3,10 +3,9 @@ import { useMutation, useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import { Button, FormGroup, Label,Input } from 'reactstrap';
-import {toSelArr, sameStringForms, testing} from '../../../helperFunctions';
+import {toSelArr} from '../../../helperFunctions';
 import Permissions from "../../components/projects/permissions";
 import ProjectDefaultValues from "../../components/projects/defaultValues";
-import { noDef } from 'configs/constants/projects';
 
 import {  GET_PROJECTS } from './index';
 
@@ -161,8 +160,8 @@ query {
 
 export default function ProjectAdd(props){
   //data & queries
-  const { history, match, closeModal } = props;
-  const { data, loading } = useQuery(GET_MY_DATA);
+  const { history, closeModal } = props;
+  const { data } = useQuery(GET_MY_DATA);
   const [ addProject, {client} ] = useMutation(ADD_PROJECT);
   const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
   const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES, { options: { fetchPolicy: 'network-only' }});
@@ -171,7 +170,6 @@ export default function ProjectAdd(props){
   const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES, { options: { fetchPolicy: 'network-only' }});
 
   const currentUser = data ? data.getMyData : {};
-  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   //state
   const [ title, setTitle ] = React.useState("");

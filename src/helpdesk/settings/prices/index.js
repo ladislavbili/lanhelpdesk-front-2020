@@ -24,7 +24,7 @@ export default function PricelistsList(props){
 
     //data
     const { history, match } = props;
-    const { data, loading, error } = useQuery(GET_PRICELISTS);
+    const { data, loading } = useQuery(GET_PRICELISTS);
     const PRICELISTS = (loading || !data ? [] : data.pricelists);
 
     return (

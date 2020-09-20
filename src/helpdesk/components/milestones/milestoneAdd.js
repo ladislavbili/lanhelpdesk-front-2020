@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import DatePicker from 'react-datepicker';
@@ -24,7 +24,7 @@ mutation addMilestone($title: String!, $description: String!, $startsAt: String,
 
 export default function MilestoneAdd (props){
   //data & queries
-  const { history, match, open, closeModal, projectID } = props;
+  const { open, closeModal, projectID } = props;
   const [ addMilestone, {client} ] = useMutation(ADD_MILESTONE);
 
   //state

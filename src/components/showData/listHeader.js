@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { rebase } from '../../index';
-import Search from './search';
-import Checkbox from '../checkbox';
-import Multiselect from '../multiselect';
+//import Search from './search';
+//import Checkbox from '../checkbox';
+//import Multiselect from '../multiselect';
 import classnames from "classnames";
 
 class ListHeader extends Component {

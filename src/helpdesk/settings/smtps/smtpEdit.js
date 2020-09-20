@@ -2,7 +2,7 @@ import React from 'react';
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input, Alert, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, FormGroup, Label,Input, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import Loading from 'components/loading';
 import Checkbox from '../../../components/checkbox';
 import { toSelArr } from 'helperFunctions';
@@ -71,8 +71,8 @@ export default function SMTPEdit(props){
   //data
   const { history, match } = props;
   const { data, loading, refetch } = useQuery(GET_SMTP, { variables: {id: parseInt(props.match.params.id)} });
-  const [updateSmtp, {updateData}] = useMutation(UPDATE_SMTP);
-  const [deleteSmtp, {deleteData, client}] = useMutation(DELETE_SMTP);
+  const [updateSmtp] = useMutation(UPDATE_SMTP);
+  const [deleteSmtp, {client}] = useMutation(DELETE_SMTP);
   const allSMTPs = toSelArr(client.readQuery({query: GET_SMTPS}).smtps);
   const filteredSMTPs = allSMTPs.filter( SMTP => SMTP.id !== parseInt(match.params.id) );
   const theOnlyOneLeft = allSMTPs.length === 0;

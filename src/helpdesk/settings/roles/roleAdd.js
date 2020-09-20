@@ -1,13 +1,9 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { Button, FormGroup, Label,Input } from 'reactstrap';
 
 import Checkbox from '../../../components/checkbox';
-import { toSelArr } from 'helperFunctions';
-import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
-import { generalRights, specificRules } from 'configs/constants/roles';
 
 import {  GET_ROLES } from './index';
 

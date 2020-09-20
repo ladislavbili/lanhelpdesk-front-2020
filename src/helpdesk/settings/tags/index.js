@@ -24,7 +24,7 @@ export default function TagsList(props){
 
     //data
     const { history, match } = props;
-    const { data, loading, error } = useQuery(GET_TAGS);
+    const { data, loading } = useQuery(GET_TAGS);
     const TAGS = (loading || !data ? [] : orderArr(data.tags));
 
     return (

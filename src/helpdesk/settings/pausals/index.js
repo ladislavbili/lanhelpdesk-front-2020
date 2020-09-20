@@ -4,8 +4,6 @@ import gql from "graphql-tag";
 
 import PausalEdit from './pausalEdit';
 
-import {sameStringForms} from '../../../helperFunctions';
-
 export const GET_COMPANIES = gql`
 query {
   companies {
@@ -19,14 +17,11 @@ query {
 export default function  CompaniesList(props){
   // state
   const [ companyFilter, setCompanyFilter ] = React.useState("");
-  const [ sortBy, setSortBy ] = React.useState("");
 
   //data
   const { history, match } = props;
-  const { data, loading, error } = useQuery(GET_COMPANIES);
+  const { data, loading } = useQuery(GET_COMPANIES);
   const COMPANIES = (loading || !data ? [] : data.companies);
-
-  console.log("WHEEEEEEEEEE");
 
   return (
     <div className="content">

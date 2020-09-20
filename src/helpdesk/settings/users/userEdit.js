@@ -1,16 +1,14 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input, Alert } from 'reactstrap';
+import { Button, FormGroup, Label, Input } from 'reactstrap';
 import Loading from 'components/loading';
 import Select from 'react-select';
 import {selectStyle} from "configs/components/select";
 
 import { isEmail, toSelArr } from 'helperFunctions';
 import Checkbox from 'components/checkbox';
-
-import { REST_URL } from 'configs/restAPI';
 
 import { GET_USERS } from './index';
 
@@ -98,8 +96,8 @@ export default function UserEdit(props){
   const { data: userData, loading: userLoading, refetch: userRefetch} = useQuery(GET_USER, { variables: {id: parseInt(props.match.params.id)} });
   const { data: rolesData, loading: rolesLoading } = useQuery(GET_ROLES);
   const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
-  const [updateUser, {updateData}] = useMutation(UPDATE_USER);
-  const [deleteUser, {deleteData, client}] = useMutation(DELETE_USER);
+  const [updateUser] = useMutation(UPDATE_USER);
+  const [deleteUser, {client}] = useMutation(DELETE_USER);
 
   const USER = ( userLoading ? [] : userData.user);
   const ROLES = ( rolesLoading ? [] : toSelArr(rolesData.roles) );
@@ -108,21 +106,20 @@ export default function UserEdit(props){
   const languages = [{label: "SK", value: "sk"}, {label: "ENG", value: "en"}]
 
   //state
-  const [ createdAt, setCreatedAt ] = React.useState(0);
-  const [ updatedAt, setUpdatedAt ] = React.useState(0);
+  //const [ createdAt, setCreatedAt ] = React.useState(0);
+  //const [ updatedAt, setUpdatedAt ] = React.useState(0);
   const [ active, setActive ] = React.useState(true);
   const [ username, setUsername ] = React.useState("");
   const [ email, setEmail ] = React.useState("");
   const [ name, setName ] = React.useState("");
   const [ surname, setSurname ] = React.useState("");
-  const [ fullName, setFullName ] = React.useState("");
   const [ receiveNotifications, setReceiveNotifications ] = React.useState(false);
   const [ signature, setSignature ] = React.useState("");
   const [ role, setRole ] = React.useState({});
   const [ company, setCompany ] = React.useState({});
   const [ language, setLanguage ] = React.useState(languages[0]);
   const [ saving, setSaving ] = React.useState(false);
-  const [ deletingUser, setDeletingUser ] = React.useState(false);
+  const [ deletingUser/*, setDeletingUser */] = React.useState(false);
   const [ deactivatingUser, setDeactivatingUser ] = React.useState(false);
   const [ passReseted, setPassReseted ] = React.useState(false);
   const [ passResetEnded, setPassResetEnded ] = React.useState(true);
@@ -130,14 +127,13 @@ export default function UserEdit(props){
   // sync
   React.useEffect( () => {
     if (!userLoading){
-      setCreatedAt(USER.createdAt);
-      setUpdatedAt(USER.updatedAt);
+    //  setCreatedAt(USER.createdAt);
+    //  setUpdatedAt(USER.updatedAt);
       setActive(USER.active);
       setUsername(USER.username);
       setEmail(USER.email);
       setName(USER.name);
       setSurname(USER.surname);
-      setFullName(USER.fullName);
       setReceiveNotifications(USER.receiveNotifications);
       setSignature((USER.signature ? USER.signature : `${USER.name} ${USER.surname}, ${USER.company.title}`));
       setRole( { ...USER.role, label: USER.role.title, value: USER.role.id} );
@@ -302,7 +298,7 @@ export default function UserEdit(props){
                 <Button
                   className={ active ? "btn-grey" : "btn-green"}
                   disabled={deactivatingUser}
-                  onClick={this.deactivateUser.bind(this)}
+                  onClick={() => setDeactivatingUser(true)}
                   >
                   {active ? 'Deactivate user' : 'Activate user'}
                 </Button>
@@ -311,7 +307,7 @@ export default function UserEdit(props){
                 <Button
                   className="btn-red m-l-5"
                   disabled={deletingUser}
-                  onClick={this.deleteUser.bind(this)}
+                  onClick={deleteUserFunc}
                   >
                   Delete
                 </Button>
@@ -321,7 +317,9 @@ export default function UserEdit(props){
               className="btn-link"
               disabled={ saving || passReseted }
               onClick={ ()=>{
-                setPassReseted({passReseted:true,passResetEnded:false});
+                setPassReseted(true);
+                setPassResetEnded(false);
+                //setPassReseted({passReseted:true,passResetEnded:false});
                 /*firebase.auth().sendPasswordResetEmail(this.state.email).then(()=>{
                   this.setState({passResetEnded:true})
                 })*/

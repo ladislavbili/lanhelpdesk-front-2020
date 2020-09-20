@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import {Nav, NavItem, TabPane, TabContent} from 'reactstrap';
@@ -8,7 +8,6 @@ import Select from "react-select";
 import {sidebarSelectStyle} from 'configs/components/select';
 
 import classnames from 'classnames';
-import {testing} from 'helperFunctions';
 
 import Filter from '../filter';
 import TaskAdd from '../../task/taskAddContainer';
@@ -22,7 +21,7 @@ import { toSelArr } from 'helperFunctions';
 import { dashboard, addProject, allMilestones, addMilestone } from 'configs/constants/sidebar';
 import moment from 'moment';
 
-import { selectedProject, selectedMilestone, filter, filters, filterName } from 'localCache';
+import { selectedProject, selectedMilestone, filter, filters/*, filterName */} from 'localCache';
 
 export const GET_PROJECTS = gql`
 query {
@@ -185,8 +184,8 @@ query {
 
 export default function TasksSidebar(props) {
   //data & queries
-  const { history, match, location } = props;
-  const { data, loading } = useQuery(GET_MY_DATA);
+  const { history, location } = props;
+  const { data } = useQuery(GET_MY_DATA);
   const { data: projectsData, loading: projectsLoading, refetch: projectsRefetch } = useQuery(GET_PROJECTS, { options: { fetchPolicy: 'network-only' }});
   const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS, { options: { fetchPolicy: 'network-only' }});
   const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
@@ -195,11 +194,8 @@ export default function TasksSidebar(props) {
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   //state
-  const [ openAddStatusModal, setOpenAddStatusModal ] = React.useState(false);
   const [ openProjectAdd, setOpenProjectAdd ] = React.useState(false);
   const [ openMilestoneAdd, setOpenMilestoneAdd ] = React.useState(false);
-  const [ isColumn, setIsColumn ] = React.useState(false);
-  const [ search, setSearch ] = React.useState("");
   const [ activeTab, setActiveTab ] = React.useState(0);
   const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ) );
   const [ currentProject, setCurrentProject ] = React.useState( projects[0] );

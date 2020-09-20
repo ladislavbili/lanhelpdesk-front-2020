@@ -4,7 +4,7 @@ import gql from "graphql-tag";
 
 import { Button, FormGroup, Label, Input } from 'reactstrap';
 import Switch from "react-switch";
-import {toSelArr} from '../../../helperFunctions';
+import {toSelArr, toSelItem} from '../../../helperFunctions';
 import Loading from 'components/loading';
 
 import { isEmail} from '../../../helperFunctions';
@@ -45,13 +45,29 @@ mutation addCompany($title: String!, $dph: Int!, $ico: String!, $dic: String!, $
     monthlyPausal
     taskWorkPausal
     taskTripPausal
+    dph
+    pricelist {
+      id
+      title
+      materialMargin
+      prices {
+        type
+        price
+        taskType {
+          id
+        }
+        tripType {
+          id
+        }
+      }
+    }
   }
 }
 `;
 
 export default function CompanyAdd(props){
   //data
-  const { history, match } = props;
+  const { history, match, addCompanyToList, closeModal } = props;
   const [addCompany, {client}] = useMutation(ADD_COMPANY);
   const [ addPricelist ] = useMutation(ADD_PRICELIST);
   const { data, loading: pricelistsLoading } = useQuery(GET_PRICELISTS);
@@ -61,59 +77,26 @@ export default function CompanyAdd(props){
 
   //state
   const [ title, setTitle ] = React.useState("");
-  const [ oldTitle, setOldTitle ] = React.useState("");
-
     const [ dph, setDph ] = React.useState(0);
-    const [ oldDph, setOldDph ] = React.useState(0);
-
   const [ ico, setIco ] = React.useState("");
-  const [ oldIco, setOldIco ] = React.useState("");
-
   const [ dic, setDic ] = React.useState("");
-  const [ oldDic, setOldDic ] = React.useState("");
-
   const [ ic_dph, setIcDph ] = React.useState("");
-  const [ oldIcDph, setOldIcDph ] = React.useState("");
-
   const [ country, setCountry ] = React.useState("");
-  const [ oldCountry, setOldCountry ] = React.useState("");
-
   const [ city, setCity ] = React.useState("");
-  const [ oldCity, setOldCity ] = React.useState("");
-
   const [ street, setStreet ] = React.useState("");
-  const [ oldStreet, setOldStreet ] = React.useState("");
-
   const [ zip, setZip ] = React.useState("");
-  const [ oldZip, setOldZip ] = React.useState("");
-
   const [ email, setEmail ] = React.useState("");
-  const [ oldEmail, setOldEmail ] = React.useState("");
-
   const [ phone, setPhone ] = React.useState("");
-  const [ oldPhone, setOldPhone ] = React.useState("");
-
   const [ description, setDescription ] = React.useState("");
-  const [ oldDescription, setOldDescription ] = React.useState("");
-
   const [ monthly, setMonthly ] = React.useState(false);
-  const [ oldMonthly, setOldMonthly ] = React.useState(false);
-
   const [ monthlyPausal, setMonthlyPausal ] = React.useState(0);
-  const [ oldMonthlyPausal, setOldMonthlyPausal ] = React.useState(0);
-
   const [ taskWorkPausal, setTaskWorkPausal ] = React.useState(0);
-  const [ oldTaskWorkPausal, setOldTaskWorkPausal ] = React.useState(0);
-
   const [ taskTripPausal, setTaskTripPausal ] = React.useState(0);
-  const [ oldTaskTripPausal, setOldTaskTripPausal ] = React.useState(0);
-
   const [ pricelist, setPricelist ] = React.useState({});
   const [ oldPricelist, setOldPricelist ] = React.useState({});
   const [ pricelistName, setPricelistName ] = React.useState("");
 
   const [ saving, setSaving ] = React.useState(false);
-  const [ loading, setLoading ] = React.useState(false);
   const [ newData, setNewData ] = React.useState(false);
   const [ clearCompanyRents, setClearCompanyRents ] = React.useState(false);
   const [ fakeID, setFakeID ] = React.useState(0);
@@ -140,6 +123,8 @@ export default function CompanyAdd(props){
   //functions
   const addCompanyFunc = () => {
     setSaving( true );
+
+    console.log("hello");
     let newRents = rents.map(r => ({
       title: r.title,
       quantity: isNaN(parseInt(r.quantity)) ? 0 : parseInt(r.quantity),
@@ -167,10 +152,16 @@ export default function CompanyAdd(props){
       taskTripPausal: (taskTripPausal === "" ? 0 : parseFloat(taskTripPausal)),
       rents: newRents,
     } }).then( ( response ) => {
+        console.log("rRESPONSE");
       const allCompanies = client.readQuery({query: GET_COMPANIES}).companies;
       const newCompany = {...response.data.addCompany, __typename: "Company"};
       client.writeQuery({ query: GET_COMPANIES, data: {companies: [...allCompanies, newCompany ] } });
-      history.push('/helpdesk/settings/companies/' + newCompany.id)
+      if (closeModal) {
+        addCompanyToList(toSelItem(newCompany));
+        closeModal();
+      } else {
+        history.push('/helpdesk/settings/companies/' + newCompany.id);
+      }
     }).catch( (err) => {
       console.log(err.message);
     });
@@ -202,25 +193,7 @@ export default function CompanyAdd(props){
   }
 
   const cancel = () => {
-    setTitle(oldTitle);
-    setIco(oldIco);
-    setDic(oldDic);
-    setIcDph(oldIcDph);
-    setCountry(oldCountry);
-    setCity(oldCity);
-    setStreet(oldStreet);
-    setZip(oldZip);
-    setEmail(oldEmail);
-    setPhone(oldPhone);
-    setDescription(oldDescription);
-    setMonthly(oldMonthly);
-    setMonthlyPausal(oldMonthlyPausal);
-    setTaskWorkPausal(oldTaskWorkPausal);
-    setTaskTripPausal(oldTaskTripPausal);
     setPricelist(oldPricelist);
-
-    setClearCompanyRents(true);
-    setNewData(false);
     setPricelistName("");
   }
 
@@ -612,11 +585,11 @@ export default function CompanyAdd(props){
               }}>{(pricelist.value === "0" && pricelistName !== "" ? "Save changes" : (saving?'Adding...':'Add company'))}</Button>
             }
 
-          { (newData  || props.addCompany) &&
-            <Button
-              className="btn-link"
-              disabled={saving}
-              onClick={cancel}>Cancel changes</Button>
+            { closeModal &&
+              <Button
+                  className="btn-link ml-auto"
+                  disabled={saving}
+                  onClick={closeModal}>Cancel</Button>
           }
 
         </div>

@@ -1,19 +1,18 @@
-import React, { Component } from 'react';
+import React from 'react';
 import TaskCol from './taskCol';
 import TaskList from './taskList';
 import TaskListDnD from './taskListDnD';
-import { connect } from "react-redux";
 import {timestampToString} from '../../helperFunctions';
 //import {setSearch, setFilter, addShowDataFilter } from '../../redux/actions';
 
-import { search, filter, filterName, tasklistLayout } from 'localCache';
+import { search, /*filter, */filterName, tasklistLayout } from 'localCache';
 
 export default function ShowDataContainer (props){
 	//data
 	const { match, history, data,  filterBy, ascending, orderBy, orderByValues, displayValues, useBreadcrums, breadcrumsData, listName, empty, itemID, link, displayCol, isTask, setStatuses, statuses, allStatuses, Edit, dndGroupData, dndGroupAttribute, calendarAllDayData, calendarEventsData, checkTask, deleteTask } = props;
 
 	//state
-	const [ filterView, setFilterView ] = React.useState(false);
+	const [ filterView ] = React.useState(false);
 	/*
 	constructor(props) {
 		super(props);
@@ -27,7 +26,7 @@ export default function ShowDataContainer (props){
 	}
 */
 
-	const addShowDataFilter = () => {
+//	const addShowDataFilter = () => {
 		/*if(filter[filterName]===undefined){
 			let defaultFilter={};
 			this.props.displayValues.forEach((display)=>{
@@ -35,7 +34,7 @@ export default function ShowDataContainer (props){
 			})
 			this.props.addShowDataFilter(this.props.filterName, defaultFilter);
 		}*/
-	}
+	//}
 
 	const filterData = () => {
 		//return data;

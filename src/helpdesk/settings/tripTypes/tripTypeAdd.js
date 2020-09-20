@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import { Button, FormGroup, Label,Input } from 'reactstrap';
@@ -22,7 +22,7 @@ mutation addTripType($title: String!, $order: Int) {
 
 export default function TripTypeAdd(props){
   //data & queries
-  const { history, match } = props;
+  const { history } = props;
   const [ addTripType, {client} ] = useMutation(ADD_TRIP_TYPE);
 
   //state

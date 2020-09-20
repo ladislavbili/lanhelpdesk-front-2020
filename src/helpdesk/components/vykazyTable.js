@@ -1,19 +1,15 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import classnames from "classnames";
 import { Nav, NavItem, NavLink} from 'reactstrap';
 import Select from 'react-select';
 import {selectStyle, invisibleSelectStyle} from 'configs/components/select';
-import {sameStringForms} from '../../helperFunctions';
 import Checkbox from '../../components/checkbox';
 
 export default function Rozpocet (props) {
   //data & queries
-  const { id, history, match, disabled, company, units, defaultUnit, defaultType, taskAssigned,
-    tripTypes, taskTypes, subtasks, workTrips, materials, customItems, showColumns, showSubtasks,
-    disbled, updateSubtask, updateSubtasks, removeSubtask, updateTrip, updateTrips, removeTrip,
+  const { disabled, company, defaultType, taskAssigned,
+    tripTypes, taskTypes, subtasks, workTrips, materials, customItems, showColumns, showSubtasks, updateSubtask, updateSubtasks, removeSubtask, updateTrip, updateTrips, removeTrip,
     updateMaterial, updateMaterials, removeMaterial, updateCustomItem, updateCustomItems, removeCustomItem,
     submitService, submitTrip, submitMaterial, submitCustomItem} = props;
 
@@ -24,11 +20,9 @@ export default function Rozpocet (props) {
 	const [ showAddSubtask, setShowAddSubtask ] = React.useState(false);
 
   const [ editedSubtaskTitle, setEditedSubtaskTitle ] = React.useState("");
-  const [ editedSubtaskType, setEditedSubtaskType ] = React.useState(null);
   const [ editedSubtaskQuantity, setEditedSubtaskQuantity ] = React.useState(0);
   const [ editedSubtaskDiscount, setEditedSubtaskDiscount ] = React.useState(0);
   const [ focusedSubtask, setFocusedSubtask ] = React.useState( null );
-  const [ selectedIDs, setSelectedIDs ] = React.useState( []);
 
 	const [ newSubtaskTitle, setNewSubtaskTitle ] = React.useState("");
   const [ newSubtaskType, setNewSubtaskType ] = React.useState(defaultType);
@@ -115,7 +109,6 @@ export default function Rozpocet (props) {
 	const onFocusSubtask = (subtask) => {
 		setEditedSubtaskTitle(subtask.title);
 		setEditedSubtaskQuantity(subtask.quantity?subtask.quantity:'');
-		setEditedSubtaskType(subtask.taskType);
 		setEditedSubtaskDiscount(subtask.discount);
 		setFocusedSubtask(subtask.id);
 	}
@@ -427,8 +420,8 @@ return (
 						</tr>
 					)}
 					{/* Trips */}
-					{ sortedTrips.map((trip, index) => {
-							if (toggleTab !== "0"){
+					{ toggleTab !== "0" &&
+            sortedTrips.map((trip, index) => {
 								return (<tr key={trip.id}>
 									{/*Checkbox done*/}
 									{showColumns.includes(0) &&
@@ -598,12 +591,11 @@ return (
 										</td>
 									}
 								</tr>)
-							}
 						}
 					)}
 					{/* Materials */}
-					{ sortedMaterials.map((material,index) => {
-							if (toggleTab !== "0"){
+					{ toggleTab !== "0" &&
+            sortedMaterials.map((material,index) => {
 								return (<tr key={material.id}>
 									{/*Checkbox done*/}
 									{showColumns.includes(0) &&
@@ -790,12 +782,11 @@ return (
 										</td>
 									}
 								</tr>)
-							}
 						}
 					)}
 					{/* Custom Items */}
-					{ sortedCustomItems.map((customItem, index)=> {
-							if (toggleTab !== "0"){
+					{ toggleTab !== "0" &&
+            sortedCustomItems.map((customItem, index)=> {
 								return (<tr key={customItem.id}>
 									{/*Checkbox done*/}
 									{showColumns.includes(0) &&
@@ -942,8 +933,7 @@ return (
 											</button>
 										</td>
 									}
-								</tr>)
-							}
+								</tr>)							
 						}
 					)}
 

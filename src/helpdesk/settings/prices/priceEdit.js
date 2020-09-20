@@ -37,10 +37,6 @@ query pricelist($id: Int!) {
         title
       }
     }
-    companies {
-      id
-      title
-    }
   }
 }
 `;
@@ -79,10 +75,10 @@ mutation deletePricelist($id: Int!, $newDefId: Int, $newId: Int) {
 
 export default function PricelistEdit(props){
   //data
-  const { history, match } = props;
+  const { history } = props;
   const { data, loading, refetch } = useQuery(GET_PRICELIST, { variables: {id: (props.listId ? props.listId : parseInt(props.match.params.id))} });
-  const [updatePricelist, {updateData}] = useMutation(UPDATE_PRICELIST);
-  const [deletePricelist, {deleteData, client}] = useMutation(DELETE_PRICELIST);
+  const [updatePricelist] = useMutation(UPDATE_PRICELIST);
+  const [deletePricelist, {client}] = useMutation(DELETE_PRICELIST);
   const allPricelists = toSelArr(client.readQuery({query: GET_PRICELISTS}).pricelists);
   const filteredPricelists = allPricelists.filter( pricelist => pricelist.id !== (props.listId ? props.listId : parseInt(props.match.params.id)) );
   const theOnlyOneLeft = allPricelists.length === 0;
@@ -95,7 +91,6 @@ export default function PricelistEdit(props){
   const [ materialMargin, setMaterialMargin ] = React.useState(0);
   const [ materialMarginExtra, setMaterialMarginExtra ] = React.useState(0);
   const [ prices, setPrices ] = React.useState([]);
-  const [ companies, setCompanies ] = React.useState([]);
 
   const [ newPricelist, setNewPricelist ] = React.useState(null);
   const [ newDefPricelist, setNewDefPricelist ] = React.useState(null);
@@ -113,7 +108,6 @@ export default function PricelistEdit(props){
         setMaterialMargin(data.pricelist.materialMargin);
         setMaterialMarginExtra(data.pricelist.materialMarginExtra);
         setPrices(data.pricelist.prices);
-        setCompanies(data.pricelist.companies);
       }
   }, [loading]);
 

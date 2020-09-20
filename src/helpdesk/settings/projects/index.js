@@ -22,7 +22,7 @@ export default function ProjectsList(props){
 
     //data
     const { history, match } = props;
-    const { data, loading, error } = useQuery(GET_PROJECTS);
+    const { data, loading } = useQuery(GET_PROJECTS);
     const PROJECTS = (loading || !data ? [] : data.projects);
 
     return (

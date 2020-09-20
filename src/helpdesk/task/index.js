@@ -1,20 +1,18 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Loading from 'components/loading';
 
 import ShowData from '../../components/showData';
-import { timestampToString, sameStringForms, applyTaskFilter, snapshotToArray } from 'helperFunctions';
-import { getEmptyFilter, getFixedFilters } from 'configs/fixedFilters';
-import { allMilestones } from 'configs/constants/sidebar';
+import { timestampToString/*, applyTaskFilter*/ } from 'helperFunctions';
+import { /*getEmptyFilter, */getFixedFilters } from 'configs/fixedFilters';
+//import { allMilestones } from 'configs/constants/sidebar';
 import TaskEdit from './taskEditContainer';
 import TaskEmpty from './taskEmpty';
 import TaskCalendar from '../calendar';
-import {rebase, database} from '../../index';
-import { GET_TASK_TYPES } from 'helpdesk/settings/taskTypes';
 
-import {  filter, filterName, selectedProject, selectedMilestone, tasklistLayout } from 'localCache';
+import {  filter, filterName, selectedProject, selectedMilestone/*, tasklistLayout */} from 'localCache';
 
 import moment from 'moment';
 
@@ -114,19 +112,6 @@ query {
 }
 `;
 
-
-const GET_STATUSES = gql`
-query {
-  statuses {
-    title
-    id
-    order
-    color
-    action
-  }
-}
-`;
-
 const GET_MY_FILTERS = gql`
 query {
   myFilters {
@@ -183,15 +168,13 @@ query {
 
 export default function TasksIndex (props) {
   //data & queries
-  const { history, match, calendarEvents, orderBy, setTasksOrderBy, ascending, setTasksAscending, statuses, setUserFilterStatuses } = props;
+  const { history, match, /*calendarEvents, orderBy, */setTasksOrderBy, ascending, setTasksAscending, statuses, setUserFilterStatuses } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
-  const { data: tasksData, loading: tasksLoading, refetch: tasksRefetch } = useQuery(GET_TASKS, { variables: {filter: null, projectId: null }, options: { fetchPolicy: 'network-only' }});
-  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
+  const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, { variables: {filter: null, projectId: null }, options: { fetchPolicy: 'network-only' }});
   const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS, { options: { fetchPolicy: 'network-only' }});
   const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
 
   const currentUser = data ? data.getMyData : {};
-  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
 	// sync
 	React.useEffect( () => {
@@ -318,7 +301,7 @@ const displayCol = (task) => {
 
 		</li>)
 }
-
+/*
 const displayCal = (task,showEvent) => {
 		return (<div style={ showEvent ? { backgroundColor:'#eaf6ff', borderRadius:5 } : {} }>
 				<p className="m-0">
@@ -353,8 +336,8 @@ const displayCal = (task,showEvent) => {
 					</span>
 				</p>}
 		</div>)
-}
-
+}*/
+/*
 const getViewOnly = ( task, status, project ) => {
 	if( project === undefined ){
 		return true;
@@ -364,7 +347,7 @@ const getViewOnly = ( task, status, project ) => {
 		permission = project.projectRights.find((p) => p.user.id === currentUser.id );
 	}
 	return ( (permission === undefined || !permission.write ) && currentUser.userData.role.value === 0 ) || ( status && status.action === 'Invoiced' );
-}
+}*/
 
 const checkTask = (id, check) => {
 	/*
@@ -518,7 +501,7 @@ const getCalendarAllDayData = (tasks) => {/*
 		link = '/helpdesk/taskList'
 	}
 
-  const dataLoading = loading || tasksLoading || statusesLoading || myFiltersLoading || publicFiltersLoading;
+  const dataLoading = loading || tasksLoading || myFiltersLoading || publicFiltersLoading;
 
 	if (dataLoading) {
 		return (<Loading />);

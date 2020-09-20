@@ -1,10 +1,9 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import {Nav, NavItem} from 'reactstrap';
 import {Link} from 'react-router-dom';
 import classnames from 'classnames';
-import {testing} from 'helperFunctions';
 import settings from 'configs/constants/settings';
 
 const GET_MY_DATA = gql`
@@ -37,8 +36,8 @@ query {
 
 export default function SettingsSidebar(props) {
   //data & queries
-  const { history, match, location } = props;
-  const { data, loading } = useQuery(GET_MY_DATA);
+  const { location } = props;
+  const { data } = useQuery(GET_MY_DATA);
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};

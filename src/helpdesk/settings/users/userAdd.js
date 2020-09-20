@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { useMutation, useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
@@ -6,7 +6,7 @@ import { Button, FormGroup, Label,Input } from 'reactstrap';
 import Select from 'react-select';
 import {selectStyle} from "configs/components/select";
 
-import {isEmail, sameStringForms, toSelArr} from 'helperFunctions';
+import {isEmail, toSelArr} from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 
 import {  GET_USERS } from './index';
@@ -60,9 +60,9 @@ query {
 
 export default function UserAddContainer(props){
   // data & queries
-  const { history, match, addUser, close } = props;
-  const { data: rolesData, loading: rolesLoading, error: er1 } = useQuery(GET_ROLES);
-  const { data: companiesData, loading: companiesLoading, error: er2 } = useQuery(GET_COMPANIES);
+  const { history, addUserToList, closeModal } = props;
+  const { data: rolesData, loading: rolesLoading } = useQuery(GET_ROLES);
+  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
   const [registerUser, {client}] = useMutation(ADD_USER);
 
   const ROLES = ( rolesLoading ? [] : toSelArr(rolesData.roles) );
@@ -71,7 +71,7 @@ export default function UserAddContainer(props){
   const languages = [{label: "SK", value: "sk"}, {label: "ENG", value: "en"}]
 
   //state
-  const [ active, setActive ] = React.useState(true);
+  const [ active ] = React.useState(true);
   const [ username, setUsername ] = React.useState("");
   const [ email, setEmail ] = React.useState("");
   const [ name, setName ] = React.useState("");
@@ -101,15 +101,16 @@ export default function UserAddContainer(props){
       companyId: company.id,
       language: language.value,
     } }).then( ( response ) => {
-      if (addUser) {
-        addUser(response);
-        close();
+      const allUsers = client.readQuery({query: GET_USERS}).users;
+      let newUser = {...response.data.registerUser,  __typename: "User"}
+      client.writeQuery({ query: GET_USERS, data: {users: [...allUsers, newUser]} });
+      if (addUserToList){
+        addUserToList();
+        closeModal();
       } else {
-        const allUsers = client.readQuery({query: GET_USERS}).users;
-        let newUser = {...response.data.registerUser,  __typename: "User"}
-        client.writeQuery({ query: GET_USERS, data: {users: [...allUsers, newUser]} });
         history.push('/helpdesk/settings/users/' + newUser.id);
       }
+
     }).catch( (err) => {
       console.log(err.message);
     });
@@ -228,6 +229,15 @@ export default function UserAddContainer(props){
           >
           { saving ? 'Adding...' : 'Add user' }
         </Button>
+
+        {closeModal &&
+          <Button
+            className="btn-link ml-auto"
+            onClick={ closeModal }
+            >
+            Cancel
+          </Button>
+        }
     </div>
   )
 }

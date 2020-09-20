@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {BrowserRouter, Route} from 'react-router-dom';
 import { Provider } from 'react-redux';
-import Rebase from 're-base';
 
 import Navigation from 'navigation';
 import Login from 'components/login';

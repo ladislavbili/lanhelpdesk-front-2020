@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { useQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
@@ -40,8 +40,8 @@ query {
 export default function UserListContainer(props){
   //data
   const { history, match } = props;
-  const { data: userData, loading: userLoading, error: userError, refetch: usersRefetch } = useQuery(GET_USERS);
-  const { data: roleData, loading: roleLoading, error: rolerError } = useQuery(GET_ROLES);
+  const { data: userData, loading: userLoading, refetch: usersRefetch } = useQuery(GET_USERS);
+  const { data: roleData, loading: roleLoading } = useQuery(GET_ROLES);
 
   const USERS = ( userLoading ? [] : userData.users);
   const ROLES = ( roleLoading ? [] : toSelArr(roleData.roles) );

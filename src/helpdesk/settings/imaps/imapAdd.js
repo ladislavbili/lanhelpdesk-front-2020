@@ -1,12 +1,9 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input, Alert, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Button, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
 import Checkbox from '../../../components/checkbox';
-import { toSelArr } from 'helperFunctions';
-import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
 
 import {  GET_IMAPS } from './index';
 
@@ -36,12 +33,12 @@ mutation addImap($title: String!, $order: Int!, $def: Boolean!, $host: String!, 
 
 export default function IMAPAdd(props){
   //data
-  const { history, match } = props;
+  const { match } = props;
   const [addImap, {client}] = useMutation(ADD_IMAP);
 
   //state
   const [ title, setTitle ] = React.useState("");
-  const [ order, setOrder ] = React.useState(0);
+  const [ order ] = React.useState(0);
   const [ def, setDef ] = React.useState(false);
   const [ host, setHost ] = React.useState("");
   const [ port, setPort ] = React.useState(465);

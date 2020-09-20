@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
-import { useMutation, useQuery, useLazyQuery } from "@apollo/react-hooks";
+import React from 'react';
+import { useMutation, useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Select from 'react-select';
-import { connect } from "react-redux";
 import { Label, TabContent, TabPane, Nav, NavItem, NavLink, Modal, ModalBody, ModalHeader, ListGroup, ListGroupItem} from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
@@ -30,9 +29,8 @@ import ck5config from 'configs/components/ck5config';
 
 import datePickerConfig from 'configs/components/datepicker';
 import PendingPicker from '../components/pendingPicker';
-import {toSelArr, toSelItem, snapshotToArray, timestampToString, sameStringForms, toMomentInput} from '../../helperFunctions';
+import {toSelArr, toSelItem, timestampToString} from '../../helperFunctions';
 import {invisibleSelectStyleNoArrow, invisibleSelectStyleNoArrowColored,invisibleSelectStyleNoArrowColoredRequired, invisibleSelectStyleNoArrowRequired} from 'configs/components/select';
-import { REST_URL } from 'configs/restAPI';
 import booleanSelects from 'configs/constants/boolSelect';
 import { noMilestone } from 'configs/constants/sidebar';
 import { noDef } from 'configs/constants/projects';
@@ -275,222 +273,6 @@ query task($id: Int!){
 }
 `;
 
-const UPDATE_TASK_IMPORTANT = gql`
-mutation updateTask($id: Int!, $important: Boolean) {
-  updateTask(
-		id: $id,
-    important: $important,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_TITLE = gql`
-mutation updateTask($id: Int!, $title: String) {
-  updateTask(
-		id: $id,
-    title: $title,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_CLOSE_DATE = gql`
-mutation updateTask($id: Int!, $closeDate: Int) {
-  updateTask(
-		id: $id,
-    closeDate: $closeDate,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_ASSIGNED_TO = gql`
-mutation updateTask($id: Int!, $assignedTo: [Int]!) {
-  updateTask(
-		id: $id,
-    assignedTo: $assignedTo
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_COMPANY = gql`
-mutation updateTask($id: Int!, $company: Int! ) {
-  updateTask(
-		id: $id,
-    company: $company,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_DEADLINE = gql`
-mutation updateTask($id: Int!, $deadline: Int ) {
-  updateTask(
-		id: $id,
-    deadline: $deadline,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_DESCRIPTION = gql`
-mutation updateTask($id: Int!, $description: String!) {
-  updateTask(
-		id: $id,
-    description: $description,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_MILESTONE = gql`
-mutation updateTask($id: Int!, $milestone: Int) {
-  updateTask(
-		id: $id,
-    milestone: $milestone,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_OVERTIME = gql`
-mutation updateTask($id: Int!, $overtime: Boolean!) {
-  updateTask(
-		id: $id,
-    overtime: $overtime,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_PAUSAL = gql`
-mutation updateTask($id: Int!, $pausal: Boolean!) {
-  updateTask(
-		id: $id,
-    pausal: $pausal,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_PENDING_CHANGABLE = gql`
-mutation updateTask($id: Int!, $pendingChangable: Boolean) {
-  updateTask(
-		id: $id,
-    pendingChangable: $pendingChangable,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_PENDING_DATE = gql`
-mutation updateTask($id: Int!, $pendingDate: Int) {
-  updateTask(
-		id: $id,
-    pendingDate: $pendingDate,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_PROJECT = gql`
-mutation updateTask($id: Int!, $project: Int!) {
-  updateTask(
-		id: $id,
-    project: $project,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_REQUESTER = gql`
-mutation updateTask($id: Int!, $requester: Int) {
-  updateTask(
-		id: $id,
-    requester: $requester,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_STATUS = gql`
-mutation updateTask($id: Int!, $status: Int!) {
-  updateTask(
-		id: $id,
-    status: $status,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_TAGS = gql`
-mutation updateTask($id: Int!, $tags: [Int]!) {
-  updateTask(
-		id: $id,
-    tags: $tags,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_TASK_TYPE = gql`
-mutation updateTask($id: Int!, $taskType: Int! ) {
-  updateTask(
-		id: $id,
-    taskType: $taskType,
-  ){
-    id
-    title
-  }
-}
-`;
-
-const UPDATE_TASK_REPEAT = gql`
-mutation updateTask($id: Int!, $repeat: RepeatInput ) {
-  updateTask(
-		id: $id,
-    repeat: $repeat,
-  ){
-    id
-    title
-  }
-}
-`;
-
 const UPDATE_TASK = gql`
 mutation updateTask($id: Int!, $important: Boolean, $title: String, $closeDate: String, $assignedTo: [Int], $company: Int, $deadline: String, $description: String, $milestone: Int, $overtime: Boolean, $pausal: Boolean, $pendingChangable: Boolean, $pendingDate: String, $project: Int, $requester: Int, $status: Int, $tags: [Int], $taskType: Int, $repeat: RepeatInput ) {
   updateTask(
@@ -526,6 +308,96 @@ mutation deleteTask($id: Int!) {
     id: $id,
   ){
     id
+  }
+}
+`;
+
+
+export const UPDATE_PROJECT_RIGHTS = gql`
+mutation updateProject($id: Int!, $projectRights: [ProjectRightInput]) {
+  updateProject(
+		id: $id,
+    projectRights: $projectRights,
+  ){
+		title
+    id
+    lockedRequester
+    milestones{
+      id
+      title
+    }
+    projectRights {
+			read
+			write
+			delete
+			internal
+			admin
+			user {
+				id
+			}
+		}
+    def {
+			assignedTo {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			company {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			overtime {
+				def
+				fixed
+				show
+				value
+			}
+			pausal {
+				def
+				fixed
+				show
+				value
+			}
+			requester {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			status {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			tag {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			taskType {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+    }
   }
 }
 `;
@@ -705,28 +577,11 @@ mutation deleteCustomItem($id: Int!) {
 
 export default function TaskEdit (props){
 	//data & queries
-	const { match, history, columns, currentUser, accessRights, statuses, companies, users, allTags, projects, tasks, taskTypes, tripTypes, emails, inModal, closeModal } = props;
+	const { match, history, columns, currentUser, accessRights, statuses, companies, users, allTags, projects, taskTypes, tripTypes, emails, inModal, closeModal } = props;
   const [ getTask, {data: taskData, loading: taskLoading } ] = useLazyQuery(GET_TASK);
-  const [ updateTask, {client} ] = useMutation(UPDATE_TASK);
-	const [ updateImportant ] = useMutation(UPDATE_TASK_IMPORTANT);
-	const [ updateTitle ] = useMutation(UPDATE_TASK_TITLE);
-	const [ updateCloseDate ] = useMutation(UPDATE_TASK_CLOSE_DATE);
-	const [ updateAssignedTo ] = useMutation(UPDATE_TASK_ASSIGNED_TO);
-	const [ updateCompany ] = useMutation(UPDATE_TASK_COMPANY);
-	const [ updateDeadline ] = useMutation(UPDATE_TASK_DEADLINE);
-	const [ updateDescription ] = useMutation(UPDATE_TASK_DESCRIPTION);
-	const [ updateMilestone ] = useMutation(UPDATE_TASK_MILESTONE);
-	const [ updateOvertime ] = useMutation(UPDATE_TASK_OVERTIME);
-	const [ updatePausal ] = useMutation(UPDATE_TASK_PAUSAL);
-	const [ updatePendingChangable ] = useMutation(UPDATE_TASK_PENDING_CHANGABLE);
-	const [ updatePendingDate ] = useMutation(UPDATE_TASK_PENDING_DATE);
-	const [ updateProject ] = useMutation(UPDATE_TASK_PROJECT);
-	const [ updateRequester ] = useMutation(UPDATE_TASK_REQUESTER);
-	const [ updateStatus ] = useMutation(UPDATE_TASK_STATUS);
-	const [ updateTags ] = useMutation(UPDATE_TASK_TAGS);
-	const [ updateTaskType ] = useMutation(UPDATE_TASK_TASK_TYPE);
-	const [ updateRepeat ] = useMutation(UPDATE_TASK_REPEAT);
-  const [ deleteTask, {deleteData} ] = useMutation(DELETE_TASK);
+  const [ updateProjectRights ] = useMutation(UPDATE_PROJECT_RIGHTS);
+  const [ updateTask/*, {client}*/ ] = useMutation(UPDATE_TASK);
+  const [ deleteTask ] = useMutation(DELETE_TASK);
   const [ addSubtask ] = useMutation(ADD_SUBTASK);
   const [ updateSubtask ] = useMutation(UPDATE_SUBTASK);
   const [ deleteSubtask ] = useMutation(DELETE_SUBTASK);
@@ -755,13 +610,10 @@ export default function TaskEdit (props){
   const [ customItems, setCustomItems ] = React.useState([]);
   const [ deadline, setDeadline ] = React.useState(null);
   const [ description, setDescription ] = React.useState("");
-  const [ descriptionVisible, setDescriptionVisible ] = React.useState(false);
-  const [ taskHistory, setTaskHistory ] = React.useState([]);
-  const [ invoicedDate, setInvoicedDate ] = React.useState(null);
+  //const [ invoicedDate, setInvoicedDate ] = React.useState(null);
   const [ important, setImportant ] = React.useState(false);
-  const [ isColumn, setIsColumn ] = React.useState(false);
+	const [ materials, setMaterials ] = React.useState([]);
   const [ milestone, setMilestone ] = React.useState([noMilestone]);
-  const [ milestones, setMilestones ] = React.useState([noMilestone]);
   const [ overtime, setOvertime ] = React.useState(booleanSelects[0]);
   const [ openUserAdd, setOpenUserAdd ] = React.useState(false);
   const [ openCompanyAdd, setOpenCompanyAdd ] = React.useState(false);
@@ -769,32 +621,26 @@ export default function TaskEdit (props){
 	const [ pendingChangable, setPendingChangable ] = React.useState(false);
   const [ pendingDate, setPendingDate ] = React.useState(null);
   const [ pendingOpen, setPendingOpen ] = React.useState(false);
-  const [ pendingStatus, setPendingStatus ] = React.useState(null);
+//  const [ pendingStatus, setPendingStatus ] = React.useState(null);
   const [ project, setProject ] = React.useState(null);
   const [ projectChangeDate, setProjectChangeDate ] = React.useState(false);
-  const [ print, setPrint ] = React.useState(false);
-  const [ reminder, setReminder ] = React.useState(null);
+//  const [ print, setPrint ] = React.useState(false);
+//  const [ reminder, setReminder ] = React.useState(null);
   const [ repeat, setRepeat ] = React.useState(null);
   const [ requester, setRequester ] = React.useState(null);
   const [ saving, setSaving ] = React.useState(false);
   const [ status, setStatus ] = React.useState(null);
   const [ statusChange, setStatusChange ] = React.useState(false);
   const [ showDescription, setShowDescription ] = React.useState(false);
+	const [ subtasks, setSubtasks ] = React.useState([]);
   const [ tags, setTags ] = React.useState([]);
-  const [ materials, setMaterials ] = React.useState([]);
+	const [ taskHistory ] = React.useState([]);
   const [ taskType, setTaskType ] = React.useState(null);
-  const [ subtasks, setSubtasks ] = React.useState([]);
 	const [ title, setTitle ] = React.useState("");
   const [ toggleTab, setToggleTab ] = React.useState(1);
   const [ workTrips, setWorkTrips ] = React.useState([]);
 
   const [ viewOnly, setViewOnly ] = React.useState(true);
-
-  let counter = 0;
-
-	const getNewID = () => {
-			return counter++;
-	}
 
 // sync
 React.useEffect( () => {
@@ -808,7 +654,7 @@ React.useEffect( () => {
 			setDeadline(taskData.task.deadline ? timestampToString(parseInt(taskData.task.deadline)) : null) ;
 			setDescription(taskData.task.description);
       setImportant(taskData.task.important);
-      setInvoicedDate( timestampToString(parseInt(taskData.task.invoicedDate)) );
+      //setInvoicedDate( timestampToString(parseInt(taskData.task.invoicedDate)) );
       const pro =  (taskData.task.project ? {...taskData.task.project, value: taskData.task.project.id, label: taskData.task.project.title} : null );
       setMilestone(pro && pro.milestone ? {...pro.milestone, value: pro.milestone.id, label: pro.milestone.title} : noMilestone );
 			setOvertime( (taskData.task.overtime ? booleanSelects[1] : booleanSelects[0]) );
@@ -816,7 +662,7 @@ React.useEffect( () => {
 			setPendingChangable(taskData.task.pendingChangable);
 			setPendingDate( timestampToString(parseInt(taskData.task.pendingDate)) );
 			setProject(pro);
-			setReminder(taskData.task.reminder);
+		//	setReminder(taskData.task.reminder);
 			setRepeat(taskData.task.repeat);
 			setRequester( (taskData.task.requester ? {...taskData.task.requester, value: taskData.task.requester.id, label: `${taskData.task.requester.name} ${taskData.task.requester.surname}`} : null)) ;
       const sta = (taskData.task.status ? toSelItem(taskData.task.status) : null )
@@ -977,6 +823,18 @@ React.useEffect( () => {
       });
     }
   }
+
+	const updateProjectRightsFunc = (user) => {
+		const newProjectRights = project.projectRights.map(item => ({read: item.read, write: item.write, delete: item.delete, internal: item.internal, admin: item.admin, user: item.user.id}));
+		const newUser = {read: true, write: false, delete: false, internal: false, admin: false, user: user.id}
+		updateProjectRights({ variables: {
+			id: project.id,
+			projectRights: [ ...newProjectRights,  newUser],
+		} }).then( ( response ) => {
+		}).catch( (err) => {
+			console.log(err.message);
+		});
+	}
 
   const cannotSave = () => {
   	return  title==="" || status===null || project === null || assignedTo === [] || saving || viewOnly;
@@ -1280,7 +1138,7 @@ React.useEffect( () => {
       console.log(err);
     });
   }
-
+/*
 	const getHistoryMessage = (type, data) => {
 		let user = "Používateľ " + currentUser.userData.name + ' ' + currentUser.userData.surname;
 		switch (type) {
@@ -1294,7 +1152,7 @@ React.useEffect( () => {
 				return user + ' spravil nedefinovanú zmenu.';
 			}
 		}
-	}
+	}*/
 
 	const setDefaults = (projectID) => {
 		if(projectID===null){
@@ -1497,7 +1355,7 @@ React.useEffect( () => {
 
 	const changeStatus = (s) => {
 		if(s.action==='PendingDate'){
-			setPendingStatus(s);
+		//	setPendingStatus(s);
 			setPendingOpen(true);
 		}else if(s.action==='CloseDate'||s.action==='Invalid'){
 			setStatus(s);
@@ -1958,7 +1816,7 @@ React.useEffect( () => {
 
 		let usedPausal = 0;
 		if (company && company.monthly){
-			let currentTasks = tasks.filter( task => {
+		/*	let currentTasks = tasks.filter( task => {
 				let condition1 = company.id === task.company.id;
 
 				let currentDate = moment();
@@ -1976,9 +1834,9 @@ React.useEffect( () => {
 				let condition2 = (currentMonth === taskCloseMonth) && (currentYear === taskCloseYear);
 
 				return condition1 && condition2;
-			})
+			})*/
 
-			let taskIDs = currentTasks.map(task => task.id);
+		//	let taskIDs = currentTasks.map(task => task.id);
 
       let currentSubtasksQuantities =[];
 			//let currentSubtasksQuantities = this.state.extraData.subtasks.filter(work => taskIDs.includes(work.task)).map(task => task.quantity);
@@ -2072,8 +1930,9 @@ React.useEffect( () => {
 				</ModalHeader>
 				<ModalBody>
 					<UserAdd
-						close={() => setOpenUserAdd(false)}
-						addUser={(user) => {
+						closeModal={() => setOpenUserAdd(false)}
+						addUserToList={(user) => {
+							updateProjectRightsFunc(user);
 			/*				let newUsers = users.concat([user]);
 							this.setState({
 								users: newUsers,
@@ -2090,8 +1949,8 @@ React.useEffect( () => {
 			<Modal isOpen={openCompanyAdd}>
 				<ModalBody>
 					<CompanyAdd
-						close={() => setOpenCompanyAdd(false)}
-						addCompany={(company) => {
+						closeModal={() => setOpenCompanyAdd(false)}
+						addCompanyToList={(company) => {
 			/*				let newCompanies = this.state.companies.concat([company]);
 							this.setState({
 								companies: newCompanies,
@@ -2288,11 +2147,11 @@ React.useEffect( () => {
 							users={users}
 							setComments={setComments}
 							addToHistory={(internal)=>{
-								let event = {
+					/*			let event = {
 									message: getHistoryMessage('comment'),
 									createdAt: moment(),
 									task: parseInt(match.params.taskID)
-								}
+								}*/
 		//						this.addNotification(event,internal);
 							}}
 							/>

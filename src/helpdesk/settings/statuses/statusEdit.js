@@ -60,8 +60,8 @@ export default function StatusEdit(props){
   //data
   const { history, match } = props;
   const { data, loading, refetch } = useQuery(GET_STATUS, { variables: {id: parseInt(props.match.params.id)} });
-  const [updateStatus, {updateData}] = useMutation(UPDATE_STATUS);
-  const [deleteStatus, {deleteData, client}] = useMutation(DELETE_STATUS);
+  const [updateStatus] = useMutation(UPDATE_STATUS);
+  const [deleteStatus, {client}] = useMutation(DELETE_STATUS);
   const allStatuses = toSelArr(client.readQuery({query: GET_STATUSES}).statuses);
   const filteredStatuses = allStatuses.filter( status => status.id !== parseInt(match.params.id) );
   const theOnlyOneLeft = allStatuses.length === 0;
