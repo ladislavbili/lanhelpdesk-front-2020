@@ -221,12 +221,12 @@ export default function TaskEditContainer(props){
   const { data: tagsData, loading: tagsLoading } = useQuery(GET_TAGS);
   const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
   const { data: tasksData, loading: tasksLoading } = useQuery(GET_ALL_TASKS);
-  const { data: emailsData, loading: emailsLoading } = useQuery(GET_EMAILS, { variables: {task: parseInt(match.params.taskID)}, options: { fetchPolicy: 'network-only' }});
+//  const { data: emailsData, loading: emailsLoading } = useQuery(GET_EMAILS, { variables: {task: parseInt(match.params.taskID)}, options: { fetchPolicy: 'network-only' }});
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
-	const loading = userLoading || statusesLoading || companiesLoading || usersLoading || taskTypesLoading || tripTypesLoading || tagsLoading || projectsLoading || tasksLoading || emailsLoading ;
+	const loading = userLoading || statusesLoading || companiesLoading || usersLoading || taskTypesLoading || tripTypesLoading || tagsLoading || projectsLoading || tasksLoading/* || emailsLoading*/ ;
 
 	if (loading) {
 		return (<Loading />);
@@ -245,7 +245,7 @@ export default function TaskEditContainer(props){
 			allTags={toSelArr(tagsData.tags)}
 			projects={toSelArr(projectsData.projects)}
 			tasks={tasksData.allTasks}
-      emails={emailsData.emails ? emailsData.emails : []}
+      emails={/*emailsData && emailsData.emails ? emailsData.emails : */[]}
 			inModal={false}
 			 />
 	 );

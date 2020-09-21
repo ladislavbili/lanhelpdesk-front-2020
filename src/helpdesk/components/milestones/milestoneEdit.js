@@ -6,6 +6,8 @@ import { Modal, ModalBody, ModalFooter, ModalHeader, Button, FormGroup, Label, I
 import DatePicker from 'react-datepicker';
 import { timestampToString } from 'helperFunctions';
 
+import moment from 'moment';
+
 import { GET_PROJECTS } from 'helpdesk/components/sidebar/tasksSidebar';
 
 const UPDATE_MILESTONE = gql`
@@ -49,13 +51,10 @@ mutation deleteMilestone($id: Int!) {
 
 export default function MilestoneEdit (props){
   //data & queries
-  const { closeModal, milestoneID, projectID } = props;
+  const { milestoneID, projectID } = props;
   const [ updateMilestone, {client} ] = useMutation(UPDATE_MILESTONE);
   const [ deleteMilestone ] = useMutation(DELETE_MILESTONE);
   const { data, loading } = useQuery(GET_MILESTONE, { variables: {id: milestoneID} });
-
-  console.log(milestoneID);
-  console.log(data);
 
   //state
   const [ title, setTitle ] = React.useState("");
@@ -69,12 +68,10 @@ export default function MilestoneEdit (props){
   // sync
   React.useEffect( () => {
       if (!loading){
-        console.log("AAAAAAAAAAA");
-        console.log(data);
         setTitle( data ? data.milestone.title : null);
         setDescription( data ? data.milestone.description : null);
-        setStartsAt( data && data.milestone.startsAt ? timestampToString(parseInt(data.milestone.startsAt)) : null );
-        setEndsAt( data && data.milestone.endsAt ? timestampToString(parseInt(data.milestone.endsAt)) : null );
+        setStartsAt( data && data.milestone.startsAt ? moment(parseInt(data.milestone.startsAt)) : null );
+        setEndsAt( data && data.milestone.endsAt ? moment(parseInt(data.milestone.endsAt)) : null );
       }
   }, [loading]);
 
@@ -90,8 +87,8 @@ export default function MilestoneEdit (props){
         id: milestoneID,
         title,
         description,
-        startsAt: startsAt ? startsAt.unix().toString() : null,
-        endsAt: endsAt ? endsAt.unix().toString() : null,
+        startsAt: startsAt ? (startsAt.unix()*1000).toString() : null,
+        endsAt: endsAt ? (endsAt.unix()*1000).toString() : null,
       } }).then( ( response ) => {
         let allProjects = client.readQuery({query: GET_PROJECTS}).projects;
         const newProjects = allProjects.map(item => {
@@ -114,7 +111,7 @@ export default function MilestoneEdit (props){
         }
         */
         client.writeQuery({ query: GET_PROJECTS, data: {projects: [...newProjects] } });
-        closeModal();
+        setOpened(false);
       }).catch( (err) => {
         console.log(err.message);
       });
@@ -130,14 +127,13 @@ export default function MilestoneEdit (props){
           const allProjects = client.readQuery({query: GET_PROJECTS}).projects;
           const newProjects = allProjects.filter(item => item.id !== milestoneID);
           client.writeQuery({ query: GET_PROJECTS, data: {projects: [...newProjects] } });
-          closeModal();
+          setOpened(false);
         }).catch( (err) => {
           console.log(err.message);
           console.log(err);
         });
       }
     };
-
 
   return (
 		<div className='p-l-15 p-r-15'>

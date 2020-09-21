@@ -56,7 +56,10 @@ query task($id: Int!){
 			id
 			title
       dph
+      usedTripPausal
+      usedSubtaskPausal
       taskWorkPausal
+      taskTripPausal
       monthly
       monthlyPausal
       pricelist {
@@ -636,15 +639,21 @@ export default function TaskEdit (props){
   const [ tags, setTags ] = React.useState([]);
 	const [ taskHistory ] = React.useState([]);
   const [ taskType, setTaskType ] = React.useState(null);
+	const [ taskTripPausal, setTaskTripPausal ] = React.useState(0);
+	const [ taskWorkPausal, setTaskWorkPausal ] = React.useState(0);
 	const [ title, setTitle ] = React.useState("");
   const [ toggleTab, setToggleTab ] = React.useState(1);
+	const [ usedSubtaskPausal, setUsedSubtaskPausal ] = React.useState(0);
+	const [ usedTripPausal, setUsedTripPausal ] = React.useState(0);
   const [ workTrips, setWorkTrips ] = React.useState([]);
 
   const [ viewOnly, setViewOnly ] = React.useState(true);
 
+
 // sync
 React.useEffect( () => {
     if (!taskLoading && taskData){
+			console.log(taskData);
 			setAssignedTo(toSelArr(taskData.task.assignedTo, 'email'));
 			setCloseDate( timestampToString(parseInt(taskData.task.closeDate)) );
 			setComments( [...taskData.task.comments.map(item => ({...item, isMail: false})), ...emails.map(item => ({...item, isMail: true}))] );
@@ -669,12 +678,15 @@ React.useEffect( () => {
 			setStatus(sta );
 			setTags(taskData.task.tags ? toSelArr(taskData.task.tags) : []);
 			setTaskType( (taskData.task.taskType ? {...taskData.task.taskType, value: taskData.task.taskType.id, label: taskData.task.taskType.title} : null ) );
+			setTaskTripPausal(taskData.task.company ? taskData.task.company.taskTripPausal : 0);
+			setTaskWorkPausal(taskData.task.company ? taskData.task.company.taskWorkPausal : 0);
 			setTitle(taskData.task.title);
       setCustomItems( taskData.task.customItems );
       setMaterials( taskData.task.materials );
       setSubtasks( (taskData.task.subtasks ? taskData.task.subtasks.map(item => ({...item, assignedTo: toSelItem(item.assignedTo, 'email'), type: toSelItem(item.type)}) ) : [] ) );
+			setUsedSubtaskPausal(taskData.task.company ? taskData.task.company.usedSubtaskPausal : 0);
+			setUsedTripPausal(taskData.task.company ? taskData.task.company.usedTripPausal : 0);
       setWorkTrips( (taskData.task.workTrips ? taskData.task.workTrips.map(item => ({...item, assignedTo: toSelItem(item.assignedTo, 'email'), type: toSelItem(item.type)}) ) : [] ) );
-
 
       if (pro){
         setDefaults(pro);
@@ -1812,40 +1824,6 @@ React.useEffect( () => {
 	}
 
 	const renderPopis = () => {
-		const TOTAL_PAUSAL = company ? company.taskWorkPausal : 0;
-
-		let usedPausal = 0;
-		if (company && company.monthly){
-		/*	let currentTasks = tasks.filter( task => {
-				let condition1 = company.id === task.company.id;
-
-				let currentDate = moment();
-				let currentMonth = currentDate.month() + 1;
-				let currentYear = currentDate.year();
-
-				if (task.closeDate === null || task.closeDate === undefined){
-					return false;
-				}
-
-				let taskCloseDate = moment(task.closeDate);
-				let taskCloseMonth = taskCloseDate.month() + 1;
-				let taskCloseYear = taskCloseDate.year();
-
-				let condition2 = (currentMonth === taskCloseMonth) && (currentYear === taskCloseYear);
-
-				return condition1 && condition2;
-			})*/
-
-		//	let taskIDs = currentTasks.map(task => task.id);
-
-      let currentSubtasksQuantities =[];
-			//let currentSubtasksQuantities = this.state.extraData.subtasks.filter(work => taskIDs.includes(work.task)).map(task => task.quantity);
-
-			if (currentSubtasksQuantities.length > 0){
-				usedPausal = currentSubtasksQuantities.reduce((total, quantity) => total + quantity);
-			}
-		}
-
 		let RenderDescription = null;
 		if( viewOnly ){
 			if( description.length !== 0 ){
@@ -1886,7 +1864,16 @@ React.useEffect( () => {
 				<div>
 				<Label className="col-form-label m-t-10 m-r-20">Popis úlohy</Label>
 				{ company && company.monthlyPausal &&
-					<span> {`Used pausal: ${usedPausal} / Total pausal: ${TOTAL_PAUSAL}`} </span>
+					<span> {`Pausal subtasks:`}
+						<span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
+							{` ${usedSubtaskPausal}`}
+						 </span>
+						{` / ${taskWorkPausal} Pausal trips:`}
+						 <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
+							 {` ${usedTripPausal}`}
+						 </span>
+						 {` / ${taskTripPausal}`}
+				  </span>
 				}
 				</div>
 				{RenderDescription}
