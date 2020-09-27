@@ -1,208 +1,349 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useQuery, useMutation } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import Select from 'react-select';
 import { Button, FormGroup, Label, Input,Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { storageHelpProjectsStart, storageHelpFiltersStart } from 'redux/actions';
-import {toSelArr} from 'helperFunctions';
+import {toSelArr, toSelItem} from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 import {selectStyle} from 'configs/components/select';
-import {rebase} from 'index';
-import { connect } from "react-redux";
-import { roles } from 'configs/constants/roles';
 
-class FilterAdd extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      title:'',
-      public:false,
-      global:false,
-      dashboard:false,
-      project:null,
-      roles: [],
+import { GET_ROLES } from 'helpdesk/settings/roles';
+import { GET_MY_FILTERS } from 'helpdesk/components/sidebar/tasksSidebar';
 
-      saving:false,
-      opened:false
+const GET_MY_DATA = gql`
+query {
+  getMyData{
+    id
+    email
+    role {
+      id
+      accessRights {
+        publicFilters
+      }
     }
   }
+}
+`;
 
-  componentWillReceiveProps(props){
-    if(!this.props.projectsLoaded && props.projectsLoaded){
-      this.setState({
-        project: this.state.opened && props.filterID && props.filterData.project ? toSelArr(props.projects).find((project)=>project.id===props.filterData.project):null,
-      })
+const ADD_FILTER = gql`
+mutation addFilter(
+  $title: String!,
+  $pub: Boolean!,
+  $global: Boolean!,
+  $dashboard: Boolean!,
+  $order: Int,
+  $roles: [Int],
+  $filter: FilterInput!
+  $projectId: Int,
+) {
+  addFilter(
+    title: $title,
+    pub: $pub,
+    global: $global,
+    dashboard: $dashboard,
+    order: $order,
+    roles: $roles,
+    filter: $filter,
+    projectId: $projectId
+){
+    title
+    id
+    createdAt
+    updatedAt
+    createdBy {
+      id
+    }
+    pub
+    global
+    dashboard
+    filter {
+      taskType {
+        id
+      }
+    }
+    project {
+      id
+    }
+    roles {
+      id
     }
   }
+}
+`;
 
-  toggle(){
-    if(!this.state.opened && this.props.filterID){
-      const filterData = this.props.filterData;
-      this.setState({
-        title: filterData.title,
-        public: filterData.public,
-        global: filterData.global ? filterData.global : false,
-        dashboard: filterData.dashboard ? filterData.dashboard : false,
-        project: filterData.project ? toSelArr(this.props.projects).find((project) => project.id === filterData.project) : null,
-        roles: toSelArr(roles).filter( (role) => filterData.roles.includes( role.id ) )
+
+const UPDATE_FILTER = gql`
+mutation updateFilter( $id: Int!, $title: String, $pub: Boolean!, $global: Boolean!, $dashboard: Boolean!, $order: Int, $roles: [Int], $filter: FilterInput, $projectId: Int,) {
+  updateFilter(
+    id: $id,
+    title: $title,
+    pub: $pub,
+    global: $global,
+    dashboard: $dashboard,
+    order: $order,
+    roles: $roles,
+    filter: $filter,
+    projectId: $projectId
+){
+    title
+    id
+    createdAt
+    updatedAt
+    id
+    title
+    pub
+    global
+    dashboard
+    project {
+      id
+      title
+    }
+    roles {
+      id
+      title
+    }
+    filter {
+      assignedToCur
+      assignedTo {
+        id
+        email
+      }
+      requesterCur
+      requester {
+        id
+        email
+      }
+      companyCur
+      company {
+        id
+        title
+      }
+      taskType {
+        id
+        title
+      }
+      statusDateFrom
+      statusDateFromNow
+      statusDateTo
+      statusDateToNow
+      pendingDateFrom
+      pendingDateFromNow
+      pendingDateTo
+      pendingDateToNow
+      closeDateFrom
+      closeDateFromNow
+      closeDateTo
+      closeDateToNow
+      deadlineFrom
+      deadlineFromNow
+      deadlineTo
+      deadlineToNow
+    }
+  }
+}
+`;
+
+const GET_PROJECTS = gql`
+query {
+  projects {
+    title
+    id
+    projectRights {
+			read
+			write
+			delete
+			internal
+			admin
+			user {
+				id
+        email
+			}
+    }
+  }
+}
+`;
+
+export default function FilterAdd(props){
+  //data & queries
+  const { history, filter, filterID, bigFilter } = props;
+  const { data } = useQuery(GET_MY_DATA);
+  const { data: roleData, loading: roleLoading } = useQuery(GET_ROLES);
+  const { data: projectData, loading: projectLoading } = useQuery(GET_PROJECTS);
+  const [ addFilter, {client} ] = useMutation(ADD_FILTER);
+  const [ updateFilter ] = useMutation(UPDATE_FILTER);
+
+  const roles = ( roleLoading ? [] : toSelArr(roleData.roles) );
+  const projects = ( projectLoading ? [] : toSelArr(projectData.projects) );
+
+  const [ title, setTitle ] = React.useState("");
+  const [ pub, setPub ] = React.useState(false);
+  const [ global, setGlobal ] = React.useState(false);
+  const [ dashboard, setDashboard ] = React.useState(false);
+  const [ project, setProject ] = React.useState(null);
+  const [ chosenRoles, setChosenRoles ] = React.useState([]);
+  const [ saving, setSaving ] = React.useState(false);
+  const [ opened, setOpened ] = React.useState(false);
+
+  let currentUser = {};
+  let accessRights = {};
+
+  if (data) {
+    currentUser = data.getMyData;
+    accessRights = currentUser.role.accessRights;
+  }
+
+  React.useEffect(() => {
+    if (filterID && bigFilter) {
+      setTitle(bigFilter.title);
+      setPub(bigFilter.pub);
+      setGlobal(bigFilter.global);
+      setDashboard(bigFilter.dashboard);
+      setProject(bigFilter.project ? toSelItem(bigFilter.project) : null);
+      setChosenRoles(bigFilter.roles ? toSelArr(bigFilter.roles) : []);
+    }
+  }, [filterID]);
+
+const addFilterFunc = () => {
+    setSaving(true);
+    if(filterID === null || filterID === undefined){
+      addFilter({ variables: {
+        title,
+        pub,
+        global,
+        dashboard,
+        projectId: project ? project.id : null,
+        filter,
+        roles: roles.map(item => item.id)
+      } }).then( ( response ) => {
+          const allFilters = client.readQuery({query: GET_MY_FILTERS}).myFilters;
+          const newFilter = {...response.data.addFilter, __typename: "Filter"};
+          const newFilters = [...allFilters, newFilter];
+          client.writeQuery({ query: GET_MY_FILTERS, data: {myFilters: [...newFilters] } });
+      }).catch( (err) => {
+        console.log(err.message);
+      });
+    }else{
+      updateFilter({ variables: {
+        id: filterID,
+        title,
+        pub,
+        global,
+        dashboard,
+        projectId: project ? project.id : null,
+        filter,
+        roles: roles.map(item => item.id)
+      } }).then( ( response ) => {
+          let allFilters = client.readQuery({query: GET_MY_FILTERS}).myFilters;
+          const newFilters = allFilters.map(item => {
+            if (item.id !== filterID){
+              return item;
+            }
+            return ({...response.data.updateFilter, __typename: "Filter"});
+          });
+          client.writeQuery({ query: GET_MY_FILTERS, data: {myFilters: [...newFilters] } });
+      }).catch( (err) => {
+        console.log(err.message);
       });
     }
-    this.setState({opened:!this.state.opened})
+    setOpened(false);
+    setSaving(false);
   }
 
-  componentWillMount(){
-    if(!this.props.projectsActive){
-      this.props.storageHelpProjectsStart();
-    }
-    if(!this.props.filtersActive){
-      this.props.storageHelpFiltersStart();
-    }
-  }
+  return (
+  <div>
+    <Button className="btn-link-reversed m-2" onClick={() => setOpened(!opened)}>
+      <i className="far fa-save icon-M"/>
+    </Button>
 
-  render(){
-    return (
-      <div>
-        <Button className="btn-link-reversed m-2" onClick={this.toggle.bind(this)}>
-          <i className="far fa-save icon-M"/>
+    <Modal style={{width: "800px"}} isOpen={opened}>
+      <ModalHeader>
+        Add filter
+      </ModalHeader>
+      <ModalBody>
+        <FormGroup className="m-t-15">
+          <Label>Filter name</Label>
+          <Input type="text" className="from-control" placeholder="Enter filter name" value={title} onChange={(e)=> setTitle(e.target.value)} />
+        </FormGroup>
+
+        { accessRights.publicFilters &&
+          <Checkbox
+            className = "m-l-5 m-r-5"
+            label = "Public (everyone see this filter)"
+            value = { pub }
+            onChange={(e)=> setPub(!pub)}
+            />
+        }
+
+        { accessRights.publicFilters && pub &&
+          <FormGroup>{/* Roles */}
+            <Label className="">Roles</Label>
+            <Select
+              placeholder="Choose roles"
+              value={chosenRoles}
+              isMulti
+              onChange={(newRoles)=>{
+                if(newRoles.some((role) => role.id === 'all' )){
+                  if( roles.length === chosenRoles.length ){
+                    setChosenRoles([]);
+                  }else{
+                    setChosenRoles(roles)
+                  }
+                }else{
+                  setChosenRoles(newRoles);
+                }
+              }}
+              options={toSelArr([{id: 'all', title: roles.length === chosenRoles.length ? 'Clear' : 'All' }].concat(roles))}
+              styles={selectStyle}
+              />
+          </FormGroup>
+        }
+
+        <Checkbox
+          className = "m-l-5 m-r-5"
+          label = "Global (shown in all projects)"
+          value = { global }
+          onChange={(e)=> setGlobal(!global)}
+          />
+
+        <div className="m-b-10">
+          <Label className="form-label">Projekt</Label>
+          <Select
+            placeholder="Vyberte projekt"
+            value={project}
+            isDisabled={global}
+            onChange={(pro)=> setProject(pro)}
+            options={projects.filter((project)=>{
+              if (project.projectRights === undefined){
+                return false;
+              }
+              let permission = project.projectRights.find((permission)=>permission.user.id === currentUser.id);
+              return permission && permission.read;
+            })}
+            styles={selectStyle}
+            />
+        </div>
+
+        <Checkbox
+          className = "m-l-5 m-r-5"
+          label = "Dashboard (shown in dashboard)"
+          value = { dashboard }
+          onChange={(e)=>setDashboard(!dashboard)}
+          />
+
+      </ModalBody>
+      <ModalFooter>
+        <Button className="mr-auto btn-link" disabled={saving} onClick={() => setOpened(!opened)}>
+          Close
         </Button>
 
-        <Modal style={{width: "800px"}} isOpen={this.state.opened}>
-          <ModalHeader>
-            Add filter
-          </ModalHeader>
-          <ModalBody>
-            <FormGroup className="m-t-15">
-              <Label>Filter name</Label>
-              <Input type="text" className="from-control" placeholder="Enter filter name" value={this.state.title} onChange={(e)=>this.setState({title:e.target.value})} />
-            </FormGroup>
 
-            { this.props.currentUser.userData.role.value > 1 &&
-              <Checkbox
-                className = "m-l-5 m-r-5"
-                label = "Public (everyone see this filter)"
-                value = { this.state.public }
-                onChange={(e)=>this.setState({public:!this.state.public })}
-                />
-            }
-
-            { this.props.currentUser.userData.role.value > 1 && this.state.public &&
-              <FormGroup>{/* Roles */}
-                <Label className="">Roles</Label>
-                <Select
-                  placeholder="Choose roles"
-                  value={this.state.roles}
-                  isMulti
-                  onChange={(newRoles)=>{
-                    if(newRoles.some((role) => role.id === 'all' )){
-                      if( this.state.roles.length === roles.length ){
-                        this.setState({ roles: [] })
-                      }else{
-                        this.setState({ roles: toSelArr(roles) })
-                      }
-                    }else{
-                      this.setState({roles: newRoles})
-                    }
-                  }}
-                  options={toSelArr([{id: 'all', title: this.state.roles.length === roles.length ? 'Clear' : 'All' }].concat(roles))}
-                  styles={selectStyle}
-                  />
-              </FormGroup>
-            }
-
-            <Checkbox
-              className = "m-l-5 m-r-5"
-              label = "Global (shown in all projects)"
-              value = { this.state.global }
-              onChange={(e)=>this.setState({global:!this.state.global })}
-              />
-
-            <div className="m-b-10">
-              <Label className="form-label">Projekt</Label>
-              <Select
-                placeholder="Vyberte projekt"
-                value={this.state.project}
-                isDisabled={this.state.global}
-                onChange={(project)=> {
-                  this.setState({project});
-                }}
-                options={toSelArr(this.props.projects).filter((project)=>{
-                  let curr = this.props.currentUser;
-                  if(curr.userData && curr.userData.role.value===3){
-                    return true;
-                  }
-                  if( project.permissions === undefined ) return false;
-                  let permission = project.permissions.find((permission)=>permission.user===curr.id);
-                  return permission && permission.read;
-                })}
-                styles={selectStyle}
-                />
-            </div>
-
-            <Checkbox
-              className = "m-l-5 m-r-5"
-              label = "Dashboard (shown in dashboard)"
-              value = { this.state.dashboard }
-              onChange={(e)=>this.setState({dashboard:!this.state.dashboard })}
-              />
-
-          </ModalBody>
-          <ModalFooter>
-            <Button className="mr-auto btn-link" disabled={this.state.saving} onClick={this.toggle.bind(this)}>
-              Close
-            </Button>
-
-
-            <Button
-              className="btn"
-              disabled={this.state.saving||this.state.title===""||(!this.state.global && this.state.project===null)}
-              onClick={()=>{
-                this.setState({saving:true});
-                if(this.props.filterID!==null){
-                  rebase.updateDoc('/help-filters/'+this.props.filterID, {
-                    title: this.state.title,
-                    filter:this.props.filter,
-                    public:this.state.public,
-                    global:this.state.global,
-                    dashboard:this.state.dashboard,
-                    project:this.state.project!==null?this.state.project.id:null,
-                    roles: this.state.roles.map( (role) => role.id ),
-                  })
-                  .then(()=> {
-                    this.setState({title:'',public:false,saving:false});
-                    this.toggle();
-                  });
-                }else{
-                  rebase.addToCollection('/help-filters', {
-                    title: this.state.title,
-                    createdBy:this.props.currentUser.id,
-                    order:this.state.public ? this.props.filters.filter((filter)=>filter.public).length : null,
-                    filter: this.props.filter,
-                    public:this.state.public,
-                    global:this.state.global,
-                    dashboard:this.state.dashboard,
-                    project:this.state.project!==null?this.state.project.id:null,
-                    roles: this.state.roles.map( (role) => role.id ),
-                  })
-                  .then((resp) => {
-                    this.setState({title:'',public:false,global:false,dashboard:false,project:null,saving:false});
-                    this.toggle();
-                  });
-                }
-              }}>{this.props.filterID!==null?(this.state.saving?'Saving...':'Save filter'):(this.state.saving?'Adding...':'Add filter')}</Button>
-            </ModalFooter>
-          </Modal>
-        </div>
-      );
-    }
-  }
-
-  const mapStateToProps = ({ userReducer, storageHelpProjects, storageHelpFilters }) => {
-    const { projectsActive, projects, projectsLoaded } = storageHelpProjects;
-    const { filtersActive, filters, filtersLoaded } = storageHelpFilters;
-
-    return {
-      currentUser:userReducer,
-      projectsActive, projects, projectsLoaded,
-      filtersActive, filters, filtersLoaded
-    };
-  };
-
-  export default connect(mapStateToProps, { storageHelpProjectsStart, storageHelpFiltersStart })(FilterAdd);
+        <Button
+          className="btn"
+          disabled={saving || title === "" || (!global && project===null)}
+          onClick={addFilterFunc}>{filterID!==null?(saving?'Saving...':'Save filter'):(saving?'Adding...':'Add filter')}</Button>
+        </ModalFooter>
+      </Modal>
+    </div>
+  );
+}

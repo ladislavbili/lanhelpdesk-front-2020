@@ -4,7 +4,6 @@ import gql from "graphql-tag";
 
 import { Modal, ModalBody, ModalFooter, ModalHeader, Button, FormGroup, Label, Input } from 'reactstrap';
 import DatePicker from 'react-datepicker';
-import { timestampToString } from 'helperFunctions';
 
 import moment from 'moment';
 

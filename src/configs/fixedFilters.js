@@ -3,18 +3,29 @@ import moment from 'moment';
 export const getEmptyFilter = () => ({
   oneOf: [],
   requester:null,
+  requesterCur: false,
   company:null,
+  companyCur: false,
   assignedTo:null,
+  assignedToCur: false,
   taskType:null,
   statusDateFrom: null,
   statusDateTo: null,
+  statusDateFromNow: null,
+  statusDateToNow: null,
   closeDateFrom: null,
   closeDateTo: null,
+  closeDateFromNow: null,
+  closeDateToNow: null,
   pendingDateFrom: null,
   pendingDateTo: null,
+  pendingDateFromNow: null,
+  pendingDateToNow: null,
   deadlineFrom: null,
   deadlineTo: null,
-  updatedAt: moment().unix()*1000
+  deadlineFromNow: null,
+  deadlineToNow: null,
+  updatedAt: moment().unix()
 })
 
 export const getFixedFilters = (  ) => {

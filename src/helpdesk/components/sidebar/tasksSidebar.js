@@ -21,7 +21,7 @@ import { toSelArr } from 'helperFunctions';
 import { dashboard, addProject, allMilestones, addMilestone } from 'configs/constants/sidebar';
 import moment from 'moment';
 
-import { selectedProject, selectedMilestone, filter, filters/*, filterName */} from 'localCache';
+import { selectedProject, selectedMilestone,/* filter, filters, filterName */} from 'localCache';
 
 export const GET_PROJECTS = gql`
 query {
@@ -129,26 +129,62 @@ query {
 }
 `;
 
-const GET_MY_FILTERS = gql`
+export const GET_MY_FILTERS = gql`
 query {
   myFilters {
     title
     id
     createdAt
     updatedAt
+    id
+    title
     pub
     global
     dashboard
-    filter {
-      taskType {
-        id
-      }
-    }
     project {
       id
+      title
     }
     roles {
       id
+      title
+    }
+    filter {
+      assignedToCur
+      assignedTo {
+        id
+        email
+      }
+      requesterCur
+      requester {
+        id
+        email
+      }
+      companyCur
+      company {
+        id
+        title
+      }
+      taskType {
+        id
+        title
+      }
+      statusDateFrom
+      statusDateFromNow
+      statusDateTo
+      statusDateToNow
+      pendingDateFrom
+      pendingDateFromNow
+      pendingDateTo
+      pendingDateToNow
+      closeDateFrom
+      closeDateFromNow
+      closeDateTo
+      closeDateToNow
+      deadlineFrom
+      deadlineFromNow
+      deadlineTo
+      deadlineToNow
     }
   }
 }
@@ -186,9 +222,9 @@ export default function TasksSidebar(props) {
   //data & queries
   const { history, location } = props;
   const { data } = useQuery(GET_MY_DATA);
-  const { data: projectsData, loading: projectsLoading, refetch: projectsRefetch } = useQuery(GET_PROJECTS, { options: { fetchPolicy: 'network-only' }});
-  const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS, { options: { fetchPolicy: 'network-only' }});
-  const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
+  const { data: projectsData, loading: projectsLoading, refetch: projectsRefetch } = useQuery(GET_PROJECTS);
+  const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS);
+//  const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
@@ -200,6 +236,8 @@ export default function TasksSidebar(props) {
   const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ) );
   const [ currentProject, setCurrentProject ] = React.useState( projects[0] );
   const [ currentMilestone, setCurrentMilestone ] = React.useState( allMilestones );
+
+  const [ filter, setFilter ] = React.useState( getEmptyFilter() );
 
   // sync
   React.useEffect( () => {
@@ -224,15 +262,19 @@ export default function TasksSidebar(props) {
 
   React.useEffect( () => {
     if (!myFiltersLoading){
-      filters({fixedFilters: [...filters().fixedFilters], myFilters: [...myFiltersData.myFilters], publicFilters: [...filters().publicFilters]});
+      if (!isNaN(location.pathname.slice(location.pathname.lastIndexOf("/") + 1))) {
+        const newFilter = myFiltersData.myFilters.find(item => item.id === parseInt(location.pathname.slice(location.pathname.lastIndexOf("/") + 1) ) );
+        setFilter(newFilter);
+      }
+    //  filters({myFilters: [...myFiltersData.myFilters], publicFilters: [...filters().publicFilters]});
     }
   }, [myFiltersLoading]);
 
-  React.useEffect( () => {
-    if (!publicFiltersLoading){
-      filters({fixedFilters: [...filters().fixedFilters], myFilters: [...filters().myFilters], publicFilters: [...publicFiltersData.publicFilters]});
-    }
-  }, [publicFiltersLoading]);
+/*  React.useEffect( () => {
+    if (!publicFiltersLoading){*/
+    //  filters({myFilters: [...filters().myFilters], publicFilters: [...publicFiltersData.publicFilters]});
+  /*  }
+  }, [publicFiltersLoading]);*/
 
   const addNewProject = (newProject) => {
       projectsRefetch();
@@ -241,6 +283,8 @@ export default function TasksSidebar(props) {
       setCurrentProject( newProject );
       selectedProject(newProject);
   }
+
+  const FILTERS = [ ...(myFiltersLoading ? [] : myFiltersData.myFilters  )];//, ...(publicFiltersLoading ? [] : publicFiltersData.publicFilters  )]
 
   return (
     <div>
@@ -328,7 +372,8 @@ export default function TasksSidebar(props) {
             onClick={() => {
               history.push(`/helpdesk/taskList/i/all`);
               setActiveTab( (activeTab === 0 ? 1 : 0) );
-              filter(getEmptyFilter());
+              setFilter(getEmptyFilter());
+            //  filter(getEmptyFilter());
               //CHANGE LOCAL CACHE
               //this.props.setHelpSidebarFilter(null);
               //this.props.setFilter(getEmptyFilter());
@@ -351,7 +396,7 @@ export default function TasksSidebar(props) {
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0} >
           <Nav vertical>
-            { [...filters().fixedFilters, ...filters().myFilters, ...filters().publicFilters].map((item)=>
+            { FILTERS.map((item)=>
               <NavItem key={item.id} className="row">
                 <Link
                   className="sidebar-menu-item"
@@ -360,21 +405,32 @@ export default function TasksSidebar(props) {
                     const newFilter = {
                       ...item.filter,
                       statusDateFrom: isNaN(parseInt(item.filter.statusDateFrom)) ? null : parseInt(item.filter.statusDateFrom),
+                      statusDateFromNow: item.filter.statusDateFromNow === true,
                       statusDateTo: isNaN(parseInt(item.filter.statusDateTo)) ? null : parseInt(item.filter.statusDateTo),
+                      statusDateToNow: item.filter.statusDateToNow === true,
                       pendingDateFrom: isNaN(parseInt(item.filter.pendingDateFrom)) ? null : parseInt(item.filter.pendingDateFrom),
+                      pendingDateFromNow: item.filter.pendingDateFromNow === true,
                       pendingDateTo: isNaN(parseInt(item.filter.pendingDateTo)) ? null : parseInt(item.filter.pendingDateTo),
+                      pendingDateToNow: item.filter.pendingDateToNow === true,
                       closeDateFrom: isNaN(parseInt(item.filter.closeDateFrom)) ? null : parseInt(item.filter.closeDateFrom),
+                      closeDateFromNow: item.filter.closeDateFromNow === true,
                       closeDateTo: isNaN(parseInt(item.filter.closeDateTo)) ? null : parseInt(item.filter.closeDateTo),
+                      closeDateToNow: item.filter.closeDateToNow === true,
+                      deadlineFrom: isNaN(parseInt(item.filter.deadlineFrom)) ? null : parseInt(item.filter.deadlineFrom),
+                      deadlineFromNow: item.filter.deadlineFromNow === true,
+                      deadlineTo: isNaN(parseInt(item.filter.deadlineTo)) ? null : parseInt(item.filter.deadlineTo),
+                      deadlineToNow: item.filter.deadlineToNow === true,
                       updatedAt: moment().unix(),
                     }
-                    filter(newFilter);
+                    setFilter({...item, filter: newFilter});
+                  //  filter(newFilter);
                   }}
                   >
                   {item.title}
                 </Link>
 
                 <div
-                  className={classnames("sidebar-icon", "clickable" , {"active" : location.pathname.includes(item.id)})}
+                  className={classnames("sidebar-icon", "clickable" , {"active" : parseInt(location.pathname.slice(location.pathname.lastIndexOf("/") + 1)) === item.id})}
                   onClick={() => {
                     if (location.pathname.includes(item.id)){
                       history.push(`/helpdesk/taskList/i/`+item.id);
@@ -382,7 +438,7 @@ export default function TasksSidebar(props) {
                         ...item.filter,
                         updatedAt: moment().unix(),
                       }
-                      filter(newFilter);
+              //        filter(newFilter);
                       setActiveTab(1);
                     }
                   }}
@@ -396,10 +452,10 @@ export default function TasksSidebar(props) {
         </TabPane>
         <TabPane tabId={1}>
           <Filter
-            filterID={filter?filter.id:null}
+            filterID={filter ? filter.id : null}
             history={history}
             filterData={filter}
-            resetFilter={()=>filter(getEmptyFilter())}
+            resetFilter={()=> {/*filter(getEmptyFilter())*/}}
             close={ () => setActiveTab(0)}
             />
         </TabPane>

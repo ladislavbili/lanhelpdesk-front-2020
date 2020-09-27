@@ -4,7 +4,7 @@ import { getFixedFilters } from "configs/fixedFilters";
 
 export const selectedProject = makeVar(null);
 export const selectedMilestone = makeVar(null);
-export const filters = makeVar({fixedFilters: getFixedFilters(), myFilters: [], publicFilters: []});
+export const filters = makeVar([]);
 export const filter = makeVar(getFixedFilters()[0]);
 export const showDataFilter = makeVar({
   id: "",
