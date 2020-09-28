@@ -1,11 +1,10 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useApolloClient  } from "@apollo/react-hooks";
 import gql from "graphql-tag";
+
 import SettingsSidebar from './settingsSidebar';
 import TasksSidebar from './tasksSidebar';
 import settings from 'configs/constants/settings';
-
-//import { currentUser } from 'localCache';
 
 const GET_MY_DATA = gql`
 query {

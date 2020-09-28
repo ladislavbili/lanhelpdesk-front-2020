@@ -3,10 +3,10 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import { HttpLink } from "apollo-link-http";
 import jwtDecode from 'jwt-decode';
 import { setContext } from 'apollo-link-context';
-import { resolvers, typeDefs } from "./localSchema";
 import { from as ApolloFrom, Observable } from 'apollo-link';
 import { onError } from 'apollo-link-error';
 
+import { resolvers, typeDefs } from "./localSchema";
 import { afterNow } from '../helperFunctions';
 import axios from 'axios';
 
@@ -109,7 +109,22 @@ export default function createClient(){
 
   cache.writeData({
     data: {
-      isLoggedIn: false
+      isLoggedIn: !!localStorage.getItem("token"),
+      cartItems: [],
+      project: null,
+      milestone: null,
+      filter: {},
+      search: "",
+      showDataFilter: {
+        id: "",
+        title: "",
+        status: "",
+        requester: "",
+        company: "",
+        assignedTo: "",
+        createdAt: "",
+        deadline: "",
+      }
     }
   });
 

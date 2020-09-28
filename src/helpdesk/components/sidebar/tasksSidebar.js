@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useApolloClient  } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import {Nav, NavItem, TabPane, TabContent} from 'reactstrap';
@@ -21,7 +21,7 @@ import { toSelArr } from 'helperFunctions';
 import { dashboard, addProject, allMilestones, addMilestone } from 'configs/constants/sidebar';
 import moment from 'moment';
 
-import { selectedProject, selectedMilestone,/* filter, filters, filterName */} from 'localCache';
+//import { selectedProject, selectedMilestone,/* filter, filters, filterName */} from 'localCache';
 
 export const GET_PROJECTS = gql`
 query {
@@ -218,6 +218,14 @@ query {
 }
 `;
 
+const LOCAL_CACHE = gql`
+  query getLocalCache {
+    project @client
+    milestone @client
+  }
+`
+;
+
 export default function TasksSidebar(props) {
   //data & queries
   const { history, location } = props;
@@ -225,9 +233,12 @@ export default function TasksSidebar(props) {
   const { data: projectsData, loading: projectsLoading, refetch: projectsRefetch } = useQuery(GET_PROJECTS);
   const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS);
 //  const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
+const { data: localCache } = useQuery(LOCAL_CACHE);
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+
+  const client = useApolloClient();
 
   //state
   const [ openProjectAdd, setOpenProjectAdd ] = React.useState(false);
@@ -241,11 +252,10 @@ export default function TasksSidebar(props) {
 
   // sync
   React.useEffect( () => {
-    if (!projectsLoading){
+    if (!projectsLoading ){
       const pro = (accessRights.addProjects ? [dashboard, addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
       setProjects(pro);
       setCurrentProject( projects[0] );
-      selectedProject(null);
     }
   }, [projectsLoading]);
 
@@ -255,8 +265,13 @@ export default function TasksSidebar(props) {
       const pro = (accessRights.addProjects ? [dashboard, addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
       setProjects(pro);
       const index = pro.findIndex(p => p.id === currentProject.id);
-      setCurrentProject( (index >= 0 ? pro[index] : [dashboard]) );
-      selectedProject((index >= 0 ? pro[index] : null));
+      if (index >= 0 && pro[index].id === null) {
+        setCurrentProject( (index >= 0 ? pro[index] : [dashboard]) );
+        client.writeData({ data: { project: null } });
+      } else if (index >= 0) {
+        setCurrentProject( pro[index] );
+        client.writeData({ data: { project: pro[index] } });
+      }
     }
   }, [projectsData]);
 
@@ -264,9 +279,9 @@ export default function TasksSidebar(props) {
     if (!myFiltersLoading){
       if (!isNaN(location.pathname.slice(location.pathname.lastIndexOf("/") + 1))) {
         const newFilter = myFiltersData.myFilters.find(item => item.id === parseInt(location.pathname.slice(location.pathname.lastIndexOf("/") + 1) ) );
-        setFilter(newFilter);
+        console.log(newFilter);
+  //      client.writeData({ data: { filter: newFilter.filter } });
       }
-    //  filters({myFilters: [...myFiltersData.myFilters], publicFilters: [...filters().publicFilters]});
     }
   }, [myFiltersLoading]);
 
@@ -281,10 +296,12 @@ export default function TasksSidebar(props) {
       const pro = (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
       setProjects(pro);
       setCurrentProject( newProject );
-      selectedProject(newProject);
+      client.writeData({ data: { project: newProject } });
   }
 
-  const FILTERS = [ ...(myFiltersLoading ? [] : myFiltersData.myFilters  )];//, ...(publicFiltersLoading ? [] : publicFiltersData.publicFilters  )]
+  const FILTERS = [ ...(myFiltersData === undefined ? [] : myFiltersData.myFilters  )];//, ...(publicFiltersLoading ? [] : publicFiltersData.publicFilters  )]
+
+  console.log(localCache);
 
   return (
     <div>
@@ -305,7 +322,7 @@ export default function TasksSidebar(props) {
         onChange={project => {
           if (project.id !== -1){
             setCurrentProject(project);
-            selectedProject(project);
+            client.writeData({ data: { project } });
           } else {
             setOpenProjectAdd(true);
           }
@@ -335,7 +352,7 @@ export default function TasksSidebar(props) {
             onChange={milestone => {
               if (milestone.id !== -1){
                 setCurrentMilestone(milestone);
-                selectedMilestone(milestone);
+                client.writeData({ data: { milestone } });
               } else{
                 setOpenMilestoneAdd(true);
               }
@@ -373,10 +390,9 @@ export default function TasksSidebar(props) {
               history.push(`/helpdesk/taskList/i/all`);
               setActiveTab( (activeTab === 0 ? 1 : 0) );
               setFilter(getEmptyFilter());
-            //  filter(getEmptyFilter());
+    //          client.writeData({ data: { filter: getEmptyFilter() } });
               //CHANGE LOCAL CACHE
               //this.props.setHelpSidebarFilter(null);
-              //this.props.setFilter(getEmptyFilter());
             }}
             >
             <i className="fa fa-plus pull-right m-r-5 m-t-5 clickable" />
@@ -423,7 +439,7 @@ export default function TasksSidebar(props) {
                       updatedAt: moment().unix(),
                     }
                     setFilter({...item, filter: newFilter});
-                  //  filter(newFilter);
+            //        client.writeData({ data: { filter: newFilter } });
                   }}
                   >
                   {item.title}
@@ -438,7 +454,7 @@ export default function TasksSidebar(props) {
                         ...item.filter,
                         updatedAt: moment().unix(),
                       }
-              //        filter(newFilter);
+          //            client.writeData({ data: { filter: item.filter } });
                       setActiveTab(1);
                     }
                   }}
