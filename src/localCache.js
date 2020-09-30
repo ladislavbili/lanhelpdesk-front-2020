@@ -1,11 +1,8 @@
 
 import { makeVar } from "@apollo/client";
-import { getFixedFilters } from "configs/fixedFilters";
 
-export const selectedProject = makeVar(null);
-export const selectedMilestone = makeVar(null);
-export const filters = makeVar([]);
-export const filter = makeVar(getFixedFilters()[0]);
+export const filter = makeVar(null);
+export const generalFilter = makeVar(null);
 export const showDataFilter = makeVar({
   id: "",
   title: "",
@@ -17,6 +14,3 @@ export const showDataFilter = makeVar({
   deadline: "",
 });
 export const filterName = makeVar("All tasks");
-export const search = makeVar("");
-export const tasklistLayout = makeVar(0);
-export const currentUser = makeVar({});

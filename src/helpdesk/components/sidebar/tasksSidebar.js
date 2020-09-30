@@ -16,12 +16,12 @@ import ProjectAdd from '../projects/projectAddContainer';
 import MilestoneEdit from '../milestones/milestoneEdit';
 import MilestoneAdd from '../milestones/milestoneAdd';
 
-import { getEmptyFilter } from 'configs/fixedFilters';
+import { getEmptyFilter, getEmptyGeneralFilter } from 'configs/fixedFilters';
 import { toSelArr } from 'helperFunctions';
 import { dashboard, addProject, allMilestones, addMilestone } from 'configs/constants/sidebar';
 import moment from 'moment';
 
-//import { selectedProject, selectedMilestone,/* filter, filters, filterName */} from 'localCache';
+import { filter, generalFilter } from 'localCache';
 
 export const GET_PROJECTS = gql`
 query {
@@ -222,9 +222,110 @@ const LOCAL_CACHE = gql`
   query getLocalCache {
     project @client
     milestone @client
+    generalFilter @client {
+      id
+      createdAt
+      updatedAt
+      createdBy {
+        id
+        email
+      }
+      title
+      pub
+      global
+      dashboard
+      order
+      filter {
+        assignedToCur
+        assignedTo {
+          id
+          email
+        }
+        requesterCur
+        requester {
+          id
+          email
+        }
+        companyCur
+        company {
+          id
+          title
+        }
+        taskType {
+          id
+          title
+        }
+        oneOf
+        updatedAt
+
+        statusDateFrom
+        statusDateFromNow
+        statusDateTo
+        statusDateToNow
+        pendingDateFrom
+        pendingDateFromNow
+        pendingDateTo
+        pendingDateToNow
+        closeDateFrom
+        closeDateFromNow
+        closeDateTo
+        closeDateToNow
+        deadlineFrom
+        deadlineFromNow
+        deadlineTo
+        deadlineToNow
+      }
+      roles {
+        id
+        title
+      }
+      project {
+        id
+        title
+      }
+    }
+    filter @client {
+      assignedToCur
+      assignedTo {
+        id
+        email
+      }
+      requesterCur
+      requester {
+        id
+        email
+      }
+      companyCur
+      company {
+        id
+        title
+      }
+      taskType {
+        id
+        title
+      }
+      oneOf
+      updatedAt
+
+      statusDateFrom
+      statusDateFromNow
+      statusDateTo
+      statusDateToNow
+      pendingDateFrom
+      pendingDateFromNow
+      pendingDateTo
+      pendingDateToNow
+      closeDateFrom
+      closeDateFromNow
+      closeDateTo
+      closeDateToNow
+      deadlineFrom
+      deadlineFromNow
+      deadlineTo
+      deadlineToNow
+    }
   }
-`
-;
+`;
 
 export default function TasksSidebar(props) {
   //data & queries
@@ -233,7 +334,7 @@ export default function TasksSidebar(props) {
   const { data: projectsData, loading: projectsLoading, refetch: projectsRefetch } = useQuery(GET_PROJECTS);
   const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS);
 //  const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
-const { data: localCache } = useQuery(LOCAL_CACHE);
+  const { data: localCache } = useQuery(LOCAL_CACHE);
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
@@ -247,8 +348,6 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
   const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ) );
   const [ currentProject, setCurrentProject ] = React.useState( projects[0] );
   const [ currentMilestone, setCurrentMilestone ] = React.useState( allMilestones );
-
-  const [ filter, setFilter ] = React.useState( getEmptyFilter() );
 
   // sync
   React.useEffect( () => {
@@ -267,10 +366,14 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
       const index = pro.findIndex(p => p.id === currentProject.id);
       if (index >= 0 && pro[index].id === null) {
         setCurrentProject( (index >= 0 ? pro[index] : [dashboard]) );
-        client.writeData({ data: { project: null } });
+        client.writeData({ data: { project: null, filter: null } });
       } else if (index >= 0) {
         setCurrentProject( pro[index] );
-        client.writeData({ data: { project: pro[index] } });
+        client.writeData({ data: {
+          project: pro[index].id
+        } });
+        filter( getEmptyFilter() );
+        generalFilter( {...getEmptyGeneralFilter(), project: pro[index]} );
       }
     }
   }, [projectsData]);
@@ -279,8 +382,8 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
     if (!myFiltersLoading){
       if (!isNaN(location.pathname.slice(location.pathname.lastIndexOf("/") + 1))) {
         const newFilter = myFiltersData.myFilters.find(item => item.id === parseInt(location.pathname.slice(location.pathname.lastIndexOf("/") + 1) ) );
-        console.log(newFilter);
-  //      client.writeData({ data: { filter: newFilter.filter } });
+        filter( newFilter.filter );
+        generalFilter( newFilter );
       }
     }
   }, [myFiltersLoading]);
@@ -296,12 +399,12 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
       const pro = (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
       setProjects(pro);
       setCurrentProject( newProject );
-      client.writeData({ data: { project: newProject } });
+      client.writeData({ data: { project: newProject.id } });
+      filter( getEmptyFilter() );
+      generalFilter( {...getEmptyGeneralFilter(), project: newProject} );
   }
 
   const FILTERS = [ ...(myFiltersData === undefined ? [] : myFiltersData.myFilters  )];//, ...(publicFiltersLoading ? [] : publicFiltersData.publicFilters  )]
-
-  console.log(localCache);
 
   return (
     <div>
@@ -322,7 +425,9 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
         onChange={project => {
           if (project.id !== -1){
             setCurrentProject(project);
-            client.writeData({ data: { project } });
+            client.writeData({ data: { project: project } });
+            filter( getEmptyFilter() );
+            generalFilter( {...getEmptyGeneralFilter(), project: project} );
           } else {
             setOpenProjectAdd(true);
           }
@@ -352,7 +457,7 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
             onChange={milestone => {
               if (milestone.id !== -1){
                 setCurrentMilestone(milestone);
-                client.writeData({ data: { milestone } });
+                client.writeData({ data: { milestone: milestone } });
               } else{
                 setOpenMilestoneAdd(true);
               }
@@ -389,10 +494,8 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
             onClick={() => {
               history.push(`/helpdesk/taskList/i/all`);
               setActiveTab( (activeTab === 0 ? 1 : 0) );
-              setFilter(getEmptyFilter());
-    //          client.writeData({ data: { filter: getEmptyFilter() } });
-              //CHANGE LOCAL CACHE
-              //this.props.setHelpSidebarFilter(null);
+              filter( getEmptyFilter() );
+              generalFilter( getEmptyGeneralFilter() );
             }}
             >
             <i className="fa fa-plus pull-right m-r-5 m-t-5 clickable" />
@@ -438,8 +541,8 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
                       deadlineToNow: item.filter.deadlineToNow === true,
                       updatedAt: moment().unix(),
                     }
-                    setFilter({...item, filter: newFilter});
-            //        client.writeData({ data: { filter: newFilter } });
+                    filter(newFilter);
+                    generalFilter(item);
                   }}
                   >
                   {item.title}
@@ -454,7 +557,8 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
                         ...item.filter,
                         updatedAt: moment().unix(),
                       }
-          //            client.writeData({ data: { filter: item.filter } });
+                      filter(item.filter);
+                      generalFilter(item);
                       setActiveTab(1);
                     }
                   }}
@@ -468,10 +572,13 @@ const { data: localCache } = useQuery(LOCAL_CACHE);
         </TabPane>
         <TabPane tabId={1}>
           <Filter
-            filterID={filter ? filter.id : null}
+            filterID={filter() ? filter().id : null}
             history={history}
-            filterData={filter}
-            resetFilter={()=> {/*filter(getEmptyFilter())*/}}
+            filterData={filter()}
+            resetFilter={()=> {
+              filter(getEmptyFilter());
+              generalFilter(getEmptyGeneralFilter());
+            }}
             close={ () => setActiveTab(0)}
             />
         </TabPane>

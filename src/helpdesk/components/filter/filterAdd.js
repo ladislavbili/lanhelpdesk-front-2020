@@ -166,7 +166,7 @@ query {
 
 export default function FilterAdd(props){
   //data & queries
-  const { history, filter, filterID, bigFilter } = props;
+  const { history, filter, filterID, generalFilter } = props;
   const { data } = useQuery(GET_MY_DATA);
   const { data: roleData, loading: roleLoading } = useQuery(GET_ROLES);
   const { data: projectData, loading: projectLoading } = useQuery(GET_PROJECTS);
@@ -194,13 +194,13 @@ export default function FilterAdd(props){
   }
 
   React.useEffect(() => {
-    if (filterID && bigFilter) {
-      setTitle(bigFilter.title);
-      setPub(bigFilter.pub);
-      setGlobal(bigFilter.global);
-      setDashboard(bigFilter.dashboard);
-      setProject(bigFilter.project ? toSelItem(bigFilter.project) : null);
-      setChosenRoles(bigFilter.roles ? toSelArr(bigFilter.roles) : []);
+    if (filterID && generalFilter) {
+      setTitle(generalFilter.title);
+      setPub(generalFilter.pub);
+      setGlobal(generalFilter.global);
+      setDashboard(generalFilter.dashboard);
+      setProject(generalFilter.project ? toSelItem(generalFilter.project) : null);
+      setChosenRoles(generalFilter.roles ? toSelArr(generalFilter.roles) : []);
     }
   }, [filterID]);
 

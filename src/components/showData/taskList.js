@@ -1,4 +1,6 @@
 import React from 'react';
+import { useQuery, useApolloClient  } from "@apollo/react-hooks";
+import gql from "graphql-tag";
 import { Modal, ModalBody } from 'reactstrap';
 import {getItemDisplayValue} from '../../helperFunctions';
 import CommandBar from './commandBar';
@@ -7,25 +9,151 @@ import Checkbox from '../checkbox';
 
 import MultipleTaskEdit from '../../helpdesk/task/multipleTaskEdit';
 
-import {/* filterName, filter, */showDataFilter, currentUser } from 'localCache';
+import { filterName, filter  } from 'localCache';
+
+const GET_MY_DATA = gql`
+query {
+  getMyData{
+		fullName
+  }
+}
+`;
+
+const LOCAL_CACHE = gql`
+  query getLocalCache {
+    project @client
+    milestone @client
+    generalFilter @client {
+      id
+      createdAt
+      updatedAt
+      createdBy {
+        id
+        email
+      }
+      title
+      pub
+      global
+      dashboard
+      order
+      filter {
+        assignedToCur
+        assignedTo {
+          id
+          email
+        }
+        requesterCur
+        requester {
+          id
+          email
+        }
+        companyCur
+        company {
+          id
+          title
+        }
+        taskType {
+          id
+          title
+        }
+        oneOf
+        updatedAt
+
+        statusDateFrom
+        statusDateFromNow
+        statusDateTo
+        statusDateToNow
+        pendingDateFrom
+        pendingDateFromNow
+        pendingDateTo
+        pendingDateToNow
+        closeDateFrom
+        closeDateFromNow
+        closeDateTo
+        closeDateToNow
+        deadlineFrom
+        deadlineFromNow
+        deadlineTo
+        deadlineToNow
+      }
+      roles {
+        id
+        title
+      }
+      project {
+        id
+        title
+      }
+    }
+    filter @client {
+      assignedToCur
+      assignedTo {
+        id
+        email
+      }
+      requesterCur
+      requester {
+        id
+        email
+      }
+      companyCur
+      company {
+        id
+        title
+      }
+      taskType {
+        id
+        title
+      }
+      oneOf
+      updatedAt
+
+      statusDateFrom
+      statusDateFromNow
+      statusDateTo
+      statusDateToNow
+      pendingDateFrom
+      pendingDateFromNow
+      pendingDateTo
+      pendingDateToNow
+      closeDateFrom
+      closeDateFromNow
+      closeDateTo
+      closeDateToNow
+      deadlineFrom
+      deadlineFromNow
+      deadlineTo
+      deadlineToNow
+    }
+  }
+`
+;
 
 export default function List (props) {
 	const { history, link, commandBar, listName, statuses, setStatuses, allStatuses, displayValues, data, deleteTask, checkTask } = props;
 	const [ checkedAll, setCheckedAll ] = React.useState(false);
 	const [ editOpen, setEditOpen ] = React.useState(false);
+	const { data: localCache } = useQuery(LOCAL_CACHE);
+
+	const currentUser = data ? data.getMyData : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+
+	const client = useApolloClient();
 
 	const clearFilter = () => {
 		if(window.confirm("Are you sure you want to clear the filter?")){
-			showDataFilter({
-			  id: "",
-			  title: "",
-			  status: "",
-			  requester: "",
-			  company: "",
-			  assignedTo: "",
-			  createdAt: "",
-			  deadline: "",
-			});
+			client.writeData({ data: {
+				showDataFilter: {
+				  id: "",
+				  title: "",
+				  status: "",
+				  requester: "",
+				  company: "",
+				  assignedTo: "",
+				  createdAt: "",
+				  deadline: "",
+				}
+			} });
 		}
 	}
 
@@ -101,7 +229,7 @@ export default function List (props) {
 														/>
 												</th>
 											}else {
-												const value = (showDataFilter()[display.value] === "cur" ? currentUser().fullName : showDataFilter()[display.value]);
+												const value = (localCache.showDataFilter[display.value] === "cur" ? currentUser().fullName : localCache.showDataFilter[display.value]);
 												return <th key={display.value} colSpan={((index===0 || index ===1 || displayValues[index-1].type!=='important') )?'1':'2'} >
 													<div className={(display.value === "deadline" ? "row" : "")}>
 
@@ -112,9 +240,9 @@ export default function List (props) {
 																className="form-control hidden-input"
 																style={{fontSize: "12px", marginRight: "10px"}}
 																onChange={(e) => {
-																	let newShowDataFilter = {...showDataFilter()};
+																	let newShowDataFilter = {...localCache.showDataFilter};
 																	newShowDataFilter[display.value] = e.target.value;
-																	showDataFilter(newShowDataFilter);
+																	client.writeData({ data: { showDataFilter: newShowDataFilter } });
 																}}/>
 															</div>
 													{display.value === "deadline" &&
@@ -160,7 +288,7 @@ export default function List (props) {
 														if(display.value === 'checked'){
 															return true;
 														}
-														let result = value.toString().toLowerCase().includes(showDataFilter()[display.value].toLowerCase());
+														let result = value.toString().toLowerCase().includes(localCache.showDataFilter[display.value].toLowerCase());
 														return result;
 													});
 									}).map((item)=>

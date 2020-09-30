@@ -1,31 +1,46 @@
 import moment from 'moment';
 
+export const getEmptyGeneralFilter = () => ({
+  id: null,
+  createdAt: "",
+  updatedAt: "",
+  createdBy: null,
+  title: "",
+  pub: false,
+  global: false,
+  dashboard: false,
+  order: false,
+  filter: getEmptyFilter(),
+  roles: null,
+  project: null,
+})
+
 export const getEmptyFilter = () => ({
-  oneOf: [],
-  requester:null,
-  requesterCur: false,
-  company:null,
-  companyCur: false,
-  assignedTo:null,
   assignedToCur: false,
+  assignedTo:null,
+  requesterCur: false,
+  requester:null,
+  companyCur: false,
+  company:null,
   taskType:null,
+  oneOf: [],
+
   statusDateFrom: null,
+  statusDateFromNow: false,
   statusDateTo: null,
-  statusDateFromNow: null,
-  statusDateToNow: null,
+  statusDateToNow: false,
   closeDateFrom: null,
+  closeDateFromNow: false,
   closeDateTo: null,
-  closeDateFromNow: null,
-  closeDateToNow: null,
+  closeDateToNow: false,
   pendingDateFrom: null,
+  pendingDateFromNow: false,
   pendingDateTo: null,
-  pendingDateFromNow: null,
-  pendingDateToNow: null,
+  pendingDateToNow: false,
   deadlineFrom: null,
+  deadlineFromNow: false,
   deadlineTo: null,
-  deadlineFromNow: null,
-  deadlineToNow: null,
-  updatedAt: moment().unix()
+  deadlineToNow: false,
 })
 
 export const getFixedFilters = (  ) => {

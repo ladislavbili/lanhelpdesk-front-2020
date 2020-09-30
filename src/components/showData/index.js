@@ -1,15 +1,143 @@
 import React from 'react';
+import { useQuery, useApolloClient  } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+
 import TaskCol from './taskCol';
 import TaskList from './taskList';
 import TaskListDnD from './taskListDnD';
 import {timestampToString} from '../../helperFunctions';
 //import {setSearch, setFilter, addShowDataFilter } from '../../redux/actions';
 
-import { search, /*filter, */filterName, tasklistLayout } from 'localCache';
+import { filter, filterName, generalFilter } from 'localCache';
+
+const GET_MY_DATA = gql`
+query {
+  getMyData{
+    tasklistLayout
+  }
+}
+`;
+
+const LOCAL_CACHE = gql`
+  query getLocalCache {
+    project @client
+    milestone @client
+		search @client
+    generalFilter @client {
+      id
+      createdAt
+      updatedAt
+      createdBy {
+        id
+        email
+      }
+      title
+      pub
+      global
+      dashboard
+      order
+      filter {
+        assignedToCur
+        assignedTo {
+          id
+          email
+        }
+        requesterCur
+        requester {
+          id
+          email
+        }
+        companyCur
+        company {
+          id
+          title
+        }
+        taskType {
+          id
+          title
+        }
+        oneOf
+        updatedAt
+
+        statusDateFrom
+        statusDateFromNow
+        statusDateTo
+        statusDateToNow
+        pendingDateFrom
+        pendingDateFromNow
+        pendingDateTo
+        pendingDateToNow
+        closeDateFrom
+        closeDateFromNow
+        closeDateTo
+        closeDateToNow
+        deadlineFrom
+        deadlineFromNow
+        deadlineTo
+        deadlineToNow
+      }
+      roles {
+        id
+        title
+      }
+      project {
+        id
+        title
+      }
+    }
+    filter @client {
+      assignedToCur
+      assignedTo {
+        id
+        email
+      }
+      requesterCur
+      requester {
+        id
+        email
+      }
+      companyCur
+      company {
+        id
+        title
+      }
+      taskType {
+        id
+        title
+      }
+      oneOf
+      updatedAt
+
+      statusDateFrom
+      statusDateFromNow
+      statusDateTo
+      statusDateToNow
+      pendingDateFrom
+      pendingDateFromNow
+      pendingDateTo
+      pendingDateToNow
+      closeDateFrom
+      closeDateFromNow
+      closeDateTo
+      closeDateToNow
+      deadlineFrom
+      deadlineFromNow
+      deadlineTo
+      deadlineToNow
+    }
+  }
+`;
 
 export default function ShowDataContainer (props){
+	const { data: userData } = useQuery(GET_MY_DATA);
+	const { data: localCache } = useQuery(LOCAL_CACHE);
+
 	//data
 	const { match, history, data,  filterBy, ascending, orderBy, orderByValues, displayValues, useBreadcrums, breadcrumsData, listName, empty, itemID, link, displayCol, isTask, setStatuses, statuses, allStatuses, Edit, dndGroupData, dndGroupAttribute, calendarAllDayData, calendarEventsData, checkTask, deleteTask } = props;
+
+  const client = useApolloClient();
+	const currentUser = userData ? userData.getMyData : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
 	//state
 	const [ filterView ] = React.useState(false);
@@ -62,7 +190,7 @@ export default function ShowDataContainer (props){
 					filterString+= item[value.value].email+' '+item[value.value].name+' '+item[value.value].surname + " ";
 				}
 			});
-			return filterString.toLowerCase().includes(search().toLowerCase());
+			return filterString.toLowerCase().includes(localCache.search.toLowerCase());
 		}).sort((item1,item2)=>{
 			let val1 = getSortValue(item1);
 			let val2 = getSortValue(item2);
@@ -110,7 +238,7 @@ export default function ShowDataContainer (props){
 		<div className="content-page">
 			<div className="content" style={{ paddingTop: 0 }}>
 				<div className="row m-0">
-					{tasklistLayout() === 0 && (
+					{currentUser.tasklistLayout === 0 && (
 						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
 							<TaskCol
 								commandBar={props}
@@ -134,7 +262,7 @@ export default function ShowDataContainer (props){
 					)}
 
 {/* filter[filterName]!==undefined &&*/}
-					{tasklistLayout() === 1 && (
+					{currentUser.tasklistLayout === 1 && (
 						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
 							{itemID && <Edit match={match} columns={false} history={history} />}
 							{!itemID &&
@@ -159,7 +287,7 @@ export default function ShowDataContainer (props){
 						</div>
 					)}
 
-					{tasklistLayout() === 2 && (
+					{currentUser.tasklistLayout === 2 && (
 						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
 							{itemID && <edit match={match} columns={false} history={history} />}
 							{!itemID &&
@@ -184,7 +312,7 @@ export default function ShowDataContainer (props){
 							}
 						</div>
 					)}
-					{tasklistLayout() === 3 && (
+					{currentUser.tasklistLayout === 3 && (
 						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
 							<calendar
 								commandBar={props}

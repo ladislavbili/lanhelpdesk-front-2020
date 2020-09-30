@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useApolloClient } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Loading from 'components/loading';
@@ -12,7 +12,7 @@ import TaskEdit from './taskEditContainer';
 import TaskEmpty from './taskEmpty';
 import TaskCalendar from '../calendar';
 
-import {  filter, filterName, selectedProject, selectedMilestone/*, tasklistLayout */} from 'localCache';
+import {  filter, filterName, generalFilter} from 'localCache';
 
 import moment from 'moment';
 
@@ -28,6 +28,7 @@ query tasks($filter: FilterInput, $projectId: Int){
     title
 		updatedAt
 		createdAt
+    important
 		closeDate
     overtime
     pausal
@@ -86,11 +87,6 @@ query tasks($filter: FilterInput, $projectId: Int){
   }
 }
 `;
-
-/*
-important
-
-*/
 
 const GET_MY_DATA = gql`
 query {
@@ -166,15 +162,132 @@ query {
 `;
 
 
+const LOCAL_CACHE = gql`
+  query getLocalCache {
+    project @client
+    milestone @client
+    filterName @client
+    generalFilter @client {
+      id
+      createdAt
+      updatedAt
+      createdBy {
+        id
+        email
+      }
+      title
+      pub
+      global
+      dashboard
+      order
+      filter {
+        assignedToCur
+        assignedTo {
+          id
+          email
+        }
+        requesterCur
+        requester {
+          id
+          email
+        }
+        companyCur
+        company {
+          id
+          title
+        }
+        taskType {
+          id
+          title
+        }
+        oneOf
+        updatedAt
+
+        statusDateFrom
+        statusDateFromNow
+        statusDateTo
+        statusDateToNow
+        pendingDateFrom
+        pendingDateFromNow
+        pendingDateTo
+        pendingDateToNow
+        closeDateFrom
+        closeDateFromNow
+        closeDateTo
+        closeDateToNow
+        deadlineFrom
+        deadlineFromNow
+        deadlineTo
+        deadlineToNow
+      }
+      roles {
+        id
+        title
+      }
+      project {
+        id
+        title
+      }
+    }
+    filter @client {
+      assignedToCur
+      assignedTo {
+        id
+        email
+      }
+      requesterCur
+      requester {
+        id
+        email
+      }
+      companyCur
+      company {
+        id
+        title
+      }
+      taskType {
+        id
+        title
+      }
+      oneOf
+      updatedAt
+
+      statusDateFrom
+      statusDateFromNow
+      statusDateTo
+      statusDateToNow
+      pendingDateFrom
+      pendingDateFromNow
+      pendingDateTo
+      pendingDateToNow
+      closeDateFrom
+      closeDateFromNow
+      closeDateTo
+      closeDateToNow
+      deadlineFrom
+      deadlineFromNow
+      deadlineTo
+      deadlineToNow
+    }
+  }
+`;
+
 export default function TasksIndex (props) {
   //data & queries
   const { history, match, /*calendarEvents, orderBy, */setTasksOrderBy, ascending, setTasksAscending, statuses, setUserFilterStatuses } = props;
   const { data, loading } = useQuery(GET_MY_DATA);
-  const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, { variables: {filter: null, projectId: null }, options: { fetchPolicy: 'network-only' }});
-  const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS, { options: { fetchPolicy: 'network-only' }});
-  const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
+  const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, { variables: {filter, projectId: ( generalFilter && generalFilter.project ? generalFilter.project.id : null ) }});
+  const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS);
+//  const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
+  const { data: localCache } = useQuery(LOCAL_CACHE);
 
   const currentUser = data ? data.getMyData : {};
+
+  const client = useApolloClient();
+
+  console.log("REFETCH");
+  console.log(filter());
+  console.log(tasksData);
 
 	// sync
 	React.useEffect( () => {
@@ -182,40 +295,39 @@ export default function TasksIndex (props) {
 	}, [match.params.listID]);
 
 	React.useEffect( () => {
-			getFilterName();
-	}, [filter]);
+    getFilterName();
+	}, [ generalFilter ]);
 
 	React.useEffect( () => {
 	}, [filterName]);
 
+  React.useEffect( () => {
+			getFilterName();
+	}, [match.params.listID]);
+
 	const getFilterName = () => {
-		let id = match.params.listID;
-		let filter = fixedFilters.find( (filter) => filter.id === id );
-		if(!id){
-			filterName("");
-			return;
-		}else if( filter !== undefined ){
-			filterName(filter.title);
-			return;
-		}
-		filter = [...(myFiltersData ? myFiltersData.myFilters : []), ...(publicFiltersData ? publicFiltersData.publicFilters : [])].find((filter)=>filter.id===id);
-		if(filter){
-			filterName(filter.title);
-		}
+		if (localCache && localCache.generalFilter){
+      client.writeData({ data: { filterName: localCache.generalFilter.title } });
+		} else {
+      client.writeData({ data: { filterName: "All tasks" } });
+    }
 	}
 
   const filterTasks = () => {
-    //let ref = tasksRefetch( { variables: {filter: filter(), projectId: (selectedProject() ? selectedProject().id : null) }, options: { fetchPolicy: 'network-only' }});
-  	return tasksData ? tasksData.tasks.filter(task => (selectedMilestone() === null) || (task.milestone ? (task.milestone.id === selectedMilestone().id) : false ) ) : [];
+    //let ref = tasksRefetch( { variables: {filter: filter(), projectId: (seProject() ? seProject().id : null) }, options: { fetchPolicy: 'network-only' }});
+  	return tasksData ? tasksData.tasks.filter(task => (localCache && localCache.milestone === null) || (task.milestone ? (task.milestone.id === localCache.milestone.id) : false ) ) : [];
   }
 
 const getBreadcrumsData = () => {
+  if (!localCache){
+    return [ {}, {}, {} ];
+  }
 	return [
 		{
 			type:'project',
-			show: selectedProject() !== null,
-			data: selectedProject(),
-			label: selectedProject() ? selectedProject().title : 'Invalid project',
+			show: localCache.project !== null,
+			data: localCache.project,
+			label: localCache.project ? localCache.project.title : 'Invalid project',
 			onClick:()=>{
 	/*			this.props.setHelpSidebarMilestone(allMilestones);
 				this.props.setMilestone(null);
@@ -226,9 +338,9 @@ const getBreadcrumsData = () => {
 		},
 		{
 			type:'milestone',
-			show: selectedProject() !== null,
-			data: selectedMilestone(),
-			label: selectedMilestone() ? selectedMilestone().title : 'Invalid milestone',
+			show: localCache.project !== null,
+			data: localCache.milestone,
+			label: localCache.milestone ? localCache.milestone.title : 'Invalid milestone',
 			onClick:()=>{
 			/*	this.props.setHelpSidebarFilter(null);
 				this.props.setFilter(getEmptyFilter());*/
@@ -501,7 +613,7 @@ const getCalendarAllDayData = (tasks) => {/*
 		link = '/helpdesk/taskList'
 	}
 
-  const dataLoading = loading || tasksLoading || myFiltersLoading || publicFiltersLoading;
+  const dataLoading = loading || tasksLoading || myFiltersLoading;
 
 	if (dataLoading) {
 		return (<Loading />);

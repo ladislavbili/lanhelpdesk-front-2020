@@ -5,12 +5,11 @@ import {Dropdown, DropdownItem, DropdownMenu, DropdownToggle} from 'reactstrap';
 import {Link} from 'react-router-dom';
 import classnames from 'classnames';
 
-import { tasklistLayout } from 'localCache';
-
 const GET_MY_DATA = gql`
 query {
   getMyData{
     id
+    tasklistLayout
     role {
       accessRights {
         publicFilters
@@ -71,7 +70,7 @@ export default function PageHeader(props) {
   }
 
   const getLayoutIcon = () => {
-    switch (tasklistLayout()) {
+    switch (currentUser.tasklistLayout) {
       case 0:
         return "fa-columns";
       case 1:
@@ -83,6 +82,10 @@ export default function PageHeader(props) {
       default:
         return "fa-cog";
     }
+  }
+
+  const setTasklistLayout = (value) => {
+    
   }
 
   const processNotifications = () => {
@@ -145,24 +148,24 @@ export default function PageHeader(props) {
               </DropdownToggle>
               <DropdownMenu right>
                 <div className="btn-group-vertical" data-toggle="buttons">
-                  <label className={classnames({'active':tasklistLayout() === 0}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" onChange={() => {tasklistLayout(0); console.log("buuuuuuuuuuuu");}} checked={tasklistLayout() === 0}/>
+                  <label className={classnames({'active':currentUser.tasklistLayout === 0}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                    <input type="radio" name="options" onChange={() => setTasklistLayout(0)} checked={currentUser.tasklistLayout === 0}/>
                     <i className="fa fa-columns"/>
                   </label>
-                  <label className={classnames({'active':tasklistLayout() === 1}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" checked={tasklistLayout() === 1} onChange={() => {tasklistLayout(1); console.log("aaaaaaaaa");}}/>
+                  <label className={classnames({'active':currentUser.tasklistLayout === 1}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                    <input type="radio" name="options" checked={currentUser.tasklistLayout === 1} onChange={() => setTasklistLayout(1)}/>
                     <i className="fa fa-list"/>
                   </label>
                   { dndLayout &&
-                    <label className={classnames({'active':tasklistLayout() === 2}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => tasklistLayout(2)} checked={tasklistLayout() === 2}/>
+                    <label className={classnames({'active':currentUser.tasklistLayout === 2}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                      <input type="radio" name="options" onChange={() => setTasklistLayout(2)} checked={currentUser.tasklistLayout === 2}/>
                       <i className="fa fa-map"/>
                     </label>
                   }
 
                   { calendarLayout &&
-                    <label className={classnames({'active':tasklistLayout() === 3}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => tasklistLayout(3)} checked={tasklistLayout() === 3}/>
+                    <label className={classnames({'active':currentUser.tasklistLayout === 3}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
+                      <input type="radio" name="options" onChange={() => setTasklistLayout(3)} checked={currentUser.tasklistLayout === 3}/>
                       <i className="fa fa-calendar-alt"/>
                     </label>
                   }

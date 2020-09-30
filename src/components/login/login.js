@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Button, FormGroup, Label,Input } from 'reactstrap';
 
-import { currentUser } from 'localCache';
-
 export default class Login extends Component {
 	constructor(props) {
 		super(props);
@@ -24,7 +22,6 @@ export default class Login extends Component {
 			this.props.client.writeData({ data: { isLoggedIn: true } });
 			console.log("LOGIN RESPONSE");
 			console.log(response);
-			currentUser(response.data.loginUser);
 		}).catch( (err) => {
 			this.setState({error: err.message, signingIn:false});
 		});
