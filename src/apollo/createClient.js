@@ -6,14 +6,20 @@ import { setContext } from 'apollo-link-context';
 import { resolvers, typeDefs } from "./localSchema";
 import { from as ApolloFrom, Observable } from 'apollo-link';
 import { onError } from 'apollo-link-error';
-
+import { createUploadLink } from 'apollo-upload-client';
 import { afterNow } from '../helperFunctions';
 import axios from 'axios';
 
 import {REST_URL} from 'configs/restAPI';
-
-
 const cache = new InMemoryCache();
+
+
+const uploadLink = createUploadLink({uri: `${REST_URL}/graphql`})
+export const secondaryClient = new ApolloClient({
+  cache,
+  link: uploadLink
+});
+
 const link = new HttpLink({
   uri: `${REST_URL}/graphql`,
   credentials: "include"
@@ -102,7 +108,7 @@ function processErrors( {graphQLErrors, operation, forward, ...rest } ) {
 export default function createClient(){
   const client = new ApolloClient({
     cache,
-    link: ApolloFrom([onError(processErrors), authLink, link]),
+    link: ApolloFrom([onError(processErrors), authLink, link, uploadLink]),
     typeDefs,
     resolvers
   });
