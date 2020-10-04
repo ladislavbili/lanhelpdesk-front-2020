@@ -1,16 +1,8 @@
-
 import { makeVar } from "@apollo/client";
 
-export const filter = makeVar(null);
+import { getEmptyFilter } from 'configs/fixedFilters';
+
+export const filter = makeVar(getEmptyFilter());
 export const generalFilter = makeVar(null);
-export const showDataFilter = makeVar({
-  id: "",
-  title: "",
-  status: "",
-  requester: "",
-  company: "",
-  assignedTo: "",
-  createdAt: "",
-  deadline: "",
-});
 export const filterName = makeVar("All tasks");
+export const project = makeVar(null);

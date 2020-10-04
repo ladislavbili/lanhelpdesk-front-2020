@@ -150,6 +150,7 @@ query {
       title
     }
     filter {
+      oneOf
       assignedToCur
       assignedTo {
         id
@@ -380,8 +381,8 @@ export default function TasksSidebar(props) {
 
   React.useEffect( () => {
     if (!myFiltersLoading){
-      if (!isNaN(location.pathname.slice(location.pathname.lastIndexOf("/") + 1))) {
-        const newFilter = myFiltersData.myFilters.find(item => item.id === parseInt(location.pathname.slice(location.pathname.lastIndexOf("/") + 1) ) );
+      if (!isNaN(location.pathname.slice(location.pathname.lastIndexOf("i/") + 2))) {
+        const newFilter = myFiltersData.myFilters.find(item => item.id === parseInt(location.pathname.slice(location.pathname.lastIndexOf("i/") + 2) ) );
         filter( newFilter.filter );
         generalFilter( newFilter );
       }

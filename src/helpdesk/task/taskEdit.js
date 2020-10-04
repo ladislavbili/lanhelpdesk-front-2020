@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useLazyQuery } from "@apollo/react-hooks";
+import { useMutation, useQuery, useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Select from 'react-select';
@@ -29,11 +29,27 @@ import ck5config from 'configs/components/ck5config';
 
 import datePickerConfig from 'configs/components/datepicker';
 import PendingPicker from '../components/pendingPicker';
-import {toSelArr, toSelItem, timestampToString} from '../../helperFunctions';
+import {toSelArr, toSelItem, timestampToString, orderArr} from '../../helperFunctions';
 import {invisibleSelectStyleNoArrow, invisibleSelectStyleNoArrowColored,invisibleSelectStyleNoArrowColoredRequired, invisibleSelectStyleNoArrowRequired} from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect';
 import { noMilestone } from 'configs/constants/sidebar';
 import { noDef } from 'configs/constants/projects';
+
+const GET_MY_DATA = gql`
+query {
+  getMyData{
+    id
+    role {
+			level
+      accessRights {
+				viewInternal
+        projects
+        publicFilters
+      }
+    }
+  }
+}
+`;
 
 const GET_TASK = gql`
 query task($id: Int!){
@@ -578,9 +594,135 @@ mutation deleteCustomItem($id: Int!) {
 }
 `;
 
+const GET_PROJECTS = gql`
+query {
+  projects {
+		id
+		title
+		milestones{
+			id
+			title
+		}
+		lockedRequester
+		projectRights {
+			read
+			write
+			delete
+			internal
+			admin
+			user {
+				id
+				fullName
+				email
+			}
+		}
+		def {
+			assignedTo {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			company {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			overtime {
+				def
+				fixed
+				show
+				value
+			}
+			pausal {
+				def
+				fixed
+				show
+				value
+			}
+			requester {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			status {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			tag {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			taskType {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+		}
+  }
+}
+`;
+
+const GET_USERS = gql`
+query {
+  users{
+    id
+    email
+    username
+    role {
+      id
+      title
+    }
+    company {
+      id
+      title
+    }
+  }
+}
+`;
+
+const GET_STATUSES = gql`
+query {
+  statuses {
+    title
+    id
+    order
+  }
+}
+`;
+
+const GET_COMPANIES = gql`
+query {
+ companies {
+	 title
+	 id
+	 monthly
+ }
+}
+`;
+
 export default function TaskEdit (props){
 	//data & queries
-	const { match, history, columns, currentUser, accessRights, statuses, companies, users, allTags, projects, taskTypes, tripTypes, emails, inModal, closeModal } = props;
+	const { match, history, columns, allTags, taskTypes, tripTypes, emails, inModal, closeModal } = props;
   const [ getTask, {data: taskData, loading: taskLoading } ] = useLazyQuery(GET_TASK);
   const [ updateProjectRights ] = useMutation(UPDATE_PROJECT_RIGHTS);
   const [ updateTask/*, {client}*/ ] = useMutation(UPDATE_TASK);
@@ -598,6 +740,22 @@ export default function TaskEdit (props){
   const [ updateCustomItem ] = useMutation(UPDATE_CUSTOM_ITEM);
   const [ deleteCustomItem ] = useMutation(DELETE_CUSTOM_ITEM);
 
+	const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
+	const projects = (projectsLoading || !projectsData ? [] : projectsData.projects);
+
+	const { data: usersData, loading: usersLoading } = useQuery(GET_USERS);
+	const users = (usersLoading || !usersData ? [] : usersData.users);
+
+	const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
+	const statuses = (statusesLoading || !statusesData ? [] : orderArr(statusesData.statuses));
+
+	const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
+	const companies = (companiesLoading || !companiesData ? [] : orderArr(companiesData.companies));
+
+	const { data: myData, loading: myDataLoading } = useQuery(GET_MY_DATA);
+	const currentUser = myDataLoading && myData ? myData.getMyData : {};
+	const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+
   //state
   const [ layout, setLayout ] = React.useState(1);
 
@@ -613,7 +771,6 @@ export default function TaskEdit (props){
   const [ customItems, setCustomItems ] = React.useState([]);
   const [ deadline, setDeadline ] = React.useState(null);
   const [ description, setDescription ] = React.useState("");
-  //const [ invoicedDate, setInvoicedDate ] = React.useState(null);
   const [ important, setImportant ] = React.useState(false);
 	const [ materials, setMaterials ] = React.useState([]);
   const [ milestone, setMilestone ] = React.useState([noMilestone]);
@@ -624,11 +781,8 @@ export default function TaskEdit (props){
 	const [ pendingChangable, setPendingChangable ] = React.useState(false);
   const [ pendingDate, setPendingDate ] = React.useState(null);
   const [ pendingOpen, setPendingOpen ] = React.useState(false);
-//  const [ pendingStatus, setPendingStatus ] = React.useState(null);
   const [ project, setProject ] = React.useState(null);
   const [ projectChangeDate, setProjectChangeDate ] = React.useState(false);
-//  const [ print, setPrint ] = React.useState(false);
-//  const [ reminder, setReminder ] = React.useState(null);
   const [ repeat, setRepeat ] = React.useState(null);
   const [ requester, setRequester ] = React.useState(null);
   const [ saving, setSaving ] = React.useState(false);
@@ -649,14 +803,12 @@ export default function TaskEdit (props){
 
   const [ viewOnly, setViewOnly ] = React.useState(true);
 
-
 // sync
 React.useEffect( () => {
     if (!taskLoading && taskData){
-			console.log(taskData);
 			setAssignedTo(toSelArr(taskData.task.assignedTo, 'email'));
 			setCloseDate( timestampToString(parseInt(taskData.task.closeDate)) );
-			setComments( [...taskData.task.comments.map(item => ({...item, isMail: false})), ...emails.map(item => ({...item, isMail: true}))] );
+			setComments( taskData.task.comments );
 			setCompany( ( taskData.task.company ? {...taskData.task.company, value: taskData.task.company.id, label: taskData.task.company.title} : null) );
 			setCreatedBy(taskData.task.createdBy);
 			setCreatedAt( taskData.task.createdAt );
@@ -688,13 +840,15 @@ React.useEffect( () => {
 			setUsedTripPausal(taskData.task.company ? taskData.task.company.usedTripPausal : 0);
       setWorkTrips( (taskData.task.workTrips ? taskData.task.workTrips.map(item => ({...item, assignedTo: toSelItem(item.assignedTo, 'email'), type: toSelItem(item.type)}) ) : [] ) );
 
-      if (pro){
+      if (pro && currentUser !== {}){
+				console.log(currentUser);
         setDefaults(pro);
-        const userRights = pro ? pro.projectRights.find(r => r.user.id === currentUser.id) : false;
-        if (sta && sta.action==='Invoiced' && inModal && userRights.isAdmin) {
+        const userRights = pro ? pro.projectRights.find(r => r.user.id === currentUser.id) : {};
+				console.log(pro.projectRights, userRights);
+        if (sta && sta.action==='Invoiced' && inModal && userRights && userRights.admin) {
           setViewOnly(false);
         } else {
-          setViewOnly((sta && sta.action==='Invoiced') || (!userRights.isAdmin && !userRights.write));
+          setViewOnly((sta && sta.action==='Invoiced') || (userRights && !userRights.admin && !userRights.write));
         }
       }
     }
@@ -1195,7 +1349,7 @@ React.useEffect( () => {
 		}
 	});
 
-	const USERS_WITH_PERMISSIONS = users.filter((user)=> project && project.projectRights && project.projectRights.some((right)=>right.user.id === user.id));
+	const USERS_WITH_PERMISSIONS = project && project.projectRights ? project.projectRights.map((right)=>right.user) : [];
 
 	const REQUESTERS =  (project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users);
 

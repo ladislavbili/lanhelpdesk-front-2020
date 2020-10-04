@@ -6,10 +6,9 @@ import TaskCol from './taskCol';
 import TaskList from './taskList';
 import TaskListDnD from './taskListDnD';
 import {timestampToString} from '../../helperFunctions';
+//import {setSearch, setFilter, addShowDataFilter } from '../../redux/actions';
 
-import { filter, generalFilter } from 'localCache';
-
-import moment from 'moment';
+import { filter, filterName, generalFilter } from 'localCache';
 
 const GET_MY_DATA = gql`
 query {
@@ -21,53 +20,153 @@ query {
 
 const LOCAL_CACHE = gql`
   query getLocalCache {
+    project @client
     milestone @client
 		search @client
-		showDataFilter @client {
-			name
-			id
-			title
-			status
-			requester
-			company
-			assignedTo
-			createdAt
-			deadline
-		}
+    generalFilter @client {
+      id
+      createdAt
+      updatedAt
+      createdBy {
+        id
+        email
+      }
+      title
+      pub
+      global
+      dashboard
+      order
+      filter {
+        assignedToCur
+        assignedTo {
+          id
+          email
+        }
+        requesterCur
+        requester {
+          id
+          email
+        }
+        companyCur
+        company {
+          id
+          title
+        }
+        taskType {
+          id
+          title
+        }
+        oneOf
+        updatedAt
+
+        statusDateFrom
+        statusDateFromNow
+        statusDateTo
+        statusDateToNow
+        pendingDateFrom
+        pendingDateFromNow
+        pendingDateTo
+        pendingDateToNow
+        closeDateFrom
+        closeDateFromNow
+        closeDateTo
+        closeDateToNow
+        deadlineFrom
+        deadlineFromNow
+        deadlineTo
+        deadlineToNow
+      }
+      roles {
+        id
+        title
+      }
+      project {
+        id
+        title
+      }
+    }
+    filter @client {
+      assignedToCur
+      assignedTo {
+        id
+        email
+      }
+      requesterCur
+      requester {
+        id
+        email
+      }
+      companyCur
+      company {
+        id
+        title
+      }
+      taskType {
+        id
+        title
+      }
+      oneOf
+      updatedAt
+
+      statusDateFrom
+      statusDateFromNow
+      statusDateTo
+      statusDateToNow
+      pendingDateFrom
+      pendingDateFromNow
+      pendingDateTo
+      pendingDateToNow
+      closeDateFrom
+      closeDateFromNow
+      closeDateTo
+      closeDateToNow
+      deadlineFrom
+      deadlineFromNow
+      deadlineTo
+      deadlineToNow
+    }
   }
 `;
 
 export default function ShowDataContainer (props){
-	const { history, match, data, listName, filterBy, displayValues, orderByValues, useBreadcrums, breadcrumsData, Empty, itemID, link, displayCol, isTask, setStatuses, statuses, allStatuses, Edit, checkTask, deleteTask, dndGroupAttribute, dndGroupData, calendarAllDayData, calendarEventsData } = props;
 	const { data: userData } = useQuery(GET_MY_DATA);
 	const { data: localCache } = useQuery(LOCAL_CACHE);
 
-	const tasklistLayout = userData ? userData.getMyData.tasklistLayout : 0;
+	//data
+	const { match, history, data,  filterBy, ascending, orderBy, orderByValues, displayValues, useBreadcrums, breadcrumsData, listName, empty, itemID, link, displayCol, isTask, setStatuses, statuses, allStatuses, Edit, dndGroupData, dndGroupAttribute, calendarAllDayData, calendarEventsData, checkTask, deleteTask } = props;
 
-	const search = (localCache ? localCache.search : "");
+  const client = useApolloClient();
+	const currentUser = userData ? userData.getMyData : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
-	const client = useApolloClient();
-
-	const addShowDataFilter = () => {
-		if(localCache && localCache.showDataFilter.name !== listName){
-			let newShowDataFilter={
-				name: listName,
-			};
-			displayValues.forEach((display)=>{
-				if (display.value === "checked" || display.value === "important"){
-					newShowDataFilter[display.value] = false;
-				} else {
-					newShowDataFilter[display.value] = '';
-				}
-			})
-			client.writeData({ data: {
-				showDataFilter: newShowDataFilter,
-			} });
-		}
+	//state
+	const [ filterView ] = React.useState(false);
+	/*
+	constructor(props) {
+		super(props);
+		this.state = {
+			search: this.props.search
+		};
+		console.log("hello?");
+		this.filterData.bind(this);
+		this.addShowDataFilter.bind(this);
+		this.addShowDataFilter();
 	}
+*/
+
+//	const addShowDataFilter = () => {
+		/*if(filter[filterName]===undefined){
+			let defaultFilter={};
+			this.props.displayValues.forEach((display)=>{
+				defaultFilter[display.value]=''
+			})
+			this.props.addShowDataFilter(this.props.filterName, defaultFilter);
+		}*/
+	//}
 
 	const filterData = () => {
-		let aaa = data.filter((item)=>{
+		//return data;
+		return data.filter((item)=>{
 			let filterString="";
 			filterBy.forEach((value)=>{
 				if(!item[value.value]){
@@ -86,16 +185,16 @@ export default function ShowDataContainer (props){
 				}else if(value.type==='list'){
 					filterString+= item[value.value].reduce(value.func,'') + " ";
 				}else if(value.type==='date'){
-					filterString+= moment(item[value.value]) + " ";
+					filterString+= timestampToString(item[value.value]) + " ";
 				}else if(value.type==='user'){
-					filterString+= item[value.value].email+' '+item[value.value].fullName + " ";
+					filterString+= item[value.value].email+' '+item[value.value].name+' '+item[value.value].surname + " ";
 				}
 			});
-			return filterString.toLowerCase().includes(search.toLowerCase());
+			return filterString.toLowerCase().includes(localCache ? localCache.search.toLowerCase() : "");
 		}).sort((item1,item2)=>{
 			let val1 = getSortValue(item1);
 			let val2 = getSortValue(item2);
-			if(localCache && localCache.ascending){
+			if(ascending){
 				if(val1===null){
 					return 1;
 				}
@@ -114,12 +213,9 @@ export default function ShowDataContainer (props){
 			}
 			return 0;
 		});
-		console.log(aaa);
-		return aaa;
 	}
-
 	const getSortValue = (item) => {
-		let value = orderByValues.find((val)=>val.value === (localCache ? localCache.orderBy : "id"));
+		let value = orderByValues.find((val)=>val.value===orderBy);
 		if(value.type==='object'){
 			if (value.value === "status"){
 				return item[value.value] ? ((100 - item[value.value].order) + " " +  item.statusChange) : null;
@@ -134,7 +230,7 @@ export default function ShowDataContainer (props){
 		}else if(value.type==='date'){
 			return parseInt(item[value.value]?item[value.value]:null);
 		}else if(value.type==='user'){
-			return (item[value.value].fullName).toLowerCase();
+			return (item[value.value].surname+' '+item[value.value].name).toLowerCase();
 		}
 	}
 
@@ -142,15 +238,15 @@ export default function ShowDataContainer (props){
 		<div className="content-page">
 			<div className="content" style={{ paddingTop: 0 }}>
 				<div className="row m-0">
-					{tasklistLayout === 0 && (
-						<div className='col-xl-12'>
+					{currentUser.tasklistLayout === 0 && (
+						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
 							<TaskCol
 								commandBar={props}
 								useBreadcrums={useBreadcrums}
 								breadcrumsData={breadcrumsData}
 								listName={listName}
 								history={history}
-								Empty={Empty}
+								empty={empty}
 								match={match}
 								data={filterData()}
 								itemID={itemID}
@@ -165,10 +261,10 @@ export default function ShowDataContainer (props){
 						</div>
 					)}
 
-
-					{tasklistLayout === 1 && localCache.showDataFilter.name == listName && (
-						<div className='col-xl-12'>
-							{itemID && <this.props.edit match={match} columns={false} history={history} />}
+{/* filter[filterName]!==undefined &&*/}
+					{currentUser.tasklistLayout === 1 && (
+						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
+							{itemID && <Edit match={match} columns={false} history={history} />}
 							{!itemID &&
 								<TaskList
 									commandBar={props}
@@ -179,7 +275,7 @@ export default function ShowDataContainer (props){
 									match={match}
 									data={filterData()}
 									displayValues={displayValues}
-									filterName={listName}
+									filterName={filterName}
 									isTask={isTask}
 									setStatuses={setStatuses}
 									statuses={statuses}
@@ -191,9 +287,9 @@ export default function ShowDataContainer (props){
 						</div>
 					)}
 
-					{tasklistLayout === 2 && (
-						<div className='col-xl-12'>
-							{itemID && <this.props.edit match={match} columns={false} history={history} />}
+					{currentUser.tasklistLayout === 2 && (
+						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
+							{itemID && <edit match={match} columns={false} history={history} />}
 							{!itemID &&
 								<TaskListDnD
 									commandBar={props}
@@ -216,9 +312,9 @@ export default function ShowDataContainer (props){
 							}
 						</div>
 					)}
-					{tasklistLayout === 3 && (
-						<div className='col-xl-12'>
-							<this.props.calendar
+					{currentUser.tasklistLayout === 3 && (
+						<div className={'' + (filterView ? 'col-xl-9' : 'col-xl-12')}>
+							<calendar
 								commandBar={props}
 								useBreadcrums={useBreadcrums}
 								breadcrumsData={breadcrumsData}
@@ -246,3 +342,10 @@ export default function ShowDataContainer (props){
 		</div>
 	);
 }
+	/*
+}
+const mapStateToProps = ({ filterReducer, showDataReducer }) => {
+	return { search:filterReducer.search ,filter:showDataReducer.filter };
+};
+
+export default connect(mapStateToProps, { setSearch, setFilter, addShowDataFilter })(ShowDataContainer);*/
