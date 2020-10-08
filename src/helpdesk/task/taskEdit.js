@@ -267,30 +267,31 @@ query task($id: Int!){
 			price
 		}
 		comments {
-			id
-			createdAt
-			message
-			internal
-			user {
-				id
-				fullName
-				email
-			}
-			childComments {
-				id
-				createdAt
-				message
-				user{
-					id
-					fullName
-					email
-				}
-			}
-			parentCommentId
+      id
+      createdAt
+      message
+      childComments {
+        id
+        createdAt
+        message
+        user{
+          id
+          fullName
+          email
+        }
+      }
 		}
 	}
 }
 `;
+/*
+internal
+user {
+  id
+  fullName
+  email
+}
+parentCommentId*/
 
 const UPDATE_TASK = gql`
 mutation updateTask($id: Int!, $important: Boolean, $title: String, $closeDate: String, $assignedTo: [Int], $company: Int, $deadline: String, $description: String, $milestone: Int, $overtime: Boolean, $pausal: Boolean, $pendingChangable: Boolean, $pendingDate: String, $project: Int, $requester: Int, $status: Int, $tags: [Int], $taskType: Int, $repeat: RepeatInput ) {
@@ -722,7 +723,7 @@ query {
 
 export default function TaskEdit (props){
 	//data & queries
-	const { match, history, columns, allTags, taskTypes, tripTypes, emails, inModal, closeModal } = props;
+	const { match, history, columns, allTags, taskTypes, tripTypes, inModal, closeModal } = props;
   const [ getTask, {data: taskData, loading: taskLoading } ] = useLazyQuery(GET_TASK);
   const [ updateProjectRights ] = useMutation(UPDATE_PROJECT_RIGHTS);
   const [ updateTask/*, {client}*/ ] = useMutation(UPDATE_TASK);

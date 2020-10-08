@@ -9,9 +9,11 @@ import Loading from 'components/loading';
 
 export const GET_PROJECTS = gql`
 query {
-  projects {
-    title
-    id
+  myProjects {
+    project {
+      title
+      id
+    }
   }
 }
 `;
@@ -23,7 +25,7 @@ export default function ProjectsList(props){
     //data
     const { history, match } = props;
     const { data, loading } = useQuery(GET_PROJECTS);
-    const PROJECTS = (loading || !data ? [] : data.projects);
+    const PROJECTS = (loading || !data ? [] : data.myProjects.map(item => ({...item.project})));
 
     return (
       <div className="content">
@@ -56,13 +58,7 @@ export default function ProjectsList(props){
   						</h2>
               <table className="table table-hover">
                 <tbody>
-                  {PROJECTS.filter((project)=>{
-										//if(this.props.role === 3){
-											return true;
-									/*	}
-										let permission = project.permissions.find((permission)=>permission.user===this.props.currUserID);
-										return permission && permission.read;*/
-									}).filter((item)=>item.title.toLowerCase().includes(projectFilter.toLowerCase())).map((project)=>
+                  {PROJECTS.filter((item)=>item.title.toLowerCase().includes(projectFilter.toLowerCase())).map((project)=>
                     <tr key={project.id}
                       className={"clickable" + (parseInt(match.params.id) === project.id ? " active":"")}
                       onClick={()=>history.push('/helpdesk/settings/projects/'+project.id)}>

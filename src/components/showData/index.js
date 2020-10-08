@@ -5,9 +5,6 @@ import gql from "graphql-tag";
 import TaskCol from './taskCol';
 import TaskList from './taskList';
 import TaskListDnD from './taskListDnD';
-import {timestampToString} from '../../helperFunctions';
-
-import { filter, generalFilter } from 'localCache';
 
 import moment from 'moment';
 
@@ -46,9 +43,9 @@ export default function ShowDataContainer (props){
 
 	const search = (localCache ? localCache.search : "");
 
-	const client = useApolloClient();
+//	const client = useApolloClient();
 
-	const addShowDataFilter = () => {
+/*	const addShowDataFilter = () => {
 		if(localCache && localCache.showDataFilter.name !== listName){
 			let newShowDataFilter={
 				name: listName,
@@ -64,7 +61,7 @@ export default function ShowDataContainer (props){
 				showDataFilter: newShowDataFilter,
 			} });
 		}
-	}
+	}*/
 
 	const filterData = () => {
 		let aaa = data.filter((item)=>{
@@ -114,7 +111,6 @@ export default function ShowDataContainer (props){
 			}
 			return 0;
 		});
-		console.log(aaa);
 		return aaa;
 	}
 
@@ -166,7 +162,7 @@ export default function ShowDataContainer (props){
 					)}
 
 
-					{tasklistLayout === 1 && localCache.showDataFilter.name == listName && (
+					{tasklistLayout === 1 && localCache.showDataFilter.name === listName && (
 						<div className='col-xl-12'>
 							{itemID && <this.props.edit match={match} columns={false} history={history} />}
 							{!itemID &&

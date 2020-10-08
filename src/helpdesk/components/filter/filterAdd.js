@@ -166,7 +166,7 @@ query {
 
 export default function FilterAdd(props){
   //data & queries
-  const { history, filter, filterID, generalFilter } = props;
+  const { filter, filterID, generalFilter } = props;
   const { data } = useQuery(GET_MY_DATA);
   const { data: roleData, loading: roleLoading } = useQuery(GET_ROLES);
   const { data: projectData, loading: projectLoading } = useQuery(GET_PROJECTS);

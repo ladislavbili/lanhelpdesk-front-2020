@@ -21,92 +21,27 @@ import { toSelArr } from 'helperFunctions';
 import { dashboard, addProject, allMilestones, addMilestone } from 'configs/constants/sidebar';
 import moment from 'moment';
 
-import { filter, generalFilter } from 'localCache';
+import { filter, generalFilter, project } from 'localCache';
 
 export const GET_PROJECTS = gql`
 query {
-  projects{
-    id
-    title
-    descrption
-    lockedRequester
-    updatedAt
-    milestones {
+  myProjects {
+    project {
       id
+      updatedAt
       title
+      milestones {
+        id
+        title
+      }
     }
-    projectRights {
-			read
+    right {
+      read
 			write
 			delete
 			internal
 			admin
-			user {
-				id
-			}
-		}
-    def {
-			assignedTo {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			company {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			overtime {
-				def
-				fixed
-				show
-				value
-			}
-			pausal {
-				def
-				fixed
-				show
-				value
-			}
-			requester {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			status {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			tag {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			taskType {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-		}
+    }
   }
 }
 `;
@@ -191,139 +126,22 @@ query {
 }
 `;
 
-const GET_PUBLIC_FILTERS = gql`
-query {
-  publicFilters {
-    title
-    id
-    createdAt
-    updatedAt
-    createdBy {
-      id
-    }
-    pub
-    global
-    dashboard
-    filter {
-      taskType {
-        id
-      }
-    }
-    project {
-      id
-    }
-    roles {
-      id
-    }
-  }
-}
-`;
-
 const LOCAL_CACHE = gql`
   query getLocalCache {
-    project @client
-    milestone @client
-    generalFilter @client {
+    milestone @client {
       id
-      createdAt
-      updatedAt
-      createdBy {
-        id
-        email
-      }
       title
-      pub
-      global
-      dashboard
-      order
-      filter {
-        assignedToCur
-        assignedTo {
-          id
-          email
-        }
-        requesterCur
-        requester {
-          id
-          email
-        }
-        companyCur
-        company {
-          id
-          title
-        }
-        taskType {
-          id
-          title
-        }
-        oneOf
-        updatedAt
-
-        statusDateFrom
-        statusDateFromNow
-        statusDateTo
-        statusDateToNow
-        pendingDateFrom
-        pendingDateFromNow
-        pendingDateTo
-        pendingDateToNow
-        closeDateFrom
-        closeDateFromNow
-        closeDateTo
-        closeDateToNow
-        deadlineFrom
-        deadlineFromNow
-        deadlineTo
-        deadlineToNow
-      }
-      roles {
-        id
-        title
-      }
-      project {
-        id
-        title
-      }
     }
-    filter @client {
-      assignedToCur
-      assignedTo {
-        id
-        email
+    project @client {
+      id
+      title
+      projectRights {
+        read
+        write
+        delete
+        internal
+        admin
       }
-      requesterCur
-      requester {
-        id
-        email
-      }
-      companyCur
-      company {
-        id
-        title
-      }
-      taskType {
-        id
-        title
-      }
-      oneOf
-      updatedAt
-
-      statusDateFrom
-      statusDateFromNow
-      statusDateTo
-      statusDateToNow
-      pendingDateFrom
-      pendingDateFromNow
-      pendingDateTo
-      pendingDateToNow
-      closeDateFrom
-      closeDateFromNow
-      closeDateTo
-      closeDateToNow
-      deadlineFrom
-      deadlineFromNow
-      deadlineTo
-      deadlineToNow
     }
   }
 `;
@@ -332,9 +150,8 @@ export default function TasksSidebar(props) {
   //data & queries
   const { history, location } = props;
   const { data } = useQuery(GET_MY_DATA);
-  const { data: projectsData, loading: projectsLoading, refetch: projectsRefetch } = useQuery(GET_PROJECTS);
+  const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
   const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS);
-//  const { data: publicFiltersData, loading: publicFiltersLoading } = useQuery(GET_PUBLIC_FILTERS, { options: { fetchPolicy: 'network-only' }});
   const { data: localCache } = useQuery(LOCAL_CACHE);
 
   const currentUser = data ? data.getMyData : {};
@@ -346,89 +163,54 @@ export default function TasksSidebar(props) {
   const [ openProjectAdd, setOpenProjectAdd ] = React.useState(false);
   const [ openMilestoneAdd, setOpenMilestoneAdd ] = React.useState(false);
   const [ activeTab, setActiveTab ] = React.useState(0);
-  const [ projects, setProjects ] = React.useState( (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ) );
-  const [ currentProject, setCurrentProject ] = React.useState( projects[0] );
-  const [ currentMilestone, setCurrentMilestone ] = React.useState( allMilestones );
+
+  const [ currentProject, setCurrentProject ] = React.useState(dashboard);
+  const [ currentMilestone, setCurrentMilestone ] = React.useState(allMilestones);
 
   // sync
   React.useEffect( () => {
-    if (!projectsLoading ){
-      const pro = (accessRights.addProjects ? [dashboard, addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
-      setProjects(pro);
-      setCurrentProject( projects[0] );
-    }
-  }, [projectsLoading]);
-
-  React.useEffect( () => {
-    if (!projectsLoading){
-      projectsRefetch();
-      const pro = (accessRights.addProjects ? [dashboard, addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
-      setProjects(pro);
-      const index = pro.findIndex(p => p.id === currentProject.id);
-      if (index >= 0 && pro[index].id === null) {
-        setCurrentProject( (index >= 0 ? pro[index] : [dashboard]) );
-        client.writeData({ data: { project: null, filter: null } });
-      } else if (index >= 0) {
-        setCurrentProject( pro[index] );
-        client.writeData({ data: {
-          project: pro[index].id
-        } });
-        filter( getEmptyFilter() );
-        generalFilter( {...getEmptyGeneralFilter(), project: pro[index]} );
-      }
-    }
-  }, [projectsData]);
-
-  React.useEffect( () => {
     if (!myFiltersLoading){
-      if (!isNaN(location.pathname.slice(location.pathname.lastIndexOf("i/") + 2))) {
-        const newFilter = myFiltersData.myFilters.find(item => item.id === parseInt(location.pathname.slice(location.pathname.lastIndexOf("i/") + 2) ) );
+      const startId = location.pathname.lastIndexOf("i/") + 2;
+      const endId = location.pathname.lastIndexOf("/") + 1;
+      let filterId = "";
+      if (startId === endId){
+        filterId = location.pathname.slice(startId);
+      } else {
+        filterId = location.pathname.slice(startId, endId - 1);
+      }
+      if (location.pathname.length > 12 && !isNaN(filterId)) {
+        const newFilter = myFiltersData.myFilters.find(item => item.id === parseInt(filterId) );
         filter( newFilter.filter );
         generalFilter( newFilter );
       }
     }
   }, [myFiltersLoading]);
 
-/*  React.useEffect( () => {
-    if (!publicFiltersLoading){*/
-    //  filters({myFilters: [...filters().myFilters], publicFilters: [...publicFiltersData.publicFilters]});
-  /*  }
-  }, [publicFiltersLoading]);*/
-
   const addNewProject = (newProject) => {
-      projectsRefetch();
-      const pro = (accessRights.addProjects ? [dashboard,addProject] : [dashboard] ).concat(toSelArr(projectsData.projects));
-      setProjects(pro);
-      setCurrentProject( newProject );
-      client.writeData({ data: { project: newProject.id } });
+      project(newProject);
+      setCurrentProject(newProject);
       filter( getEmptyFilter() );
       generalFilter( {...getEmptyGeneralFilter(), project: newProject} );
   }
 
-  const FILTERS = [ ...(myFiltersData === undefined ? [] : myFiltersData.myFilters  )];//, ...(publicFiltersLoading ? [] : publicFiltersData.publicFilters  )]
+  const FILTERS = [ ...(myFiltersData === undefined ? [] : myFiltersData.myFilters  )];
+  const MY_PROJECTS = !projectsData ? [] : (toSelArr(projectsData.myProjects.map(item => ({...item.project, projectRights: item.right}) )));
+  const PROJECTS = [...(accessRights.addProjects ? [dashboard,addProject] : [dashboard] ), ...MY_PROJECTS ];
+  const MILESTONES = ([allMilestones, addMilestone]).concat(toSelArr( project().id !== null && project().id !== -1 ? project().milestones : [] ));
+
 
   return (
     <div>
       <Select
-        options={
-            !projectsLoading ?
-            toSelArr(projects.filter((project)=>{
-            if( accessRights.projects || (project.id === -1 || project.id === null) ){
-              return true;
-            }
-            let permission = project.projectRights.find((right)=> right.user.is === currentUser.id);
-            return permission && permission.read;
-          })) :
-          []
-        }
-        value={currentProject}
+        options={PROJECTS}
+        value={project()}
         styles={sidebarSelectStyle}
-        onChange={project => {
-          if (project.id !== -1){
-            setCurrentProject(project);
-            client.writeData({ data: { project: project } });
+        onChange={pro => {
+          if (pro.id !== -1){
+            project(pro);
+            setCurrentProject(pro);
             filter( getEmptyFilter() );
-            generalFilter( {...getEmptyGeneralFilter(), project: project} );
+            generalFilter( {...getEmptyGeneralFilter(), project: pro} );
           } else {
             setOpenProjectAdd(true);
           }
@@ -447,19 +229,26 @@ export default function TasksSidebar(props) {
         }}
         />
       <hr className="m-l-15 m-r-15"/>
-      { currentProject !== null &&
-        currentProject.id !== -1 &&
-        currentProject.id !== null &&
+      {  project().id !== -1 &&
+        project().id !== null &&
         <div className="">
           <Select
-            options={([allMilestones, addMilestone]).concat(toSelArr( currentProject.milestones )) }
-            value={currentMilestone}
+            options={ MILESTONES }
+            value={ localCache.milestone }
             styles={sidebarSelectStyle}
-            onChange={milestone => {
-              if (milestone.id !== -1){
-                setCurrentMilestone(milestone);
-                client.writeData({ data: { milestone: milestone } });
-              } else{
+            onChange={mile => {
+              if (mile.id !== -1){
+                let milestone = {
+                  id: mile.id,
+                  createdAt: mile.createdAt,
+                  updatedAt: mile.updatedAt,
+                  title: mile.title,
+                  description: mile.description,
+                  startsAt: mile.startsAt,
+                  endsAt: mile.endsAt,
+                };
+                client.writeData({ data: { milestone } });
+              } else {
                 setOpenMilestoneAdd(true);
               }
             }}
@@ -482,8 +271,8 @@ export default function TasksSidebar(props) {
 
       <TaskAdd
         history={history}
-        projectID={projects.map((item)=>item.id).includes(currentProject.id) ? currentProject.id : null}
-        triggerDate={ parseInt(currentProject.updatedAt) }
+        projectID={ project().id }
+        triggerDate={ parseInt(project().updatedAt) }
         currentUser={currentUser}
         />
 
@@ -496,7 +285,7 @@ export default function TasksSidebar(props) {
               history.push(`/helpdesk/taskList/i/all`);
               setActiveTab( (activeTab === 0 ? 1 : 0) );
               filter( getEmptyFilter() );
-              generalFilter( getEmptyGeneralFilter() );
+              generalFilter( null );
             }}
             >
             <i className="fa fa-plus pull-right m-r-5 m-t-5 clickable" />
@@ -516,69 +305,83 @@ export default function TasksSidebar(props) {
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0} >
           <Nav vertical>
-            { FILTERS.map((item)=>
-              <NavItem key={item.id} className="row">
-                <Link
-                  className="sidebar-menu-item"
-                  to={{ pathname: `/helpdesk/taskList/i/`+item.id }}
-                  onClick={()=>{
-                    const newFilter = {
-                      ...item.filter,
-                      statusDateFrom: isNaN(parseInt(item.filter.statusDateFrom)) ? null : parseInt(item.filter.statusDateFrom),
-                      statusDateFromNow: item.filter.statusDateFromNow === true,
-                      statusDateTo: isNaN(parseInt(item.filter.statusDateTo)) ? null : parseInt(item.filter.statusDateTo),
-                      statusDateToNow: item.filter.statusDateToNow === true,
-                      pendingDateFrom: isNaN(parseInt(item.filter.pendingDateFrom)) ? null : parseInt(item.filter.pendingDateFrom),
-                      pendingDateFromNow: item.filter.pendingDateFromNow === true,
-                      pendingDateTo: isNaN(parseInt(item.filter.pendingDateTo)) ? null : parseInt(item.filter.pendingDateTo),
-                      pendingDateToNow: item.filter.pendingDateToNow === true,
-                      closeDateFrom: isNaN(parseInt(item.filter.closeDateFrom)) ? null : parseInt(item.filter.closeDateFrom),
-                      closeDateFromNow: item.filter.closeDateFromNow === true,
-                      closeDateTo: isNaN(parseInt(item.filter.closeDateTo)) ? null : parseInt(item.filter.closeDateTo),
-                      closeDateToNow: item.filter.closeDateToNow === true,
-                      deadlineFrom: isNaN(parseInt(item.filter.deadlineFrom)) ? null : parseInt(item.filter.deadlineFrom),
-                      deadlineFromNow: item.filter.deadlineFromNow === true,
-                      deadlineTo: isNaN(parseInt(item.filter.deadlineTo)) ? null : parseInt(item.filter.deadlineTo),
-                      deadlineToNow: item.filter.deadlineToNow === true,
-                      updatedAt: moment().unix(),
-                    }
-                    filter(newFilter);
-                    generalFilter(item);
-                  }}
-                  >
-                  {item.title}
-                </Link>
-
-                <div
-                  className={classnames("sidebar-icon", "clickable" , {"active" : parseInt(location.pathname.slice(location.pathname.lastIndexOf("/") + 1)) === item.id})}
-                  onClick={() => {
-                    if (location.pathname.includes(item.id)){
-                      history.push(`/helpdesk/taskList/i/`+item.id);
+            { FILTERS.map((item)=> {
+                const startId = location.pathname.lastIndexOf("i/") + 2;
+                const endId = location.pathname.lastIndexOf("/") + 1;
+                let filterId = "";
+                if (startId === endId){
+                  filterId = location.pathname.slice(startId);
+                } else {
+                  filterId = location.pathname.slice(startId, endId - 1);
+                }
+                let isActive = false;
+                if (location.pathname.length > 12 && !isNaN(filterId)) {
+                   isActive = item.id === parseInt(filterId);
+                }
+                return (
+                  <NavItem key={item.id} className="row">
+                  <Link
+                    className="sidebar-menu-item"
+                    to={{ pathname: `/helpdesk/taskList/i/`+item.id }}
+                    onClick={()=>{
                       const newFilter = {
                         ...item.filter,
+                        statusDateFrom: isNaN(parseInt(item.filter.statusDateFrom)) ? null : parseInt(item.filter.statusDateFrom),
+                        statusDateFromNow: item.filter.statusDateFromNow === true,
+                        statusDateTo: isNaN(parseInt(item.filter.statusDateTo)) ? null : parseInt(item.filter.statusDateTo),
+                        statusDateToNow: item.filter.statusDateToNow === true,
+                        pendingDateFrom: isNaN(parseInt(item.filter.pendingDateFrom)) ? null : parseInt(item.filter.pendingDateFrom),
+                        pendingDateFromNow: item.filter.pendingDateFromNow === true,
+                        pendingDateTo: isNaN(parseInt(item.filter.pendingDateTo)) ? null : parseInt(item.filter.pendingDateTo),
+                        pendingDateToNow: item.filter.pendingDateToNow === true,
+                        closeDateFrom: isNaN(parseInt(item.filter.closeDateFrom)) ? null : parseInt(item.filter.closeDateFrom),
+                        closeDateFromNow: item.filter.closeDateFromNow === true,
+                        closeDateTo: isNaN(parseInt(item.filter.closeDateTo)) ? null : parseInt(item.filter.closeDateTo),
+                        closeDateToNow: item.filter.closeDateToNow === true,
+                        deadlineFrom: isNaN(parseInt(item.filter.deadlineFrom)) ? null : parseInt(item.filter.deadlineFrom),
+                        deadlineFromNow: item.filter.deadlineFromNow === true,
+                        deadlineTo: isNaN(parseInt(item.filter.deadlineTo)) ? null : parseInt(item.filter.deadlineTo),
+                        deadlineToNow: item.filter.deadlineToNow === true,
                         updatedAt: moment().unix(),
                       }
-                      filter(item.filter);
+                      filter(newFilter);
                       generalFilter(item);
-                      setActiveTab(1);
-                    }
-                  }}
-                  >
-                  <i className="fa fa-cog"/>
-                </div>
-              </NavItem>
+                    }}
+                    >
+                    {item.title}
+                  </Link>
+
+                  <div
+                    className={classnames("sidebar-icon", "clickable" , {"active" : isActive})}
+                    onClick={() => {
+                      if (isActive){
+                        history.push(`/helpdesk/taskList/i/`+item.id);
+                        const newFilter = {
+                          ...item.filter,
+                          updatedAt: moment().unix(),
+                        }
+                        filter(newFilter);
+                        generalFilter(item);
+                        setActiveTab(1);
+                      }
+                    }}
+                    >
+                    <i className="fa fa-cog"/>
+                  </div>
+                </NavItem>
+              )}
             )}
 
           </Nav>
         </TabPane>
         <TabPane tabId={1}>
           <Filter
-            filterID={filter() ? filter().id : null}
+            filterID={generalFilter() ? generalFilter().id : null}
             history={history}
             filterData={filter()}
             resetFilter={()=> {
               filter(getEmptyFilter());
-              generalFilter(getEmptyGeneralFilter());
+              generalFilter(null);
             }}
             close={ () => setActiveTab(0)}
             />
@@ -588,19 +391,23 @@ export default function TasksSidebar(props) {
       { openProjectAdd &&
         <ProjectAdd open={openProjectAdd} closeModal={() => setOpenProjectAdd(false)} addProject={(e) => addNewProject(e)}/>
       }
-      { accessRights.projects &&
-        currentProject.id !== null &&
-        <ProjectEdit  projectID={currentProject.id} {...props} />
+
+      { project().projectRights &&
+        project().projectRights.write &&
+        <ProjectEdit  projectID={project().id} {...props} />
       }
 
       { openMilestoneAdd &&
+        currentProject && currentProject.id &&
         <MilestoneAdd projectID={currentProject.id} open={openMilestoneAdd}  closeModal={() => setOpenMilestoneAdd(false)} />
       }
-      { accessRights.projects &&
-        currentProject.id !== null &&
-        currentMilestone.id !== null &&
-        currentMilestone.id !== -1 &&
-        <MilestoneEdit milestoneID={currentMilestone.id} projectID={currentProject.id} {...props} />
+      { project().projectRights &&
+        project().projectRights.write &&
+        localCache &&
+        localCache.milestone &&
+        localCache.milestone.id !== -1 &&
+        localCache.milestone.id !== null &&
+        <MilestoneEdit milestoneID={localCache.milestone.id} projectID={project().id} {...props} />
       }
 
     </div>

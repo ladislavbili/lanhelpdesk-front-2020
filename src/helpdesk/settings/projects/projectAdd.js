@@ -258,9 +258,9 @@ export default function ProjectAdd(props){
       projectRights: newProjectRights,
       def: newDef,
     } }).then( ( response ) => {
-      const allProjects = client.readQuery({query: GET_PROJECTS}).projects;
+      const allProjects = client.readQuery({query: GET_PROJECTS}).myProjects;
       const newProject = {...response.data.addProject, __typename: "Project"};
-      client.writeQuery({ query: GET_PROJECTS, data: {projects: [...allProjects, newProject ] } });
+      client.writeQuery({ query: GET_PROJECTS, data: {myProjects: [...allProjects, newProject ] } });
       if (closeModal){
         props.addProject(newProject);
         closeModal();

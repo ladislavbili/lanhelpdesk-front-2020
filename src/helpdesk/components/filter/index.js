@@ -60,51 +60,52 @@ export default function Filter(props) {
   const [ newFilterName, setNewFilterName ] = React.useState("");
   const [ openEditName, setOpenEditName ] = React.useState(false);
 
-  const [ assignedToCur, setAssignedToCur ] = React.useState(filterID ? filterData.filter.assignedToCur : false);
+  const [ assignedToCur, setAssignedToCur ] = React.useState(((filterID && filterData) ? filterData.assignedToCur : false));
+
   let assigned = {id:null,label:'Žiadny',value:null};
-  if (filterID && filterData.filter.assignedToCur){
+  if (filterID && filterData.assignedToCur){
     assigned = {label:'Current',value:'cur',id:'cur'};
-  } else if (filterID && filterData.filter.assignedTo){
-    assigned = toSelItem(filterData.filter.assignedTo, 'email');
+  } else if (filterID && filterData.assignedTo){
+    assigned = toSelItem(filterData.assignedTo, 'email');
   }
   const [ assignedTo, setAssignedTo ] = React.useState(assigned);
 
-  const [ requesterCur, setRequesterCur ] = React.useState(filterID ? filterData.filter.requesterCur : false);
+  const [ requesterCur, setRequesterCur ] = React.useState(filterID ? filterData.requesterCur : false);
   let req = {id:null,label:'Žiadny',value:null};
-  if (filterID && filterData.filter.requesterCur){
+  if (filterID && filterData.requesterCur){
     req = {label:'Current',value:'cur',id:'cur'};
-  } else if (filterID && filterData.filter.requester){
-    req = toSelItem(filterData.filter.requester, 'email');
+  } else if (filterID && filterData.requester){
+    req = toSelItem(filterData.requester, 'email');
   }
   const [ requester, setRequester ] = React.useState( req );
 
-  const [ companyCur, setCompanyCur ] = React.useState(filterID ? filterData.filter.companyCur : false);
+  const [ companyCur, setCompanyCur ] = React.useState(filterID ? filterData.companyCur : false);
   let com = {id:null,label:'Žiadny',value:null};
-  if (filterID && filterData.filter.companyCur){
+  if (filterID && filterData.companyCur){
     com = {label:'Current',value:'cur',id:'cur'};
-  } else if (filterID && filterData.filter.company){
-    com = toSelItem(filterData.filter.company);
+  } else if (filterID && filterData.company){
+    com = toSelItem(filterData.company);
   }
   const [ company, setCompany ] = React.useState(com);
 
-  const [ taskType, setTaskType ] = React.useState(filterID && filterData.filter.taskType? toSelItem(filterData.filter.taskType) : null);
-  const [ oneOf, setOneOf ] = React.useState(filterID && filterData.filter.oneOf ? toSelArr(filterData.filter.oneOf) : []);
-  const [ statusDateFrom, setStatusDateFrom ] = React.useState(filterID ? toMomentInput(filterData.filter.statusDateFrom) : null);
-  const [ statusDateFromNow, setStatusDateFromNow ] = React.useState(filterID ? filterData.filter.statusDateFromNow : false);
-  const [ statusDateTo, setStatusDateTo ] = React.useState(filterID ? toMomentInput(filterData.filter.statusDateTo) : null);
-  const [ statusDateToNow, setStatusDateToNow ] = React.useState(filterID ? filterData.filter.statusDateToNow : false);
-  const [ pendingDateFrom, setPendingDateFrom ] = React.useState(filterID ? toMomentInput(filterData.filter.pendingDateFrom) : null);
-  const [ pendingDateFromNow, setPendingDateFromNow ] = React.useState(filterID ? filterData.filter.pendingDateFromNow : false);
-  const [ pendingDateTo, setPendingDateTo ] = React.useState(filterID ? toMomentInput(filterData.filter.pendingDateTo) : null);
-  const [ pendingDateToNow, setPendingDateToNow ] = React.useState(filterID ? filterData.filter.pendingDateToNow : false);
-  const [ closeDateFrom, setCloseDateFrom ] = React.useState(filterID ? toMomentInput(filterData.filter.closeDateFrom) : null);
-  const [ closeDateFromNow, setCloseDateFromNow ] = React.useState(filterID ? filterData.filter.closeDateFromNow : false);
-  const [ closeDateTo, setCloseDateTo ] = React.useState(filterID ? toMomentInput(filterData.filter.closeDateTo) : null);
-  const [ closeDateToNow, setCloseDateToNow ] = React.useState(filterID ? filterData.filter.closeDateToNow : false);
-  const [ deadlineFrom, setDeadlineFrom ] = React.useState(filterID ? toMomentInput(filterData.filter.deadlineFrom) : null);
-  const [ deadlineFromNow, setDeadlineFromNow ] = React.useState(filterID ? filterData.filter.deadlineFromNow : false);
-  const [ deadlineTo, setDeadlineTo ] = React.useState(filterID ? toMomentInput(filterData.filter.deadlineTo) : null);
-  const [ deadlineToNow, setDeadlineToNow ] = React.useState(filterID ? filterData.filter.deadlineToNow : false);
+  const [ taskType, setTaskType ] = React.useState(filterID && filterData.taskType? toSelItem(filterData.taskType) : null);
+  const [ oneOf, setOneOf ] = React.useState(filterID && filterData.oneOf ? toSelArr(filterData.oneOf) : []);
+  const [ statusDateFrom, setStatusDateFrom ] = React.useState(filterID ? toMomentInput(filterData.statusDateFrom) : null);
+  const [ statusDateFromNow, setStatusDateFromNow ] = React.useState(filterID ? filterData.statusDateFromNow : false);
+  const [ statusDateTo, setStatusDateTo ] = React.useState(filterID ? toMomentInput(filterData.statusDateTo) : null);
+  const [ statusDateToNow, setStatusDateToNow ] = React.useState(filterID ? filterData.statusDateToNow : false);
+  const [ pendingDateFrom, setPendingDateFrom ] = React.useState(filterID ? toMomentInput(filterData.pendingDateFrom) : null);
+  const [ pendingDateFromNow, setPendingDateFromNow ] = React.useState(filterID ? filterData.pendingDateFromNow : false);
+  const [ pendingDateTo, setPendingDateTo ] = React.useState(filterID ? toMomentInput(filterData.pendingDateTo) : null);
+  const [ pendingDateToNow, setPendingDateToNow ] = React.useState(filterID ? filterData.pendingDateToNow : false);
+  const [ closeDateFrom, setCloseDateFrom ] = React.useState(filterID ? toMomentInput(filterData.closeDateFrom) : null);
+  const [ closeDateFromNow, setCloseDateFromNow ] = React.useState(filterID ? filterData.closeDateFromNow : false);
+  const [ closeDateTo, setCloseDateTo ] = React.useState(filterID ? toMomentInput(filterData.closeDateTo) : null);
+  const [ closeDateToNow, setCloseDateToNow ] = React.useState(filterID ? filterData.closeDateToNow : false);
+  const [ deadlineFrom, setDeadlineFrom ] = React.useState(filterID ? toMomentInput(filterData.deadlineFrom) : null);
+  const [ deadlineFromNow, setDeadlineFromNow ] = React.useState(filterID ? filterData.deadlineFromNow : false);
+  const [ deadlineTo, setDeadlineTo ] = React.useState(filterID ? toMomentInput(filterData.deadlineTo) : null);
+  const [ deadlineToNow, setDeadlineToNow ] = React.useState(filterID ? filterData.deadlineToNow : false);
 
   React.useEffect(() => {
 		if (!openEditName) {
@@ -113,55 +114,55 @@ export default function Filter(props) {
 	}, [openEditName]);
 
   React.useEffect(() => {
-		if (filterID && filterData) {
+		if (filterID && filterData ) {
       setNewFilterName("");
       setOpenEditName(false);
 
-      setAssignedToCur(filterData.filter.assignedToCur);
+      setAssignedToCur(filterData.assignedToCur);
       let assigned = {id:null,label:'Žiadny',value:null};
-      if (filterID && filterData.filter.assignedToCur){
+      if (filterID && filterData.assignedToCur){
         assigned = {label:'Current',value:'cur',id:'cur'};
-      } else if (filterID && filterData.filter.assignedTo){
-        assigned = toSelItem(filterData.filter.assignedTo, 'email');
+      } else if (filterID && filterData.assignedTo){
+        assigned = toSelItem(filterData.assignedTo, 'email');
       }
       setAssignedTo(assigned);
 
-      setRequesterCur(filterData.filter.requesterCur);
+      setRequesterCur(filterData.requesterCur);
       let req = {id:null,label:'Žiadny',value:null};
-      if (filterData.filter.requesterCur){
+      if (filterData.requesterCur){
         req = {label:'Current',value:'cur',id:'cur'};
-      } else if (filterData.filter.requester){
-        req = toSelItem(filterData.filter.requester, 'email');
+      } else if (filterData.requester){
+        req = toSelItem(filterData.requester, 'email');
       }
       setRequester( req );
 
-      setCompanyCur(filterData.filter.companyCur );
+      setCompanyCur(filterData.companyCur );
       let com = {id:null,label:'Žiadny',value:null};
-      if (filterData.filter.companyCur){
+      if (filterData.companyCur){
         com = {label:'Current',value:'cur',id:'cur'};
-      } else if (filterData.filter.company){
-        com = toSelItem(filterData.filter.company);
+      } else if (filterData.company){
+        com = toSelItem(filterData.company);
       }
       setCompany(com);
 
-      setTaskType( filterData.filter.taskType ? toSelItem(filterData.filter.taskType) : null );
-      setOneOf( filterData.filter.oneOf ? toSelArr(filterData.filter.oneOf) : [] );
-      setStatusDateFrom( toMomentInput(filterData.filter.statusDateFrom) );
-      setStatusDateFromNow( filterData.filter.statusDateFromNow );
-      setStatusDateTo( toMomentInput(filterData.filter.statusDateTo) );
-      setStatusDateToNow( filterData.filter.statusDateToNow );
-      setPendingDateFrom( toMomentInput(filterData.filter.pendingDateFrom) );
-      setPendingDateFromNow( filterData.filter.pendingDateFromNow );
-      setPendingDateTo( toMomentInput(filterData.filter.pendingDateTo) );
-      setPendingDateToNow( filterData.filter.pendingDateToNow );
-      setCloseDateFrom( toMomentInput(filterData.filter.closeDateFrom) );
-      setCloseDateFromNow( filterData.filter.closeDateFromNow );
-      setCloseDateTo( toMomentInput(filterData.filter.closeDateTo) );
-      setCloseDateToNow( filterData.filter.closeDateToNow );
-      setDeadlineFrom( toMomentInput(filterData.filter.deadlineFrom) );
-      setDeadlineFromNow( filterData.filter.deadlineFromNow );
-      setDeadlineTo( toMomentInput(filterData.filter.deadlineTo) );
-      setDeadlineToNow( filterData.filter.deadlineToNow );
+      setTaskType( filterData.taskType ? toSelItem(filterData.taskType) : null );
+      setOneOf( filterData.oneOf ? toSelArr(filterData.oneOf) : [] );
+      setStatusDateFrom( toMomentInput(filterData.statusDateFrom) );
+      setStatusDateFromNow( filterData.statusDateFromNow );
+      setStatusDateTo( toMomentInput(filterData.statusDateTo) );
+      setStatusDateToNow( filterData.statusDateToNow );
+      setPendingDateFrom( toMomentInput(filterData.pendingDateFrom) );
+      setPendingDateFromNow( filterData.pendingDateFromNow );
+      setPendingDateTo( toMomentInput(filterData.pendingDateTo) );
+      setPendingDateToNow( filterData.pendingDateToNow );
+      setCloseDateFrom( toMomentInput(filterData.closeDateFrom) );
+      setCloseDateFromNow( filterData.closeDateFromNow );
+      setCloseDateTo( toMomentInput(filterData.closeDateTo) );
+      setCloseDateToNow( filterData.closeDateToNow );
+      setDeadlineFrom( toMomentInput(filterData.deadlineFrom) );
+      setDeadlineFromNow( filterData.deadlineFromNow );
+      setDeadlineTo( toMomentInput(filterData.deadlineTo) );
+      setDeadlineToNow( filterData.deadlineToNow );
 		}
 	}, [filterID]);
 /*
@@ -313,33 +314,33 @@ export default function Filter(props) {
           <AddFilter
             filter={{
               requester: requester && requester.value !== 'cur' && requester.value !== null ? requester.id : null,
-              requesterCur: requesterCur,
+              requesterCur,
               company: company && company.value !== 'cur' && company.value !== null ? company.id : null,
-              companyCur: companyCur,
+              companyCur,
               assignedTo: assignedTo && assignedTo.value !== 'cur' && assignedTo.value !== null ? assignedTo.id : null,
-              assignedToCur: assignedToCur,
+              assignedToCur,
               taskType: taskType ? taskType.id : null,
               oneOf: oneOf.map( (item) => item.value ),
 
               statusDateFrom: toMomentInput(statusDateFrom),
-              statusDateFromNow: statusDateFromNow === true,
+              statusDateFromNow,
               statusDateTo: toMomentInput(statusDateTo),
-              statusDateToNow: statusDateToNow === true,
+              statusDateToNow,
 
               pendingDateFrom: toMomentInput(pendingDateFrom),
-              pendingDateFromNow: pendingDateFromNow === true,
+              pendingDateFromNow,
               pendingDateTo: toMomentInput(pendingDateTo),
-              pendingDateToNow: pendingDateToNow === true,
+              pendingDateToNow,
 
               closeDateFrom: toMomentInput(closeDateFrom),
-              closeDateFromNow: closeDateFromNow === true,
+              closeDateFromNow,
               closeDateTo: toMomentInput(closeDateTo),
-              closeDateToNow: closeDateToNow === true,
+              closeDateToNow,
 
               deadlineFrom: toMomentInput(deadlineFrom),
-              deadlineFromNow: deadlineFromNow === true,
+              deadlineFromNow,
               deadlineTo: toMomentInput(deadlineTo),
-              deadlineToNow: deadlineToNow === true,
+              deadlineToNow,
             }}
             filterID={filterID}
             bigFilter={filterData}

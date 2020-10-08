@@ -5,22 +5,13 @@ import gql from "graphql-tag";
 import Loading from 'components/loading';
 
 import ShowData from '../../components/showData';
-import { timestampToString, sameStringForms, applyTaskFilter, snapshotToArray, orderArr } from 'helperFunctions';
-import { getEmptyFilter, getFixedFilters } from 'configs/fixedFilters';
-import { allMilestones } from 'configs/constants/sidebar';
+import { timestampToString,  orderArr } from 'helperFunctions';
+import { getEmptyFilter } from 'configs/fixedFilters';
 import TaskEdit from './taskEdit';
 import TaskEmpty from './taskEmpty';
 import TaskCalendar from '../calendar';
 
-import {setTasksOrderBy, setTasksAscending, setUserFilterStatuses,
-	 setTasklistLayout, storageHelpCalendarEventsStart,
-	setHelpSidebarProject, setHelpSidebarMilestone, setHelpSidebarFilter, setFilter, setMilestone,setProject} from 'redux/actions';
-
-import moment from 'moment';
-
 import {  filter, generalFilter, project } from 'localCache';
-
-const fixedFilters = getFixedFilters();
 
 const GET_TASKS = gql`
 query tasks($filter: FilterInput, $projectId: Int){
@@ -28,65 +19,74 @@ query tasks($filter: FilterInput, $projectId: Int){
     filter: $filter,
     projectId: $projectId,
   ){
-    id
-    title
-		updatedAt
-		createdAt
-    important
-		closeDate
-    overtime
-    pausal
-    pendingChangable
-    statusChange
-		assignedTo {
-			id
-			fullName
-      email
-		}
-		company {
+		tasks {
 			id
 			title
+			updatedAt
+			createdAt
+			important
+			closeDate
+			overtime
+			pausal
+			pendingChangable
+			statusChange
+			assignedTo {
+				id
+				fullName
+				email
+			}
+			company {
+				id
+				title
+			}
+			createdBy {
+				id
+				name
+				surname
+			}
+			deadline
+			description
+			milestone{
+				id
+				title
+			}
+			pendingDate
+			project{
+				id
+				title
+			}
+			requester{
+				id
+				name
+				surname
+				fullName
+				email
+			}
+			status {
+				id
+				title
+				color
+				action
+			}
+			tags {
+				id
+				title
+			}
+			taskType {
+				id
+				title
+			}
+			repeat {
+				repeatEvery
+				repeatInterval
+				startsAt
+			}
 		}
-		createdBy {
-			id
-			name
-			surname
-		}
-		deadline
-		description
-		milestone{
-			id
-			title
-		}
-		pendingDate
-		project{
-			id
-			title
-		}
-		requester{
-			id
-			name
-			surname
-		}
-		status {
-			id
-			title
-			color
-			action
-		}
-		tags {
-			id
-			title
-		}
-		taskType {
-			id
-			title
-		}
-		repeat {
-			repeatEvery
-			repeatInterval
-			startsAt
-		}
+    execTime
+    secondaryTimes {
+      time
+      source
+    }
   }
 }
 `;
@@ -116,44 +116,11 @@ query {
 }
 `;
 
-const GET_MY_FILTERS = gql`
-query {
-  myFilters {
-    title
-    id
-    createdAt
-    updatedAt
-    pub
-    global
-    dashboard
-    filter {
-			oneOf
-      taskType {
-        id
-      }
-    }
-    project {
-      id
-    }
-    roles {
-      id
-    }
-  }
-}
-`;
-
 const LOCAL_CACHE = gql`
   query getLocalCache {
-    project @client
     milestone @client {
-      roles {
         id
         title
-      }
-      project {
-        id
-        title
-      }
     }
   }
 `;
@@ -191,8 +158,14 @@ query {
 export default function TasksIndex (props) {
 	const { history, match, calendarEvents } = props;
 	const { data, loading } = useQuery(GET_MY_DATA);
-  const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, { variables: {filterId: ( generalFilter ? generalFilter.id : null), filter, projectId: (generalFilter && generalFilter.project ? generalFilter.project.id : null ) }});
-	const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS);
+
+	let mappedFilter = {...filter()};
+	mappedFilter.requester = mappedFilter.requester ? mappedFilter.requester.id : null;
+	mappedFilter.assignedTo = mappedFilter.assignedTo ? mappedFilter.assignedTo.id : null;
+	mappedFilter.company = mappedFilter.company ? mappedFilter.company.id : null;
+	delete mappedFilter.__typename;
+
+  const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, { variables: {filterId: ( generalFilter() ? generalFilter().id : null), filter: mappedFilter, projectId: (project().id !== null ? project().id : null ) }});
 	const { data: localCache } = useQuery(LOCAL_CACHE);
   const [ deleteTask ] = useMutation(DELETE_TASK);
   const [ setUserStatuses ] = useMutation(SET_USER_STATUSES);
@@ -203,7 +176,7 @@ export default function TasksIndex (props) {
 	const client = useApolloClient();
 
 	const [ filterName, setFilterName ] = React.useState(generalFilter ? generalFilter.title : "");
-		const [ tasks, setTasks ] = React.useState([]);
+	const [ tasks, setTasks ] = React.useState([]);
 
 	React.useEffect( () => {
 			setFilterName(generalFilter ? generalFilter.title : "");
@@ -211,7 +184,7 @@ export default function TasksIndex (props) {
 
 	React.useEffect( () => {
 		if (!tasksLoading){
-			setTasks(tasksData ? tasksData.tasks : []);
+			setTasks(tasksData && tasksData.tasks && tasksData.tasks.tasks ? tasksData.tasks.tasks : []);
 		}
 	}, [tasksLoading]);
 
@@ -490,7 +463,7 @@ export default function TasksIndex (props) {
 		}).map((task)=>({...task,end: task.status.action !== 'pendingOLD' ? task.start : task.end }))*/
 	}
 
-	const dataLoading = loading || tasksLoading || myFiltersLoading;
+	const dataLoading = loading || tasksLoading;
 
 	if (dataLoading) {
 		return (<Loading />);

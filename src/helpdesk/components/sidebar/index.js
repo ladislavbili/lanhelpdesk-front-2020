@@ -10,17 +10,6 @@ const GET_MY_DATA = gql`
 query {
   getMyData{
     id
-    name
-    surname
-    fullName
-    tasklistLayout
-    email
-		statuses {
-			id
-			title
-			color
-			action
-		}
     role {
       accessRights {
         publicFilters

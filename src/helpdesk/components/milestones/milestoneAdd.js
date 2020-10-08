@@ -23,6 +23,7 @@ mutation addMilestone($title: String!, $description: String!, $startsAt: String,
 `;
 
 export default function MilestoneAdd (props){
+  return null;
   //data & queries
   const { open, closeModal, projectID } = props;
   const [ addMilestone, {client} ] = useMutation(ADD_MILESTONE);

@@ -1,16 +1,11 @@
 
 import { gql } from "@apollo/client";
-const createAccessRights = (required) => {
-  return ['login', 'testSections', 'mailViaComment', 'vykazy', 'publicFilters', 'addProjects', 'viewVykaz', 'viewRozpocet', 'viewErrors', 'viewInternal',
-    'users', 'companies', 'pausals', 'projects', 'statuses', 'units', 'prices', 'suppliers', 'tags', 'invoices', 'roles', 'taskTypes', 'tripTypes', 'imaps', 'smtps'].reduce((acc, right) => {
-      return acc + `${right}: Boolean${(required ? '!' : '')}\n`;
-    }, '')
-}
 
 export const typeDefs = gql`
   extend type Query {
     isLoggedIn: Boolean!
     cartItems: [ID!]!
+    project: BasicProject
     milestone: Milestone
     search: String
     showDataFilter: ShowDataFilter
@@ -36,10 +31,26 @@ export const typeDefs = gql`
     id: Int
     createdAt: String
     updatedAt: String
-    title: String!
-    description: String!
+    title: String
+    description: String
     startsAt: String
     endsAt: String
+  }
+
+  type BasicProject {
+    id: Int
+    title: String
+    milestones: [Milestone]
+    projectRights: ProjectRights
+    __type: String
+  }
+
+  type ProjectRights {
+    read: Boolean
+    write: Boolean
+    delete: Boolean
+    admin: Boolean
+    internal: Boolean
   }
 
   extend type Launch {

@@ -111,6 +111,7 @@ export default function createClient(){
     data: {
       isLoggedIn: false,
       cartItems: [],
+      project: null,
       milestone: null,
       orderBy: 'id',
       ascending: false,

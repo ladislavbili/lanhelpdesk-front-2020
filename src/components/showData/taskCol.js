@@ -1,13 +1,11 @@
 import React from 'react';
-import { useQuery, useMutation, useApolloClient } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import CommandBar from './commandBar';
 import ListHeader from './listHeader';
 import classnames from "classnames";
 
 export default function ColumnDisplay(props) {
-	const {match, history, commandBar, useBreadcrums, breadcrumsData, listName, Empty, data, itemID, link, displayCol, isTask, setStatuses, statuses, allStatuses, Edit} = props;
+	const {match, history, commandBar, listName, Empty, data, itemID, link, displayCol, setStatuses, statuses, allStatuses, Edit} = props;
 
 	return (
 		<div>
