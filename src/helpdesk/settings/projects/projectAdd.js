@@ -22,6 +22,10 @@ mutation addProject($title: String!, $descrption: String!, $lockedRequester: Boo
     title
     descrption
     lockedRequester
+    milestones {
+      id
+      title
+    }
     projectRights {
 			read
 			write

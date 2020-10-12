@@ -10,6 +10,9 @@ import { resolvers, typeDefs } from "./localSchema";
 import { afterNow } from '../helperFunctions';
 import axios from 'axios';
 
+
+import { allMilestones } from 'configs/constants/sidebar';
+
 import {REST_URL} from 'configs/restAPI';
 
 
@@ -111,8 +114,8 @@ export default function createClient(){
     data: {
       isLoggedIn: false,
       cartItems: [],
-      project: null,
-      milestone: null,
+      projectName: "Any project",
+      milestone: allMilestones,
       orderBy: 'id',
       ascending: false,
       search: "",

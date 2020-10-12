@@ -5,7 +5,7 @@ export const typeDefs = gql`
   extend type Query {
     isLoggedIn: Boolean!
     cartItems: [ID!]!
-    project: BasicProject
+    projectName: String
     milestone: Milestone
     search: String
     showDataFilter: ShowDataFilter
@@ -29,28 +29,10 @@ export const typeDefs = gql`
 
   type Milestone {
     id: Int
-    createdAt: String
-    updatedAt: String
     title: String
-    description: String
-    startsAt: String
-    endsAt: String
-  }
-
-  type BasicProject {
-    id: Int
-    title: String
-    milestones: [Milestone]
-    projectRights: ProjectRights
-    __type: String
-  }
-
-  type ProjectRights {
-    read: Boolean
-    write: Boolean
-    delete: Boolean
-    admin: Boolean
-    internal: Boolean
+    value: Int
+    label: String
+    __typename: String
   }
 
   extend type Launch {

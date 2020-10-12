@@ -118,6 +118,7 @@ query {
 
 const LOCAL_CACHE = gql`
   query getLocalCache {
+    projectName @client
     milestone @client {
         id
         title
@@ -192,9 +193,9 @@ export default function TasksIndex (props) {
 		return [
 			{
 				type: 'project',
-				show: project() !== null,
-				data: project(),
-				label: project() ? project().title:'Invalid project',
+				show: localCache ? localCache.projectName : true,
+				data: localCache ? localCache.projectName : null,
+				label: localCache ? localCache.projectName : 'Invalid project',
 				onClick:()=>{
 					client.writeData({ data: {
 						milestone: null,
@@ -206,7 +207,7 @@ export default function TasksIndex (props) {
 			},
 			{
 				type:'milestone',
-				show:project() !== null,
+				show: localCache ? localCache.projectName !== "Any project" : false,
 				data: localCache ? localCache.milestone : null,
 				label: localCache && localCache.milestone ? localCache.milestone.title : 'Invalid milestone',
 				onClick:()=>{

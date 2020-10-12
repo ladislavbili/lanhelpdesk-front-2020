@@ -50,7 +50,7 @@ mutation deleteMilestone($id: Int!) {
 
 export default function MilestoneEdit (props){
   //data & queries
-  const { milestoneID, projectID } = props;
+  const { milestoneID, projectID, editCacheMilestone, deleteCacheMilestone } = props;
   const [ updateMilestone, {client} ] = useMutation(UPDATE_MILESTONE);
   const [ deleteMilestone ] = useMutation(DELETE_MILESTONE);
   const { data, loading } = useQuery(GET_MILESTONE, { variables: {id: milestoneID} });
@@ -89,27 +89,22 @@ export default function MilestoneEdit (props){
         startsAt: startsAt ? (startsAt.unix()*1000).toString() : null,
         endsAt: endsAt ? (endsAt.unix()*1000).toString() : null,
       } }).then( ( response ) => {
-        let allProjects = client.readQuery({query: GET_PROJECTS}).projects;
+        let allProjects = client.readQuery({query: GET_PROJECTS}).myProjects;
         const newProjects = allProjects.map(item => {
-          if (item.id !== projectID){
-            return item;
+          if (item.project.id !== projectID){
+            return {...item};
           }
           let newProject = {...item};
-          newProject.milestones =newProject.milestones.map(item => {
+          newProject.project.milestones = newProject.project.milestones.map(item => {
             if (item.id !== milestoneID) {
               return item;
             }
-            return {...response.data.updateMilestone, __typename: "Milestone"}
+            return {...response.data.updateMilestone, __typename: "Milestone"};
           });
           return newProject;
         });
-        /*
-        if(body.startsAt){
-          let milestoneTasks = this.props.tasks.map((task)=>{return {...task,status:this.props.statuses.find((status)=>status.id===task.status)}}).filter((task)=>task.milestone === this.props.item.id && task.status.action==='pending');
-          milestoneTasks.map((task)=>rebase.updateDoc(`/help-tasks/${task.id}`, {pendingDate:body.startsAt}))
-        }
-        */
-        client.writeQuery({ query: GET_PROJECTS, data: {projects: [...newProjects] } });
+        client.writeQuery({ query: GET_PROJECTS, data: {myProjects: [...newProjects] } });
+        editCacheMilestone(response.data.updateMilestone, newProjects.find(item => item.project.id === projectID) );
         setOpened(false);
       }).catch( (err) => {
         console.log(err.message);
@@ -123,9 +118,17 @@ export default function MilestoneEdit (props){
         deleteMilestone({ variables: {
           id: milestoneID,
         } }).then( ( response ) => {
-          const allProjects = client.readQuery({query: GET_PROJECTS}).projects;
-          const newProjects = allProjects.filter(item => item.id !== milestoneID);
-          client.writeQuery({ query: GET_PROJECTS, data: {projects: [...newProjects] } });
+          let allProjects = client.readQuery({query: GET_PROJECTS}).myProjects;
+          const newProjects = allProjects.map(item => {
+            if (item.project.id !== projectID){
+              return {...item};
+            }
+            let newProject = {...item};
+            newProject.project.milestones = newProject.project.milestones.filter(item => item.id !== milestoneID);
+            return newProject;
+          });
+          client.writeQuery({ query: GET_PROJECTS, data: {myProjects: [...newProjects] } });
+          deleteCacheMilestone(newProjects.find(item => item.project.id === projectID) );
           setOpened(false);
         }).catch( (err) => {
           console.log(err.message);

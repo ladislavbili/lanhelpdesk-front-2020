@@ -17,7 +17,7 @@ import MilestoneEdit from '../milestones/milestoneEdit';
 import MilestoneAdd from '../milestones/milestoneAdd';
 
 import { getEmptyFilter, getEmptyGeneralFilter } from 'configs/fixedFilters';
-import { toSelArr } from 'helperFunctions';
+import { toSelArr, toSelItem } from 'helperFunctions';
 import { dashboard, addProject, allMilestones, addMilestone } from 'configs/constants/sidebar';
 import moment from 'moment';
 
@@ -128,20 +128,12 @@ query {
 
 const LOCAL_CACHE = gql`
   query getLocalCache {
+    projectName @client
     milestone @client {
       id
       title
-    }
-    project @client {
-      id
-      title
-      projectRights {
-        read
-        write
-        delete
-        internal
-        admin
-      }
+      value
+      label
     }
   }
 `;
@@ -150,7 +142,7 @@ export default function TasksSidebar(props) {
   //data & queries
   const { history, location } = props;
   const { data } = useQuery(GET_MY_DATA);
-  const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
+  const { data: projectsData } = useQuery(GET_PROJECTS);
   const { data: myFiltersData, loading: myFiltersLoading } = useQuery(GET_MY_FILTERS);
   const { data: localCache } = useQuery(LOCAL_CACHE);
 
@@ -165,7 +157,6 @@ export default function TasksSidebar(props) {
   const [ activeTab, setActiveTab ] = React.useState(0);
 
   const [ currentProject, setCurrentProject ] = React.useState(dashboard);
-  const [ currentMilestone, setCurrentMilestone ] = React.useState(allMilestones);
 
   // sync
   React.useEffect( () => {
@@ -186,18 +177,54 @@ export default function TasksSidebar(props) {
     }
   }, [myFiltersLoading]);
 
-  const addNewProject = (newProject) => {
-      project(newProject);
-      setCurrentProject(newProject);
-      filter( getEmptyFilter() );
-      generalFilter( {...getEmptyGeneralFilter(), project: newProject} );
-  }
 
   const FILTERS = [ ...(myFiltersData === undefined ? [] : myFiltersData.myFilters  )];
   const MY_PROJECTS = !projectsData ? [] : (toSelArr(projectsData.myProjects.map(item => ({...item.project, projectRights: item.right}) )));
   const PROJECTS = [...(accessRights.addProjects ? [dashboard,addProject] : [dashboard] ), ...MY_PROJECTS ];
   const MILESTONES = ([allMilestones, addMilestone]).concat(toSelArr( project().id !== null && project().id !== -1 ? project().milestones : [] ));
 
+  const addNewProject = (newProject) => {
+      project(toSelItem(newProject));
+      setCurrentProject(toSelItem(newProject));
+      client.writeData({ data: { milestone:  allMilestones, projectName: newProject.title} });
+      filter( getEmptyFilter() );
+      generalFilter( {...getEmptyGeneralFilter(), project: toSelItem(newProject)} );
+  }
+
+  const addNewMilestone = (newMilestone, changedProject) => {
+      const newProject = toSelItem( {...changedProject.project, projectRights: changedProject.right} );
+      project( newProject  );
+      setCurrentProject( newProject );
+      let milestone = {
+        id: newMilestone.id,
+        title: newMilestone.title,
+        value: newMilestone.id,
+        label: newMilestone.title,
+        __typename: "Milestone"
+      };
+      client.writeData({ data: { milestone} });
+  }
+
+  const editCacheMilestone = (editedMilestone, changedProject) => {
+      const newProject = toSelItem( {...changedProject.project, projectRights: changedProject.right} );
+      project( newProject  );
+      setCurrentProject( newProject );
+      let milestone = {
+        id: editedMilestone.id,
+        title: editedMilestone.title,
+        value: editedMilestone.id,
+        label: editedMilestone.title,
+        __typename: "Milestone"
+      };
+      client.writeData({ data: { milestone} });
+  }
+
+  const deleteCacheMilestone = ( changedProject ) => {
+      const newProject = toSelItem( {...changedProject.project, projectRights: changedProject.right} );
+      project( newProject  );
+      setCurrentProject( newProject );
+      client.writeData({ data: { milestone:  allMilestones} });
+  }
 
   return (
     <div>
@@ -209,6 +236,7 @@ export default function TasksSidebar(props) {
           if (pro.id !== -1){
             project(pro);
             setCurrentProject(pro);
+            client.writeData({ data: { milestone:  allMilestones, projectName: pro.title} });
             filter( getEmptyFilter() );
             generalFilter( {...getEmptyGeneralFilter(), project: pro} );
           } else {
@@ -234,20 +262,18 @@ export default function TasksSidebar(props) {
         <div className="">
           <Select
             options={ MILESTONES }
-            value={ localCache.milestone }
+            value={ localCache ? localCache.milestone : null }
             styles={sidebarSelectStyle}
             onChange={mile => {
               if (mile.id !== -1){
                 let milestone = {
                   id: mile.id,
-                  createdAt: mile.createdAt,
-                  updatedAt: mile.updatedAt,
                   title: mile.title,
-                  description: mile.description,
-                  startsAt: mile.startsAt,
-                  endsAt: mile.endsAt,
+                  value: mile.id,
+                  label: mile.title,
+                  __typename: "Milestone"
                 };
-                client.writeData({ data: { milestone } });
+                client.writeData({ data: { milestone} });
               } else {
                 setOpenMilestoneAdd(true);
               }
@@ -399,7 +425,7 @@ export default function TasksSidebar(props) {
 
       { openMilestoneAdd &&
         currentProject && currentProject.id &&
-        <MilestoneAdd projectID={currentProject.id} open={openMilestoneAdd}  closeModal={() => setOpenMilestoneAdd(false)} />
+        <MilestoneAdd projectID={currentProject.id} open={openMilestoneAdd}  closeModal={() => setOpenMilestoneAdd(false)} addNewMilestone={(e1, e2) => addNewMilestone(e1, e2)} />
       }
       { project().projectRights &&
         project().projectRights.write &&
@@ -407,7 +433,7 @@ export default function TasksSidebar(props) {
         localCache.milestone &&
         localCache.milestone.id !== -1 &&
         localCache.milestone.id !== null &&
-        <MilestoneEdit milestoneID={localCache.milestone.id} projectID={project().id} {...props} />
+        <MilestoneEdit milestoneID={localCache.milestone.id} projectID={project().id} {...props} editCacheMilestone={(e1, e2) => editCacheMilestone(e1, e2)} deleteCacheMilestone={(e) => deleteCacheMilestone(e)} />
       }
 
     </div>

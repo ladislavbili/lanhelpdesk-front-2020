@@ -23,9 +23,8 @@ mutation addMilestone($title: String!, $description: String!, $startsAt: String,
 `;
 
 export default function MilestoneAdd (props){
-  return null;
   //data & queries
-  const { open, closeModal, projectID } = props;
+  const { open, closeModal, projectID, addNewMilestone } = props;
   const [ addMilestone, {client} ] = useMutation(ADD_MILESTONE);
 
   //state
@@ -45,16 +44,17 @@ export default function MilestoneAdd (props){
       endsAt: endsAt ? endsAt.unix().toString() : null,
       projectId: projectID,
     } }).then( ( response ) => {
-        let allProjects = client.readQuery({query: GET_PROJECTS}).projects;
+        let allProjects = client.readQuery({query: GET_PROJECTS}).myProjects;
         const newProjects = allProjects.map(item => {
-          if (item.id !== projectID){
-            return item;
+          if (item.project.id !== projectID){
+            return {...item};
           }
           let newProject = {...item};
-          newProject.milestones = [...newProject.milestones, {...response.data.addMilestone, __typename: "Milestone"}];
+          newProject.project.milestones = [...newProject.project.milestones, {...response.data.addMilestone, __typename: "Milestone"}];
           return newProject;
         });
-        client.writeQuery({ query: GET_PROJECTS, data: {projects: [...newProjects] } });
+        client.writeQuery({ query: GET_PROJECTS, data: {myProjects: [...newProjects] } });
+        addNewMilestone(response.data.addMilestone, newProjects.find(item => item.project.id === projectID) );
         closeModal();
     }).catch( (err) => {
       console.log(err.message);
@@ -107,11 +107,11 @@ export default function MilestoneAdd (props){
           </div>
 
           <ModalFooter>
-            <Button className="btn mr-auto" disabled={saving} onClick={() => closeModal()}>
+            <Button className="btn-link mr-auto" disabled={saving} onClick={() => closeModal()}>
               Close
             </Button>
 
-            <Button className="btn-link"
+            <Button className="btn"
               disabled={saving || title === ""}
               onClick={addMilestoneFunc}>
             { saving ? 'Adding...' : 'Add milestone' }

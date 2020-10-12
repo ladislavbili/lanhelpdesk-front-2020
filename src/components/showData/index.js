@@ -18,7 +18,12 @@ query {
 
 const LOCAL_CACHE = gql`
   query getLocalCache {
-    milestone @client
+    milestone @client {
+      id
+      title
+      value
+      label
+    }
 		search @client
 		showDataFilter @client {
 			name
