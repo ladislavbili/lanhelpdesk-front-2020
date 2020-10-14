@@ -48,7 +48,16 @@ export const getFixedFilters = (  ) => {
     //all tasks
     {
       title: 'All tasks',
-      id: 'all',
+      id: null,
+      createdAt: "",
+      updatedAt: "",
+      createdBy: null,
+      pub: true,
+      global: true,
+      dashboard: true,
+      order: 0,
+      roles: null,
+      project: null,
       filter:{
         ...getEmptyFilter(),
       }
@@ -56,31 +65,58 @@ export const getFixedFilters = (  ) => {
     // my tasks
     {
       title: 'My tasks',
-      id: 'myTasks',
+      id: null,
+      createdAt: "",
+      updatedAt: "",
+      createdBy: null,
+      pub: true,
+      global: true,
+      dashboard: true,
+      order: 1,
+      roles: null,
+      project: null,
       filter:{
         ...getEmptyFilter(),
-        assignedTo: "cur",
-        requester: "cur",
+        assignedToCur: true,
+        requesterCur: true,
         oneOf: ['assignedTo', 'requester' ],
       }
     },
     // assignedTasks
     {
       title: 'Assigned tasks',
-      id: 'assignedTasks',
+      id: null,
+      createdAt: "",
+      updatedAt: "",
+      createdBy: null,
+      pub: true,
+      global: true,
+      dashboard: true,
+      order: 2,
+      roles: null,
+      project: null,
       filter:{
         ...getEmptyFilter(),
-        assignedTo: "cur",
+        assignedToCur: true,
       }
     },
     // escalatedTasks
     {
       title: 'Escalated tasks',
-      id: 'escalatedTasks',
+      id: null,
+      createdAt: "",
+      updatedAt: "",
+      createdBy: null,
+      pub: true,
+      global: true,
+      dashboard: true,
+      order: 3,
+      roles: null,
+      project: null,
       filter:{
         ...getEmptyFilter(),
-        assignedTo: "cur",
-        requester: "cur",
+        assignedToCur: true,
+        requesterCur: true,
         oneOf: ['assignedTo', 'requester' ],
         deadlineTo: moment().unix()*1000
       }

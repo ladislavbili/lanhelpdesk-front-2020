@@ -6,6 +6,7 @@ export const typeDefs = gql`
     isLoggedIn: Boolean!
     cartItems: [ID!]!
     projectName: String
+    filterName: String
     milestone: Milestone
     search: String
     showDataFilter: ShowDataFilter

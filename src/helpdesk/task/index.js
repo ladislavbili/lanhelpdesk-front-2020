@@ -119,9 +119,12 @@ query {
 const LOCAL_CACHE = gql`
   query getLocalCache {
     projectName @client
+    filterName @client
     milestone @client {
         id
         title
+        label
+        value
     }
   }
 `;
@@ -193,7 +196,7 @@ export default function TasksIndex (props) {
 		return [
 			{
 				type: 'project',
-				show: localCache ? localCache.projectName : true,
+				show: true,
 				data: localCache ? localCache.projectName : null,
 				label: localCache ? localCache.projectName : 'Invalid project',
 				onClick:()=>{
@@ -207,9 +210,9 @@ export default function TasksIndex (props) {
 			},
 			{
 				type:'milestone',
-				show: localCache ? localCache.projectName !== "Any project" : false,
+				show: true,
 				data: localCache ? localCache.milestone : null,
-				label: localCache && localCache.milestone ? localCache.milestone.title : 'Invalid milestone',
+				label: localCache && localCache.milestone ? localCache.milestone.label : 'Invalid milestone',
 				onClick:()=>{
 					filter(getEmptyFilter());
 					generalFilter(null);
@@ -219,9 +222,10 @@ export default function TasksIndex (props) {
 			{
 				type:'filter',
 				show: true,
-				data: filter(),
-				label: filterName,
+				data: localCache ? localCache.filterName : null,
+				label: localCache ? localCache.filterName : 'Invalid filter',
 				onClick:()=>{
+          console.log("bleh", localCache);
 				}
 			}
 		]

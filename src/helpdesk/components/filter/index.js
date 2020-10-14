@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery, useMutation, useApolloClient } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { Input } from 'reactstrap';
 import Select from 'react-select';
@@ -15,6 +15,8 @@ import { GET_USERS } from 'helpdesk/settings/users';
 import { GET_COMPANIES } from 'helpdesk/settings/companies';
 import { GET_TASK_TYPES } from 'helpdesk/settings/taskTypes';
 import { GET_MY_FILTERS } from 'helpdesk/components/sidebar/tasksSidebar';
+
+import { filter, generalFilter } from 'localCache';
 
 const GET_MY_DATA = gql`
 query {
@@ -38,18 +40,38 @@ mutation deleteFilter($id: Int!) {
 }
 `;
 
+const LOCAL_CACHE = gql`
+  query getLocalCache {
+    filterName @client
+  }
+`;
+
+
+const UPDATE_FILTER = gql`
+mutation updateFilter( $id: Int!, $title: String ) {
+  updateFilter(
+    id: $id,
+    title: $title,
+  )
+}
+`;
+
 export default function Filter(props) {
   //data & queries
-  const { history, filterID, filterData, close } = props;
+  const { history, filterID, filterData, generalFilterData, close, setToEmptyFilter, setCurrentFilter } = props;
   const { data } = useQuery(GET_MY_DATA);
+  const { data: localCache } = useQuery(LOCAL_CACHE);
   const { data: userData, loading: userLoading } = useQuery(GET_USERS);
   const { data: companyData, loading: companyLoading } = useQuery(GET_COMPANIES);
   const { data: taskTypeData, loading: taskTypeLoading } = useQuery(GET_TASK_TYPES);
-  const [ deleteFilter, {client} ] = useMutation(DELETE_FILTER);
+  const [ updateFilter ] = useMutation(UPDATE_FILTER);
+  const [ deleteFilter ] = useMutation(DELETE_FILTER);
 
   const users = ( userLoading ? [] : toSelArr(userData.users, 'email'));
   const companies = ( companyLoading ? [] : toSelArr(companyData.companies) );
   const taskTypes = ( taskTypeLoading ? [] : toSelArr(taskTypeData.taskTypes) );
+
+  const client = useApolloClient();
 
   let currentUser = {};
 
@@ -58,54 +80,35 @@ export default function Filter(props) {
   }
 
   const [ newFilterName, setNewFilterName ] = React.useState("");
-  const [ openEditName, setOpenEditName ] = React.useState(false);
+  const [ openEditName, setOpenEditName ] = React.useState( false );
 
-  const [ assignedToCur, setAssignedToCur ] = React.useState(((filterID && filterData) ? filterData.assignedToCur : false));
+  const [ assignedToCur, setAssignedToCur ] = React.useState( false );
+  const [ assignedTo, setAssignedTo ] = React.useState( {id:null,label:'Žiadny',value:null} );
 
-  let assigned = {id:null,label:'Žiadny',value:null};
-  if (filterID && filterData.assignedToCur){
-    assigned = {label:'Current',value:'cur',id:'cur'};
-  } else if (filterID && filterData.assignedTo){
-    assigned = toSelItem(filterData.assignedTo, 'email');
-  }
-  const [ assignedTo, setAssignedTo ] = React.useState(assigned);
+  const [ requesterCur, setRequesterCur ] = React.useState( false );
+  const [ requester, setRequester ] = React.useState( {id:null,label:'Žiadny',value:null} );
 
-  const [ requesterCur, setRequesterCur ] = React.useState(filterID ? filterData.requesterCur : false);
-  let req = {id:null,label:'Žiadny',value:null};
-  if (filterID && filterData.requesterCur){
-    req = {label:'Current',value:'cur',id:'cur'};
-  } else if (filterID && filterData.requester){
-    req = toSelItem(filterData.requester, 'email');
-  }
-  const [ requester, setRequester ] = React.useState( req );
+  const [ companyCur, setCompanyCur ] = React.useState( false );
+  const [ company, setCompany ] = React.useState( {id:null,label:'Žiadny',value:null} );
 
-  const [ companyCur, setCompanyCur ] = React.useState(filterID ? filterData.companyCur : false);
-  let com = {id:null,label:'Žiadny',value:null};
-  if (filterID && filterData.companyCur){
-    com = {label:'Current',value:'cur',id:'cur'};
-  } else if (filterID && filterData.company){
-    com = toSelItem(filterData.company);
-  }
-  const [ company, setCompany ] = React.useState(com);
-
-  const [ taskType, setTaskType ] = React.useState(filterID && filterData.taskType? toSelItem(filterData.taskType) : null);
-  const [ oneOf, setOneOf ] = React.useState(filterID && filterData.oneOf ? toSelArr(filterData.oneOf) : []);
-  const [ statusDateFrom, setStatusDateFrom ] = React.useState(filterID ? toMomentInput(filterData.statusDateFrom) : null);
-  const [ statusDateFromNow, setStatusDateFromNow ] = React.useState(filterID ? filterData.statusDateFromNow : false);
-  const [ statusDateTo, setStatusDateTo ] = React.useState(filterID ? toMomentInput(filterData.statusDateTo) : null);
-  const [ statusDateToNow, setStatusDateToNow ] = React.useState(filterID ? filterData.statusDateToNow : false);
-  const [ pendingDateFrom, setPendingDateFrom ] = React.useState(filterID ? toMomentInput(filterData.pendingDateFrom) : null);
-  const [ pendingDateFromNow, setPendingDateFromNow ] = React.useState(filterID ? filterData.pendingDateFromNow : false);
-  const [ pendingDateTo, setPendingDateTo ] = React.useState(filterID ? toMomentInput(filterData.pendingDateTo) : null);
-  const [ pendingDateToNow, setPendingDateToNow ] = React.useState(filterID ? filterData.pendingDateToNow : false);
-  const [ closeDateFrom, setCloseDateFrom ] = React.useState(filterID ? toMomentInput(filterData.closeDateFrom) : null);
-  const [ closeDateFromNow, setCloseDateFromNow ] = React.useState(filterID ? filterData.closeDateFromNow : false);
-  const [ closeDateTo, setCloseDateTo ] = React.useState(filterID ? toMomentInput(filterData.closeDateTo) : null);
-  const [ closeDateToNow, setCloseDateToNow ] = React.useState(filterID ? filterData.closeDateToNow : false);
-  const [ deadlineFrom, setDeadlineFrom ] = React.useState(filterID ? toMomentInput(filterData.deadlineFrom) : null);
-  const [ deadlineFromNow, setDeadlineFromNow ] = React.useState(filterID ? filterData.deadlineFromNow : false);
-  const [ deadlineTo, setDeadlineTo ] = React.useState(filterID ? toMomentInput(filterData.deadlineTo) : null);
-  const [ deadlineToNow, setDeadlineToNow ] = React.useState(filterID ? filterData.deadlineToNow : false);
+  const [ taskType, setTaskType ] = React.useState( null );
+  const [ oneOf, setOneOf ] = React.useState( [] );
+  const [ statusDateFrom, setStatusDateFrom ] = React.useState( "" );
+  const [ statusDateFromNow, setStatusDateFromNow ] = React.useState( false );
+  const [ statusDateTo, setStatusDateTo ] = React.useState( "" );
+  const [ statusDateToNow, setStatusDateToNow ] = React.useState( false );
+  const [ pendingDateFrom, setPendingDateFrom ] = React.useState( "" );
+  const [ pendingDateFromNow, setPendingDateFromNow ] = React.useState( false );
+  const [ pendingDateTo, setPendingDateTo ] = React.useState( "" );
+  const [ pendingDateToNow, setPendingDateToNow ] = React.useState( false );
+  const [ closeDateFrom, setCloseDateFrom ] = React.useState( "" );
+  const [ closeDateFromNow, setCloseDateFromNow ] = React.useState( false );
+  const [ closeDateTo, setCloseDateTo ] = React.useState( "" );
+  const [ closeDateToNow, setCloseDateToNow ] = React.useState( false );
+  const [ deadlineFrom, setDeadlineFrom ] = React.useState( "" );
+  const [ deadlineFromNow, setDeadlineFromNow ] = React.useState( false );
+  const [ deadlineTo, setDeadlineTo ] = React.useState( "" );
+  const [ deadlineToNow, setDeadlineToNow ] = React.useState( false );
 
   React.useEffect(() => {
 		if (!openEditName) {
@@ -114,8 +117,8 @@ export default function Filter(props) {
 	}, [openEditName]);
 
   React.useEffect(() => {
-		if (filterID && filterData ) {
-      setNewFilterName("");
+		if ( filterID  ) {
+      setNewFilterName(generalFilterData.title);
       setOpenEditName(false);
 
       setAssignedToCur(filterData.assignedToCur);
@@ -146,7 +149,18 @@ export default function Filter(props) {
       setCompany(com);
 
       setTaskType( filterData.taskType ? toSelItem(filterData.taskType) : null );
-      setOneOf( filterData.oneOf ? toSelArr(filterData.oneOf) : [] );
+
+      let oneOfArr = filterData.oneOf ? toSelArr(filterData.oneOf) : [];
+      oneOfArr.map(item => {
+        if (item === 'requester'){
+          return {id: 'req', title: "Requester", value: 'req', label: "Requester"}
+        } else if (item === 'assigned'){
+          return {id: 'as', title: "Assigned", value: 'as', label: "Assigned"}
+        } else {
+          return {id: 'com', title: "Company", value: 'com', label: "Company"}
+        }
+      })
+      setOneOf( oneOfArr );
       setStatusDateFrom( toMomentInput(filterData.statusDateFrom) );
       setStatusDateFromNow( filterData.statusDateFromNow );
       setStatusDateTo( toMomentInput(filterData.statusDateTo) );
@@ -165,25 +179,9 @@ export default function Filter(props) {
       setDeadlineToNow( filterData.deadlineToNow );
 		}
 	}, [filterID]);
-/*
-  const getItemValue = (sourceKey,props,id) => {
-    const source = toSelArr( props[sourceKey], ['users'].includes(sourceKey) ? 'email' : 'title' )
-    let value = source.find((item)=>item.id === id);
-    if(value===undefined){
-      if(id==='cur'){
-        value={label:'Current',value:'cur',id:'cur'};
-      }else{
-        value={id:null,label:'Žiadny',value:null};
-      }
-    }
-    return value;
-  }*/
-
 
   const deleteFilterFunc = () => {
-    if(window.confirm("Are you sure?") && filterID!==null){
-    //  props.resetFilter();
-    //  close();
+    if ( filterID !== null && window.confirm("Are you sure?") ){
       deleteFilter({ variables: {
         id: filterID,
       } }).then( ( response ) => {
@@ -191,110 +189,181 @@ export default function Filter(props) {
         const newFilters = allFilters.filter(item =>item.id !== filterID);
         client.writeQuery({ query: GET_MY_FILTERS, data: {myFilters: [...newFilters] } });
         history.push('/helpdesk/taskList/i/all');
+        setToEmptyFilter();
+        close();
       }).catch( (err) => {
         console.log(err.message);
         console.log(err);
       });
-      /*rebase.removeDoc('/help-filters/'+this.props.filterID).then(()=>{
-        this.setState(emptyFilter,this.applyFilter.bind(this));
-      });*/
     }
   }
 
   const resetFilter = () => {
     if( filterID === null ){
       setEmptyFilter();
+    } else {
+      setFilter();
     }
-    setFilter();
   }
 
   const setFilter = () => {
-    /*if(!this.storageLoaded(props)){
-      return;
+    setNewFilterName(generalFilterData.title);
+    setOpenEditName(false);
+
+    setAssignedToCur(filterData.assignedToCur);
+    let assigned = {id:null,label:'Žiadny',value:null};
+    if (filterID && filterData.assignedToCur){
+      assigned = {label:'Current',value:'cur',id:'cur'};
+    } else if (filterID && filterData.assignedTo){
+      assigned = toSelItem(filterData.assignedTo, 'email');
     }
-    const filterData = props.filters.find( (filter) => filter.id === props.filter.id );
-    const filter = props.filter;
-    this.setState({
-      requester: this.getItemValue( 'users', props, filter.requester ),
-      company: this.getItemValue( 'companies', props, filter.company ),
-      assigned: this.getItemValue( 'users', props, filter.assigned ),
-      taskType: this.getItemValue( 'taskTypes', props, filter.taskType ),
-      oneOf: oneOfOptions.filter( (option) => filter.oneOf.includes(option.value) ),
+    setAssignedTo(assigned);
 
-      statusDateFrom: toMomentInput(filter.statusDateFrom),
-      statusDateFromNow: filter.statusDateFromNow === true,
-      statusDateTo: toMomentInput(filter.statusDateTo),
-      statusDateToNow: filter.statusDateToNow === true,
+    setRequesterCur(filterData.requesterCur);
+    let req = {id:null,label:'Žiadny',value:null};
+    if (filterData.requesterCur){
+      req = {label:'Current',value:'cur',id:'cur'};
+    } else if (filterData.requester){
+      req = toSelItem(filterData.requester, 'email');
+    }
+    setRequester( req );
 
-      pendingDateFrom: toMomentInput(filter.pendingDateFrom),
-      pendingDateFromNow: filter.pendingDateFromNow === true,
-      pendingDateTo: toMomentInput(filter.pendingDateTo),
-      pendingDateToNow: filter.pendingDateToNow === true,
+    setCompanyCur(filterData.companyCur );
+    let com = {id:null,label:'Žiadny',value:null};
+    if (filterData.companyCur){
+      com = {label:'Current',value:'cur',id:'cur'};
+    } else if (filterData.company){
+      com = toSelItem(filterData.company);
+    }
+    setCompany(com);
 
-      closeDateFrom: toMomentInput(filter.closeDateFrom),
-      closeDateFromNow: filter.closeDateFromNow === true,
-      closeDateTo: toMomentInput(filter.closeDateTo),
-      closeDateToNow: filter.closeDateToNow === true,
+    setTaskType( filterData.taskType ? toSelItem(filterData.taskType) : null );
 
-      deadlineFrom: toMomentInput(filter.deadlineFrom),
-      deadlineFromNow: filter.deadlineFromNow === true,
-      deadlineTo: toMomentInput(filter.deadlineTo),
-      deadlineToNow: filter.deadlineToNow === true,
+    let oneOfArr = filterData.oneOf ? toSelArr(filterData.oneOf) : [];
+    oneOfArr.map(item => {
+      if (item === 'requester'){
+        return {id: 'req', title: "Requester", value: 'requester', label: "Requester"}
+      } else if (item === 'assigned'){
+        return {id: 'as', title: "Assigned", value: 'assigned', label: "Assigned"}
+      } else {
+        return {id: 'com', title: "Company", value: 'company', label: "Company"}
+      }
+    })
+    setOneOf( oneOfArr );
+    setStatusDateFrom( toMomentInput(filterData.statusDateFrom) );
+    setStatusDateFromNow( filterData.statusDateFromNow );
+    setStatusDateTo( toMomentInput(filterData.statusDateTo) );
+    setStatusDateToNow( filterData.statusDateToNow );
+    setPendingDateFrom( toMomentInput(filterData.pendingDateFrom) );
+    setPendingDateFromNow( filterData.pendingDateFromNow );
+    setPendingDateTo( toMomentInput(filterData.pendingDateTo) );
+    setPendingDateToNow( filterData.pendingDateToNow );
+    setCloseDateFrom( toMomentInput(filterData.closeDateFrom) );
+    setCloseDateFromNow( filterData.closeDateFromNow );
+    setCloseDateTo( toMomentInput(filterData.closeDateTo) );
+    setCloseDateToNow( filterData.closeDateToNow );
+    setDeadlineFrom( toMomentInput(filterData.deadlineFrom) );
+    setDeadlineFromNow( filterData.deadlineFromNow );
+    setDeadlineTo( toMomentInput(filterData.deadlineTo) );
+    setDeadlineToNow( filterData.deadlineToNow );
 
-      public:filterData ? filterData.public : false,
-    });
-  }
-
-  storageLoaded(props){
-    return (
-      props.filtersLoaded &&
-      props.taskTypesLoaded &&
-      props.usersLoaded &&
-      props.companiesLoaded
-    )*/
+    filter(filterData);
+    generalFilter(generalFilterData);
   }
 
 
   const setEmptyFilter = () => {
-    // filter = emptyFilter bla bla
+    setNewFilterName("");
+    setOpenEditName( false );
+
+    setAssignedToCur( false );
+    setAssignedTo( {id:null,label:'Žiadny',value:null} );
+
+    setRequesterCur( false );
+    setRequester( {id:null,label:'Žiadny',value:null} );
+
+    setCompanyCur( false );
+    setCompany( {id:null,label:'Žiadny',value:null} );
+
+    setTaskType( null );
+    setOneOf( [] );
+    setStatusDateFrom( "" );
+    setStatusDateFromNow( false );
+    setStatusDateTo( "" );
+    setStatusDateToNow( false );
+    setPendingDateFrom( "" );
+    setPendingDateFromNow( false );
+    setPendingDateTo( "" );
+    setPendingDateToNow( false );
+    setCloseDateFrom( "" );
+    setCloseDateFromNow( false );
+    setCloseDateTo( "" );
+    setCloseDateToNow( false );
+    setDeadlineFrom( "" );
+    setDeadlineFromNow( false );
+    setDeadlineTo( "" );
+    setDeadlineToNow( false );
   }
 
   const applyFilter = () => {
-  /*  let body={
-      requester:this.state.requester.id,
-      company:this.state.company.id,
-      assigned:this.state.assigned.id,
-      taskType:this.state.taskType.id,
-      oneOf: this.state.oneOf.map( (item) => item.value ),
+    let newGeneralFilter = {...generalFilterData};
+    let newFilter = {};
+    let body={
+        requester: requester.id,
+        requesterCur: requesterCur,
+        company: company.id,
+        companyCur: companyCur,
+        assignedTo: assignedTo.id,
+        assignedToCur: assignedToCur,
 
-      statusDateFrom: toMomentInput(this.state.statusDateFrom),
-      statusDateFromNow: this.state.statusDateFromNow === true,
-      statusDateTo: toMomentInput(this.state.statusDateTo),
-      statusDateToNow: this.state.statusDateToNow === true,
+        taskType: taskType.id,
+        oneOf: oneOf.map( (item) => item.value ),
 
-      pendingDateFrom: toMomentInput(this.state.pendingDateFrom),
-      pendingDateFromNow: this.state.pendingDateFromNow === true,
-      pendingDateTo: toMomentInput(this.state.pendingDateTo),
-      pendingDateToNow: this.state.pendingDateToNow === true,
+        statusDateFrom: toMomentInput(statusDateFrom),
+        statusDateFromNow: statusDateFromNow,
+        statusDateTo: toMomentInput(statusDateTo),
+        statusDateToNow: statusDateToNow,
 
-      closeDateFrom: toMomentInput(this.state.closeDateFrom),
-      closeDateFromNow: this.state.closeDateFromNow === true,
-      closeDateTo: toMomentInput(this.state.closeDateTo),
-      closeDateToNow: this.state.closeDateToNow === true,
+        pendingDateFrom: toMomentInput(pendingDateFrom),
+        pendingDateFromNow: pendingDateFromNow,
+        pendingDateTo: toMomentInput(pendingDateTo),
+        pendingDateToNow: pendingDateToNow,
 
-      deadlineFrom: toMomentInput(this.state.deadlineFrom),
-      deadlineFromNow: this.state.deadlineFromNow === true,
-      deadlineTo: toMomentInput(this.state.deadlineTo),
-      deadlineToNow: this.state.deadlineToNow === true,
+        closeDateFrom: toMomentInput(closeDateFrom),
+        closeDateFromNow: closeDateFromNow,
+        closeDateTo: toMomentInput(closeDateTo),
+        closeDateToNow: closeDateToNow,
 
-      updatedAt:(new Date()).getTime()
-    }
-    this.props.setFilter(body);*/ // localCache
+        deadlineFrom: toMomentInput(deadlineFrom),
+        deadlineFromNow: deadlineFromNow,
+        deadlineTo: toMomentInput(deadlineTo),
+        deadlineToNow: deadlineToNow,
+
+        updatedAt:(new Date()).getTime()
+      }
+    setCurrentFilter(newGeneralFilter);
   }
 
   const renameFilter = () => {
-    if ( filterData && filterData.title !== newFilterName && newFilterName.length > 0){
-    //  rebase.updateDoc('/help-filters/'+this.props.filterID, {title: this.state.newFilterName})
+    if ( generalFilterData && generalFilterData.title !== newFilterName && newFilterName.length > 0){
+      updateFilter({ variables: {
+        id: filterID,
+        title: newFilterName,
+      } }).then( ( response ) => {
+          let allFilters = client.readQuery({query: GET_MY_FILTERS}).myFilters;
+          const newFilters = allFilters.map(item => {
+            if (item.id !== filterID){
+              return item;
+            }
+            return ({...generalFilterData, name: newFilterName, __typename: "Filter"});
+          });
+          client.writeQuery({ query: GET_MY_FILTERS, data: {myFilters: [...newFilters] } });
+          generalFilter({...generalFilterData, title: newFilterName});
+          setCurrentFilter({...generalFilterData, title: newFilterName});
+          client.writeData({ data: { filterName: newFilterName} });
+      }).catch( (err) => {
+        console.log(err.message);
+      });
     }
   }
 
@@ -372,7 +441,10 @@ export default function Filter(props) {
                     placeholder="Enter filter name"
                     autoFocus
                     value={newFilterName ? newFilterName : filterData.title}
-                    onChange={(e) => setNewFilterName(e.target.value)}
+                    onChange={(e) => {
+                      setNewFilterName(e.target.value);
+                      renameFilter()
+                    }}
                     onBlur={() => setOpenEditName(false)}
                     />
                 }

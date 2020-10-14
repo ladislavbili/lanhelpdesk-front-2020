@@ -115,6 +115,7 @@ export default function createClient(){
       isLoggedIn: false,
       cartItems: [],
       projectName: "Any project",
+      filterName: "All tasks",
       milestone: allMilestones,
       orderBy: 'id',
       ascending: false,

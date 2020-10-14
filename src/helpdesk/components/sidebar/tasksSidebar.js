@@ -16,7 +16,7 @@ import ProjectAdd from '../projects/projectAddContainer';
 import MilestoneEdit from '../milestones/milestoneEdit';
 import MilestoneAdd from '../milestones/milestoneAdd';
 
-import { getEmptyFilter, getEmptyGeneralFilter } from 'configs/fixedFilters';
+import { getEmptyFilter } from 'configs/fixedFilters';
 import { toSelArr, toSelItem } from 'helperFunctions';
 import { dashboard, addProject, allMilestones, addMilestone } from 'configs/constants/sidebar';
 import moment from 'moment';
@@ -70,6 +70,9 @@ query {
     title
     id
     createdAt
+    createdBy {
+      id
+    }
     updatedAt
     id
     title
@@ -129,6 +132,7 @@ query {
 const LOCAL_CACHE = gql`
   query getLocalCache {
     projectName @client
+    filterName @client
     milestone @client {
       id
       title
@@ -157,6 +161,7 @@ export default function TasksSidebar(props) {
   const [ activeTab, setActiveTab ] = React.useState(0);
 
   const [ currentProject, setCurrentProject ] = React.useState(dashboard);
+  const [ currentFilter, setCurrentFilter ] = React.useState( {} );
 
   // sync
   React.useEffect( () => {
@@ -169,16 +174,19 @@ export default function TasksSidebar(props) {
       } else {
         filterId = location.pathname.slice(startId, endId - 1);
       }
-      if (location.pathname.length > 12 && !isNaN(filterId)) {
-        const newFilter = myFiltersData.myFilters.find(item => item.id === parseInt(filterId) );
-        filter( newFilter.filter );
-        generalFilter( newFilter );
+      if (location.pathname.length > 12) {
+        const newFilter = myFiltersData.myFilters.find(item => item.id === filterId );
+        if (newFilter){
+          filter( newFilter.filter );
+          generalFilter( newFilter );
+          setCurrentFilter( newFilter );
+          client.writeData({ data: { filterName: newFilter.title} });
+        }
       }
     }
   }, [myFiltersLoading]);
 
-
-  const FILTERS = [ ...(myFiltersData === undefined ? [] : myFiltersData.myFilters  )];
+  const FILTERS =(myFiltersData === undefined ? [] : myFiltersData.myFilters);
   const MY_PROJECTS = !projectsData ? [] : (toSelArr(projectsData.myProjects.map(item => ({...item.project, projectRights: item.right}) )));
   const PROJECTS = [...(accessRights.addProjects ? [dashboard,addProject] : [dashboard] ), ...MY_PROJECTS ];
   const MILESTONES = ([allMilestones, addMilestone]).concat(toSelArr( project().id !== null && project().id !== -1 ? project().milestones : [] ));
@@ -186,9 +194,10 @@ export default function TasksSidebar(props) {
   const addNewProject = (newProject) => {
       project(toSelItem(newProject));
       setCurrentProject(toSelItem(newProject));
-      client.writeData({ data: { milestone:  allMilestones, projectName: newProject.title} });
+      client.writeData({ data: { milestone:  allMilestones, projectName: newProject.title, filterName: "All tasks"} });
       filter( getEmptyFilter() );
-      generalFilter( {...getEmptyGeneralFilter(), project: toSelItem(newProject)} );
+      generalFilter( null );
+      setCurrentFilter( {} );
   }
 
   const addNewMilestone = (newMilestone, changedProject) => {
@@ -236,9 +245,7 @@ export default function TasksSidebar(props) {
           if (pro.id !== -1){
             project(pro);
             setCurrentProject(pro);
-            client.writeData({ data: { milestone:  allMilestones, projectName: pro.title} });
-            filter( getEmptyFilter() );
-            generalFilter( {...getEmptyGeneralFilter(), project: pro} );
+            client.writeData({ data: { milestone:  allMilestones, projectName: pro.title } });
           } else {
             setOpenProjectAdd(true);
           }
@@ -273,7 +280,7 @@ export default function TasksSidebar(props) {
                   label: mile.title,
                   __typename: "Milestone"
                 };
-                client.writeData({ data: { milestone} });
+                client.writeData({ data: { milestone } });
               } else {
                 setOpenMilestoneAdd(true);
               }
@@ -331,23 +338,10 @@ export default function TasksSidebar(props) {
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0} >
           <Nav vertical>
-            { FILTERS.map((item)=> {
-                const startId = location.pathname.lastIndexOf("i/") + 2;
-                const endId = location.pathname.lastIndexOf("/") + 1;
-                let filterId = "";
-                if (startId === endId){
-                  filterId = location.pathname.slice(startId);
-                } else {
-                  filterId = location.pathname.slice(startId, endId - 1);
-                }
-                let isActive = false;
-                if (location.pathname.length > 12 && !isNaN(filterId)) {
-                   isActive = item.id === parseInt(filterId);
-                }
-                return (
+            { FILTERS.map((item)=>
                   <NavItem key={item.id} className="row">
                   <Link
-                    className="sidebar-menu-item"
+                    className={classnames("sidebar-menu-item", {"active" : item.id === currentFilter.id})}
                     to={{ pathname: `/helpdesk/taskList/i/`+item.id }}
                     onClick={()=>{
                       const newFilter = {
@@ -372,22 +366,17 @@ export default function TasksSidebar(props) {
                       }
                       filter(newFilter);
                       generalFilter(item);
+                      setCurrentFilter(item);
+                      client.writeData({ data: { filterName: item.title} });
                     }}
                     >
                     {item.title}
                   </Link>
 
                   <div
-                    className={classnames("sidebar-icon", "clickable" , {"active" : isActive})}
+                    className={classnames("sidebar-icon", "clickable" , {"active": item.id === currentFilter.id })}
                     onClick={() => {
-                      if (isActive){
-                        history.push(`/helpdesk/taskList/i/`+item.id);
-                        const newFilter = {
-                          ...item.filter,
-                          updatedAt: moment().unix(),
-                        }
-                        filter(newFilter);
-                        generalFilter(item);
+                      if (item.id === currentFilter.id){
                         setActiveTab(1);
                       }
                     }}
@@ -395,7 +384,6 @@ export default function TasksSidebar(props) {
                     <i className="fa fa-cog"/>
                   </div>
                 </NavItem>
-              )}
             )}
 
           </Nav>
@@ -404,10 +392,14 @@ export default function TasksSidebar(props) {
           <Filter
             filterID={generalFilter() ? generalFilter().id : null}
             history={history}
-            filterData={filter()}
-            resetFilter={()=> {
-              filter(getEmptyFilter());
-              generalFilter(null);
+            filter={filter()}
+            generalFilter={generalFilter()}
+            setCurrentFilter={ (f) => setCurrentFilter(f) }
+            setToEmptyFilter={()=> {
+              filter(  getEmptyFilter() );
+              generalFilter( null );
+              setCurrentFilter( {} );
+              client.writeData({ data: { filterName: "All tasks"} });
             }}
             close={ () => setActiveTab(0)}
             />
