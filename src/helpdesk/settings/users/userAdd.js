@@ -1,17 +1,32 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import {
+  useMutation,
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
+import {
+  selectStyle
+} from "configs/components/select";
 
-import {isEmail, toSelArr} from 'helperFunctions';
+import {
+  isEmail,
+  toSelArr
+} from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 
-import {  GET_USERS } from './index';
+import {
+  GET_USERS
+} from './index';
 
-const ADD_USER = gql`
+const ADD_USER = gql `
 mutation registerUser($username: String!, $email: String!, $name: String!, $language: LanguageEnum!, $surname: String!, $password: String!, $receiveNotifications: Boolean, $signature: String, $roleId: Int!, $companyId: Int!) {
   registerUser(
     username: $username,
@@ -39,7 +54,7 @@ mutation registerUser($username: String!, $email: String!, $name: String!, $lang
 }
 `;
 
-export const GET_ROLES = gql`
+export const GET_ROLES = gql `
 query {
   roles{
     id
@@ -49,7 +64,7 @@ query {
 }
 `;
 
-export const GET_COMPANIES = gql`
+export const GET_COMPANIES = gql `
 query {
   companies{
     id
@@ -58,68 +73,101 @@ query {
 }
 `;
 
-export default function UserAddContainer(props){
+export default function UserAddContainer( props ) {
   // data & queries
-  const { history, addUserToList, closeModal } = props;
-  const { data: rolesData, loading: rolesLoading } = useQuery(GET_ROLES);
-  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
-  const [registerUser, {client}] = useMutation(ADD_USER);
+  const {
+    history,
+    addUserToList,
+    closeModal
+  } = props;
+  const {
+    data: rolesData,
+    loading: rolesLoading
+  } = useQuery( GET_ROLES );
+  const {
+    data: companiesData,
+    loading: companiesLoading
+  } = useQuery( GET_COMPANIES );
+  const [ registerUser, {
+    client
+  } ] = useMutation( ADD_USER );
 
-  const ROLES = ( rolesLoading ? [] : toSelArr(rolesData.roles) );
-  const COMPANIES = ( companiesLoading ? [] : toSelArr(companiesData.companies) );
+  const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
+  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.companies ) );
 
-  const languages = [{label: "SK", value: "sk"}, {label: "ENG", value: "en"}]
+  const languages = [ {
+    label: "SK",
+    value: "sk"
+  }, {
+    label: "ENG",
+    value: "en"
+  } ]
 
   //state
-  const [ active ] = React.useState(true);
-  const [ username, setUsername ] = React.useState("");
-  const [ email, setEmail ] = React.useState("");
-  const [ name, setName ] = React.useState("");
-  const [ surname, setSurname ] = React.useState("");
-  const [ password, setPassword ] = React.useState("");
-  const [ receiveNotifications, setReceiveNotifications ] = React.useState(false);
-  const [ signature, setSignature ] = React.useState("");
-  const [ signatureChanged, setSignatureChanged ] = React.useState(false);
-  const [ role, setRole ] = React.useState(null);
-  const [ company, setCompany ] = React.useState(null);
-  const [ language, setLanguage ] = React.useState(languages[0]);
-  const [ saving, setSaving ] = React.useState(false);
+  const [ active ] = React.useState( true );
+  const [ username, setUsername ] = React.useState( "" );
+  const [ email, setEmail ] = React.useState( "" );
+  const [ name, setName ] = React.useState( "" );
+  const [ surname, setSurname ] = React.useState( "" );
+  const [ password, setPassword ] = React.useState( "" );
+  const [ receiveNotifications, setReceiveNotifications ] = React.useState( false );
+  const [ signature, setSignature ] = React.useState( "" );
+  const [ signatureChanged, setSignatureChanged ] = React.useState( false );
+  const [ role, setRole ] = React.useState( null );
+  const [ company, setCompany ] = React.useState( null );
+  const [ language, setLanguage ] = React.useState( languages[ 0 ] );
+  const [ saving, setSaving ] = React.useState( false );
 
 
   const addUserFunc = () => {
     setSaving( true );
-    registerUser({ variables: {
-      active,
-      username,
-      email,
-      name,
-      surname,
-      password,
-      receiveNotifications,
-      signature: (signature ? signature : `${name} ${surname}, ${company.title}`),
-      roleId: role.id,
-      companyId: company.id,
-      language: language.value,
-    } }).then( ( response ) => {
-      const allUsers = client.readQuery({query: GET_USERS}).users;
-      let newUser = {...response.data.registerUser,  __typename: "User"}
-      client.writeQuery({ query: GET_USERS, data: {users: [...allUsers, newUser]} });
-      if (addUserToList){
-        addUserToList();
-        closeModal();
-      } else {
-        history.push('/helpdesk/settings/users/' + newUser.id);
-      }
+    registerUser( {
+        variables: {
+          active,
+          username,
+          email,
+          name,
+          surname,
+          password,
+          receiveNotifications,
+          signature: ( signature ? signature : `${name} ${surname}, ${company.title}` ),
+          roleId: role.id,
+          companyId: company.id,
+          language: language.value,
+        }
+      } )
+      .then( ( response ) => {
+        const allUsers = client.readQuery( {
+            query: GET_USERS
+          } )
+          .users;
+        let newUser = {
+          ...response.data.registerUser,
+          __typename: "User"
+        }
+        client.writeQuery( {
+          query: GET_USERS,
+          data: {
+            users: [ ...allUsers, newUser ]
+          }
+        } );
+        if ( addUserToList ) {
+          addUserToList();
+          closeModal();
+        } else {
+          history.push( '/helpdesk/settings/users/' + newUser.id );
+        }
 
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   }
 
   const cannotAddUser = () => {
-    let cond1 = saving || (COMPANIES ? COMPANIES.length === 0 : false) ;
-    let cond2 = !username || !name || !surname || !isEmail(email) || password.length < 6 || !role || !company;
+    let cond1 = saving || ( COMPANIES ? COMPANIES.length === 0 : false );
+    let cond2 = !username || !name || !surname || !isEmail( email ) || password.length < 6 || !role || !company;
     return cond1 || cond2;
   }
 

@@ -1,18 +1,40 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import {
+  useMutation,
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader  } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader
+} from 'reactstrap';
 import Loading from 'components/loading';
-import { actions } from 'configs/constants/statuses';
-import { SketchPicker } from "react-color";
+import {
+  actions
+} from 'configs/constants/statuses';
+import {
+  SketchPicker
+} from "react-color";
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
-import { toSelArr } from 'helperFunctions';
+import {
+  selectStyle
+} from "configs/components/select";
+import {
+  toSelArr
+} from 'helperFunctions';
 
-import {  GET_STATUSES } from './index';
+import {
+  GET_STATUSES
+} from './index';
 
-const GET_STATUS = gql`
+const GET_STATUS = gql `
 query status($id: Int!) {
   status (
     id: $id
@@ -27,7 +49,7 @@ query status($id: Int!) {
 }
 `;
 
-const UPDATE_STATUS = gql`
+const UPDATE_STATUS = gql `
 mutation updateStatus($id: Int!, $title: String!, $order: Int!, $icon: String!, $color: String!, $action: StatusAllowedType!) {
   updateStatus(
     id: $id,
@@ -44,7 +66,7 @@ mutation updateStatus($id: Int!, $title: String!, $order: Int!, $icon: String!, 
 }
 `;
 
-export const DELETE_STATUS = gql`
+export const DELETE_STATUS = gql `
 mutation deleteStatus($id: Int!, $newId: Int!) {
   deleteStatus(
     id: $id,
@@ -56,77 +78,109 @@ mutation deleteStatus($id: Int!, $newId: Int!) {
 `;
 
 
-export default function StatusEdit(props){
+export default function StatusEdit( props ) {
   //data
-  const { history, match } = props;
-  const { data, loading, refetch } = useQuery(GET_STATUS, { variables: {id: parseInt(props.match.params.id)} });
-  const [updateStatus] = useMutation(UPDATE_STATUS);
-  const [deleteStatus, {client}] = useMutation(DELETE_STATUS);
-  const allStatuses = toSelArr(client.readQuery({query: GET_STATUSES}).statuses);
-  const filteredStatuses = allStatuses.filter( status => status.id !== parseInt(match.params.id) );
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading,
+    refetch
+  } = useQuery( GET_STATUS, {
+    variables: {
+      id: parseInt( props.match.params.id )
+    }
+  } );
+  const [ updateStatus ] = useMutation( UPDATE_STATUS );
+  const [ deleteStatus, {
+    client
+  } ] = useMutation( DELETE_STATUS );
+  const allStatuses = toSelArr( client.readQuery( {
+      query: GET_STATUSES
+    } )
+    .statuses );
+  const filteredStatuses = allStatuses.filter( status => status.id !== parseInt( match.params.id ) );
   const theOnlyOneLeft = allStatuses.length === 0;
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ color, setColor ] = React.useState("#f759f2");
-  const [ order, setOrder ] = React.useState(0);
-  const [ icon, setIcon ] = React.useState("fas fa-arrow-left");
-  const [ action, setAction ] = React.useState(actions[0]);
-  const [ saving, setSaving ] = React.useState(false);
-  const [ choosingNewStatus, setChooseingNewStatus ] = React.useState(false);
-  const [ newStatus, setNewStatus ] = React.useState(null);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ color, setColor ] = React.useState( "#f759f2" );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ icon, setIcon ] = React.useState( "fas fa-arrow-left" );
+  const [ action, setAction ] = React.useState( actions[ 0 ] );
+  const [ saving, setSaving ] = React.useState( false );
+  const [ choosingNewStatus, setChooseingNewStatus ] = React.useState( false );
+  const [ newStatus, setNewStatus ] = React.useState( null );
 
   // sync
   React.useEffect( () => {
-      if (!loading){
-        setTitle(data.status.title);
-        setColor(data.status.color);
-        setOrder(data.status.order);
-        setIcon(data.status.icon);
-        setAction(actions.find(a => a.value === data.status.action));
-      }
-  }, [loading]);
+    if ( !loading ) {
+      setTitle( data.status.title );
+      setColor( data.status.color );
+      setOrder( data.status.order );
+      setIcon( data.status.icon );
+      setAction( actions.find( a => a.value === data.status.action ) );
+    }
+  }, [ loading ] );
 
   React.useEffect( () => {
-      refetch({ variables: {id: parseInt(match.params.id)} });
-  }, [match.params.id]);
+    refetch( {
+      variables: {
+        id: parseInt( match.params.id )
+      }
+    } );
+  }, [ match.params.id ] );
 
   // functions
   const updateStatusFunc = () => {
     setSaving( true );
-    updateStatus({ variables: {
-      id: parseInt(match.params.id),
-      title,
-      order: (order !== '' ? parseInt(order) : 0),
-      icon,
-      color,
-      action: action.value,
-    } }).then( ( response ) => {
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    updateStatus( {
+        variables: {
+          id: parseInt( match.params.id ),
+          title,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+          icon,
+          color,
+          action: action.value,
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-     setSaving( false );
+    setSaving( false );
   };
 
   const deleteStatusFunc = () => {
-    setChooseingNewStatus(false);
+    setChooseingNewStatus( false );
 
-    if(window.confirm("Are you sure?")){
-      deleteStatus({ variables: {
-        id: parseInt(match.params.id),
-        newId: newStatus.id,
-      } }).then( ( response ) => {
-        client.writeQuery({ query: GET_STATUSES, data: {statuses: filteredStatuses} });
-        history.goBack();
-      }).catch( (err) => {
-        console.log(err.message);
-        console.log(err);
-      });
+    if ( window.confirm( "Are you sure?" ) ) {
+      deleteStatus( {
+          variables: {
+            id: parseInt( match.params.id ),
+            newId: newStatus.id,
+          }
+        } )
+        .then( ( response ) => {
+          client.writeQuery( {
+            query: GET_STATUSES,
+            data: {
+              statuses: filteredStatuses
+            }
+          } );
+          history.goBack();
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+          console.log( err );
+        } );
     }
   };
 
-  if (loading) {
+  if ( loading ) {
     return <Loading />
   }
 

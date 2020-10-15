@@ -1,12 +1,21 @@
 import React from 'react';
-import { useMutation } from "@apollo/react-hooks";
+import {
+  useMutation
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 
-import {  GET_TRIP_TYPES } from './index';
+import {
+  GET_TRIP_TYPES
+} from './index';
 
-const ADD_TRIP_TYPE = gql`
+const ADD_TRIP_TYPE = gql `
 mutation addTripType($title: String!, $order: Int) {
   addTripType(
     title: $title,
@@ -20,30 +29,49 @@ mutation addTripType($title: String!, $order: Int) {
 `;
 
 
-export default function TripTypeAdd(props){
+export default function TripTypeAdd( props ) {
   //data & queries
-  const { history } = props;
-  const [ addTripType, {client} ] = useMutation(ADD_TRIP_TYPE);
+  const {
+    history
+  } = props;
+  const [ addTripType, {
+    client
+  } ] = useMutation( ADD_TRIP_TYPE );
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ order, setOrder ] = React.useState(0);
-  const [ saving, setSaving ] = React.useState(false);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ saving, setSaving ] = React.useState( false );
 
   //functions
   const addTripTypeFunc = () => {
     setSaving( true );
-    addTripType({ variables: {
-      title,
-      order: (order !== '' ? parseInt(order) : 0),
-    } }).then( ( response ) => {
-      const allTripTypes = client.readQuery({query: GET_TRIP_TYPES}).tripTypes;
-      const newTripType = {...response.data.addTripType, __typename: "TripType"};
-      client.writeQuery({ query: GET_TRIP_TYPES, data: {tripTypes: [...allTripTypes, newTripType ] } });
-      history.push('/helpdesk/settings/tripTypes/' + newTripType.id)
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    addTripType( {
+        variables: {
+          title,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+        }
+      } )
+      .then( ( response ) => {
+        const allTripTypes = client.readQuery( {
+            query: GET_TRIP_TYPES
+          } )
+          .tripTypes;
+        const newTripType = {
+          ...response.data.addTripType,
+          __typename: "TripType"
+        };
+        client.writeQuery( {
+          query: GET_TRIP_TYPES,
+          data: {
+            tripTypes: [ ...allTripTypes, newTripType ]
+          }
+        } );
+        history.push( '/helpdesk/settings/tripTypes/' + newTripType.id )
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   }
 

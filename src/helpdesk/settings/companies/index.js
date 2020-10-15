@@ -1,13 +1,17 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import CompanyAdd from './companyAdd';
 import CompanyEdit from './companyEdit';
 import Loading from 'components/loading';
 
-export const GET_COMPANIES = gql`
+export const GET_COMPANIES = gql `
 query {
   companies {
     title
@@ -17,18 +21,24 @@ query {
 }
 `;
 
-export default function CompanysList(props){
-    // state
-    const [ companyFilter, setCompanyFilter ] = React.useState("");
-    const [ sortBy, setSortBy ] = React.useState("");
+export default function CompanysList( props ) {
+  // state
+  const [ companyFilter, setCompanyFilter ] = React.useState( "" );
+  const [ sortBy, setSortBy ] = React.useState( "" );
 
-    //data
-    const { history, match } = props;
-    const { data, loading } = useQuery(GET_COMPANIES);
-    const COMPANIES = (loading || !data ? [] : data.companies);
+  //data
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_COMPANIES );
+  const COMPANIES = ( loading || !data ? [] : data.companies );
 
-    return (
-      <div className="content">
+  return (
+    <div className="content">
         <div className="row m-0 p-0 taskList-container">
           <div className="col-lg-4">
             <div className="commandbar">
@@ -117,5 +127,5 @@ export default function CompanysList(props){
           </div>
         </div>
       </div>
-    );
+  );
 }

@@ -1,12 +1,23 @@
 import React from 'react';
-import { useMutation } from "@apollo/react-hooks";
+import {
+  useMutation
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import { Button, FormGroup, Label,Input } from 'reactstrap';
-import { SketchPicker } from "react-color";
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
+import {
+  SketchPicker
+} from "react-color";
 
-import {  GET_TAGS } from './index';
+import {
+  GET_TAGS
+} from './index';
 
-const ADD_TAG = gql`
+const ADD_TAG = gql `
 mutation addTag($title: String!, $color: String, $order: Int) {
   addTag(
     title: $title,
@@ -21,37 +32,56 @@ mutation addTag($title: String!, $color: String, $order: Int) {
 }
 `;
 
-export default function TagAdd(props){
+export default function TagAdd( props ) {
   //data & queries
-  const { history } = props;
-  const [ addTag, {client} ] = useMutation(ADD_TAG);
+  const {
+    history
+  } = props;
+  const [ addTag, {
+    client
+  } ] = useMutation( ADD_TAG );
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ color, setColor ] = React.useState("#f759f2");
-  const [ order, setOrder ] = React.useState(0);
-  const [ saving, setSaving ] = React.useState(false);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ color, setColor ] = React.useState( "#f759f2" );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ saving, setSaving ] = React.useState( false );
 
   //functions
   const addTagFunc = () => {
     setSaving( true );
-    addTag({ variables: {
-      title,
-      color,
-      order: (order !== '' ? parseInt(order) : 0),
-    } }).then( ( response ) => {
-      const allTags = client.readQuery({query: GET_TAGS}).tags;
-      const newTag = {...response.data.addTag, __typename: "Tag"};
-      client.writeQuery({ query: GET_TAGS, data: {tags: [...allTags, newTag ] } });
-      history.push('/helpdesk/settings/tags/' + newTag.id)
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    addTag( {
+        variables: {
+          title,
+          color,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+        }
+      } )
+      .then( ( response ) => {
+        const allTags = client.readQuery( {
+            query: GET_TAGS
+          } )
+          .tags;
+        const newTag = {
+          ...response.data.addTag,
+          __typename: "Tag"
+        };
+        client.writeQuery( {
+          query: GET_TAGS,
+          data: {
+            tags: [ ...allTags, newTag ]
+          }
+        } );
+        history.push( '/helpdesk/settings/tags/' + newTag.id )
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   }
 
-    return (
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+  return (
+    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
 
         <FormGroup>
           <Label for="name">Tag name</Label>

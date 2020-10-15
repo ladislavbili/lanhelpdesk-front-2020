@@ -1,23 +1,42 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import {
+  useMutation,
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label, Input } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 import Switch from "react-switch";
-import {toSelArr, toSelItem} from '../../../helperFunctions';
+import {
+  toSelArr,
+  toSelItem
+} from '../../../helperFunctions';
 import Loading from 'components/loading';
 
-import { isEmail} from '../../../helperFunctions';
+import {
+  isEmail
+} from '../../../helperFunctions';
 import CompanyRents from './companyRents';
 import CompanyPriceList from './companyPriceList';
 
 import classnames from "classnames";
 
-import {  GET_COMPANIES } from './index';
-import {  GET_PRICELISTS } from '../prices/index';
-import {  ADD_PRICELIST } from '../prices/priceAdd';
+import {
+  GET_COMPANIES
+} from './index';
+import {
+  GET_PRICELISTS
+} from '../prices/index';
+import {
+  ADD_PRICELIST
+} from '../prices/priceAdd';
 
-const ADD_COMPANY = gql`
+const ADD_COMPANY = gql `
 mutation addCompany($title: String!, $dph: Int!, $ico: String!, $dic: String!, $ic_dph: String!, $country: String!, $city: String!, $street: String!, $zip: String!, $email: String!, $phone: String!, $description: String!, $pricelistId: Int!, $monthly: Boolean!, $monthlyPausal: Float!, $taskWorkPausal: Float!, $taskTripPausal: Float!, $rents: [CompanyRentCreateInput]!) {
   addCompany(
     title: $title,
@@ -65,142 +84,177 @@ mutation addCompany($title: String!, $dph: Int!, $ico: String!, $dic: String!, $
 }
 `;
 
-export default function CompanyAdd(props){
+export default function CompanyAdd( props ) {
   //data
-  const { history, match, addCompanyToList, closeModal } = props;
-  const [addCompany, {client}] = useMutation(ADD_COMPANY);
-  const [ addPricelist ] = useMutation(ADD_PRICELIST);
-  const { data, loading: pricelistsLoading } = useQuery(GET_PRICELISTS);
-  const PRICELISTS = (pricelistsLoading || !data ? [] : data.pricelists);
-  let pl = [{label: "Nový cenník", value: "0"}, ...toSelArr(PRICELISTS)];
-  const [ pricelists, setPricelists ] = React.useState(pl);
+  const {
+    history,
+    match,
+    addCompanyToList,
+    closeModal
+  } = props;
+  const [ addCompany, {
+    client
+  } ] = useMutation( ADD_COMPANY );
+  const [ addPricelist ] = useMutation( ADD_PRICELIST );
+  const {
+    data,
+    loading: pricelistsLoading
+  } = useQuery( GET_PRICELISTS );
+  const PRICELISTS = ( pricelistsLoading || !data ? [] : data.pricelists );
+  let pl = [ {
+    label: "Nový cenník",
+    value: "0"
+  }, ...toSelArr( PRICELISTS ) ];
+  const [ pricelists, setPricelists ] = React.useState( pl );
 
   //state
-  const [ title, setTitle ] = React.useState("");
-    const [ dph, setDph ] = React.useState(0);
-  const [ ico, setIco ] = React.useState("");
-  const [ dic, setDic ] = React.useState("");
-  const [ ic_dph, setIcDph ] = React.useState("");
-  const [ country, setCountry ] = React.useState("");
-  const [ city, setCity ] = React.useState("");
-  const [ street, setStreet ] = React.useState("");
-  const [ zip, setZip ] = React.useState("");
-  const [ email, setEmail ] = React.useState("");
-  const [ phone, setPhone ] = React.useState("");
-  const [ description, setDescription ] = React.useState("");
-  const [ monthly, setMonthly ] = React.useState(false);
-  const [ monthlyPausal, setMonthlyPausal ] = React.useState(0);
-  const [ taskWorkPausal, setTaskWorkPausal ] = React.useState(0);
-  const [ taskTripPausal, setTaskTripPausal ] = React.useState(0);
-  const [ pricelist, setPricelist ] = React.useState({});
-  const [ oldPricelist, setOldPricelist ] = React.useState({});
-  const [ pricelistName, setPricelistName ] = React.useState("");
+  const [ title, setTitle ] = React.useState( "" );
+  const [ dph, setDph ] = React.useState( 0 );
+  const [ ico, setIco ] = React.useState( "" );
+  const [ dic, setDic ] = React.useState( "" );
+  const [ ic_dph, setIcDph ] = React.useState( "" );
+  const [ country, setCountry ] = React.useState( "" );
+  const [ city, setCity ] = React.useState( "" );
+  const [ street, setStreet ] = React.useState( "" );
+  const [ zip, setZip ] = React.useState( "" );
+  const [ email, setEmail ] = React.useState( "" );
+  const [ phone, setPhone ] = React.useState( "" );
+  const [ description, setDescription ] = React.useState( "" );
+  const [ monthly, setMonthly ] = React.useState( false );
+  const [ monthlyPausal, setMonthlyPausal ] = React.useState( 0 );
+  const [ taskWorkPausal, setTaskWorkPausal ] = React.useState( 0 );
+  const [ taskTripPausal, setTaskTripPausal ] = React.useState( 0 );
+  const [ pricelist, setPricelist ] = React.useState( {} );
+  const [ oldPricelist, setOldPricelist ] = React.useState( {} );
+  const [ pricelistName, setPricelistName ] = React.useState( "" );
 
-  const [ saving, setSaving ] = React.useState(false);
-  const [ newData, setNewData ] = React.useState(false);
-  const [ clearCompanyRents, setClearCompanyRents ] = React.useState(false);
-  const [ fakeID, setFakeID ] = React.useState(0);
+  const [ saving, setSaving ] = React.useState( false );
+  const [ newData, setNewData ] = React.useState( false );
+  const [ clearCompanyRents, setClearCompanyRents ] = React.useState( false );
+  const [ fakeID, setFakeID ] = React.useState( 0 );
 
-  const [ rents, setRents ] = React.useState([]);
+  const [ rents, setRents ] = React.useState( [] );
 
   const getFakeID = () => {
     let fake = fakeID;
-    setFakeID(fakeID+1);
+    setFakeID( fakeID + 1 );
     return fake;
   }
 
   //sync
   React.useEffect( () => {
-      if (!pricelistsLoading){
-        let pl = [{label: "Nový cenník", value: "0"}, ...toSelArr(data.pricelists)];
-        setPricelists(pl);
-        let def = pl.find((p)=>p.def);
-        setPricelist(def);
-        setOldPricelist(def);
-      }
-  }, [pricelistsLoading]);
+    if ( !pricelistsLoading ) {
+      let pl = [ {
+        label: "Nový cenník",
+        value: "0"
+      }, ...toSelArr( data.pricelists ) ];
+      setPricelists( pl );
+      let def = pl.find( ( p ) => p.def );
+      setPricelist( def );
+      setOldPricelist( def );
+    }
+  }, [ pricelistsLoading ] );
 
   //functions
   const addCompanyFunc = () => {
     setSaving( true );
 
-    console.log("hello");
-    let newRents = rents.map(r => ({
+    console.log( "hello" );
+    let newRents = rents.map( r => ( {
       title: r.title,
-      quantity: isNaN(parseInt(r.quantity)) ? 0 : parseInt(r.quantity),
-      cost: isNaN(parseFloat(r.unitCost)) ? 0 : parseInt(r.unitCost),
-      price: isNaN(parseFloat(r.unitPrice)) ? 0 : parseInt(r.unitPrice)
-    }));
+      quantity: isNaN( parseInt( r.quantity ) ) ? 0 : parseInt( r.quantity ),
+      cost: isNaN( parseFloat( r.unitCost ) ) ? 0 : parseInt( r.unitCost ),
+      price: isNaN( parseFloat( r.unitPrice ) ) ? 0 : parseInt( r.unitPrice )
+    } ) );
 
-    addCompany({ variables: {
-      title,
-      dph: (dph === "" ? 0 : parseInt(dph)),
-      ico,
-      dic,
-      ic_dph,
-      country,
-      city,
-      street,
-      zip,
-      email,
-      phone,
-      description,
-      pricelistId: pricelist.id,
-      monthly,
-      monthlyPausal: (monthlyPausal === "" ? 0 : parseFloat(monthlyPausal)),
-      taskWorkPausal: (taskWorkPausal === "" ? 0 : parseFloat(taskWorkPausal)),
-      taskTripPausal: (taskTripPausal === "" ? 0 : parseFloat(taskTripPausal)),
-      rents: newRents,
-    } }).then( ( response ) => {
-        console.log("rRESPONSE");
-      const allCompanies = client.readQuery({query: GET_COMPANIES}).companies;
-      const newCompany = {...response.data.addCompany, __typename: "Company"};
-      client.writeQuery({ query: GET_COMPANIES, data: {companies: [...allCompanies, newCompany ] } });
-      if (closeModal) {
-        addCompanyToList(toSelItem(newCompany));
-        closeModal();
-      } else {
-        history.push('/helpdesk/settings/companies/' + newCompany.id);
-      }
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    addCompany( {
+        variables: {
+          title,
+          dph: ( dph === "" ? 0 : parseInt( dph ) ),
+          ico,
+          dic,
+          ic_dph,
+          country,
+          city,
+          street,
+          zip,
+          email,
+          phone,
+          description,
+          pricelistId: pricelist.id,
+          monthly,
+          monthlyPausal: ( monthlyPausal === "" ? 0 : parseFloat( monthlyPausal ) ),
+          taskWorkPausal: ( taskWorkPausal === "" ? 0 : parseFloat( taskWorkPausal ) ),
+          taskTripPausal: ( taskTripPausal === "" ? 0 : parseFloat( taskTripPausal ) ),
+          rents: newRents,
+        }
+      } )
+      .then( ( response ) => {
+        console.log( "rRESPONSE" );
+        const allCompanies = client.readQuery( {
+            query: GET_COMPANIES
+          } )
+          .companies;
+        const newCompany = {
+          ...response.data.addCompany,
+          __typename: "Company"
+        };
+        client.writeQuery( {
+          query: GET_COMPANIES,
+          data: {
+            companies: [ ...allCompanies, newCompany ]
+          }
+        } );
+        if ( closeModal ) {
+          addCompanyToList( toSelItem( newCompany ) );
+          closeModal();
+        } else {
+          history.push( '/helpdesk/settings/companies/' + newCompany.id );
+        }
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   }
 
   const savePriceList = () => {
     setSaving( true );
 
-    addPricelist({ variables: {
-      title: pricelistName,
-      order: 0,
-      afterHours: 0,
-      def: false,
-      materialMargin: 0,
-      materialMarginExtra: 0,
-      prices: [],
-    } }).then( ( response ) => {
-      let newPricelist = response.data.addPricelist;
-      setPricelist(newPricelist);
-      let newPricelists = pricelists.concat([newPricelist]);
-      setPricelists(newPricelists);
+    addPricelist( {
+        variables: {
+          title: pricelistName,
+          order: 0,
+          afterHours: 0,
+          def: false,
+          materialMargin: 0,
+          materialMarginExtra: 0,
+          prices: [],
+        }
+      } )
+      .then( ( response ) => {
+        let newPricelist = response.data.addPricelist;
+        setPricelist( newPricelist );
+        let newPricelists = pricelists.concat( [ newPricelist ] );
+        setPricelists( newPricelists );
 
-      addCompanyFunc();
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+        addCompanyFunc();
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   }
 
   const cancel = () => {
-    setPricelist(oldPricelist);
-    setPricelistName("");
+    setPricelist( oldPricelist );
+    setPricelistName( "" );
   }
 
-  const attributes = [title, ico, email];
-  const cannotSave = saving || attributes.some(attr => attr === "") || (pricelist.value === "0" && pricelistName === "");
+  const attributes = [ title, ico, email ];
+  const cannotSave = saving || attributes.some( attr => attr === "" ) || ( pricelist.value === "0" && pricelistName === "" );
 
-  if (pricelistsLoading) {
+  if ( pricelistsLoading ) {
     return <Loading />
   }
 
@@ -594,5 +648,5 @@ export default function CompanyAdd(props){
 
         </div>
       </div>
-    );
+  );
 }

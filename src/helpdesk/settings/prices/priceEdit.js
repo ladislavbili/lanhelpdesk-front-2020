@@ -1,18 +1,36 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import {
+  useMutation,
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input, Modal, ModalBody, ModalHeader, ModalFooter } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  ModalFooter
+} from 'reactstrap';
 
-import { toSelArr } from 'helperFunctions';
+import {
+  toSelArr
+} from 'helperFunctions';
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
+import {
+  selectStyle
+} from "configs/components/select";
 import Loading from 'components/loading';
 import Switch from "react-switch";
 
-import {  GET_PRICELISTS } from './index';
+import {
+  GET_PRICELISTS
+} from './index';
 
-const GET_PRICELIST = gql`
+const GET_PRICELIST = gql `
 query pricelist($id: Int!) {
   pricelist (
     id: $id
@@ -41,7 +59,7 @@ query pricelist($id: Int!) {
 }
 `;
 
-const UPDATE_PRICELIST = gql`
+const UPDATE_PRICELIST = gql `
 mutation updatePricelist($id: Int!, $title: String!, $order: Int!, $afterHours: Int!, $def: Boolean!, $materialMargin: Int!, $materialMarginExtra: Int!, $prices: [UpdatePriceInput]! ) {
   updatePricelist(
     id: $id,
@@ -61,7 +79,7 @@ mutation updatePricelist($id: Int!, $title: String!, $order: Int!, $afterHours: 
 }
 `;
 
-export const DELETE_PRICELIST = gql`
+export const DELETE_PRICELIST = gql `
 mutation deletePricelist($id: Int!, $newDefId: Int, $newId: Int) {
   deletePricelist(
     id: $id,
@@ -73,101 +91,157 @@ mutation deletePricelist($id: Int!, $newDefId: Int, $newId: Int) {
 }
 `;
 
-export default function PricelistEdit(props){
+export default function PricelistEdit( props ) {
   //data
-  const { history } = props;
-  const { data, loading, refetch } = useQuery(GET_PRICELIST, { variables: {id: (props.listId ? props.listId : parseInt(props.match.params.id))} });
-  const [updatePricelist] = useMutation(UPDATE_PRICELIST);
-  const [deletePricelist, {client}] = useMutation(DELETE_PRICELIST);
-  const allPricelists = toSelArr(client.readQuery({query: GET_PRICELISTS}).pricelists);
-  const filteredPricelists = allPricelists.filter( pricelist => pricelist.id !== (props.listId ? props.listId : parseInt(props.match.params.id)) );
+  const {
+    history
+  } = props;
+  const {
+    data,
+    loading,
+    refetch
+  } = useQuery( GET_PRICELIST, {
+    variables: {
+      id: ( props.listId ? props.listId : parseInt( props.match.params.id ) )
+    }
+  } );
+  const [ updatePricelist ] = useMutation( UPDATE_PRICELIST );
+  const [ deletePricelist, {
+    client
+  } ] = useMutation( DELETE_PRICELIST );
+  const allPricelists = toSelArr( client.readQuery( {
+      query: GET_PRICELISTS
+    } )
+    .pricelists );
+  const filteredPricelists = allPricelists.filter( pricelist => pricelist.id !== ( props.listId ? props.listId : parseInt( props.match.params.id ) ) );
   const theOnlyOneLeft = allPricelists.length === 0;
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ order, setOrder ] = React.useState(0);
-  const [ afterHours, setAfterHours ] = React.useState(0);
-  const [ def, setDef ] = React.useState(false);
-  const [ materialMargin, setMaterialMargin ] = React.useState(0);
-  const [ materialMarginExtra, setMaterialMarginExtra ] = React.useState(0);
-  const [ prices, setPrices ] = React.useState([]);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ afterHours, setAfterHours ] = React.useState( 0 );
+  const [ def, setDef ] = React.useState( false );
+  const [ materialMargin, setMaterialMargin ] = React.useState( 0 );
+  const [ materialMarginExtra, setMaterialMarginExtra ] = React.useState( 0 );
+  const [ prices, setPrices ] = React.useState( [] );
 
-  const [ newPricelist, setNewPricelist ] = React.useState(null);
-  const [ newDefPricelist, setNewDefPricelist ] = React.useState(null);
-  const [ choosingNewPricelist, setChooseingNewPricelist ] = React.useState(false);
+  const [ newPricelist, setNewPricelist ] = React.useState( null );
+  const [ newDefPricelist, setNewDefPricelist ] = React.useState( null );
+  const [ choosingNewPricelist, setChooseingNewPricelist ] = React.useState( false );
 
-  const [ saving, setSaving ] = React.useState(false);
+  const [ saving, setSaving ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
-      if (!loading){
-        setTitle(data.pricelist.title);
-        setOrder(data.pricelist.order);
-        setAfterHours(data.pricelist.afterHours);
-        setDef(data.pricelist.def);
-        setMaterialMargin(data.pricelist.materialMargin);
-        setMaterialMarginExtra(data.pricelist.materialMarginExtra);
-        setPrices(data.pricelist.prices);
-      }
-  }, [loading]);
+    if ( !loading ) {
+      setTitle( data.pricelist.title );
+      setOrder( data.pricelist.order );
+      setAfterHours( data.pricelist.afterHours );
+      setDef( data.pricelist.def );
+      setMaterialMargin( data.pricelist.materialMargin );
+      setMaterialMarginExtra( data.pricelist.materialMarginExtra );
+      setPrices( data.pricelist.prices );
+    }
+  }, [ loading ] );
 
   React.useEffect( () => {
-      refetch({ variables: {id: (props.listId ? props.listId : parseInt(props.match.params.id))} });
-  }, [(props.listId ? props.listId : parseInt(props.match.params.id))]);
+    refetch( {
+      variables: {
+        id: ( props.listId ? props.listId : parseInt( props.match.params.id ) )
+      }
+    } );
+  }, [ ( props.listId ? props.listId : parseInt( props.match.params.id ) ) ] );
 
 
   // functions
   const updatePricelistFunc = () => {
     setSaving( true );
-    let newPrices = prices.map(p => {
-      return {id: p.id, price: (p.price === "" ? 0 : parseFloat(p.price))}
-    });
-    updatePricelist({ variables: {
-      id: (props.listId ? props.listId : parseInt(props.match.params.id)),
-      title,
-      order: (order !== '' ? parseInt(order) : 0),
-      afterHours: (afterHours !== '' ? parseInt(afterHours) : 0),
-      def,
-      materialMargin: (materialMargin !== '' ? parseInt(materialMargin) : 0),
-      materialMarginExtra: (materialMarginExtra !== '' ? parseInt(materialMarginExtra) : 0),
-      prices: newPrices,
-    } }).then( ( response ) => {
-      let updatedPricelist = {...response.data.updatePricelist, __typename: "Pricelist"};
-      let newPL = filteredPricelists;
-      if (def) {
-        newPL = newPL.map(pl => ({...pl, def: false}));
+    let newPrices = prices.map( p => {
+      return {
+        id: p.id,
+        price: ( p.price === "" ? 0 : parseFloat( p.price ) )
       }
-      client.writeQuery({ query: GET_PRICELISTS, data: {pricelists: [...newPL, updatedPricelist ] } });
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    } );
+    updatePricelist( {
+        variables: {
+          id: ( props.listId ? props.listId : parseInt( props.match.params.id ) ),
+          title,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+          afterHours: ( afterHours !== '' ? parseInt( afterHours ) : 0 ),
+          def,
+          materialMargin: ( materialMargin !== '' ? parseInt( materialMargin ) : 0 ),
+          materialMarginExtra: ( materialMarginExtra !== '' ? parseInt( materialMarginExtra ) : 0 ),
+          prices: newPrices,
+        }
+      } )
+      .then( ( response ) => {
+        let updatedPricelist = {
+          ...response.data.updatePricelist,
+          __typename: "Pricelist"
+        };
+        let newPL = filteredPricelists;
+        if ( def ) {
+          newPL = newPL.map( pl => ( {
+            ...pl,
+            def: false
+          } ) );
+        }
+        client.writeQuery( {
+          query: GET_PRICELISTS,
+          data: {
+            pricelists: [ ...newPL, updatedPricelist ]
+          }
+        } );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-     setSaving( false );
-}
-
-const deletePricelistFunc = () => {
-  setChooseingNewPricelist(false);
-
-  if(window.confirm("Are you sure?")){
-    deletePricelist({ variables: {
-      id: (props.listId ? props.listId : parseInt(props.match.params.id)),
-      newDefId: ( newDefPricelist ? parseInt(newDefPricelist.id) : null ),
-      newId: ( newPricelist ? parseInt(newPricelist.id) : null ),
-    } }).then( ( response ) => {
-      if (def) {
-        client.writeQuery({ query: GET_PRICELISTS, data: {pricelists: filteredPricelists.map(pl => {return {...pl, def: (pl.id === parseInt(newDefPricelist.id)) }} )} });
-      } else {
-        client.writeQuery({ query: GET_PRICELISTS, data: {pricelists: filteredPricelists} });
-      }
-      history.push('/helpdesk/settings/pricelists/add');
-    }).catch( (err) => {
-      console.log(err.message);
-      console.log(err);
-    });
+    setSaving( false );
   }
-};
 
-  if (loading) {
+  const deletePricelistFunc = () => {
+    setChooseingNewPricelist( false );
+
+    if ( window.confirm( "Are you sure?" ) ) {
+      deletePricelist( {
+          variables: {
+            id: ( props.listId ? props.listId : parseInt( props.match.params.id ) ),
+            newDefId: ( newDefPricelist ? parseInt( newDefPricelist.id ) : null ),
+            newId: ( newPricelist ? parseInt( newPricelist.id ) : null ),
+          }
+        } )
+        .then( ( response ) => {
+          if ( def ) {
+            client.writeQuery( {
+              query: GET_PRICELISTS,
+              data: {
+                pricelists: filteredPricelists.map( pl => {
+                  return {
+                    ...pl,
+                    def: ( pl.id === parseInt( newDefPricelist.id ) )
+                  }
+                } )
+              }
+            } );
+          } else {
+            client.writeQuery( {
+              query: GET_PRICELISTS,
+              data: {
+                pricelists: filteredPricelists
+              }
+            } );
+          }
+          history.push( '/helpdesk/settings/pricelists/add' );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+          console.log( err );
+        } );
+    }
+  };
+
+  if ( loading ) {
     return <Loading />
   }
 
@@ -322,5 +396,5 @@ const deletePricelistFunc = () => {
         </div>
 
     </div>
-    );
+  );
 }

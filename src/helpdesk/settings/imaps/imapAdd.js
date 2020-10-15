@@ -1,13 +1,25 @@
 import React from 'react';
-import { useMutation } from "@apollo/react-hooks";
+import {
+  useMutation
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText
+} from 'reactstrap';
 import Checkbox from '../../../components/checkbox';
 
-import {  GET_IMAPS } from './index';
+import {
+  GET_IMAPS
+} from './index';
 
-const ADD_IMAP = gql`
+const ADD_IMAP = gql `
 mutation addImap($title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $tsl: Boolean!) {
   addImap(
     title: $title,
@@ -31,56 +43,75 @@ mutation addImap($title: String!, $order: Int!, $def: Boolean!, $host: String!, 
 }
 `;
 
-export default function IMAPAdd(props){
+export default function IMAPAdd( props ) {
   //data
-  const { match } = props;
-  const [addImap, {client}] = useMutation(ADD_IMAP);
+  const {
+    match
+  } = props;
+  const [ addImap, {
+    client
+  } ] = useMutation( ADD_IMAP );
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ order ] = React.useState(0);
-  const [ def, setDef ] = React.useState(false);
-  const [ host, setHost ] = React.useState("");
-  const [ port, setPort ] = React.useState(465);
-  const [ username, setUsername ] = React.useState("");
-  const [ password, setPassword ] = React.useState("");
-  const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState(false);
-  const [ tsl, setTsl ] = React.useState(true);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ order ] = React.useState( 0 );
+  const [ def, setDef ] = React.useState( false );
+  const [ host, setHost ] = React.useState( "" );
+  const [ port, setPort ] = React.useState( 465 );
+  const [ username, setUsername ] = React.useState( "" );
+  const [ password, setPassword ] = React.useState( "" );
+  const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState( false );
+  const [ tsl, setTsl ] = React.useState( true );
 
-  const [ showPass, setShowPass ] = React.useState(false);
+  const [ showPass, setShowPass ] = React.useState( false );
 
-  const [ saving, setSaving ] = React.useState(false);
+  const [ saving, setSaving ] = React.useState( false );
 
   //functions
   const addIMAPFunc = () => {
     setSaving( true );
-    addImap({ variables: {
-      title,
-      order: (order !== '' ? parseInt(order) : 0),
-      def,
-      host,
-      port: (port !== '' ? parseInt(port) : 465),
-      username,
-      password,
-      rejectUnauthorized,
-      tsl,
-    } }).then( ( response ) => {
-      const allIMAPs = client.readQuery({query: GET_IMAPS}).imaps;
-      const newIMAP = {...response.data.addImap, __typename: "Imap"};
-      client.writeQuery({ query: GET_IMAPS, data: {imaps: [...allIMAPs.filter( IMAP => IMAP.id !== parseInt(match.params.id) ), newIMAP ] } });
-  //    history.push('/helpdesk/settings/imaps/' + newIMAP.id)
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    addImap( {
+        variables: {
+          title,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+          def,
+          host,
+          port: ( port !== '' ? parseInt( port ) : 465 ),
+          username,
+          password,
+          rejectUnauthorized,
+          tsl,
+        }
+      } )
+      .then( ( response ) => {
+        const allIMAPs = client.readQuery( {
+            query: GET_IMAPS
+          } )
+          .imaps;
+        const newIMAP = {
+          ...response.data.addImap,
+          __typename: "Imap"
+        };
+        client.writeQuery( {
+          query: GET_IMAPS,
+          data: {
+            imaps: [ ...allIMAPs.filter( IMAP => IMAP.id !== parseInt( match.params.id ) ), newIMAP ]
+          }
+        } );
+        //    history.push('/helpdesk/settings/imaps/' + newIMAP.id)
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   }
 
 
-    const cannotSave = saving || title === '' ||  host === '' || port === '' || username === '';
+  const cannotSave = saving || title === '' || host === '' || port === '' || username === '';
 
 
-    return (
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+  return (
+    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
         <Checkbox
           className = "m-b-5 p-l-0"
           value = { def }
@@ -132,5 +163,5 @@ export default function IMAPAdd(props){
 
         <Button className="btn" disabled={cannotSave} onClick={addIMAPFunc}>{saving?'Adding...':'Add Imap'}</Button>
       </div>
-    );
-  }
+  );
+}

@@ -1,14 +1,20 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import RoleAdd from './roleAdd';
 import RoleEdit from './roleEdit';
 import Loading from 'components/loading';
-import { orderArr } from 'helperFunctions';
+import {
+  orderArr
+} from 'helperFunctions';
 
-export const GET_ROLES = gql`
+export const GET_ROLES = gql `
 query {
   roles {
     title
@@ -19,17 +25,23 @@ query {
 }
 `;
 
-export default function RolesList(props){
-    // state
-    const [ roleFilter, setRoleFilter ] = React.useState("");
+export default function RolesList( props ) {
+  // state
+  const [ roleFilter, setRoleFilter ] = React.useState( "" );
 
-    //data
-    const { history, match } = props;
-    const { data, loading } = useQuery(GET_ROLES);
-    const ROLES = (loading || !data ? [] : orderArr(data.roles));
+  //data
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_ROLES );
+  const ROLES = ( loading || !data ? [] : orderArr( data.roles ) );
 
-    return (
-			<div className="content">
+  return (
+    <div className="content">
         <div className="row m-0 p-0 taskList-container">
           <div className="col-lg-4">
             <div className="commandbar">
@@ -94,5 +106,5 @@ export default function RolesList(props){
           </div>
         </div>
       </div>
-    );
+  );
 }

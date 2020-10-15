@@ -1,18 +1,24 @@
 import React from 'react';
 
-export default function CompanyRents(props){
-	//data
-	const { data, disabled, addRent, updateRent, removeRent } = props;
+export default function CompanyRents( props ) {
+  //data
+  const {
+    data,
+    disabled,
+    addRent,
+    updateRent,
+    removeRent
+  } = props;
 
-	//state
-	const [ title, setTitle ] = React.useState("");
-	const [ quantity, setQuantity ] = React.useState(1);
-	const [ unitCost, setUnitCost ] = React.useState(0);
-	const [ unitPrice, setUnitPrice ] = React.useState(0);
-	const [ totalPrice, setTotalPrice ] = React.useState(0);
+  //state
+  const [ title, setTitle ] = React.useState( "" );
+  const [ quantity, setQuantity ] = React.useState( 1 );
+  const [ unitCost, setUnitCost ] = React.useState( 0 );
+  const [ unitPrice, setUnitPrice ] = React.useState( 0 );
+  const [ totalPrice, setTotalPrice ] = React.useState( 0 );
 
-		return (
-			<div className="row m-t-20">
+  return (
+    <div className="row m-t-20">
 				<div className="col-md-12">
 					<div>
 						<h4>Prenájom Hardware & Software </h4>
@@ -270,5 +276,5 @@ export default function CompanyRents(props){
 					</div>
 
 				</div>
-			);
-	}
+  );
+}

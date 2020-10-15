@@ -1,25 +1,41 @@
 import React from 'react';
-import { useQuery, useApolloClient  } from "@apollo/react-hooks";
+import {
+  useQuery,
+  useApolloClient
+}
+from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import { Modal, ModalBody } from 'reactstrap';
-import {getItemDisplayValue} from '../../helperFunctions';
+import {
+  Modal,
+  ModalBody
+}
+from 'reactstrap';
+import {
+  getItemDisplayValue
+}
+from '../../helperFunctions';
 import CommandBar from './commandBar';
 import ListHeader from './listHeader';
 import Checkbox from '../checkbox';
 
 import MultipleTaskEdit from '../../helpdesk/task/multipleTaskEdit';
-
-import { filterName, filter  } from 'localCache';
-
-const GET_MY_DATA = gql`
+/*
+import {
+  filterName,
+  filter
+}
+from 'localCache';
+*/
+/*
+const GET_MY_DATA = gql `
 query {
   getMyData{
 		fullName
   }
 }
 `;
-
-const LOCAL_CACHE = gql`
+*/
+const LOCAL_CACHE = gql `
   query getLocalCache {
     project @client
     milestone @client
@@ -126,41 +142,56 @@ const LOCAL_CACHE = gql`
       deadlineToNow
     }
   }
-`
-;
+`;
 
-export default function List (props) {
-	const { history, link, commandBar, listName, statuses, setStatuses, allStatuses, displayValues, data, deleteTask, checkTask } = props;
-	const [ checkedAll, setCheckedAll ] = React.useState(false);
-	const [ editOpen, setEditOpen ] = React.useState(false);
-	const { data: localCache } = useQuery(LOCAL_CACHE);
+export default function List( props ) {
+  const {
+    history,
+    link,
+    commandBar,
+    listName,
+    statuses,
+    setStatuses,
+    allStatuses,
+    displayValues,
+    data,
+    deleteTask,
+    checkTask
+  } = props;
+  const [ checkedAll, setCheckedAll ] = React.useState( false );
+  const [ editOpen, setEditOpen ] = React.useState( false );
+  const {
+    data: localCache
+  } = useQuery( LOCAL_CACHE );
 
-	const currentUser = data ? data.getMyData : {};
-  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+  const currentUser = data ? data.getMyData : {};
+  //const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
-	const client = useApolloClient();
+  const client = useApolloClient();
 
-	const clearFilter = () => {
-		if(window.confirm("Are you sure you want to clear the filter?")){
-			client.writeData({ data: {
-				showDataFilter: {
-				  id: "",
-				  title: "",
-				  status: "",
-				  requester: "",
-				  company: "",
-				  assignedTo: "",
-				  createdAt: "",
-				  deadline: "",
-				}
-			} });
-		}
-	}
+  const clearFilter = () => {
+    if ( window.confirm( "Are you sure you want to clear the filter?" ) ) {
+      client.writeData( {
+        data: {
+          showDataFilter: {
+            id: "",
+            title: "",
+            status: "",
+            requester: "",
+            company: "",
+            assignedTo: "",
+            createdAt: "",
+            deadline: "",
+          }
+        }
+      } );
+    }
+  }
 
-//	const selectedFilter = showDataFilter();
-//	console.log(selectedFilter);
-	return (
-			<div>
+  //	const selectedFilter = showDataFilter();
+  //	console.log(selectedFilter);
+  return (
+    <div>
 				<CommandBar {...commandBar} listName={listName}/>
 				<div className="full-width scroll-visible fit-with-header-and-commandbar task-container">
 					<ListHeader {...commandBar} listName={listName} statuses={statuses} setStatuses={setStatuses} allStatuses={allStatuses} />
@@ -337,5 +368,5 @@ export default function List (props) {
 					</Modal>
 
 			</div>
-	);
+  );
 }

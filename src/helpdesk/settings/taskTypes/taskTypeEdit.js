@@ -1,16 +1,34 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import {
+  useMutation,
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader
+} from 'reactstrap';
 import Loading from 'components/loading';
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
-import { toSelArr } from 'helperFunctions';
+import {
+  selectStyle
+} from "configs/components/select";
+import {
+  toSelArr
+} from 'helperFunctions';
 
-import {  GET_TASK_TYPES } from './index';
+import {
+  GET_TASK_TYPES
+} from './index';
 
-const GET_TASK_TYPE = gql`
+const GET_TASK_TYPE = gql `
 query taskType($id: Int!) {
   taskType (
     id: $id
@@ -22,7 +40,7 @@ query taskType($id: Int!) {
 }
 `;
 
-const UPDATE_TASK_TYPE = gql`
+const UPDATE_TASK_TYPE = gql `
 mutation updateTaskType($id: Int!, $title: String, $order: Int) {
   updateTaskType(
     id: $id,
@@ -36,7 +54,7 @@ mutation updateTaskType($id: Int!, $title: String, $order: Int) {
 }
 `;
 
-export const DELETE_TASK_TYPE = gql`
+export const DELETE_TASK_TYPE = gql `
 mutation deleteTaskType($id: Int!, $newId: Int!) {
   deleteTaskType(
     id: $id,
@@ -47,65 +65,97 @@ mutation deleteTaskType($id: Int!, $newId: Int!) {
 }
 `;
 
-export default function TaskTypeEdit(props){
+export default function TaskTypeEdit( props ) {
   //data
-  const { history, match } = props;
-  const { data, loading, refetch } = useQuery(GET_TASK_TYPE, { variables: {id: parseInt(props.match.params.id)} });
-  const [updateTaskType] = useMutation(UPDATE_TASK_TYPE);
-  const [deleteTaskType, {client}] = useMutation(DELETE_TASK_TYPE);
-  const allTaskTypes = toSelArr(client.readQuery({query: GET_TASK_TYPES}).taskTypes);
-  const filteredTaskTypes = allTaskTypes.filter( taskType => taskType.id !== parseInt(match.params.id) );
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading,
+    refetch
+  } = useQuery( GET_TASK_TYPE, {
+    variables: {
+      id: parseInt( props.match.params.id )
+    }
+  } );
+  const [ updateTaskType ] = useMutation( UPDATE_TASK_TYPE );
+  const [ deleteTaskType, {
+    client
+  } ] = useMutation( DELETE_TASK_TYPE );
+  const allTaskTypes = toSelArr( client.readQuery( {
+      query: GET_TASK_TYPES
+    } )
+    .taskTypes );
+  const filteredTaskTypes = allTaskTypes.filter( taskType => taskType.id !== parseInt( match.params.id ) );
   const theOnlyOneLeft = allTaskTypes.length === 0;
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ order, setOrder ] = React.useState(0);
-  const [ saving, setSaving ] = React.useState(false);
-  const [ choosingNewTaskType, setChooseingNewTaskType ] = React.useState(false);
-  const [ newTaskType, setNewTaskType ] = React.useState(null);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ saving, setSaving ] = React.useState( false );
+  const [ choosingNewTaskType, setChooseingNewTaskType ] = React.useState( false );
+  const [ newTaskType, setNewTaskType ] = React.useState( null );
 
   // sync
   React.useEffect( () => {
-      if (!loading){
-        setTitle(data.taskType.title);
-        setOrder(data.taskType.order);
-      }
-  }, [loading]);
+    if ( !loading ) {
+      setTitle( data.taskType.title );
+      setOrder( data.taskType.order );
+    }
+  }, [ loading ] );
 
   React.useEffect( () => {
-      refetch({ variables: {id: parseInt(match.params.id)} });
-  }, [match.params.id]);
+    refetch( {
+      variables: {
+        id: parseInt( match.params.id )
+      }
+    } );
+  }, [ match.params.id ] );
 
   // functions
   const updateTaskTypeFunc = () => {
     setSaving( true );
 
-    updateTaskType({ variables: {
-      id: parseInt(match.params.id),
-      title,
-      order: (order !== '' ? parseInt(order) : 0),
-    } }).then( ( response ) => {
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    updateTaskType( {
+        variables: {
+          id: parseInt( match.params.id ),
+          title,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-     setSaving( false );
+    setSaving( false );
   };
 
   const deleteTaskTypeFunc = () => {
-    setChooseingNewTaskType(false);
+    setChooseingNewTaskType( false );
 
-    if(window.confirm("Are you sure?")){
-      deleteTaskType({ variables: {
-        id: parseInt(match.params.id),
-        newId: parseInt(newTaskType.id),
-      } }).then( ( response ) => {
-        client.writeQuery({ query: GET_TASK_TYPES, data: {taskTypes: filteredTaskTypes} });
-        history.goBack();
-      }).catch( (err) => {
-        console.log(err.message);
-        console.log(err);
-      });
+    if ( window.confirm( "Are you sure?" ) ) {
+      deleteTaskType( {
+          variables: {
+            id: parseInt( match.params.id ),
+            newId: parseInt( newTaskType.id ),
+          }
+        } )
+        .then( ( response ) => {
+          client.writeQuery( {
+            query: GET_TASK_TYPES,
+            data: {
+              taskTypes: filteredTaskTypes
+            }
+          } );
+          history.goBack();
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+          console.log( err );
+        } );
     }
   };
 

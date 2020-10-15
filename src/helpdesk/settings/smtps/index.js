@@ -1,13 +1,17 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import SMTPAdd from './smtpAdd';
 import SMTPEdit from './smtpEdit';
 import Loading from 'components/loading';
 
-export const GET_SMTPS = gql`
+export const GET_SMTPS = gql `
 query {
   smtps {
     title
@@ -21,18 +25,24 @@ query {
 }
 `;
 
-export default function SMTPsList(props){
-    // state
-    const [ SMTPFilter, setSMTPFilter ] = React.useState("");
-    const [ smtpTesting, setSmtpTesting ] = React.useState(false);
+export default function SMTPsList( props ) {
+  // state
+  const [ SMTPFilter, setSMTPFilter ] = React.useState( "" );
+  const [ smtpTesting, setSmtpTesting ] = React.useState( false );
 
-    //data
-    const { history, match } = props;
-    const { data, loading } = useQuery(GET_SMTPS);
-    const SMTPS = (loading || !data ? [] : data.smtps);
+  //data
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_SMTPS );
+  const SMTPS = ( loading || !data ? [] : data.smtps );
 
   const testSMTPs = () => {
-    setSmtpTesting(true);
+    setSmtpTesting( true );
     /*firebase.auth().currentUser.getIdToken(true).then((token)=>{
       fetch(`${REST_URL}/test-smtps`,{
         headers: {

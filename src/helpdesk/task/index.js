@@ -1,19 +1,32 @@
 import React from 'react';
-import { useQuery, useMutation, useApolloClient } from "@apollo/react-hooks";
+import {
+  useQuery,
+  useMutation,
+  useApolloClient
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Loading from 'components/loading';
 
 import ShowData from '../../components/showData';
-import { timestampToString,  orderArr } from 'helperFunctions';
-import { getEmptyFilter } from 'configs/fixedFilters';
+import {
+  timestampToString,
+  orderArr
+} from 'helperFunctions';
+import {
+  getEmptyFilter
+} from 'configs/fixedFilters';
 import TaskEdit from './taskEdit';
 import TaskEmpty from './taskEmpty';
 import TaskCalendar from '../calendar';
 
-import {  filter, generalFilter, project } from 'localCache';
+import {
+  filter,
+  generalFilter,
+  project
+} from 'localCache';
 
-const GET_TASKS = gql`
+const GET_TASKS = gql `
 query tasks($filter: FilterInput, $projectId: Int){
   tasks (
     filter: $filter,
@@ -91,7 +104,7 @@ query tasks($filter: FilterInput, $projectId: Int){
 }
 `;
 
-const GET_MY_DATA = gql`
+const GET_MY_DATA = gql `
 query {
   getMyData{
     id
@@ -116,7 +129,7 @@ query {
 }
 `;
 
-const LOCAL_CACHE = gql`
+const LOCAL_CACHE = gql `
   query getLocalCache {
     projectName @client
     filterName @client
@@ -129,7 +142,7 @@ const LOCAL_CACHE = gql`
   }
 `;
 
-const DELETE_TASK = gql`
+const DELETE_TASK = gql `
 mutation deleteTask($id: Int!) {
   deleteTask(
     id: $id,
@@ -139,7 +152,7 @@ mutation deleteTask($id: Int!) {
 }
 `;
 
-const SET_USER_STATUSES = gql`
+const SET_USER_STATUSES = gql `
 mutation setUserStatuses($ids: [Int]!) {
   setUserStatuses(
     ids: $ids
@@ -149,7 +162,7 @@ mutation setUserStatuses($ids: [Int]!) {
 }
 `;
 
-const GET_STATUSES = gql`
+const GET_STATUSES = gql `
 query {
   statuses {
     title
@@ -159,80 +172,107 @@ query {
 }
 `;
 
-export default function TasksIndex (props) {
-	const { history, match, calendarEvents } = props;
-	const { data, loading } = useQuery(GET_MY_DATA);
+export default function TasksIndex( props ) {
+  const {
+    history,
+    match,
+    //calendarEvents
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_MY_DATA );
 
-	let mappedFilter = {...filter()};
-	mappedFilter.requester = mappedFilter.requester ? mappedFilter.requester.id : null;
-	mappedFilter.assignedTo = mappedFilter.assignedTo ? mappedFilter.assignedTo.id : null;
-	mappedFilter.company = mappedFilter.company ? mappedFilter.company.id : null;
-	delete mappedFilter.__typename;
+  let mappedFilter = {
+    ...filter()
+  };
+  mappedFilter.requester = mappedFilter.requester ? mappedFilter.requester.id : null;
+  mappedFilter.assignedTo = mappedFilter.assignedTo ? mappedFilter.assignedTo.id : null;
+  mappedFilter.company = mappedFilter.company ? mappedFilter.company.id : null;
+  delete mappedFilter.__typename;
 
-  const { data: tasksData, loading: tasksLoading } = useQuery(GET_TASKS, { variables: {filterId: ( generalFilter() ? generalFilter().id : null), filter: mappedFilter, projectId: (project().id !== null ? project().id : null ) }});
-	const { data: localCache } = useQuery(LOCAL_CACHE);
-  const [ deleteTask ] = useMutation(DELETE_TASK);
-  const [ setUserStatuses ] = useMutation(SET_USER_STATUSES);
-	const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
-	const statuses = (statusesLoading || !statusesData ? [] : orderArr(statusesData.statuses));
+  const {
+    data: tasksData,
+    loading: tasksLoading
+  } = useQuery( GET_TASKS, {
+    variables: {
+      filterId: ( generalFilter() ? generalFilter()
+        .id : null ),
+      filter: mappedFilter,
+      projectId: ( project()
+        .id !== null ? project()
+        .id : null )
+    }
+  } );
+  const {
+    data: localCache
+  } = useQuery( LOCAL_CACHE );
+  const [ deleteTask ] = useMutation( DELETE_TASK );
+  const [ setUserStatuses ] = useMutation( SET_USER_STATUSES );
+  const {
+    data: statusesData,
+    loading: statusesLoading
+  } = useQuery( GET_STATUSES );
+  const statuses = ( statusesLoading || !statusesData ? [] : orderArr( statusesData.statuses ) );
 
-	const currentUser = data ? data.getMyData : {};
-	const client = useApolloClient();
+  const currentUser = data ? data.getMyData : {};
+  const client = useApolloClient();
 
-	const [ filterName, setFilterName ] = React.useState(generalFilter ? generalFilter.title : "");
-	const [ tasks, setTasks ] = React.useState([]);
+  const [ filterName, setFilterName ] = React.useState( generalFilter ? generalFilter.title : "" );
+  const [ tasks, setTasks ] = React.useState( [] );
 
-	React.useEffect( () => {
-			setFilterName(generalFilter ? generalFilter.title : "");
-	}, [match.params.listID]);
+  React.useEffect( () => {
+    setFilterName( generalFilter ? generalFilter.title : "" );
+  }, [ match.params.listID ] );
 
-	React.useEffect( () => {
-		if (!tasksLoading){
-			setTasks(tasksData && tasksData.tasks && tasksData.tasks.tasks ? tasksData.tasks.tasks : []);
-		}
-	}, [tasksLoading]);
+  React.useEffect( () => {
+    if ( !tasksLoading ) {
+      setTasks( tasksData && tasksData.tasks && tasksData.tasks.tasks ? tasksData.tasks.tasks : [] );
+    }
+  }, [ tasksLoading ] );
 
-	const getBreadcrumsData = () => {
-		return [
-			{
-				type: 'project',
-				show: true,
-				data: localCache ? localCache.projectName : null,
-				label: localCache ? localCache.projectName : 'Invalid project',
-				onClick:()=>{
-					client.writeData({ data: {
-						milestone: null,
-					} });
-					filter(getEmptyFilter());
-					generalFilter(null);
-					history.push('/helpdesk/taskList/i/all');
-				}
-			},
-			{
-				type:'milestone',
-				show: true,
-				data: localCache ? localCache.milestone : null,
-				label: localCache && localCache.milestone ? localCache.milestone.label : 'Invalid milestone',
-				onClick:()=>{
-					filter(getEmptyFilter());
-					generalFilter(null);
-					history.push('/helpdesk/taskList/i/all');
-				}
-			},
-			{
-				type:'filter',
-				show: true,
-				data: localCache ? localCache.filterName : null,
-				label: localCache ? localCache.filterName : 'Invalid filter',
-				onClick:()=>{
-          console.log("bleh", localCache);
-				}
-			}
-		]
-	}
+  const getBreadcrumsData = () => {
+    return [ {
+        type: 'project',
+        show: true,
+        data: localCache ? localCache.projectName : null,
+        label: localCache ? localCache.projectName : 'Invalid project',
+        onClick: () => {
+          client.writeData( {
+            data: {
+              milestone: null,
+            }
+          } );
+          filter( getEmptyFilter() );
+          generalFilter( null );
+          history.push( '/helpdesk/taskList/i/all' );
+        }
+      },
+      {
+        type: 'milestone',
+        show: true,
+        data: localCache ? localCache.milestone : null,
+        label: localCache && localCache.milestone ? localCache.milestone.label : 'Invalid milestone',
+        onClick: () => {
+          filter( getEmptyFilter() );
+          generalFilter( null );
+          history.push( '/helpdesk/taskList/i/all' );
+        }
+      },
+      {
+        type: 'filter',
+        show: true,
+        data: localCache ? localCache.filterName : null,
+        label: localCache ? localCache.filterName : 'Invalid filter',
+        onClick: () => {
+          console.log( "bleh", localCache );
+        }
+      }
+    ]
+  }
 
-	const displayCol = (task) => {
-			return (<li>
+  const displayCol = ( task ) => {
+    return ( <li>
 				<div className="taskCol-title">
 					<span className="attribute-label">#{task.id} | </span> {task.title}
 				</div>
@@ -284,11 +324,12 @@ export default function TasksIndex (props) {
 						)}
 					</div>
 
-			</li>)
-	}
+			</li> )
+  }
 
-	const displayCal = (task,showEvent) => {
-			return (<div style={ showEvent ? { backgroundColor:'#eaf6ff', borderRadius:5 } : {} }>
+  /*
+  const displayCal = ( task, showEvent ) => {
+    return ( <div style={ showEvent ? { backgroundColor:'#eaf6ff', borderRadius:5 } : {} }>
 					<p className="m-0">
 						{showEvent && <span className="label label-event">
 						Event
@@ -320,170 +361,185 @@ export default function TasksIndex (props) {
 							{task.assignedTo?task.assignedTo.reduce((total,user)=>total+=user.fullName+', ','').slice(0,-2):'Neznámy používateľ'}
 						</span>
 					</p>}
-			</div>)
-	}
+			</div> )
+  }
+  */
 
-	const filterTasks = () => {
-		let newTasks = tasks.map((task)=>{
-			return {
-				...task,
-				viewOnly: getViewOnly(task, task.status, task.project),
-				checked: task.checked ? task.checked : false,
-			}
-		});
+  const filterTasks = () => {
+    let newTasks = tasks.map( ( task ) => {
+      return {
+        ...task,
+        viewOnly: getViewOnly( task, task.status, task.project ),
+        checked: task.checked ? task.checked : false,
+      }
+    } );
     let filteredTasks = [];
-		if (localCache) {
-			filteredTasks = newTasks.filter( ( task ) => {
-				if (task.project && task.milestone) {
-					return task.milestone.id === localCache.milestone.id
-				}
-				return true;
-			} );
-		}
-		return filteredTasks;
-	}
+    if ( localCache ) {
+      filteredTasks = newTasks.filter( ( task ) => {
+        if ( task.project && task.milestone ) {
+          return task.milestone.id === localCache.milestone.id
+        }
+        return true;
+      } );
+    }
+    return filteredTasks;
+  }
 
-	const getViewOnly = ( task, status, project ) => {
-		if( project === undefined ){
-			return true;
-		}
-		let permission = {};
-		if(project.projectRights){
-			permission = project.projectRights.find((permission) => permission.user.id === currentUser.id );
-		}
-		return ( (permission === undefined || !permission.write ) && currentUser.role.level === 0 ) || ( status && status.action === 'Invoiced' );
-	}
+  const getViewOnly = ( task, status, project ) => {
+    if ( project === undefined ) {
+      return true;
+    }
+    let permission = {};
+    if ( project.projectRights ) {
+      permission = project.projectRights.find( ( permission ) => permission.user.id === currentUser.id );
+    }
+    return ( ( permission === undefined || !permission.write ) && currentUser.role.level === 0 ) || ( status && status.action === 'Invoiced' );
+  }
 
-	const checkTask = (id, check) => {
-		let newTasks = tasks.map((task)=>{
-			if (task.id === id){
-				return { ...task, checked: check}
-			} else if (id === 'all'){
-				return { ...task, checked: check}
-			}
-			return {...task}
-		});
+  const checkTask = ( id, check ) => {
+    let newTasks = tasks.map( ( task ) => {
+      if ( task.id === id ) {
+        return {
+          ...task,
+          checked: check
+        }
+      } else if ( id === 'all' ) {
+        return {
+          ...task,
+          checked: check
+        }
+      }
+      return {
+        ...task
+      }
+    } );
 
-		setTasks(newTasks);
-	}
+    setTasks( newTasks );
+  }
 
-	const deleteTaskFunc = () => {
-		if(window.confirm("Are you sure?")){
-			let filteredTasks = filterTasks();
-			let tasksToDelete = filteredTasks.filter( task => task.checked );
-			let failedTasks = tasksToDelete.filter( (task) => task.viewOnly );
-			tasksToDelete = tasksToDelete.filter( task => !task.viewOnly );
-			let newTasks = tasks.filter(task1 => !tasksToDelete.some( (task2) => task1.id === task2.id ));
+  const deleteTaskFunc = () => {
+    if ( window.confirm( "Are you sure?" ) ) {
+      let filteredTasks = filterTasks();
+      let tasksToDelete = filteredTasks.filter( task => task.checked );
+      let failedTasks = tasksToDelete.filter( ( task ) => task.viewOnly );
+      tasksToDelete = tasksToDelete.filter( task => !task.viewOnly );
+      let newTasks = tasks.filter( task1 => !tasksToDelete.some( ( task2 ) => task1.id === task2.id ) );
 
-			tasksToDelete.forEach(task => {
-	      deleteTask({ variables: {
-	        id: task.id,
-	      } }).then( ( response ) => {
-	      }).catch( (err) => {
-	        console.log(err.message);
-	        console.log(err);
-	      });
-			});
+      tasksToDelete.forEach( task => {
+        deleteTask( {
+            variables: {
+              id: task.id,
+            }
+          } )
+          .then( ( response ) => {} )
+          .catch( ( err ) => {
+            console.log( err.message );
+            console.log( err );
+          } );
+      } );
 
-			tasks(newTasks);
+      tasks( newTasks );
 
-			if( failedTasks.length > 0 ) {
-				window.alert(`${tasksToDelete.length} were deleted. Some tasks couln't be deleted. This includes: \n` + failedTasks.reduce( (acc, task) => acc + `${task.id} ${task.title} \n` , '' ) )
-			}
-		}
-	}
+      if ( failedTasks.length > 0 ) {
+        window.alert( `${tasksToDelete.length} were deleted. Some tasks couln't be deleted. This includes: \n` + failedTasks.reduce( ( acc, task ) => acc + `${task.id} ${task.title} \n`, '' ) )
+      }
+    }
+  }
 
-	const setUserStatusesFunc = (ids) => {
-			setUserStatuses({ variables: {
-				ids
-			} }).then( ( response ) => {
-			}).catch( (err) => {
-				console.log(err.message);
-			});
-	}
+  const setUserStatusesFunc = ( ids ) => {
+    setUserStatuses( {
+        variables: {
+          ids
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+  }
 
-	const getCalendarEventsData = (tasks) => {
-		/*let taskIDs = tasks.map((task)=>task.id);
-		return this.props.calendarEvents.filter((event)=>taskIDs.includes(event.taskID)).map((event)=>{
-			let task = tasks.find((task)=>event.taskID===task.id);
-			return {
-				...task,
-				isTask:false,
-				eventID:event.id,
-				titleFunction:this.displayCal,
-				start:new Date(event.start),
-				end:new Date(event.end),
-			}
-		})*/
-	}
+  const getCalendarEventsData = ( tasks ) => {
+    /*let taskIDs = tasks.map((task)=>task.id);
+    return this.props.calendarEvents.filter((event)=>taskIDs.includes(event.taskID)).map((event)=>{
+    	let task = tasks.find((task)=>event.taskID===task.id);
+    	return {
+    		...task,
+    		isTask:false,
+    		eventID:event.id,
+    		titleFunction:this.displayCal,
+    		start:new Date(event.start),
+    		end:new Date(event.end),
+    	}
+    })*/
+  }
 
-	const getCalendarAllDayData = (tasks) => {
-		/*return tasks.map((task) => {
-			let newTask = {
-				...task,
-				isTask:true,
-				titleFunction:this.displayCal,
-				allDay: !task.status || task.status.action !== 'pendingOLD',
-			}
-			if(!task.status){
-				return {
-					...newTask,
-					status: this.props.statuses.find((status)=>status.action==='new'),
-					start:new Date(),
-				}
-			}
-			switch (task.status.action) {
-				case 'invoiced':{
-					return {
-						...newTask,
-						start:new Date(task.invoicedDate),
-					}
-				}
-				case 'close':{
-					return {
-						...newTask,
-						start:new Date(task.closeDate),
-					}
-				}
-				case 'invalid':{
-					return {
-						...newTask,
-						start:new Date(task.closeDate),
-					}
-				}
-				case 'pending':{
-					return {
-						...newTask,
-						start:new Date(task.pendingDate),
-						//end:new Date(task.pendingDateTo ? task.pendingDateTo: fromMomentToUnix(moment(task.pendingDate).add(30,'minutes')) ),
-					}
-				}
-				default:{
-					return {
-						...newTask,
-						start:new Date(),
-					}
-				}
-			}
-		}).map((task)=>({...task,end: task.status.action !== 'pendingOLD' ? task.start : task.end }))*/
-	}
+  const getCalendarAllDayData = ( tasks ) => {
+    /*return tasks.map((task) => {
+    	let newTask = {
+    		...task,
+    		isTask:true,
+    		titleFunction:this.displayCal,
+    		allDay: !task.status || task.status.action !== 'pendingOLD',
+    	}
+    	if(!task.status){
+    		return {
+    			...newTask,
+    			status: this.props.statuses.find((status)=>status.action==='new'),
+    			start:new Date(),
+    		}
+    	}
+    	switch (task.status.action) {
+    		case 'invoiced':{
+    			return {
+    				...newTask,
+    				start:new Date(task.invoicedDate),
+    			}
+    		}
+    		case 'close':{
+    			return {
+    				...newTask,
+    				start:new Date(task.closeDate),
+    			}
+    		}
+    		case 'invalid':{
+    			return {
+    				...newTask,
+    				start:new Date(task.closeDate),
+    			}
+    		}
+    		case 'pending':{
+    			return {
+    				...newTask,
+    				start:new Date(task.pendingDate),
+    				//end:new Date(task.pendingDateTo ? task.pendingDateTo: fromMomentToUnix(moment(task.pendingDate).add(30,'minutes')) ),
+    			}
+    		}
+    		default:{
+    			return {
+    				...newTask,
+    				start:new Date(),
+    			}
+    		}
+    	}
+    }).map((task)=>({...task,end: task.status.action !== 'pendingOLD' ? task.start : task.end }))*/
+  }
 
-	const dataLoading = loading || tasksLoading;
+  const dataLoading = loading || tasksLoading;
 
-	if (dataLoading) {
-		return (<Loading />);
-	}
+  if ( dataLoading ) {
+    return ( <Loading /> );
+  }
 
-	console.log(match.params.taskID);
+  console.log( match.params.taskID );
 
-	let link='';
-	if(match.params.hasOwnProperty('listID')){
-		link = '/helpdesk/taskList/i/'+match.params.listID;
-	}else{
-		link = '/helpdesk/taskList'
-	}
-	return (
-		<ShowData
+  let link = '';
+  if ( match.params.hasOwnProperty( 'listID' ) ) {
+    link = '/helpdesk/taskList/i/' + match.params.listID;
+  } else {
+    link = '/helpdesk/taskList'
+  }
+  return (
+      <ShowData
 			data={filterTasks()}
 			filterBy={[
 				{value:'assignedTo',type:'list',func:((total,user)=>total+=user.email+' '+user.fullName+' ')},

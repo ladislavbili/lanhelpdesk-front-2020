@@ -1,12 +1,21 @@
 import React from 'react';
-import { useMutation } from "@apollo/react-hooks";
+import {
+  useMutation
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 
-import {  GET_TASK_TYPES } from './index';
+import {
+  GET_TASK_TYPES
+} from './index';
 
-const ADD_TASK_TYPE = gql`
+const ADD_TASK_TYPE = gql `
 mutation addTaskType($title: String!, $order: Int) {
   addTaskType(
     title: $title,
@@ -19,30 +28,49 @@ mutation addTaskType($title: String!, $order: Int) {
 }
 `;
 
-export default function TaskTypeAdd(props){
+export default function TaskTypeAdd( props ) {
   //data & queries
-  const { history } = props;
-  const [ addTaskType, {client} ] = useMutation(ADD_TASK_TYPE);
+  const {
+    history
+  } = props;
+  const [ addTaskType, {
+    client
+  } ] = useMutation( ADD_TASK_TYPE );
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ order, setOrder ] = React.useState(0);
-  const [ saving, setSaving ] = React.useState(false);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ saving, setSaving ] = React.useState( false );
 
   //functions
   const addTaskTypeFunc = () => {
     setSaving( true );
-    addTaskType({ variables: {
-      title: title,
-      order: (order !== '' ? parseInt(order) : 0),
-    } }).then( ( response ) => {
-      const allTaskTypes = client.readQuery({query: GET_TASK_TYPES}).taskTypes;
-      const newTaskType = {...response.data.addTaskType, __typename: "TaskType"};
-      client.writeQuery({ query: GET_TASK_TYPES, data: {taskTypes: [...allTaskTypes, newTaskType ] } });
-      history.push('/helpdesk/settings/taskTypes/' + newTaskType.id)
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    addTaskType( {
+        variables: {
+          title: title,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+        }
+      } )
+      .then( ( response ) => {
+        const allTaskTypes = client.readQuery( {
+            query: GET_TASK_TYPES
+          } )
+          .taskTypes;
+        const newTaskType = {
+          ...response.data.addTaskType,
+          __typename: "TaskType"
+        };
+        client.writeQuery( {
+          query: GET_TASK_TYPES,
+          data: {
+            taskTypes: [ ...allTaskTypes, newTaskType ]
+          }
+        } );
+        history.push( '/helpdesk/settings/taskTypes/' + newTaskType.id )
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   }
 

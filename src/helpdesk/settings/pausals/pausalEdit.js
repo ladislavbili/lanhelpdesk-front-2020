@@ -1,8 +1,16 @@
 import React from 'react';
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import {
+  useQuery,
+  useMutation
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 /*
 storageCompaniesStart,
 storageHelpPricelistsStart,
@@ -13,13 +21,19 @@ storageHelpTripTypesStart*/
 import CompanyRents from '../companies/companyRents';
 import CompanyPriceList from '../companies/companyPriceList';
 
-import { toSelArr } from '../../../helperFunctions';
+import {
+  toSelArr
+} from '../../../helperFunctions';
 import Loading from 'components/loading';
 
-import {  GET_PRICELISTS } from '../prices/index';
-import {  ADD_PRICELIST } from '../prices/priceAdd';
+import {
+  GET_PRICELISTS
+} from '../prices/index';
+import {
+  ADD_PRICELIST
+} from '../prices/priceAdd';
 
-const GET_COMPANY = gql`
+const GET_COMPANY = gql `
 query company($id: Int!) {
   company (
     id: $id
@@ -73,7 +87,7 @@ query company($id: Int!) {
 }
 `;
 
-const UPDATE_COMPANY = gql`
+const UPDATE_COMPANY = gql `
 mutation updateCompany($id: Int!, $title: String, $dph: Int, $ico: String, $dic: String, $ic_dph: String, $country: String, $city: String, $street: String, $zip: String, $email: String, $phone: String, $description: String, $pricelistId: Int!, $monthly: Boolean, $monthlyPausal: Float, $taskWorkPausal: Float, $taskTripPausal: Float, $rents: [CompanyRentUpdateInput]) {
   updateCompany(
     id: $id,
@@ -105,134 +119,169 @@ mutation updateCompany($id: Int!, $title: String, $dph: Int, $ico: String, $dic:
 }
 `;
 
-export default function PausalEdit(props){
+export default function PausalEdit( props ) {
   //data
-  const { match } = props;
-  const { data, loading, refetch } = useQuery(GET_COMPANY, { variables: {id: parseInt(match.params.id)} });
-  const [updateCompany] = useMutation(UPDATE_COMPANY);
-
-  const [ addPricelist ] = useMutation(ADD_PRICELIST);
-  const { data: pricelistsData, loading: pricelistsLoading } = useQuery(GET_PRICELISTS);
-  let pl = (pricelistsLoading || !pricelistsData ? [] : pricelistsData.pricelists);
-  pl = [{label: "Nový cenník", value: "0"}, ...toSelArr(pl)];
-  const [ pricelists, setPricelists ] = React.useState(pl);
-
-    //state
-    const [ title, setTitle ] = React.useState("");
-    const [ monthlyPausal, setMonthlyPausal ] = React.useState(0);
-    const [ taskWorkPausal, setTaskWorkPausal ] = React.useState(0);
-    const [ taskTripPausal, setTaskTripPausal ] = React.useState(0);
-    const [ pricelist, setPricelist ] = React.useState({});
-    const [ oldPricelist, setOldPricelist ] = React.useState({});
-    const [ pricelistName, setPricelistName ] = React.useState("");
-
-    const [ rents, setRents ] = React.useState([]);
-    const [ clearCompanyRents, setClearCompanyRents ] = React.useState(false);
-
-    const [ fakeID, setFakeID ] = React.useState(0);
-
-    const [ saving, setSaving ] = React.useState(false);
-
-    const getFakeID = () => {
-      let fake = fakeID;
-      setFakeID(fakeID+1);
-      return fake;
+  const {
+    match
+  } = props;
+  const {
+    data,
+    loading,
+    refetch
+  } = useQuery( GET_COMPANY, {
+    variables: {
+      id: parseInt( match.params.id )
     }
+  } );
+  const [ updateCompany ] = useMutation( UPDATE_COMPANY );
 
-    //sync
-    React.useEffect( () => {
-        if (!pricelistsLoading){
-          let pl = [{label: "Nový cenník", value: "0"}, ...toSelArr(pricelistsData.pricelists)];
-          setPricelists(pl);
+  const [ addPricelist ] = useMutation( ADD_PRICELIST );
+  const {
+    data: pricelistsData,
+    loading: pricelistsLoading
+  } = useQuery( GET_PRICELISTS );
+  let pl = ( pricelistsLoading || !pricelistsData ? [] : pricelistsData.pricelists );
+  pl = [ {
+    label: "Nový cenník",
+    value: "0"
+  }, ...toSelArr( pl ) ];
+  const [ pricelists, setPricelists ] = React.useState( pl );
+
+  //state
+  const [ title, setTitle ] = React.useState( "" );
+  const [ monthlyPausal, setMonthlyPausal ] = React.useState( 0 );
+  const [ taskWorkPausal, setTaskWorkPausal ] = React.useState( 0 );
+  const [ taskTripPausal, setTaskTripPausal ] = React.useState( 0 );
+  const [ pricelist, setPricelist ] = React.useState( {} );
+  const [ oldPricelist, setOldPricelist ] = React.useState( {} );
+  const [ pricelistName, setPricelistName ] = React.useState( "" );
+
+  const [ rents, setRents ] = React.useState( [] );
+  const [ clearCompanyRents, setClearCompanyRents ] = React.useState( false );
+
+  const [ fakeID, setFakeID ] = React.useState( 0 );
+
+  const [ saving, setSaving ] = React.useState( false );
+
+  const getFakeID = () => {
+    let fake = fakeID;
+    setFakeID( fakeID + 1 );
+    return fake;
+  }
+
+  //sync
+  React.useEffect( () => {
+    if ( !pricelistsLoading ) {
+      let pl = [ {
+        label: "Nový cenník",
+        value: "0"
+      }, ...toSelArr( pricelistsData.pricelists ) ];
+      setPricelists( pl );
+    }
+  }, [ pricelistsLoading ] );
+
+  React.useEffect( () => {
+    if ( !loading ) {
+      setTitle( data.company.title );
+      setMonthlyPausal( data.company.monthlyPausal );
+      setTaskWorkPausal( data.company.taskWorkPausal );
+      setTaskTripPausal( data.company.taskTripPausal );
+      let pl = {
+        ...data.company.pricelist,
+        value: data.company.pricelist.id,
+        label: data.company.pricelist.title
+      };
+      setPricelist( pl );
+      setOldPricelist( pl );
+      let r = data.company.companyRents.map( re => {
+        return {
+          id: re.id,
+          title: re.title,
+          quantity: re.quantity,
+          unitPrice: re.price,
+          unitCost: re.cost,
+          totalPrice: parseInt( re.quantity ) * parseFloat( re.price ),
         }
-    }, [pricelistsLoading]);
+      } )
+      setRents( r );
+    }
+  }, [ loading ] );
 
-    React.useEffect( () => {
-        if (!loading){
-          setTitle(data.company.title);
-          setMonthlyPausal(data.company.monthlyPausal);
-          setTaskWorkPausal(data.company.taskWorkPausal);
-          setTaskTripPausal(data.company.taskTripPausal);
-          let pl = {...data.company.pricelist, value: data.company.pricelist.id, label: data.company.pricelist.title};
-          setPricelist(pl);
-          setOldPricelist(pl);
-          let r = data.company.companyRents.map(re => {
-            return {
-              id: re.id,
-              title: re.title,
-              quantity: re.quantity,
-              unitPrice: re.price,
-              unitCost: re.cost,
-              totalPrice: parseInt(re.quantity)*parseFloat(re.price),
-            }
-          })
-          setRents(r);
+  React.useEffect( () => {
+    refetch( {
+      variables: {
+        id: parseInt( match.params.id )
+      }
+    } );
+  }, [ match.params.id ] );
+
+  // functions
+  const updateCompanyFunc = () => {
+    setSaving( true );
+
+    let newRents = rents.map( r => {
+      let newRent = {
+        title: r.title,
+        quantity: isNaN( parseInt( r.quantity ) ) ? 0 : parseInt( r.quantity ),
+        cost: isNaN( parseInt( r.unitCost ) ) ? 0 : parseInt( r.unitCost ),
+        price: isNaN( parseInt( r.unitPrice ) ) ? 0 : parseInt( r.unitPrice )
+      };
+      if ( r.id ) {
+        newRent.id = r.id;
+      }
+      return newRent;
+    } );
+
+    updateCompany( {
+        variables: {
+          id: parseInt( match.params.id ),
+          monthlyPausal: ( monthlyPausal === "" ? 0 : parseFloat( monthlyPausal ) ),
+          taskWorkPausal: ( taskWorkPausal === "" ? 0 : parseFloat( taskWorkPausal ) ),
+          taskTripPausal: ( taskTripPausal === "" ? 0 : parseFloat( taskTripPausal ) ),
+          rents: newRents,
         }
-    }, [loading]);
+      } )
+      .then( ( response ) => {
+        /*  let updatedRole = {...response.data.updateRole, __typename: "Role"};
+          client.writeQuery({ query: GET_ROLES, data: {roles: [...allRoles.filter( role => role.id !== parseInt(match.params.id) ), updatedRole ] } });*/
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-    React.useEffect( () => {
-        refetch({ variables: {id: parseInt(match.params.id)} });
-    }, [match.params.id]);
-
-        // functions
-        const updateCompanyFunc = () => {
-          setSaving( true );
-
-          let newRents = rents.map(r => {
-            let newRent = {
-              title: r.title,
-              quantity: isNaN(parseInt(r.quantity)) ? 0 : parseInt(r.quantity),
-              cost: isNaN(parseInt(r.unitCost)) ? 0 : parseInt(r.unitCost),
-              price: isNaN(parseInt(r.unitPrice)) ? 0 : parseInt(r.unitPrice)
-            };
-            if (r.id){
-              newRent.id = r.id;
-            }
-            return newRent;
-          });
-
-          updateCompany({ variables: {
-            id: parseInt(match.params.id),
-            monthlyPausal: (monthlyPausal === "" ? 0 : parseFloat(monthlyPausal)),
-            taskWorkPausal: (taskWorkPausal === "" ? 0 : parseFloat(taskWorkPausal)),
-            taskTripPausal: (taskTripPausal === "" ? 0 : parseFloat(taskTripPausal)),
-            rents: newRents,
-          } }).then( ( response ) => {
-          /*  let updatedRole = {...response.data.updateRole, __typename: "Role"};
-            client.writeQuery({ query: GET_ROLES, data: {roles: [...allRoles.filter( role => role.id !== parseInt(match.params.id) ), updatedRole ] } });*/
-          }).catch( (err) => {
-            console.log(err.message);
-          });
-
-           setSaving( false );
-        };
+    setSaving( false );
+  };
 
 
-        const savePriceList = () => {
-          setSaving( true );
+  const savePriceList = () => {
+    setSaving( true );
 
-          addPricelist({ variables: {
-            title: pricelistName,
-            order: 0,
-            afterHours: 0,
-            def: false,
-            materialMargin: 0,
-            materialMarginExtra: 0,
-            prices: [],
-          } }).then( ( response ) => {
-            let newPricelist = response.data.addPricelist;
-            setPricelist(newPricelist);
-            let newPricelists = pricelists.concat([newPricelist]);
-            setPricelists(newPricelists);
-
-            updateCompanyFunc();
-          }).catch( (err) => {
-            console.log(err.message);
-          });
-          setSaving( false );
+    addPricelist( {
+        variables: {
+          title: pricelistName,
+          order: 0,
+          afterHours: 0,
+          def: false,
+          materialMargin: 0,
+          materialMarginExtra: 0,
+          prices: [],
         }
+      } )
+      .then( ( response ) => {
+        let newPricelist = response.data.addPricelist;
+        setPricelist( newPricelist );
+        let newPricelists = pricelists.concat( [ newPricelist ] );
+        setPricelists( newPricelists );
 
-            /*
+        updateCompanyFunc();
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+    setSaving( false );
+  }
+
+  /*
   submit(){
       this.setState({saving:true});
       rebase.updateDoc('/companies/'+this.props.match.params.id,
@@ -256,20 +305,20 @@ export default function PausalEdit(props){
         }));
   }
 */
-    const cancel = () => {
-      setClearCompanyRents(true);
-    }
+  const cancel = () => {
+    setClearCompanyRents( true );
+  }
 
-    const cannotSave = saving || (pricelist.value === "0" && pricelistName === "");
+  const cannotSave = saving || ( pricelist.value === "0" && pricelistName === "" );
 
-    if (loading) {
+  if ( loading ) {
     return <Loading />
-    }
+  }
 
-    console.log("aaaaaaaaaaaaaa");
+  console.log( "aaaaaaaaaaaaaa" );
 
-    return (
-      <div className="fit-with-header-and-commandbar-2 scroll-visible">
+  return (
+    <div className="fit-with-header-and-commandbar-2 scroll-visible">
 
       <h2 className="p-t-10 p-l-20 p-b-5">{title}</h2>
 
@@ -350,5 +399,5 @@ export default function PausalEdit(props){
        }}>{saving?'Saving...':'Save changes'}</Button>
       </div>
     </div>
-    );
-  }
+  );
+}

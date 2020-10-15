@@ -1,13 +1,19 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import StatusAdd from './statusAdd';
 import StatusEdit from './statusEdit';
-import { orderArr } from 'helperFunctions';
+import {
+  orderArr
+} from 'helperFunctions';
 
-export const GET_STATUSES = gql`
+export const GET_STATUSES = gql `
 query {
   statuses {
     title
@@ -17,17 +23,23 @@ query {
 }
 `;
 
-export default function StatusesList(props){
-    // state
-    const [ statusFilter, setStatusFilter ] = React.useState("");
+export default function StatusesList( props ) {
+  // state
+  const [ statusFilter, setStatusFilter ] = React.useState( "" );
 
-    //data
-    const { history, match } = props;
-    const { data, loading } = useQuery(GET_STATUSES);
-    const statuses = (loading || !data ? [] : orderArr(data.statuses));
+  //data
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_STATUSES );
+  const statuses = ( loading || !data ? [] : orderArr( data.statuses ) );
 
-    return (
-      <div className="content">
+  return (
+    <div className="content">
         <div className="row m-0 p-0 taskList-container">
           <div className="col-lg-4">
             <div className="commandbar">
@@ -84,5 +96,5 @@ export default function StatusesList(props){
           </div>
         </div>
       </div>
-    );
+  );
 }

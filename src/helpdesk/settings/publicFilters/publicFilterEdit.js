@@ -1,13 +1,27 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, Label, Input, Alert } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  Alert
+} from 'reactstrap';
 
-import { connect } from "react-redux";
+import {
+  connect
+} from "react-redux";
 import Checkbox from 'components/checkbox';
-import {rebase} from 'index';
+import {
+  rebase
+} from 'index';
 
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
 import Select from 'react-select';
-import {selectStyle} from 'configs/components/select';
+import {
+  selectStyle
+} from 'configs/components/select';
 import {
   storageHelpFiltersStart,
   storageUsersStart,
@@ -15,17 +29,27 @@ import {
   storageHelpTaskTypesStart,
   storageHelpProjectsStart,
 } from 'redux/actions';
-import { roles } from 'configs/constants/roles';
-import { toMomentInput, toSelArr, filterProjectsByPermissions, fromMomentToUnix } from 'helperFunctions';
-import { oneOfOptions, emptyFilter } from 'configs/constants/filter';
+import {
+  roles
+} from 'configs/constants/roles';
+import {
+  toMomentInput,
+  toSelArr,
+  filterProjectsByPermissions,
+  fromMomentToUnix
+} from 'helperFunctions';
+import {
+  oneOfOptions,
+  emptyFilter
+} from 'configs/constants/filter';
 
 
-class PublicFilterEdit extends Component{
-  constructor(props){
-    super(props);
+class PublicFilterEdit extends Component {
+  constructor( props ) {
+    super( props );
     this.state = {
-      global:false,
-      dashboard:false,
+      global: false,
+      dashboard: false,
       order: 0,
       roles: [],
       title: '',
@@ -38,40 +62,42 @@ class PublicFilterEdit extends Component{
     }
   }
 
-  componentWillReceiveProps(props){
-    if ( this.props.match.params.id !== props.match.params.id ){
-      this.setState({ loading: true })
-      this.setData(props);
-    }else if( this.storageLoaded(this.props) !== this.storageLoaded(props) ){
-      this.setData(props);
+  componentWillReceiveProps( props ) {
+    if ( this.props.match.params.id !== props.match.params.id ) {
+      this.setState( {
+        loading: true
+      } )
+      this.setData( props );
+    } else if ( this.storageLoaded( this.props ) !== this.storageLoaded( props ) ) {
+      this.setData( props );
     }
   }
 
-  componentWillMount(){
-    if(!this.props.filtersActive){
+  componentWillMount() {
+    if ( !this.props.filtersActive ) {
       this.props.storageHelpFiltersStart();
     }
 
-    if(!this.props.usersActive){
+    if ( !this.props.usersActive ) {
       this.props.storageUsersStart();
     }
 
-    if(!this.props.companiesActive){
+    if ( !this.props.companiesActive ) {
       this.props.storageCompaniesStart();
     }
 
-    if(!this.props.taskTypesActive){
+    if ( !this.props.taskTypesActive ) {
       this.props.storageHelpTaskTypesStart();
     }
 
-    if(!this.props.projectsActive){
+    if ( !this.props.projectsActive ) {
       this.props.storageHelpProjectsStart();
     }
 
-    this.setData(this.props);
+    this.setData( this.props );
   }
 
-  storageLoaded(props){
+  storageLoaded( props ) {
     return (
       props.filtersLoaded &&
       props.taskTypesLoaded &&
@@ -81,121 +107,135 @@ class PublicFilterEdit extends Component{
     )
   }
 
-  getItemValue(sourceKey,props,id){
-    const source = toSelArr( props[sourceKey], ['users'].includes(sourceKey) ? 'email' : 'title' )
-    let value = source.find((item)=>item.id === id);
-    if(value===undefined){
-      if(id==='cur'){
-        value={label:'Current',value:'cur',id:'cur'};
-      }else{
-        value={id:null,label:'Žiadny',value:null};
+  getItemValue( sourceKey, props, id ) {
+    const source = toSelArr( props[ sourceKey ], [ 'users' ].includes( sourceKey ) ? 'email' : 'title' )
+    let value = source.find( ( item ) => item.id === id );
+    if ( value === undefined ) {
+      if ( id === 'cur' ) {
+        value = {
+          label: 'Current',
+          value: 'cur',
+          id: 'cur'
+        };
+      } else {
+        value = {
+          id: null,
+          label: 'Žiadny',
+          value: null
+        };
       }
     }
     return value;
   }
 
-  setData(props){
-    if( !this.storageLoaded(props) ){
+  setData( props ) {
+    if ( !this.storageLoaded( props ) ) {
       return;
     }
-    const filterData = props.filters.find( (filter) => filter.id === props.match.params.id );
+    const filterData = props.filters.find( ( filter ) => filter.id === props.match.params.id );
     const filter = filterData.filter;
-    if(filter === undefined){
+    if ( filter === undefined ) {
       return;
     }
-    this.setState({
+    this.setState( {
       requester: this.getItemValue( 'users', props, filter.requester ),
       company: this.getItemValue( 'companies', props, filter.company ),
       assigned: this.getItemValue( 'users', props, filter.assigned ),
       taskType: this.getItemValue( 'taskTypes', props, filter.taskType ),
-      oneOf: oneOfOptions.filter( (option) => filter.oneOf.includes(option.value) ),
+      oneOf: oneOfOptions.filter( ( option ) => filter.oneOf.includes( option.value ) ),
 
-      statusDateFrom: toMomentInput(filter.statusDateFrom),
+      statusDateFrom: toMomentInput( filter.statusDateFrom ),
       statusDateFromNow: filter.statusDateFromNow === true,
-      statusDateTo: toMomentInput(filter.statusDateTo),
+      statusDateTo: toMomentInput( filter.statusDateTo ),
       statusDateToNow: filter.statusDateToNow === true,
 
-      pendingDateFrom: toMomentInput(filter.pendingDateFrom),
+      pendingDateFrom: toMomentInput( filter.pendingDateFrom ),
       pendingDateFromNow: filter.pendingDateFromNow === true,
-      pendingDateTo: toMomentInput(filter.pendingDateTo),
+      pendingDateTo: toMomentInput( filter.pendingDateTo ),
       pendingDateToNow: filter.pendingDateToNow === true,
 
-      closeDateFrom: toMomentInput(filter.closeDateFrom),
+      closeDateFrom: toMomentInput( filter.closeDateFrom ),
       closeDateFromNow: filter.closeDateFromNow === true,
-      closeDateTo: toMomentInput(filter.closeDateTo),
+      closeDateTo: toMomentInput( filter.closeDateTo ),
       closeDateToNow: filter.closeDateToNow === true,
 
-      deadlineFrom: toMomentInput(filter.deadlineFrom),
+      deadlineFrom: toMomentInput( filter.deadlineFrom ),
       deadlineFromNow: filter.deadlineFromNow === true,
-      deadlineTo: toMomentInput(filter.deadlineTo),
+      deadlineTo: toMomentInput( filter.deadlineTo ),
       deadlineToNow: filter.deadlineToNow === true,
 
       title: filterData.title,
       order: filterData.order || 0,
-      roles: filterData.roles ? toSelArr(roles.filter( (role) => filterData.roles.includes(role.id) )) : [],
+      roles: filterData.roles ? toSelArr( roles.filter( ( role ) => filterData.roles.includes( role.id ) ) ) : [],
       global: filterData.global,
       dashboard: filterData.dashboard,
       loading: false,
-    });
+    } );
   }
 
-  cantSaveFilter(){
-    return this.state.saving || this.state.loading || this.state.title === "" || (!this.state.global && this.state.project === null) || isNaN(parseInt(this.state.order))
+  cantSaveFilter() {
+    return this.state.saving || this.state.loading || this.state.title === "" || ( !this.state.global && this.state.project === null ) || isNaN( parseInt( this.state.order ) )
   }
 
-  deleteFilter(){
-    if(window.confirm("Are you sure?")){
-      this.setState({ deleting: true })
-      rebase.removeDoc('/help-filters/' + this.props.match.params.id);
+  deleteFilter() {
+    if ( window.confirm( "Are you sure?" ) ) {
+      this.setState( {
+        deleting: true
+      } )
+      rebase.removeDoc( '/help-filters/' + this.props.match.params.id );
     }
   }
 
-  submit(){
-    this.setState({ saving: true })
+  submit() {
+    this.setState( {
+      saving: true
+    } )
     let body = {
       title: this.state.title,
       order: this.state.order,
       public: true,
       global: this.state.global,
       dashboard: this.state.dashboard,
-      project: this.state.project !==null ? this.state.project.id : null,
-      roles: this.state.roles.map( (role) => role.id ),
+      project: this.state.project !== null ? this.state.project.id : null,
+      roles: this.state.roles.map( ( role ) => role.id ),
       filter: {
         requester: this.state.requester.id,
         company: this.state.company.id,
         assigned: this.state.assigned.id,
         taskType: this.state.taskType.id,
-        oneOf: this.state.oneOf.map( (item) => item.value ),
+        oneOf: this.state.oneOf.map( ( item ) => item.value ),
 
-        statusDateFrom: this.state.statusDateFromNow ? null :  fromMomentToUnix(this.state.statusDateFrom),
+        statusDateFrom: this.state.statusDateFromNow ? null : fromMomentToUnix( this.state.statusDateFrom ),
         statusDateFromNow: this.state.statusDateFromNow,
-        statusDateTo: this.state.statusDateToNow ? null :  fromMomentToUnix(this.state.statusDateTo),
+        statusDateTo: this.state.statusDateToNow ? null : fromMomentToUnix( this.state.statusDateTo ),
         statusDateToNow: this.state.statusDateToNow,
 
-        closeDateFrom: this.state.closeDateFromNow ? null :  fromMomentToUnix(this.state.closeDateFrom),
+        closeDateFrom: this.state.closeDateFromNow ? null : fromMomentToUnix( this.state.closeDateFrom ),
         closeDateFromNow: this.state.closeDateFromNow,
-        closeDateTo: this.state.closeDateToNow ? null :  fromMomentToUnix(this.state.closeDateTo),
+        closeDateTo: this.state.closeDateToNow ? null : fromMomentToUnix( this.state.closeDateTo ),
         closeDateToNow: this.state.closeDateToNow,
 
-        pendingDateFrom: this.state.pendingDateFromNow ? null :  fromMomentToUnix(this.state.pendingDateFrom),
+        pendingDateFrom: this.state.pendingDateFromNow ? null : fromMomentToUnix( this.state.pendingDateFrom ),
         pendingDateFromNow: this.state.pendingDateFromNow,
-        pendingDateTo: this.state.pendingDateToNow ? null :  fromMomentToUnix(this.state.pendingDateTo),
+        pendingDateTo: this.state.pendingDateToNow ? null : fromMomentToUnix( this.state.pendingDateTo ),
         pendingDateToNow: this.state.pendingDateToNow,
 
-        deadlineFrom: this.state.deadlineFromNow ? null :  fromMomentToUnix(this.state.deadlineFrom),
+        deadlineFrom: this.state.deadlineFromNow ? null : fromMomentToUnix( this.state.deadlineFrom ),
         deadlineFromNow: this.state.deadlineFromNow,
-        deadlineTo: this.state.deadlineToNow ? null :  fromMomentToUnix(this.state.deadlineTo),
+        deadlineTo: this.state.deadlineToNow ? null : fromMomentToUnix( this.state.deadlineTo ),
         deadlineToNow: this.state.deadlineToNow,
       },
     }
-    rebase.updateDoc('/help-filters/' + this.props.match.params.id, body)
-    .then(()=> {
-      this.setState({ saving: false });
-    });
+    rebase.updateDoc( '/help-filters/' + this.props.match.params.id, body )
+      .then( () => {
+        this.setState( {
+          saving: false
+        } );
+      } );
   }
 
-  render(){
-    if( !this.storageLoaded(this.props) ){
+  render() {
+    if ( !this.storageLoaded( this.props ) ) {
       return <Alert color="success">
         Loading data...
       </Alert>
@@ -426,33 +466,63 @@ class PublicFilterEdit extends Component{
   }
 }
 
-const mapStateToProps = ({
+const mapStateToProps = ( {
   storageHelpFilters,
   storageHelpTaskTypes,
   storageUsers,
   storageCompanies,
   storageHelpProjects,
   userReducer
-}) => {
-  const { filtersActive, filtersLoaded, filters } = storageHelpFilters;
-  const { taskTypesActive, taskTypesLoaded, taskTypes } = storageHelpTaskTypes;
-  const { usersActive, usersLoaded, users } = storageUsers;
-  const { companiesActive, companiesLoaded, companies } = storageCompanies;
-  const { projectsActive, projects, projectsLoaded } = storageHelpProjects;
+} ) => {
+  const {
+    filtersActive,
+    filtersLoaded,
+    filters
+  } = storageHelpFilters;
+  const {
+    taskTypesActive,
+    taskTypesLoaded,
+    taskTypes
+  } = storageHelpTaskTypes;
+  const {
+    usersActive,
+    usersLoaded,
+    users
+  } = storageUsers;
+  const {
+    companiesActive,
+    companiesLoaded,
+    companies
+  } = storageCompanies;
+  const {
+    projectsActive,
+    projects,
+    projectsLoaded
+  } = storageHelpProjects;
   return {
-    filtersActive, filtersLoaded, filters,
-    taskTypesActive, taskTypesLoaded, taskTypes,
-    usersActive, usersLoaded, users,
-    companiesActive, companiesLoaded, companies,
-    projectsActive, projects, projectsLoaded,
-    currentUser:userReducer
+    filtersActive,
+    filtersLoaded,
+    filters,
+    taskTypesActive,
+    taskTypesLoaded,
+    taskTypes,
+    usersActive,
+    usersLoaded,
+    users,
+    companiesActive,
+    companiesLoaded,
+    companies,
+    projectsActive,
+    projects,
+    projectsLoaded,
+    currentUser: userReducer
   };
 };
 
-export default connect(mapStateToProps, {
+export default connect( mapStateToProps, {
   storageHelpFiltersStart,
   storageUsersStart,
   storageCompaniesStart,
   storageHelpTaskTypesStart,
   storageHelpProjectsStart,
-})(PublicFilterEdit);
+} )( PublicFilterEdit );

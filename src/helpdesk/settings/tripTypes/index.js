@@ -1,14 +1,20 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import TripTypeAdd from './tripTypeAdd';
 import TripTypeEdit from './tripTypeEdit';
 import Loading from 'components/loading';
-import { orderArr } from 'helperFunctions';
+import {
+  orderArr
+} from 'helperFunctions';
 
-export const GET_TRIP_TYPES = gql`
+export const GET_TRIP_TYPES = gql `
 query {
   tripTypes {
     title
@@ -18,13 +24,19 @@ query {
 }
 `;
 
-export default function TripTypeListContainer(props){
+export default function TripTypeListContainer( props ) {
   // state
-  const [ tripTypeFilter, setTripTypeFilter ] = React.useState("");
+  const [ tripTypeFilter, setTripTypeFilter ] = React.useState( "" );
 
   //data
-  const { history, match } = props;
-  const { data, loading }  = useQuery(GET_TRIP_TYPES);
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_TRIP_TYPES );
 
   return (
     <div className="content">

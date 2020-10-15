@@ -1,13 +1,17 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import ImapAdd from './imapAdd';
 import ImapEdit from './imapEdit';
 import Loading from 'components/loading';
 
-export const GET_IMAPS = gql`
+export const GET_IMAPS = gql `
 query {
   imaps {
     title
@@ -21,17 +25,23 @@ query {
 }
 `;
 
-export default function IMAPsList(props){
-    // state
-    const [ imapFilter, setImapFilter ] = React.useState("");
+export default function IMAPsList( props ) {
+  // state
+  const [ imapFilter, setImapFilter ] = React.useState( "" );
 
-    //data
-    const { history, match } = props;
-    const { data, loading } = useQuery(GET_IMAPS);
-    const IMAPS = (loading || !data ? [] : data.imaps);
+  //data
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_IMAPS );
+  const IMAPS = ( loading || !data ? [] : data.imaps );
 
-    return (
-      <div className="content">
+  return (
+    <div className="content">
           <div className="row m-0 p-0 taskList-container">
             <div className="col-lg-4">
               <div className="commandbar">
@@ -129,5 +139,5 @@ export default function IMAPsList(props){
           </div>
         </div>
       </div>
-    );
+  );
 }

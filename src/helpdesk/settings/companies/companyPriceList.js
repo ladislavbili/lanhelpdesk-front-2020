@@ -1,16 +1,34 @@
 import React from 'react';
-import { Button, FormGroup, Label,Input } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
+import {
+  selectStyle
+} from "configs/components/select";
 import Switch from "react-switch";
 import PriceEdit from "../prices/priceEdit";
 
-export default function CompanyPriceList(props)  {
+export default function CompanyPriceList( props ) {
   //data
-  const { pricelist, pricelists, newData, priceName, cancel, history, setPricelist, setOldPricelist, setNewData, setPricelistName } = props;
+  const {
+    pricelist,
+    pricelists,
+    newData,
+    priceName,
+    cancel,
+    history,
+    setPricelist,
+    setOldPricelist,
+    setNewData,
+    setPricelistName
+  } = props;
 
-	return (
-		<div>
+  return (
+    <div>
 			<div className="row">
         <h3 className="m-b-20 m-r-10">Cenník</h3>
           <label>
@@ -97,5 +115,5 @@ export default function CompanyPriceList(props)  {
             </div>
           }
 			</div>
-		);
+  );
 }

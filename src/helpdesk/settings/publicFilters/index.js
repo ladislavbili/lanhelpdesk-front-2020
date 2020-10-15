@@ -1,16 +1,25 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 //import PublicFilterAdd from './publicFilterAdd';
 //import PublicFilterEdit from './publicFilterEdit';
 //import Loading from 'components/loading';
-import { filterIncludesText, orderArr } from 'helperFunctions';
+import {
+  filterIncludesText,
+  orderArr
+} from 'helperFunctions';
 
-import { GET_ROLES } from 'helpdesk/settings/roles';
+import {
+  GET_ROLES
+} from 'helpdesk/settings/roles';
 
-export const GET_PUBLIC_FILTERS = gql`
+export const GET_PUBLIC_FILTERS = gql `
 query {
   publicFilters {
     title
@@ -21,34 +30,43 @@ query {
 }
 `;
 
-export default function PublicFilterListContainer(props){
+export default function PublicFilterListContainer( props ) {
   // state
-  const [ search, setSearch ] = React.useState("");
-  const [ roleFilter, setRoleFilter ] = React.useState("all");
+  const [ search, setSearch ] = React.useState( "" );
+  const [ roleFilter, setRoleFilter ] = React.useState( "all" );
 
   //data
-  const { history, match } = props;
-  const { data, loading }  = useQuery(GET_PUBLIC_FILTERS);
-  const { data: rolesData, loading: rolesLoading }  = useQuery(GET_ROLES);
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_PUBLIC_FILTERS );
+  const {
+    data: rolesData,
+    loading: rolesLoading
+  } = useQuery( GET_ROLES );
 
   const getFilteredFilters = () => {
-    console.log(data);
-    let filters = (loading || !data ? [] : orderArr(data.publicFilters));
-    filters.filter((filter) => (
+    console.log( data );
+    let filters = ( loading || !data ? [] : orderArr( data.publicFilters ) );
+    filters.filter( ( filter ) => (
       filter.pub &&
       filterIncludesText( filter.title, search ) && (
         roleFilter === 'all' ||
-        ( roleFilter === 'none' && (filter.roles === undefined || filter.roles.length === 0 ) ) ||
+        ( roleFilter === 'none' && ( filter.roles === undefined || filter.roles.length === 0 ) ) ||
         ( filter.roles !== undefined && filter.roles.includes( roleFilter ) )
       )
-    ));
+    ) );
     return filters
   }
 
-  console.log(rolesData);
+  console.log( rolesData );
 
   return (
-		<div className="content">
+    <div className="content">
       <div className="row m-0 p-0 taskList-container">
         <div className="col-lg-4">
           <div className="commandbar">

@@ -1,16 +1,22 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import Multiselect from 'components/multiselect';
-import { toSelArr } from 'helperFunctions';
+import {
+  toSelArr
+} from 'helperFunctions';
 
 import UserAdd from './userAdd';
 import UserEdit from './userEdit';
 import Loading from 'components/loading';
 
-export const GET_USERS = gql`
+export const GET_USERS = gql `
 query {
   users{
     id
@@ -28,7 +34,7 @@ query {
 }
 `;
 
-export const GET_ROLES = gql`
+export const GET_ROLES = gql `
 query {
   roles{
     id
@@ -37,31 +43,41 @@ query {
 }
 `;
 
-export default function UserListContainer(props){
+export default function UserListContainer( props ) {
   //data
-  const { history, match } = props;
-  const { data: userData, loading: userLoading, refetch: usersRefetch } = useQuery(GET_USERS);
-  const { data: roleData, loading: roleLoading } = useQuery(GET_ROLES);
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data: userData,
+    loading: userLoading,
+    refetch: usersRefetch
+  } = useQuery( GET_USERS );
+  const {
+    data: roleData,
+    loading: roleLoading
+  } = useQuery( GET_ROLES );
 
-  const USERS = ( userLoading ? [] : userData.users);
-  const ROLES = ( roleLoading ? [] : toSelArr(roleData.roles) );
+  const USERS = ( userLoading ? [] : userData.users );
+  const ROLES = ( roleLoading ? [] : toSelArr( roleData.roles ) );
 
   // state
-  const [ userFilter, setUserFilter ] = React.useState("");
-  const [ selectedRoles, setSelectedRoles ] = React.useState(ROLES);
+  const [ userFilter, setUserFilter ] = React.useState( "" );
+  const [ selectedRoles, setSelectedRoles ] = React.useState( ROLES );
 
   //data
-  const FILTERED_USERS = USERS.filter( user => selectedRoles.some(sr => sr.id === user.role.id) );
+  const FILTERED_USERS = USERS.filter( user => selectedRoles.some( sr => sr.id === user.role.id ) );
 
   const allRolesSelected = selectedRoles.length === ROLES.length;
 
   // sync
   React.useEffect( () => {
-      if (!roleLoading){
-        setSelectedRoles(toSelArr(roleData.roles));
-        usersRefetch();
-      }
-  }, [roleLoading]);
+    if ( !roleLoading ) {
+      setSelectedRoles( toSelArr( roleData.roles ) );
+      usersRefetch();
+    }
+  }, [ roleLoading ] );
 
   return (
     <div className="content">

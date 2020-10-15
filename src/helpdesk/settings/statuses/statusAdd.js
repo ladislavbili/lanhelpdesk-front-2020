@@ -1,15 +1,30 @@
 import React from 'react';
-import { useMutation } from "@apollo/react-hooks";
+import {
+  useMutation
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import { Button, FormGroup, Label,Input } from 'reactstrap';
-import { SketchPicker } from "react-color";
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
+import {
+  SketchPicker
+} from "react-color";
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
-import { actions } from 'configs/constants/statuses';
+import {
+  selectStyle
+} from "configs/components/select";
+import {
+  actions
+} from 'configs/constants/statuses';
 
-import {  GET_STATUSES } from './index';
+import {
+  GET_STATUSES
+} from './index';
 
-const ADD_STATUS = gql`
+const ADD_STATUS = gql `
 mutation addStatus($title: String!, $order: Int!, $icon: String!, $color: String!, $action: StatusAllowedType!) {
   addStatus(
     title: $title,
@@ -25,41 +40,60 @@ mutation addStatus($title: String!, $order: Int!, $icon: String!, $color: String
 }
 `;
 
-export default function StatusAdd(props){
+export default function StatusAdd( props ) {
   //data & queries
-  const { history } = props;
-  const [ addStatus, {client} ] = useMutation(ADD_STATUS);
+  const {
+    history
+  } = props;
+  const [ addStatus, {
+    client
+  } ] = useMutation( ADD_STATUS );
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ color, setColor ] = React.useState("#f759f2");
-  const [ order, setOrder ] = React.useState(0);
-  const [ icon, setIcon ] = React.useState("fas fa-arrow-left");
-  const [ action, setAction ] = React.useState(actions[0]);
-  const [ saving, setSaving ] = React.useState(false);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ color, setColor ] = React.useState( "#f759f2" );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ icon, setIcon ] = React.useState( "fas fa-arrow-left" );
+  const [ action, setAction ] = React.useState( actions[ 0 ] );
+  const [ saving, setSaving ] = React.useState( false );
 
   //functions
   const addStatusFunc = () => {
     setSaving( true );
-    addStatus({ variables: {
-      title,
-      order: (order !== '' ? parseInt(order) : 0),
-      icon,
-      color,
-      action: action.value,
-    } }).then( ( response ) => {
-      const allStatuses = client.readQuery({query: GET_STATUSES}).statuses;
-      const newStatus = {...response.data.addStatus, __typename: "Status"};
-      client.writeQuery({ query: GET_STATUSES, data: {statuses: [...allStatuses, newStatus ] } });
-      history.push('/helpdesk/settings/statuses/' + newStatus.id)
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    addStatus( {
+        variables: {
+          title,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+          icon,
+          color,
+          action: action.value,
+        }
+      } )
+      .then( ( response ) => {
+        const allStatuses = client.readQuery( {
+            query: GET_STATUSES
+          } )
+          .statuses;
+        const newStatus = {
+          ...response.data.addStatus,
+          __typename: "Status"
+        };
+        client.writeQuery( {
+          query: GET_STATUSES,
+          data: {
+            statuses: [ ...allStatuses, newStatus ]
+          }
+        } );
+        history.push( '/helpdesk/settings/statuses/' + newStatus.id )
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   }
 
-    return (
-      <div className="scroll-visible p-20 fit-with-header-and-commandbar">
+  return (
+    <div className="scroll-visible p-20 fit-with-header-and-commandbar">
           <FormGroup>
             <Label for="name">Status name</Label>
             <Input type="text" name="name" id="name" placeholder="Enter status name" value={title} onChange={(e)=>setTitle(e.target.value)} />
@@ -90,5 +124,5 @@ export default function StatusAdd(props){
           />
         <Button className="btn m-t-5" disabled={saving} onClick={addStatusFunc}>{saving?'Adding...':'Add status'}</Button>
       </div>
-    );
+  );
 }

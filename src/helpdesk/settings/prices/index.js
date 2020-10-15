@@ -1,13 +1,17 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import PriceAdd from './priceAdd';
 import PriceEdit from './priceEdit';
 import Loading from 'components/loading';
 
-export const GET_PRICELISTS = gql`
+export const GET_PRICELISTS = gql `
 query {
   pricelists {
     title
@@ -18,17 +22,23 @@ query {
 }
 `;
 
-export default function PricelistsList(props){
-    // state
-    const [ pricelistFilter, setPricelistFilter ] = React.useState("");
+export default function PricelistsList( props ) {
+  // state
+  const [ pricelistFilter, setPricelistFilter ] = React.useState( "" );
 
-    //data
-    const { history, match } = props;
-    const { data, loading } = useQuery(GET_PRICELISTS);
-    const PRICELISTS = (loading || !data ? [] : data.pricelists);
+  //data
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_PRICELISTS );
+  const PRICELISTS = ( loading || !data ? [] : data.pricelists );
 
-    return (
-      <div className="content">
+  return (
+    <div className="content">
           <div className="row m-0 p-0 taskList-container">
             <div className="col-lg-4">
               <div className="commandbar">
@@ -91,5 +101,5 @@ export default function PricelistsList(props){
             </div>
           </div>
         </div>
-    );
+  );
 }

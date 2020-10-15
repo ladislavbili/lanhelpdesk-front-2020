@@ -1,14 +1,20 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import TagAdd from './tagAdd';
 import TagEdit from './tagEdit';
 import Loading from 'components/loading';
-import { orderArr } from 'helperFunctions';
+import {
+  orderArr
+} from 'helperFunctions';
 
-export const GET_TAGS = gql`
+export const GET_TAGS = gql `
 query {
   tags {
     title
@@ -18,17 +24,23 @@ query {
 }
 `;
 
-export default function TagsList(props){
-    // state
-    const [ tagFilter, setTagFilter ] = React.useState("");
+export default function TagsList( props ) {
+  // state
+  const [ tagFilter, setTagFilter ] = React.useState( "" );
 
-    //data
-    const { history, match } = props;
-    const { data, loading } = useQuery(GET_TAGS);
-    const TAGS = (loading || !data ? [] : orderArr(data.tags));
+  //data
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_TAGS );
+  const TAGS = ( loading || !data ? [] : orderArr( data.tags ) );
 
-    return (
-      <div className="content">
+  return (
+    <div className="content">
         <div className="row m-0 p-0 taskList-container">
           <div className="col-lg-4">
             <div className="commandbar">
@@ -86,5 +98,5 @@ export default function TagsList(props){
           </div>
         </div>
       </div>
-    )
+  )
 }

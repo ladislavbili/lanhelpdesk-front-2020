@@ -1,17 +1,38 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import {
+  useMutation,
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label,Input, InputGroup, InputGroupAddon, InputGroupText, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader
+} from 'reactstrap';
 import Loading from 'components/loading';
 import Checkbox from '../../../components/checkbox';
-import { toSelArr } from 'helperFunctions';
+import {
+  toSelArr
+} from 'helperFunctions';
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
+import {
+  selectStyle
+} from "configs/components/select";
 
-import {  GET_SMTPS } from './index';
+import {
+  GET_SMTPS
+} from './index';
 
-const GET_SMTP = gql`
+const GET_SMTP = gql `
 query smtp($id: Int!) {
   smtp (
     id: $id
@@ -30,7 +51,7 @@ query smtp($id: Int!) {
 }
 `;
 
-const UPDATE_SMTP = gql`
+const UPDATE_SMTP = gql `
 mutation updateSmtp($id: Int!, $title: String, $order: Int, $def: Boolean, $host: String, $port: Int, $username: String, $password: String, $rejectUnauthorized: Boolean, $secure: Boolean) {
   updateSmtp(
     id: $id,
@@ -55,7 +76,7 @@ mutation updateSmtp($id: Int!, $title: String, $order: Int, $def: Boolean, $host
 }
 `;
 
-export const DELETE_SMTP = gql`
+export const DELETE_SMTP = gql `
 mutation deleteSmtp($id: Int!, $newDefId: Int!, $newId: Int!) {
   deleteSmtp(
     id: $id,
@@ -67,112 +88,173 @@ mutation deleteSmtp($id: Int!, $newDefId: Int!, $newId: Int!) {
 }
 `;
 
-export default function SMTPEdit(props){
+export default function SMTPEdit( props ) {
   //data
-  const { history, match } = props;
-  const { data, loading, refetch } = useQuery(GET_SMTP, { variables: {id: parseInt(props.match.params.id)} });
-  const [updateSmtp] = useMutation(UPDATE_SMTP);
-  const [deleteSmtp, {client}] = useMutation(DELETE_SMTP);
-  const allSMTPs = toSelArr(client.readQuery({query: GET_SMTPS}).smtps);
-  const filteredSMTPs = allSMTPs.filter( SMTP => SMTP.id !== parseInt(match.params.id) );
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading,
+    refetch
+  } = useQuery( GET_SMTP, {
+    variables: {
+      id: parseInt( props.match.params.id )
+    }
+  } );
+  const [ updateSmtp ] = useMutation( UPDATE_SMTP );
+  const [ deleteSmtp, {
+    client
+  } ] = useMutation( DELETE_SMTP );
+  const allSMTPs = toSelArr( client.readQuery( {
+      query: GET_SMTPS
+    } )
+    .smtps );
+  const filteredSMTPs = allSMTPs.filter( SMTP => SMTP.id !== parseInt( match.params.id ) );
   const theOnlyOneLeft = allSMTPs.length === 0;
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ order, setOrder ] = React.useState(0);
-  const [ def, setDef ] = React.useState(false);
-  const [ host, setHost ] = React.useState("");
-  const [ port, setPort ] = React.useState(465);
-  const [ username, setUsername ] = React.useState("");
-  const [ password, setPassword ] = React.useState("");
-  const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState(false);
-  const [ secure, setSecure ] = React.useState(true);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ def, setDef ] = React.useState( false );
+  const [ host, setHost ] = React.useState( "" );
+  const [ port, setPort ] = React.useState( 465 );
+  const [ username, setUsername ] = React.useState( "" );
+  const [ password, setPassword ] = React.useState( "" );
+  const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState( false );
+  const [ secure, setSecure ] = React.useState( true );
 
-  const [ showPass, setShowPass ] = React.useState(false);
+  const [ showPass, setShowPass ] = React.useState( false );
 
-  const [ saving, setSaving ] = React.useState(false);
-  const [ newSMTP, setNewSMTP ] = React.useState(null);
-  const [ choosingNewSMTP, setChooseingNewSMTP ] = React.useState(false);
-  const [ newDefSMTP, setNewDefSMTP ] = React.useState(null);
+  const [ saving, setSaving ] = React.useState( false );
+  const [ newSMTP, setNewSMTP ] = React.useState( null );
+  const [ choosingNewSMTP, setChooseingNewSMTP ] = React.useState( false );
+  const [ newDefSMTP, setNewDefSMTP ] = React.useState( null );
 
   // sync
   React.useEffect( () => {
-      if (!loading){
-        setTitle(data.smtp.title);
-        setOrder(data.smtp.order);
-        setDef(data.smtp.def);
-        setHost(data.smtp.host);
-        setPort(data.smtp.port);
-        setUsername(data.smtp.username);
-        setPassword(data.smtp.password);
-        setRejectUnauthorized(data.smtp.rejectUnauthorized);
-        setSecure(data.smtp.secure);
-      }
-  }, [loading]);
+    if ( !loading ) {
+      setTitle( data.smtp.title );
+      setOrder( data.smtp.order );
+      setDef( data.smtp.def );
+      setHost( data.smtp.host );
+      setPort( data.smtp.port );
+      setUsername( data.smtp.username );
+      setPassword( data.smtp.password );
+      setRejectUnauthorized( data.smtp.rejectUnauthorized );
+      setSecure( data.smtp.secure );
+    }
+  }, [ loading ] );
 
   React.useEffect( () => {
-      refetch({ variables: {id: parseInt(match.params.id)} });
-  }, [match.params.id]);
+    refetch( {
+      variables: {
+        id: parseInt( match.params.id )
+      }
+    } );
+  }, [ match.params.id ] );
 
   // functions
   const updateSMTPFunc = () => {
     setSaving( true );
-    updateSmtp({ variables: {
-      id: parseInt(match.params.id),
-      title,
-      order: (order !== '' ? parseInt(order) : 0),
-      def,
-      host,
-      port: (port !== '' ? parseInt(port) : 0),
-      username,
-      password,
-      rejectUnauthorized,
-      secure,
-    } }).then( ( response ) => {
-      const updatedSMTP = {...response.data.updateSmtp};
-      if (def){
-        client.writeQuery({ query: GET_SMTPS, data: {smtps: [...allSMTPs.map( SMTP => {
-          if (SMTP.id === parseInt(match.params.id)) {
-            return ({...updatedSMTP, def: true});
-          } else {
-            return({...SMTP, def: false});
-          }
-        } ) ] } });
-      } else {
-        client.writeQuery({ query: GET_SMTPS, data: {smtps: [...allSMTPs.filter( SMTP => SMTP.id !== parseInt(match.params.id) ), updatedSMTP ] } });
-      }
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    updateSmtp( {
+        variables: {
+          id: parseInt( match.params.id ),
+          title,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+          def,
+          host,
+          port: ( port !== '' ? parseInt( port ) : 0 ),
+          username,
+          password,
+          rejectUnauthorized,
+          secure,
+        }
+      } )
+      .then( ( response ) => {
+        const updatedSMTP = {
+          ...response.data.updateSmtp
+        };
+        if ( def ) {
+          client.writeQuery( {
+            query: GET_SMTPS,
+            data: {
+              smtps: [ ...allSMTPs.map( SMTP => {
+                if ( SMTP.id === parseInt( match.params.id ) ) {
+                  return ( {
+                    ...updatedSMTP,
+                    def: true
+                  } );
+                } else {
+                  return ( {
+                    ...SMTP,
+                    def: false
+                  } );
+                }
+              } ) ]
+            }
+          } );
+        } else {
+          client.writeQuery( {
+            query: GET_SMTPS,
+            data: {
+              smtps: [ ...allSMTPs.filter( SMTP => SMTP.id !== parseInt( match.params.id ) ), updatedSMTP ]
+            }
+          } );
+        }
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-     setSaving( false );
+    setSaving( false );
   };
 
   const deleteSMTPFunc = () => {
-    setChooseingNewSMTP(false);
+    setChooseingNewSMTP( false );
 
-    if(window.confirm("Are you sure?")){
-      deleteSmtp({ variables: {
-        id: parseInt(match.params.id),
-        newDefId: ( newDefSMTP ? parseInt(newDefSMTP.id) : null ),
-        newId: ( newSMTP ? parseInt(newSMTP.id) : null ),
-      } }).then( ( response ) => {
-        if (def) {
-          client.writeQuery({ query: GET_SMTPS, data: {smtps: filteredSMTPs.map(smtp => {return {...smtp, def: (smtp.id === parseInt(newDefSMTP.id)) }} )} });
-        } else {
-          client.writeQuery({ query: GET_SMTPS, data: {smtps: filteredSMTPs} });
-        }
-        history.push('/helpdesk/settings/smtps/add');
-      }).catch( (err) => {
-        console.log(err.message);
-        console.log(err);
-      });
+    if ( window.confirm( "Are you sure?" ) ) {
+      deleteSmtp( {
+          variables: {
+            id: parseInt( match.params.id ),
+            newDefId: ( newDefSMTP ? parseInt( newDefSMTP.id ) : null ),
+            newId: ( newSMTP ? parseInt( newSMTP.id ) : null ),
+          }
+        } )
+        .then( ( response ) => {
+          if ( def ) {
+            client.writeQuery( {
+              query: GET_SMTPS,
+              data: {
+                smtps: filteredSMTPs.map( smtp => {
+                  return {
+                    ...smtp,
+                    def: ( smtp.id === parseInt( newDefSMTP.id ) )
+                  }
+                } )
+              }
+            } );
+          } else {
+            client.writeQuery( {
+              query: GET_SMTPS,
+              data: {
+                smtps: filteredSMTPs
+              }
+            } );
+          }
+          history.push( '/helpdesk/settings/smtps/add' );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+          console.log( err );
+        } );
     }
   };
 
-  const cannotSave = saving || title === '' ||  host === '' || port === '' || username === '';
+  const cannotSave = saving || title === '' || host === '' || port === '' || username === '';
 
-  if (loading) {
+  if ( loading ) {
     return <Loading />
   }
 

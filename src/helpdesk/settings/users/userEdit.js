@@ -1,18 +1,33 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import {
+  useMutation,
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label, Input } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 import Loading from 'components/loading';
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
+import {
+  selectStyle
+} from "configs/components/select";
 
-import { isEmail, toSelArr } from 'helperFunctions';
+import {
+  isEmail,
+  toSelArr
+} from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 
-import { GET_USERS } from './index';
+import {
+  GET_USERS
+} from './index';
 
-const GET_USER = gql`
+const GET_USER = gql `
 query user($id: Int!) {
   user (
     id: $id
@@ -42,7 +57,7 @@ query user($id: Int!) {
 }
 `;
 
-const UPDATE_USER = gql`
+const UPDATE_USER = gql `
 mutation updateUser($id: Int!, $username: String, $email: String, $name: String, $surname: String, $receiveNotifications: Boolean, $signature: String, $roleId: Int, $companyId: Int, $language: LanguageEnum) {
   updateUser(
     id: $id,
@@ -61,7 +76,7 @@ mutation updateUser($id: Int!, $username: String, $email: String, $name: String,
 }
 `;
 
-export const DELETE_USER = gql`
+export const DELETE_USER = gql `
 mutation deleteUser($id: Int!) {
   deleteUser(
     id: $id,
@@ -71,7 +86,7 @@ mutation deleteUser($id: Int!) {
 }
 `;
 
-export const GET_ROLES = gql`
+export const GET_ROLES = gql `
 query {
   roles{
     id
@@ -81,7 +96,7 @@ query {
 }
 `;
 
-export const GET_COMPANIES = gql`
+export const GET_COMPANIES = gql `
 query {
   companies{
     id
@@ -90,130 +105,194 @@ query {
 }
 `;
 
-export default function UserEdit(props){
+export default function UserEdit( props ) {
   // data & queries
-  const { history, match } = props;
-  const { data: userData, loading: userLoading, refetch: userRefetch} = useQuery(GET_USER, { variables: {id: parseInt(props.match.params.id)} });
-  const { data: rolesData, loading: rolesLoading } = useQuery(GET_ROLES);
-  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
-  const [updateUser] = useMutation(UPDATE_USER);
-  const [deleteUser, {client}] = useMutation(DELETE_USER);
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data: userData,
+    loading: userLoading,
+    refetch: userRefetch
+  } = useQuery( GET_USER, {
+    variables: {
+      id: parseInt( props.match.params.id )
+    }
+  } );
+  const {
+    data: rolesData,
+    loading: rolesLoading
+  } = useQuery( GET_ROLES );
+  const {
+    data: companiesData,
+    loading: companiesLoading
+  } = useQuery( GET_COMPANIES );
+  const [ updateUser ] = useMutation( UPDATE_USER );
+  const [ deleteUser, {
+    client
+  } ] = useMutation( DELETE_USER );
 
-  const USER = ( userLoading ? [] : userData.user);
-  const ROLES = ( rolesLoading ? [] : toSelArr(rolesData.roles) );
-  const COMPANIES = ( companiesLoading ? [] : toSelArr(companiesData.companies) );
+  const USER = ( userLoading ? [] : userData.user );
+  const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
+  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.companies ) );
 
-  const languages = [{label: "SK", value: "sk"}, {label: "ENG", value: "en"}]
+  const languages = [ {
+    label: "SK",
+    value: "sk"
+  }, {
+    label: "ENG",
+    value: "en"
+  } ]
 
   //state
   //const [ createdAt, setCreatedAt ] = React.useState(0);
   //const [ updatedAt, setUpdatedAt ] = React.useState(0);
-  const [ active, setActive ] = React.useState(true);
-  const [ username, setUsername ] = React.useState("");
-  const [ email, setEmail ] = React.useState("");
-  const [ name, setName ] = React.useState("");
-  const [ surname, setSurname ] = React.useState("");
-  const [ receiveNotifications, setReceiveNotifications ] = React.useState(false);
-  const [ signature, setSignature ] = React.useState("");
-  const [ role, setRole ] = React.useState({});
-  const [ company, setCompany ] = React.useState({});
-  const [ language, setLanguage ] = React.useState(languages[0]);
-  const [ saving, setSaving ] = React.useState(false);
-  const [ deletingUser/*, setDeletingUser */] = React.useState(false);
-  const [ deactivatingUser, setDeactivatingUser ] = React.useState(false);
-  const [ passReseted, setPassReseted ] = React.useState(false);
-  const [ passResetEnded, setPassResetEnded ] = React.useState(true);
+  const [ active, setActive ] = React.useState( true );
+  const [ username, setUsername ] = React.useState( "" );
+  const [ email, setEmail ] = React.useState( "" );
+  const [ name, setName ] = React.useState( "" );
+  const [ surname, setSurname ] = React.useState( "" );
+  const [ receiveNotifications, setReceiveNotifications ] = React.useState( false );
+  const [ signature, setSignature ] = React.useState( "" );
+  const [ role, setRole ] = React.useState( {} );
+  const [ company, setCompany ] = React.useState( {} );
+  const [ language, setLanguage ] = React.useState( languages[ 0 ] );
+  const [ saving, setSaving ] = React.useState( false );
+  const [ deletingUser /*, setDeletingUser */ ] = React.useState( false );
+  const [ deactivatingUser, setDeactivatingUser ] = React.useState( false );
+  const [ passReseted, setPassReseted ] = React.useState( false );
+  const [ passResetEnded, setPassResetEnded ] = React.useState( true );
 
   // sync
   React.useEffect( () => {
-    if (!userLoading){
-    //  setCreatedAt(USER.createdAt);
-    //  setUpdatedAt(USER.updatedAt);
-      setActive(USER.active);
-      setUsername(USER.username);
-      setEmail(USER.email);
-      setName(USER.name);
-      setSurname(USER.surname);
-      setReceiveNotifications(USER.receiveNotifications);
-      setSignature((USER.signature ? USER.signature : `${USER.name} ${USER.surname}, ${USER.company.title}`));
-      setRole( { ...USER.role, label: USER.role.title, value: USER.role.id} );
-      setCompany(  { ...USER.company, label: USER.company.title, value: USER.company.id} );
-      setLanguage(USER.language === "sk" ? languages[0] : languages[1]);
-      }
-  }, [userLoading]);
+    if ( !userLoading ) {
+      //  setCreatedAt(USER.createdAt);
+      //  setUpdatedAt(USER.updatedAt);
+      setActive( USER.active );
+      setUsername( USER.username );
+      setEmail( USER.email );
+      setName( USER.name );
+      setSurname( USER.surname );
+      setReceiveNotifications( USER.receiveNotifications );
+      setSignature( ( USER.signature ? USER.signature : `${USER.name} ${USER.surname}, ${USER.company.title}` ) );
+      setRole( {
+        ...USER.role,
+        label: USER.role.title,
+        value: USER.role.id
+      } );
+      setCompany( {
+        ...USER.company,
+        label: USER.company.title,
+        value: USER.company.id
+      } );
+      setLanguage( USER.language === "sk" ? languages[ 0 ] : languages[ 1 ] );
+    }
+  }, [ userLoading ] );
 
   React.useEffect( () => {
-      userRefetch({ variables: {id: parseInt(match.params.id)} });
-  }, [match.params.id]);
+    userRefetch( {
+      variables: {
+        id: parseInt( match.params.id )
+      }
+    } );
+  }, [ match.params.id ] );
 
   // functions
   const updateUserFunc = () => {
     setSaving( true );
-    updateUser({ variables: {
-      id: parseInt(match.params.id),
-      username,
-      email,
-      name,
-      surname,
-      receiveNotifications,
-      signature,
-      roleId: role.id,
-      companyId: company.id,
-      language: language.value,
-    } }).then( ( response ) => {
-      const allUsers = client.readQuery({query: GET_USERS}).users;
-      let newUser = {
-        id: parseInt(match.params.id),
-        username,
-        email,
-        role,
-        company,
-        __typename: "User"
-      }
-      client.writeQuery({ query: GET_USERS, data: {users: allUsers.map( user => (user.id !== parseInt(match.params.id) ? user : {...newUser}) )} });
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    updateUser( {
+        variables: {
+          id: parseInt( match.params.id ),
+          username,
+          email,
+          name,
+          surname,
+          receiveNotifications,
+          signature,
+          roleId: role.id,
+          companyId: company.id,
+          language: language.value,
+        }
+      } )
+      .then( ( response ) => {
+        const allUsers = client.readQuery( {
+            query: GET_USERS
+          } )
+          .users;
+        let newUser = {
+          id: parseInt( match.params.id ),
+          username,
+          email,
+          role,
+          company,
+          __typename: "User"
+        }
+        client.writeQuery( {
+          query: GET_USERS,
+          data: {
+            users: allUsers.map( user => ( user.id !== parseInt( match.params.id ) ? user : {
+              ...newUser
+            } ) )
+          }
+        } );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   };
 
   const deleteUserFunc = () => {
-    if(!window.confirm("Are you sure you want to delete the user?")){
-      deleteUser({ variables: {
-        id: parseInt(match.params.id)
-      } }).then( ( response ) => {
-        const allUsers = client.readQuery({query: GET_USERS}).users;
-        client.writeQuery({ query: GET_USERS, data: {users: allUsers.filter( user => user.id !== parseInt(match.params.id),)} });
-        history.goBack();
-      }).catch( (err) => {
-        console.log(err.message);
-      });
+    if ( !window.confirm( "Are you sure you want to delete the user?" ) ) {
+      deleteUser( {
+          variables: {
+            id: parseInt( match.params.id )
+          }
+        } )
+        .then( ( response ) => {
+          const allUsers = client.readQuery( {
+              query: GET_USERS
+            } )
+            .users;
+          client.writeQuery( {
+            query: GET_USERS,
+            data: {
+              users: allUsers.filter( user => user.id !== parseInt( match.params.id ), )
+            }
+          } );
+          history.goBack();
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
     }
   };
 
   /*deactivateUser(){
     this.setState({ deletingUser: true })
-    firebase.auth().currentUser.getIdToken(/* forceRefresh */ /*true).then((token)=>{
-      fetch(`${REST_URL}/deactivate-user`,{
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'POST',
-        body: JSON.stringify({
-          token,
-          userID: this.props.match.params.id,
-        }),
-      }).then((response)=>response.json().then((response)=>{
-        this.setState({ deletingUser: false, deactivated: response.deactivated })
-        console.log(response);
-      })).catch((error)=>{
-        this.setState({ deletingUser: false })
-        console.log(error);
-      })
-    })
-  }*/
+    firebase.auth().currentUser.getIdToken(/* forceRefresh */
+  /*true).then((token)=>{
+       fetch(`${REST_URL}/deactivate-user`,{
+         headers: {
+           'Content-Type': 'application/json'
+         },
+         method: 'POST',
+         body: JSON.stringify({
+           token,
+           userID: this.props.match.params.id,
+         }),
+       }).then((response)=>response.json().then((response)=>{
+         this.setState({ deletingUser: false, deactivated: response.deactivated })
+         console.log(response);
+       })).catch((error)=>{
+         this.setState({ deletingUser: false })
+         console.log(error);
+       })
+     })
+   }*/
 
-  if (userLoading || rolesLoading || companiesLoading) {
+  if ( userLoading || rolesLoading || companiesLoading ) {
     return <Loading />
   }
 

@@ -1,14 +1,20 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import TaskTypeAdd from './taskTypeAdd';
 import TaskTypeEdit from './taskTypeEdit';
 import Loading from 'components/loading';
-import { orderArr } from 'helperFunctions';
+import {
+  orderArr
+} from 'helperFunctions';
 
-export const GET_TASK_TYPES = gql`
+export const GET_TASK_TYPES = gql `
 query {
   taskTypes {
     title
@@ -18,13 +24,19 @@ query {
 }
 `;
 
-export default function TaskTypeList(props){
+export default function TaskTypeList( props ) {
   // state
-  const [ taskTypeFilter, setTaskTypeFilter ] = React.useState("");
+  const [ taskTypeFilter, setTaskTypeFilter ] = React.useState( "" );
 
   //data
-  const { history, match } = props;
-  const { data, loading } = useQuery(GET_TASK_TYPES);
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_TASK_TYPES );
 
   return (
     <div className="content">

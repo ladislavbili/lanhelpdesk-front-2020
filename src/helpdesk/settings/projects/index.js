@@ -1,13 +1,17 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import {Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import ProjectAdd from './projectAdd';
 import ProjectEdit from './projectEdit';
 import Loading from 'components/loading';
 
-export const GET_PROJECTS = gql`
+export const GET_PROJECTS = gql `
 query {
   myProjects {
     project {
@@ -18,17 +22,25 @@ query {
 }
 `;
 
-export default function ProjectsList(props){
-    // state
-    const [ projectFilter, setProjectFilter ] = React.useState("");
+export default function ProjectsList( props ) {
+  // state
+  const [ projectFilter, setProjectFilter ] = React.useState( "" );
 
-    //data
-    const { history, match } = props;
-    const { data, loading } = useQuery(GET_PROJECTS);
-    const PROJECTS = (loading || !data ? [] : data.myProjects.map(item => ({...item.project})));
+  //data
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_PROJECTS );
+  const PROJECTS = ( loading || !data ? [] : data.myProjects.map( item => ( {
+    ...item.project
+  } ) ) );
 
-    return (
-      <div className="content">
+  return (
+    <div className="content">
         <div className="row m-0 p-0 taskList-container">
           <div className="col-lg-4">
             <div className="commandbar">
@@ -85,5 +97,5 @@ export default function ProjectsList(props){
             </div>
           </div>
         </div>
-    );
+  );
 }

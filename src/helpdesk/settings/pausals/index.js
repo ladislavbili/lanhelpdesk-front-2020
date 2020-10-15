@@ -1,10 +1,12 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import PausalEdit from './pausalEdit';
 
-export const GET_COMPANIES = gql`
+export const GET_COMPANIES = gql `
 query {
   companies {
     title
@@ -14,14 +16,20 @@ query {
 }
 `;
 
-export default function  CompaniesList(props){
+export default function CompaniesList( props ) {
   // state
-  const [ companyFilter, setCompanyFilter ] = React.useState("");
+  const [ companyFilter, setCompanyFilter ] = React.useState( "" );
 
   //data
-  const { history, match } = props;
-  const { data, loading } = useQuery(GET_COMPANIES);
-  const COMPANIES = (loading || !data ? [] : data.companies);
+  const {
+    history,
+    match
+  } = props;
+  const {
+    data,
+    loading
+  } = useQuery( GET_COMPANIES );
+  const COMPANIES = ( loading || !data ? [] : data.companies );
 
   return (
     <div className="content">
@@ -84,5 +92,5 @@ export default function  CompaniesList(props){
         </div>
       </div>
       </div>
-    );
+  );
 }

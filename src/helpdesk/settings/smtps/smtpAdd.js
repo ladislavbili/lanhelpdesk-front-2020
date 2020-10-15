@@ -1,13 +1,25 @@
 import React from 'react';
-import { useMutation } from "@apollo/react-hooks";
+import {
+  useMutation
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
-import { Button, FormGroup, Label, Input, InputGroup, InputGroupAddon, InputGroupText } from 'reactstrap';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText
+} from 'reactstrap';
 import Checkbox from '../../../components/checkbox';
 
-import {  GET_SMTPS } from './index';
+import {
+  GET_SMTPS
+} from './index';
 
-const ADD_SMTP = gql`
+const ADD_SMTP = gql `
 mutation addSmtp($title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $secure: Boolean!) {
   addSmtp(
     title: $title,
@@ -31,51 +43,71 @@ mutation addSmtp($title: String!, $order: Int!, $def: Boolean!, $host: String!, 
 }
 `;
 
-export default function SMTPAdd(props){
+export default function SMTPAdd( props ) {
   //data
-  const { history, match } = props;
-  const [addSmtp, {client}] = useMutation(ADD_SMTP);
+  const {
+    history,
+    match
+  } = props;
+  const [ addSmtp, {
+    client
+  } ] = useMutation( ADD_SMTP );
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ order ] = React.useState(0);
-  const [ def, setDef ] = React.useState(false);
-  const [ host, setHost ] = React.useState("");
-  const [ port, setPort ] = React.useState(465);
-  const [ username, setUsername ] = React.useState("");
-  const [ password, setPassword ] = React.useState("");
-  const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState(false);
-  const [ secure, setSecure ] = React.useState(true);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ order ] = React.useState( 0 );
+  const [ def, setDef ] = React.useState( false );
+  const [ host, setHost ] = React.useState( "" );
+  const [ port, setPort ] = React.useState( 465 );
+  const [ username, setUsername ] = React.useState( "" );
+  const [ password, setPassword ] = React.useState( "" );
+  const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState( false );
+  const [ secure, setSecure ] = React.useState( true );
 
-  const [ showPass, setShowPass ] = React.useState(false);
+  const [ showPass, setShowPass ] = React.useState( false );
 
-  const [ saving, setSaving ] = React.useState(false);
+  const [ saving, setSaving ] = React.useState( false );
 
   //functions
   const addSMTPFunc = () => {
     setSaving( true );
-    addSmtp({ variables: {
-      title,
-      order: (order !== '' ? parseInt(order) : 0),
-      def,
-      host,
-      port: (port !== '' ? parseInt(port) : 465),
-      username,
-      password,
-      rejectUnauthorized,
-      secure,
-    } }).then( ( response ) => {
-      const allSMTPs = client.readQuery({query: GET_SMTPS}).smtps;
-      const newSMTP = {...response.data.addSmtp, __typename: "Smtp"};
-      client.writeQuery({ query: GET_SMTPS, data: {smtps: [...allSMTPs.filter( SMTP => SMTP.id !== parseInt(match.params.id) ), newSMTP ] } });
-      history.push('/helpdesk/settings/smtps/' + newSMTP.id)
-    }).catch( (err) => {
-      console.log(err.message);
-    });
+    addSmtp( {
+        variables: {
+          title,
+          order: ( order !== '' ? parseInt( order ) : 0 ),
+          def,
+          host,
+          port: ( port !== '' ? parseInt( port ) : 465 ),
+          username,
+          password,
+          rejectUnauthorized,
+          secure,
+        }
+      } )
+      .then( ( response ) => {
+        const allSMTPs = client.readQuery( {
+            query: GET_SMTPS
+          } )
+          .smtps;
+        const newSMTP = {
+          ...response.data.addSmtp,
+          __typename: "Smtp"
+        };
+        client.writeQuery( {
+          query: GET_SMTPS,
+          data: {
+            smtps: [ ...allSMTPs.filter( SMTP => SMTP.id !== parseInt( match.params.id ) ), newSMTP ]
+          }
+        } );
+        history.push( '/helpdesk/settings/smtps/' + newSMTP.id )
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
     setSaving( false );
   }
 
-  const cannotSave = saving || title === '' ||  host === '' || port === '' || username === '';
+  const cannotSave = saving || title === '' || host === '' || port === '' || username === '';
 
   return (
     <div className="p-20 scroll-visible fit-with-header-and-commandbar">
