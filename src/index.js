@@ -41,19 +41,40 @@ const Root = () => {
         const formData = new FormData();
         console.log(files[0]);
         files.forEach((file) => formData.append(`file`, file));
+        //FORM DATA
         formData.append("token", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibG9naW5LZXkiOiJmdDN3dWgzN3N0Z3FzZ3Q4ZjlxZGMiLCJpYXQiOjE2MDEzMDYzMTMsImV4cCI6MTYwMjE3MDMxM30.SFyoI9fHlFfJ87j_zLGcLIkGhmnsEF7E3KzU6FkFmdc");
         formData.append("taskId", 1);
+        formData.append("message", 'Test message 7.10');
+        formData.append("subject", 'Test subject 7.10');
+        ['warningcl@gmail.com', 'lanhelpdesk2019@gmail.com'].forEach((email) => formData.append(`tos`, email));
+        axios.post('http://localhost:4000/send-email', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        /*
+        formData.append("taskId", 1);
+        formData.append("message", 'Test 7.10');
+        formData.append("internal", false);
+        axios.post('http://localhost:4000/send-comment', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        */
+        /*
         axios.post('http://localhost:4000/upload-attachments', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         })
+        */
       }}/>
     <button onClick={() => {
         axios.get('http://localhost:4000/get-attachments', {
           params: {
-            taskId: 1,
-            path: 'files/task-attachments/1/1601409017058-cmyk-printer-test-page-powerpoint-template_2.jpg'
+            type: "comment",
+            path: 'files/comment-attachments/1/38/1602085239685-teeest.txt'
           },
           headers: {
             'authorization': "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibG9naW5LZXkiOiJmdDN3dWgzN3N0Z3FzZ3Q4ZjlxZGMiLCJpYXQiOjE2MDEzMDYzMTMsImV4cCI6MTYwMjE3MDMxM30.SFyoI9fHlFfJ87j_zLGcLIkGhmnsEF7E3KzU6FkFmdc"
