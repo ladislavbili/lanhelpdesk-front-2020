@@ -341,7 +341,7 @@ export default function ProjectEdit( props ) {
 
   const [ saving, setSaving ] = React.useState( false );
   const [ newProject, setNewProject ] = React.useState( null );
-  const [ choosingNewProject, setChooseingNewProject ] = React.useState( false );
+  const [ choosingNewProject, setChoosingNewProject ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
@@ -550,7 +550,7 @@ export default function ProjectEdit( props ) {
 
 
   const deleteProjectFunc = () => {
-    setChooseingNewProject( false );
+    setChoosingNewProject( false );
     if ( window.confirm( "Are you sure?" ) ) {
       deleteProject( {
           variables: {
@@ -689,7 +689,7 @@ export default function ProjectEdit( props ) {
 						</FormGroup>
 					</ModalBody>
 					<ModalFooter>
-						<Button className="btn-link mr-auto"onClick={() => setChooseingNewProject(false)}>
+						<Button className="btn-link mr-auto"onClick={() => setChoosingNewProject(false)}>
 							Cancel
 						</Button>
 						<Button className="btn ml-auto" disabled={!newProject} onClick={deleteProjectFunc}>
@@ -705,7 +705,7 @@ export default function ProjectEdit( props ) {
 						onClick={updateProjectFunc}>
 						{(saving?'Saving...':'Save project')}
 					</Button>
-					<Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChooseingNewProject(true)}>
+					<Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewProject(true)}>
 						Delete
 					</Button>
           {closeModal &&

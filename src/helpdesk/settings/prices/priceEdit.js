@@ -127,7 +127,7 @@ export default function PricelistEdit( props ) {
 
   const [ newPricelist, setNewPricelist ] = React.useState( null );
   const [ newDefPricelist, setNewDefPricelist ] = React.useState( null );
-  const [ choosingNewPricelist, setChooseingNewPricelist ] = React.useState( false );
+  const [ choosingNewPricelist, setChoosingNewPricelist ] = React.useState( false );
 
   const [ saving, setSaving ] = React.useState( false );
 
@@ -201,7 +201,7 @@ export default function PricelistEdit( props ) {
   }
 
   const deletePricelistFunc = () => {
-    setChooseingNewPricelist( false );
+    setChoosingNewPricelist( false );
 
     if ( window.confirm( "Are you sure?" ) ) {
       deletePricelist( {
@@ -377,7 +377,7 @@ export default function PricelistEdit( props ) {
             }
           </ModalBody>
           <ModalFooter>
-            <Button className="btn-link mr-auto"onClick={() => setChooseingNewPricelist(false)}>
+            <Button className="btn-link mr-auto"onClick={() => setChoosingNewPricelist(false)}>
               Cancel
             </Button>
             <Button className="btn ml-auto" disabled={!newPricelist || (def ? !newDefPricelist : false)} onClick={deletePricelistFunc}>
@@ -392,7 +392,7 @@ export default function PricelistEdit( props ) {
               disabled={saving}
               onClick={updatePricelistFunc}>{saving?'Saving prices...':'Save prices'}</Button>
 
-            <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChooseingNewPricelist(true)}>Delete price list</Button>
+            <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewPricelist(true)}>Delete price list</Button>
         </div>
 
     </div>

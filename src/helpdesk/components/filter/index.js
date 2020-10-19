@@ -30,7 +30,7 @@ import {
 } from 'helpdesk/settings/users';
 import {
   GET_COMPANIES
-} from 'helpdesk/settings/companies';
+} from 'helpdesk/settings/companies/querries';
 import {
   GET_TASK_TYPES
 } from 'helpdesk/settings/taskTypes/querries';

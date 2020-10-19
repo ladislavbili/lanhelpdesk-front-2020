@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -19,6 +18,7 @@ import {
   ModalHeader
 } from 'reactstrap';
 import Loading from 'components/loading';
+import ErrorMessage from 'components/errorMessage';
 import Checkbox from '../../../components/checkbox';
 import {
   toSelArr
@@ -29,64 +29,14 @@ import {
 } from "configs/components/select";
 
 import {
-  GET_SMTPS
-} from './index';
+  GET_SMTPS,
+  GET_SMTP,
+  UPDATE_SMTP,
+  DELETE_SMTP,
+  TEST_SMTP
+} from './querries';
 
-const GET_SMTP = gql `
-query smtp($id: Int!) {
-  smtp (
-    id: $id
-  ) {
-    id
-    title
-    order
-    def
-    host
-    port
-    username
-    password
-    rejectUnauthorized
-    secure
-  }
-}
-`;
 
-const UPDATE_SMTP = gql `
-mutation updateSmtp($id: Int!, $title: String, $order: Int, $def: Boolean, $host: String, $port: Int, $username: String, $password: String, $rejectUnauthorized: Boolean, $secure: Boolean) {
-  updateSmtp(
-    id: $id,
-    title: $title,
-    order: $order,
-    def: $def,
-    host: $host,
-    port: $port,
-    username: $username,
-    password: $password,
-    rejectUnauthorized: $rejectUnauthorized,
-    secure: $secure,
-  ){
-    id
-    title
-    order
-    def
-    host
-    port
-    username
-  }
-}
-`;
-
-export const DELETE_SMTP = gql `
-mutation deleteSmtp($id: Int!, $newDefId: Int!, $newId: Int!) {
-  deleteSmtp(
-    id: $id,
-    newDefId: $newDefId,
-    newId: $newId,
-  ){
-    id
-  }
-}
-`;
 
 export default function SMTPEdit( props ) {
   //data
@@ -104,6 +54,7 @@ export default function SMTPEdit( props ) {
     }
   } );
   const [ updateSmtp ] = useMutation( UPDATE_SMTP );
+  const [ testSmtp ] = useMutation( TEST_SMTP );
   const [ deleteSmtp, {
     client
   } ] = useMutation( DELETE_SMTP );
@@ -112,7 +63,7 @@ export default function SMTPEdit( props ) {
     } )
     .smtps );
   const filteredSMTPs = allSMTPs.filter( SMTP => SMTP.id !== parseInt( match.params.id ) );
-  const theOnlyOneLeft = allSMTPs.length === 0;
+  const theOnlyOneLeft = allSMTPs.length === 1;
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -128,8 +79,9 @@ export default function SMTPEdit( props ) {
   const [ showPass, setShowPass ] = React.useState( false );
 
   const [ saving, setSaving ] = React.useState( false );
+  const [ tested, setTested ] = React.useState( false );
   const [ newSMTP, setNewSMTP ] = React.useState( null );
-  const [ choosingNewSMTP, setChooseingNewSMTP ] = React.useState( false );
+  const [ choosingNewSMTP, setChoosingNewSMTP ] = React.useState( false );
   const [ newDefSMTP, setNewDefSMTP ] = React.useState( null );
 
   // sync
@@ -210,9 +162,25 @@ export default function SMTPEdit( props ) {
 
     setSaving( false );
   };
-
+  const startTest = () => {
+    let newSmtps = [ ...allSMTPs ];
+    let smtpIndex = newSmtps.findIndex( ( smtp ) => smtp.id === parseInt( match.params.id ) );
+    newSmtps[ smtpIndex ].currentlyTested = true;
+    client.writeQuery( {
+      query: GET_SMTPS,
+      data: {
+        smtps: newSmtps
+      }
+    } );
+    setTested( true );
+    testSmtp( {
+      variables: {
+        id: parseInt( match.params.id )
+      }
+    } );
+  }
   const deleteSMTPFunc = () => {
-    setChooseingNewSMTP( false );
+    setChoosingNewSMTP( false );
 
     if ( window.confirm( "Are you sure?" ) ) {
       deleteSmtp( {
@@ -341,7 +309,7 @@ export default function SMTPEdit( props ) {
           }
         </ModalBody>
         <ModalFooter>
-          <Button className="btn-link mr-auto"onClick={() => setChooseingNewSMTP(false)}>
+          <Button className="btn-link mr-auto"onClick={() => setChoosingNewSMTP(false)}>
             Cancel
           </Button>
           <Button className="btn ml-auto" disabled={!newSMTP || (def ? !newDefSMTP : false)} onClick={deleteSMTPFunc}>
@@ -351,8 +319,11 @@ export default function SMTPEdit( props ) {
       </Modal>
 
       <div className="row">
-          <Button className="btn" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</Button>
-          <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={ () => setChooseingNewSMTP(true) }>Delete</Button>
+        <Button className="btn" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</Button>
+        <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</Button>
+        {console.log(data)}
+        <ErrorMessage show={ !loading && !data.smtp.currentlyTested && !data.smtp.working  } message={data.smtp.errorMessage} />
+        <Button className="btn ml-auto" disabled={saving || tested} onClick={ startTest }>Test SMTP</Button>
       </div>
     </div>
   );

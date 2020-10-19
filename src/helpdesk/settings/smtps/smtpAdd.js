@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useMutation
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -16,32 +15,11 @@ import {
 import Checkbox from '../../../components/checkbox';
 
 import {
-  GET_SMTPS
-} from './index';
+  GET_SMTPS,
+  ADD_SMTP
+} from './querries';
 
-const ADD_SMTP = gql `
-mutation addSmtp($title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $secure: Boolean!) {
-  addSmtp(
-    title: $title,
-    order: $order,
-    def: $def,
-    host: $host,
-    port: $port,
-    username: $username,
-    password: $password,
-    rejectUnauthorized: $rejectUnauthorized,
-    secure: $secure,
-  ){
-    id
-    title
-    order
-    def
-    host
-    port
-    username
-  }
-}
-`;
+
 
 export default function SMTPAdd( props ) {
   //data
@@ -65,7 +43,7 @@ export default function SMTPAdd( props ) {
   const [ secure, setSecure ] = React.useState( true );
 
   const [ showPass, setShowPass ] = React.useState( false );
-
+  //TODO add well known
   const [ saving, setSaving ] = React.useState( false );
 
   //functions

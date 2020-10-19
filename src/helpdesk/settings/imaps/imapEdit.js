@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -29,64 +28,13 @@ import {
 } from "configs/components/select";
 
 import {
-  GET_IMAPS
-} from './index';
+  GET_IMAPS,
+  GET_IMAP,
+  UPDATE_IMAP,
+  DELETE_IMAP,
+} from './querries';
 
-const GET_IMAP = gql `
-query imap($id: Int!) {
-  imap (
-    id: $id
-  ) {
-    id
-    title
-    order
-    def
-    host
-    port
-    username
-    password
-    rejectUnauthorized
-    tsl
-  }
-}
-`;
 
-const UPDATE_IMAP = gql `
-mutation updateImap($id: Int!, $title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $tsl: Boolean!) {
-  updateImap(
-    id: $id,
-    title: $title,
-    order: $order,
-    def: $def,
-    host: $host,
-    port: $port,
-    username: $username,
-    password: $password,
-    rejectUnauthorized: $rejectUnauthorized,
-    tsl: $tsl,
-  ){
-    id
-    title
-    order
-    def
-    host
-    port
-    username
-  }
-}
-`;
-
-export const DELETE_IMAP = gql `
-mutation deleteImap($id: Int!, $newDefId: Int!, $newId: Int!) {
-  deleteImap(
-    id: $id,
-    newDefId: $newDefId,
-    newId: $newId,
-  ){
-    id
-  }
-}
-`;
 
 export default function IMAPEdit( props ) {
   //data
@@ -129,7 +77,7 @@ export default function IMAPEdit( props ) {
 
   const [ saving, setSaving ] = React.useState( false );
   const [ newIMAP, setNewIMAP ] = React.useState( null );
-  const [ choosingNewIMAP, setChooseingNewIMAP ] = React.useState( false );
+  const [ choosingNewIMAP, setChoosingNewIMAP ] = React.useState( false );
   const [ newDefIMAP, setNewDefIMAP ] = React.useState( null );
 
   // sync
@@ -212,7 +160,7 @@ export default function IMAPEdit( props ) {
   };
 
   const deleteIMAPFunc = () => {
-    setChooseingNewIMAP( false );
+    setChoosingNewIMAP( false );
 
     if ( window.confirm( "Are you sure?" ) ) {
       deleteImap( {
@@ -338,7 +286,7 @@ export default function IMAPEdit( props ) {
             }
           </ModalBody>
           <ModalFooter>
-            <Button className="btn-link mr-auto"onClick={() => setChooseingNewIMAP(false)}>
+            <Button className="btn-link mr-auto"onClick={() => setChoosingNewIMAP(false)}>
               Cancel
             </Button>
             <Button className="btn ml-auto" disabled={!newIMAP || (def ? !newDefIMAP : false)} onClick={deleteIMAPFunc}>
@@ -349,7 +297,7 @@ export default function IMAPEdit( props ) {
 
         <div className="row">
             <Button className="btn" disabled={cannotSave} onClick={updateIMAPFunc}>{ saving ? 'Saving IMAP...' : 'Save IMAP' }</Button>
-            <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={ () => setChooseingNewIMAP(true) }>Delete</Button>
+            <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewIMAP(true) }>Delete</Button>
         </div>
       </div>
   );

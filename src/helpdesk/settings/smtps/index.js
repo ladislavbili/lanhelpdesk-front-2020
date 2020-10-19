@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useMutation
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button
@@ -10,20 +10,10 @@ import {
 import SMTPAdd from './smtpAdd';
 import SMTPEdit from './smtpEdit';
 import Loading from 'components/loading';
-
-export const GET_SMTPS = gql `
-query {
-  smtps {
-    title
-    id
-    order
-    host
-    port
-    username
-    def
-  }
-}
-`;
+import {
+  GET_SMTPS,
+  TEST_SMTPS
+} from './querries';
 
 export default function SMTPsList( props ) {
   // state
@@ -40,20 +30,28 @@ export default function SMTPsList( props ) {
     loading
   } = useQuery( GET_SMTPS );
   const SMTPS = ( loading || !data ? [] : data.smtps );
-
+  const [ testSmtps ] = useMutation( TEST_SMTPS );
   const testSMTPs = () => {
     setSmtpTesting( true );
-    /*firebase.auth().currentUser.getIdToken(true).then((token)=>{
-      fetch(`${REST_URL}/test-smtps`,{
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'POST',
-        body: JSON.stringify({
-          token
-        }),
-      })
-    })*/
+    testSmtps();
+  }
+
+  const getStatusIcon = ( smtp ) => {
+    let color = 'red';
+    let iconName = 'far fa-times-circle';
+    if ( smtpTesting || smtp.currentlyTested ) {
+      color = 'orange';
+      iconName = 'fa fa-sync';
+    } else if ( smtp.working ) {
+      color = 'green';
+      iconName = 'far fa-check-circle';
+    }
+    return (
+      <i
+        style={{color}}
+        className={iconName}
+        />
+    )
   }
 
   return (
@@ -86,16 +84,16 @@ export default function SMTPsList( props ) {
               <h2 className=" p-l-10 p-b-10">
                 SMTPs
               </h2>
-              { false && props.role === 3 && !smtpTesting &&
+              { !smtpTesting &&
                 <Button
-                  disabled={ props.role !== 3 || smtpTesting }
+                  disabled={ smtpTesting }
                   className="btn-primary center-hor ml-auto"
                   onClick={testSMTPs}
                   >
                   Test SMTPs
                 </Button>
               }
-              { false && props.role === 3 && smtpTesting &&
+              { smtpTesting &&
                 <div className="center-hor ml-auto">
                   Testing SMTPs...
                 </div>
@@ -108,7 +106,7 @@ export default function SMTPsList( props ) {
                   <th>Host</th>
                   <th>Port</th>
                   <th>Username</th>
-                  <th>Default</th>
+                  <th>Def</th>
                   <th></th>
                 </tr>
               </thead>
@@ -123,32 +121,23 @@ export default function SMTPsList( props ) {
                     key={smtp.id}
                     className={"clickable" + (parseInt(match.params.id) === smtp.id ? " active":"")}
                     onClick={()=>history.push('/helpdesk/settings/smtps/'+smtp.id)}>
-                    <td>
+                    <td style={{maxWidth: 100, overflow: 'hidden'}}>
                       {smtp.title}
                     </td>
-                    <td>
+                    <td style={{maxWidth: 100, overflow: 'hidden'}}>
                       {smtp.host}
                     </td>
                     <td>
                       {smtp.port}
                     </td>
-                    <td>
+                    <td style={{maxWidth: 100, overflow: 'hidden'}}>
                       {smtp.username}
                     </td>
                     <td>
                       {smtp.def ? "Yes" : "No"}
                     </td>
                     <td>
-                      {
-                        smtp.working === false ?
-                        <i style={{color:'red'}}
-                          className="far fa-times-circle"
-                          />
-                        :
-                        <i style={{color:'green'}}
-                          className="far fa-check-circle"
-                          />
-                      }
+                      {getStatusIcon(smtp)}
                     </td>
                   </tr>
                   )}

@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -16,32 +16,21 @@ import {
 import Checkbox from '../../../components/checkbox';
 
 import {
-  GET_IMAPS
-} from './index';
+  GET_IMAPS,
+  ADD_IMAP,
+} from './querries';
 
-const ADD_IMAP = gql `
-mutation addImap($title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $tsl: Boolean!) {
-  addImap(
-    title: $title,
-    order: $order,
-    def: $def,
-    host: $host,
-    port: $port,
-    username: $username,
-    password: $password,
-    rejectUnauthorized: $rejectUnauthorized,
-    tsl: $tsl,
-  ){
-    id
-    title
-    order
-    def
-    host
-    port
-    username
-  }
-}
-`;
+import {
+  GET_ROLES,
+} from '../roles/querries';
+import {
+  GET_COMPANIES,
+} from '../companies/querries';
+import {
+  GET_PROJECTS,
+} from '../projects/querries';
+
+
 
 export default function IMAPAdd( props ) {
   //data
@@ -51,6 +40,18 @@ export default function IMAPAdd( props ) {
   const [ addImap, {
     client
   } ] = useMutation( ADD_IMAP );
+  const {
+    roleData,
+    rolesLoading
+  } = useQuery( GET_ROLES );
+  const {
+    companyData,
+    companiesLoading
+  } = useQuery( GET_COMPANIES );
+  const {
+    projectData,
+    projectsLoading
+  } = useQuery( GET_PROJECTS );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -61,7 +62,13 @@ export default function IMAPAdd( props ) {
   const [ username, setUsername ] = React.useState( "" );
   const [ password, setPassword ] = React.useState( "" );
   const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState( false );
-  const [ tsl, setTsl ] = React.useState( true );
+  const [ tls, setTls ] = React.useState( true );
+  const [ destination, setDestination ] = React.useState( '' );
+  const [ ignoredRecievers, setIgnoredRecievers ] = React.useState( [] );
+  const [ ignoredRecieversDestination, setIgnoredRecieversDestination ] = React.useState( '' );
+  const [ role, setRole ] = React.useState( null );
+  const [ company, setCompany ] = React.useState( null );
+  const [ project, setProject ] = React.useState( null );
 
   const [ showPass, setShowPass ] = React.useState( false );
 
@@ -80,7 +87,7 @@ export default function IMAPAdd( props ) {
           username,
           password,
           rejectUnauthorized,
-          tsl,
+          tls,
         }
       } )
       .then( ( response ) => {
@@ -106,8 +113,18 @@ export default function IMAPAdd( props ) {
     setSaving( false );
   }
 
-
-  const cannotSave = saving || title === '' || host === '' || port === '' || username === '';
+  const dataLoaded = rolesLoading && companiesLoading && projectsLoading;
+  const cannotSave = (
+    saving ||
+    title === '' ||
+    host === '' ||
+    port === '' ||
+    username === '' ||
+    role === null ||
+    company === null ||
+    project === null ||
+    dataLoaded
+  );
 
 
   return (
@@ -149,8 +166,8 @@ export default function IMAPAdd( props ) {
 
         <Checkbox
           className = "m-b-5 p-l-0"
-          value = { tsl }
-          onChange={ () => setTsl(!tsl) }
+          value = { tls }
+          onChange={ () => setTls(!tls) }
           label = "TLS"
           />
 

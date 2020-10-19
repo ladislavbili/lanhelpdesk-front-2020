@@ -1,9 +1,6 @@
 import React, {
   Component
 } from 'react';
-import {
-  Alert
-} from 'reactstrap';
 import classnames from 'classnames';
 
 export default class Error extends Component {

@@ -32,110 +32,18 @@ import CompanyPriceList from './companyPriceList';
 import Loading from 'components/loading';
 
 import {
-  GET_COMPANIES
-} from './index';
-import {
   GET_PRICELISTS
 } from '../prices/index';
 import {
   ADD_PRICELIST
 } from '../prices/priceAdd';
 
-const GET_COMPANY = gql `
-query company($id: Int!) {
-  company (
-    id: $id
-  ) {
-      title
-      dph
-      ico
-      dic
-      ic_dph
-      country
-      city
-      street
-      zip
-      email
-      phone
-      description
-      pricelist {
-        id
-        title
-        order
-        afterHours
-        def
-        materialMargin
-        materialMarginExtra
-        prices {
-          id
-          type
-          price
-          taskType {
-            id
-            title
-          }
-          tripType {
-            id
-            title
-          }
-        }
-      }
-      monthly
-      monthlyPausal
-      taskWorkPausal
-      taskTripPausal
-      companyRents {
-        id
-        title
-        quantity
-        cost
-        price
-      }
-    }
-}
-`;
-const UPDATE_COMPANY = gql `
-mutation updateCompany($id: Int!, $title: String, $dph: Int, $ico: String, $dic: String, $ic_dph: String, $country: String, $city: String, $street: String, $zip: String, $email: String, $phone: String, $description: String, $pricelistId: Int!, $monthly: Boolean, $monthlyPausal: Float, $taskWorkPausal: Float, $taskTripPausal: Float, $rents: [CompanyRentUpdateInput]) {
-  updateCompany(
-    id: $id,
-    title: $title,
-    dph: $dph,
-    ico: $ico,
-    dic: $dic,
-    ic_dph: $ic_dph,
-    country: $country,
-    city: $city,
-    street: $street,
-    zip: $zip,
-    email: $email,
-    phone: $phone,
-    description: $description,
-    pricelistId: $pricelistId,
-    monthly: $monthly,
-    monthlyPausal: $monthlyPausal,
-    taskWorkPausal: $taskWorkPausal,
-    taskTripPausal: $taskTripPausal,
-    rents: $rents,
-  ){
-    id
-    title
-    monthlyPausal
-    taskWorkPausal
-    taskTripPausal
-  }
-}
-`;
-
-export const DELETE_COMPANY = gql `
-mutation deleteCompany($id: Int!, $newId: Int!) {
-  deleteCompany(
-    id: $id,
-    newId: $newId,
-  ){
-    id
-  }
-}
-`;
+import {
+  GET_COMPANY,
+  UPDATE_COMPANY,
+  DELETE_COMPANY,
+  GET_COMPANIES,
+} from './querries';
 
 export default function CompanyEdit( props ) {
   //data
@@ -236,7 +144,7 @@ export default function CompanyEdit( props ) {
   const [ fakeID, setFakeID ] = React.useState( 0 );
 
   const [ newCompany, setNewCompany ] = React.useState( null );
-  const [ choosingNewCompany, setChooseingNewCompany ] = React.useState( false );
+  const [ choosingNewCompany, setChoosingNewCompany ] = React.useState( false );
 
   const [ rents, setRents ] = React.useState( [] );
 
@@ -370,7 +278,7 @@ export default function CompanyEdit( props ) {
   };
 
   const deleteCompanyFunc = () => {
-    setChooseingNewCompany( false );
+    setChoosingNewCompany( false );
 
     if ( window.confirm( "Are you sure?" ) ) {
       deleteCompany( {
@@ -846,7 +754,7 @@ export default function CompanyEdit( props ) {
                 }
             }}>{saving?'Saving...':'Save changes'}</Button>
           }
-           <Button className="btn-red" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setChooseingNewCompany(true)}>Delete</Button>
+           <Button className="btn-red" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setChoosingNewCompany(true)}>Delete</Button>
 
           {newData &&
             <Button
@@ -872,7 +780,7 @@ export default function CompanyEdit( props ) {
 
           </ModalBody>
           <ModalFooter>
-            <Button className="btn-link mr-auto"onClick={() => setChooseingNewCompany(false)}>
+            <Button className="btn-link mr-auto"onClick={() => setChoosingNewCompany(false)}>
               Cancel
             </Button>
             <Button className="btn ml-auto" disabled={!newCompany} onClick={deleteCompanyFunc}>

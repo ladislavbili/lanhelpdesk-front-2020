@@ -111,7 +111,7 @@ export default function StatusEdit( props ) {
   const [ icon, setIcon ] = React.useState( "fas fa-arrow-left" );
   const [ action, setAction ] = React.useState( actions[ 0 ] );
   const [ saving, setSaving ] = React.useState( false );
-  const [ choosingNewStatus, setChooseingNewStatus ] = React.useState( false );
+  const [ choosingNewStatus, setChoosingNewStatus ] = React.useState( false );
   const [ newStatus, setNewStatus ] = React.useState( null );
 
   // sync
@@ -155,7 +155,7 @@ export default function StatusEdit( props ) {
   };
 
   const deleteStatusFunc = () => {
-    setChooseingNewStatus( false );
+    setChoosingNewStatus( false );
 
     if ( window.confirm( "Are you sure?" ) ) {
       deleteStatus( {
@@ -218,7 +218,7 @@ export default function StatusEdit( props ) {
 
       <div className="row">
         <Button className="btn m-t-5" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</Button>
-        {action.value!=='Invoiced' && <Button className="btn-red m-l-5 m-t-5" disabled={saving || theOnlyOneLeft} onClick={() => setChooseingNewStatus(true)}>Delete</Button>}
+        {action.value!=='Invoiced' && <Button className="btn-red m-l-5 m-t-5" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewStatus(true)}>Delete</Button>}
       </div>
 
       <Modal isOpen={choosingNewStatus}>
@@ -237,7 +237,7 @@ export default function StatusEdit( props ) {
 
         </ModalBody>
         <ModalFooter>
-          <Button className="btn-link mr-auto"onClick={() => setChooseingNewStatus(false)}>
+          <Button className="btn-link mr-auto"onClick={() => setChoosingNewStatus(false)}>
             Cancel
           </Button>
           <Button className="btn ml-auto" disabled={!newStatus} onClick={deleteStatusFunc}>

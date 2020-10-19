@@ -10,16 +10,9 @@ import {
 import CompanyAdd from './companyAdd';
 import CompanyEdit from './companyEdit';
 import Loading from 'components/loading';
-
-export const GET_COMPANIES = gql `
-query {
-  companies {
-    title
-    id
-    monthly
-  }
-}
-`;
+import {
+  GET_COMPANIES
+} from './querries';
 
 export default function CompanysList( props ) {
   // state

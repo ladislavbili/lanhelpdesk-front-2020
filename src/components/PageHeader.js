@@ -1,7 +1,6 @@
 import React from 'react';
 import {
-  useQuery,
-  useMutation
+  useQuery
 } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import {
@@ -44,12 +43,6 @@ query {
       }
     }
   }
-}
-`;
-
-const LOGOUT_USER = gql `
-mutation logoutUser{
-  logoutUser: Boolean
 }
 `;
 
