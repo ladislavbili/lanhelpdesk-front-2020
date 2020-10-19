@@ -1,114 +1,121 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
-import { connect } from "react-redux";
-import { FormGroup, Label, Button } from 'reactstrap';
+import {
+  FormGroup,
+  Label,
+  Button
+} from 'reactstrap';
 import moment from 'moment';
 
 import datePickerConfig from 'configs/components/datepicker';
-import {selectStyle} from 'configs/components/select';
-import { setReportMonth, setReportYear, setReportFrom, setReportTo } from '../../redux/actions';
+import {
+  selectStyle
+} from 'configs/components/select';
 
-var months = [{value:1,label:'January'},{value:2,label:'February'},{value:3,label:'March'},{value:4,label:'April'},{value:5,label:'May'},{value:6,label:'June'},
-{value:7,label:'July'},{value:8,label:'August'},{value:9,label:'September'},{value:10,label:'October'},{value:11,label:'November'},{value:12,label:'December'}]
+var months = [
+{value:1,label:'January'},
+{value:2,label:'February'},
+{value:3,label:'March'},
+{value:4,label:'April'},
+{value:5,label:'May'},
+{value:6,label:'June'},
+{value:7,label:'July'},
+{value:8,label:'August'},
+{value:9,label:'September'},
+{value:10,label:'October'},
+{value:11,label:'November'},
+{value:12,label:'December'}
+];
+
 var years = [];
-
-for (let i = (new Date().getFullYear()); i >= 2000; i--) {
+for (let i = moment().year(); i >= 2000; i--) {
   years.push({value:i,label:i});
 }
 
-class MonthSelector extends Component {
-	constructor(props){
-		super(props);
-		this.state={
-			month:this.props.month,
-			year:this.props.year,
-      from:moment(this.props.from),
-      to:moment(this.props.to),
-		}
-	}
+export default function MonthSelector ( props ) {
+  const {
+    fromDate,
+    setFromDate,
+    toDate,
+    setToDate,
+    refetchInvoices
+  } = props;
 
-	render() {
-		return (
-				<div className="p-20">
-  					<FormGroup>
-  						<Label>Select month and year</Label>
-  							<div className="flex-row">
-  							<div className="w-50 p-r-20">
-  								<Select
-  									value={this.state.month}
-  									onChange={(e)=> this.setState({month: e})}
-  									options={months}
-  									styles={selectStyle}
-  									/>
-  							</div>
-  							<div className="w-50 p-r-20">
-  								<Select
-  									value={this.state.year}
-  									onChange={(e)=> this.setState({year: e})}
-  									options={years}
-  									styles={selectStyle}
-  									/>
-  							</div>
-                <Button type="button" disabled={this.state.year===null || this.state.month===null} className="btn-primary flex" onClick={()=>{
-                    this.props.setReportYear(this.state.year);
-                    this.props.setReportMonth(this.state.month);
-                    let firstDay = new Date(this.state.year.value, this.state.month.value-1, 1).getTime();
-                    let lastDay = new Date(this.state.year.value, this.state.month.value, 1).getTime();
-                    this.props.setReportFrom(firstDay);
-                    this.props.setReportTo(lastDay);
-                    this.setState({from: moment(firstDay), to: moment(lastDay)});
-                  }}>
-                  Show
-                </Button>
-  						</div>
-  					</FormGroup>
-            <FormGroup>
-              <Label>Select date range you preffer</Label>
-                <div className="flex-row">
-                <div className="w-50 p-r-20">
-                  <DatePicker
-                    className="form-control datepicker-width-185"
-                    selected={this.state.from}
-                    onChange={date => {
-                      this.setState({ from: date });
-                    }}
-                    placeholderText="From"
-                    {...datePickerConfig}
-                    showTimeSelect={false}
-                    dateFormat="DD.MM.YYYY"
-                  />
-                </div>
-                <div className="w-50 p-r-20">
-                  <DatePicker
-                    className="form-control datepicker-width-185"
-                    selected={this.state.to}
-                    onChange={date => {
-                      this.setState({ to: date });
-                    }}
-                    placeholderText="To"
-                    {...datePickerConfig}
-                    showTimeSelect={false}
-                    dateFormat="DD.MM.YYYY"
-                  />
-                </div>
-                <Button type="button" disabled={this.state.from.unix() > this.state.to.unix()} className="btn-primary flex" onClick={()=>{
-                    this.props.setReportFrom(this.state.from.unix()*1000);
-                    this.props.setReportTo(this.state.to.unix()*1000);
-                  }}>
-                  Show
-                </Button>
-              </div>
-            </FormGroup>
-			 </div>
-			);
-		}
-	}
+  const [ year, setYear ] = React.useState( years.find(y => y.value === moment().year()) );
+  const [ month, setMonth ] = React.useState( months[moment().month()] );
 
-	const mapStateToProps = ({ reportReducer }) => {
-		const { year, month, from, to } = reportReducer;
-
-		return { year, month, from, to }
-	};
-
-	export default connect(mapStateToProps, { setReportMonth, setReportYear, setReportFrom, setReportTo })(MonthSelector);
+  return (
+    <div className="p-20">
+      <FormGroup>
+        <Label>Select month and year</Label>
+        <div className="flex-row">
+          <div className="w-50 p-r-20">
+            <Select
+              value={month}
+              onChange={(e)=> setMonth(e)}
+              options={months}
+              styles={selectStyle}
+              />
+          </div>
+          <div className="w-50 p-r-20">
+            <Select
+              value={year}
+              onChange={(e)=> setYear(e)}
+              options={years}
+              styles={selectStyle}
+              />
+          </div>
+          <Button type="button" disabled={year===null || month===null} className="btn-primary flex" onClick={()=>{
+              let firstDay = moment({ year: year.value, month: month.value-1, day: 1});
+              let lastDay = moment({ year: year.value, month: month.value-1});
+              lastDay.date(lastDay.daysInMonth());
+              setFromDate(firstDay);
+              setToDate(lastDay);
+              refetchInvoices();
+            }}>
+            Show
+          </Button>
+        </div>
+      </FormGroup>
+      <FormGroup>
+        <Label>Select date range you preffer</Label>
+        <div className="flex-row">
+          <div className="w-50 p-r-20">
+            <DatePicker
+              className="form-control datepicker-width-185"
+              selected={fromDate}
+              onChange={date => {
+                setFromDate(date)
+              }}
+              placeholderText="From"
+              {...datePickerConfig}
+              showTimeSelect={false}
+              dateFormat="DD.MM.YYYY"
+              />
+          </div>
+          <div className="w-50 p-r-20">
+            <DatePicker
+              className="form-control datepicker-width-185"
+              selected={toDate}
+              onChange={date => {
+                setToDate(date)
+              }}
+              placeholderText="To"
+              {...datePickerConfig}
+              showTimeSelect={false}
+              dateFormat="DD.MM.YYYY"
+              />
+          </div>
+          <Button type="button" disabled={fromDate !== null && toDate !== null && ( fromDate.valueOf() > toDate.valueOf() )} className="btn-primary flex" onClick={()=>{
+              refetchInvoices();
+        /*      setFromDate(fromDate);
+              setToDate(toDate);*/
+            }}>
+            Show
+          </Button>
+        </div>
+      </FormGroup>
+    </div>
+  );
+}
