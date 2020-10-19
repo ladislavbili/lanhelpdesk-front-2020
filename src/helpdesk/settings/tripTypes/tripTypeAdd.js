@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useMutation
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -12,22 +11,9 @@ import {
 } from 'reactstrap';
 
 import {
-  GET_TRIP_TYPES
-} from './index';
-
-const ADD_TRIP_TYPE = gql `
-mutation addTripType($title: String!, $order: Int) {
-  addTripType(
-    title: $title,
-    order: $order,
-  ){
-    id
-    title
-    order
-  }
-}
-`;
-
+  GET_TRIP_TYPES,
+  ADD_TRIP_TYPE,
+} from './querries';
 
 export default function TripTypeAdd( props ) {
   //data & queries

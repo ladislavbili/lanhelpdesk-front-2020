@@ -68,6 +68,12 @@ export default function StatusesList( props ) {
                 Statuses
               </h2>
               <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th> Order </th>
+                  </tr>
+                </thead>
                 <tbody>
                   {statuses.filter((item)=>item.title.toLowerCase().includes(statusFilter.toLowerCase())).map((status)=>
                     <tr key={status.id}

@@ -1,36 +1,24 @@
 import React from 'react';
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import ErrorMessage from 'components/errorMessage';
 import {
   Button,
   FormGroup,
   Label,
   Input
 } from 'reactstrap';
-
-import Checkbox from '../../../components/checkbox';
+import RightRow from './rightRow';
 
 import {
-  GET_ROLES
-} from './index';
+  GET_ROLES,
+  ADD_ROLE,
+  GET_MY_DATA
+} from './querries';
 
-const ADD_ROLE = gql `
-mutation addRole($title: String!, $order: Int, $level: Int!, $accessRights: AccessRightsCreateInput!) {
-  addRole(
-    title: $title,
-    order: $order,
-    level: $level,
-    accessRights: $accessRights,
-  ){
-    id
-    title
-    order
-    level
-  }
-}
-`;
+
 
 export default function RoleAdd( props ) {
   //data
@@ -41,143 +29,141 @@ export default function RoleAdd( props ) {
   const [ addRole, {
     client
   } ] = useMutation( ADD_ROLE );
-
+  const userDataQuery = useQuery( GET_MY_DATA );
+  const currentUserLevel = ( userDataQuery.loading ? null : userDataQuery.data.getMyData.role.level );
   //state
   const [ title, setTitle ] = React.useState( "" );
   const [ order, setOrder ] = React.useState( 0 );
   const [ level, setLevel ] = React.useState( 0 );
 
-  const login = [
-    ...React.useState( false ),
-    "Login to system"
-  ];
-  const testSections = [
-    ...React.useState( false ),
-    "Test sections - Navoody, CMDB, Hesla, Naklady, Projekty, Monitoring"
-  ];
-  const mailViaComment = [
-    ...React.useState( false ),
-    "Send mail via comments"
-  ];
-  const vykazy = [
-    ...React.useState( false ),
-    "Výkazy"
-  ];
-  const publicFilters = [
-    ...React.useState( false ),
-    "Public Filters"
-  ];
-  const addProjects = [
-    ...React.useState( false ),
-    "Add projects"
-  ];
-  const viewVykaz = [
-    ...React.useState( false ),
-    "View vykaz"
-  ];
-  const viewRozpocet = [
-    ...React.useState( false ),
-    "View rozpocet"
-  ];
-  const viewErrors = [
-    ...React.useState( false ),
-    "View errors"
-  ];
-  const viewInternal = [
-    ...React.useState( false ),
-    "Internal messages"
-  ];
-
   const generalRights = [
-    login,
-    testSections,
-    mailViaComment,
-    vykazy,
-    publicFilters,
-    addProjects,
-    viewVykaz,
-    viewRozpocet,
-    viewErrors,
-    viewInternal
+    {
+      state: React.useState( false ),
+      key: 'login',
+      label: "Login to system"
+    },
+    {
+      state: React.useState( false ),
+      key: 'testSections',
+      label: "Test sections - Navody, CMDB, Hesla, Naklady, Projekty, Monitoring"
+    },
+    {
+      state: React.useState( false ),
+      key: 'mailViaComment',
+      label: "Send mail via comments"
+    },
+    {
+      state: React.useState( false ),
+      key: 'vykazy',
+      label: "Výkazy"
+    },
+    {
+      state: React.useState( false ),
+      key: 'publicFilters',
+      label: "Public Filters"
+    },
+    {
+      state: React.useState( false ),
+      key: 'addProjects',
+      label: "Add projects"
+    },
+    {
+      state: React.useState( false ),
+      key: 'viewVykaz',
+      label: "View vykaz"
+    },
+    {
+      state: React.useState( false ),
+      key: 'viewRozpocet',
+      label: "View rozpocet"
+    },
+    {
+      state: React.useState( false ),
+      key: 'viewErrors',
+      label: "View errors"
+    },
+    {
+      state: React.useState( false ),
+      key: 'viewInternal',
+      label: "Internal messages"
+    }
   ];
-
-  const users = [
-    ...React.useState( false ),
-    "Users"
-  ];
-  const companies = [
-    ...React.useState( false ),
-    "Companies"
-  ];
-  const pausals = [
-    ...React.useState( false ),
-    "Pausals"
-  ];
-  const projects = [
-    ...React.useState( false ),
-    "Projects"
-  ];
-  const statuses = [
-    ...React.useState( false ),
-    "Statuses"
-  ];
-  const units = [
-    ...React.useState( false ),
-    "Units"
-  ];
-  const prices = [
-    ...React.useState( false ),
-    "Prices"
-  ];
-  const suppliers = [
-    ...React.useState( false ),
-    "Suppliers"
-  ];
-  const tags = [
-    ...React.useState( false ),
-    "Tags"
-  ];
-  const invoices = [
-    ...React.useState( false ),
-    "Invoices"
-  ];
-  const roles = [
-    ...React.useState( false ),
-    "Roles"
-  ];
-  const taskTypes = [
-    ...React.useState( false ),
-    "Task types"
-  ];
-  const tripTypes = [
-    ...React.useState( false ),
-    "Trip types"
-  ];
-  const imaps = [
-    ...React.useState( false ),
-    "IMAPs"
-  ];
-  const smtps = [
-    ...React.useState( false ),
-    "SMTPs"
-  ];
-
   const settings = [
-    users,
-    companies,
-    pausals,
-    projects,
-    statuses,
-    units,
-    prices,
-    suppliers,
-    tags,
-    invoices,
-    roles,
-    taskTypes,
-    tripTypes,
-    imaps,
-    smtps
+    {
+      state: React.useState( false ),
+      key: 'users',
+      label: "Users"
+    },
+    {
+      state: React.useState( false ),
+      key: 'companies',
+      label: "Companies"
+    },
+    {
+      state: React.useState( false ),
+      key: 'pausals',
+      label: "Pausals"
+    },
+    {
+      state: React.useState( false ),
+      key: 'projects',
+      label: "Projects"
+    },
+    {
+      state: React.useState( false ),
+      key: 'statuses',
+      label: "Statuses"
+    },
+    {
+      state: React.useState( false ),
+      key: 'units',
+      label: "Units"
+    },
+    {
+      state: React.useState( false ),
+      key: 'prices',
+      label: "Prices"
+    },
+    {
+      state: React.useState( false ),
+      key: 'suppliers',
+      label: "Suppliers"
+    },
+    {
+      state: React.useState( false ),
+      key: 'tags',
+      label: "Tags"
+    },
+    {
+      state: React.useState( false ),
+      key: 'invoices',
+      label: "Invoices"
+    },
+    {
+      state: React.useState( false ),
+      key: 'roles',
+      label: "Roles"
+    },
+    {
+      state: React.useState( false ),
+      key: 'taskTypes',
+      label: "Task types"
+    },
+    {
+      state: React.useState( false ),
+      key: 'tripTypes',
+      label: "Trip types"
+    },
+    {
+      state: React.useState( false ),
+      key: 'imaps',
+      label: "IMAPs"
+    },
+    {
+      state: React.useState( false ),
+      key: 'smtps',
+      label: "SMTPs"
+    },
   ];
 
   const [ saving, setSaving ] = React.useState( false );
@@ -185,33 +171,8 @@ export default function RoleAdd( props ) {
   //functions
   const addRoleFunc = () => {
     setSaving( true );
-    let accessRights = {
-      login: login[ 0 ],
-      testSections: testSections[ 0 ],
-      mailViaComment: mailViaComment[ 0 ],
-      vykazy: vykazy[ 0 ],
-      publicFilters: publicFilters[ 0 ],
-      addProjects: addProjects[ 0 ],
-      viewVykaz: viewVykaz[ 0 ],
-      viewRozpocet: viewRozpocet[ 0 ],
-      viewErrors: viewErrors[ 0 ],
-      viewInternal: viewInternal[ 0 ],
-      users: users[ 0 ],
-      companies: companies[ 0 ],
-      pausals: pausals[ 0 ],
-      projects: projects[ 0 ],
-      statuses: statuses[ 0 ],
-      units: units[ 0 ],
-      prices: prices[ 0 ],
-      suppliers: suppliers[ 0 ],
-      tags: tags[ 0 ],
-      invoices: invoices[ 0 ],
-      roles: roles[ 0 ],
-      taskTypes: taskTypes[ 0 ],
-      tripTypes: tripTypes[ 0 ],
-      imaps: imaps[ 0 ],
-      smtps: smtps[ 0 ]
-    }
+    let accessRights = {};
+    [ ...generalRights, ...settings ].forEach( ( right ) => accessRights[ right.key ] = right.state[ 0 ] );
     addRole( {
         variables: {
           title,
@@ -264,7 +225,10 @@ export default function RoleAdd( props ) {
     </FormGroup>
 
     <FormGroup>
-      <Label for="role">Level</Label>
+      <Label for="role" className="row">
+        Level
+        <ErrorMessage show={ currentUserLevel === null || level <= currentUserLevel } message={`Targets role can't be lower or same as yours(${currentUserLevel})!`} />
+      </Label>
       <Input name="name" id="name" type="number" placeholder="Enter role name" value={level} onChange={(e) => setLevel(e.target.value)}/>
     </FormGroup>
 
@@ -282,19 +246,15 @@ export default function RoleAdd( props ) {
           </tr>
         </thead>
         <tbody>
-          {
-            generalRights.map(right => <tr key={right} onClick={() => {
-                console.log('bb');
-                right[1](!right[0])
-              }}>
-              <td>{right[2]}</td>
-              <td>
-                <Checkbox className="m-b-5 p-l-0" centerVer="centerVer" centerHor="centerHor" value={right[0]} label="" onChange={() => {
-                    console.log('aa');
-                  }} highlighted={true}/>
-              </td>
-            </tr>)
-          }
+          { generalRights.map( (right) =>
+            <RightRow
+              key={[right.key,right.state[0]].toString()}
+              onChange={right.state[1]}
+              label={right.label}
+              disabled={false}
+              value={right.state[0]}
+              />
+          )}
         </tbody>
       </table>
     </div>
@@ -313,19 +273,20 @@ export default function RoleAdd( props ) {
           </tr>
         </thead>
         <tbody>
-          {
-            settings.map(right => <tr key={right} onClick={() => right[1](!right[0])}>
-              <td>{right[2]}</td>
-              <td>
-                <Checkbox className="m-b-5 p-l-0" centerVer="centerVer" centerHor="centerHor" value={right[0]} label="" onChange={() => {}} highlighted={true}/>
-              </td>
-            </tr>)
-          }
+          { settings.map( (right) =>
+            <RightRow
+              key={[right.key,right.state[0]].toString()}
+              onChange={right.state[1]}
+              label={right.label}
+              disabled={false}
+              value={right.state[0]}
+              />
+          )}
         </tbody>
       </table>
     </div>
 
-    <Button className="btn" onClick={addRoleFunc}>{
+    <Button className="btn" disabled={currentUserLevel === null || currentUserLevel >= level} onClick={addRoleFunc}>{
         saving
           ? 'Adding...'
           : 'Add role'

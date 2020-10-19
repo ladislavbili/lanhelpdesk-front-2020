@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -12,46 +11,16 @@ import {
   Input
 } from 'reactstrap';
 import Loading from 'components/loading';
-
 import {
-  GET_TRIP_TYPES
-} from './index';
-
-const GET_TRIP_TYPE = gql `
-query tripType($id: Int!) {
-  tripType (
-    id: $id
-  ) {
-    id
-    title
-    order
-  }
-}
-`;
-
-const UPDATE_TRIP_TYPE = gql `
-mutation updateTripType($id: Int!, $title: String, $order: Int) {
-  updateTripType(
-    id: $id,
-    title: $title,
-    order: $order,
-  ){
-    id
-    title
-    order
-  }
-}
-`;
-
-export const DELETE_TRIP_TYPE = gql `
-mutation deleteTripType($id: Int!) {
-  deleteTripType(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
+  toSelArr
+} from 'helperFunctions';
+import DeleteReplacement from 'components/deleteReplacement';
+import {
+  GET_TRIP_TYPES,
+  GET_TRIP_TYPE,
+  UPDATE_TRIP_TYPE,
+  DELETE_TRIP_TYPE,
+} from './querries';
 
 export default function TripTypeEdit( props ) {
   // data & queries
@@ -72,11 +41,18 @@ export default function TripTypeEdit( props ) {
   const [ deleteTripType, {
     client
   } ] = useMutation( DELETE_TRIP_TYPE );
+  const allTripTypes = toSelArr( client.readQuery( {
+      query: GET_TRIP_TYPES
+    } )
+    .tripTypes );
+  const filteredTripTypes = allTripTypes.filter( tripType => tripType.id !== parseInt( match.params.id ) );
+  const theOnlyOneLeft = allTripTypes.length < 2;
 
   //state
   const [ title, setTitle ] = React.useState( "" );
   const [ order, setOrder ] = React.useState( 0 );
   const [ saving, setSaving ] = React.useState( false );
+  const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
@@ -112,23 +88,19 @@ export default function TripTypeEdit( props ) {
 
     setSaving( false );
   };
-
-  const deleteTripTypeFunc = () => {
+  const deleteTripTypeFunc = ( replacement ) => {
     if ( window.confirm( "Are you sure?" ) ) {
       deleteTripType( {
           variables: {
             id: parseInt( match.params.id ),
+            newId: parseInt( replacement.id ),
           }
         } )
         .then( ( response ) => {
-          const allTripTypes = client.readQuery( {
-              query: GET_TRIP_TYPES
-            } )
-            .tripTypes;
           client.writeQuery( {
             query: GET_TRIP_TYPES,
             data: {
-              tripTypes: allTripTypes.filter( tripType => tripType.id !== parseInt( match.params.id ), )
+              tripTypes: filteredTripTypes
             }
           } );
           history.goBack();
@@ -145,18 +117,31 @@ export default function TripTypeEdit( props ) {
 
   return (
     <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-        <FormGroup>
-          <Label for="name">Task type name</Label>
-          <Input type="text" name="name" id="name" placeholder="Enter trip type" value={title} onChange={(e)=>setTitle(e.target.value)} />
-        </FormGroup>
-        <FormGroup>
-          <Label for="order">Order</Label>
-          <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
-        </FormGroup>
-        <div className="row">
-          <Button className="btn" disabled={saving} onClick={updateTripTypeFunc}>{saving ? 'Saving trip type...' : 'Save trip type'}</Button>
-          <Button className="btn-red m-l-5"  disabled={saving} onClick={deleteTripTypeFunc}>Delete</Button>
-        </div>
+      <FormGroup>
+        <Label for="name">Task type name</Label>
+        <Input type="text" name="name" id="name" placeholder="Enter trip type" value={title} onChange={(e)=>setTitle(e.target.value)} />
+      </FormGroup>
+      <FormGroup>
+        <Label for="order">Order</Label>
+        <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
+      </FormGroup>
+      <div className="row">
+        <Button className="btn" disabled={saving} onClick={updateTripTypeFunc}>{saving ? 'Saving trip type...' : 'Save trip type'}</Button>
+        <Button
+          className="btn-red m-l-5"
+          disabled={saving || theOnlyOneLeft}
+          onClick={() => setDeleteOpen(true)}
+          >
+          Delete
+        </Button>
+      </div>
+      <DeleteReplacement
+        isOpen={deleteOpen}
+        label="trip type"
+        options={filteredTripTypes}
+        close={()=>setDeleteOpen(false)}
+        finishDelete={deleteTripTypeFunc}
+        />
     </div>
   )
 }

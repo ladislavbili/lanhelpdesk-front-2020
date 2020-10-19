@@ -33,7 +33,7 @@ import {
 } from 'helpdesk/settings/companies';
 import {
   GET_TASK_TYPES
-} from 'helpdesk/settings/taskTypes';
+} from 'helpdesk/settings/taskTypes/querries';
 import {
   GET_MY_FILTERS
 } from 'helpdesk/components/sidebar/tasksSidebar';

@@ -1,8 +1,16 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import {toSelArr } from '../../helperFunctions';
-import { Modal, ModalBody, Button } from 'reactstrap';
+import {
+  toSelArr
+} from '../../helperFunctions';
+import {
+  Modal,
+  ModalBody,
+  Button
+} from 'reactstrap';
 import TaskAdd from './taskAdd';
 /*
 import {
@@ -11,12 +19,18 @@ import {
   storageMetadataStart,
   storageHelpMilestonesStart,
       } from '../../redux/actions';*/
-import { noMilestone } from 'configs/constants/sidebar';
+import {
+  noMilestone
+} from 'configs/constants/sidebar';
 
-import { GET_TASK_TYPES } from 'helpdesk/settings/taskTypes';
-import { GET_TRIP_TYPES } from 'helpdesk/settings/tripTypes';
+import {
+  GET_TASK_TYPES
+} from 'helpdesk/settings/taskTypes/querries';
+import {
+  GET_TRIP_TYPES
+} from 'helpdesk/settings/tripTypes/querries';
 
-const GET_STATUSES = gql`
+const GET_STATUSES = gql `
 query {
   statuses {
     title
@@ -28,7 +42,7 @@ query {
 }
 `;
 
-const GET_TAGS = gql`
+const GET_TAGS = gql `
 query {
   tags {
     title
@@ -39,7 +53,7 @@ query {
 }
 `;
 
-const GET_PROJECTS = gql`
+const GET_PROJECTS = gql `
 query {
   projects {
     title
@@ -121,7 +135,7 @@ query {
 }
 `;
 
-const GET_COMPANIES = gql`
+const GET_COMPANIES = gql `
 query {
   companies {
     title
@@ -147,7 +161,7 @@ query {
 }
 `;
 
-const GET_USERS = gql`
+const GET_USERS = gql `
 query {
   users{
     id
@@ -162,20 +176,69 @@ query {
 }
 `;
 
-export default function TaskAddContainer (props){
+export default function TaskAddContainer( props ) {
   //data & queries
-  const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES, { options: { fetchPolicy: 'network-only' }});
-  const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES, { options: { fetchPolicy: 'network-only' }});
-  const { data: usersData, loading: usersLoading } = useQuery(GET_USERS, { options: { fetchPolicy: 'network-only' }});
-  const { data: taskTypesData, loading: taskTypesLoading } = useQuery(GET_TASK_TYPES, { options: { fetchPolicy: 'network-only' }});
-  const { data: tripTypesData, loading: tripTypesLoading } = useQuery(GET_TRIP_TYPES, { options: { fetchPolicy: 'network-only' }});
-  const { data: tagsData, loading: tagsLoading } = useQuery(GET_TAGS, { options: { fetchPolicy: 'network-only' }});
-  const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS, { options: { fetchPolicy: 'network-only' }});
+  const {
+    data: statusesData,
+    loading: statusesLoading
+  } = useQuery( GET_STATUSES, {
+    options: {
+      fetchPolicy: 'network-only'
+    }
+  } );
+  const {
+    data: companiesData,
+    loading: companiesLoading
+  } = useQuery( GET_COMPANIES, {
+    options: {
+      fetchPolicy: 'network-only'
+    }
+  } );
+  const {
+    data: usersData,
+    loading: usersLoading
+  } = useQuery( GET_USERS, {
+    options: {
+      fetchPolicy: 'network-only'
+    }
+  } );
+  const {
+    data: taskTypesData,
+    loading: taskTypesLoading
+  } = useQuery( GET_TASK_TYPES, {
+    options: {
+      fetchPolicy: 'network-only'
+    }
+  } );
+  const {
+    data: tripTypesData,
+    loading: tripTypesLoading
+  } = useQuery( GET_TRIP_TYPES, {
+    options: {
+      fetchPolicy: 'network-only'
+    }
+  } );
+  const {
+    data: tagsData,
+    loading: tagsLoading
+  } = useQuery( GET_TAGS, {
+    options: {
+      fetchPolicy: 'network-only'
+    }
+  } );
+  const {
+    data: projectsData,
+    loading: projectsLoading
+  } = useQuery( GET_PROJECTS, {
+    options: {
+      fetchPolicy: 'network-only'
+    }
+  } );
 
   //state
-  const [ openAddTaskModal, setOpenAddTaskModal ] = React.useState(false);
+  const [ openAddTaskModal, setOpenAddTaskModal ] = React.useState( false );
 
-  const [ newID/*, setNewID */] = React.useState(0); //ked budu tasky, toto bude max task.id + 1
+  const [ newID /*, setNewID */ ] = React.useState( 0 ); //ked budu tasky, toto bude max task.id + 1
 
   /*constructor(props){
     super(props);
@@ -200,153 +263,153 @@ export default function TaskAddContainer (props){
     }
     this.setData.bind(this);
   }*/
-/*
-  storageLoaded(props){
-    return props.statusesLoaded &&
-    props.projectsLoaded &&
-    props.usersLoaded &&
-    props.companiesLoaded &&
-    props.workTypesLoaded &&
-    props.unitsLoaded &&
-    props.pricesLoaded &&
-    props.pricelistsLoaded &&
-    props.tagsLoaded &&
-    props.taskTypesLoaded &&
-    props.metadataLoaded &&
-    props.milestonesLoaded &&
-    props.tripTypesLoaded
+  /*
+    storageLoaded(props){
+      return props.statusesLoaded &&
+      props.projectsLoaded &&
+      props.usersLoaded &&
+      props.companiesLoaded &&
+      props.workTypesLoaded &&
+      props.unitsLoaded &&
+      props.pricesLoaded &&
+      props.pricelistsLoaded &&
+      props.tagsLoaded &&
+      props.taskTypesLoaded &&
+      props.metadataLoaded &&
+      props.milestonesLoaded &&
+      props.tripTypesLoaded
 
-  }
-
-  componentWillReceiveProps(props){
-		if((!sameStringForms(props.statuses,this.props.statuses)||
-      !sameStringForms(props.projects,this.props.projects)||
-      !sameStringForms(props.users,this.props.users)||
-      !sameStringForms(props.companies,this.props.companies)||
-      !sameStringForms(props.workTypes,this.props.workTypes)||
-      !sameStringForms(props.units,this.props.units)||
-      !sameStringForms(props.prices,this.props.prices)||
-      !sameStringForms(props.pricelists,this.props.pricelists)||
-      !sameStringForms(props.tags,this.props.tags)||
-      !sameStringForms(props.taskTypes,this.props.taskTypes)||
-      !sameStringForms(props.metadata,this.props.metadata)||
-			!sameStringForms(props.milestones,this.props.milestones)||
-      !sameStringForms(props.tripTypes,this.props.tripTypes)
-      )&&
-      this.storageLoaded(props)
-    ){
-      this.setData(props);
-		}
-    if(!this.storageLoaded(this.props) && this.storageLoaded(props)){
-      this.setData(props);
-    }
-	}
-
-  componentWillMount(){
-    if(!this.props.statusesActive){
-      this.props.storageHelpStatusesStart();
     }
 
-    if(!this.props.projectsActive){
-      this.props.storageHelpProjectsStart();
+    componentWillReceiveProps(props){
+  		if((!sameStringForms(props.statuses,this.props.statuses)||
+        !sameStringForms(props.projects,this.props.projects)||
+        !sameStringForms(props.users,this.props.users)||
+        !sameStringForms(props.companies,this.props.companies)||
+        !sameStringForms(props.workTypes,this.props.workTypes)||
+        !sameStringForms(props.units,this.props.units)||
+        !sameStringForms(props.prices,this.props.prices)||
+        !sameStringForms(props.pricelists,this.props.pricelists)||
+        !sameStringForms(props.tags,this.props.tags)||
+        !sameStringForms(props.taskTypes,this.props.taskTypes)||
+        !sameStringForms(props.metadata,this.props.metadata)||
+  			!sameStringForms(props.milestones,this.props.milestones)||
+        !sameStringForms(props.tripTypes,this.props.tripTypes)
+        )&&
+        this.storageLoaded(props)
+      ){
+        this.setData(props);
+  		}
+      if(!this.storageLoaded(this.props) && this.storageLoaded(props)){
+        this.setData(props);
+      }
+  	}
+
+    componentWillMount(){
+      if(!this.props.statusesActive){
+        this.props.storageHelpStatusesStart();
+      }
+
+      if(!this.props.projectsActive){
+        this.props.storageHelpProjectsStart();
+      }
+
+      if(!this.props.tripTypesActive){
+        this.props.storageHelpTripTypesStart();
+      }
+
+      if(!this.props.usersActive){
+        this.props.storageUsersStart();
+      }
+
+      if(!this.props.companiesActive){
+        this.props.storageCompaniesStart();
+      }
+
+      if(!this.props.workTypesActive){
+        this.props.storageHelpWorkTypesStart();
+      }
+
+      if(!this.props.unitsActive){
+        this.props.storageHelpUnitsStart();
+      }
+
+      if(!this.props.pricesActive){
+        this.props.storageHelpPricesStart();
+      }
+
+      if(!this.props.pricelistsActive){
+        this.props.storageHelpPricelistsStart();
+      }
+
+      if(!this.props.tagsActive){
+        this.props.storageHelpTagsStart();
+      }
+
+      if(!this.props.taskTypesActive){
+        this.props.storageHelpTaskTypesStart();
+      }
+      if(!this.props.metadataActive){
+        this.props.storageMetadataStart();
+      }
+      if(!this.props.milestonesActive){
+        this.props.storageHelpMilestonesStart();
+      }
+      if(this.storageLoaded(this.props)){
+        this.setData(this.props);
+      }
     }
 
-    if(!this.props.tripTypesActive){
-      this.props.storageHelpTripTypesStart();
-    }
+      setData(props){
+        let statuses = toSelArr(props.statuses);
+        let projects = toSelArr(props.projects);
+        let tripTypes = toSelArr(props.tripTypes);
+        let users = toSelArr(props.users,'email');
+        let companies = toSelArr(props.companies);
+        let units = toSelArr(props.units);
+        let prices = props.prices;
+        let pricelists = props.pricelists;
+        let tags = toSelArr(props.tags);
+        let taskTypes = toSelArr(props.taskTypes);
+        let defaultUnit = props.metadata?props.metadata.defaultUnit:null;
+        let newID = props.metadata?props.metadata.taskLastID:null;
+        let milestones = toSelArr([noMilestone].concat(props.milestones));
 
-    if(!this.props.usersActive){
-      this.props.storageUsersStart();
-    }
+        let newCompanies=companies.map((company)=>{
+          let newCompany={...company,pricelist:pricelists.find((item)=>item.id===company.pricelist)};
+          return newCompany;
+        });
+        let newTaskTypes=taskTypes.map((taskType)=>{
+          let newTaskType = {...taskType, prices:prices.filter((price)=>price.type===taskType.id)}
+          return newTaskType;
+        });
 
-    if(!this.props.companiesActive){
-      this.props.storageCompaniesStart();
-    }
+        let newTripTypes=tripTypes.map((tripType)=>{
+          let newTripType = {...tripType, prices:prices.filter((price)=>price.type===tripType.id)}
+          return newTripType;
+        });
 
-    if(!this.props.workTypesActive){
-      this.props.storageHelpWorkTypesStart();
-    }
+        this.setState({
+          statuses,
+          projects,
+          users,
+          companies:newCompanies,
+          tripTypes:newTripTypes,
+          taskTypes:newTaskTypes,
+          allTags:tags,
+          milestones,
+          units,
+          newID,
+          loading:false,
 
-    if(!this.props.unitsActive){
-      this.props.storageHelpUnitsStart();
-    }
+          defaultUnit
+        });
+      }*/
 
-    if(!this.props.pricesActive){
-      this.props.storageHelpPricesStart();
-    }
+  const loading = statusesLoading || companiesLoading || usersLoading || taskTypesLoading || tripTypesLoading || tagsLoading || projectsLoading;
 
-    if(!this.props.pricelistsActive){
-      this.props.storageHelpPricelistsStart();
-    }
-
-    if(!this.props.tagsActive){
-      this.props.storageHelpTagsStart();
-    }
-
-    if(!this.props.taskTypesActive){
-      this.props.storageHelpTaskTypesStart();
-    }
-    if(!this.props.metadataActive){
-      this.props.storageMetadataStart();
-    }
-    if(!this.props.milestonesActive){
-      this.props.storageHelpMilestonesStart();
-    }
-    if(this.storageLoaded(this.props)){
-      this.setData(this.props);
-    }
-  }
-
-    setData(props){
-      let statuses = toSelArr(props.statuses);
-      let projects = toSelArr(props.projects);
-      let tripTypes = toSelArr(props.tripTypes);
-      let users = toSelArr(props.users,'email');
-      let companies = toSelArr(props.companies);
-      let units = toSelArr(props.units);
-      let prices = props.prices;
-      let pricelists = props.pricelists;
-      let tags = toSelArr(props.tags);
-      let taskTypes = toSelArr(props.taskTypes);
-      let defaultUnit = props.metadata?props.metadata.defaultUnit:null;
-      let newID = props.metadata?props.metadata.taskLastID:null;
-      let milestones = toSelArr([noMilestone].concat(props.milestones));
-
-      let newCompanies=companies.map((company)=>{
-        let newCompany={...company,pricelist:pricelists.find((item)=>item.id===company.pricelist)};
-        return newCompany;
-      });
-      let newTaskTypes=taskTypes.map((taskType)=>{
-        let newTaskType = {...taskType, prices:prices.filter((price)=>price.type===taskType.id)}
-        return newTaskType;
-      });
-
-      let newTripTypes=tripTypes.map((tripType)=>{
-        let newTripType = {...tripType, prices:prices.filter((price)=>price.type===tripType.id)}
-        return newTripType;
-      });
-
-      this.setState({
-        statuses,
-        projects,
-        users,
-        companies:newCompanies,
-        tripTypes:newTripTypes,
-        taskTypes:newTaskTypes,
-        allTags:tags,
-        milestones,
-        units,
-        newID,
-        loading:false,
-
-        defaultUnit
-      });
-    }*/
-
-    const loading = statusesLoading  || companiesLoading || usersLoading || taskTypesLoading || tripTypesLoading || tagsLoading || projectsLoading;
-
-	  return (
-			<div className="display-inline">
+  return (
+    <div className="display-inline">
 			{
 				!props.task &&
 				<Button
@@ -398,8 +461,8 @@ export default function TaskAddContainer (props){
 					</ModalBody>
 				</Modal>
 		</div>
-    );
-  }
+  );
+}
 
 /*
 const mapStateToProps = ({userReducer, filterReducer, taskReducer, storageHelpStatuses, storageHelpProjects,storageUsers,storageCompanies,storageHelpWorkTypes,storageHelpUnits,storageHelpPrices,storageHelpPricelists,storageHelpTags,storageHelpTaskTypes, storageMetadata, storageHelpMilestones, storageHelpTripTypes }) => {

@@ -67,6 +67,13 @@ export default function PricelistsList( props ) {
     							Price lists
     						</h2>
                 <table className="table table-hover">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Default</th>
+                      <th> Order </th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {PRICELISTS.filter((item)=>item.title.toLowerCase().includes(pricelistFilter.toLowerCase())).map((pricelist)=>
                       <tr key={pricelist.id}
@@ -77,6 +84,9 @@ export default function PricelistsList( props ) {
                         </td>
                         <td width="10%">
                           {pricelist.def ? "Default" : ""}
+                        </td>
+                        <td>
+                          {pricelist.order}
                         </td>
                       </tr>
                     )}

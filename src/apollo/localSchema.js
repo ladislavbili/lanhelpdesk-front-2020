@@ -1,7 +1,8 @@
+import {
+  gql
+} from "@apollo/client";
 
-import { gql } from "@apollo/client";
-
-export const typeDefs = gql`
+export const typeDefs = gql `
   extend type Query {
     isLoggedIn: Boolean!
     cartItems: [ID!]!

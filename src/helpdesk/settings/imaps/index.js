@@ -74,10 +74,9 @@ export default function IMAPsList( props ) {
                     <tr className="clickable">
                       <th>Title</th>
                       <th>Host</th>
-                      <th>Port</th>
                       <th>Username</th>
-                      <th>Default</th>
-                      <th></th>
+                      <th>Order</th>
+                        <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -98,13 +97,10 @@ export default function IMAPsList( props ) {
                           {imap.host}
                         </td>
                         <td>
-                          {imap.port}
-                        </td>
-                        <td>
                           {imap.username}
                         </td>
                         <td>
-                          {imap.def ? "Yes" : "No"}
+                          {imap.order}
                         </td>
                         <td>
                           {

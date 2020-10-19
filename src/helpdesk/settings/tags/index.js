@@ -69,6 +69,12 @@ export default function TagsList( props ) {
   							Tags
   						</h2>
               <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th> Order </th>
+                  </tr>
+                </thead>
                 <tbody>
                   {TAGS.filter((item)=>item.title.toLowerCase().includes(tagFilter.toLowerCase())).map((tag)=>
                     <tr
@@ -77,6 +83,9 @@ export default function TagsList( props ) {
                       onClick={()=>history.push('/helpdesk/settings/tags/'+tag.id)}>
                       <td>
                         {tag.title}
+                      </td>
+                      <td>
+                        {tag.order}
                       </td>
                     </tr>
                   )}

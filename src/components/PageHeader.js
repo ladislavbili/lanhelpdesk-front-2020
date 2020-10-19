@@ -1,11 +1,24 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import {
+  useQuery,
+  useMutation
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import {Dropdown, DropdownItem, DropdownMenu, DropdownToggle} from 'reactstrap';
-import {Link} from 'react-router-dom';
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle
+} from 'reactstrap';
+import {
+  writeCleanCashe
+} from 'apollo/createClient';
+import {
+  Link
+} from 'react-router-dom';
 import classnames from 'classnames';
 
-const GET_MY_DATA = gql`
+const GET_MY_DATA = gql `
 query {
   getMyData{
     id
@@ -34,35 +47,50 @@ query {
 }
 `;
 
-export default function PageHeader(props) {
+const LOGOUT_USER = gql `
+mutation logoutUser{
+  logoutUser: Boolean
+}
+`;
+
+export default function PageHeader( props ) {
   //data & queries
-  const { history, settings, showLayoutSwitch, dndLayout, calendarLayout } = props;
-  const { data } = useQuery(GET_MY_DATA);
+  const {
+    history,
+    settings,
+    showLayoutSwitch,
+    dndLayout,
+    calendarLayout
+  } = props;
+  const {
+    data,
+    client
+  } = useQuery( GET_MY_DATA );
   //state
-  const [ notificationsOpen, setNotificationsOpen ] = React.useState(false);
-  const [ layoutOpen, setLayoutOpen ] = React.useState(false);
-  const [ settingsOpen, setSettingsOpen ] = React.useState(false);
-  const [ errorMessages/*, setErrorMessages*/ ] = React.useState([]);
-  const [ unreadNotifications/*, setUnreadNotifications */] = React.useState([]);
+  const [ notificationsOpen, setNotificationsOpen ] = React.useState( false );
+  const [ layoutOpen, setLayoutOpen ] = React.useState( false );
+  const [ settingsOpen, setSettingsOpen ] = React.useState( false );
+  const [ errorMessages /*, setErrorMessages*/ ] = React.useState( [] );
+  const [ unreadNotifications /*, setUnreadNotifications */ ] = React.useState( [] );
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   const getLocation = () => {
     let url = history.location.pathname;
-    if (url.includes('cmdb')) {
+    if ( url.includes( 'cmdb' ) ) {
       return '/cmdb';
-    } else if (url.includes('helpdesk')) {
+    } else if ( url.includes( 'helpdesk' ) ) {
       return '/helpdesk';
-    } else if (url.includes('passmanager')) {
+    } else if ( url.includes( 'passmanager' ) ) {
       return '/passmanager';
-    } else if (url.includes('expenditures')) {
+    } else if ( url.includes( 'expenditures' ) ) {
       return '/expenditures';
-    } else if (url.includes('projects')) {
+    } else if ( url.includes( 'projects' ) ) {
       return '/projects';
-    } else if (url.includes('reports')) {
+    } else if ( url.includes( 'reports' ) ) {
       return '/reports';
-    } else if (url.includes('monitoring')) {
+    } else if ( url.includes( 'monitoring' ) ) {
       return '/monitoring';
     } else {
       return '/lanwiki';
@@ -70,7 +98,7 @@ export default function PageHeader(props) {
   }
 
   const getLayoutIcon = () => {
-    switch (currentUser.tasklistLayout) {
+    switch ( currentUser.tasklistLayout ) {
       case 0:
         return "fa-columns";
       case 1:
@@ -84,7 +112,7 @@ export default function PageHeader(props) {
     }
   }
 
-  const setTasklistLayout = (value) => {
+  const setTasklistLayout = ( value ) => {
 
   }
 
@@ -105,11 +133,11 @@ export default function PageHeader(props) {
     })*/
   }
 
-/*    const errorMessages = props.errorMessages.filter((message) => !message.read )
-    let unreadNotifications = [...props.currentUser.notifications].splice(5, props.currentUser.notifications.length - 1).filter((notification) => !notification.read);*/
-    const URL = getLocation();
+  /*    const errorMessages = props.errorMessages.filter((message) => !message.read )
+      let unreadNotifications = [...props.currentUser.notifications].splice(5, props.currentUser.notifications.length - 1).filter((notification) => !notification.read);*/
+  const URL = getLocation();
 
-    return (<div className="page-header flex">
+  return ( <div className="page-header flex">
       <div className="d-flex full-height p-l-10">
         <div className="center-hor">
           <Link to={{
@@ -239,12 +267,15 @@ export default function PageHeader(props) {
           }
           <i className="header-icon clickable fa fa-sign-out-alt center-hor" onClick={() => {
               if (window.confirm('Are you sure you want to log out?')) {
+                localStorage.removeItem("acctok");
+                writeCleanCashe();
+                client.writeData({ data: { isLoggedIn: false } });
               }
             }}/>
         </div>
       </div>
-    </div>);
-  }
+    </div> );
+}
 /*
 const mapStateToProps = ({userReducer, storageHelpTasks, storageErrorMessages}) => {
   const {tasksActive, tasks} = storageHelpTasks;

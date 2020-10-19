@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button
@@ -13,16 +12,9 @@ import Loading from 'components/loading';
 import {
   orderArr
 } from 'helperFunctions';
-
-export const GET_TRIP_TYPES = gql `
-query {
-  tripTypes {
-    title
-    id
-    order
-  }
-}
-`;
+import {
+  GET_TRIP_TYPES
+} from './querries';
 
 export default function TripTypeListContainer( props ) {
   // state
@@ -68,6 +60,12 @@ export default function TripTypeListContainer( props ) {
               Trip type
             </h2>
             <table className="table table-hover">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th> Order </th>
+                </tr>
+              </thead>
               <tbody>
                   { (loading || !data ? [] : orderArr(data.tripTypes)).filter((item)=>item.title.toLowerCase().includes(tripTypeFilter.toLowerCase())).map((tripType)=>
                   <tr key={tripType.id}
@@ -91,13 +89,16 @@ export default function TripTypeListContainer( props ) {
         <div className="col-lg-8">
           <div className="commandbar"></div>
           {
-            match.params.id && match.params.id==='add' && <TripTypeAdd history={history} />
+            match.params.id && match.params.id==='add' &&
+            <TripTypeAdd history={history} />
           }
           {
-            loading && match.params.id && match.params.id!=='add' && <Loading />
+            loading && match.params.id && match.params.id!=='add' &&
+            <Loading />
           }
           {
-            !loading && match.params.id && match.params.id!=='add' && data.tripTypes.some((item)=> item.id.toString() === match.params.id) && <TripTypeEdit {...{history, match}} />
+            !loading && match.params.id && match.params.id!=='add' && data.tripTypes.some((item)=> item.id.toString() === match.params.id) &&
+            <TripTypeEdit {...{history, match}} />
           }
         </div>
       </div>

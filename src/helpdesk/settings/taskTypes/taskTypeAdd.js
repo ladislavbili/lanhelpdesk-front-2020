@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useMutation
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -12,21 +11,9 @@ import {
 } from 'reactstrap';
 
 import {
-  GET_TASK_TYPES
-} from './index';
-
-const ADD_TASK_TYPE = gql `
-mutation addTaskType($title: String!, $order: Int) {
-  addTaskType(
-    title: $title,
-    order: $order,
-  ){
-    id
-    title
-    order
-  }
-}
-`;
+  ADD_TASK_TYPE,
+  GET_TASK_TYPES,
+} from './querries';
 
 export default function TaskTypeAdd( props ) {
   //data & queries

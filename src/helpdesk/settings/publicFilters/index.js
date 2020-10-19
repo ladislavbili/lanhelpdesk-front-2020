@@ -16,8 +16,8 @@ import {
 } from 'helperFunctions';
 
 import {
-  GET_ROLES
-} from 'helpdesk/settings/roles';
+  GET_BASIC_ROLES
+} from 'helpdesk/settings/roles/querries';
 
 export const GET_PUBLIC_FILTERS = gql `
 query {
@@ -47,7 +47,7 @@ export default function PublicFilterListContainer( props ) {
   const {
     data: rolesData,
     loading: rolesLoading
-  } = useQuery( GET_ROLES );
+  } = useQuery( GET_BASIC_ROLES );
 
   const getFilteredFilters = () => {
     console.log( data );

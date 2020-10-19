@@ -1,17 +1,38 @@
 import React from 'react';
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import {
+  useQuery,
+  useMutation
+} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 
 import Select from 'react-select';
-import { Button, FormGroup, Label, Input,Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import {toSelArr, toSelItem} from 'helperFunctions';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader
+} from 'reactstrap';
+import {
+  toSelArr,
+  toSelItem
+} from 'helperFunctions';
 import Checkbox from 'components/checkbox';
-import {selectStyle} from 'configs/components/select';
+import {
+  selectStyle
+} from 'configs/components/select';
 
-import { GET_ROLES } from 'helpdesk/settings/roles';
-import { GET_MY_FILTERS } from 'helpdesk/components/sidebar/tasksSidebar';
+import {
+  GET_BASIC_ROLES
+} from 'helpdesk/settings/roles/querries';
+import {
+  GET_MY_FILTERS
+} from 'helpdesk/components/sidebar/tasksSidebar';
 
-const GET_MY_DATA = gql`
+const GET_MY_DATA = gql `
 query {
   getMyData{
     id
@@ -26,7 +47,7 @@ query {
 }
 `;
 
-const ADD_FILTER = gql`
+const ADD_FILTER = gql `
 mutation addFilter(
   $title: String!,
   $pub: Boolean!,
@@ -73,7 +94,7 @@ mutation addFilter(
 `;
 
 
-const UPDATE_FILTER = gql`
+const UPDATE_FILTER = gql `
 mutation updateFilter( $id: Int!, $title: String, $pub: Boolean!, $global: Boolean!, $dashboard: Boolean!, $order: Int, $roles: [Int], $filter: FilterInput, $projectId: Int,) {
   updateFilter(
     id: $id,
@@ -144,7 +165,7 @@ mutation updateFilter( $id: Int!, $title: String, $pub: Boolean!, $global: Boole
 }
 `;
 
-const GET_PROJECTS = gql`
+const GET_PROJECTS = gql `
 query {
   projects {
     title
@@ -164,94 +185,138 @@ query {
 }
 `;
 
-export default function FilterAdd(props){
+export default function FilterAdd( props ) {
   //data & queries
-  const { filter, filterID, generalFilter } = props;
-  const { data } = useQuery(GET_MY_DATA);
-  const { data: roleData, loading: roleLoading } = useQuery(GET_ROLES);
-  const { data: projectData, loading: projectLoading } = useQuery(GET_PROJECTS);
-  const [ addFilter, {client} ] = useMutation(ADD_FILTER);
-  const [ updateFilter ] = useMutation(UPDATE_FILTER);
+  const {
+    filter,
+    filterID,
+    generalFilter
+  } = props;
+  const {
+    data
+  } = useQuery( GET_MY_DATA );
+  const {
+    data: roleData,
+    loading: roleLoading
+  } = useQuery( GET_BASIC_ROLES );
+  const {
+    data: projectData,
+    loading: projectLoading
+  } = useQuery( GET_PROJECTS );
+  const [ addFilter, {
+    client
+  } ] = useMutation( ADD_FILTER );
+  const [ updateFilter ] = useMutation( UPDATE_FILTER );
 
-  const roles = ( roleLoading ? [] : toSelArr(roleData.roles) );
-  const projects = ( projectLoading ? [] : toSelArr(projectData.projects) );
+  const roles = ( roleLoading ? [] : toSelArr( roleData.roles ) );
+  const projects = ( projectLoading ? [] : toSelArr( projectData.projects ) );
 
-  const [ title, setTitle ] = React.useState("");
-  const [ pub, setPub ] = React.useState(false);
-  const [ global, setGlobal ] = React.useState(false);
-  const [ dashboard, setDashboard ] = React.useState(false);
-  const [ project, setProject ] = React.useState(null);
-  const [ chosenRoles, setChosenRoles ] = React.useState([]);
-  const [ saving, setSaving ] = React.useState(false);
-  const [ opened, setOpened ] = React.useState(false);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ pub, setPub ] = React.useState( false );
+  const [ global, setGlobal ] = React.useState( false );
+  const [ dashboard, setDashboard ] = React.useState( false );
+  const [ project, setProject ] = React.useState( null );
+  const [ chosenRoles, setChosenRoles ] = React.useState( [] );
+  const [ saving, setSaving ] = React.useState( false );
+  const [ opened, setOpened ] = React.useState( false );
 
   let currentUser = {};
   let accessRights = {};
 
-  if (data) {
+  if ( data ) {
     currentUser = data.getMyData;
     accessRights = currentUser.role.accessRights;
   }
 
-  React.useEffect(() => {
-    if (filterID && generalFilter) {
-      setTitle(generalFilter.title);
-      setPub(generalFilter.pub);
-      setGlobal(generalFilter.global);
-      setDashboard(generalFilter.dashboard);
-      setProject(generalFilter.project ? toSelItem(generalFilter.project) : null);
-      setChosenRoles(generalFilter.roles ? toSelArr(generalFilter.roles) : []);
+  React.useEffect( () => {
+    if ( filterID && generalFilter ) {
+      setTitle( generalFilter.title );
+      setPub( generalFilter.pub );
+      setGlobal( generalFilter.global );
+      setDashboard( generalFilter.dashboard );
+      setProject( generalFilter.project ? toSelItem( generalFilter.project ) : null );
+      setChosenRoles( generalFilter.roles ? toSelArr( generalFilter.roles ) : [] );
     }
-  }, [filterID]);
+  }, [ filterID ] );
 
-const addFilterFunc = () => {
-    setSaving(true);
-    if(filterID === null || filterID === undefined){
-      addFilter({ variables: {
-        title,
-        pub,
-        global,
-        dashboard,
-        projectId: project ? project.id : null,
-        filter,
-        roles: roles.map(item => item.id)
-      } }).then( ( response ) => {
-          const allFilters = client.readQuery({query: GET_MY_FILTERS}).myFilters;
-          const newFilter = {...response.data.addFilter, __typename: "Filter"};
-          const newFilters = [...allFilters, newFilter];
-          client.writeQuery({ query: GET_MY_FILTERS, data: {myFilters: [...newFilters] } });
-      }).catch( (err) => {
-        console.log(err.message);
-      });
-    }else{
-      updateFilter({ variables: {
-        id: filterID,
-        title,
-        pub,
-        global,
-        dashboard,
-        projectId: project ? project.id : null,
-        filter,
-        roles: roles.map(item => item.id)
-      } }).then( ( response ) => {
-          let allFilters = client.readQuery({query: GET_MY_FILTERS}).myFilters;
-          const newFilters = allFilters.map(item => {
-            if (item.id !== filterID){
+  const addFilterFunc = () => {
+    setSaving( true );
+    if ( filterID === null || filterID === undefined ) {
+      addFilter( {
+          variables: {
+            title,
+            pub,
+            global,
+            dashboard,
+            projectId: project ? project.id : null,
+            filter,
+            roles: roles.map( item => item.id )
+          }
+        } )
+        .then( ( response ) => {
+          const allFilters = client.readQuery( {
+              query: GET_MY_FILTERS
+            } )
+            .myFilters;
+          const newFilter = {
+            ...response.data.addFilter,
+            __typename: "Filter"
+          };
+          const newFilters = [ ...allFilters, newFilter ];
+          client.writeQuery( {
+            query: GET_MY_FILTERS,
+            data: {
+              myFilters: [ ...newFilters ]
+            }
+          } );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
+    } else {
+      updateFilter( {
+          variables: {
+            id: filterID,
+            title,
+            pub,
+            global,
+            dashboard,
+            projectId: project ? project.id : null,
+            filter,
+            roles: roles.map( item => item.id )
+          }
+        } )
+        .then( ( response ) => {
+          let allFilters = client.readQuery( {
+              query: GET_MY_FILTERS
+            } )
+            .myFilters;
+          const newFilters = allFilters.map( item => {
+            if ( item.id !== filterID ) {
               return item;
             }
-            return ({...response.data.updateFilter, __typename: "Filter"});
-          });
-          client.writeQuery({ query: GET_MY_FILTERS, data: {myFilters: [...newFilters] } });
-      }).catch( (err) => {
-        console.log(err.message);
-      });
+            return ( {
+              ...response.data.updateFilter,
+              __typename: "Filter"
+            } );
+          } );
+          client.writeQuery( {
+            query: GET_MY_FILTERS,
+            data: {
+              myFilters: [ ...newFilters ]
+            }
+          } );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
     }
-    setOpened(false);
-    setSaving(false);
+    setOpened( false );
+    setSaving( false );
   }
 
   return (
-  <div>
+    <div>
     <Button className="btn-link-reversed m-2" onClick={() => setOpened(!opened)}>
       <i className="far fa-save icon-M"/>
     </Button>

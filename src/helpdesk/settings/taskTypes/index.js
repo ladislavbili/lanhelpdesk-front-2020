@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button
@@ -14,15 +13,10 @@ import {
   orderArr
 } from 'helperFunctions';
 
-export const GET_TASK_TYPES = gql `
-query {
-  taskTypes {
-    title
-    id
-    order
-  }
-}
-`;
+import {
+  GET_TASK_TYPES,
+} from './querries';
+
 
 export default function TaskTypeList( props ) {
   // state
@@ -68,6 +62,12 @@ export default function TaskTypeList( props ) {
               Work types
             </h2>
             <table className="table table-hover">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th> Order </th>
+                </tr>
+              </thead>
               <tbody>
                 { (loading || !data ? [] : orderArr(data.taskTypes)).filter((item)=>item.title.toLowerCase().includes(taskTypeFilter.toLowerCase())).map((taskType)=>
                   <tr key={taskType.id}
@@ -75,6 +75,9 @@ export default function TaskTypeList( props ) {
                     onClick={()=>history.push('/helpdesk/settings/taskTypes/'+taskType.id)}>
                     <td>
                       {taskType.title}
+                    </td>
+                    <td>
+                      {taskType.order}
                     </td>
                   </tr>
                 )}
