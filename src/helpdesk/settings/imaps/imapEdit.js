@@ -12,17 +12,16 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader
 } from 'reactstrap';
 import Loading from 'components/loading';
 import Checkbox from '../../../components/checkbox';
 import {
-  toSelArr
+  toSelArr,
+  filterUnique
 } from 'helperFunctions';
-import Select from 'react-select';
+import Select, {
+  Creatable
+} from 'react-select';
 import {
   selectStyle
 } from "configs/components/select";
@@ -32,7 +31,17 @@ import {
   GET_IMAP,
   UPDATE_IMAP,
   DELETE_IMAP,
+  TEST_IMAP,
 } from './querries';
+import {
+  GET_ROLES,
+} from '../roles/querries';
+import {
+  GET_COMPANIES,
+} from '../companies/querries';
+import {
+  GET_PROJECTS,
+} from '../projects/querries';
 
 
 
@@ -51,6 +60,19 @@ export default function IMAPEdit( props ) {
       id: parseInt( match.params.id )
     }
   } );
+  const {
+    data: roleData,
+    loading: rolesLoading
+  } = useQuery( GET_ROLES );
+  const {
+    data: companyData,
+    loading: companiesLoading
+  } = useQuery( GET_COMPANIES );
+  const {
+    data: projectData,
+    loading: projectsLoading
+  } = useQuery( GET_PROJECTS );
+  const [ testImap ] = useMutation( TEST_IMAP );
   const [ updateImap ] = useMutation( UPDATE_IMAP );
   const [ deleteImap, {
     client
@@ -71,18 +93,24 @@ export default function IMAPEdit( props ) {
   const [ username, setUsername ] = React.useState( "" );
   const [ password, setPassword ] = React.useState( "" );
   const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState( false );
-  const [ tsl, setTsl ] = React.useState( true );
+  const [ tls, setTls ] = React.useState( true );
+  const [ active, setActive ] = React.useState( true );
+  const [ destination, setDestination ] = React.useState( '' );
+  const [ ignoredRecievers, setIgnoredRecievers ] = React.useState( [] );
+  const [ previousIgnoredRecievers, setPreviousIgnoredRecievers ] = React.useState( [] );
+  const [ ignoredRecieversDestination, setIgnoredRecieversDestination ] = React.useState( '' );
+  const [ role, setRole ] = React.useState( null );
+  const [ company, setCompany ] = React.useState( null );
+  const [ project, setProject ] = React.useState( null );
+  const [ tested, setTested ] = React.useState( false );
 
   const [ showPass, setShowPass ] = React.useState( false );
 
   const [ saving, setSaving ] = React.useState( false );
-  const [ newIMAP, setNewIMAP ] = React.useState( null );
-  const [ choosingNewIMAP, setChoosingNewIMAP ] = React.useState( false );
-  const [ newDefIMAP, setNewDefIMAP ] = React.useState( null );
 
   // sync
   React.useEffect( () => {
-    if ( !loading ) {
+    if ( !loading && !rolesLoading && !companiesLoading && !projectsLoading ) {
       setTitle( data.imap.title );
       setOrder( data.imap.order );
       setDef( data.imap.def );
@@ -91,9 +119,29 @@ export default function IMAPEdit( props ) {
       setUsername( data.imap.username );
       setPassword( data.imap.password );
       setRejectUnauthorized( data.imap.rejectUnauthorized );
-      setTsl( data.imap.tsl );
+      setTls( data.imap.tls );
+      setActive( data.imap.active );
+      setDestination( data.imap.destination );
+      setIgnoredRecievers( data.imap.ignoredRecievers.split( ' ' )
+        .map( ( item ) => ( {
+          label: item,
+          value: item
+        } ) ) );
+      setPreviousIgnoredRecievers( data.imap.ignoredRecievers.split( ' ' )
+        .map( ( item ) => ( {
+          label: item,
+          value: item
+        } ) ) );
+      setIgnoredRecieversDestination( data.imap.ignoredRecieversDestination );
+      setRole( toSelArr( roleData.roles )
+        .find( ( role ) => role.id === data.imap.role.id ) );
+      setCompany( toSelArr( companyData.companies )
+        .find( ( company ) => company.id === data.imap.company.id ) );
+      setProject( toSelArr( projectData.projects )
+        .find( ( project ) => project.id === data.imap.project.id ) );
+      setTested( false );
     }
-  }, [ loading ] );
+  }, [ loading, rolesLoading, companiesLoading, projectsLoading ] );
 
   React.useEffect( () => {
     refetch( {
@@ -109,6 +157,7 @@ export default function IMAPEdit( props ) {
     updateImap( {
         variables: {
           id: parseInt( match.params.id ),
+          active,
           title,
           order: ( order !== '' ? parseInt( order ) : 0 ),
           def,
@@ -117,7 +166,14 @@ export default function IMAPEdit( props ) {
           username,
           password,
           rejectUnauthorized,
-          tsl,
+          tls,
+          destination,
+          ignoredRecievers: ignoredRecievers.map( ( item ) => item.label )
+            .join( ' ' ),
+          ignoredRecieversDestination,
+          projectId: project.id,
+          roleId: role.id,
+          companyId: company.id,
         }
       } )
       .then( ( response ) => {
@@ -160,38 +216,20 @@ export default function IMAPEdit( props ) {
   };
 
   const deleteIMAPFunc = () => {
-    setChoosingNewIMAP( false );
-
     if ( window.confirm( "Are you sure?" ) ) {
       deleteImap( {
           variables: {
             id: parseInt( match.params.id ),
-            newDefId: ( newDefIMAP ? parseInt( newDefIMAP.id ) : null ),
-            newId: ( newIMAP ? parseInt( newIMAP.id ) : null ),
           }
         } )
         .then( ( response ) => {
-          if ( def ) {
-            client.writeQuery( {
-              query: GET_IMAPS,
-              data: {
-                imaps: filteredIMAPs.map( imap => {
-                  return {
-                    ...imap,
-                    def: ( imap.id === parseInt( newDefIMAP.id ) )
-                  }
-                } )
-              }
-            } );
-          } else {
-            client.writeQuery( {
-              query: GET_IMAPS,
-              data: {
-                imaps: filteredIMAPs
-              }
-            } );
-          }
-          history.push( '/helpdesk/settings/imaps/add' );
+          client.writeQuery( {
+            query: GET_IMAPS,
+            data: {
+              imaps: filteredIMAPs
+            }
+          } );
+          history.goBack();
         } )
         .catch( ( err ) => {
           console.log( err.message );
@@ -200,9 +238,40 @@ export default function IMAPEdit( props ) {
     }
   };
 
-  const cannotSave = saving || title === '' || host === '' || port === '' || username === '';
+  const startTest = () => {
+    let newImaps = [ ...allIMAPs ];
+    let imapIndex = newImaps.findIndex( ( imap ) => imap.id === parseInt( match.params.id ) );
+    newImaps[ imapIndex ].currentlyTested = true;
+    client.writeQuery( {
+      query: GET_IMAPS,
+      data: {
+        imaps: newImaps
+      }
+    } );
+    setTested( true );
+    testImap( {
+      variables: {
+        id: parseInt( match.params.id )
+      }
+    } );
+  }
 
-  if ( loading ) {
+  const dataLoaded = !loading && !rolesLoading && !companiesLoading && !projectsLoading;
+  const cannotSave = (
+    saving ||
+    title === '' ||
+    host === '' ||
+    port === '' ||
+    username === '' ||
+    role === null ||
+    company === null ||
+    project === null ||
+    ignoredRecieversDestination === "" ||
+    destination === "" ||
+    !dataLoaded
+  );
+
+  if ( !dataLoaded ) {
     return <Loading />
   }
 
@@ -214,6 +283,12 @@ export default function IMAPEdit( props ) {
           value = { def }
           onChange={ () => setDef(!def) }
           label = "Default"
+          />
+        <Checkbox
+          className = "m-b-5 p-l-0"
+          value = { active }
+          onChange={ () => setActive(!active) }
+          label = "Active"
           />
 
         <FormGroup>
@@ -246,58 +321,71 @@ export default function IMAPEdit( props ) {
 
         <Checkbox
           className = "m-b-5 p-l-0"
-          value = { tsl }
-          onChange={ () => setTsl(!tsl) }
+          value = { tls }
+          onChange={ () => setTls(!tls) }
           label = "TLS"
           />
+          <FormGroup>
+            <Label for="destination">Destination</Label>
+            <Input type="text" name="destination" id="destination" placeholder="Enter destination" value={destination} onChange={ (e) => setDestination(e.target.value) } />
+          </FormGroup>
 
+          <FormGroup>
+            <Label for="ignoredRecievers">Ignored recievers</Label>
+            <Creatable
+              isMulti
+              value={ignoredRecievers}
+              onChange={(ignoredRecievers) => {
+                setIgnoredRecievers(ignoredRecievers);
+                setPreviousIgnoredRecievers(filterUnique([...ignoredRecievers, ...previousIgnoredRecievers]));
+              }}
+              options={previousIgnoredRecievers}
+              styles={selectStyle}
+              />
+          </FormGroup>
+
+          <FormGroup>
+            <Label for="ignoredDestination">Ignored recievers destination</Label>
+            <Input type="text" name="ignoredDestination" id="ignoredDestination" placeholder="Enter ignored e-mails destination" value={ignoredRecieversDestination} onChange={ (e) => setIgnoredRecieversDestination(e.target.value) } />
+          </FormGroup>
         <Checkbox
           className = "m-b-5 p-l-0"
           value = { rejectUnauthorized }
           onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
           label = "Reject unauthorized"
           />
-
-        <Modal isOpen={choosingNewIMAP}>
-          <ModalHeader>
-            Please choose an IMAP to replace this one
-          </ModalHeader>
-          <ModalBody>
-            <FormGroup>
-              { def && <Label>A replacement IMAP</Label> }
-              <Select
-                styles={selectStyle}
-                options={filteredIMAPs}
-                value={newIMAP}
-                onChange={s => setNewIMAP(s)}
-                />
-            </FormGroup>
-
-            {def &&
-              <FormGroup>
-                <Label>New default IMAP</Label>
-                <Select
-                  styles={selectStyle}
-                  options={filteredIMAPs}
-                  value={newDefIMAP}
-                  onChange={s => setNewDefIMAP(s)}
-                  />
-              </FormGroup>
-            }
-          </ModalBody>
-          <ModalFooter>
-            <Button className="btn-link mr-auto"onClick={() => setChoosingNewIMAP(false)}>
-              Cancel
-            </Button>
-            <Button className="btn ml-auto" disabled={!newIMAP || (def ? !newDefIMAP : false)} onClick={deleteIMAPFunc}>
-              Complete deletion
-            </Button>
-          </ModalFooter>
-        </Modal>
+          <FormGroup>
+            <Label for="role">Users Role</Label>
+            <Select
+              styles={selectStyle}
+              options={toSelArr(roleData.roles)}
+              value={role}
+              onChange={role => setRole(role)}
+              />
+          </FormGroup>
+          <FormGroup>
+            <Label for="project">Users Company</Label>
+            <Select
+              styles={selectStyle}
+              options={toSelArr(companyData.companies)}
+              value={company}
+              onChange={company => setCompany(company)}
+              />
+          </FormGroup>
+          <FormGroup>
+            <Label for="project">Tasks Project</Label>
+            <Select
+              styles={selectStyle}
+              options={toSelArr(projectData.projects)}
+              value={project}
+              onChange={project => setProject(project)}
+              />
+          </FormGroup>
 
         <div className="row">
             <Button className="btn" disabled={cannotSave} onClick={updateIMAPFunc}>{ saving ? 'Saving IMAP...' : 'Save IMAP' }</Button>
-            <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewIMAP(true) }>Delete</Button>
+            <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={ deleteIMAPFunc }>Delete</Button>
+            <Button className="btn ml-auto" disabled={saving || tested} onClick={ startTest }>Test IMAP</Button>
         </div>
       </div>
   );

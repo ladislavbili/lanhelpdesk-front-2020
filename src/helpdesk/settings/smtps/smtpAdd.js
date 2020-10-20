@@ -13,6 +13,12 @@ import {
   InputGroupText
 } from 'reactstrap';
 import Checkbox from '../../../components/checkbox';
+import Select from 'react-select';
+import {
+  selectStyle
+} from "configs/components/select";
+
+import wellKnownOptions from 'configs/constants/wellKnown';
 
 import {
   GET_SMTPS,
@@ -43,9 +49,9 @@ export default function SMTPAdd( props ) {
   const [ secure, setSecure ] = React.useState( true );
 
   const [ showPass, setShowPass ] = React.useState( false );
-  //TODO add well known
   const [ saving, setSaving ] = React.useState( false );
-
+  const [ wellKnown, setWellKnown ] = React.useState( wellKnownOptions[ 0 ] );
+  const wellKnownBlock = wellKnown.id !== null;
   //functions
   const addSMTPFunc = () => {
     setSaving( true );
@@ -60,6 +66,7 @@ export default function SMTPAdd( props ) {
           password,
           rejectUnauthorized,
           secure,
+          wellKnown: wellKnown.value
         }
       } )
       .then( ( response ) => {
@@ -85,7 +92,10 @@ export default function SMTPAdd( props ) {
     setSaving( false );
   }
 
-  const cannotSave = saving || title === '' || host === '' || port === '' || username === '';
+  const cannotSave = (
+    ( wellKnownBlock && ( saving || password === '' || username === '' ) ) ||
+    ( !wellKnownBlock && ( !wellKnownBlock && saving || title === '' || host === '' || port === '' || password === '' || username === '' ) )
+  )
 
   return (
     <div className="p-20 scroll-visible fit-with-header-and-commandbar">
@@ -99,6 +109,15 @@ export default function SMTPAdd( props ) {
       <FormGroup>
         <Label for="name">Title</Label>
         <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
+      </FormGroup>
+      <FormGroup>
+        <Label>Well known providers - requires only user and password</Label>
+        <Select
+          styles={selectStyle}
+          options={wellKnownOptions}
+          value={wellKnown}
+          onChange={wellKnown => setWellKnown(wellKnown)}
+          />
       </FormGroup>
       <FormGroup>
         <Label for="name">Host</Label>

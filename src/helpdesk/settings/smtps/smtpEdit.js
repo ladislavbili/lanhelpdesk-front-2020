@@ -28,6 +28,8 @@ import {
   selectStyle
 } from "configs/components/select";
 
+import wellKnownOptions from 'configs/constants/wellKnown';
+
 import {
   GET_SMTPS,
   GET_SMTP,
@@ -83,6 +85,8 @@ export default function SMTPEdit( props ) {
   const [ newSMTP, setNewSMTP ] = React.useState( null );
   const [ choosingNewSMTP, setChoosingNewSMTP ] = React.useState( false );
   const [ newDefSMTP, setNewDefSMTP ] = React.useState( null );
+  const [ wellKnown, setWellKnown ] = React.useState( wellKnownOptions[ 0 ] );
+  const wellKnownBlock = wellKnown.id !== null;
 
   // sync
   React.useEffect( () => {
@@ -96,6 +100,8 @@ export default function SMTPEdit( props ) {
       setPassword( data.smtp.password );
       setRejectUnauthorized( data.smtp.rejectUnauthorized );
       setSecure( data.smtp.secure );
+      setWellKnown( wellKnownOptions.find( ( option ) => option.id === data.smtp.wellKnown ) );
+      setTested( false );
     }
   }, [ loading ] );
 
@@ -122,6 +128,7 @@ export default function SMTPEdit( props ) {
           password,
           rejectUnauthorized,
           secure,
+          wellKnown: wellKnown.value
         }
       } )
       .then( ( response ) => {
@@ -220,7 +227,12 @@ export default function SMTPEdit( props ) {
     }
   };
 
-  const cannotSave = saving || title === '' || host === '' || port === '' || username === '';
+
+  const cannotSave = (
+    ( wellKnownBlock && ( saving || password === '' || username === '' ) ) ||
+    ( !wellKnownBlock && ( saving || title === '' || host === '' || port === '' || password === '' || username === '' ) )
+  )
+
 
   if ( loading ) {
     return <Loading />
@@ -238,6 +250,16 @@ export default function SMTPEdit( props ) {
       <FormGroup>
         <Label for="name">Title</Label>
         <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
+      </FormGroup>
+
+      <FormGroup>
+        <Label>Well known providers - requires only user and password</Label>
+        <Select
+          styles={selectStyle}
+          options={wellKnownOptions}
+          value={wellKnown}
+          onChange={wellKnown => setWellKnown(wellKnown)}
+          />
       </FormGroup>
 
       <FormGroup>
@@ -321,7 +343,6 @@ export default function SMTPEdit( props ) {
       <div className="row">
         <Button className="btn" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</Button>
         <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</Button>
-        {console.log(data)}
         <ErrorMessage show={ !loading && !data.smtp.currentlyTested && !data.smtp.working  } message={data.smtp.errorMessage} />
         <Button className="btn ml-auto" disabled={saving || tested} onClick={ startTest }>Test SMTP</Button>
       </div>

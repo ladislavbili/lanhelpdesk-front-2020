@@ -9,7 +9,6 @@ import {
   Input
 } from 'reactstrap';
 import Select from 'react-select';
-
 import {
   toSelArr,
   toSelItem,

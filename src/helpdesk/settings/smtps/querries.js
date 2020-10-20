@@ -17,7 +17,7 @@ query {
 `;
 
 export const ADD_SMTP = gql `
-mutation addSmtp($title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $secure: Boolean!) {
+mutation addSmtp($title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $secure: Boolean!, $wellKnown: WellKnownEnum) {
   addSmtp(
     title: $title,
     order: $order,
@@ -28,6 +28,7 @@ mutation addSmtp($title: String!, $order: Int!, $def: Boolean!, $host: String!, 
     password: $password,
     rejectUnauthorized: $rejectUnauthorized,
     secure: $secure,
+    wellKnown: $wellKnown
   ){
     id
     title
@@ -36,6 +37,13 @@ mutation addSmtp($title: String!, $order: Int!, $def: Boolean!, $host: String!, 
     host
     port
     username
+    password
+    rejectUnauthorized
+    secure
+    working
+    currentlyTested
+    errorMessage
+    wellKnown
   }
 }
 `;
@@ -58,12 +66,13 @@ query smtp($id: Int!) {
     working
     currentlyTested
     errorMessage
+    wellKnown
   }
 }
 `;
 
 export const UPDATE_SMTP = gql `
-mutation updateSmtp($id: Int!, $title: String, $order: Int, $def: Boolean, $host: String, $port: Int, $username: String, $password: String, $rejectUnauthorized: Boolean, $secure: Boolean) {
+mutation updateSmtp($id: Int!, $title: String, $order: Int, $def: Boolean, $host: String, $port: Int, $username: String, $password: String, $rejectUnauthorized: Boolean, $secure: Boolean, $wellKnown: WellKnownEnum) {
   updateSmtp(
     id: $id,
     title: $title,
@@ -75,6 +84,7 @@ mutation updateSmtp($id: Int!, $title: String, $order: Int, $def: Boolean, $host
     password: $password,
     rejectUnauthorized: $rejectUnauthorized,
     secure: $secure,
+    wellKnown: $wellKnown
   ){
     id
     title
@@ -83,6 +93,13 @@ mutation updateSmtp($id: Int!, $title: String, $order: Int, $def: Boolean, $host
     host
     port
     username
+    password
+    rejectUnauthorized
+    secure
+    working
+    currentlyTested
+    errorMessage
+    wellKnown
   }
 }
 `;

@@ -12,13 +12,15 @@ query {
     username
     currentlyTested
     working
+    active
   }
 }
 `;
 
 export const ADD_IMAP = gql `
-mutation addImap($title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $tls: Boolean!) {
+mutation addImap($active: Boolean!, $title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $tls: Boolean!, $destination: String!, $ignoredRecievers: String!, $ignoredRecieversDestination: String!, $projectId: Int!, $roleId: Int!, $companyId: Int!) {
   addImap(
+    active: $active,
     title: $title,
     order: $order,
     def: $def,
@@ -28,14 +30,23 @@ mutation addImap($title: String!, $order: Int!, $def: Boolean!, $host: String!, 
     password: $password,
     rejectUnauthorized: $rejectUnauthorized,
     tls: $tls,
+    destination: $destination,
+    ignoredRecievers: $ignoredRecievers,
+    ignoredRecieversDestination: $ignoredRecieversDestination,
+    projectId: $projectId,
+    roleId: $roleId,
+    companyId: $companyId,
   ){
     id
     title
     order
-    def
     host
     port
+    def
     username
+    currentlyTested
+    working
+    active
   }
 }
 `;
@@ -46,6 +57,7 @@ query imap($id: Int!) {
     id: $id
   ) {
     id
+    active
     title
     order
     def
@@ -55,14 +67,27 @@ query imap($id: Int!) {
     password
     rejectUnauthorized
     tls
+    destination
+    ignoredRecievers
+    ignoredRecieversDestination
+    project{
+      id
+    }
+    role{
+      id
+    }
+    company{
+      id
+    }
   }
 }
 `;
 
 export const UPDATE_IMAP = gql `
-mutation updateImap($id: Int!, $title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $tls: Boolean!) {
+mutation updateImap($id: Int!, $active: Boolean!, $title: String!, $order: Int!, $def: Boolean!, $host: String!, $port: Int!, $username: String!, $password: String!, $rejectUnauthorized: Boolean!, $tls: Boolean!, $destination: String!, $ignoredRecievers: String!, $ignoredRecieversDestination: String!, $projectId: Int!, $roleId: Int!, $companyId: Int!) {
   updateImap(
     id: $id,
+    active: $active,
     title: $title,
     order: $order,
     def: $def,
@@ -72,24 +97,31 @@ mutation updateImap($id: Int!, $title: String!, $order: Int!, $def: Boolean!, $h
     password: $password,
     rejectUnauthorized: $rejectUnauthorized,
     tls: $tls,
+    destination: $destination,
+    ignoredRecievers: $ignoredRecievers,
+    ignoredRecieversDestination: $ignoredRecieversDestination,
+    projectId: $projectId,
+    roleId: $roleId,
+    companyId: $companyId,
   ){
     id
     title
     order
-    def
     host
     port
+    def
     username
+    currentlyTested
+    working
+    active
   }
 }
 `;
 
 export const DELETE_IMAP = gql `
-mutation deleteImap($id: Int!, $newDefId: Int!, $newId: Int!) {
+mutation deleteImap($id: Int!) {
   deleteImap(
-    id: $id,
-    newDefId: $newDefId,
-    newId: $newId,
+    id: $id
   ){
     id
   }

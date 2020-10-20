@@ -3,6 +3,7 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
+import Loading from 'components/loading';
 
 import {
   Button,
@@ -13,7 +14,17 @@ import {
   InputGroupAddon,
   InputGroupText
 } from 'reactstrap';
-import Checkbox from '../../../components/checkbox';
+import {
+  toSelArr,
+  filterUnique
+} from 'helperFunctions';
+import Checkbox from 'components/checkbox';
+import Select, {
+  Creatable
+} from 'react-select';
+import {
+  selectStyle
+} from "configs/components/select";
 
 import {
   GET_IMAPS,
@@ -35,22 +46,23 @@ import {
 export default function IMAPAdd( props ) {
   //data
   const {
-    match
+    match,
+    history
   } = props;
   const [ addImap, {
     client
   } ] = useMutation( ADD_IMAP );
   const {
-    roleData,
-    rolesLoading
+    data: roleData,
+    loading: rolesLoading
   } = useQuery( GET_ROLES );
   const {
-    companyData,
-    companiesLoading
+    data: companyData,
+    loading: companiesLoading
   } = useQuery( GET_COMPANIES );
   const {
-    projectData,
-    projectsLoading
+    data: projectData,
+    loading: projectsLoading
   } = useQuery( GET_PROJECTS );
 
   //state
@@ -63,8 +75,10 @@ export default function IMAPAdd( props ) {
   const [ password, setPassword ] = React.useState( "" );
   const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState( false );
   const [ tls, setTls ] = React.useState( true );
+  const [ active, setActive ] = React.useState( true );
   const [ destination, setDestination ] = React.useState( '' );
   const [ ignoredRecievers, setIgnoredRecievers ] = React.useState( [] );
+  const [ previousIgnoredRecievers, setPreviousIgnoredRecievers ] = React.useState( [] );
   const [ ignoredRecieversDestination, setIgnoredRecieversDestination ] = React.useState( '' );
   const [ role, setRole ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
@@ -79,6 +93,7 @@ export default function IMAPAdd( props ) {
     setSaving( true );
     addImap( {
         variables: {
+          active,
           title,
           order: ( order !== '' ? parseInt( order ) : 0 ),
           def,
@@ -88,6 +103,13 @@ export default function IMAPAdd( props ) {
           password,
           rejectUnauthorized,
           tls,
+          destination,
+          ignoredRecievers: ignoredRecievers.map( ( item ) => item.label )
+            .join( ' ' ),
+          ignoredRecieversDestination,
+          projectId: project.id,
+          roleId: role.id,
+          companyId: company.id,
         }
       } )
       .then( ( response ) => {
@@ -105,7 +127,7 @@ export default function IMAPAdd( props ) {
             imaps: [ ...allIMAPs.filter( IMAP => IMAP.id !== parseInt( match.params.id ) ), newIMAP ]
           }
         } );
-        //    history.push('/helpdesk/settings/imaps/' + newIMAP.id)
+        history.push( '/helpdesk/settings/imaps/' + newIMAP.id )
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -113,7 +135,8 @@ export default function IMAPAdd( props ) {
     setSaving( false );
   }
 
-  const dataLoaded = rolesLoading && companiesLoading && projectsLoading;
+  const dataLoaded = !rolesLoading && !companiesLoading && !projectsLoading;
+
   const cannotSave = (
     saving ||
     title === '' ||
@@ -123,62 +146,124 @@ export default function IMAPAdd( props ) {
     role === null ||
     company === null ||
     project === null ||
-    dataLoaded
+    ignoredRecieversDestination === "" ||
+    destination === "" ||
+    !dataLoaded
   );
-
+  if ( !dataLoaded ) {
+    return <Loading />
+  }
 
   return (
     <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-        <Checkbox
-          className = "m-b-5 p-l-0"
-          value = { def }
-          onChange={ () => setDef(!def) }
-          label = "Default"
+      <Checkbox
+        className = "m-b-5 p-l-0"
+        value = { def }
+        onChange={ () => setDef(!def) }
+        label = "Default"
+        />
+      <Checkbox
+        className = "m-b-5 p-l-0"
+        value = { active }
+        onChange={ () => setActive(!active) }
+        label = "Active"
+        />
+
+      <FormGroup>
+        <Label for="name">Title</Label>
+        <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
+      </FormGroup>
+      <FormGroup>
+        <Label for="name">Host</Label>
+        <Input type="text" name="name" id="host" placeholder="Enter host" value={host} onChange={ (e) => setHost(e.target.value) }/>
+      </FormGroup>
+      <FormGroup>
+        <Label for="name">Port</Label>
+        <Input type="number" name="name" id="port" placeholder="Enter port"  value={port} onChange={ (e) => setPort(e.target.value) } />
+      </FormGroup>
+      <FormGroup>
+        <Label for="name">Username</Label>
+        <Input type="text" name="name" id="user" placeholder="Enter user" value={username} onChange={ (e) => setUsername(e.target.value) } />
+      </FormGroup>
+      <FormGroup>
+        <Label>Password</Label>
+        <InputGroup>
+          <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={password} onChange={ (e) => setPassword(e.target.value) } />
+          <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
+            <InputGroupText>
+              <i className={"mt-auto mb-auto "+ (!showPass ?'fa fa-eye':'fa fa-eye-slash')}/>
+            </InputGroupText>
+          </InputGroupAddon>
+        </InputGroup>
+      </FormGroup>
+
+      <Checkbox
+        className = "m-b-5 p-l-0"
+        value = { tls }
+        onChange={ () => setTls(!tls) }
+        label = "TLS"
+        />
+      <FormGroup>
+        <Label for="destination">Destination</Label>
+        <Input type="text" name="destination" id="destination" placeholder="Enter destination" value={destination} onChange={ (e) => setDestination(e.target.value) } />
+      </FormGroup>
+
+      <FormGroup>
+        <Label for="ignoredRecievers">Ignored recievers</Label>
+        <Creatable
+          isMulti
+          value={ignoredRecievers}
+          onChange={(ignoredRecievers) => {
+            setIgnoredRecievers(ignoredRecievers);
+            setPreviousIgnoredRecievers(filterUnique([...ignoredRecievers, ...previousIgnoredRecievers]));
+          }}
+          options={previousIgnoredRecievers}
+          styles={selectStyle}
           />
+      </FormGroup>
 
-        <FormGroup>
-          <Label for="name">Title</Label>
-          <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
-        </FormGroup>
-        <FormGroup>
-          <Label for="name">Host</Label>
-          <Input type="text" name="name" id="host" placeholder="Enter host" value={host} onChange={ (e) => setHost(e.target.value) }/>
-        </FormGroup>
-        <FormGroup>
-          <Label for="name">Port</Label>
-          <Input type="number" name="name" id="port" placeholder="Enter port"  value={port} onChange={ (e) => setPort(e.target.value) } />
-        </FormGroup>
-        <FormGroup>
-          <Label for="name">Username</Label>
-          <Input type="text" name="name" id="user" placeholder="Enter user" value={username} onChange={ (e) => setUsername(e.target.value) } />
-        </FormGroup>
-        <FormGroup>
-          <Label>Password</Label>
-          <InputGroup>
-            <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={password} onChange={ (e) => setPassword(e.target.value) } />
-            <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
-              <InputGroupText>
-                <i className={"mt-auto mb-auto "+ (!showPass ?'fa fa-eye':'fa fa-eye-slash')}/>
-              </InputGroupText>
-            </InputGroupAddon>
-          </InputGroup>
-        </FormGroup>
+      <FormGroup>
+        <Label for="ignoredDestination">Ignored recievers destination</Label>
+        <Input type="text" name="ignoredDestination" id="ignoredDestination" placeholder="Enter ignored e-mails destination" value={ignoredRecieversDestination} onChange={ (e) => setIgnoredRecieversDestination(e.target.value) } />
+      </FormGroup>
 
-        <Checkbox
-          className = "m-b-5 p-l-0"
-          value = { tls }
-          onChange={ () => setTls(!tls) }
-          label = "TLS"
+
+      <Checkbox
+        className = "m-b-5 p-l-0"
+        value = { rejectUnauthorized }
+        onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
+        label = "Reject unauthorized"
+        />
+
+      <FormGroup>
+        <Label for="role">Users Role</Label>
+        <Select
+          styles={selectStyle}
+          options={toSelArr(roleData.roles)}
+          value={role}
+          onChange={role => setRole(role)}
           />
-
-        <Checkbox
-          className = "m-b-5 p-l-0"
-          value = { rejectUnauthorized }
-          onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
-          label = "Reject unauthorized"
+      </FormGroup>
+      <FormGroup>
+        <Label for="project">Users Company</Label>
+        <Select
+          styles={selectStyle}
+          options={toSelArr(companyData.companies)}
+          value={company}
+          onChange={company => setCompany(company)}
           />
+      </FormGroup>
+      <FormGroup>
+        <Label for="project">Tasks Project</Label>
+        <Select
+          styles={selectStyle}
+          options={toSelArr(projectData.projects)}
+          value={project}
+          onChange={project => setProject(project)}
+          />
+      </FormGroup>
 
-        <Button className="btn" disabled={cannotSave} onClick={addIMAPFunc}>{saving?'Adding...':'Add Imap'}</Button>
-      </div>
+      <Button className="btn" disabled={cannotSave} onClick={addIMAPFunc}>{saving?'Adding...':'Add Imap'}</Button>
+    </div>
   );
 }

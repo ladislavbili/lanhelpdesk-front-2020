@@ -13,7 +13,8 @@ from './dataChecks';
 export {
   orderArr,
   sortBy,
-  arraySelectToString
+  arraySelectToString,
+  filterUnique
 }
 from './arrayManipulations';
 
