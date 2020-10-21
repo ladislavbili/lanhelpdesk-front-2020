@@ -69,8 +69,9 @@ export default function  MothlyReportsCompany (props) {
 		});
 	}
 
-	//const [ pickedTasks, setPickedTasks ] = React.useState( [] );
-	//const [ showCompany, setShowCompany ] = React.useState( null );
+	const [ pickedTasks, setPickedTasks ] = React.useState( [] );
+	const [ allTasks, setAllTasks ] = React.useState( [] );
+	const [ showCompany, setShowCompany ] = React.useState( null );
 
 	React.useEffect( () => {
 		if ( !statusesLoading ) {
@@ -91,14 +92,10 @@ export default function  MothlyReportsCompany (props) {
 			onTrigger();
 		}
 	}, [ chosenStatuses ] );
-/*
-	React.useEffect( () => {
-		if (localCache) {
-			if ( localCache.reportsChosenStatuses.length > 0){
-				onTrigger();
-			}
-		}
-	}, [ localCache ] );*/
+
+	const invoiceTasks = () => {
+
+	}
 
 	const loading = statusesLoading || invoiceCompaniesLoading;
 
@@ -168,40 +165,60 @@ export default function  MothlyReportsCompany (props) {
 				</div>
 			</div>
 
-			<div className="p-20">
-				{
-					loading &&
-					<Loading />
-				}
-				{
-					!loading &&
-					<table className="table m-b-10">
-						<thead>
-							<tr>
-								<th>Company name</th>
-								<th>Work hours</th>
-								<th>Materials</th>
-								<th>Vlastné položky</th>
-								<th>Trips</th>
-								<th>Rented items</th>
-							</tr>
-						</thead>
-							<tbody>
-								{
-									INVOICE_COMPANIES.map((inv)=>
-									<tr key={inv.company.id} className="clickable" onClick={()=>{}}>
-									<td>{inv.company.title}</td>
-									<td>{inv.subtasksHours}</td>
-									<td>{inv.materialsQuantity}</td>
-									<td>{inv.customItemsQuantity}</td>
-									<td>{inv.tripsHours}</td>
-									<td>{inv.rentedItemsQuantity}</td>
-									</tr>)
-									}
-							</tbody>
-					</table>
-				}
-			</div>
+			{
+				loading &&
+				<Loading />
+			}
+			{
+				!loading &&
+				<div className="p-20">
+						<table className="table m-b-10">
+							<thead>
+								<tr>
+									<th>Company name</th>
+									<th>Work hours</th>
+									<th>Materials</th>
+									<th>Vlastné položky</th>
+									<th>Trips</th>
+									<th>Rented items</th>
+								</tr>
+							</thead>
+								<tbody>
+									{
+										INVOICE_COMPANIES.map((inv)=>
+										<tr
+											key={inv.company.id}
+											className="clickable"
+											onClick={()=> setShowCompany(inv.company)}>
+										<td>{inv.company.title}</td>
+										<td>{inv.subtasksHours}</td>
+										<td>{inv.materialsQuantity}</td>
+										<td>{inv.customItemsQuantity}</td>
+										<td>{inv.tripsHours}</td>
+										<td>{inv.rentedItemsQuantity}</td>
+										</tr>)
+										}
+								</tbody>
+						</table>
+						{
+							showCompany !== null &&
+							<div className="commandbar">
+								<Button
+									className="btn-primary center-hor"
+									onClick={()=>{}}
+									>
+									{pickedTasks.length === allTasks.filter((task) => showCompany && task.company.id === showCompany.id && statusIDs.includes(task.status.id)).length ? "Odznačiť všetky" : "Označiť všetky"}
+								</Button>
+								<Button
+									className="btn-danger m-l-5 center-hor"
+									onClick={invoiceTasks}
+									>
+									Faktúrovať
+								</Button>
+							</div>
+						}
+				</div>
+			}
 		</div>
 	);
 }
