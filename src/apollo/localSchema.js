@@ -2,6 +2,11 @@ import {
   gql
 } from "@apollo/client";
 
+import {
+  showDataFilterType,
+  milestoneType
+} from './types';
+
 export const typeDefs = gql `
   extend type Query {
     isLoggedIn: Boolean!
@@ -13,29 +18,17 @@ export const typeDefs = gql `
     showDataFilter: ShowDataFilter
     orderBy: String
     ascending: Boolean
+
+    reportsFromDate: Int
+    reportsToDate: Int
+    reportsMonth: Int
+    reportsYear: Int
+    reportsChosenStatuses: [Int]
   }
 
-  type ShowDataFilter {
-    name: String
-    checked: Boolean
-    important: Boolean
-    id: String
-    title: String
-    status: String
-    requester: String
-    company: String
-    assignedTo: String
-    createdAt: String
-    deadline: String
-  }
+  ${showDataFilterType}
 
-  type Milestone {
-    id: Int
-    title: String
-    value: Int
-    label: String
-    __typename: String
-  }
+  ${milestoneType}
 
   extend type Launch {
     isInCart: Boolean!

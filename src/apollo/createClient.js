@@ -27,6 +27,7 @@ import {
   afterNow
 } from '../helperFunctions';
 import axios from 'axios';
+import moment from 'moment';
 
 
 import {
@@ -63,7 +64,12 @@ export function writeCleanCashe() {
         assignedTo: "",
         createdAt: "",
         deadline: "",
-      }
+      },
+      reportsFromDate: moment().startOf('month').valueOf(),
+      reportsToDate: moment().endOf('month').valueOf(),
+      reportsMonth: moment().month().valueOf(),
+      reportsYear: moment().year().valueOf(),
+      reportsChosenStatuses: [],
     }
   } );
 }

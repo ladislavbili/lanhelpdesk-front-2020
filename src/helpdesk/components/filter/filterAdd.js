@@ -208,7 +208,7 @@ export default function FilterAdd( props ) {
   } ] = useMutation( ADD_FILTER );
   const [ updateFilter ] = useMutation( UPDATE_FILTER );
   const roles = ( roleLoading ? [] : toSelArr( roleData.basicRoles ) );
-  const projects = ( projectLoading ? [] : toSelArr( projectData.projects ) );
+  const projects = ( projectLoading ? [] : toSelArr( projectData ? projectData.projects : [] ) );
 
   const [ title, setTitle ] = React.useState( "" );
   const [ pub, setPub ] = React.useState( false );

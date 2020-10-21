@@ -8,6 +8,8 @@ import {
 	Route
 } from 'react-router-dom';
 
+import Reroute from './rerouteReports';
+
 import Sidebar from './Sidebar';
 import ErrorMessages from 'components/errorMessages';
 import PageHeader from '../components/PageHeader';
@@ -47,7 +49,7 @@ export default function Navigation ( props )  {
 			<div className="row center center-ver h-100vh">
 				<Sidebar {...props} />
 				<div className="main">
-					<Route exact path="/reports" component={GeneralReports} />
+					<Route exact path="/reports" component={Reroute} />
 					<Route exact path="/reports/errorMessages" component={ErrorMessages} />
 					<Route exact path="/reports/i/:id" component={GeneralReports} />
 					<Route exact path="/reports/monthly/companies" component={CompanyMonthlyReport} />
