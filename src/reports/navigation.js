@@ -1,8 +1,14 @@
-import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
-import { connect } from "react-redux";
+import React from 'react';
 
-//import {testing} from '../helperFunctions';
+import {
+	useQuery
+} from "@apollo/react-hooks";
+
+import {
+	Route
+} from 'react-router-dom';
+
+import Reroute from './rerouteReports';
 
 import Sidebar from './Sidebar';
 import ErrorMessages from 'components/errorMessages';
@@ -12,76 +18,59 @@ import GeneralReports from './general';
 import CompanyMonthlyReport from './monthly/company';
 import AssignedMonthlyReport from './monthly/assigned';
 import CompanyInvoices from './invoices/company';
+import AccessDenied from 'components/accessDenied';
 
-import StatusList from './../helpdesk/settings/statuses';
-import ProjectList from './../helpdesk/settings/projects';
-import CompanyList from './../helpdesk/settings/companies';
-import UserList from './../helpdesk/settings/users';
-import PriceList from './../helpdesk/settings/prices';
-import TagList from './../helpdesk/settings/tags';
-import TaskTypeList from './../helpdesk/settings/taskTypes';
-import ImapList from './../helpdesk/settings/imaps';
-import SMTPList from './../helpdesk/settings/smtps';
+import settings from 'configs/constants/settings';
 
-class Navigation extends Component {
-	render() {
-		return (
-			<div>
-				<div className="page-header">
-					<div className="center-ver row center flex">
-						<SelectPage />
-						<PageHeader {...this.props}
-							settings={
-							[{title:'Projects',link:'projects'},
-							{title:'Statuses',link:'statuses'},
-							{title:'Companies',link:'companies'},
-							{title:'Users',link:'users'},
-							{title:'Prices',link:'pricelists'},
-							{title:'Tags',link:'tags'},
-							{title:'Task types',link:'taskTypes'},
-							{title:'Imaps',link:'imaps'},
-							{title:'SMTPs',link:'smtps'},
-						]} />
-					</div>
+import {
+	GET_MY_SETTINGS
+} from './querries';
+
+export default function Navigation ( props )  {
+	const {
+		data
+	} = useQuery( GET_MY_SETTINGS );
+
+	const currentUser = data ? data.getMyData : {};
+	const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights  : {};
+
+	return (
+		<div>
+			<div className="page-header">
+				<div className="center-ver row center flex">
+					<SelectPage />
+					<PageHeader
+						{...props}
+						settings={settings}
+						/>
 				</div>
+			</div>
 
-				<div className="row center center-ver h-100vh">
-						<Sidebar {...this.props} />
-					<div className="main">
-					<Route exact path="/reports" component={GeneralReports} />
+			<div className="row center center-ver h-100vh">
+				<Sidebar {...props} />
+				<div className="main">
+					<Route exact path="/reports" component={Reroute} />
 					<Route exact path="/reports/errorMessages" component={ErrorMessages} />
 					<Route exact path="/reports/i/:id" component={GeneralReports} />
 					<Route exact path="/reports/monthly/companies" component={CompanyMonthlyReport} />
 					<Route exact path="/reports/monthly/requester" component={AssignedMonthlyReport} />
 					<Route exact path="/reports/company_invoices" component={CompanyInvoices} />
 
-					<Route exact path='/reports/settings/statuses' component={StatusList} />
-	        <Route exact path='/reports/settings/statuses/:id' component={StatusList} />
-	        <Route exact path='/reports/settings/projects' component={ProjectList} />
-	        <Route exact path='/reports/settings/projects/:id' component={ProjectList} />
-	        <Route exact path='/reports/settings/companies' component={CompanyList} />
-	        <Route exact path='/reports/settings/companies/:id' component={CompanyList} />
-	        <Route exact path='/reports/settings/users' component={UserList} />
-	        <Route exact path='/reports/settings/users/:id' component={UserList} />
-	        <Route exact path='/reports/settings/pricelists' component={PriceList} />
-	        <Route exact path='/reports/settings/pricelists/:id' component={PriceList} />
-					<Route exact path='/reports/settings/tags' component={TagList} />
-					<Route exact path='/reports/settings/tags/:id' component={TagList} />
-					<Route exact path='/reports/settings/taskTypes' component={TaskTypeList} />
-	        <Route exact path='/reports/settings/taskTypes/:id' component={TaskTypeList} />
-					<Route exact path='/reports/settings/imaps' component={ImapList} />
-					<Route exact path='/reports/settings/imaps/:id' component={ImapList} />
-					<Route exact path='/reports/settings/smtps' component={SMTPList} />
-					<Route exact path='/reports/settings/smtps/:id' component={SMTPList} />
+					{ /* SETTINGS */ }
+					{ settings.map( (item) => {
+						if (accessRights[item.value]){
+							return (<Route exact key={item.link} path={`/reports/settings/${item.link}`} component={item.component} />);
+						}
+						return (<Route exact key={item.link} path={`/reports/settings/${item.link}`} component={AccessDenied} />);
+					})}
+					{ settings.map( (item) =>{
+						if (accessRights[item.value]){
+							return (<Route exact key={item.link} path={`/reports/settings/${item.link}/:id`} component={item.component} />);
+						}
+						return (<Route exact key={item.link} path={`/reports/settings/${item.link}/:id`} component={AccessDenied} />);
+					})}
 				</div>
 			</div>
 		</div>
 	);
 }
-}
-
-const mapStateToProps = ({ userReducer }) => {
-	return { currentUser:userReducer };
-};
-
-export default connect(mapStateToProps, { })(Navigation);
