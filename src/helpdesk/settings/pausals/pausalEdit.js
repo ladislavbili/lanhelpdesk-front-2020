@@ -3,7 +3,6 @@ import {
   useQuery,
   useMutation
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -27,97 +26,13 @@ import {
 import Loading from 'components/loading';
 
 import {
-  GET_PRICELISTS
-} from '../prices/index';
-import {
+  GET_PRICELISTS,
   ADD_PRICELIST
-} from '../prices/priceAdd';
-
-const GET_COMPANY = gql `
-query company($id: Int!) {
-  company (
-    id: $id
-  ) {
-      title
-      dph
-      ico
-      dic
-      ic_dph
-      country
-      city
-      street
-      zip
-      email
-      phone
-      description
-      pricelist {
-        id
-        title
-        order
-        afterHours
-        def
-        materialMargin
-        materialMarginExtra
-        prices {
-          id
-          type
-          price
-          taskType {
-            id
-            title
-          }
-          tripType {
-            id
-            title
-          }
-        }
-      }
-      monthly
-      monthlyPausal
-      taskWorkPausal
-      taskTripPausal
-      companyRents {
-        id
-        title
-        quantity
-        cost
-        price
-      }
-    }
-}
-`;
-
-const UPDATE_COMPANY = gql `
-mutation updateCompany($id: Int!, $title: String, $dph: Int, $ico: String, $dic: String, $ic_dph: String, $country: String, $city: String, $street: String, $zip: String, $email: String, $phone: String, $description: String, $pricelistId: Int!, $monthly: Boolean, $monthlyPausal: Float, $taskWorkPausal: Float, $taskTripPausal: Float, $rents: [CompanyRentUpdateInput]) {
-  updateCompany(
-    id: $id,
-    title: $title,
-    dph: $dph,
-    ico: $ico,
-    dic: $dic,
-    ic_dph: $ic_dph,
-    country: $country,
-    city: $city,
-    street: $street,
-    zip: $zip,
-    email: $email,
-    phone: $phone,
-    description: $description,
-    pricelistId: $pricelistId,
-    monthly: $monthly,
-    monthlyPausal: $monthlyPausal,
-    taskWorkPausal: $taskWorkPausal,
-    taskTripPausal: $taskTripPausal,
-    rents: $rents,
-  ){
-    id
-    title
-    monthlyPausal
-    taskWorkPausal
-    taskTripPausal
-  }
-}
-`;
+} from '../prices/querries';
+import {
+  GET_COMPANY,
+  UPDATE_COMPANY
+} from '../companies/querries';
 
 export default function PausalEdit( props ) {
   //data
@@ -235,6 +150,7 @@ export default function PausalEdit( props ) {
     updateCompany( {
         variables: {
           id: parseInt( match.params.id ),
+          pricelistId: pricelist.id,
           monthlyPausal: ( monthlyPausal === "" ? 0 : parseFloat( monthlyPausal ) ),
           taskWorkPausal: ( taskWorkPausal === "" ? 0 : parseFloat( taskWorkPausal ) ),
           taskTripPausal: ( taskTripPausal === "" ? 0 : parseFloat( taskTripPausal ) ),

@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button
@@ -11,16 +10,9 @@ import PriceAdd from './priceAdd';
 import PriceEdit from './priceEdit';
 import Loading from 'components/loading';
 
-export const GET_PRICELISTS = gql `
-query {
-  pricelists {
-    title
-    id
-    order
-    def
-  }
-}
-`;
+import {
+  GET_PRICELISTS
+} from './querries';
 
 export default function PricelistsList( props ) {
   // state

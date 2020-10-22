@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -31,52 +30,11 @@ import {
 } from 'helperFunctions';
 
 import {
-  GET_STATUSES
-} from './index';
-
-const GET_STATUS = gql `
-query status($id: Int!) {
-  status (
-    id: $id
-  ) {
-    id
-    title
-    color
-    icon
-    action
-    order
-  }
-}
-`;
-
-const UPDATE_STATUS = gql `
-mutation updateStatus($id: Int!, $title: String!, $order: Int!, $icon: String!, $color: String!, $action: StatusAllowedType!) {
-  updateStatus(
-    id: $id,
-    title: $title,
-    color: $color,
-    icon: $icon,
-    action: $action,
-    order: $order,
-  ){
-    id
-    title
-    order
-  }
-}
-`;
-
-export const DELETE_STATUS = gql `
-mutation deleteStatus($id: Int!, $newId: Int!) {
-  deleteStatus(
-    id: $id,
-    newId: $newId,
-  ){
-    id
-  }
-}
-`;
-
+  GET_STATUSES,
+  GET_STATUS,
+  UPDATE_STATUS,
+  DELETE_STATUS
+} from './querries';
 
 export default function StatusEdit( props ) {
   //data

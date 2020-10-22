@@ -2,19 +2,12 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import PausalEdit from './pausalEdit';
 
-export const GET_COMPANIES = gql `
-query {
-  companies {
-    title
-    id
-    monthly
-  }
-}
-`;
+import {
+  GET_COMPANIES
+} from '../companies/querries';
 
 export default function CompaniesList( props ) {
   // state

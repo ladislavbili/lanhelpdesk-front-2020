@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -15,47 +14,13 @@ import Switch from "react-switch";
 import Loading from 'components/loading';
 
 import {
-  GET_PRICELISTS
-} from './index';
+  GET_PRICELISTS,
+  ADD_PRICELIST,
+  GET_TASK_TYPES,
+  GET_TRIP_TYPES,
+} from './querries';
 
-export const ADD_PRICELIST = gql `
-mutation addPricelist($title: String!, $order: Int!, $afterHours: Int!, $def: Boolean!, $materialMargin: Int!, $materialMarginExtra: Int!, $prices: [CreatePriceInput]! ) {
-  addPricelist(
-    title: $title,
-    order: $order,
-    afterHours: $afterHours,
-    def: $def,
-    materialMargin: $materialMargin,
-    materialMarginExtra: $materialMarginExtra,
-    prices: $prices,
-  ){
-    id
-    title
-    order
-    def
-  }
-}
-`;
 
-export const GET_TASK_TYPES = gql `
-query {
-  taskTypes {
-    title
-    id
-    order
-  }
-}
-`;
-
-export const GET_TRIP_TYPES = gql `
-query {
-  tripTypes {
-    title
-    id
-    order
-  }
-}
-`;
 
 export default function PricelistAdd( props ) {
   //data

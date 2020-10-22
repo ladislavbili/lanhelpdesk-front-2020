@@ -26,7 +26,7 @@ import {
 
 import {
   GET_USERS
-} from 'helpdesk/settings/users';
+} from 'helpdesk/settings/users/querries';
 import {
   GET_COMPANIES
 } from 'helpdesk/settings/companies/querries';

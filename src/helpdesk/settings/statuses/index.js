@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button
@@ -13,15 +12,9 @@ import {
   orderArr
 } from 'helperFunctions';
 
-export const GET_STATUSES = gql `
-query {
-  statuses {
-    title
-    id
-    order
-  }
-}
-`;
+import {
+  GET_STATUSES
+} from './querries';
 
 export default function StatusesList( props ) {
   // state

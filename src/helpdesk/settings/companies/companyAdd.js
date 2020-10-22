@@ -13,24 +13,20 @@ import {
 import Switch from "react-switch";
 import {
   toSelArr,
-  toSelItem
-} from '../../../helperFunctions';
+  toSelItem,
+  isEmail
+} from 'helperFunctions';
 import Loading from 'components/loading';
 
-import {
-  isEmail
-} from '../../../helperFunctions';
 import CompanyRents from './companyRents';
 import CompanyPriceList from './companyPriceList';
 
 import classnames from "classnames";
 
 import {
-  GET_PRICELISTS
-} from '../prices/index';
-import {
+  GET_PRICELISTS,
   ADD_PRICELIST
-} from '../prices/priceAdd';
+} from '../prices/querries';
 
 import {
   GET_COMPANIES,
@@ -112,12 +108,11 @@ export default function CompanyAdd( props ) {
   const addCompanyFunc = () => {
     setSaving( true );
 
-    console.log( "hello" );
     let newRents = rents.map( r => ( {
       title: r.title,
-      quantity: isNaN( parseInt( r.quantity ) ) ? 0 : parseInt( r.quantity ),
-      cost: isNaN( parseFloat( r.unitCost ) ) ? 0 : parseInt( r.unitCost ),
-      price: isNaN( parseFloat( r.unitPrice ) ) ? 0 : parseInt( r.unitPrice )
+      quantity: isNaN( parseFloat( r.quantity ) ) ? 0 : parseFloat( r.quantity ),
+      cost: isNaN( parseFloat( r.unitCost ) ) ? 0 : parseFloat( r.unitCost ),
+      price: isNaN( parseFloat( r.unitPrice ) ) ? 0 : parseFloat( r.unitPrice )
     } ) );
 
     addCompany( {
@@ -201,11 +196,12 @@ export default function CompanyAdd( props ) {
 
   const cancel = () => {
     setPricelist( oldPricelist );
+    setNewData( false );
     setPricelistName( "" );
   }
 
   const attributes = [ title, ico, email ];
-  const cannotSave = saving || attributes.some( attr => attr === "" ) || ( pricelist.value === "0" && pricelistName === "" );
+  const cannotSave = saving || attributes.some( attr => attr === "" ) || ( pricelist.value === "0" && pricelistName === "" ) || !isEmail( email );
 
   if ( pricelistsLoading ) {
     return <Loading />
@@ -591,6 +587,14 @@ export default function CompanyAdd( props ) {
                 }
               }}>{(pricelist.value === "0" && pricelistName !== "" ? "Save changes" : (saving?'Adding...':'Add company'))}</Button>
             }
+
+            { !closeModal && newData &&
+              <Button
+                  className="btn-link ml-auto"
+                  disabled={saving}
+                  onClick={cancel}>Cancel</Button>
+          }
+
 
             { closeModal &&
               <Button

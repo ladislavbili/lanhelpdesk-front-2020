@@ -31,11 +31,9 @@ import CompanyPriceList from './companyPriceList';
 import Loading from 'components/loading';
 
 import {
-  GET_PRICELISTS
-} from '../prices/index';
-import {
+  GET_PRICELISTS,
   ADD_PRICELIST
-} from '../prices/priceAdd';
+} from '../prices/querries';
 
 import {
   GET_COMPANY,

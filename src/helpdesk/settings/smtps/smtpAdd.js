@@ -94,7 +94,7 @@ export default function SMTPAdd( props ) {
 
   const cannotSave = (
     ( wellKnownBlock && ( saving || password === '' || username === '' ) ) ||
-    ( !wellKnownBlock && ( !wellKnownBlock && saving || title === '' || host === '' || port === '' || password === '' || username === '' ) )
+    ( !wellKnownBlock && ( saving || title === '' || host === '' || port === '' || password === '' || username === '' ) )
   )
 
   return (

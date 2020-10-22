@@ -2,35 +2,28 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button
 } from 'reactstrap';
-//import PublicFilterAdd from './publicFilterAdd';
-//import PublicFilterEdit from './publicFilterEdit';
-//import Loading from 'components/loading';
+import PublicFilterAdd from './publicFilterAdd';
+import PublicFilterEdit from './publicFilterEdit';
 import {
-  filterIncludesText,
-  orderArr
+  textIncluded,
+  orderArr,
+  toSelArr
 } from 'helperFunctions';
+import Loading from 'components/loading';
 
 import {
   GET_BASIC_ROLES
 } from 'helpdesk/settings/roles/querries';
 
-export const GET_PUBLIC_FILTERS = gql `
-query {
-  publicFilters {
-    title
-    pub
-    id
-    order
-  }
-}
-`;
+import {
+  GET_PUBLIC_FILTERS
+} from './querries';
 
-export default function PublicFilterListContainer( props ) {
+export default function PublicFilterList( props ) {
   // state
   const [ search, setSearch ] = React.useState( "" );
   const [ roleFilter, setRoleFilter ] = React.useState( "all" );
@@ -41,8 +34,8 @@ export default function PublicFilterListContainer( props ) {
     match
   } = props;
   const {
-    data,
-    loading
+    data: publicFiltersData,
+    loading: publicFilterLoading
   } = useQuery( GET_PUBLIC_FILTERS );
   const {
     data: rolesData,
@@ -50,21 +43,20 @@ export default function PublicFilterListContainer( props ) {
   } = useQuery( GET_BASIC_ROLES );
 
   const getFilteredFilters = () => {
-    console.log( data );
-    let filters = ( loading || !data ? [] : orderArr( data.publicFilters ) );
-    filters.filter( ( filter ) => (
-      filter.pub &&
-      filterIncludesText( filter.title, search ) && (
+    if ( publicFilterLoading ) {
+      return [];
+    }
+    return publicFiltersData.publicFilters.filter( ( filter ) => (
+      textIncluded( filter.title, search ) &&
+      (
         roleFilter === 'all' ||
         ( roleFilter === 'none' && ( filter.roles === undefined || filter.roles.length === 0 ) ) ||
-        ( filter.roles !== undefined && filter.roles.includes( roleFilter ) )
+        ( filter.roles !== undefined && filter.roles.some( ( role ) => roleFilter === role.id ) )
       )
     ) );
-    return filters
   }
 
-  console.log( rolesData );
-
+  const dataLoading = ( publicFilterLoading || rolesLoading );
   return (
     <div className="content">
       <div className="row m-0 p-0 taskList-container">
@@ -104,50 +96,58 @@ export default function PublicFilterListContainer( props ) {
   								className="invisible-select text-bold text-highlight"
   								onChange={(e)=>setRoleFilter(e.target.value)}>
   									<option value='all'>All filters</option>
-                    { (rolesLoading || !rolesData ? [] : orderArr(rolesData.roles)).map((role) =>
+                    { (rolesLoading ? [] : orderArr(toSelArr(rolesData.basicRoles))).map((role) =>
                       <option value={role.id} key={role.id}>{role.title}</option>
                     )}
                     <option value='none'>Without role</option>
   							</select>
               </div>
             </div>
-            <table className="table table-hover">
-              <tbody>
-                {getFilteredFilters().map((filter)=>
-                  <tr
-                    key={filter.id}
-                    className={"clickable" + (match.params.id === filter.id ? " active":"")}
-                    style={{whiteSpace: "nowrap",  overflow: "hidden"}}
-                    onClick={()=>history.push('/helpdesk/settings/publicFilters/'+filter.id.toString())}>
-                    <td
-                      style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
-                      {filter.title}
-                    </td>
-                    <td
-                      style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
-                      {filter.order}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            {
+              dataLoading ?
+              (
+                <Loading />
+              ):
+              (
+                <table className="table table-hover">
+                  <tbody>
+                    { getFilteredFilters().map( (filter) =>
+                      <tr
+                        key={filter.id}
+                        className={"clickable" + (match.params.id === filter.id ? " active":"")}
+                        style={{whiteSpace: "nowrap",  overflow: "hidden"}}
+                        onClick={()=>history.push('/helpdesk/settings/publicFilters/'+filter.id.toString())}>
+                        <td
+                          style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
+                          {filter.title}
+                        </td>
+                        <td
+                          style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
+                          {filter.order}
+                        </td>
+                      </tr>
+                    ) }
+                  </tbody>
+                </table>
+              )
+            }
           </div>
         </div>
         <div className="col-lg-8">
           <div className="commandbar"></div>
-          {/*
-            match.params.id && match.params.id==='add' && <PublicFilterAdd />
-          }
           {
-            loading && match.params.id && match.params.id!=='add' && <Loading />
+            match.params.id &&
+            match.params.id==='add' &&
+            <PublicFilterAdd {...{history}} />
           }
+
           {
-            !loading &&
+            !dataLoading &&
             match.params.id &&
             match.params.id!=='add' &&
-            getFilteredFilters().some((item)=>item.id.toString()===match.params.id) &&
+            publicFiltersData.publicFilters.some((item)=>item.id === parseInt(match.params.id)) &&
             <PublicFilterEdit {...{history, match}}/>
-            */}
+          }
         </div>
       </div>
     </div>

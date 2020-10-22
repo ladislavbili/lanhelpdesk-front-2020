@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useMutation
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import {
   Button,
   FormGroup,
@@ -21,24 +20,9 @@ import {
 } from 'configs/constants/statuses';
 
 import {
-  GET_STATUSES
-} from './index';
-
-const ADD_STATUS = gql `
-mutation addStatus($title: String!, $order: Int!, $icon: String!, $color: String!, $action: StatusAllowedType!) {
-  addStatus(
-    title: $title,
-    order: $order,
-    icon: $icon,
-    color: $color,
-    action: $action,
-  ){
-    id
-    title
-    order
-  }
-}
-`;
+  GET_STATUSES,
+  ADD_STATUS
+} from './querries';
 
 export default function StatusAdd( props ) {
   //data & queries

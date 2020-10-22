@@ -1,18 +1,32 @@
 import React from 'react';
-import { Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 
 import Select from "react-select";
-import {selectStyle} from "configs/components/select";
-import Checkbox from '../../../components/checkbox';
+import {
+  selectStyle
+} from "configs/components/select";
+import Checkbox from 'components/checkbox';
+import ErrorMessage from 'components/errorMessage';
 
-export default function Permissions(props) {
+export default function ProjectPermissions( props ) {
   //data
-  const { users, addUser, givePermission, permissions, userID, isAdmin, lockedRequester, lockRequester } = props;
+  const {
+    users,
+    addUser,
+    givePermission,
+    permissions,
+    userID,
+    isAdmin,
+    lockedRequester,
+    lockRequester
+  } = props;
 
-	const [ chosenUser, setChosenUser ] = React.useState({});
-
-		return (
-			<div >
+  const [ chosenUser, setChosenUser ] = React.useState( {} );
+  const showNoAdminError = !permissions.some( ( projectRight ) => projectRight.admin )
+  return (
+    <div >
 				<h3 className="m-t-20 m-b-20"> Prístupové práva </h3>
 				<div className="row">
 					<div className="m-r-10 center-hor">
@@ -162,6 +176,7 @@ export default function Permissions(props) {
 						</tbody>
 					</table>
 				}
+        <ErrorMessage message="Project must have at least one administrator!" show={showNoAdminError} />
 				<div className="row">
 					<Checkbox
 						className = "m-l-5 m-r-5"
@@ -173,5 +188,5 @@ export default function Permissions(props) {
 				</div>
 
 			</div>
-		);
-	}
+  );
+}
