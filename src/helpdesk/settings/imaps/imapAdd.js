@@ -35,7 +35,7 @@ import {
   GET_ROLES,
 } from '../roles/querries';
 import {
-  GET_COMPANIES,
+  GET_BASIC_COMPANIES,
 } from '../companies/querries';
 import {
   GET_PROJECTS,
@@ -59,7 +59,7 @@ export default function IMAPAdd( props ) {
   const {
     data: companyData,
     loading: companiesLoading
-  } = useQuery( GET_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES );
   const {
     data: projectData,
     loading: projectsLoading
@@ -248,7 +248,7 @@ export default function IMAPAdd( props ) {
         <Label for="project">Users Company</Label>
         <Select
           styles={selectStyle}
-          options={toSelArr(companyData.companies)}
+          options={toSelArr(companyData.basicCompanies)}
           value={company}
           onChange={company => setCompany(company)}
           />

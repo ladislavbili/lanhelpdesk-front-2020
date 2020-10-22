@@ -10,12 +10,6 @@ import {
   Label,
   Input
 } from 'reactstrap';
-/*
-storageCompaniesStart,
-storageHelpPricelistsStart,
-storageMetadataStart,
-storageHelpTaskTypesStart,
-storageHelpTripTypesStart*/
 
 import CompanyRents from '../companies/companyRents';
 import CompanyPriceList from '../companies/companyPriceList';

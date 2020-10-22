@@ -228,52 +228,6 @@ mutation deleteProject($id: Int!, $newId: Int!) {
 }
 `;
 
-
-export const GET_STATUSES = gql `
-query {
-  statuses{
-    id
-    title
-  }
-}
-`;
-
-export const GET_COMPANIES = gql `
-query {
-  companies{
-    id
-    title
-  }
-}
-`;
-
-export const GET_USERS = gql `
-query {
-  users{
-    id
-    email
-  }
-}
-`;
-
-export const GET_TAGS = gql `
-query {
-  tags{
-    id
-    title
-  }
-}
-`;
-
-export const GET_TASK_TYPES = gql `
-query {
-  taskTypes{
-    id
-    title
-  }
-}
-`;
-
 export const GET_MY_DATA = gql `
 query {
   getMyData{

@@ -31,7 +31,7 @@ import {
 } from '../roles/querries';
 
 import {
-  GET_COMPANIES,
+  GET_BASIC_COMPANIES,
 } from '../companies/querries';
 
 
@@ -49,13 +49,13 @@ export default function UserAddContainer( props ) {
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES );
   const [ registerUser, {
     client
   } ] = useMutation( ADD_USER );
 
   const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
-  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.companies ) );
+  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
 
   const languages = [ {
     label: "SK",

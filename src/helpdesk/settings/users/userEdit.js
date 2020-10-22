@@ -33,7 +33,7 @@ import {
 } from '../roles/querries';
 
 import {
-  GET_COMPANIES,
+  GET_BASIC_COMPANIES,
 } from '../companies/querries';
 
 export default function UserEdit( props ) {
@@ -58,7 +58,7 @@ export default function UserEdit( props ) {
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES );
   const [ updateUser ] = useMutation( UPDATE_USER );
   const [ deleteUser, {
     client
@@ -66,7 +66,7 @@ export default function UserEdit( props ) {
 
   const USER = ( userLoading ? [] : userData.user );
   const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
-  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.companies ) );
+  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
 
   const languages = [ {
     label: "SK",
@@ -77,8 +77,6 @@ export default function UserEdit( props ) {
   } ]
 
   //state
-  //const [ createdAt, setCreatedAt ] = React.useState(0);
-  //const [ updatedAt, setUpdatedAt ] = React.useState(0);
   const [ active, setActive ] = React.useState( true );
   const [ username, setUsername ] = React.useState( "" );
   const [ email, setEmail ] = React.useState( "" );
@@ -299,7 +297,7 @@ export default function UserEdit( props ) {
         <div className="row">
           <Button
             className="btn m-r-5"
-            disabled={ saving || ( companiesData.companies ? companiesData.companies.length === 0 : false) || !isEmail(email) }
+            disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
             onClick={ updateUserFunc }
             >
             { saving ? 'Saving user...' : 'Save user' }

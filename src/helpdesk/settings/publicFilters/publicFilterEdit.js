@@ -31,10 +31,10 @@ import {
   GET_TASK_TYPES,
 } from '../taskTypes/querries';
 import {
-  GET_USERS,
+  GET_BASIC_USERS,
 } from '../users/querries';
 import {
-  GET_COMPANIES,
+  GET_BASIC_COMPANIES,
 } from '../companies/querries';
 import {
   GET_PROJECTS,
@@ -116,12 +116,12 @@ export default function PublicFilterEdit( props ) {
   const {
     data: usersData,
     loading: usersLoading
-  } = useQuery( GET_USERS );
+  } = useQuery( GET_BASIC_USERS );
 
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES );
 
   const {
     data: projectsData,
@@ -268,7 +268,7 @@ export default function PublicFilterEdit( props ) {
       } else if ( filter.company === null ) {
         setCompany( emptyFilter.company );
       } else {
-        setCompany( toSelArr( companiesData.companies )
+        setCompany( toSelArr( companiesData.basicCompanies )
           .find( ( company ) => company.id === filter.company.id ) );
       }
 
@@ -277,7 +277,7 @@ export default function PublicFilterEdit( props ) {
       } else if ( filter.requester === null ) {
         setRequester( emptyFilter.requester );
       } else {
-        setRequester( toSelArr( usersData.users )
+        setRequester( toSelArr( usersData.basicUsers )
           .find( ( user ) => user.id === filter.requester.id ) );
       }
 
@@ -286,7 +286,7 @@ export default function PublicFilterEdit( props ) {
       } else if ( filter.assignedTo === null ) {
         setAssigned( emptyFilter.assigned );
       } else {
-        setAssigned( toSelArr( usersData.users )
+        setAssigned( toSelArr( usersData.basicUsers )
           .find( ( user ) => user.id === filter.assigned.id ) );
       }
 
@@ -402,7 +402,7 @@ export default function PublicFilterEdit( props ) {
         <label>Zadal</label>
         <Select
           id="select-requester"
-          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.users, 'email'))}
+          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
           onChange={ (requester) => setRequester(requester) }
           value={requester}
           styles={selectStyle} />
@@ -411,7 +411,7 @@ export default function PublicFilterEdit( props ) {
       <FormGroup>{/* Company */}
         <label>Firma</label>
         <Select
-          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.companies))}
+          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
           onChange={ (company) => setCompany(company) }
           value={company}
           styles={selectStyle} />
@@ -420,7 +420,7 @@ export default function PublicFilterEdit( props ) {
       <FormGroup>{/* Assigned */}
         <label>Riesi</label>
         <Select
-          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.users, 'email'))}
+          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
           onChange={(newValue)=>setAssigned(newValue)}
           value={assigned}
           styles={selectStyle}

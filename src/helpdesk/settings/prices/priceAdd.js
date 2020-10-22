@@ -12,12 +12,15 @@ import {
 } from 'reactstrap';
 import Switch from "react-switch";
 import Loading from 'components/loading';
-
+import {
+  GET_TASK_TYPES,
+} from '../taskTypes/querries';
+import {
+  GET_TRIP_TYPES,
+} from '../tripTypes/querries';
 import {
   GET_PRICELISTS,
   ADD_PRICELIST,
-  GET_TASK_TYPES,
-  GET_TRIP_TYPES,
 } from './querries';
 
 

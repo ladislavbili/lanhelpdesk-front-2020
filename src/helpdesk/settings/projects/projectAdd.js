@@ -24,14 +24,24 @@ import Permissions from "helpdesk/components/projectPermissions";
 import Loading from 'components/loading';
 import ProjectDefaultValues from "helpdesk/components/projects/defaultValues";
 import {
+  GET_BASIC_COMPANIES,
+} from '../companies/querries';
+import {
+  GET_BASIC_USERS,
+} from '../users/querries';
+import {
+  GET_STATUSES,
+} from '../statuses/querries';
+import {
+  GET_TAGS,
+} from '../tags/querries';
+import {
+  GET_TASK_TYPES,
+} from '../taskTypes/querries';
+import {
   GET_PROJECTS,
   GET_MY_PROJECTS,
   ADD_PROJECT,
-  GET_STATUSES,
-  GET_COMPANIES,
-  GET_USERS,
-  GET_TAGS,
-  GET_TASK_TYPES,
   GET_MY_DATA
 } from './querries';
 
@@ -55,11 +65,11 @@ export default function ProjectAdd( props ) {
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_COMPANIES, fetchNetOptions );
+  } = useQuery( GET_BASIC_COMPANIES, fetchNetOptions );
   const {
     data: usersData,
     loading: usersLoading
-  } = useQuery( GET_USERS, fetchNetOptions );
+  } = useQuery( GET_BASIC_USERS, fetchNetOptions );
   const {
     data: allTagsData,
     loading: allTagsLoading
@@ -91,7 +101,7 @@ export default function ProjectAdd( props ) {
   //events
   React.useEffect( () => {
     if ( !myDataLoading && !usersLoading ) {
-      const CurrentUser = toSelArr( usersData.users, 'email' )
+      const CurrentUser = toSelArr( usersData.basicUsers, 'email' )
         .find( ( user ) => user.id === currentUser.id );
       setProjectRights( [ {
         user: CurrentUser,
@@ -219,7 +229,7 @@ export default function ProjectAdd( props ) {
   }
 
   let canReadUserIDs = projectRights.map( ( permission ) => permission.user.id );
-  let canBeAssigned = toSelArr( usersData.users, 'email' )
+  let canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
     .filter( ( user ) => canReadUserIDs.includes( user.id ) );
 
   return (
@@ -261,7 +271,7 @@ export default function ProjectAdd( props ) {
             setProjectRights(newProjectRights);
 						}
 					}}
-          users={(usersLoading ? [] : toSelArr(usersData.users, 'email'))}
+          users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
 					permissions={projectRights}
 					userID={currentUser.id}
 					isAdmin={currentUser.role.accessRights.projects || currentUser.role.accessRights.addProjects}
@@ -287,9 +297,9 @@ export default function ProjectAdd( props ) {
         taskType={taskType}
         setTaskType={setTaskType}
         statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
-        companies={(companiesLoading ? [] : toSelArr(companiesData.companies))}
+        companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
         canBeAssigned={canBeAssigned}
-        users={lockedRequester ? (projectRights.map(r => r.user)) : (usersLoading ? [] : toSelArr(usersData.users, 'email'))}
+        users={lockedRequester ? (projectRights.map(r => r.user)) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
         allTags={(allTagsLoading ? [] : toSelArr(allTagsData.tags))}
         taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
 				/>

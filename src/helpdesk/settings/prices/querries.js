@@ -30,26 +30,6 @@ mutation addPricelist($title: String!, $order: Int!, $afterHours: Int!, $def: Bo
 }
 `;
 
-export const GET_TASK_TYPES = gql `
-query {
-  taskTypes {
-    title
-    id
-    order
-  }
-}
-`;
-
-export const GET_TRIP_TYPES = gql `
-query {
-  tripTypes {
-    title
-    id
-    order
-  }
-}
-`;
-
 export const GET_PRICELIST = gql `
 query pricelist($id: Int!) {
   pricelist (

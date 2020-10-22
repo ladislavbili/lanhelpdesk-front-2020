@@ -46,6 +46,24 @@ query {
 }
 `;
 
+export const GET_BASIC_USERS = gql `
+query {
+  basicUsers{
+    id
+    email
+    username
+    role {
+      id
+      title
+    }
+    company {
+      id
+      title
+    }
+  }
+}
+`;
+
 export const GET_USER = gql `
 query user($id: Int!) {
   user (
