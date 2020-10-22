@@ -3,8 +3,6 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
-
 import {
   Button,
   FormGroup,
@@ -24,86 +22,19 @@ import {
 import Checkbox from 'components/checkbox';
 
 import {
-  GET_USERS
-} from './index';
+  GET_USERS,
+  GET_USER,
+  UPDATE_USER,
+  DELETE_USER,
+} from './querries';
 
-const GET_USER = gql `
-query user($id: Int!) {
-  user (
-    id: $id
-  ) {
-    id
-    createdAt
-    updatedAt
-    active
-    username
-    email
-    name
-    surname
-    fullName
-    receiveNotifications
-    signature
-    role {
-      id
-      title
-      level
-    }
-    company {
-      id
-      title
-    }
-    language
-  }
-}
-`;
+import {
+  GET_ROLES,
+} from '../roles/querries';
 
-const UPDATE_USER = gql `
-mutation updateUser($id: Int!, $username: String, $email: String, $name: String, $surname: String, $receiveNotifications: Boolean, $signature: String, $roleId: Int, $companyId: Int, $language: LanguageEnum) {
-  updateUser(
-    id: $id,
-    username: $username,
-    email: $email,
-    name: $name,
-    surname: $surname,
-    receiveNotifications: $receiveNotifications,
-    signature: $signature,
-    roleId: $roleId,
-    companyId: $companyId,
-    language: $language,
-  ){
-    id
-  }
-}
-`;
-
-export const DELETE_USER = gql `
-mutation deleteUser($id: Int!) {
-  deleteUser(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
-
-export const GET_ROLES = gql `
-query {
-  roles{
-    id
-    title
-    level
-  }
-}
-`;
-
-export const GET_COMPANIES = gql `
-query {
-  companies{
-    id
-    title
-  }
-}
-`;
+import {
+  GET_BASIC_COMPANIES,
+} from '../companies/querries';
 
 export default function UserEdit( props ) {
   // data & queries
@@ -127,7 +58,7 @@ export default function UserEdit( props ) {
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES );
   const [ updateUser ] = useMutation( UPDATE_USER );
   const [ deleteUser, {
     client
@@ -135,7 +66,7 @@ export default function UserEdit( props ) {
 
   const USER = ( userLoading ? [] : userData.user );
   const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
-  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.companies ) );
+  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
 
   const languages = [ {
     label: "SK",
@@ -146,8 +77,6 @@ export default function UserEdit( props ) {
   } ]
 
   //state
-  //const [ createdAt, setCreatedAt ] = React.useState(0);
-  //const [ updatedAt, setUpdatedAt ] = React.useState(0);
   const [ active, setActive ] = React.useState( true );
   const [ username, setUsername ] = React.useState( "" );
   const [ email, setEmail ] = React.useState( "" );
@@ -368,7 +297,7 @@ export default function UserEdit( props ) {
         <div className="row">
           <Button
             className="btn m-r-5"
-            disabled={ saving || ( companiesData.companies ? companiesData.companies.length === 0 : false) || !isEmail(email) }
+            disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
             onClick={ updateUserFunc }
             >
             { saving ? 'Saving user...' : 'Save user' }

@@ -1,436 +1,408 @@
-import React, {
-  Component
-} from 'react';
+import React from 'react';
+import {
+  useMutation,
+  useQuery
+} from "@apollo/react-hooks";
 import {
   Button,
   FormGroup,
   Label,
   Input,
-  Alert
 } from 'reactstrap';
-
-import {
-  connect
-} from "react-redux";
 import Checkbox from 'components/checkbox';
-import {
-  rebase
-} from 'index';
 
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
+import Loading from 'components/loading';
 import Select from 'react-select';
 import {
   selectStyle
 } from 'configs/components/select';
 import {
-  storageUsersStart,
-  storageCompaniesStart,
-  storageHelpTaskTypesStart,
-  storageHelpProjectsStart,
-} from 'redux/actions';
-import {
-  roles
-} from 'configs/constants/roles';
-import {
   toSelArr,
-  filterProjectsByPermissions,
-  fromMomentToUnix
+  fromObjectToState
 } from 'helperFunctions';
+import {
+  ADD_PUBLIC_FILTER,
+  GET_PUBLIC_FILTERS
+} from './querries';
+import {
+  GET_TASK_TYPES,
+} from '../taskTypes/querries';
+import {
+  GET_BASIC_USERS,
+} from '../users/querries';
+import {
+  GET_BASIC_COMPANIES,
+} from '../companies/querries';
+import {
+  GET_PROJECTS,
+} from '../projects/querries';
+import {
+  GET_ROLES,
+} from '../roles/querries';
+
 import {
   oneOfOptions,
   emptyFilter
 } from 'configs/constants/filter';
 
-class PublicFilterAdd extends Component {
-  constructor( props ) {
-    super( props );
-    this.state = {
-      global: false,
-      dashboard: false,
-      order: 0,
-      roles: [],
-      title: '',
-      project: null,
-      ...emptyFilter,
+export default function PublicFilterAdd( props ) {
+  const {
+    history
+  } = props;
 
-      saving: false,
-    }
-  }
+  // state
+  const [ global, setGlobal ] = React.useState( false );
+  const [ dashboard, setDashboard ] = React.useState( false );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ roles, setRoles ] = React.useState( [] );
+  const [ title, setTitle ] = React.useState( '' );
+  const [ project, setProject ] = React.useState( null );
+  const [ saving, setSaving ] = React.useState( null );
+  const {
+    requester,
+    setRequester,
+    company,
+    setCompany,
+    assigned,
+    setAssigned,
+    taskType,
+    setTaskType,
+    statusDateFrom,
+    setStatusDateFrom,
+    statusDateFromNow,
+    setStatusDateFromNow,
+    statusDateTo,
+    setStatusDateTo,
+    statusDateToNow,
+    setStatusDateToNow,
+    closeDateFrom,
+    setCloseDateFrom,
+    closeDateFromNow,
+    setCloseDateFromNow,
+    closeDateTo,
+    setCloseDateTo,
+    closeDateToNow,
+    setCloseDateToNow,
+    pendingDateFrom,
+    setPendingDateFrom,
+    pendingDateFromNow,
+    setPendingDateFromNow,
+    pendingDateTo,
+    setPendingDateTo,
+    pendingDateToNow,
+    setPendingDateToNow,
+    deadlineFrom,
+    setDeadlineFrom,
+    deadlineFromNow,
+    setDeadlineFromNow,
+    deadlineTo,
+    setDeadlineTo,
+    deadlineToNow,
+    setDeadlineToNow,
+    oneOf,
+    setOneOf,
+  } = fromObjectToState( emptyFilter );
 
-  componentWillMount() {
+  //get data
+  const {
+    data: taskTypesData,
+    loading: taskTypesLoading
+  } = useQuery( GET_TASK_TYPES );
 
-    if ( !this.props.usersActive ) {
-      this.props.storageUsersStart();
-    }
+  const {
+    data: usersData,
+    loading: usersLoading
+  } = useQuery( GET_BASIC_USERS );
 
-    if ( !this.props.companiesActive ) {
-      this.props.storageCompaniesStart();
-    }
+  const {
+    data: companiesData,
+    loading: companiesLoading
+  } = useQuery( GET_BASIC_COMPANIES );
 
-    if ( !this.props.taskTypesActive ) {
-      this.props.storageHelpTaskTypesStart();
-    }
+  const {
+    data: projectsData,
+    loading: projectsLoading
+  } = useQuery( GET_PROJECTS );
 
-    if ( !this.props.projectsActive ) {
-      this.props.storageHelpProjectsStart();
-    }
-  }
+  const {
+    data: rolesData,
+    loading: rolesLoading
+  } = useQuery( GET_ROLES );
 
-  storageLoaded( props ) {
-    return (
-      props.taskTypesLoaded &&
-      props.usersLoaded &&
-      props.companiesLoaded &&
-      props.projectsLoaded
-    )
-  }
+  const [ addPublicFilter, {
+    client
+  } ] = useMutation( ADD_PUBLIC_FILTER );
 
-  cantSaveFilter() {
-    return this.state.saving || this.state.title === "" || ( !this.state.global && this.state.project === null ) || isNaN( parseInt( this.state.order ) )
-  }
+  const dataLoading = (
+    taskTypesLoading ||
+    usersLoading ||
+    companiesLoading ||
+    projectsLoading ||
+    rolesLoading
+  )
 
-  submit() {
-    this.setState( {
-      saving: true
-    } )
-    let body = {
-      title: this.state.title,
-      order: this.state.order,
-      public: true,
-      global: this.state.global,
-      dashboard: this.state.dashboard,
-      project: this.state.project !== null ? this.state.project.id : null,
-      roles: this.state.roles.map( ( role ) => role.id ),
+  const cantSave = (
+    dataLoading ||
+    saving ||
+    title === "" ||
+    ( !global && project === null ) ||
+    isNaN( parseInt( order ) )
+  )
+
+  const submitPublicFilter = () => {
+    setSaving( true );
+    let variables = {
+      title,
+      global,
+      dashboard,
+      order: isNaN( parseInt( order ) ) ? 0 : parseInt( order ),
+      roles: roles.map( ( role ) => role.id ),
+      projectId: global ? null : project.id,
       filter: {
-        requester: this.state.requester.id,
-        company: this.state.company.id,
-        assigned: this.state.assigned.id,
-        taskType: this.state.taskType.id,
-        oneOf: this.state.oneOf.map( ( item ) => item.value ),
+        assignedToCur: assigned.id === 'cur',
+        assignedTo: assigned.id === 'cur' ? null : assigned.id,
+        requesterCur: requester.id === 'cur',
+        requester: requester.id === 'cur' ? null : requester.id,
+        companyCur: company.id === 'cur',
+        company: company.id === 'cur' ? null : company.id,
+        taskType: taskType.id,
+        oneOf: oneOf.map( ( oneOf ) => oneOf.value ),
 
-        statusDateFrom: this.state.statusDateFromNow ? null : fromMomentToUnix( this.state.statusDateFrom ),
-        statusDateFromNow: this.state.statusDateFromNow,
-        statusDateTo: this.state.statusDateToNow ? null : fromMomentToUnix( this.state.statusDateTo ),
-        statusDateToNow: this.state.statusDateToNow,
-
-        closeDateFrom: this.state.closeDateFromNow ? null : fromMomentToUnix( this.state.closeDateFrom ),
-        closeDateFromNow: this.state.closeDateFromNow,
-        closeDateTo: this.state.closeDateToNow ? null : fromMomentToUnix( this.state.closeDateTo ),
-        closeDateToNow: this.state.closeDateToNow,
-
-        pendingDateFrom: this.state.pendingDateFromNow ? null : fromMomentToUnix( this.state.pendingDateFrom ),
-        pendingDateFromNow: this.state.pendingDateFromNow,
-        pendingDateTo: this.state.pendingDateToNow ? null : fromMomentToUnix( this.state.pendingDateTo ),
-        pendingDateToNow: this.state.pendingDateToNow,
-
-        deadlineFrom: this.state.deadlineFromNow ? null : fromMomentToUnix( this.state.deadlineFrom ),
-        deadlineFromNow: this.state.deadlineFromNow,
-        deadlineTo: this.state.deadlineToNow ? null : fromMomentToUnix( this.state.deadlineTo ),
-        deadlineToNow: this.state.deadlineToNow,
+        statusDateFrom: statusDateFrom === null ? null : statusDateFrom.valueOf()
+          .toString(),
+        statusDateFromNow,
+        statusDateTo: statusDateTo === null ? null : statusDateTo.valueOf()
+          .toString(),
+        statusDateToNow,
+        pendingDateFrom: pendingDateFrom === null ? null : pendingDateFrom.valueOf()
+          .toString(),
+        pendingDateFromNow,
+        pendingDateTo: pendingDateTo === null ? null : pendingDateTo.valueOf()
+          .toString(),
+        pendingDateToNow,
+        closeDateFrom: closeDateFrom === null ? null : closeDateFrom.valueOf()
+          .toString(),
+        closeDateFromNow,
+        closeDateTo: closeDateTo === null ? null : closeDateTo.valueOf()
+          .toString(),
+        closeDateToNow,
+        deadlineFrom: deadlineFrom === null ? null : deadlineFrom.valueOf()
+          .toString(),
+        deadlineFromNow,
+        deadlineTo: deadlineTo === null ? null : deadlineTo.valueOf()
+          .toString(),
+        deadlineToNow,
       },
     }
-    rebase.addToCollection( '/help-filters', body )
-      .then( () => {
-        this.setState( {
-          ...emptyFilter,
-          global: false,
-          dashboard: false,
-          order: 0,
-          roles: [],
-          title: '',
-          project: null,
-          saving: false,
-        } );
-      } );
+    addPublicFilter( {
+        variables
+      } )
+      .then( ( response ) => {
+        const newPublicFilter = {
+          ...response.data.addPublicFilter,
+          __typename: "Filter"
+        };
+        const publicFilters = client.readQuery( {
+            query: GET_PUBLIC_FILTERS
+          } )
+          .publicFilters;
+        client.writeQuery( {
+          query: GET_PUBLIC_FILTERS,
+          data: {
+            publicFilters: [ ...publicFilters, newPublicFilter ]
+          }
+        } )
+        history.push( `./${newPublicFilter.id}` );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+        setSaving( false );
+      } )
   }
 
-  render() {
-    if ( !this.storageLoaded( this.props ) ) {
-      return <Alert color="success">
-        Loading data...
-      </Alert>
-    }
-    return (
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-        <FormGroup> {/* Title */}
-          <Label for="role">Filter name</Label>
-          <Input
-            name="name"
-            id="name"
-            type="text"
-            placeholder="Enter role name"
-            value={this.state.title}
-            onChange={(e)=>{
-              this.setState({title: e.target.value})
-            }}
-            />
-        </FormGroup>
-
-        <FormGroup>{/* Order */}
-          <Label for="role">Filter order</Label>
-          <Input
-            name="name"
-            id="name"
-            type="number"
-            placeholder="Enter filter order"
-            value={this.state.order}
-            onChange={(e)=>{
-              this.setState({
-                order: e.target.value})
-              }}
-              />
-          </FormGroup>
-
-          {/* Global */}
-          <Checkbox
-            className = "m-l-5 m-r-5"
-            label = "Global (shown in all projects)"
-            value = { this.state.global }
-            onChange={(e)=>this.setState({global:!this.state.global })}
-            />
-
-          <div className="m-b-10">{/* Project */}
-            <Label className="form-label">Projekt</Label>
-            <Select
-              placeholder="Vyberte projekt"
-              value={this.state.project}
-              isDisabled={this.state.global}
-              onChange={(project)=> {
-                this.setState({ project });
-              }}
-              options={filterProjectsByPermissions(this.props.projects, this.props.currentUser)}
-              styles={selectStyle}
-              />
-          </div>
-
-          {/* Dashboard */}
-          <Checkbox
-            className = "m-l-5 m-r-5"
-            label = "Dashboard (shown in dashboard)"
-            value = { this.state.dashboard }
-            onChange={(e)=>this.setState({dashboard:!this.state.dashboard })}
-            />
-
-          <FormGroup>{/* Roles */}
-            <Label className="">Roles</Label>
-            <Select
-              placeholder="Choose roles"
-              value={this.state.roles}
-              isMulti
-              onChange={(newRoles)=>{
-                if(newRoles.some((role) => role.id === 'all' )){
-                  if( this.state.roles.length === roles.length ){
-                    this.setState({ roles: [] })
-                  }else{
-                    this.setState({ roles: toSelArr(roles) })
-                  }
-                }else{
-                  this.setState({roles: newRoles})
-                }
-              }}
-              options={toSelArr([{id: 'all', title: this.state.roles.length === roles.length ? 'Clear' : 'All' }].concat(roles))}
-              styles={selectStyle}
-              />
-          </FormGroup>
-
-
-          <Label className="m-t-15">Filter attributes</Label>
-          <hr className="m-t-5 m-b-10"/>
-
-          <FormGroup>{/* Requester */}
-            <label>Zadal</label>
-            <Select
-              id="select-requester"
-              options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(this.props.users, 'email'))}
-              onChange={ (requester) => this.setState({requester}) }
-              value={this.state.requester}
-              styles={selectStyle} />
-          </FormGroup>
-
-          <FormGroup>{/* Company */}
-            <label>Firma</label>
-            <Select
-              options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(this.props.companies))}
-              onChange={ (company) => this.setState({company}) }
-              value={this.state.company}
-              styles={selectStyle} />
-          </FormGroup>
-
-          <FormGroup>{/* Assigned */}
-            <label>Riesi</label>
-            <Select
-              options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(this.props.users, 'email'))}
-              onChange={(newValue)=>this.setState({assigned:newValue})}
-              value={this.state.assigned}
-              styles={selectStyle}
-              />
-          </FormGroup>
-
-          {/* Status Date */}
-          <FilterDatePickerInCalendar
-            label="Status date"
-            showNowFrom={this.state.statusDateFromNow}
-            dateFrom={this.state.statusDateFrom}
-            setShowNowFrom={(statusDateFromNow)=>{
-              this.setState({ statusDateFromNow })
-            }}
-            setDateFrom={(statusDateFrom)=>{
-              this.setState({statusDateFrom})
-            }}
-            showNowTo={this.state.statusDateToNow}
-            dateTo={this.state.statusDateTo}
-            setShowNowTo={(statusDateToNow)=>{
-              this.setState({ statusDateToNow })
-            }}
-            setDateTo={(statusDateTo)=>{
-              this.setState({statusDateTo})
-            }}
-            />
-
-          {/* Pending Date */}
-          <FilterDatePickerInCalendar
-            label="Pending date"
-            showNowFrom={this.state.pendingDateFromNow}
-            dateFrom={this.state.pendingDateFrom}
-            setShowNowFrom={(pendingDateFromNow)=>{
-              this.setState({ pendingDateFromNow })
-            }}
-            setDateFrom={(pendingDateFrom)=>{
-              this.setState({pendingDateFrom})
-            }}
-            showNowTo={this.state.pendingDateToNow}
-            dateTo={this.state.pendingDateTo}
-            setShowNowTo={(pendingDateToNow)=>{
-              this.setState({ pendingDateToNow })
-            }}
-            setDateTo={(pendingDateTo)=>{
-              this.setState({pendingDateTo})
-            }}
-            />
-
-          {/* Close Date */}
-          <FilterDatePickerInCalendar
-            label="Close date"
-            showNowFrom={this.state.closeDateFromNow}
-            dateFrom={this.state.closeDateFrom}
-            setShowNowFrom={(closeDateFromNow)=>{
-              this.setState({ closeDateFromNow })
-            }}
-            setDateFrom={(closeDateFrom)=>{
-              this.setState({closeDateFrom})
-            }}
-            showNowTo={this.state.closeDateToNow}
-            dateTo={this.state.closeDateTo}
-            setShowNowTo={(closeDateToNow)=>{
-              this.setState({ closeDateToNow })
-            }}
-            setDateTo={(closeDateTo)=>{
-              this.setState({closeDateTo})
-            }}
-            />
-
-          {/* Deadline */}
-          <FilterDatePickerInCalendar
-            label="Deadline"
-            showNowFrom={this.state.deadlineFromNow}
-            dateFrom={this.state.deadlineFrom}
-            setShowNowFrom={(deadlineFromNow)=>{
-              this.setState({ deadlineFromNow })
-            }}
-            setDateFrom={(deadlineFrom)=>{
-              this.setState({deadlineFrom})
-            }}
-            showNowTo={this.state.deadlineToNow}
-            dateTo={this.state.deadlineTo}
-            setShowNowTo={(deadlineToNow)=>{
-              this.setState({ deadlineToNow })
-            }}
-            setDateTo={(deadlineTo)=>{
-              this.setState({deadlineTo})
-            }}
-            />
-
-          <FormGroup>{/* Work Type */}
-            <label htmlFor="example-input-small">Typ práce</label>
-            <Select
-              options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(this.props.taskTypes))}
-              onChange={(newValue)=>this.setState({taskType:newValue})}
-              value={this.state.taskType}
-              styles={selectStyle} />
-          </FormGroup>
-
-          <FormGroup>{/* One Of */}
-            <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
-            <Select
-              options={oneOfOptions}
-              onChange={(oneOf)=>this.setState({oneOf})}
-              value={this.state.oneOf}
-              isMulti
-              styles={selectStyle} />
-          </FormGroup>
-
-          <Button className="btn" disabled={this.cantSaveFilter()} onClick={this.submit.bind(this)}>{this.state.saving?'Adding...':'Add filter'}</Button>
-        </div>
-    );
+  if ( dataLoading ) {
+    return <Loading />
   }
+  return (
+    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+      <FormGroup> {/* Title */}
+        <Label htmlFor="title">Filter name</Label>
+        <Input
+          id="title"
+          type="text"
+          placeholder="Enter role name"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          />
+      </FormGroup>
+
+      <FormGroup>{/* Order */}
+        <Label for="order">Filter order</Label>
+        <Input
+          id="order"
+          type="number"
+          placeholder="Enter filter order"
+          value={order}
+          onChange={(e) => setOrder(e.target.value)}
+          />
+      </FormGroup>
+
+      {/* Global */}
+      <Checkbox
+        className = "m-l-5 m-r-5"
+        label = "Global (shown in all projects)"
+        value = { global }
+        onChange={(e) => setGlobal(!global)}
+        />
+
+      <div className="m-b-10">{/* Project */}
+        <Label className="form-label">Projekt</Label>
+        <Select
+          placeholder="Vyberte projekt"
+          value={project}
+          isDisabled={global}
+          onChange={(project) => setProject(project)}
+          options={toSelArr(projectsData.projects)}
+          styles={selectStyle}
+          />
+      </div>
+
+      {/* Dashboard */}
+      <Checkbox
+        className = "m-l-5 m-r-5"
+        label = "Dashboard (shown in dashboard)"
+        value = { dashboard }
+        onChange={(e) => setDashboard(!dashboard)}
+        />
+
+      <FormGroup>{/* Roles */}
+        <Label className="">Roles</Label>
+        <Select
+          placeholder="Choose roles"
+          value={roles}
+          isMulti
+          onChange={(newRoles)=>{
+            if(newRoles.some((role) => role.id === 'all' )){
+              if( roles.length === rolesData.roles.length ){
+                setRoles([]);
+              }else{
+                setRoles(toSelArr(rolesData.roles));
+              }
+            }else{
+              setRoles(newRoles);
+            }
+          }}
+          options={toSelArr([{id: 'all', title: roles.length === rolesData.roles.length ? 'Clear' : 'All' }, ...rolesData.roles])}
+          styles={selectStyle}
+          />
+      </FormGroup>
+
+
+      <Label className="m-t-15">Filter attributes</Label>
+      <hr className="m-t-5 m-b-10"/>
+
+      <FormGroup>{/* Requester */}
+        <label>Zadal</label>
+        <Select
+          id="select-requester"
+          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+          onChange={ (requester) => setRequester(requester) }
+          value={requester}
+          styles={selectStyle} />
+      </FormGroup>
+
+      <FormGroup>{/* Company */}
+        <label>Firma</label>
+        <Select
+          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
+          onChange={ (company) => setCompany(company) }
+          value={company}
+          styles={selectStyle} />
+      </FormGroup>
+
+      <FormGroup>{/* Assigned */}
+        <label>Riesi</label>
+        <Select
+          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+          onChange={(newValue)=>setAssigned(newValue)}
+          value={assigned}
+          styles={selectStyle}
+          />
+      </FormGroup>
+
+      {/* Status Date */}
+      <FilterDatePickerInCalendar
+        label="Status date"
+        showNowFrom={statusDateFromNow}
+        dateFrom={statusDateFrom}
+        setShowNowFrom={setStatusDateFromNow}
+        setDateFrom={setStatusDateFrom}
+        showNowTo={statusDateToNow}
+        dateTo={statusDateTo}
+        setShowNowTo={setStatusDateToNow}
+        setDateTo={setStatusDateTo}
+        />
+
+      {/* Pending Date */}
+      <FilterDatePickerInCalendar
+        label="Pending date"
+        showNowFrom={pendingDateFromNow}
+        dateFrom={pendingDateFrom}
+        setShowNowFrom={setPendingDateFromNow}
+        setDateFrom={setPendingDateFrom}
+        showNowTo={pendingDateToNow}
+        dateTo={pendingDateTo}
+        setShowNowTo={setPendingDateToNow}
+        setDateTo={setPendingDateTo}
+        />
+
+      {/* Close Date */}
+      <FilterDatePickerInCalendar
+        label="Close date"
+        showNowFrom={closeDateFromNow}
+        dateFrom={closeDateFrom}
+        showNowTo={closeDateToNow}
+        dateTo={closeDateTo}
+        setShowNowFrom={setCloseDateFromNow}
+        setDateFrom={setCloseDateFrom}
+        setShowNowTo={setCloseDateToNow}
+        setDateTo={setCloseDateTo}
+        />
+
+      {/* Deadline */}
+      <FilterDatePickerInCalendar
+        label="Deadline"
+        showNowFrom={deadlineFromNow}
+        dateFrom={deadlineFrom}
+        showNowTo={deadlineToNow}
+        dateTo={deadlineTo}
+        setShowNowFrom={setDeadlineFromNow}
+        setDateFrom={setDeadlineFrom}
+        setShowNowTo={setDeadlineToNow}
+        setDateTo={setDeadlineTo}
+        />
+
+      <FormGroup>{/* Work Type */}
+        <label htmlFor="example-input-small">Typ práce</label>
+        <Select
+          options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypesData.taskTypes))}
+          onChange={(taskType)=>setTaskType(taskType)}
+          value={taskType}
+          styles={selectStyle} />
+      </FormGroup>
+
+      <FormGroup>{/* One Of */}
+        <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
+        <Select
+          options={oneOfOptions}
+          onChange={(oneOf)=>setOneOf(oneOf)}
+          value={oneOf}
+          isMulti
+          styles={selectStyle} />
+      </FormGroup>
+
+      <Button className="btn" disabled={cantSave} onClick={submitPublicFilter}>{saving?'Adding...':'Add filter'}</Button>
+    </div>
+  );
 }
-
-const mapStateToProps = ( {
-  storageHelpFilters,
-  storageHelpTaskTypes,
-  storageUsers,
-  storageCompanies,
-  storageHelpProjects,
-  userReducer
-} ) => {
-  const {
-    filtersActive,
-    filtersLoaded,
-    filters
-  } = storageHelpFilters;
-  const {
-    taskTypesActive,
-    taskTypesLoaded,
-    taskTypes
-  } = storageHelpTaskTypes;
-  const {
-    usersActive,
-    usersLoaded,
-    users
-  } = storageUsers;
-  const {
-    companiesActive,
-    companiesLoaded,
-    companies
-  } = storageCompanies;
-  const {
-    projectsActive,
-    projects,
-    projectsLoaded
-  } = storageHelpProjects;
-  return {
-    filtersActive,
-    filtersLoaded,
-    filters,
-    taskTypesActive,
-    taskTypesLoaded,
-    taskTypes,
-    usersActive,
-    usersLoaded,
-    users,
-    companiesActive,
-    companiesLoaded,
-    companies,
-    projectsActive,
-    projects,
-    projectsLoaded,
-    currentUser: userReducer
-  };
-};
-
-export default connect( mapStateToProps, {
-  storageUsersStart,
-  storageCompaniesStart,
-  storageHelpTaskTypesStart,
-  storageHelpProjectsStart,
-} )( PublicFilterAdd );

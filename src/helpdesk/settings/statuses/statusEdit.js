@@ -3,17 +3,12 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
   FormGroup,
   Label,
-  Input,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader
+  Input
 } from 'reactstrap';
 import Loading from 'components/loading';
 import {
@@ -22,6 +17,7 @@ import {
 import {
   SketchPicker
 } from "react-color";
+import DeleteReplacement from 'components/deleteReplacement';
 import Select from 'react-select';
 import {
   selectStyle
@@ -31,52 +27,11 @@ import {
 } from 'helperFunctions';
 
 import {
-  GET_STATUSES
-} from './index';
-
-const GET_STATUS = gql `
-query status($id: Int!) {
-  status (
-    id: $id
-  ) {
-    id
-    title
-    color
-    icon
-    action
-    order
-  }
-}
-`;
-
-const UPDATE_STATUS = gql `
-mutation updateStatus($id: Int!, $title: String!, $order: Int!, $icon: String!, $color: String!, $action: StatusAllowedType!) {
-  updateStatus(
-    id: $id,
-    title: $title,
-    color: $color,
-    icon: $icon,
-    action: $action,
-    order: $order,
-  ){
-    id
-    title
-    order
-  }
-}
-`;
-
-export const DELETE_STATUS = gql `
-mutation deleteStatus($id: Int!, $newId: Int!) {
-  deleteStatus(
-    id: $id,
-    newId: $newId,
-  ){
-    id
-  }
-}
-`;
-
+  GET_STATUSES,
+  GET_STATUS,
+  UPDATE_STATUS,
+  DELETE_STATUS
+} from './querries';
 
 export default function StatusEdit( props ) {
   //data
@@ -111,8 +66,7 @@ export default function StatusEdit( props ) {
   const [ icon, setIcon ] = React.useState( "fas fa-arrow-left" );
   const [ action, setAction ] = React.useState( actions[ 0 ] );
   const [ saving, setSaving ] = React.useState( false );
-  const [ choosingNewStatus, setChoosingNewStatus ] = React.useState( false );
-  const [ newStatus, setNewStatus ] = React.useState( null );
+  const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
@@ -154,14 +108,14 @@ export default function StatusEdit( props ) {
     setSaving( false );
   };
 
-  const deleteStatusFunc = () => {
-    setChoosingNewStatus( false );
+  const deleteStatusFunc = ( replacement ) => {
+    setDeleteOpen( false );
 
     if ( window.confirm( "Are you sure?" ) ) {
       deleteStatus( {
           variables: {
             id: parseInt( match.params.id ),
-            newId: newStatus.id,
+            newId: replacement.id,
           }
         } )
         .then( ( response ) => {
@@ -218,33 +172,15 @@ export default function StatusEdit( props ) {
 
       <div className="row">
         <Button className="btn m-t-5" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</Button>
-        {action.value!=='Invoiced' && <Button className="btn-red m-l-5 m-t-5" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewStatus(true)}>Delete</Button>}
+        {action.value!=='Invoiced' && <Button className="btn-red m-l-5 m-t-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</Button>}
       </div>
-
-      <Modal isOpen={choosingNewStatus}>
-        <ModalHeader>
-          Please choose a status to replace this one
-        </ModalHeader>
-        <ModalBody>
-          <FormGroup>
-            <Select
-              styles={selectStyle}
-              options={filteredStatuses}
-              value={newStatus}
-              onChange={s => setNewStatus(s)}
-              />
-          </FormGroup>
-
-        </ModalBody>
-        <ModalFooter>
-          <Button className="btn-link mr-auto"onClick={() => setChoosingNewStatus(false)}>
-            Cancel
-          </Button>
-          <Button className="btn ml-auto" disabled={!newStatus} onClick={deleteStatusFunc}>
-            Complete deletion
-          </Button>
-        </ModalFooter>
-      </Modal>
+      <DeleteReplacement
+        isOpen={deleteOpen}
+        label="status"
+        options={filteredStatuses}
+        close={()=>setDeleteOpen(false)}
+        finishDelete={deleteStatusFunc}
+        />
     </div>
   );
 }

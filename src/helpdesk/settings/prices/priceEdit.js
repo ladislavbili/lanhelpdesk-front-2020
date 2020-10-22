@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -27,69 +26,13 @@ import Loading from 'components/loading';
 import Switch from "react-switch";
 
 import {
-  GET_PRICELISTS
-} from './index';
+  GET_PRICELISTS,
+  GET_PRICELIST,
+  UPDATE_PRICELIST,
+  DELETE_PRICELIST,
+} from './querries';
 
-const GET_PRICELIST = gql `
-query pricelist($id: Int!) {
-  pricelist (
-    id: $id
-  ) {
-    id
-    title
-    order
-    afterHours
-    def
-    materialMargin
-    materialMarginExtra
-    prices {
-      id
-      type
-      price
-      taskType {
-        id
-        title
-      }
-      tripType {
-        id
-        title
-      }
-    }
-  }
-}
-`;
 
-const UPDATE_PRICELIST = gql `
-mutation updatePricelist($id: Int!, $title: String!, $order: Int!, $afterHours: Int!, $def: Boolean!, $materialMargin: Int!, $materialMarginExtra: Int!, $prices: [UpdatePriceInput]! ) {
-  updatePricelist(
-    id: $id,
-    title: $title,
-    order: $order,
-    afterHours: $afterHours,
-    def: $def,
-    materialMargin: $materialMargin,
-    materialMarginExtra: $materialMarginExtra,
-    prices: $prices,
-  ){
-    id
-    title
-    order
-    def
-  }
-}
-`;
-
-export const DELETE_PRICELIST = gql `
-mutation deletePricelist($id: Int!, $newDefId: Int, $newId: Int) {
-  deletePricelist(
-    id: $id,
-    newDefId: $newDefId,
-    newId: $newId,
-  ){
-    id
-  }
-}
-`;
 
 export default function PricelistEdit( props ) {
   //data

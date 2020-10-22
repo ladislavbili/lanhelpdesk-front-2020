@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button
@@ -10,17 +9,9 @@ import {
 import ProjectAdd from './projectAdd';
 import ProjectEdit from './projectEdit';
 import Loading from 'components/loading';
-
-export const GET_PROJECTS = gql `
-query {
-  myProjects {
-    project {
-      title
-      id
-    }
-  }
-}
-`;
+import {
+  GET_PROJECTS
+} from './querries';
 
 export default function ProjectsList( props ) {
   // state
@@ -35,9 +26,7 @@ export default function ProjectsList( props ) {
     data,
     loading
   } = useQuery( GET_PROJECTS );
-  const PROJECTS = ( loading || !data ? [] : data.myProjects.map( item => ( {
-    ...item.project
-  } ) ) );
+  const PROJECTS = ( loading ? [] : data.projects );
 
   return (
     <div className="content">

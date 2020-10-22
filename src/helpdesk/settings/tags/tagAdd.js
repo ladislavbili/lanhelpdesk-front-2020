@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useMutation
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import {
   Button,
   FormGroup,
@@ -14,23 +13,11 @@ import {
 } from "react-color";
 
 import {
-  GET_TAGS
-} from './index';
+  GET_TAGS,
+  ADD_TAG
+} from './querries';
 
-const ADD_TAG = gql `
-mutation addTag($title: String!, $color: String, $order: Int) {
-  addTag(
-    title: $title,
-    color: $color,
-    order: $order,
-  ){
-    id
-    title
-    color
-    order
-  }
-}
-`;
+
 
 export default function TagAdd( props ) {
   //data & queries

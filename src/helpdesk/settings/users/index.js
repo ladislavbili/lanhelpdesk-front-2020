@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button
@@ -15,33 +14,13 @@ import {
 import UserAdd from './userAdd';
 import UserEdit from './userEdit';
 import Loading from 'components/loading';
+import {
+  GET_USERS,
+} from './querries';
 
-export const GET_USERS = gql `
-query {
-  users{
-    id
-    email
-    username
-    role {
-      id
-      title
-    }
-    company {
-      id
-      title
-    }
-  }
-}
-`;
-
-export const GET_ROLES = gql `
-query {
-  roles{
-    id
-    title
-  }
-}
-`;
+import {
+  GET_ROLES,
+} from '../roles/querries';
 
 export default function UserListContainer( props ) {
   //data

@@ -3,203 +3,51 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
   FormGroup,
   Label,
-  Input,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader
+  Input
 } from 'reactstrap';
 import {
   toSelArr
-} from '../../../helperFunctions';
-import Permissions from "../../components/projects/permissions";
-import ProjectDefaultValues from "../../components/projects/defaultValues";
-import Select from 'react-select';
+} from 'helperFunctions';
 import {
-  selectStyle
-} from "configs/components/select";
+  fetchNetOptions
+} from "configs/constants/apollo";
+import {
+  defList,
+  defBool,
+  defItem
+} from 'configs/constants/projects';
+import Permissions from "helpdesk/components/projectPermissions";
+import ProjectDefaultValues from "helpdesk/components/projects/defaultValues";
+import DeleteReplacement from 'components/deleteReplacement';
 import Loading from 'components/loading';
-
 import {
-  GET_PROJECTS
-} from './index';
-
-export const GET_PROJECT = gql `
-query project($id: Int!) {
-  project(
-		id: $id,
-  ){
-    id
-    title
-    descrption
-    lockedRequester
-    projectRights {
-			read
-			write
-			delete
-			internal
-			admin
-			user {
-				id
-        email
-			}
-		}
-    def {
-			assignedTo {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			company {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			overtime {
-				def
-				fixed
-				show
-				value
-			}
-			pausal {
-				def
-				fixed
-				show
-				value
-			}
-			requester {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			status {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			tag {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			taskType {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-		}
-  }
-}
-`;
-
-export const UPDATE_PROJECT = gql `
-mutation updateProject($id: Int!, $title: String, $descrption: String, $lockedRequester: Boolean, $projectRights: [ProjectRightInput], $def: ProjectDefaultsInput) {
-  updateProject(
-		id: $id,
-    title: $title,
-    descrption: $descrption,
-    lockedRequester: $lockedRequester,
-    projectRights: $projectRights,
-    def: $def,
-  ){
-    id
-    title
-  }
-}
-`;
-
-export const DELETE_PROJECT = gql `
-mutation deleteProject($id: Int!, $newId: Int!) {
-  deleteProject(
-    id: $id,
-    newId: $newId,
-  ){
-    id
-  }
-}
-`;
-
-const GET_STATUSES = gql `
-query {
-  statuses{
-    id
-    title
-  }
-}
-`;
-
-const GET_COMPANIES = gql `
-query {
-  companies{
-    id
-    title
-  }
-}
-`;
-
-const GET_USERS = gql `
-query {
-  users{
-    id
-    email
-  }
-}
-`;
-
-const GET_TAGS = gql `
-query {
-  tags{
-    id
-    title
-  }
-}
-`;
-
-const GET_TASK_TYPES = gql `
-query {
-  taskTypes{
-    id
-    title
-  }
-}
-`;
-
-const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    role {
-      accessRights {
-        projects
-      }
-    }
-  }
-}
-`;
+  GET_BASIC_COMPANIES,
+} from '../companies/querries';
+import {
+  GET_BASIC_USERS,
+} from '../users/querries';
+import {
+  GET_STATUSES,
+} from '../statuses/querries';
+import {
+  GET_TAGS,
+} from '../tags/querries';
+import {
+  GET_TASK_TYPES,
+} from '../taskTypes/querries';
+import {
+  GET_PROJECTS,
+  GET_MY_PROJECTS,
+  GET_PROJECT,
+  UPDATE_PROJECT,
+  DELETE_PROJECT,
+  GET_MY_DATA
+} from './querries';
 
 export default function ProjectEdit( props ) {
   //data & queries
@@ -210,7 +58,8 @@ export default function ProjectEdit( props ) {
     projectID
   } = props;
   const {
-    data
+    data: myData,
+    loading: myDataLoading
   } = useQuery( GET_MY_DATA );
   const {
     data: projectData,
@@ -220,9 +69,7 @@ export default function ProjectEdit( props ) {
     variables: {
       id: ( projectID ? projectID : parseInt( match.params.id ) )
     },
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchNetOptions
   } );
   const [ updateProject ] = useMutation( UPDATE_PROJECT );
   const [ deleteProject, {
@@ -231,123 +78,56 @@ export default function ProjectEdit( props ) {
   const {
     data: statusesData,
     loading: statusesLoading
-  } = useQuery( GET_STATUSES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
+  } = useQuery( GET_STATUSES, fetchNetOptions );
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_COMPANIES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
+  } = useQuery( GET_BASIC_COMPANIES, fetchNetOptions );
   const {
     data: usersData,
     loading: usersLoading
-  } = useQuery( GET_USERS, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
+  } = useQuery( GET_BASIC_USERS, fetchNetOptions );
   const {
     data: allTagsData,
     loading: allTagsLoading
-  } = useQuery( GET_TAGS, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
+  } = useQuery( GET_TAGS, fetchNetOptions );
   const {
     data: taskTypesData,
     loading: taskTypesLoading
-  } = useQuery( GET_TASK_TYPES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
+  } = useQuery( GET_TASK_TYPES, fetchNetOptions );
 
   const allProjects = toSelArr( client.readQuery( {
       query: GET_PROJECTS
     } )
     .projects );
   const filteredProjects = allProjects.filter( project => project.id !== ( projectID ? projectID : parseInt( match.params.id ) ) );
-  const theOnlyOneLeft = allProjects.length === 0;
+  const theOnlyOneLeft = allProjects.length === 1;
 
-  const currentUser = data ? data.getMyData : {};
+  const currentUser = myData ? myData.getMyData : {};
 
   //state
   const [ title, setTitle ] = React.useState( "" );
-  const [ descrption, setDescription ] = React.useState( "" );
+  const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
   const [ projectRights, setProjectRights ] = React.useState( [] );
 
-  const [ assignedTo, setAssignedTo ] = React.useState( {
-    fixed: false,
-    def: false,
-    show: true,
-    value: []
-  } );
-  const [ company, setCompany ] = React.useState( {
-    fixed: false,
-    def: false,
-    show: true,
-    value: null,
-  } );
-  const [ overtime, setOvertime ] = React.useState( {
-    fixed: false,
-    def: false,
-    show: true,
-    value: {
-      value: false,
-      label: 'No'
-    }
-  } );
-  const [ pausal, setPausal ] = React.useState( {
-    fixed: false,
-    def: false,
-    show: true,
-    value: {
-      value: false,
-      label: 'No'
-    }
-  } );
-  const [ requester, setRequester ] = React.useState( {
-    fixed: false,
-    def: false,
-    show: true,
-    value: null
-  } );
-  const [ status, setStatus ] = React.useState( {
-    fixed: false,
-    def: false,
-    show: true,
-    value: null
-  } );
-  const [ tag, setTag ] = React.useState( {
-    fixed: false,
-    def: false,
-    show: true,
-    value: []
-  } );
-  const [ taskType, setTaskType ] = React.useState( {
-    fixed: false,
-    def: false,
-    show: true,
-    value: null
-  } );
+  const [ assignedTo, setAssignedTo ] = React.useState( defList );
+  const [ company, setCompany ] = React.useState( defItem );
+  const [ overtime, setOvertime ] = React.useState( defBool );
+  const [ pausal, setPausal ] = React.useState( defBool );
+  const [ requester, setRequester ] = React.useState( defItem );
+  const [ status, setStatus ] = React.useState( defItem );
+  const [ tag, setTag ] = React.useState( defList );
+  const [ taskType, setTaskType ] = React.useState( defItem );
 
   const [ saving, setSaving ] = React.useState( false );
-  const [ newProject, setNewProject ] = React.useState( null );
-  const [ choosingNewProject, setChoosingNewProject ] = React.useState( false );
+  const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
     if ( !projectLoading ) {
       setTitle( projectData.project.title );
-      setDescription( projectData.project.descrption );
+      setDescription( projectData.project.description );
       setLockedRequester( projectData.project.lockedRequester );
       setProjectRights( projectData.project.projectRights );
       let newOvertime = {
@@ -381,7 +161,7 @@ export default function ProjectEdit( props ) {
 
   React.useEffect( () => {
     if ( !projectLoading && !usersLoading ) {
-      let users = toSelArr( usersData.users, 'email' );
+      let users = toSelArr( usersData.basicUsers, 'email' );
       let newAssignedTo = {
         def: projectData.project.def.assignedTo.def,
         fixed: projectData.project.def.assignedTo.fixed,
@@ -401,7 +181,7 @@ export default function ProjectEdit( props ) {
 
   React.useEffect( () => {
     if ( !projectLoading && !companiesLoading ) {
-      let companies = toSelArr( companiesData.companies );
+      let companies = toSelArr( companiesData.basicCompanies );
       let newCompany = {
         def: projectData.project.def.company.def,
         fixed: projectData.project.def.company.fixed,
@@ -521,7 +301,7 @@ export default function ProjectEdit( props ) {
         variables: {
           id: ( projectID ? projectID : parseInt( match.params.id ) ),
           title,
-          descrption,
+          description,
           lockedRequester,
           projectRights: newProjectRights,
           def: newDef,
@@ -531,14 +311,23 @@ export default function ProjectEdit( props ) {
         const updatedProject = {
           ...response.data.updateProject
         };
-        client.writeQuery( {
-          query: GET_PROJECTS,
-          data: {
-            projects: [ ...allProjects.filter( project => project.id !== ( projectID ? projectID : parseInt( match.params.id ) ) ), updatedProject ]
-          }
-        } );
         if ( closeModal ) {
+          client.writeQuery( {
+            query: GET_MY_PROJECTS,
+            data: {
+              projects: [ ...allProjects.filter( project => project.id !== ( projectID ? projectID : parseInt( match.params.id ) ) ), updatedProject ]
+            }
+          } );
+
           closeModal();
+        } else {
+          client.writeQuery( {
+            query: GET_PROJECTS,
+            data: {
+              projects: [ ...allProjects.filter( project => project.id !== ( projectID ? projectID : parseInt( match.params.id ) ) ), updatedProject ]
+            }
+          } );
+
         }
       } )
       .catch( ( err ) => {
@@ -548,26 +337,31 @@ export default function ProjectEdit( props ) {
     setSaving( false );
   };
 
-
-  const deleteProjectFunc = () => {
-    setChoosingNewProject( false );
+  const deleteProjectFunc = ( replacement ) => {
+    setDeleteOpen( false );
     if ( window.confirm( "Are you sure?" ) ) {
       deleteProject( {
           variables: {
             id: ( projectID ? projectID : parseInt( match.params.id ) ),
-            newId: ( newProject ? parseInt( newProject.id ) : null ),
+            newId: parseInt( replacement.id ),
           }
         } )
         .then( ( response ) => {
-          client.writeQuery( {
-            query: GET_PROJECTS,
-            data: {
-              projects: filteredProjects
-            }
-          } );
           if ( closeModal ) {
+            client.writeQuery( {
+              query: GET_MY_PROJECTS,
+              data: {
+                projects: filteredProjects
+              }
+            } );
             closeModal();
           } else {
+            client.writeQuery( {
+              query: GET_PROJECTS,
+              data: {
+                projects: filteredProjects
+              }
+            } );
             history.push( '/helpdesk/settings/projects/add' );
           }
         } )
@@ -578,141 +372,135 @@ export default function ProjectEdit( props ) {
     }
   };
 
-  if ( projectLoading || statusesLoading || companiesLoading || usersLoading || allTagsLoading || taskTypesLoading ) {
+  if (
+    projectLoading ||
+    statusesLoading ||
+    companiesLoading ||
+    usersLoading ||
+    allTagsLoading ||
+    taskTypesLoading ||
+    myDataLoading
+  ) {
     return <Loading />
   }
 
-  const cannotSave = saving || title === "" || ( company && company.value === null && company.fixed ) || ( status && status.value === null && status.fixed ) || ( assignedTo && assignedTo.value.length === 0 && assignedTo.fixed ) || ( taskType && taskType.value === null && taskType.fixed );
+  const cannotSave = (
+    saving ||
+    title === "" ||
+    ( company && company.value === null && company.fixed ) ||
+    ( status && status.value === null && status.fixed ) ||
+    ( assignedTo && assignedTo.value.length === 0 && assignedTo.fixed ) ||
+    ( taskType && taskType.value === null && taskType.fixed ) ||
+    !projectRights.some( ( projectRight ) => projectRight.admin )
+  )
 
-  const rights = projectRights.findIndex( p => p.user.id === currentUser.id );
-  const isAdmin = rights >= 0 ? projectRights[ rights ].admin : false;
+  const myProjectRights = projectRights.find( p => p.user.id === currentUser.id );
+  const isAdmin = myProjectRights !== undefined && myProjectRights.admin;
 
-  let canReadUserIDs = [];
-  let canBeAssigned = [];
-
-  if ( !usersLoading ) {
-    canReadUserIDs = projectRights.map( ( permission ) => permission.user.id );
-    canBeAssigned = toSelArr( usersData.users, 'email' )
-      .filter( ( user ) => canReadUserIDs.includes( user.id ) );
-  }
+  let canReadUserIDs = projectRights.map( ( permission ) => permission.user.id );
+  let canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
+    .filter( ( user ) => canReadUserIDs.includes( user.id ) );
 
   return (
     <div className="p-20 fit-with-header-and-commandbar scroll-visible">
-				<FormGroup>
-					<Label for="name">Project name</Label>
-					<Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
-				</FormGroup>
+      <FormGroup>
+        <Label for="name">Project name</Label>
+        <Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
+      </FormGroup>
 
-				<FormGroup>
-					<Label htmlFor="description">Popis</Label>
-					<Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={descrption} onChange={(e) => setDescription( e.target.value )}/>
-				</FormGroup>
+      <FormGroup>
+        <Label htmlFor="description">Popis</Label>
+        <Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription( e.target.value )}/>
+      </FormGroup>
 
-				<Permissions
-					addUser={(user)=>{
-            let newProjectRights = [...projectRights, {user, read: true, write: false, delete: false, internal: false, admin: false}];
-						setProjectRights(newProjectRights);
-					}}
-					givePermission={(user, right)=>{
-						let newProjectRights=[...projectRights];
-						let index = projectRights.findIndex((r)=>r.user.id === user.id);
-						let item = newProjectRights[index];
-						item.read = right.read;
-						item.write = right.write;
-						item.delete = right.delete;
-						item.internal= right.internal;
-						item.admin = right.admin;
+      <Permissions
+        addUser={(user)=>{
+          let newProjectRights = [...projectRights, {user, read: true, write: false, delete: false, internal: false, admin: false}];
+          setProjectRights(newProjectRights);
+        }}
+        givePermission={(user, right)=>{
+          let newProjectRights=[...projectRights];
+          let index = projectRights.findIndex((r)=>r.user.id === user.id);
+          let item = newProjectRights[index];
+          item.read = right.read;
+          item.write = right.write;
+          item.delete = right.delete;
+          item.internal= right.internal;
+          item.admin = right.admin;
 
-						if(!item.read){
-							newProjectRights.splice(index,1);
-              setProjectRights(newProjectRights);
-              if (lockedRequester){
-                let newAssignedTo = {...assignedTo};
-                newAssignedTo.value = newAssignedTo.value.filter(u => u.id !== item.user.id);
-                setAssignedTo(newAssignedTo);
-              }
-						}else{
+          if(!item.read){
+            newProjectRights.splice(index,1);
             setProjectRights(newProjectRights);
-						}
-					}}
-          users={(usersLoading ? [] : toSelArr(usersData.users, 'email'))}
-					permissions={projectRights}
-					userID={currentUser.id}
-					isAdmin={isAdmin}
-					lockedRequester={lockedRequester}
-					lockRequester={() => setLockedRequester( !lockedRequester) }
-					/>
+            if (lockedRequester){
+              let newAssignedTo = {...assignedTo};
+              newAssignedTo.value = newAssignedTo.value.filter(u => u.id !== item.user.id);
+              setAssignedTo(newAssignedTo);
+            }
+          }else{
+            setProjectRights(newProjectRights);
+          }
+        }}
+        users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+        permissions={projectRights}
+        userID={currentUser.id}
+        isAdmin={currentUser.role.accessRights.projects || currentUser.role.accessRights.addProjects || isAdmin}
+        lockedRequester={lockedRequester}
+        lockRequester={() => setLockedRequester( !lockedRequester) }
+        />
 
-					<ProjectDefaultValues
-		        assignedTo={assignedTo}
-		        setAssignedTo={setAssignedTo}
-		        company={company}
-		        setCompany={setCompany}
-		        overtime={overtime}
-		        setOvertime={setOvertime}
-		        pausal={pausal}
-		        setPausal={setPausal}
-		        requester={requester}
-		        setRequester={setRequester}
-		        status={status}
-		        setStatus={setStatus}
-		        tag={tag}
-		        setTag={setTag}
-		        taskType={taskType}
-		        setTaskType={setTaskType}
-		        statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
-		        companies={(companiesLoading ? [] : toSelArr(companiesData.companies))}
-		        canBeAssigned={canBeAssigned}
-		        users={lockedRequester ? (toSelArr(projectRights.map(r => r.user), 'email')) : (usersLoading ? [] : toSelArr(usersData.users, 'email'))}
-		        allTags={(allTagsLoading ? [] : toSelArr(allTagsData.tags))}
-		        taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
-						/>
+      <ProjectDefaultValues
+        assignedTo={assignedTo}
+        setAssignedTo={setAssignedTo}
+        company={company}
+        setCompany={setCompany}
+        overtime={overtime}
+        setOvertime={setOvertime}
+        pausal={pausal}
+        setPausal={setPausal}
+        requester={requester}
+        setRequester={setRequester}
+        status={status}
+        setStatus={setStatus}
+        tag={tag}
+        setTag={setTag}
+        taskType={taskType}
+        setTaskType={setTaskType}
+        statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
+        companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
+        canBeAssigned={canBeAssigned}
+        users={lockedRequester ? (toSelArr(projectRights.map(r => r.user), 'email')) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+        allTags={(allTagsLoading ? [] : toSelArr(allTagsData.tags))}
+        taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
+        />
 
-					{ (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) || ( taskType.value === null && taskType.fixed)) &&
-						<div className="red" style={{color:'red'}}>
-						Status, assigned to, task type and company can't be empty if they are fixed!
-					</div>
-				}
+      { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) || ( taskType.value === null && taskType.fixed)) &&
+        <div className="red" style={{color:'red'}}>
+          Status, assigned to, task type and company can't be empty if they are fixed!
+        </div>
+      }
 
-				<Modal isOpen={choosingNewProject}>
-					<ModalHeader>
-						Please choose an project to replace this one
-					</ModalHeader>
-					<ModalBody>
-						<FormGroup>
-							<Select
-								styles={selectStyle}
-								options={filteredProjects}
-								value={newProject}
-								onChange={s => setNewProject(s)}
-								/>
-						</FormGroup>
-					</ModalBody>
-					<ModalFooter>
-						<Button className="btn-link mr-auto"onClick={() => setChoosingNewProject(false)}>
-							Cancel
-						</Button>
-						<Button className="btn ml-auto" disabled={!newProject} onClick={deleteProjectFunc}>
-							Complete deletion
-						</Button>
-					</ModalFooter>
-				</Modal>
-
-					<div className="row">
-					<Button
-						className="btn"
-						disabled={cannotSave}
-						onClick={updateProjectFunc}>
-						{(saving?'Saving...':'Save project')}
-					</Button>
-					<Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewProject(true)}>
-						Delete
-					</Button>
-          {closeModal &&
-            <Button className="btn-link ml-auto" onClick={() => closeModal()}>
-              Close
-            </Button>}
-				</div>
+      <div className="row">
+        <Button
+          className="btn"
+          disabled={cannotSave}
+          onClick={updateProjectFunc}>
+          {(saving?'Saving...':'Save project')}
+        </Button>
+        <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
+          Delete
+        </Button>
+        {closeModal &&
+          <Button className="btn-link ml-auto" onClick={() => closeModal()}>
+            Close
+          </Button>}
+        </div>
+        <DeleteReplacement
+          isOpen={deleteOpen}
+          label="project"
+          options={filteredProjects}
+          close={()=>setDeleteOpen(false)}
+          finishDelete={deleteProjectFunc}
+          />
       </div>
   );
 }

@@ -58,6 +58,15 @@ query {
 }
 `;
 
+export const GET_BASIC_COMPANIES = gql `
+query {
+  basicCompanies {
+    title
+    id
+  }
+}
+`;
+
 export const GET_COMPANY = gql `
 query company($id: Int!) {
   company (
@@ -111,6 +120,7 @@ query company($id: Int!) {
     }
 }
 `;
+
 export const UPDATE_COMPANY = gql `
 mutation updateCompany($id: Int!, $title: String, $dph: Int, $ico: String, $dic: String, $ic_dph: String, $country: String, $city: String, $street: String, $zip: String, $email: String, $phone: String, $description: String, $pricelistId: Int!, $monthly: Boolean, $monthlyPausal: Float, $taskWorkPausal: Float, $taskTripPausal: Float, $rents: [CompanyRentUpdateInput]) {
   updateCompany(

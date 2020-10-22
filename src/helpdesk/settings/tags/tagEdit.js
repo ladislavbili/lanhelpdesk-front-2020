@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -17,47 +16,11 @@ import {
 } from "react-color";
 
 import {
-  GET_TAGS
-} from './index';
-
-const GET_TAG = gql `
-query tag($id: Int!) {
-  tag (
-    id: $id
-  ) {
-    id
-    title
-    color
-    order
-  }
-}
-`;
-
-const UPDATE_TAG = gql `
-mutation updateTag($id: Int!, $title: String, $color: String, $order: Int) {
-  updateTag(
-    id: $id,
-    title: $title,
-    color: $color,
-    order: $order,
-  ){
-    id
-    title
-    color
-    order
-  }
-}
-`;
-
-export const DELETE_TAG = gql `
-mutation deleteTag($id: Int!) {
-  deleteTag(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
+  GET_TAG,
+  GET_TAGS,
+  UPDATE_TAG,
+  DELETE_TAG
+} from './querries';
 
 export default function TagEdit( props ) {
   //data

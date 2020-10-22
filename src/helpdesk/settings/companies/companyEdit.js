@@ -9,33 +9,24 @@ import {
   FormGroup,
   Label,
   Input,
-  Modal,
-  ModalHeader,
-  ModalFooter,
-  ModalBody
 } from 'reactstrap';
 import Switch from "react-switch";
 import {
   toSelArr
 } from '../../../helperFunctions';
-import Select from 'react-select';
-import {
-  selectStyle
-} from "configs/components/select";
 
 import {
   isEmail
 } from '../../../helperFunctions';
 import CompanyRents from './companyRents';
 import CompanyPriceList from './companyPriceList';
+import DeleteReplacement from 'components/deleteReplacement';
 import Loading from 'components/loading';
 
 import {
-  GET_PRICELISTS
-} from '../prices/index';
-import {
+  GET_PRICELISTS,
   ADD_PRICELIST
-} from '../prices/priceAdd';
+} from '../prices/querries';
 
 import {
   GET_COMPANY,
@@ -141,9 +132,7 @@ export default function CompanyEdit( props ) {
   const [ newData, setNewData ] = React.useState( false );
   const [ clearCompanyRents, setClearCompanyRents ] = React.useState( false );
   const [ fakeID, setFakeID ] = React.useState( 0 );
-
-  const [ newCompany, setNewCompany ] = React.useState( null );
-  const [ choosingNewCompany, setChoosingNewCompany ] = React.useState( false );
+  const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
   const [ rents, setRents ] = React.useState( [] );
 
@@ -276,14 +265,14 @@ export default function CompanyEdit( props ) {
     setNewData( false );
   };
 
-  const deleteCompanyFunc = () => {
-    setChoosingNewCompany( false );
+  const deleteCompanyFunc = ( replacement ) => {
+    setDeleteOpen( false );
 
     if ( window.confirm( "Are you sure?" ) ) {
       deleteCompany( {
           variables: {
             id: parseInt( match.params.id ),
-            newId: parseInt( newCompany.id ),
+            newId: parseInt( replacement.id ),
           }
         } )
         .then( ( response ) => {
@@ -753,7 +742,7 @@ export default function CompanyEdit( props ) {
                 }
             }}>{saving?'Saving...':'Save changes'}</Button>
           }
-           <Button className="btn-red" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setChoosingNewCompany(true)}>Delete</Button>
+           <Button className="btn-red" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</Button>
 
           {newData &&
             <Button
@@ -762,31 +751,13 @@ export default function CompanyEdit( props ) {
               onClick={cancel}>Cancel changes</Button>
           }
         </div>
-
-        <Modal isOpen={choosingNewCompany}>
-          <ModalHeader>
-            Please choose a company to replace this one
-          </ModalHeader>
-          <ModalBody>
-            <FormGroup>
-              <Select
-                styles={selectStyle}
-                options={filteredCompanies}
-                value={newCompany}
-                onChange={role => setNewCompany(role)}
-                />
-            </FormGroup>
-
-          </ModalBody>
-          <ModalFooter>
-            <Button className="btn-link mr-auto"onClick={() => setChoosingNewCompany(false)}>
-              Cancel
-            </Button>
-            <Button className="btn ml-auto" disabled={!newCompany} onClick={deleteCompanyFunc}>
-              Complete deletion
-            </Button>
-          </ModalFooter>
-        </Modal>
+        <DeleteReplacement
+          isOpen={deleteOpen}
+          label="company"
+          options={filteredCompanies}
+          close={()=>setDeleteOpen(false)}
+          finishDelete={deleteCompanyFunc}
+          />
 
       </div>
   );

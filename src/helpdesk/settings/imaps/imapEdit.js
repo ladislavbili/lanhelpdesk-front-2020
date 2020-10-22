@@ -37,7 +37,7 @@ import {
   GET_ROLES,
 } from '../roles/querries';
 import {
-  GET_COMPANIES,
+  GET_BASIC_COMPANIES,
 } from '../companies/querries';
 import {
   GET_PROJECTS,
@@ -67,7 +67,7 @@ export default function IMAPEdit( props ) {
   const {
     data: companyData,
     loading: companiesLoading
-  } = useQuery( GET_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES );
   const {
     data: projectData,
     loading: projectsLoading
@@ -135,7 +135,7 @@ export default function IMAPEdit( props ) {
       setIgnoredRecieversDestination( data.imap.ignoredRecieversDestination );
       setRole( toSelArr( roleData.roles )
         .find( ( role ) => role.id === data.imap.role.id ) );
-      setCompany( toSelArr( companyData.companies )
+      setCompany( toSelArr( companyData.basicCompanies )
         .find( ( company ) => company.id === data.imap.company.id ) );
       setProject( toSelArr( projectData.projects )
         .find( ( project ) => project.id === data.imap.project.id ) );
@@ -367,7 +367,7 @@ export default function IMAPEdit( props ) {
             <Label for="project">Users Company</Label>
             <Select
               styles={selectStyle}
-              options={toSelArr(companyData.companies)}
+              options={toSelArr(companyData.basicCompanies)}
               value={company}
               onChange={company => setCompany(company)}
               />

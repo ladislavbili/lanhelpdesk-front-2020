@@ -3,7 +3,6 @@ import {
   useMutation,
   useQuery
 } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 
 import {
   Button,
@@ -23,55 +22,18 @@ import {
 import Checkbox from 'components/checkbox';
 
 import {
-  GET_USERS
-} from './index';
+  GET_USERS,
+  ADD_USER
+} from './querries';
 
-const ADD_USER = gql `
-mutation registerUser($username: String!, $email: String!, $name: String!, $language: LanguageEnum!, $surname: String!, $password: String!, $receiveNotifications: Boolean, $signature: String, $roleId: Int!, $companyId: Int!) {
-  registerUser(
-    username: $username,
-    email: $email,
-    name: $name,
-    surname: $surname,
-    password: $password,
-    receiveNotifications: $receiveNotifications,
-    signature: $signature,
-    roleId: $roleId,
-    companyId: $companyId,
-    language: $language,
-  ){
-    id
-    email
-    username
-    role {
-      id
-      title
-    }
-    company {
-      title
-    }
-  }
-}
-`;
+import {
+  GET_ROLES,
+} from '../roles/querries';
 
-export const GET_ROLES = gql `
-query {
-  roles{
-    id
-    title
-    level
-  }
-}
-`;
+import {
+  GET_BASIC_COMPANIES,
+} from '../companies/querries';
 
-export const GET_COMPANIES = gql `
-query {
-  companies{
-    id
-    title
-  }
-}
-`;
 
 export default function UserAddContainer( props ) {
   // data & queries
@@ -87,13 +49,13 @@ export default function UserAddContainer( props ) {
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES );
   const [ registerUser, {
     client
   } ] = useMutation( ADD_USER );
 
   const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
-  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.companies ) );
+  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
 
   const languages = [ {
     label: "SK",

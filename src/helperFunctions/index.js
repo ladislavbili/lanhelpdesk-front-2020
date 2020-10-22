@@ -6,7 +6,8 @@ from './select';
 
 export {
   isEmail,
-  sameStringForms
+  sameStringForms,
+  textIncluded,
 }
 from './dataChecks';
 
@@ -38,7 +39,6 @@ export {
   filterDateSatisfied,
   filterOneOf,
   filterProjectsByPermissions,
-  filterIncludesText
 }
 from './filter';
 
@@ -59,6 +59,11 @@ export {
   getItemDisplayValue
 }
 from './showData';
+
+export {
+  fromObjectToState,
+}
+from './reactFunctions';
 
 export {
   hightlightText,

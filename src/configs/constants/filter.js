@@ -1,5 +1,4 @@
-export const oneOfOptions = [
-  {
+export const oneOfOptions = [ {
     value: 'requester',
     label: 'Requester'
   },
@@ -13,11 +12,34 @@ export const oneOfOptions = [
   }
 ]
 
+export const ofCurrentUser = {
+  label: 'Current',
+  value: 'cur',
+  id: 'cur'
+};
+
+
 export const emptyFilter = {
-  requester:{id:null,label:'Žiadny',value:null},
-  company:{id:null,label:'Žiadny',value:null},
-  assigned:{id:null,label:'Žiadny',value:null},
-  workType:{id:null,label:'Žiadny',value:null},
+  requester: {
+    id: null,
+    label: 'Žiadny',
+    value: null
+  },
+  company: {
+    id: null,
+    label: 'Žiadny',
+    value: null
+  },
+  assigned: {
+    id: null,
+    label: 'Žiadny',
+    value: null
+  },
+  taskType: {
+    id: null,
+    label: 'Žiadny',
+    value: null
+  },
 
   statusDateFrom: null,
   statusDateFromNow: false,
@@ -41,6 +63,6 @@ export const emptyFilter = {
   deadlineTo: null,
   deadlineToNow: false,
 
-  public:false,
+  public: false,
   oneOf: []
 }

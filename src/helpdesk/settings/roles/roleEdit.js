@@ -8,19 +8,12 @@ import {
   FormGroup,
   Label,
   Input,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader
 } from 'reactstrap';
 import ErrorMessage from 'components/errorMessage';
+import DeleteReplacement from 'components/deleteReplacement';
 import {
   toSelArr
 } from 'helperFunctions';
-import Select from 'react-select';
-import {
-  selectStyle
-} from "configs/components/select";
 import Loading from 'components/loading';
 import RightRow from './rightRow';
 
@@ -196,8 +189,7 @@ export default function RoleEdit( props ) {
     },
   ];
 
-  const [ newRole, setNewRole ] = React.useState( null );
-  const [ choosingNewRole, setChoosingNewRole ] = React.useState( false );
+  const [ deleteOpen, setDeleteOpen ] = React.useState( false );
   const [ saving, setSaving ] = React.useState( false );
 
   // sync
@@ -251,14 +243,14 @@ export default function RoleEdit( props ) {
     setSaving( false );
   };
 
-  const deleteRoleFunc = () => {
-    setChoosingNewRole( false );
+  const deleteRoleFunc = ( replacement ) => {
+    setDeleteOpen( false );
 
     if ( window.confirm( "Are you sure?" ) ) {
       deleteRole( {
           variables: {
             id: parseInt( match.params.id ),
-            newId: parseInt( newRole.id ),
+            newId: parseInt( replacement.id ),
           }
         } )
         .then( ( response ) => {
@@ -358,38 +350,21 @@ export default function RoleEdit( props ) {
         </table>
       </div>
 
-      <Modal isOpen={choosingNewRole}>
-        <ModalHeader>
-          Please choose a role to replace this one
-        </ModalHeader>
-        <ModalBody>
-          <FormGroup>
-            <Select
-              styles={selectStyle}
-              options={filteredRoles}
-              value={newRole}
-              onChange={s => setNewRole(s)}
-              />
-          </FormGroup>
-        </ModalBody>
-        <ModalFooter>
-          <Button className="btn-link mr-auto"onClick={() => setChoosingNewRole(false)}>
-            Cancel
-          </Button>
-          <Button className="btn ml-auto" disabled={!newRole} onClick={deleteRoleFunc}>
-            Complete deletion
-          </Button>
-        </ModalFooter>
-      </Modal>
-
       <div className="row">
         <Button className="btn" disabled={saving || currentUserLevel === null || currentUserLevel >= level} onClick={updateRoleFunc}>{saving?'Saving...':'Save'}</Button>
-        <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft || currentUserLevel === null || currentUserLevel >= level } onClick={ () => setChoosingNewRole(true) }>Delete</Button>
+        <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft || currentUserLevel === null || currentUserLevel >= level } onClick={ () => setDeleteOpen(true) }>Delete</Button>
         {props.close &&
           <Button className="btn-link"
             onClick={()=>{props.close()}}>Cancel</Button>
         }
       </div>
+      <DeleteReplacement
+        isOpen={deleteOpen}
+        label="role"
+        options={filteredRoles}
+        close={()=>setDeleteOpen(false)}
+        finishDelete={deleteRoleFunc}
+        />
     </div>
   );
 }
