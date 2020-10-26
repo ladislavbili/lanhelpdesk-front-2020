@@ -530,8 +530,6 @@ export default function TasksIndex( props ) {
     return ( <Loading /> );
   }
 
-  console.log( match.params.taskID );
-
   let link = '';
   if ( match.params.hasOwnProperty( 'listID' ) ) {
     link = '/helpdesk/taskList/i/' + match.params.listID;

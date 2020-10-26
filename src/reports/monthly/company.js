@@ -1,112 +1,126 @@
 import React from 'react';
 
 import {
-	useQuery,
-	useLazyQuery,
-	useApolloClient
+  useQuery,
+  useLazyQuery,
+  useApolloClient
 } from "@apollo/react-hooks";
 
 import moment from 'moment';
 import Select from 'react-select';
 
 import {
-	toSelArr,
-	orderArr
+  toSelArr,
+  orderArr
 } from 'helperFunctions';
 
 import MonthSelector from '../components/monthSelector';
 import Loading from 'components/loading';
 
 import {
-	selectStyleColored
+  selectStyleColored
 } from 'configs/components/select';
 
-import { months } from '../components/constants';
+import {
+  months
+} from '../components/constants';
 
 import {
   GET_INVOICE_COMPANIES,
-	GET_STATUSES,
-	GET_LOCAL_CACHE
+  GET_STATUSES,
+  //  GET_LOCAL_CACHE
 } from './querries';
 
-export default function  MothlyReportsCompany (props) {
+export default function MothlyReportsCompany( props ) {
+  /*
 	const {
 		data: localCache
 	} = useQuery( GET_LOCAL_CACHE );
-
-	const {
+*/
+  const {
     data: statusesData,
     loading: statusesLoading
   } = useQuery( GET_STATUSES );
 
-	const [ fromDate, setFromDate ] = React.useState(
-		moment().startOf('month')
-		);
-	const [ toDate, setToDate ] = React.useState(
-		moment().endOf('month')
-	);
-	const [ year, setYear ] = React.useState( {
-	      label: moment().year(),
-	      value: moment().year()
-	} );
+  const [ fromDate, setFromDate ] = React.useState(
+    moment()
+    .startOf( 'month' )
+  );
+  const [ toDate, setToDate ] = React.useState(
+    moment()
+    .endOf( 'month' )
+  );
+  const [ year, setYear ] = React.useState( {
+    label: moment()
+      .year(),
+    value: moment()
+      .year()
+  } );
   const [ month, setMonth ] = React.useState(
-		months[moment().month()]
-	);
+    months[ moment()
+      .month() ]
+  );
 
-	const client = useApolloClient();
+  const client = useApolloClient();
 
-	const [ chosenStatuses, setChosenStatuses ] = React.useState( [] );
+  const [ chosenStatuses, setChosenStatuses ] = React.useState( [] );
 
-	const [ fetchInvoiceCompanies, { loading: invoiceCompaniesLoading, data: invoiceCompaniesData }] = useLazyQuery(GET_INVOICE_COMPANIES);
+  const [ fetchInvoiceCompanies, {
+    loading: invoiceCompaniesLoading,
+    data: invoiceCompaniesData
+  } ] = useLazyQuery( GET_INVOICE_COMPANIES );
 
-	const onTrigger = (newFrom, newTo) => {
-		fetchInvoiceCompanies({
-	    variables: {
-	      fromDate: newFrom ? newFrom.valueOf().toString() : fromDate.valueOf().toString(),
-				toDate: newTo ? newTo.valueOf().toString() : toDate.valueOf().toString(),
-				statuses: chosenStatuses.map(status => status.id)
-	    }
-		});
-	}
+  const onTrigger = ( newFrom, newTo ) => {
+    fetchInvoiceCompanies( {
+      variables: {
+        fromDate: newFrom ? newFrom.valueOf()
+          .toString() : fromDate.valueOf()
+          .toString(),
+        toDate: newTo ? newTo.valueOf()
+          .toString() : toDate.valueOf()
+          .toString(),
+        statuses: chosenStatuses.map( status => status.id )
+      }
+    } );
+  }
 
-	//const [ pickedTasks, setPickedTasks ] = React.useState( [] );
-	//const [ showCompany, setShowCompany ] = React.useState( null );
+  //const [ pickedTasks, setPickedTasks ] = React.useState( [] );
+  //const [ showCompany, setShowCompany ] = React.useState( null );
 
-	React.useEffect( () => {
-		if ( !statusesLoading ) {
-			const statuses = statusesData && statusesData.statuses ?
-			toSelArr( orderArr( statusesData.statuses.filter( (status) => status.action === 'CloseDate') ) ) :
-			[];
-			setChosenStatuses( statuses );
-			client.writeData( {
-				data: {
-					reportsChosenStatuses: statuses.map(status => status.id),
-				}
-			} );
-		}
-	}, [ statusesLoading ] );
+  React.useEffect( () => {
+    if ( !statusesLoading ) {
+      const statuses = statusesData && statusesData.statuses ?
+        toSelArr( orderArr( statusesData.statuses.filter( ( status ) => status.action === 'CloseDate' ) ) ) : [];
+      setChosenStatuses( statuses );
+      client.writeData( {
+        data: {
+          reportsChosenStatuses: statuses.map( status => status.id ),
+        }
+      } );
+    }
+  }, [ statusesLoading ] );
 
-	React.useEffect( () => {
-		if (chosenStatuses.length > 0){
-			onTrigger();
-		}
-	}, [ chosenStatuses ] );
-/*
-	React.useEffect( () => {
-		if (localCache) {
-			if ( localCache.reportsChosenStatuses.length > 0){
-				onTrigger();
-			}
-		}
-	}, [ localCache ] );*/
+  React.useEffect( () => {
+    if ( chosenStatuses.length > 0 ) {
+      onTrigger();
+    }
+  }, [ chosenStatuses ] );
+  /*
+  	React.useEffect( () => {
+  		if (localCache) {
+  			if ( localCache.reportsChosenStatuses.length > 0){
+  				onTrigger();
+  			}
+  		}
+  	}, [ localCache ] );*/
 
-	const loading = statusesLoading || invoiceCompaniesLoading;
+  const loading = statusesLoading || invoiceCompaniesLoading;
 
-	const STATUSES = statusesData && statusesData.statuses ?  toSelArr( orderArr( statusesData.statuses ) ) : [];
-	const INVOICE_COMPANIES = invoiceCompaniesData && invoiceCompaniesData.getInvoiceCompanies ? invoiceCompaniesData.getInvoiceCompanies : [];
+  const STATUSES = statusesData && statusesData.statuses ? toSelArr( orderArr( statusesData.statuses ) ) : [];
+  const INVOICE_COMPANIES = invoiceCompaniesData && invoiceCompaniesData.getInvoiceCompanies ? invoiceCompaniesData.getInvoiceCompanies : [];
 
-	return (
-		<div className="scrollable fit-with-header">
+  return (
+    <div className="scrollable fit-with-header">
 			<h2 className="m-l-20 m-t-20">Firmy</h2>
 			<div style={{maxWidth:500}}>
 				<MonthSelector
@@ -203,5 +217,5 @@ export default function  MothlyReportsCompany (props) {
 				}
 			</div>
 		</div>
-	);
+  );
 }

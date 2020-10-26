@@ -1,183 +1,232 @@
 import React from 'react';
 
 import classnames from "classnames";
-import { Nav, NavItem, NavLink} from 'reactstrap';
+import {
+  Nav,
+  NavItem,
+  NavLink
+} from 'reactstrap';
 import Select from 'react-select';
-import {selectStyle, invisibleSelectStyle} from 'configs/components/select';
+import {
+  selectStyle,
+  invisibleSelectStyle
+} from 'configs/components/select';
 import Checkbox from '../../components/checkbox';
 
-export default function Rozpocet (props) {
+export default function Rozpocet( props ) {
   //data & queries
-  const { disabled, company, defaultType, taskAssigned,
-    tripTypes, taskTypes, subtasks, workTrips, materials, customItems, showColumns, showSubtasks, updateSubtask, updateSubtasks, removeSubtask, updateTrip, updateTrips, removeTrip,
-    updateMaterial, updateMaterials, removeMaterial, updateCustomItem, updateCustomItems, removeCustomItem,
-    submitService, submitTrip, submitMaterial, submitCustomItem} = props;
+  const {
+    disabled,
+    company,
+    defaultType,
+    taskAssigned,
+    tripTypes,
+    taskTypes,
+    subtasks,
+    workTrips,
+    materials,
+    customItems,
+    showColumns,
+    showSubtasks,
+    updateSubtask,
+    updateSubtasks,
+    removeSubtask,
+    updateTrip,
+    updateTrips,
+    removeTrip,
+    updateMaterial,
+    updateMaterials,
+    removeMaterial,
+    updateCustomItem,
+    updateCustomItems,
+    removeCustomItem,
+    submitService,
+    submitTrip,
+    submitMaterial,
+    submitCustomItem
+  } = props;
 
-	//state
-  const [ toggleTab, setToggleTab ] = React.useState("1");
+  //state
+  const [ toggleTab, setToggleTab ] = React.useState( "1" );
 
-	//subtasks
-	const [ showAddSubtask, setShowAddSubtask ] = React.useState(false);
+  //subtasks
+  const [ showAddSubtask, setShowAddSubtask ] = React.useState( false );
 
-  const [ editedSubtaskTitle, setEditedSubtaskTitle ] = React.useState("");
-  const [ editedSubtaskQuantity, setEditedSubtaskQuantity ] = React.useState(0);
-  const [ editedSubtaskDiscount, setEditedSubtaskDiscount ] = React.useState(0);
+  const [ editedSubtaskTitle, setEditedSubtaskTitle ] = React.useState( "" );
+  const [ editedSubtaskQuantity, setEditedSubtaskQuantity ] = React.useState( 0 );
+  const [ editedSubtaskDiscount, setEditedSubtaskDiscount ] = React.useState( 0 );
   const [ focusedSubtask, setFocusedSubtask ] = React.useState( null );
+  const [ newSubtaskTitle, setNewSubtaskTitle ] = React.useState( "" );
+  const [ newSubtaskType, setNewSubtaskType ] = React.useState( defaultType );
+  const [ newSubtaskAssigned, setNewSubtaskAssigned ] = React.useState( taskAssigned.length > 0 ? taskAssigned[ 0 ] : null );
+  const [ newSubtaskQuantity, setNewSubtaskQuantity ] = React.useState( 0 );
+  const [ newSubtaskDiscount, setNewSubtaskDiscount ] = React.useState( 0 );
 
-	const [ newSubtaskTitle, setNewSubtaskTitle ] = React.useState("");
-  const [ newSubtaskType, setNewSubtaskType ] = React.useState(defaultType);
-  const [ newSubtaskAssigned, setNewSubtaskAssigned ] = React.useState(taskAssigned.length>0?taskAssigned[0]:null);
-  const [ newSubtaskQuantity, setNewSubtaskQuantity ] = React.useState(0);
-  const [ newSubtaskDiscount, setNewSubtaskDiscount ] = React.useState(0);
+  //trips
+  const [ showAddTrip, setShowAddTrip ] = React.useState( false );
 
-		//trips
-		const [ showAddTrip, setShowAddTrip ] = React.useState(false);
+  const [ editedTripQuantity, setEditedTripQuantity ] = React.useState( 0 );
+  const [ editedTripDiscount, setEditedTripDiscount ] = React.useState( 0 );
+  const [ focusedTrip, setFocusedTrip ] = React.useState( null );
 
-	  const [ editedTripQuantity, setEditedTripQuantity ] = React.useState(0);
-	  const [ editedTripDiscount, setEditedTripDiscount ] = React.useState(0);
-	  const [ focusedTrip, setFocusedTrip ] = React.useState( null );
+  const [ newTripType, setNewTripType ] = React.useState( tripTypes.length > 0 ? tripTypes[ 0 ] : null );
+  const [ newTripAssigned, setNewTripAssigned ] = React.useState( taskAssigned.length > 0 ? taskAssigned[ 0 ] : null );
+  const [ newTripQuantity, setNewTripQuantity ] = React.useState( 1 );
+  const [ newTripDiscount, setNewTripDiscount ] = React.useState( 0 );
 
-	  const [ newTripType, setNewTripType ] = React.useState(tripTypes.length>0 ? tripTypes[0]:null);
-	  const [ newTripAssigned, setNewTripAssigned ] = React.useState(taskAssigned.length>0?taskAssigned[0]:null);
-	  const [ newTripQuantity, setNewTripQuantity ] = React.useState(1);
-	  const [ newTripDiscount, setNewTripDiscount ] = React.useState(0);
+  //Materials
+  const [ showAddMaterial, setShowAddMaterial ] = React.useState( false );
+  const [ marginChanged, setMarginChanged ] = React.useState( false );
+  const [ focusedMaterial, setFocusedMaterial ] = React.useState( null );
 
-		//Materials
-		const [ showAddMaterial, setShowAddMaterial ] = React.useState( false);
-		const [ marginChanged, setMarginChanged ] = React.useState(false);
-		const [ focusedMaterial, setFocusedMaterial ] = React.useState( null);
+  const [ editedMaterialTitle, setEditedMaterialTitle ] = React.useState( "" );
+  const [ editedMaterialQuantity, setEditedMaterialQuantity ] = React.useState( 0 );
+  const [ editedMaterialMargin, setEditedMaterialMargin ] = React.useState( null );
+  const [ editedMaterialPrice, setEditedMaterialPrice ] = React.useState( null );
 
-		const [ editedMaterialTitle, setEditedMaterialTitle ] = React.useState("");
-		const [ editedMaterialQuantity, setEditedMaterialQuantity ] = React.useState( 0);
-		const [ editedMaterialMargin, setEditedMaterialMargin ] = React.useState(null);
-		const [ editedMaterialPrice, setEditedMaterialPrice ] = React.useState(null);
+  const [ newMaterialTitle, setNewMaterialTitle ] = React.useState( '' );
+  const [ newMaterialQuantity, setNewMaterialQuantity ] = React.useState( 1 );
+  const [ newMaterialMargin, setNewMaterialMargin ] = React.useState( company && company.pricelist ? company.pricelist.materialMargin : 0 );
+  const [ newMaterialPrice, setNewMaterialPrice ] = React.useState( 0 );
+  const [ newDiscountedMaterialPrice, setNewDiscountedMaterialPrice ] = React.useState( 0 );
 
-		const [ newMaterialTitle, setNewMaterialTitle ] = React.useState('');
-		const [ newMaterialQuantity, setNewMaterialQuantity ] = React.useState(1);
-		const [ newMaterialMargin, setNewMaterialMargin ] = React.useState(company && company.pricelist ? company.pricelist.materialMargin : 0);
-		const [ newMaterialPrice, setNewMaterialPrice ] = React.useState(0);
-    const [ newDiscountedMaterialPrice, setNewDiscountedMaterialPrice ] = React.useState(0);
+  // Custom items
+  const [ showAddCustomItem, setShowAddCustomItem ] = React.useState( false );
+  const [ focusedCustomItem, setFocusedCustomItem ] = React.useState( null );
 
-		// Custom items
-		const [ showAddCustomItem, setShowAddCustomItem ] = React.useState(false);
-		const [ focusedCustomItem, setFocusedCustomItem ] = React.useState(null);
+  const [ editedCustomItemTitle, setEditedCustomItemTitle ] = React.useState( "" );
+  const [ editedCustomItemQuantity, setEditedCustomItemQuantity ] = React.useState( 0 );
+  const [ editedCustomItemPrice, setEditedCustomItemPrice ] = React.useState( null );
 
-		const [ editedCustomItemTitle, setEditedCustomItemTitle ] = React.useState("");
-		const [ editedCustomItemQuantity, setEditedCustomItemQuantity ] = React.useState(0);
-		const [ editedCustomItemPrice, setEditedCustomItemPrice ] = React.useState(null);
+  const [ newCustomItemTitle, setNewCustomItemTitle ] = React.useState( '' );
+  const [ newCustomItemQuantity, setNewCustomItemQuantity ] = React.useState( 1 );
+  const [ newCustomItemPrice, setNewCustomItemPrice ] = React.useState( 0 );
 
-		const [ newCustomItemTitle, setNewCustomItemTitle ] = React.useState('');
-		const [ newCustomItemQuantity, setNewCustomItemQuantity ] = React.useState(1);
-		const [ newCustomItemPrice, setNewCustomItemPrice ] = React.useState(0);
+  React.useEffect( () => {
+    setNewMaterialMargin( company && company.pricelist ? company.pricelist.materialMargin : 0 );
+  }, [ company ] )
 
-	const getCreationError = () => {
-		let noType = newSubtaskType===null;
-		let noAssigned = newSubtaskAssigned===null;
-		let noCompany = company===null;
-		if(!noType && !noAssigned && !noCompany){
-			return ''
-		}
-		if(noType && noAssigned && noCompany){
-			return 'First assign the task to someone, pick task type and company!';
-		}
-		if(!noType && noAssigned && noCompany){
-			return 'First assign the task to someone and pick company!';
-		}
-		if(!noType && !noAssigned && noCompany){
-			return 'First pick company!';
-		}
-		if(!noType && noAssigned && !noCompany){
-			return 'First assign the task to someone!';
-		}
-		if(noType && !noAssigned && noCompany){
-			return 'First pick task type and company!';
-		}
-		if(noType && !noAssigned && !noCompany){
-			return 'First pick task type!';
-		}
-		if(noType && noAssigned && !noCompany){
-			return 'First assign the task to someone and pick task type!';
-		}
-	}
+  React.useEffect( () => {
+    setNewSubtaskAssigned( taskAssigned.length > 0 ? taskAssigned[ 0 ] : null );
+    setNewTripAssigned( taskAssigned.length > 0 ? taskAssigned[ 0 ] : null );
+  }, [ taskAssigned ] )
 
-	const onFocusWorkTrip = (trip) => {
-		setEditedTripQuantity(trip.quantity);
-		setEditedTripDiscount(trip.discount);
-		setFocusedTrip(trip.id);
-	}
+  React.useEffect( () => {
+    setNewSubtaskType( defaultType )
+  }, [ defaultType ] )
 
-	const onFocusSubtask = (subtask) => {
-		setEditedSubtaskTitle(subtask.title);
-		setEditedSubtaskQuantity(subtask.quantity?subtask.quantity:'');
-		setEditedSubtaskDiscount(subtask.discount);
-		setFocusedSubtask(subtask.id);
-	}
+  const getCreationError = () => {
+    let noType = newSubtaskType === null;
+    let noAssigned = newSubtaskAssigned === null;
+    let noCompany = company === null;
+    console.log();
+    if ( !noType && !noAssigned && !noCompany ) {
+      return ''
+    }
+    if ( noType && noAssigned && noCompany ) {
+      return 'First assign the task to someone, pick task type and company!';
+    }
+    if ( !noType && noAssigned && noCompany ) {
+      return 'First assign the task to someone and pick company!';
+    }
+    if ( !noType && !noAssigned && noCompany ) {
+      return 'First pick company!';
+    }
+    if ( !noType && noAssigned && !noCompany ) {
+      return 'First assign the task to someone!';
+    }
+    if ( noType && !noAssigned && noCompany ) {
+      return 'First pick task type and company!';
+    }
+    if ( noType && !noAssigned && !noCompany ) {
+      return 'First pick task type!';
+    }
+    if ( noType && noAssigned && !noCompany ) {
+      return 'First assign the task to someone and pick task type!';
+    }
+  }
 
-	const onFocusMaterial = (material) => {
-		setEditedMaterialTitle(material.title);
-		setEditedMaterialQuantity(material.quantity);
-		setEditedMaterialMargin(material.margin);
-		setEditedMaterialPrice(material.price);
-		setFocusedMaterial(material.id);
-	}
+  const onFocusWorkTrip = ( trip ) => {
+    setEditedTripQuantity( trip.quantity );
+    setEditedTripDiscount( trip.discount );
+    setFocusedTrip( trip.id );
+  }
 
-	const onFocusCustomItem = (customItem) => {
-		setEditedCustomItemTitle(customItem.title);
-		setEditedCustomItemQuantity(customItem.quantity);
-		setEditedCustomItemPrice(customItem.price);
-		setFocusedCustomItem(customItem.id);
-	}
+  const onFocusSubtask = ( subtask ) => {
+    setEditedSubtaskTitle( subtask.title );
+    setEditedSubtaskQuantity( subtask.quantity ? subtask.quantity : '' );
+    setEditedSubtaskDiscount( subtask.discount );
+    setFocusedSubtask( subtask.id );
+  }
 
-	const getPrice = (type) => {
-		if(!type){
-			return NaN;
-		}
-    let price = (company && company.pricelist && company.pricelist.prices ? company.pricelist.prices.find(price => {
-      if (type.__typename === "TaskType" && price.type === "TaskType") {
+  const onFocusMaterial = ( material ) => {
+    setEditedMaterialTitle( material.title );
+    setEditedMaterialQuantity( material.quantity );
+    setEditedMaterialMargin( material.margin );
+    setEditedMaterialPrice( material.price );
+    setFocusedMaterial( material.id );
+  }
+
+  const onFocusCustomItem = ( customItem ) => {
+    setEditedCustomItemTitle( customItem.title );
+    setEditedCustomItemQuantity( customItem.quantity );
+    setEditedCustomItemPrice( customItem.price );
+    setFocusedCustomItem( customItem.id );
+  }
+
+  const getPrice = ( type ) => {
+    if ( !type ) {
+      return NaN;
+    }
+    let price = ( company && company.pricelist && company.pricelist.prices ? company.pricelist.prices.find( price => {
+      if ( type.__typename === "TaskType" && price.type === "TaskType" ) {
         return price.taskType.id === type.id;
-      } else if (type.__typename === "TripType" && price.type === "TripType"){
+      } else if ( type.__typename === "TripType" && price.type === "TripType" ) {
         return price.tripType.id === type.id;
       }
       return false;
-    }) : undefined);
-		if(price === undefined){
-			price = NaN;
-		}else{
-			price = price.price;
-		}
-		return parseFloat(parseFloat(price).toFixed(2));
-	}
+    } ) : undefined );
+    if ( price === undefined ) {
+      price = NaN;
+    } else {
+      price = price.price;
+    }
+    return parseFloat( parseFloat( price )
+      .toFixed( 2 ) );
+  }
 
-	const getTotalPrice = (item) => {
-		return parseFloat(getPrice(item.type).toFixed(2))
-	}
+  const getTotalPrice = ( item ) => {
+    return parseFloat( getPrice( item.type )
+      .toFixed( 2 ) )
+  }
 
-	const getTotalDiscountedPrice = (item) => {
-		return parseFloat(parseFloat(getTotalPrice(item)*(100-parseInt(item.discount))/100).toFixed(2))
-	}
+  const getTotalDiscountedPrice = ( item ) => {
+    return parseFloat( parseFloat( getTotalPrice( item ) * ( 100 - parseInt( item.discount ) ) / 100 )
+      .toFixed( 2 ) )
+  }
 
-	const getDiscountedMaterialPrice = (material) => {
-		return parseFloat( material.price * ( 1 + material.margin / 100 ))
-	}
+  const getDiscountedMaterialPrice = ( material ) => {
+    return parseFloat( material.price * ( 1 + material.margin / 100 ) )
+  }
 
-	const getBasicMaterialPrice = (material) => {
-		return parseFloat( material.price / ( 1 + material.margin / 100 ))
-	}
+  const getBasicMaterialPrice = ( material ) => {
+    return parseFloat( material.price / ( 1 + material.margin / 100 ) )
+  }
 
-	const getDPH = () => {
-		let dph = 20;
-		if(company && company.dph > 0){
-			dph = company.dph;
-		}
-		return (100+dph)/100;
-	}
+  const getDPH = () => {
+    let dph = 20;
+    if ( company && company.dph > 0 ) {
+      dph = company.dph;
+    }
+    return ( 100 + dph ) / 100;
+  }
 
-	let sortedWorks = subtasks.sort((work1,work2) => work1.order - work2.order);
-	let sortedTrips = workTrips.sort((trip1,trip2) => trip1.order - trip2.order);
-	let sortedMaterials = materials.sort((material1,material2) => material1.order - material2.order);
-	let sortedCustomItems = customItems.sort((customItem1,customItem2) => customItem1.order - customItem2.order);
-return (
-		<div className="vykazyTable">
+  let sortedWorks = subtasks.sort( ( work1, work2 ) => work1.order - work2.order );
+  let sortedTrips = workTrips.sort( ( trip1, trip2 ) => trip1.order - trip2.order );
+  let sortedMaterials = materials.sort( ( material1, material2 ) => material1.order - material2.order );
+  let sortedCustomItems = customItems.sort( ( customItem1, customItem2 ) => customItem1.order - customItem2.order );
+  return (
+    <div className="vykazyTable">
 			<div className="" style={{color: "#FF4500", height: "20px"}}>
 				{getCreationError()}
 		</div>
@@ -933,7 +982,7 @@ return (
 											</button>
 										</td>
 									}
-								</tr>)							
+								</tr>)
 						}
 					)}
 
@@ -1373,7 +1422,7 @@ return (
 										disabled={disabled}
 										onClick={()=>{
 											let body={
-												margin:newMaterialMargin!==''?newMaterialMargin:0,
+												margin:newMaterialMargin!==''?parseFloat(newMaterialMargin):0,
 												price:newMaterialPrice!==''?newMaterialPrice:0,
 												quantity:newMaterialQuantity!==''? parseFloat(newMaterialQuantity) :0,
 												title:newMaterialTitle,
@@ -1586,5 +1635,5 @@ return (
 				</div>
 			}
 	</div>
-	);
+  );
 }

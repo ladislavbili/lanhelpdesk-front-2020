@@ -1,9 +1,13 @@
 import React from 'react';
-import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import {
+  useMutation
+} from "@apollo/react-hooks";
 
 import Select from 'react-select';
-import { Label, Button } from 'reactstrap';
+import {
+  Label,
+  Button
+} from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 
@@ -17,183 +21,258 @@ import classnames from "classnames";
 import CKEditor5 from '@ckeditor/ckeditor5-react';
 import ck5config from 'configs/components/ck5config';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
+import axios from 'axios';
 import datePickerConfig from 'configs/components/datepicker';
-import {invisibleSelectStyleNoArrow, invisibleSelectStyleNoArrowColored,invisibleSelectStyleNoArrowColoredRequired, invisibleSelectStyleNoArrowRequired} from 'configs/components/select';
+import {
+  invisibleSelectStyleNoArrow,
+  invisibleSelectStyleNoArrowColored,
+  invisibleSelectStyleNoArrowColoredRequired,
+  invisibleSelectStyleNoArrowRequired
+} from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect'
-import { noMilestone } from 'configs/constants/sidebar';
-import { noDef } from 'configs/constants/projects';
+import {
+  noMilestone
+} from 'configs/constants/sidebar';
+import {
+  noDef
+} from 'configs/constants/projects';
+import {
+  ADD_TASK
+} from './querries';
 
-export const ADD_TASK = gql`
-mutation addTask($title: String!, $closeDate: String, $assignedTo: [Int]!, $company: Int!, $deadline: String, $description: String!, $milestone: Int, $overtime: Boolean!, $pausal: Boolean!, $pendingChangable: Boolean, $pendingDate: String, $project: Int!, $requester: Int, $status: Int!, $tags: [Int]!, $taskType: Int!, $repeat: RepeatInput, $subtasks: [SubtaskInput], $workTrips: [WorkTripInput], $materials: [MaterialInput], $customItems: [CustomItemInput]) {
-  addTask(
-    title: $title,
-    closeDate: $closeDate,
-    assignedTo: $assignedTo,
-    company: $company,
-    deadline: $deadline,
-    description: $description,
-    milestone: $milestone,
-    overtime: $overtime,
-    pausal: $pausal,
-    pendingChangable: $pendingChangable,
-    pendingDate: $pendingDate,
-    project: $project,
-    requester: $requester,
-    status: $status,
-    tags: $tags,
-    taskType: $taskType,
-    repeat: $repeat,
-    subtasks: $subtasks,
-    workTrips: $workTrips,
-    materials: $materials,
-    customItems: $customItems,
-  ){
-    id
-    title
-  }
-}
-`;
+import {
+  REST_URL
+} from 'configs/restAPI';
 
-export default function TaskAdd (props){
+export default function TaskAdd( props ) {
   //data & queries
-  const { match, loading, newID, projectID, currentUser, projects, users, allTags, taskTypes, tripTypes, milestones, companies, statuses, units, defaultUnit, closeModal } = props;
-  const [ addTask ] = useMutation(ADD_TASK);
+  const {
+    match,
+    loading,
+    newID,
+    projectID,
+    currentUser,
+    projects,
+    users,
+    allTags,
+    taskTypes,
+    tripTypes,
+    milestones,
+    companies,
+    statuses,
+    units,
+    defaultUnit,
+    closeModal
+  } = props;
+  const [ addTask ] = useMutation( ADD_TASK );
 
   //state
-  const [ layout, setLayout ] = React.useState(1);
+  const [ layout, setLayout ] = React.useState( 1 );
 
-	const [ defaultFields, setDefaultFields ] = React.useState(noDef);
+  const [ defaultFields, setDefaultFields ] = React.useState( noDef );
 
-  const [ attachments, setAttachments ] = React.useState([]);
-  const [ assignedTo, setAssignedTo ] = React.useState([]);
-  const [ closeDate, setCloseDate ] = React.useState(null);
-  const [ company, setCompany ] = React.useState(null);
-  const [ customItems, setCustomItems ] = React.useState([]);
-  const [ deadline, setDeadline ] = React.useState(null);
-  const [ description, setDescription ] = React.useState("");
-  const [ descriptionVisible, setDescriptionVisible ] = React.useState(false);
-  const [ milestone, setMilestone ] = React.useState([noMilestone]);
-  const [ overtime, setOvertime ] = React.useState(booleanSelects[0]);
-  const [ pausal, setPausal ] = React.useState(booleanSelects[0]);
-  const [ pendingDate, setPendingDate ] = React.useState(null);
-  const [ pendingChangable, setPendingChangable ] = React.useState(false);
-  const [ project, setProject ] = React.useState(projectID ? projects.find(p => p.id === projectID) : null);
-//  const [ reminder, setReminder ] = React.useState(null);
-  const [ repeat, setRepeat ] = React.useState(null);
-  const [ requester, setRequester ] = React.useState(null);
-  const [ saving, setSaving ] = React.useState(false);
-  const [ status, setStatus ] = React.useState(null);
-  const [ subtasks, setSubtasks ] = React.useState([]);
-  const [ tags, setTags ] = React.useState([]);
-  const [ materials, setMaterials ] = React.useState([]);
-  const [ taskType, setTaskType ] = React.useState(null);
-	const [ title, setTitle ] = React.useState("");
-  const [ workTrips, setWorkTrips ] = React.useState([]);
+  const [ attachments, setAttachments ] = React.useState( [] );
+  const [ assignedTo, setAssignedTo ] = React.useState( [] );
+  const [ closeDate, setCloseDate ] = React.useState( null );
+  const [ company, setCompany ] = React.useState( null );
+  const [ customItems, setCustomItems ] = React.useState( [] );
+  const [ deadline, setDeadline ] = React.useState( null );
+  const [ description, setDescription ] = React.useState( "" );
+  const [ descriptionVisible, setDescriptionVisible ] = React.useState( false );
+  const [ milestone, setMilestone ] = React.useState( [ noMilestone ] );
+  const [ overtime, setOvertime ] = React.useState( booleanSelects[ 0 ] );
+  const [ pausal, setPausal ] = React.useState( booleanSelects[ 0 ] );
+  const [ pendingDate, setPendingDate ] = React.useState( null );
+  const [ pendingChangable, setPendingChangable ] = React.useState( false );
+  const [ project, setProject ] = React.useState( projectID ? projects.find( p => p.id === projectID ) : null );
+  //  const [ reminder, setReminder ] = React.useState(null);
+  const [ repeat, setRepeat ] = React.useState( null );
+  const [ requester, setRequester ] = React.useState( null );
+  const [ saving, setSaving ] = React.useState( false );
+  const [ status, setStatus ] = React.useState( null );
+  const [ subtasks, setSubtasks ] = React.useState( [] );
+  const [ tags, setTags ] = React.useState( [] );
+  const [ materials, setMaterials ] = React.useState( [] );
+  const [ taskType, setTaskType ] = React.useState( null );
+  const [ title, setTitle ] = React.useState( "" );
+  const [ workTrips, setWorkTrips ] = React.useState( [] );
 
   let counter = 0;
 
-	const getNewID = () => {
-			return counter++;
-		}
+  const getNewID = () => {
+    return counter++;
+  }
 
-	const userRights = project ? project.projectRights.find(r => r.user.id === currentUser.id) : false;
+  const userRights = project ? project.projectRights.find( r => r.user.id === currentUser.id ) : false;
 
-	const [ viewOnly, setViewOnly ] = React.useState(currentUser.role.level !== 0 && !userRights.write);
+  const [ viewOnly, setViewOnly ] = React.useState( currentUser.role.level !== 0 && !userRights.write );
 
-	const setDefaults = (id, forced) => {
-		if(id === null){
-			setDefaultFields( noDef );
-			return;
-		}
+  const setDefaults = ( id, forced ) => {
+    if ( id === null ) {
+      setDefaultFields( noDef );
+      return;
+    }
 
-		let pro = projects.find((proj) => proj.id === id);
-		let def = pro.def;
-		if(!def){
-			setDefaultFields( noDef );
-			return;
-		}
+    let pro = projects.find( ( proj ) => proj.id === id );
+    let def = pro.def;
+    if ( !def ) {
+      setDefaultFields( noDef );
+      return;
+    }
 
-		if (props.task && !forced) {
-			setDefaultFields( def );
-			return;
-		}
+    if ( props.task && !forced ) {
+      setDefaultFields( def );
+      return;
+    }
 
-		let maybeRequester = users ? users.find((user)=>user.id === currentUser.id) : null;
+    let maybeRequester = null;
+    if ( users ) {
+      if ( pro.lockedRequester && pro.projectRights.some( ( right ) => right.user.id === currentUser.id ) ) {
+        users.find( ( user ) => user.id === currentUser.id );
+      } else {
+        users.find( ( user ) => user.id === currentUser.id );
+      }
+    }
 
-		let permissionIDs = project ? project.projectRights.map((permission) => permission.user.id) : [];
+    let permissionIDs = project ? project.projectRights.map( ( permission ) => permission.user.id ) : [];
 
-		let filterredAssignedTo = assignedTo.filter((user)=>permissionIDs.includes(user.id));
-		let newAssignedTo = def.assignedTo && (def.assignedTo.fixed || def.assignedTo.def) ? users.filter((item)=> def.assignedTo.value.includes(item.id)) : filterredAssignedTo;
-		setAssignedTo(newAssignedTo);
+    let filterredAssignedTo = assignedTo.filter( ( user ) => permissionIDs.includes( user.id ) );
+    let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.includes( item.id ) ) : filterredAssignedTo;
+    setAssignedTo( newAssignedTo );
 
-    let newRequester = def.requester && (def.requester.fixed || def.requester.def) ? users.find((item)=> item.id === def.requester.value.id) : maybeRequester;
-    setRequester(newRequester);
+    let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
+    setRequester( newRequester );
 
-		let newCompany = def.company && (def.company.fixed || def.company.def) ? companies.find((item)=> item.id === def.company.value) : (companies && newRequester ? companies.find((company) => company.id === currentUser.company.id) : null);
-		setCompany(newCompany);
+    let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value ) : ( companies && newRequester ? companies.find( ( company ) => company.id === currentUser.company.id ) : null );
+    setCompany( newCompany );
 
 
-		let newStatus = def.status && (def.status.fixed || def.status.def) ? statuses.find((item)=> item.id === def.status.value.is) : statuses[0];
-		setStatus(newStatus);
+    let newStatus = def.status && ( def.status.fixed || def.status.def ) ? statuses.find( ( item ) => item.id === def.status.value.is ) : statuses[ 0 ];
+    setStatus( newStatus );
 
-		let mappedTags = def.tag.value.map(t => t.id);
-		let newTags = def.tag&& (def.tag.fixed || def.tag.def) ? allTags.filter((item)=> mappedTags.includes(item.id)) : allTags;
-		setTags(newTags);
+    let mappedTags = def.tag.value.map( t => t.id );
+    let newTags = def.tag && ( def.tag.fixed || def.tag.def ) ? allTags.filter( ( item ) => mappedTags.includes( item.id ) ) : allTags;
+    setTags( newTags );
 
-		let newTaskType = def.taskType && (def.taskType.fixed || def.taskType.def) ? taskTypes.find((item)=> item.id===def.taskType.value) : taskType;
-		setTaskType(newTaskType);
+    let newTaskType = def.taskType && ( def.taskType.fixed || def.taskType.def ) ? taskTypes.find( ( item ) => item.id === def.taskType.value ) : taskType;
+    setTaskType( newTaskType );
 
-		let newOvertime = def.overtime && (def.overtime.fixed || def.overtime.def) ? booleanSelects.find((item)=> def.overtime.value === item.value) : overtime;
-		setOvertime(newOvertime);
+    let newOvertime = def.overtime && ( def.overtime.fixed || def.overtime.def ) ? booleanSelects.find( ( item ) => def.overtime.value === item.value ) : overtime;
+    setOvertime( newOvertime );
 
-		let newPausal = def.pausal && (def.pausal.fixed || def.pausal.def) ? booleanSelects.find((item)=> def.pausal.value === item.value) : pausal;
-		setPausal(newPausal);
+    let newPausal = def.pausal && ( def.pausal.fixed || def.pausal.def ) ? booleanSelects.find( ( item ) => def.pausal.value === item.value ) : pausal;
+    setPausal( newPausal );
 
-		setProject(pro);
+    setProject( pro );
 
-		const userRights = pro.projectRights.find(r => r.user.id === currentUser.id);
-		setViewOnly(currentUser.role.level !== 0 && !userRights.write);
+    const userRights = pro.projectRights.find( r => r.user.id === currentUser.id );
+    setViewOnly( currentUser.role.level !== 0 && !userRights.write );
 
-		setDefaultFields( def );
-	}
+    setDefaultFields( def );
+  }
 
-	const addTaskFunc = () => {
-		setSaving(true);
-    addTask({ variables: {
-      title,
-      closeDate: closeDate ? closeDate.unix().toString() : null,
-      assignedTo: assignedTo.map(user => user.id),
-      company: company.id,
-      deadline: deadline ?  deadline.unix().toString() : null,
-      description,
-      milestone: milestone ? milestone.id : null,
-      overtime: overtime.value,
-      pausal: pausal.value,
-      pendingChangable,
-      pendingDate: pendingDate ? pendingDate.unix().toString() : null,
-      project: project.id,
-      requester: requester ? requester.id : null,
-      status: status.id,
-      tags: tags.map(tag => tag.id),
-      taskType: taskType ? taskType.id: null,
-      repeat: repeat ? {...repeat, startsAt: repeat.startsAt + "", repeatEvery: repeat.repeatEvery + ""} : null,
-      subtasks:  subtasks.map(item => ({title: item.title, order: item.order, done: item.done, quantity: item.quantity, discount: item.discount, type: item.type.id, assignedTo: item.assignedTo.id})),
-      workTrips:  workTrips.map(item => ({order: item.order, done: item.done, quantity: item.quantity, discount: item.discount, type: item.type.id, assignedTo: item.assignedTo.id})),
-      materials: materials.map(item => ({title: item.title, order: item.order, done: item.done, quantity: item.quantity, margin: item.margin, price: parseFloat(item.price)})),
-      customItems:  customItems.map(item => ({title: item.title, order: item.order, done: item.done, quantity: item.quantity, price: parseFloat(item.price)})),
-    } }).then( ( response ) => {
-      console.log(response);
-      closeModal();
-    }).catch( (err) => {
-      console.log(err.message);
-    });
-		setSaving(false);
-	}
+  const addTaskFunc = () => {
+    setSaving( true );
+    addTask( {
+        variables: {
+          title,
+          closeDate: closeDate ? closeDate.valueOf()
+            .toString() : null,
+          assignedTo: assignedTo.map( user => user.id ),
+          company: company.id,
+          deadline: deadline ? deadline.valueOf()
+            .toString() : null,
+          description,
+          milestone: milestone ? milestone.id : null,
+          overtime: overtime.value,
+          pausal: pausal.value,
+          pendingChangable,
+          pendingDate: pendingDate ? pendingDate.valueOf()
+            .toString() : null,
+          project: project.id,
+          requester: requester ? requester.id : null,
+          status: status.id,
+          tags: tags.map( tag => tag.id ),
+          taskType: taskType ? taskType.id : null,
+          repeat: repeat ? {
+            ...repeat,
+            startsAt: repeat.startsAt + "",
+            repeatEvery: repeat.repeatEvery + ""
+          } : null,
+          subtasks: subtasks.map( item => ( {
+            title: item.title,
+            order: item.order,
+            done: item.done,
+            quantity: item.quantity,
+            discount: item.discount,
+            type: item.type.id,
+            assignedTo: item.assignedTo.id
+          } ) ),
+          workTrips: workTrips.map( item => ( {
+            order: item.order,
+            done: item.done,
+            quantity: item.quantity,
+            discount: item.discount,
+            type: item.type.id,
+            assignedTo: item.assignedTo.id
+          } ) ),
+          materials: materials.map( item => ( {
+            title: item.title,
+            order: item.order,
+            done: item.done,
+            quantity: item.quantity,
+            margin: item.margin,
+            price: parseFloat( item.price )
+          } ) ),
+          customItems: customItems.map( item => ( {
+            title: item.title,
+            order: item.order,
+            done: item.done,
+            quantity: item.quantity,
+            price: parseFloat( item.price )
+          } ) ),
+        }
+      } )
+      .then( ( response ) => {
+        if ( attachments.length > 0 ) {
+          const formData = new FormData();
+          attachments.map( ( attachment ) => attachment.data )
+            .forEach( ( file ) => formData.append( `file`, file ) );
+          formData.append( "token", `Bearer ${localStorage.getItem( "acctok" )}` );
+          formData.append( "taskId", response.data.addTask.id );
+          axios.post( `${REST_URL}/upload-attachments`, formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            } )
+            .then( ( response2 ) => {
+              if ( response2.data.ok ) {
+                setSaving( false );
+                closeModal();
+              } else {
+                console.log( response2 );
+                setSaving( false );
+              }
+            } )
+            .catch( ( err ) => {
+              console.log( err.message );
+              setSaving( false );
+            } );
+        } else {
+          setSaving( false );
+          closeModal();
+        }
 
-	const	renderTitle = () => {
-		return (
-			<div className="row m-b-15">
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+        setSaving( false );
+      } );
+  }
+
+  const renderTitle = () => {
+    return (
+      <div className="row m-b-15">
 				<span className="center-hor flex m-r-15">
 					<input type="text"
 						 value={title}
@@ -242,15 +321,15 @@ export default function TaskAdd (props){
 				Switch layout
 			</button>
 		</div>
-	);
-}
+    );
+  }
 
-const USERS_WITH_PERMISSIONS = users.filter((user)=> project && project.projectRights.some((r) => r.user.id === user.id));
-const REQUESTERS =  (project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users);
+  const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.projectRights.some( ( r ) => r.user.id === user.id ) );
+  const REQUESTERS = ( project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users );
 
-const renderSelectsLayout1 = () => {
-	return(
-		<div className="row">
+  const renderSelectsLayout1 = () => {
+    return (
+      <div className="row">
 				{viewOnly &&
 					<div className="row p-r-10">
 					<Label className="col-3 col-form-label">Projekt</Label>
@@ -540,11 +619,12 @@ const renderSelectsLayout1 = () => {
 			</div>
 		</div>}
 	</div>
-)}
+    )
+  }
 
-const renderSelectsLayout2 = () => {
-	return(
-		<div className="task-edit-right">
+  const renderSelectsLayout2 = () => {
+    return (
+      <div className="task-edit-right">
 				{viewOnly &&
 					<div className="">
 						<Label className="col-form-label-2">Projekt</Label>
@@ -839,12 +919,12 @@ const renderSelectsLayout2 = () => {
 			</div>}
 
 	</div>
-	)
-}
+    )
+  }
 
-	const renderPopis = () => {
-		return(
-			<div>
+  const renderPopis = () => {
+    return (
+      <div>
 				<Label className="m-b-10 col-form-label m-t-10">Popis úlohy</Label>
 					{!descriptionVisible &&
 						<span className="task-edit-popis p-20 text-muted" onClick={()=>setDescriptionVisible(true)}>
@@ -864,12 +944,12 @@ const renderSelectsLayout2 = () => {
 							/>
 					}
 		</div>
-		)
-	}
+    )
+  }
 
-	const renderTags = () => {
-		return (
-			<div className="row m-t-10">
+  const renderTags = () => {
+    return (
+      <div className="row m-t-10">
 				<div className="center-hor">
 					<Label className="center-hor">Tagy: </Label>
 				</div>
@@ -885,17 +965,17 @@ const renderSelectsLayout2 = () => {
 						/>
 				</div>
 			</div>
-		)
-	}
+    )
+  }
 
-	const renderAttachments = () => {
-		return (
-			<Attachments
+  const renderAttachments = () => {
+    return (
+      <Attachments
 				disabled={viewOnly}
 				taskID={null}
 				attachments={attachments}
 				addAttachments={(newAttachments)=>{
-					let time = moment().unix();
+					let time = moment().valueOf();
 					newAttachments = newAttachments.map((attachment)=>{
 						return {
 							title:attachment.name,
@@ -912,13 +992,12 @@ const renderSelectsLayout2 = () => {
 					setAttachments([...newAttachments]);
 				}}
 				/>
-			)
-	}
+    )
+  }
 
-
-	const renderVykazyTable = (subtasks, workTrips, materials, customItems) => {
-		return(
-			<VykazyTable
+  const renderVykazyTable = ( subtasks, workTrips, materials, customItems ) => {
+    return (
+      <VykazyTable
           id={company ? company.id : 0}
 					showColumns={ [0,1,2,3,4,5,6,7,8] }
 
@@ -1024,12 +1103,12 @@ const renderSelectsLayout2 = () => {
 					units={units}
 					defaultUnit={defaultUnit}
 					/>
-		)
-	}
+    )
+  }
 
-	const renderButtons = () => {
-		return (
-			<div>
+  const renderButtons = () => {
+    return (
+      <div>
 				{closeModal &&
 					<Button className="btn-link-remove" onClick={() => closeModal()}>Cancel</Button>
 				}
@@ -1040,11 +1119,11 @@ const renderSelectsLayout2 = () => {
 					> Create task
 				</button>
 			</div>
-		)
-	}
+    )
+  }
 
-	return (
-		<div className={classnames("scrollable", { "p-20": layout === 1}, { "row": layout === 2})}>
+  return (
+    <div className={classnames("scrollable", { "p-20": layout === 1}, { "row": layout === 2})}>
 
 			<div className={classnames({ "task-edit-left p-l-20 p-r-20 p-b-15 p-t-15": layout === 2})}>
 
@@ -1069,5 +1148,5 @@ const renderSelectsLayout2 = () => {
 				{ layout === 2 && renderSelectsLayout2() }
 
 			</div>
-	);
+  );
 }

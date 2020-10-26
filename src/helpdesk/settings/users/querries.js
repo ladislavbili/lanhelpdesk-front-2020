@@ -95,7 +95,18 @@ query user($id: Int!) {
 `;
 
 export const UPDATE_USER = gql `
-mutation updateUser($id: Int!, $username: String, $email: String, $name: String, $surname: String, $receiveNotifications: Boolean, $signature: String, $roleId: Int, $companyId: Int, $language: LanguageEnum) {
+mutation updateUser(
+  $id: Int!,
+  $username: String,
+  $email: String,
+  $name: String,
+  $surname: String,
+  $receiveNotifications: Boolean,
+  $signature: String, $roleId: Int,
+  $companyId: Int,
+  $language: LanguageEnum
+  $password: String
+  ) {
   updateUser(
     id: $id,
     username: $username,
@@ -107,8 +118,19 @@ mutation updateUser($id: Int!, $username: String, $email: String, $name: String,
     roleId: $roleId,
     companyId: $companyId,
     language: $language,
+    password: $password
   ){
     id
+    email
+    username
+    role {
+      id
+      title
+    }
+    company {
+      id
+      title
+    }
   }
 }
 `;
@@ -119,6 +141,28 @@ mutation deleteUser($id: Int!) {
     id: $id,
   ){
     id
+  }
+}
+`;
+
+export const SET_USER_ACTIVE = gql `
+mutation setUserActive($id: Int!, $active: Boolean!) {
+  setUserActive(
+    id: $id,
+    active: $active
+  ){
+    id
+  }
+}
+`;
+
+export const GET_MY_DATA = gql `
+query {
+  getMyData{
+    id
+    role {
+      level
+    }
   }
 }
 `;
