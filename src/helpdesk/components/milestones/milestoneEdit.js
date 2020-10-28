@@ -114,23 +114,25 @@ export default function MilestoneEdit( props ) {
           } )
           .myProjects;
         const newProjects = allProjects.map( item => {
-          if ( item.project.id !== projectID ) {
+          if ( item.project.id !== projectData.localProject.project.id ) {
             return {
               ...item
             };
           }
           let newProject = {
-            ...item
-          };
-          newProject.project.milestones = newProject.project.milestones.map( item => {
-            if ( item.id !== id ) {
-              return item;
+            ...item,
+            project: {
+              ...item.project,
+              milestones: [
+                ...item.project.milestones.filter( ( milestone ) => milestone.id === id ),
+                {
+                  ...item.project.milestones.filter( ( milestone ) => milestone.id === id ),
+                  ...response.data.updateMilestone,
+                  __typename: "Milestone"
+                }
+              ]
             }
-            return {
-              ...response.data.updateMilestone,
-              __typename: "Milestone"
-            };
-          } );
+          };
           return newProject;
         } );
         client.writeQuery( {
@@ -139,7 +141,7 @@ export default function MilestoneEdit( props ) {
             myProjects: [ ...newProjects ]
           }
         } );
-        editCacheMilestone( response.data.updateMilestone, newProjects.find( item => item.project.id === projectID ) );
+        closeModal( response.data.updateMilestone );
         setOpened( false );
       } )
       .catch( ( err ) => {
@@ -167,11 +169,13 @@ export default function MilestoneEdit( props ) {
                 ...item
               };
             }
-            let newProject = {
-              ...item
+            return {
+              ...item,
+              project: {
+                ...item.project,
+                milestones: item.project.milestones.filter( item => item.id !== id )
+              }
             };
-            newProject.project.milestones = newProject.project.milestones.filter( item => item.id !== id );
-            return newProject;
           } );
           client.writeQuery( {
             query: GET_MY_PROJECTS,

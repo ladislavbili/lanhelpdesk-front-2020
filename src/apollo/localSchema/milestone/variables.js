@@ -3,7 +3,7 @@ import {
 } from "@apollo/client";
 
 import {
-  noMilestone
+  allMilestones
 } from 'configs/constants/sidebar';
 
-export const milestoneVar = makeVar( noMilestone );
+export const milestoneVar = makeVar( allMilestones );

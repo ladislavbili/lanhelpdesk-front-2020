@@ -164,6 +164,7 @@ export default function TasksSidebar( props ) {
       milestones = [ allMilestones, ...projectData.localProject.project.milestones ];
     }
   }
+
   const DropdownIndicator = ( {
     innerProps,
     isDisabled
@@ -352,13 +353,27 @@ export default function TasksSidebar( props ) {
                 title: editedMilestone.title,
                 label: editedMilestone.title,
               }
-              setProject(milestone);
+              setMilestone(milestone);
+              setProject({
+                ...projectData.localProject,
+                project:{
+                  ...projectData.localProject.project,
+                  milestones: [...projectData.localProject.project.milestones.filter((milest => milest.id !== milestone.id)), milestone],
+                }
+              })
               refetchMyProjects();
             }
           }}
           milestoneDeleted={()=>{
-            setMilestone(noMilestone);
             refetchMyProjects();
+            setProject({
+              ...projectData.localProject,
+              project:{
+                ...projectData.localProject.project,
+                milestones: projectData.localProject.project.milestones.filter((milest => milest.id !== milestoneData.localMilestone.id)),
+              }
+            });
+            setMilestone(allMilestones);
           }}
           />
       }
