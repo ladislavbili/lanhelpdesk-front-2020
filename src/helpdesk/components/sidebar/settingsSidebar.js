@@ -1,49 +1,34 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
-import {Nav, NavItem} from 'reactstrap';
-import {Link} from 'react-router-dom';
+import {
+  useQuery
+} from "@apollo/client";
+import {
+  Nav,
+  NavItem
+} from 'reactstrap';
+import {
+  Link
+} from 'react-router-dom';
 import classnames from 'classnames';
 import settings from 'configs/constants/settings';
+import {
+  GET_MY_DATA
+} from './querries';
 
-const GET_MY_DATA = gql`
-query {
-  getMyData{
-    id
-    role {
-      accessRights {
-        publicFilters
-        users
-        companies
-        pausals
-        projects
-        statuses
-        units
-        prices
-        suppliers
-        tags
-        invoices
-        roles
-        taskTypes
-        tripTypes
-        imaps
-        smtps
-      }
-    }
-  }
-}
-`;
-
-export default function SettingsSidebar(props) {
+export default function SettingsSidebar( props ) {
   //data & queries
-  const { location } = props;
-  const { data } = useQuery(GET_MY_DATA);
+  const {
+    location
+  } = props;
+  const {
+    data
+  } = useQuery( GET_MY_DATA );
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
-    return (
-      <Nav vertical>
+  return (
+    <Nav vertical>
 				{settings.filter((setting) => accessRights[setting.value]).map((setting)=>
 					<NavItem key={setting.link}>
 						<Link className={classnames("sidebar-align", "sidebar-menu-item" , {"active" : location.pathname.includes(setting.link)})}
@@ -51,5 +36,5 @@ export default function SettingsSidebar(props) {
 					</NavItem>
 				)}
 			</Nav>
-    );
-  }
+  );
+}

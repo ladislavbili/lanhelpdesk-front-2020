@@ -3,7 +3,7 @@ import {
   useQuery,
   useMutation,
   useApolloClient
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import gql from "graphql-tag";
 
 import Loading from 'components/loading';
@@ -15,16 +15,14 @@ import {
 } from 'helperFunctions';
 import {
   getEmptyFilter
-} from 'configs/fixedFilters';
+} from 'configs/constants/filter';
 import TaskEdit from './taskEdit';
 import TaskEmpty from './taskEmpty';
 import TaskCalendar from '../calendar';
-
-import {
-  filter,
-  generalFilter,
-  project
-} from 'localCache';
+//TODO remove and make work
+const filter = () => ( {} );
+const generalFilter = () => ( {} );
+const project = () => ( {} );
 
 const GET_TASKS = gql `
 query tasks($filter: FilterInput, $projectId: Int){

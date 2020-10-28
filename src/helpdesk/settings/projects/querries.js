@@ -6,6 +6,18 @@ query {
     project {
       title
       id
+      updatedAt
+      milestones {
+        id
+        title
+      }
+    }
+    right {
+      read
+			write
+			delete
+			internal
+			admin
     }
   }
 }

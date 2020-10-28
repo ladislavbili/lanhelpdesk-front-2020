@@ -2,7 +2,7 @@ import React from 'react';
 import {
   useMutation,
   useQuery
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import Loading from 'components/loading';
 
 import {

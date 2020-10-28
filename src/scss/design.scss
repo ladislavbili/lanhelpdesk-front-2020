@@ -1205,6 +1205,11 @@ tr:last-child{
   padding: 7px 15px !important;
 }
 
+.sidebar-menu-item.active{
+  font-weight: 900;
+  color: #0078D4 !important;
+}
+
 .sidebar-icon{
   color: transparent;
   padding-top: 7px;

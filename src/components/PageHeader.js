@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   useQuery
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import gql from "graphql-tag";
 import {
   Dropdown,
@@ -10,11 +10,11 @@ import {
   DropdownToggle
 } from 'reactstrap';
 import {
-  writeCleanCashe
-} from 'apollo/createClient';
-import {
   Link
 } from 'react-router-dom';
+import {
+  setIsLoggedIn
+} from 'apollo/localSchema/actions';
 import classnames from 'classnames';
 
 const GET_MY_DATA = gql `
@@ -56,8 +56,7 @@ export default function PageHeader( props ) {
     calendarLayout
   } = props;
   const {
-    data,
-    client
+    data
   } = useQuery( GET_MY_DATA );
   //state
   const [ notificationsOpen, setNotificationsOpen ] = React.useState( false );
@@ -261,8 +260,7 @@ export default function PageHeader( props ) {
           <i className="header-icon clickable fa fa-sign-out-alt center-hor" onClick={() => {
               if (window.confirm('Are you sure you want to log out?')) {
                 localStorage.removeItem("acctok");
-                writeCleanCashe();
-                client.writeData({ data: { isLoggedIn: false } });
+                setIsLoggedIn(false);
               }
             }}/>
         </div>

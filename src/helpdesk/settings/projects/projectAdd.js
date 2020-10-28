@@ -2,7 +2,7 @@ import React from 'react';
 import {
   useMutation,
   useQuery
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import {
   Button,
   FormGroup,
@@ -177,18 +177,22 @@ export default function ProjectAdd( props ) {
           __typename: "Project"
         };
         if ( closeModal ) {
-          const allProjects = client.readQuery( {
-              query: GET_MY_PROJECTS
-            } )
-            .myProjects;
-          client.writeQuery( {
-            query: GET_MY_PROJECTS,
-            data: {
-              myProjects: [ ...allProjects, newProject ]
-            }
-          } );
-          props.addProject( newProject );
-          closeModal();
+          const myRights = newProjectRights.find( ( projectRight ) => projectRight.UserId === currentUser.id );
+          if ( myRights ) {
+            const allProjects = client.readQuery( {
+                query: GET_MY_PROJECTS
+              } )
+              .myProjects;
+            client.writeQuery( {
+              query: GET_MY_PROJECTS,
+              data: {
+                myProjects: [ ...allProjects, newProject ]
+              }
+            } );
+            closeModal( newProject, myRights );
+          } else {
+            closeModal( null, null );
+          }
         } else {
           const allProjects = client.readQuery( {
               query: GET_PROJECTS

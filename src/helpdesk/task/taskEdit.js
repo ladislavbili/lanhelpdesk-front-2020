@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMutation, useQuery, useLazyQuery } from "@apollo/react-hooks";
+import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import gql from "graphql-tag";
 
 import Select from 'react-select';

@@ -2,7 +2,7 @@ import React from 'react';
 import {
   useMutation,
   useQuery
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import {
   Button,
   FormGroup,
@@ -99,15 +99,8 @@ export default function UserEdit( props ) {
   const [ language, setLanguage ] = React.useState( languages[ 0 ] );
   const [ saving, setSaving ] = React.useState( false );
   const [ deletingUser /*, setDeletingUser */ ] = React.useState( false );
-  const [ deactivatingUser, setDeactivatingUser ] = React.useState( false );
   const [ passwordChangeOpen, setPasswordChangeOpen ] = React.useState( false );
   const [ password, setPassword ] = React.useState( null );
-
-  const allUsers = client.readQuery( {
-      query: GET_USERS
-    } )
-    .users;
-  const filteredUsers = allUsers.filter( user => user.role.level === 0 );
 
   // sync
   React.useEffect( () => {

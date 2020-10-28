@@ -1,78 +1,39 @@
 import {
-  ApolloClient
-} from "apollo-client";
-import {
-  InMemoryCache
-} from "apollo-cache-inmemory";
-import {
-  HttpLink
-} from "apollo-link-http";
-import jwtDecode from 'jwt-decode';
-import {
-  setContext
-} from 'apollo-link-context';
-import {
+  ApolloClient,
+  InMemoryCache,
+  HttpLink,
   from as ApolloFrom,
-  Observable
-} from 'apollo-link';
+  Observable,
+} from "@apollo/client";
 import {
   onError
-} from 'apollo-link-error';
-
+} from "@apollo/client/link/error";
 import {
-  resolvers,
-  typeDefs
-} from "./localSchema";
+  setContext
+} from '@apollo/client/link/context';
+import jwtDecode from 'jwt-decode';
 import {
   afterNow
 } from '../helperFunctions';
 import axios from 'axios';
-import moment from 'moment';
-
-
+import * as resolvers from './localSchema/resolvers';
 import {
-  allMilestones
-} from 'configs/constants/sidebar';
+  setIsLoggedIn
+} from './localSchema/actions';
 
 import {
   REST_URL
 } from 'configs/restAPI';
 
-
-const cache = new InMemoryCache();
-
-export function writeCleanCashe() {
-  cache.writeData( {
-    data: {
-      isLoggedIn: false,
-      cartItems: [],
-      projectName: "Any project",
-      filterName: "All tasks",
-      milestone: allMilestones,
-      orderBy: 'id',
-      ascending: false,
-      search: "",
-      showDataFilter: {
-        name: undefined,
-        checked: false,
-        important: false,
-        id: "",
-        title: "",
-        status: "",
-        requester: "",
-        company: "",
-        assignedTo: "",
-        createdAt: "",
-        deadline: "",
-      },
-      reportsFromDate: moment().startOf('month').valueOf(),
-      reportsToDate: moment().endOf('month').valueOf(),
-      reportsMonth: moment().month().valueOf(),
-      reportsYear: moment().year().valueOf(),
-      reportsChosenStatuses: [],
+export const cache = new InMemoryCache( {
+  typePolicies: {
+    Query: {
+      fields: {
+        ...resolvers
+      }
     }
-  } );
-}
+  }
+} );
 
 const link = new HttpLink( {
   uri: `${REST_URL}/graphql`,
@@ -99,11 +60,7 @@ const promiseToObservable = promise => (
           localStorage.setItem( "acctok", accessToken );
         } else {
           localStorage.removeItem( "acctok" )
-          cache.writeData( {
-            data: {
-              isLoggedIn: false
-            }
-          } );
+          setIsLoggedIn( false );
         }
         if ( subscriber.closed ) return;
         subscriber.next();
@@ -114,7 +71,6 @@ const promiseToObservable = promise => (
     return subscriber;
   } )
 )
-
 const authLink = setContext( async ( _, {
   headers
 } ) => {
@@ -132,11 +88,7 @@ const authLink = setContext( async ( _, {
       localStorage.setItem( "acctok", accessToken );
     } else {
       localStorage.removeItem( "acctok" )
-      cache.writeData( {
-        data: {
-          isLoggedIn: false
-        }
-      } );
+      setIsLoggedIn( false );
     }
   }
   return {
@@ -162,11 +114,7 @@ function processErrors( {
   }
   if ( error.extensions.code === "NO_ACC_TOKEN" ) {
     localStorage.removeItem( "acctok" )
-    cache.writeData( {
-      data: {
-        isLoggedIn: false
-      }
-    } );
+    setIsLoggedIn( false );
   }
 }
 
@@ -174,11 +122,7 @@ export default function createClient() {
   const client = new ApolloClient( {
     cache,
     link: ApolloFrom( [ onError( processErrors ), authLink, link ] ),
-    typeDefs,
-    resolvers
   } );
-
-  writeCleanCashe();
 
   if ( localStorage.getItem( "acctok" ) ) {
     refreshToken().then( ( response ) => {
@@ -188,18 +132,10 @@ export default function createClient() {
       } = response.data;
       if ( ok ) {
         localStorage.setItem( "acctok", accessToken );
-        client.writeData( {
-          data: {
-            isLoggedIn: true
-          }
-        } );
+        setIsLoggedIn( true )
       } else {
-        localStorage.removeItem( "acctok" )
-        client.writeData( {
-          data: {
-            isLoggedIn: false
-          }
-        } );
+        localStorage.removeItem( "acctok" );
+        setIsLoggedIn( false );
       }
     } )
   }

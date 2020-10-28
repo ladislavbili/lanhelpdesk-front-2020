@@ -66,3 +66,42 @@ export const emptyFilter = {
   public: false,
   oneOf: []
 }
+
+export const getEmptyGeneralFilter = () => ( {
+  dashboard: false,
+  global: false,
+  id: null,
+  project: null,
+  pub: false,
+  title: "No filter",
+  filter: getEmptyFilter(),
+  roles: null,
+} )
+
+export const getEmptyFilter = () => ( {
+  assignedToCur: false,
+  assignedTo: null,
+  requesterCur: false,
+  requester: null,
+  companyCur: false,
+  company: null,
+  taskType: null,
+  oneOf: [],
+
+  statusDateFrom: null,
+  statusDateFromNow: false,
+  statusDateTo: null,
+  statusDateToNow: false,
+  closeDateFrom: null,
+  closeDateFromNow: false,
+  closeDateTo: null,
+  closeDateToNow: false,
+  pendingDateFrom: null,
+  pendingDateFromNow: false,
+  pendingDateTo: null,
+  pendingDateToNow: false,
+  deadlineFrom: null,
+  deadlineFromNow: false,
+  deadlineTo: null,
+  deadlineToNow: false,
+} )

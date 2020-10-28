@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   useQuery
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import gql from "graphql-tag";
 import {
   toSelArr

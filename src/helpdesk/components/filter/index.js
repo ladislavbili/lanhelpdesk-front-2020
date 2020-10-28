@@ -3,7 +3,7 @@ import {
   useQuery,
   useMutation,
   useApolloClient
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import gql from "graphql-tag";
 import {
   Input
@@ -35,12 +35,12 @@ import {
 } from 'helpdesk/settings/taskTypes/querries';
 import {
   GET_MY_FILTERS
-} from 'helpdesk/components/sidebar/tasksSidebar';
-
+} from './querries';
 import {
-  filter,
-  generalFilter
-} from 'localCache';
+  GET_FILTER,
+  GET_GENERAL_FILTER
+} from 'apollo/localSchema/querries';
+
 
 const GET_MY_DATA = gql `
 query {
@@ -94,6 +94,7 @@ export default function Filter( props ) {
   const {
     data
   } = useQuery( GET_MY_DATA );
+
   /*
   const {
     data: localCache
@@ -415,9 +416,9 @@ export default function Filter( props ) {
     setDeadlineFromNow( filterData.deadlineFromNow );
     setDeadlineTo( toMomentInput( filterData.deadlineTo ) );
     setDeadlineToNow( filterData.deadlineToNow );
-
-    filter( filterData );
-    generalFilter( generalFilterData );
+    //TODO
+    //filter( filterData );
+    //generalFilter( generalFilterData );
   }
 
 
@@ -539,10 +540,13 @@ export default function Filter( props ) {
               myFilters: [ ...newFilters ]
             }
           } );
+          /*
+          TODO
           generalFilter( {
             ...generalFilterData,
             title: newFilterName
           } );
+          */
           setCurrentFilter( {
             ...generalFilterData,
             title: newFilterName

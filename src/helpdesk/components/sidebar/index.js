@@ -2,40 +2,14 @@ import React from 'react';
 import {
   useQuery,
   //  useApolloClient
-} from "@apollo/react-hooks";
-import gql from "graphql-tag";
+} from "@apollo/client";
 
 import SettingsSidebar from './settingsSidebar';
 import TasksSidebar from './tasksSidebar';
 import settings from 'configs/constants/settings';
-
-const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    role {
-      accessRights {
-        publicFilters
-        users
-        companies
-        pausals
-        projects
-        statuses
-        units
-        prices
-        suppliers
-        tags
-        invoices
-        roles
-        taskTypes
-        tripTypes
-        imaps
-        smtps
-      }
-    }
-  }
-}
-`;
+import {
+  GET_MY_DATA
+} from './querries';
 
 export default function Sidebar( props ) {
   //data & queries

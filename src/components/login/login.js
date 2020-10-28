@@ -1,35 +1,59 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, Label,Input } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
+import {
+  setIsLoggedIn
+} from 'apollo/localSchema/actions';
 
 export default class Login extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			email:'',
-			password:'',
-			signingIn: false,
-			error:  null,
-		};
-		this.login.bind(this);
-	}
+  constructor( props ) {
+    super( props );
+    this.state = {
+      email: '',
+      password: '',
+      signingIn: false,
+      error: null,
+    };
+    this.login.bind( this );
+  }
 
-	login(){
-		this.setState({error: null, signingIn:true});
+  login() {
+    this.setState( {
+      error: null,
+      signingIn: true
+    } );
 
-		this.props.login({ variables: { email: this.state.email, password: this.state.password } }).then( ( response ) => {
-			this.setState({signingIn:false});
-			localStorage.setItem("acctok", response.data.loginUser.accessToken);
-			this.props.client.writeData({ data: { isLoggedIn: true } });
-			console.log("LOGIN RESPONSE");
-			console.log(response);
-		}).catch( (err) => {
-			this.setState({error: err.message, signingIn:false});
-		});
-	}
-
-	render() {
-		return (
-			<div style={{height:'100vh',display: 'flex'}}>
+    this.props.login( {
+        variables: {
+          email: this.state.email,
+          password: this.state.password
+        }
+      } )
+      .then( ( response ) => {
+        this.setState( {
+          signingIn: false
+        } );
+        localStorage.setItem( "acctok", response.data.loginUser.accessToken );
+        setIsLoggedIn( true );
+        console.log( "LOGIN RESPONSE" );
+        console.log( response );
+      } )
+      .catch( ( err ) => {
+        this.setState( {
+          error: err.message,
+          signingIn: false
+        } );
+      } );
+  }
+  render() {
+    return (
+      <div style={{height:'100vh',display: 'flex'}}>
 			<div className="card" style={{backgroundColor:'white', borderRadius:6, padding:'10px 20px', width:'350px',margin:'auto'}}>
 
 				<FormGroup>
@@ -60,6 +84,6 @@ export default class Login extends Component {
 				}
 			</div>
 		</div>
-		);
-	}
+    );
+  }
 }

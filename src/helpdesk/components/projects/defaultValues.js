@@ -1,15 +1,40 @@
 import React from 'react';
 import Select from 'react-select';
-import {invisibleSelectStyle} from 'configs/components/select';
+import {
+  invisibleSelectStyle
+} from 'configs/components/select';
 import Checkbox from '../../../components/checkbox';
 import booleanSelects from 'configs/constants/boolSelect'
 
-export default function ProjectDefaultValues(props) {
+export default function ProjectDefaultValues( props ) {
   //data
-  const { assignedTo, setAssignedTo, company, setCompany, status, setStatus, requester, setRequester, tag, setTag, taskType, setTaskType, pausal, setPausal, overtime, setOvertime, canBeAssigned, statuses, users, allTags, companies, taskTypes } = props;
+  const {
+    assignedTo,
+    setAssignedTo,
+    company,
+    setCompany,
+    status,
+    setStatus,
+    requester,
+    setRequester,
+    tag,
+    setTag,
+    taskType,
+    setTaskType,
+    pausal,
+    setPausal,
+    overtime,
+    setOvertime,
+    canBeAssigned,
+    statuses,
+    users,
+    allTags,
+    companies,
+    taskTypes
+  } = props;
 
-    return (
-      <div>
+  return (
+    <div>
         <h3 className="m-t-20"> Default values </h3>
         <table className="table">
           <thead>
@@ -371,5 +396,5 @@ export default function ProjectDefaultValues(props) {
           </div>
         }
       </div>
-    );
+  );
 }

@@ -1,9 +1,11 @@
 import React from 'react';
-import { useMutation } from "@apollo/react-hooks";
+import {
+  useMutation
+} from "@apollo/client";
 import Login from './login';
 import gql from "graphql-tag";
 
-const LOGIN_USER = gql`
+const LOGIN_USER = gql `
 mutation loginUser($email: String!, $password: String!) {
   loginUser(
     email: $email,
@@ -40,9 +42,9 @@ mutation loginUser($email: String!, $password: String!) {
 }
 `;
 
-export default function LoginContainer(){
-  const [login, {client}] = useMutation(LOGIN_USER);
+export default function LoginContainer() {
+  const [ login ] = useMutation( LOGIN_USER );
   return (
-    <Login login={login} client={client} />
+    <Login login={login} />
   )
 }

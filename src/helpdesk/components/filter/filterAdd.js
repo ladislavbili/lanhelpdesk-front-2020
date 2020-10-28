@@ -2,7 +2,7 @@ import React from 'react';
 import {
   useQuery,
   useMutation
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import gql from "graphql-tag";
 
 import Select from 'react-select';
@@ -30,7 +30,7 @@ import {
 } from 'helpdesk/settings/roles/querries';
 import {
   GET_MY_FILTERS
-} from 'helpdesk/components/sidebar/tasksSidebar';
+} from './querries';
 
 const GET_MY_DATA = gql `
 query {

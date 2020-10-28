@@ -2,7 +2,7 @@ import React from 'react';
 import {
   useQuery,
   useMutation,
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 
 import {
   Button

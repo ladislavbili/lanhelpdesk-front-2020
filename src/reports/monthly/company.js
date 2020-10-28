@@ -4,7 +4,7 @@ import {
   useQuery,
   useLazyQuery,
   useApolloClient
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 
 import moment from 'moment';
 import Select from 'react-select';

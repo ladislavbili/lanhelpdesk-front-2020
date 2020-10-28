@@ -2,7 +2,7 @@ import React from 'react';
 import {
   useQuery,
   //useApolloClient
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import gql from "graphql-tag";
 
 import TaskCol from './taskCol';

@@ -1,15 +1,29 @@
 import React from 'react';
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import {
+  useMutation,
+  useQuery
+} from "@apollo/client";
 import gql from "graphql-tag";
 
-import { Modal, ModalBody, ModalFooter, ModalHeader, Button, FormGroup, Label, Input } from 'reactstrap';
+import {
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 import DatePicker from 'react-datepicker';
 
 import moment from 'moment';
 
-import { GET_PROJECTS } from 'helpdesk/components/sidebar/tasksSidebar';
+import {
+  GET_MY_PROJECTS
+} from 'helpdesk/settings/projects/querries';
 
-const UPDATE_MILESTONE = gql`
+const UPDATE_MILESTONE = gql `
 mutation updateMilestone($id: Int!, $title: String, $description: String, $startsAt: String, $endsAt: String) {
   updateMilestone(
     id: $id,
@@ -24,7 +38,7 @@ mutation updateMilestone($id: Int!, $title: String, $description: String, $start
 }
 `;
 
-const GET_MILESTONE = gql`
+const GET_MILESTONE = gql `
 query milestone($id: Int!) {
   milestone(
     id: $id
@@ -38,7 +52,7 @@ query milestone($id: Int!) {
 }
 `;
 
-const DELETE_MILESTONE = gql`
+const DELETE_MILESTONE = gql `
 mutation deleteMilestone($id: Int!) {
   deleteMilestone(
     id: $id
@@ -48,97 +62,148 @@ mutation deleteMilestone($id: Int!) {
 }
 `;
 
-export default function MilestoneEdit (props){
+export default function MilestoneEdit( props ) {
   //data & queries
-  const { milestoneID, projectID, editCacheMilestone, deleteCacheMilestone } = props;
-  const [ updateMilestone, {client} ] = useMutation(UPDATE_MILESTONE);
-  const [ deleteMilestone ] = useMutation(DELETE_MILESTONE);
-  const { data, loading } = useQuery(GET_MILESTONE, { variables: {id: milestoneID} });
+  const {
+    milestoneID,
+    projectID,
+    editCacheMilestone,
+    deleteCacheMilestone
+  } = props;
+  const [ updateMilestone, {
+    client
+  } ] = useMutation( UPDATE_MILESTONE );
+  const [ deleteMilestone ] = useMutation( DELETE_MILESTONE );
+  const {
+    data,
+    loading
+  } = useQuery( GET_MILESTONE, {
+    variables: {
+      id: milestoneID
+    }
+  } );
 
   //state
-  const [ title, setTitle ] = React.useState("");
-  const [ description, setDescription ] = React.useState("");
-  const [ startsAt, setStartsAt ] = React.useState(null);
-  const [ endsAt, setEndsAt ] = React.useState(null);
+  const [ title, setTitle ] = React.useState( "" );
+  const [ description, setDescription ] = React.useState( "" );
+  const [ startsAt, setStartsAt ] = React.useState( null );
+  const [ endsAt, setEndsAt ] = React.useState( null );
 
-  const [ saving, setSaving ] = React.useState(false);
-  const [ opened, setOpened ] = React.useState(false);
+  const [ saving, setSaving ] = React.useState( false );
+  const [ opened, setOpened ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
-      if (!loading){
-        setTitle( data ? data.milestone.title : null);
-        setDescription( data ? data.milestone.description : null);
-        setStartsAt( data && data.milestone.startsAt ? moment(parseInt(data.milestone.startsAt)) : null );
-        setEndsAt( data && data.milestone.endsAt ? moment(parseInt(data.milestone.endsAt)) : null );
-      }
-  }, [loading]);
+    if ( !loading ) {
+      setTitle( data ? data.milestone.title : null );
+      setDescription( data ? data.milestone.description : null );
+      setStartsAt( data && data.milestone.startsAt ? moment( parseInt( data.milestone.startsAt ) ) : null );
+      setEndsAt( data && data.milestone.endsAt ? moment( parseInt( data.milestone.endsAt ) ) : null );
+    }
+  }, [ loading ] );
 
   const toggle = () => {
-    setOpened(!opened);
+    setOpened( !opened );
   }
 
-    // functions
-    const updateMilestoneFunc = () => {
-      setSaving( true );
+  // functions
+  const updateMilestoneFunc = () => {
+    setSaving( true );
 
-      updateMilestone({ variables: {
-        id: milestoneID,
-        title,
-        description,
-        startsAt: startsAt ? (startsAt.unix()*1000).toString() : null,
-        endsAt: endsAt ? (endsAt.unix()*1000).toString() : null,
-      } }).then( ( response ) => {
-        let allProjects = client.readQuery({query: GET_PROJECTS}).myProjects;
-        const newProjects = allProjects.map(item => {
-          if (item.project.id !== projectID){
-            return {...item};
+    updateMilestone( {
+        variables: {
+          id: milestoneID,
+          title,
+          description,
+          startsAt: startsAt ? ( startsAt.unix() * 1000 )
+            .toString() : null,
+          endsAt: endsAt ? ( endsAt.unix() * 1000 )
+            .toString() : null,
+        }
+      } )
+      .then( ( response ) => {
+        let allProjects = client.readQuery( {
+            query: GET_MY_PROJECTS
+          } )
+          .myProjects;
+        const newProjects = allProjects.map( item => {
+          if ( item.project.id !== projectID ) {
+            return {
+              ...item
+            };
           }
-          let newProject = {...item};
-          newProject.project.milestones = newProject.project.milestones.map(item => {
-            if (item.id !== milestoneID) {
+          let newProject = {
+            ...item
+          };
+          newProject.project.milestones = newProject.project.milestones.map( item => {
+            if ( item.id !== milestoneID ) {
               return item;
             }
-            return {...response.data.updateMilestone, __typename: "Milestone"};
-          });
+            return {
+              ...response.data.updateMilestone,
+              __typename: "Milestone"
+            };
+          } );
           return newProject;
-        });
-        client.writeQuery({ query: GET_PROJECTS, data: {myProjects: [...newProjects] } });
-        editCacheMilestone(response.data.updateMilestone, newProjects.find(item => item.project.id === projectID) );
-        setOpened(false);
-      }).catch( (err) => {
-        console.log(err.message);
-      });
+        } );
+        client.writeQuery( {
+          query: GET_MY_PROJECTS,
+          data: {
+            myProjects: [ ...newProjects ]
+          }
+        } );
+        editCacheMilestone( response.data.updateMilestone, newProjects.find( item => item.project.id === projectID ) );
+        setOpened( false );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-       setSaving( false );
-    };
+    setSaving( false );
+  };
 
-    const deleteMilestoneFunc = () => {
-      if(window.confirm("Are you sure?")){
-        deleteMilestone({ variables: {
-          id: milestoneID,
-        } }).then( ( response ) => {
-          let allProjects = client.readQuery({query: GET_PROJECTS}).myProjects;
-          const newProjects = allProjects.map(item => {
-            if (item.project.id !== projectID){
-              return {...item};
+  const deleteMilestoneFunc = () => {
+    if ( window.confirm( "Are you sure?" ) ) {
+      deleteMilestone( {
+          variables: {
+            id: milestoneID,
+          }
+        } )
+        .then( ( response ) => {
+          let allProjects = client.readQuery( {
+              query: GET_MY_PROJECTS
+            } )
+            .myProjects;
+          const newProjects = allProjects.map( item => {
+            if ( item.project.id !== projectID ) {
+              return {
+                ...item
+              };
             }
-            let newProject = {...item};
-            newProject.project.milestones = newProject.project.milestones.filter(item => item.id !== milestoneID);
+            let newProject = {
+              ...item
+            };
+            newProject.project.milestones = newProject.project.milestones.filter( item => item.id !== milestoneID );
             return newProject;
-          });
-          client.writeQuery({ query: GET_PROJECTS, data: {myProjects: [...newProjects] } });
-          deleteCacheMilestone(newProjects.find(item => item.project.id === projectID) );
-          setOpened(false);
-        }).catch( (err) => {
-          console.log(err.message);
-          console.log(err);
-        });
-      }
-    };
+          } );
+          client.writeQuery( {
+            query: GET_MY_PROJECTS,
+            data: {
+              myProjects: [ ...newProjects ]
+            }
+          } );
+          deleteCacheMilestone( newProjects.find( item => item.project.id === projectID ) );
+          setOpened( false );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+          console.log( err );
+        } );
+    }
+  };
 
   return (
-		<div className='p-l-15 p-r-15'>
+    <div className='p-l-15 p-r-15'>
 			<Button
 				className='btn-link p-0'
 				onClick={toggle}

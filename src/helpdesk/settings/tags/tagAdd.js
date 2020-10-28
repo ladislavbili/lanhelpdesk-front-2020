@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   useMutation
-} from "@apollo/react-hooks";
+} from "@apollo/client";
 import {
   Button,
   FormGroup,
