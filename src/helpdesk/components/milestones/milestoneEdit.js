@@ -3,7 +3,9 @@ import {
   useMutation,
   useQuery
 } from "@apollo/client";
-import gql from "graphql-tag";
+import {
+  gql
+} from '@apollo/client';;
 
 import {
   Modal,
@@ -22,64 +24,49 @@ import moment from 'moment';
 import {
   GET_MY_PROJECTS
 } from 'helpdesk/settings/projects/querries';
+import {
+  GET_MILESTONE as GET_LOCAL_MILESTONE,
+  GET_PROJECT
+} from 'apollo/localSchema/querries';
 
-const UPDATE_MILESTONE = gql `
-mutation updateMilestone($id: Int!, $title: String, $description: String, $startsAt: String, $endsAt: String) {
-  updateMilestone(
-    id: $id,
-    title: $title,
-    description: $description,
-    startsAt: $startsAt,
-    endsAt: $endsAt
-){
-  id
-  title
-  }
-}
-`;
-
-const GET_MILESTONE = gql `
-query milestone($id: Int!) {
-  milestone(
-    id: $id
-){
-  id
-  title
-  description
-  startsAt
-  endsAt
-  }
-}
-`;
-
-const DELETE_MILESTONE = gql `
-mutation deleteMilestone($id: Int!) {
-  deleteMilestone(
-    id: $id
-  ){
-    id
-  }
-}
-`;
+import {
+  UPDATE_MILESTONE,
+  GET_MILESTONE,
+  DELETE_MILESTONE,
+} from './querries';
 
 export default function MilestoneEdit( props ) {
-  //data & queries
+
   const {
-    milestoneID,
-    projectID,
-    editCacheMilestone,
-    deleteCacheMilestone
+    milestoneDeleted,
+    closeModal
   } = props;
+
+  //data & queries
   const [ updateMilestone, {
     client
   } ] = useMutation( UPDATE_MILESTONE );
   const [ deleteMilestone ] = useMutation( DELETE_MILESTONE );
+
+  const {
+    data: projectData,
+    loading: projectLoading
+  } = useQuery( GET_PROJECT );
+
+  const {
+    data: milestoneData,
+    loading: milestoneLoading
+  } = useQuery( GET_LOCAL_MILESTONE );
+
+  const id = milestoneData.localMilestone.id;
+  const projectID = projectData.localProject.project.id;
+
   const {
     data,
     loading
   } = useQuery( GET_MILESTONE, {
     variables: {
-      id: milestoneID
+      id
     }
   } );
 
@@ -112,7 +99,7 @@ export default function MilestoneEdit( props ) {
 
     updateMilestone( {
         variables: {
-          id: milestoneID,
+          id,
           title,
           description,
           startsAt: startsAt ? ( startsAt.unix() * 1000 )
@@ -136,7 +123,7 @@ export default function MilestoneEdit( props ) {
             ...item
           };
           newProject.project.milestones = newProject.project.milestones.map( item => {
-            if ( item.id !== milestoneID ) {
+            if ( item.id !== id ) {
               return item;
             }
             return {
@@ -166,7 +153,7 @@ export default function MilestoneEdit( props ) {
     if ( window.confirm( "Are you sure?" ) ) {
       deleteMilestone( {
           variables: {
-            id: milestoneID,
+            id,
           }
         } )
         .then( ( response ) => {
@@ -183,7 +170,7 @@ export default function MilestoneEdit( props ) {
             let newProject = {
               ...item
             };
-            newProject.project.milestones = newProject.project.milestones.filter( item => item.id !== milestoneID );
+            newProject.project.milestones = newProject.project.milestones.filter( item => item.id !== id );
             return newProject;
           } );
           client.writeQuery( {
@@ -192,7 +179,7 @@ export default function MilestoneEdit( props ) {
               myProjects: [ ...newProjects ]
             }
           } );
-          deleteCacheMilestone( newProjects.find( item => item.project.id === projectID ) );
+          milestoneDeleted()
           setOpened( false );
         } )
         .catch( ( err ) => {

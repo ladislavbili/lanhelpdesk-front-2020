@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMutation, useQuery } from "@apollo/client";
-import gql from "graphql-tag";
+import { gql } from '@apollo/client';;
 
 import classnames from "classnames";
 import { Nav, NavItem, NavLink} from 'reactstrap';

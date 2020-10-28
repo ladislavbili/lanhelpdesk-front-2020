@@ -3,7 +3,7 @@ import {
   useQuery,
   useMutation
 } from "@apollo/client";
-import gql from "graphql-tag";
+import { gql } from '@apollo/client';;
 
 import Select from 'react-select';
 import {

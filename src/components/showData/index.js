@@ -3,7 +3,7 @@ import {
   useQuery,
   //useApolloClient
 } from "@apollo/client";
-import gql from "graphql-tag";
+import { gql } from '@apollo/client';;
 
 import TaskCol from './taskCol';
 import TaskList from './taskList';

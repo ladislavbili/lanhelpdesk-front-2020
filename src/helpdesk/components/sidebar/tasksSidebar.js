@@ -356,6 +356,10 @@ export default function TasksSidebar( props ) {
               refetchMyProjects();
             }
           }}
+          milestoneDeleted={()=>{
+            setMilestone(noMilestone);
+            refetchMyProjects();
+          }}
           />
       }
 

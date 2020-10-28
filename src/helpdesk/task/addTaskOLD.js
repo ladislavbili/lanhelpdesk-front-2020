@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { useMutation, useQuery } from "@apollo/client";
-import gql from "graphql-tag";
+import { gql } from '@apollo/client';;
 
 import Select from 'react-select';
 import {rebase} from '../../index';
