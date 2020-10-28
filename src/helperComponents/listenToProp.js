@@ -1,10 +1,11 @@
-export default function ListenToProp(props) {
+export default function ListenToProp( props ) {
   //data
-  const {prop} = props;
+  const {
+    prop
+  } = props;
+  console.log( props );
 
-  React.useEffect(() => {
-    console.log(prop);
-  }, [prop]);
+  React.useEffect( () => {}, [ prop ] );
 
   return null;
 }

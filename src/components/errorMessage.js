@@ -11,7 +11,6 @@ export default class Error extends Component {
       inLabel
     } = this.props;
     const giveMargin = ( inLabel === null || inLabel === undefined ) ? true : inLabel;
-    console.log( giveMargin );
     if ( show === undefined ) {
       return <div className="error-style center-hor">{`DEFINE PARAMETER SHOW - add to the component parameter show={true/false condition}`}</div>
     }

@@ -26,6 +26,10 @@ import ProjectDefaultValues from "helpdesk/components/projects/defaultValues";
 import DeleteReplacement from 'components/deleteReplacement';
 import Loading from 'components/loading';
 import {
+  setProject,
+} from 'apollo/localSchema/actions';
+
+import {
   GET_BASIC_COMPANIES,
 } from '../companies/querries';
 import {
@@ -57,19 +61,23 @@ export default function ProjectEdit( props ) {
     closeModal,
     projectID
   } = props;
+
+  const id = closeModal ? projectID : parseInt( match.params.id );
+
   const {
     data: myData,
     loading: myDataLoading
   } = useQuery( GET_MY_DATA );
+
   const {
     data: projectData,
     loading: projectLoading,
     refetch
   } = useQuery( GET_PROJECT, {
     variables: {
-      id: ( projectID ? projectID : parseInt( match.params.id ) )
+      id
     },
-    fetchNetOptions
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updateProject ] = useMutation( UPDATE_PROJECT );
   const [ deleteProject, {
@@ -100,7 +108,7 @@ export default function ProjectEdit( props ) {
       query: GET_PROJECTS
     } )
     .projects );
-  const filteredProjects = allProjects.filter( project => project.id !== ( projectID ? projectID : parseInt( match.params.id ) ) );
+  const filteredProjects = allProjects.filter( project => project.id !== id );
   const theOnlyOneLeft = allProjects.length === 1;
 
   const currentUser = myData ? myData.getMyData : {};
@@ -236,18 +244,10 @@ export default function ProjectEdit( props ) {
   React.useEffect( () => {
     refetch( {
       variables: {
-        id: parseInt( match.params.id )
+        id
       }
     } );
-  }, [ match.params.id ] );
-
-  React.useEffect( () => {
-    refetch( {
-      variables: {
-        id: projectID
-      }
-    } );
-  }, [ projectID ] );
+  }, [ id ] );
 
   // functions
   const updateProjectFunc = () => {
@@ -299,7 +299,7 @@ export default function ProjectEdit( props ) {
 
     updateProject( {
         variables: {
-          id: ( projectID ? projectID : parseInt( match.params.id ) ),
+          id,
           title,
           description,
           lockedRequester,
@@ -312,19 +312,29 @@ export default function ProjectEdit( props ) {
           ...response.data.updateProject
         };
         if ( closeModal ) {
-          client.writeQuery( {
-            query: GET_MY_PROJECTS,
-            data: {
-              projects: [ ...allProjects.filter( project => project.id !== ( projectID ? projectID : parseInt( match.params.id ) ) ), updatedProject ]
-            }
-          } );
-
-          closeModal();
+          const myRights = newProjectRights.find( ( projectRight ) => projectRight.UserId === currentUser.id );
+          if ( myRights ) {
+            client.writeQuery( {
+              query: GET_MY_PROJECTS,
+              data: {
+                projects: [ ...allProjects.filter( project => project.id !== id ), updatedProject ]
+              }
+            } );
+            closeModal( updatedProject, myRights );
+          } else {
+            client.writeQuery( {
+              query: GET_MY_PROJECTS,
+              data: {
+                projects: [ ...allProjects.filter( project => project.id !== id ) ]
+              }
+            } );
+            closeModal( null, null );
+          }
         } else {
           client.writeQuery( {
             query: GET_PROJECTS,
             data: {
-              projects: [ ...allProjects.filter( project => project.id !== ( projectID ? projectID : parseInt( match.params.id ) ) ), updatedProject ]
+              projects: [ ...allProjects.filter( project => project.id !== id ), updatedProject ]
             }
           } );
 
@@ -342,7 +352,7 @@ export default function ProjectEdit( props ) {
     if ( window.confirm( "Are you sure?" ) ) {
       deleteProject( {
           variables: {
-            id: ( projectID ? projectID : parseInt( match.params.id ) ),
+            id,
             newId: parseInt( replacement.id ),
           }
         } )
@@ -354,7 +364,8 @@ export default function ProjectEdit( props ) {
                 projects: filteredProjects
               }
             } );
-            closeModal();
+            projectDeleted();
+            closeModal( null, null );
           } else {
             client.writeQuery( {
               query: GET_PROJECTS,
@@ -490,7 +501,7 @@ export default function ProjectEdit( props ) {
           Delete
         </Button>
         {closeModal &&
-          <Button className="btn-link ml-auto" onClick={() => closeModal()}>
+          <Button className="btn-link ml-auto" onClick={() => closeModal(null, null)}>
             Close
           </Button>}
         </div>

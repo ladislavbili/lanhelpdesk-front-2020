@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from "@apollo/client";
-import gql from "graphql-tag";
 
 import DatePicker from 'react-datepicker';
 import {
@@ -20,32 +20,28 @@ import {
   GET_MY_PROJECTS
 } from 'helpdesk/settings/projects/querries';
 
-const ADD_MILESTONE = gql `
-mutation addMilestone($title: String!, $description: String!, $startsAt: String, $endsAt: String, $projectId: Int!) {
-  addMilestone(
-    title: $title,
-    description: $description,
-    startsAt: $startsAt,
-    endsAt: $endsAt,
-    projectId: $projectId
-){
-  id
-  title
-  }
-}
-`;
+import {
+  ADD_MILESTONE
+} from './querries';
+
+import {
+  GET_PROJECT,
+} from 'apollo/localSchema/querries';
 
 export default function MilestoneAdd( props ) {
   //data & queries
   const {
     open,
-    closeModal,
-    projectID,
-    addNewMilestone
+    closeModal
   } = props;
   const [ addMilestone, {
     client
   } ] = useMutation( ADD_MILESTONE );
+
+  const {
+    data: projectData,
+    loading: projectLoading
+  } = useQuery( GET_PROJECT );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -65,7 +61,7 @@ export default function MilestoneAdd( props ) {
             .toString() : null,
           endsAt: endsAt ? endsAt.unix()
             .toString() : null,
-          projectId: projectID,
+          projectId: projectData.localProject.project.id,
         }
       } )
       .then( ( response ) => {
@@ -74,18 +70,24 @@ export default function MilestoneAdd( props ) {
           } )
           .myProjects;
         const newProjects = allProjects.map( item => {
-          if ( item.project.id !== projectID ) {
+          if ( item.project.id !== projectData.localProject.project.id ) {
             return {
               ...item
             };
           }
           let newProject = {
-            ...item
+            ...item,
+            project: {
+              ...item.project,
+              milestones: [
+              ...item.project.milestones,
+                {
+                  ...response.data.addMilestone,
+                  __typename: "Milestone"
+              }
+            ]
+            }
           };
-          newProject.project.milestones = [ ...newProject.project.milestones, {
-            ...response.data.addMilestone,
-            __typename: "Milestone"
-          } ];
           return newProject;
         } );
         client.writeQuery( {
@@ -94,8 +96,7 @@ export default function MilestoneAdd( props ) {
             myProjects: [ ...newProjects ]
           }
         } );
-        addNewMilestone( response.data.addMilestone, newProjects.find( item => item.project.id === projectID ) );
-        closeModal();
+        closeModal( response.data.addMilestone );
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -105,56 +106,56 @@ export default function MilestoneAdd( props ) {
 
   return (
     <div>
-        <Modal isOpen={open} >
-          <ModalHeader> Add milestone </ModalHeader>
-          <ModalBody>
-            <FormGroup>
-              <Label for="title">Milestone title</Label>
-              <Input type="text" id="title" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
-            </FormGroup>
+      <Modal isOpen={open} >
+        <ModalHeader> Add milestone </ModalHeader>
+        <ModalBody>
+          <FormGroup>
+            <Label for="title">Milestone title</Label>
+            <Input type="text" id="title" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
+          </FormGroup>
 
-            <FormGroup>
-  						<Label htmlFor="description">Popis</Label>
-  						<Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription(e.target.value)}/>
-  					</FormGroup>
-          </ModalBody>
+          <FormGroup>
+            <Label htmlFor="description">Popis</Label>
+            <Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription(e.target.value)}/>
+          </FormGroup>
+        </ModalBody>
 
-          <div className="row">
-						<DatePicker
-							selected={startsAt}
-							onChange={date => setStartsAt(date)}
-							locale="en-gb"
-							placeholderText="No starting date"
-							showTimeSelect
-							className="form-control hidden-input"
-							todayButton="Today"
-							timeFormat="HH:mm"
-							timeIntervals={15}
-							dateFormat="HH:mm DD.MM.YYYY"
-						/>
+        <div className="row">
+          <DatePicker
+            selected={startsAt}
+            onChange={date => setStartsAt(date)}
+            locale="en-gb"
+            placeholderText="No starting date"
+            showTimeSelect
+            className="form-control hidden-input"
+            todayButton="Today"
+            timeFormat="HH:mm"
+            timeIntervals={15}
+            dateFormat="HH:mm DD.MM.YYYY"
+            />
 
-  						<DatePicker
-  							selected={endsAt}
-  							onChange={date => setEndsAt(date)}
-  							locale="en-gb"
-  							placeholderText="No ending date"
-  							showTimeSelect
-  							className="form-control hidden-input"
-  							todayButton="Today"
-  							timeFormat="HH:mm"
-  							timeIntervals={15}
-  							dateFormat="HH:mm DD.MM.YYYY"
-  						/>
-          </div>
+          <DatePicker
+            selected={endsAt}
+            onChange={date => setEndsAt(date)}
+            locale="en-gb"
+            placeholderText="No ending date"
+            showTimeSelect
+            className="form-control hidden-input"
+            todayButton="Today"
+            timeFormat="HH:mm"
+            timeIntervals={15}
+            dateFormat="HH:mm DD.MM.YYYY"
+            />
+        </div>
 
-          <ModalFooter>
-            <Button className="btn-link mr-auto" disabled={saving} onClick={() => closeModal()}>
-              Close
-            </Button>
+        <ModalFooter>
+          <Button className="btn-link mr-auto" disabled={saving} onClick={() => closeModal(null)}>
+            Close
+          </Button>
 
-            <Button className="btn"
-              disabled={saving || title === ""}
-              onClick={addMilestoneFunc}>
+          <Button className="btn"
+            disabled={saving || title === "" || projectLoading}
+            onClick={addMilestoneFunc}>
             { saving ? 'Adding...' : 'Add milestone' }
           </Button>
         </ModalFooter>

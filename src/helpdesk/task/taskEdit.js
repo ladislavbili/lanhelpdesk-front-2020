@@ -1,9 +1,25 @@
 import React from 'react';
-import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
+import {
+  useMutation,
+  useQuery,
+  useLazyQuery
+} from "@apollo/client";
 import gql from "graphql-tag";
 
 import Select from 'react-select';
-import { Label, TabContent, TabPane, Nav, NavItem, NavLink, Modal, ModalBody, ModalHeader, ListGroup, ListGroupItem} from 'reactstrap';
+import {
+  Label,
+  TabContent,
+  TabPane,
+  Nav,
+  NavItem,
+  NavLink,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  ListGroup,
+  ListGroupItem
+} from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 //import CKEditor4 from 'ckeditor4-react';
@@ -29,13 +45,27 @@ import ck5config from 'configs/components/ck5config';
 
 import datePickerConfig from 'configs/components/datepicker';
 import PendingPicker from '../components/pendingPicker';
-import {toSelArr, toSelItem, timestampToString, orderArr} from '../../helperFunctions';
-import {invisibleSelectStyleNoArrow, invisibleSelectStyleNoArrowColored,invisibleSelectStyleNoArrowColoredRequired, invisibleSelectStyleNoArrowRequired} from 'configs/components/select';
+import {
+  toSelArr,
+  toSelItem,
+  timestampToString,
+  orderArr
+} from '../../helperFunctions';
+import {
+  invisibleSelectStyleNoArrow,
+  invisibleSelectStyleNoArrowColored,
+  invisibleSelectStyleNoArrowColoredRequired,
+  invisibleSelectStyleNoArrowRequired
+} from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect';
-import { noMilestone } from 'configs/constants/sidebar';
-import { noDef } from 'configs/constants/projects';
+import {
+  noMilestone
+} from 'configs/constants/sidebar';
+import {
+  noDef
+} from 'configs/constants/projects';
 
-const GET_MY_DATA = gql`
+const GET_MY_DATA = gql `
 query {
   getMyData{
     id
@@ -51,7 +81,7 @@ query {
 }
 `;
 
-const GET_TASK = gql`
+const GET_TASK = gql `
 query task($id: Int!){
 	task(
 		id: $id
@@ -293,7 +323,7 @@ user {
 }
 parentCommentId*/
 
-const UPDATE_TASK = gql`
+const UPDATE_TASK = gql `
 mutation updateTask($id: Int!, $important: Boolean, $title: String, $closeDate: String, $assignedTo: [Int], $company: Int, $deadline: String, $description: String, $milestone: Int, $overtime: Boolean, $pausal: Boolean, $pendingChangable: Boolean, $pendingDate: String, $project: Int, $requester: Int, $status: Int, $tags: [Int], $taskType: Int, $repeat: RepeatInput ) {
   updateTask(
 		id: $id,
@@ -322,7 +352,7 @@ mutation updateTask($id: Int!, $important: Boolean, $title: String, $closeDate: 
 }
 `;
 
-export const DELETE_TASK = gql`
+export const DELETE_TASK = gql `
 mutation deleteTask($id: Int!) {
   deleteTask(
     id: $id,
@@ -333,7 +363,7 @@ mutation deleteTask($id: Int!) {
 `;
 
 
-export const UPDATE_PROJECT_RIGHTS = gql`
+export const UPDATE_PROJECT_RIGHTS = gql `
 mutation updateProject($id: Int!, $projectRights: [ProjectRightInput]) {
   updateProject(
 		id: $id,
@@ -422,7 +452,7 @@ mutation updateProject($id: Int!, $projectRights: [ProjectRightInput]) {
 }
 `;
 
-const ADD_SUBTASK = gql`
+const ADD_SUBTASK = gql `
 mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
   addSubtask(
     title: $title,
@@ -439,7 +469,7 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: F
 }
 `;
 
-const UPDATE_SUBTASK = gql`
+const UPDATE_SUBTASK = gql `
 mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
   updateSubtask(
 		id: $id,
@@ -457,7 +487,7 @@ mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $
 }
 `;
 
-export const DELETE_SUBTASK = gql`
+export const DELETE_SUBTASK = gql `
 mutation deleteSubtask($id: Int!) {
   deleteSubtask(
     id: $id,
@@ -468,7 +498,7 @@ mutation deleteSubtask($id: Int!) {
 `;
 
 
-const ADD_WORKTRIP = gql`
+const ADD_WORKTRIP = gql `
 mutation addWorkTrip($order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
   addWorkTrip(
 		order: $order,
@@ -484,7 +514,7 @@ mutation addWorkTrip($order: Int!, $done: Boolean!, $quantity: Float!, $discount
 }
 `;
 
-const UPDATE_WORKTRIP = gql`
+const UPDATE_WORKTRIP = gql `
 mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
   updateWorkTrip(
 		id: $id,
@@ -500,7 +530,7 @@ mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $quantity: Float
 }
 `;
 
-export const DELETE_WORKTRIP = gql`
+export const DELETE_WORKTRIP = gql `
 mutation deleteWorkTrip($id: Int!) {
   deleteWorkTrip(
     id: $id,
@@ -510,7 +540,7 @@ mutation deleteWorkTrip($id: Int!) {
 }
 `;
 
-const ADD_MATERIAL = gql`
+const ADD_MATERIAL = gql `
 mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $margin: Float!, $price: Float!, $task: Int!) {
   addMaterial(
     title: $title,
@@ -526,7 +556,7 @@ mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $quantity: 
 }
 `;
 
-const UPDATE_MATERIAL = gql`
+const UPDATE_MATERIAL = gql `
 mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $margin: Float, $price: Float) {
   updateMaterial(
 		id: $id,
@@ -543,7 +573,7 @@ mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, 
 }
 `;
 
-export const DELETE_MATERIAL = gql`
+export const DELETE_MATERIAL = gql `
 mutation deleteMaterial($id: Int!) {
   deleteMaterial(
     id: $id,
@@ -554,7 +584,7 @@ mutation deleteMaterial($id: Int!) {
 `;
 
 
-const ADD_CUSTOM_ITEM = gql`
+const ADD_CUSTOM_ITEM = gql `
 mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $price: Float!, $task: Int!) {
   addCustomItem(
     title: $title,
@@ -569,7 +599,7 @@ mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $quantity
 }
 `;
 
-const UPDATE_CUSTOM_ITEM = gql`
+const UPDATE_CUSTOM_ITEM = gql `
 mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $price: Float) {
   updateCustomItem(
 		id: $id,
@@ -585,7 +615,7 @@ mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean
 }
 `;
 
-export const DELETE_CUSTOM_ITEM = gql`
+export const DELETE_CUSTOM_ITEM = gql `
 mutation deleteCustomItem($id: Int!) {
   deleteCustomItem(
     id: $id,
@@ -595,7 +625,7 @@ mutation deleteCustomItem($id: Int!) {
 }
 `;
 
-const GET_PROJECTS = gql`
+const GET_PROJECTS = gql `
 query {
   projects {
 		id
@@ -683,7 +713,7 @@ query {
 }
 `;
 
-const GET_USERS = gql`
+const GET_USERS = gql `
 query {
   users{
     id
@@ -701,7 +731,7 @@ query {
 }
 `;
 
-const GET_STATUSES = gql`
+const GET_STATUSES = gql `
 query {
   statuses {
     title
@@ -711,7 +741,7 @@ query {
 }
 `;
 
-const GET_COMPANIES = gql`
+const GET_COMPANIES = gql `
 query {
  companies {
 	 title
@@ -721,644 +751,846 @@ query {
 }
 `;
 
-export default function TaskEdit (props){
-	//data & queries
-	const { match, history, columns, allTags, taskTypes, tripTypes, inModal, closeModal } = props;
-  const [ getTask, {data: taskData, loading: taskLoading } ] = useLazyQuery(GET_TASK);
-  const [ updateProjectRights ] = useMutation(UPDATE_PROJECT_RIGHTS);
-  const [ updateTask/*, {client}*/ ] = useMutation(UPDATE_TASK);
-  const [ deleteTask ] = useMutation(DELETE_TASK);
-  const [ addSubtask ] = useMutation(ADD_SUBTASK);
-  const [ updateSubtask ] = useMutation(UPDATE_SUBTASK);
-  const [ deleteSubtask ] = useMutation(DELETE_SUBTASK);
-  const [ addWorkTrip ] = useMutation(ADD_WORKTRIP);
-  const [ updateWorkTrip ] = useMutation(UPDATE_WORKTRIP);
-  const [ deleteWorkTrip ] = useMutation(DELETE_WORKTRIP);
-  const [ addMaterial ] = useMutation(ADD_MATERIAL);
-  const [ updateMaterial ] = useMutation(UPDATE_MATERIAL);
-  const [ deleteMaterial ] = useMutation(DELETE_MATERIAL);
-  const [ addCustomItem ] = useMutation(ADD_CUSTOM_ITEM);
-  const [ updateCustomItem ] = useMutation(UPDATE_CUSTOM_ITEM);
-  const [ deleteCustomItem ] = useMutation(DELETE_CUSTOM_ITEM);
+export default function TaskEdit( props ) {
+  //data & queries
+  const {
+    match,
+    history,
+    columns,
+    allTags,
+    taskTypes,
+    tripTypes,
+    inModal,
+    closeModal
+  } = props;
+  const [ getTask, {
+    data: taskData,
+    loading: taskLoading
+  } ] = useLazyQuery( GET_TASK );
+  const [ updateProjectRights ] = useMutation( UPDATE_PROJECT_RIGHTS );
+  const [ updateTask /*, {client}*/ ] = useMutation( UPDATE_TASK );
+  const [ deleteTask ] = useMutation( DELETE_TASK );
+  const [ addSubtask ] = useMutation( ADD_SUBTASK );
+  const [ updateSubtask ] = useMutation( UPDATE_SUBTASK );
+  const [ deleteSubtask ] = useMutation( DELETE_SUBTASK );
+  const [ addWorkTrip ] = useMutation( ADD_WORKTRIP );
+  const [ updateWorkTrip ] = useMutation( UPDATE_WORKTRIP );
+  const [ deleteWorkTrip ] = useMutation( DELETE_WORKTRIP );
+  const [ addMaterial ] = useMutation( ADD_MATERIAL );
+  const [ updateMaterial ] = useMutation( UPDATE_MATERIAL );
+  const [ deleteMaterial ] = useMutation( DELETE_MATERIAL );
+  const [ addCustomItem ] = useMutation( ADD_CUSTOM_ITEM );
+  const [ updateCustomItem ] = useMutation( UPDATE_CUSTOM_ITEM );
+  const [ deleteCustomItem ] = useMutation( DELETE_CUSTOM_ITEM );
 
-	const { data: projectsData, loading: projectsLoading } = useQuery(GET_PROJECTS);
-	const projects = (projectsLoading || !projectsData ? [] : projectsData.projects);
+  const {
+    data: projectsData,
+    loading: projectsLoading
+  } = useQuery( GET_PROJECTS );
+  const projects = ( projectsLoading || !projectsData ? [] : projectsData.projects );
 
-	const { data: usersData, loading: usersLoading } = useQuery(GET_USERS);
-	const users = (usersLoading || !usersData ? [] : usersData.users);
+  const {
+    data: usersData,
+    loading: usersLoading
+  } = useQuery( GET_USERS );
+  const users = ( usersLoading || !usersData ? [] : usersData.users );
 
-	const { data: statusesData, loading: statusesLoading } = useQuery(GET_STATUSES);
-	const statuses = (statusesLoading || !statusesData ? [] : orderArr(statusesData.statuses));
+  const {
+    data: statusesData,
+    loading: statusesLoading
+  } = useQuery( GET_STATUSES );
+  const statuses = ( statusesLoading || !statusesData ? [] : orderArr( statusesData.statuses ) );
 
-	const { data: companiesData, loading: companiesLoading } = useQuery(GET_COMPANIES);
-	const companies = (companiesLoading || !companiesData ? [] : orderArr(companiesData.companies));
+  const {
+    data: companiesData,
+    loading: companiesLoading
+  } = useQuery( GET_COMPANIES );
+  const companies = ( companiesLoading || !companiesData ? [] : orderArr( companiesData.companies ) );
 
-	const { data: myData, loading: myDataLoading } = useQuery(GET_MY_DATA);
-	const currentUser = myDataLoading && myData ? myData.getMyData : {};
-	const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+  const {
+    data: myData,
+    loading: myDataLoading
+  } = useQuery( GET_MY_DATA );
+  const currentUser = myDataLoading && myData ? myData.getMyData : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   //state
-  const [ layout, setLayout ] = React.useState(1);
+  const [ layout, setLayout ] = React.useState( 1 );
 
-	const [ defaultFields, setDefaultFields ] = React.useState(noDef);
+  const [ defaultFields, setDefaultFields ] = React.useState( noDef );
 
-  const [ attachments, setAttachments ] = React.useState([]);
-  const [ assignedTo, setAssignedTo ] = React.useState([]);
-  const [ createdBy, setCreatedBy ] = React.useState(null);
-  const [ createdAt, setCreatedAt ] = React.useState(null);
-  const [ closeDate, setCloseDate ] = React.useState(null);
-  const [ comments, setComments ] = React.useState([]);
-  const [ company, setCompany ] = React.useState(null);
-  const [ customItems, setCustomItems ] = React.useState([]);
-  const [ deadline, setDeadline ] = React.useState(null);
-  const [ description, setDescription ] = React.useState("");
-  const [ important, setImportant ] = React.useState(false);
-	const [ materials, setMaterials ] = React.useState([]);
-  const [ milestone, setMilestone ] = React.useState([noMilestone]);
-  const [ overtime, setOvertime ] = React.useState(booleanSelects[0]);
-  const [ openUserAdd, setOpenUserAdd ] = React.useState(false);
-  const [ openCompanyAdd, setOpenCompanyAdd ] = React.useState(false);
-  const [ pausal, setPausal ] = React.useState(booleanSelects[0]);
-	const [ pendingChangable, setPendingChangable ] = React.useState(false);
-  const [ pendingDate, setPendingDate ] = React.useState(null);
-  const [ pendingOpen, setPendingOpen ] = React.useState(false);
-  const [ project, setProject ] = React.useState(null);
-  const [ projectChangeDate, setProjectChangeDate ] = React.useState(false);
-  const [ repeat, setRepeat ] = React.useState(null);
-  const [ requester, setRequester ] = React.useState(null);
-  const [ saving, setSaving ] = React.useState(false);
-  const [ status, setStatus ] = React.useState(null);
-  const [ statusChange, setStatusChange ] = React.useState(false);
-  const [ showDescription, setShowDescription ] = React.useState(false);
-	const [ subtasks, setSubtasks ] = React.useState([]);
-  const [ tags, setTags ] = React.useState([]);
-	const [ taskHistory ] = React.useState([]);
-  const [ taskType, setTaskType ] = React.useState(null);
-	const [ taskTripPausal, setTaskTripPausal ] = React.useState(0);
-	const [ taskWorkPausal, setTaskWorkPausal ] = React.useState(0);
-	const [ title, setTitle ] = React.useState("");
-  const [ toggleTab, setToggleTab ] = React.useState(1);
-	const [ usedSubtaskPausal, setUsedSubtaskPausal ] = React.useState(0);
-	const [ usedTripPausal, setUsedTripPausal ] = React.useState(0);
-  const [ workTrips, setWorkTrips ] = React.useState([]);
+  const [ attachments, setAttachments ] = React.useState( [] );
+  const [ assignedTo, setAssignedTo ] = React.useState( [] );
+  const [ createdBy, setCreatedBy ] = React.useState( null );
+  const [ createdAt, setCreatedAt ] = React.useState( null );
+  const [ closeDate, setCloseDate ] = React.useState( null );
+  const [ comments, setComments ] = React.useState( [] );
+  const [ company, setCompany ] = React.useState( null );
+  const [ customItems, setCustomItems ] = React.useState( [] );
+  const [ deadline, setDeadline ] = React.useState( null );
+  const [ description, setDescription ] = React.useState( "" );
+  const [ important, setImportant ] = React.useState( false );
+  const [ materials, setMaterials ] = React.useState( [] );
+  const [ milestone, setMilestone ] = React.useState( [ noMilestone ] );
+  const [ overtime, setOvertime ] = React.useState( booleanSelects[ 0 ] );
+  const [ openUserAdd, setOpenUserAdd ] = React.useState( false );
+  const [ openCompanyAdd, setOpenCompanyAdd ] = React.useState( false );
+  const [ pausal, setPausal ] = React.useState( booleanSelects[ 0 ] );
+  const [ pendingChangable, setPendingChangable ] = React.useState( false );
+  const [ pendingDate, setPendingDate ] = React.useState( null );
+  const [ pendingOpen, setPendingOpen ] = React.useState( false );
+  const [ project, setProject ] = React.useState( null );
+  const [ projectChangeDate, setProjectChangeDate ] = React.useState( false );
+  const [ repeat, setRepeat ] = React.useState( null );
+  const [ requester, setRequester ] = React.useState( null );
+  const [ saving, setSaving ] = React.useState( false );
+  const [ status, setStatus ] = React.useState( null );
+  const [ statusChange, setStatusChange ] = React.useState( false );
+  const [ showDescription, setShowDescription ] = React.useState( false );
+  const [ subtasks, setSubtasks ] = React.useState( [] );
+  const [ tags, setTags ] = React.useState( [] );
+  const [ taskHistory ] = React.useState( [] );
+  const [ taskType, setTaskType ] = React.useState( null );
+  const [ taskTripPausal, setTaskTripPausal ] = React.useState( 0 );
+  const [ taskWorkPausal, setTaskWorkPausal ] = React.useState( 0 );
+  const [ title, setTitle ] = React.useState( "" );
+  const [ toggleTab, setToggleTab ] = React.useState( 1 );
+  const [ usedSubtaskPausal, setUsedSubtaskPausal ] = React.useState( 0 );
+  const [ usedTripPausal, setUsedTripPausal ] = React.useState( 0 );
+  const [ workTrips, setWorkTrips ] = React.useState( [] );
 
-  const [ viewOnly, setViewOnly ] = React.useState(true);
+  const [ viewOnly, setViewOnly ] = React.useState( true );
 
-// sync
-React.useEffect( () => {
-    if (!taskLoading && taskData){
-			setAssignedTo(toSelArr(taskData.task.assignedTo, 'email'));
-			setCloseDate( timestampToString(parseInt(taskData.task.closeDate)) );
-			setComments( taskData.task.comments );
-			setCompany( ( taskData.task.company ? {...taskData.task.company, value: taskData.task.company.id, label: taskData.task.company.title} : null) );
-			setCreatedBy(taskData.task.createdBy);
-			setCreatedAt( taskData.task.createdAt );
-			setDeadline(taskData.task.deadline ? timestampToString(parseInt(taskData.task.deadline)) : null) ;
-			setDescription(taskData.task.description);
-      setImportant(taskData.task.important);
+  // sync
+  React.useEffect( () => {
+    if ( !taskLoading && taskData ) {
+      setAssignedTo( toSelArr( taskData.task.assignedTo, 'email' ) );
+      setCloseDate( timestampToString( parseInt( taskData.task.closeDate ) ) );
+      setComments( taskData.task.comments );
+      setCompany( ( taskData.task.company ? {
+        ...taskData.task.company,
+        value: taskData.task.company.id,
+        label: taskData.task.company.title
+      } : null ) );
+      setCreatedBy( taskData.task.createdBy );
+      setCreatedAt( taskData.task.createdAt );
+      setDeadline( taskData.task.deadline ? timestampToString( parseInt( taskData.task.deadline ) ) : null );
+      setDescription( taskData.task.description );
+      setImportant( taskData.task.important );
       //setInvoicedDate( timestampToString(parseInt(taskData.task.invoicedDate)) );
-      const pro =  (taskData.task.project ? {...taskData.task.project, value: taskData.task.project.id, label: taskData.task.project.title} : null );
-      setMilestone(pro && pro.milestone ? {...pro.milestone, value: pro.milestone.id, label: pro.milestone.title} : noMilestone );
-			setOvertime( (taskData.task.overtime ? booleanSelects[1] : booleanSelects[0]) );
-			setPausal( (taskData.task.pausal ? booleanSelects[1] : booleanSelects[0]) );
-			setPendingChangable(taskData.task.pendingChangable);
-			setPendingDate( timestampToString(parseInt(taskData.task.pendingDate)) );
-			setProject(pro);
-		//	setReminder(taskData.task.reminder);
-			setRepeat(taskData.task.repeat);
-			setRequester( (taskData.task.requester ? {...taskData.task.requester, value: taskData.task.requester.id, label: `${taskData.task.requester.name} ${taskData.task.requester.surname}`} : null)) ;
-      const sta = (taskData.task.status ? toSelItem(taskData.task.status) : null )
-			setStatus(sta );
-			setTags(taskData.task.tags ? toSelArr(taskData.task.tags) : []);
-			setTaskType( (taskData.task.taskType ? {...taskData.task.taskType, value: taskData.task.taskType.id, label: taskData.task.taskType.title} : null ) );
-			setTaskTripPausal(taskData.task.company ? taskData.task.company.taskTripPausal : 0);
-			setTaskWorkPausal(taskData.task.company ? taskData.task.company.taskWorkPausal : 0);
-			setTitle(taskData.task.title);
+      const pro = ( taskData.task.project ? {
+        ...taskData.task.project,
+        value: taskData.task.project.id,
+        label: taskData.task.project.title
+      } : null );
+      setMilestone( pro && pro.milestone ? {
+        ...pro.milestone,
+        value: pro.milestone.id,
+        label: pro.milestone.title
+      } : noMilestone );
+      setOvertime( ( taskData.task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
+      setPausal( ( taskData.task.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
+      setPendingChangable( taskData.task.pendingChangable );
+      setPendingDate( timestampToString( parseInt( taskData.task.pendingDate ) ) );
+      setProject( pro );
+      //	setReminder(taskData.task.reminder);
+      setRepeat( taskData.task.repeat );
+      setRequester( ( taskData.task.requester ? {
+        ...taskData.task.requester,
+        value: taskData.task.requester.id,
+        label: `${taskData.task.requester.name} ${taskData.task.requester.surname}`
+      } : null ) );
+      const sta = ( taskData.task.status ? toSelItem( taskData.task.status ) : null )
+      setStatus( sta );
+      setTags( taskData.task.tags ? toSelArr( taskData.task.tags ) : [] );
+      setTaskType( ( taskData.task.taskType ? {
+        ...taskData.task.taskType,
+        value: taskData.task.taskType.id,
+        label: taskData.task.taskType.title
+      } : null ) );
+      setTaskTripPausal( taskData.task.company ? taskData.task.company.taskTripPausal : 0 );
+      setTaskWorkPausal( taskData.task.company ? taskData.task.company.taskWorkPausal : 0 );
+      setTitle( taskData.task.title );
       setCustomItems( taskData.task.customItems );
       setMaterials( taskData.task.materials );
-      setSubtasks( (taskData.task.subtasks ? taskData.task.subtasks.map(item => ({...item, assignedTo: toSelItem(item.assignedTo, 'email'), type: toSelItem(item.type)}) ) : [] ) );
-			setUsedSubtaskPausal(taskData.task.company ? taskData.task.company.usedSubtaskPausal : 0);
-			setUsedTripPausal(taskData.task.company ? taskData.task.company.usedTripPausal : 0);
-      setWorkTrips( (taskData.task.workTrips ? taskData.task.workTrips.map(item => ({...item, assignedTo: toSelItem(item.assignedTo, 'email'), type: toSelItem(item.type)}) ) : [] ) );
+      setSubtasks( ( taskData.task.subtasks ? taskData.task.subtasks.map( item => ( {
+        ...item,
+        assignedTo: toSelItem( item.assignedTo, 'email' ),
+        type: toSelItem( item.type )
+      } ) ) : [] ) );
+      setUsedSubtaskPausal( taskData.task.company ? taskData.task.company.usedSubtaskPausal : 0 );
+      setUsedTripPausal( taskData.task.company ? taskData.task.company.usedTripPausal : 0 );
+      setWorkTrips( ( taskData.task.workTrips ? taskData.task.workTrips.map( item => ( {
+        ...item,
+        assignedTo: toSelItem( item.assignedTo, 'email' ),
+        type: toSelItem( item.type )
+      } ) ) : [] ) );
 
-      if (pro && currentUser !== {}){
-				console.log(currentUser);
-        setDefaults(pro);
-        const userRights = pro ? pro.projectRights.find(r => r.user.id === currentUser.id) : {};
-				console.log(pro.projectRights, userRights);
-        if (sta && sta.action==='Invoiced' && inModal && userRights && userRights.admin) {
-          setViewOnly(false);
+      if ( pro && currentUser !== {} ) {
+        setDefaults( pro );
+        const userRights = pro ? pro.projectRights.find( r => r.user.id === currentUser.id ) : {};
+        if ( sta && sta.action === 'Invoiced' && inModal && userRights && userRights.admin ) {
+          setViewOnly( false );
         } else {
-          setViewOnly((sta && sta.action==='Invoiced') || (userRights && !userRights.admin && !userRights.write));
+          setViewOnly( ( sta && sta.action === 'Invoiced' ) || ( userRights && !userRights.admin && !userRights.write ) );
         }
       }
     }
-	}, [taskLoading]);
+  }, [ taskLoading ] );
 
-	React.useEffect( () => {
-	    getTask({ variables: {id: parseInt(match.params.taskID)} });
-	}, [match.params.taskID]);
+  React.useEffect( () => {
+    getTask( {
+      variables: {
+        id: parseInt( match.params.taskID )
+      }
+    } );
+  }, [ match.params.taskID ] );
 
-	React.useEffect(() => {
-		if (important) {
-			updateTaskFunc(["important"]);
-		}
-	}, [important]);
+  React.useEffect( () => {
+    if ( important ) {
+      updateTaskFunc( [ "important" ] );
+    }
+  }, [ important ] );
 
-	React.useEffect(() => {
-		if (title) {
-			updateTaskFunc(["title"]);
-		}
-	}, [title]);
+  React.useEffect( () => {
+    if ( title ) {
+      updateTaskFunc( [ "title" ] );
+    }
+  }, [ title ] );
 
-	React.useEffect(() => {
-		if (closeDate) {
-			updateTaskFunc(["closeDate"]);
-		}
-	}, [closeDate]);
+  React.useEffect( () => {
+    if ( closeDate ) {
+      updateTaskFunc( [ "closeDate" ] );
+    }
+  }, [ closeDate ] );
 
-	React.useEffect(() => {
-		if (assignedTo) {
-			updateTaskFunc(["assignedTo"]);
-		}
-	}, [assignedTo]);
+  React.useEffect( () => {
+    if ( assignedTo ) {
+      updateTaskFunc( [ "assignedTo" ] );
+    }
+  }, [ assignedTo ] );
 
-	React.useEffect(() => {
-		if (attachments) {
-			updateTaskFunc(["attachments"]);
-		}
-	}, [attachments]);
+  React.useEffect( () => {
+    if ( attachments ) {
+      updateTaskFunc( [ "attachments" ] );
+    }
+  }, [ attachments ] );
 
-	React.useEffect(() => {
-		if (company) {
-			updateTaskFunc(["company"]);
-		}
-	}, [company]);
+  React.useEffect( () => {
+    if ( company ) {
+      updateTaskFunc( [ "company" ] );
+    }
+  }, [ company ] );
 
-	React.useEffect(() => {
-		if (deadline) {
-			updateTaskFunc(["deadline"]);
-		}
-	}, [deadline]);
+  React.useEffect( () => {
+    if ( deadline ) {
+      updateTaskFunc( [ "deadline" ] );
+    }
+  }, [ deadline ] );
 
-	React.useEffect(() => {
-		if (description) {
-			updateTaskFunc(["description"]);
-		}
-	}, [description]);
+  React.useEffect( () => {
+    if ( description ) {
+      updateTaskFunc( [ "description" ] );
+    }
+  }, [ description ] );
 
-	React.useEffect(() => {
-		if (milestone) {
-			updateTaskFunc(["milestone"]);
-		}
-	}, [milestone]);
+  React.useEffect( () => {
+    if ( milestone ) {
+      updateTaskFunc( [ "milestone" ] );
+    }
+  }, [ milestone ] );
 
-	React.useEffect(() => {
-		if (overtime) {
-			updateTaskFunc(["overtime"]);
-		}
-	}, [overtime]);
+  React.useEffect( () => {
+    if ( overtime ) {
+      updateTaskFunc( [ "overtime" ] );
+    }
+  }, [ overtime ] );
 
-	React.useEffect(() => {
-		if (pausal) {
-			updateTaskFunc(["pausal"]);
-		}
-	}, [pausal]);
+  React.useEffect( () => {
+    if ( pausal ) {
+      updateTaskFunc( [ "pausal" ] );
+    }
+  }, [ pausal ] );
 
-	React.useEffect(() => {
-		if (pendingChangable) {
-			updateTaskFunc(["pendingChangable"]);
-		}
-	}, [pendingChangable]);
+  React.useEffect( () => {
+    if ( pendingChangable ) {
+      updateTaskFunc( [ "pendingChangable" ] );
+    }
+  }, [ pendingChangable ] );
 
-	React.useEffect(() => {
-		if (pendingDate) {
-			updateTaskFunc(["pendingDate"]);
-		}
-	}, [pendingDate]);
+  React.useEffect( () => {
+    if ( pendingDate ) {
+      updateTaskFunc( [ "pendingDate" ] );
+    }
+  }, [ pendingDate ] );
 
-	React.useEffect(() => {
-		if (project) {
-			updateTaskFunc(["project"]);
-		}
-	}, [project]);
+  React.useEffect( () => {
+    if ( project ) {
+      updateTaskFunc( [ "project" ] );
+    }
+  }, [ project ] );
 
-	React.useEffect(() => {
-		if (requester) {
-			updateTaskFunc(["requester"]);
-		}
-	}, [requester]);
+  React.useEffect( () => {
+    if ( requester ) {
+      updateTaskFunc( [ "requester" ] );
+    }
+  }, [ requester ] );
 
-	React.useEffect(() => {
-		if (status) {
-			updateTaskFunc(["status"]);
-		}
-	}, [status]);
+  React.useEffect( () => {
+    if ( status ) {
+      updateTaskFunc( [ "status" ] );
+    }
+  }, [ status ] );
 
-	React.useEffect(() => {
-		if (tags) {
-			updateTaskFunc(["tags"]);
-		}
-	}, [tags]);
+  React.useEffect( () => {
+    if ( tags ) {
+      updateTaskFunc( [ "tags" ] );
+    }
+  }, [ tags ] );
 
-	React.useEffect(() => {
-		if (taskType) {
-			updateTaskFunc(["taskType"]);
-		}
-	}, [taskType]);
+  React.useEffect( () => {
+    if ( taskType ) {
+      updateTaskFunc( [ "taskType" ] );
+    }
+  }, [ taskType ] );
 
-	React.useEffect(() => {
-		if (repeat) {
-			updateTaskFunc(["repeat"]);
-		}
-	}, [repeat]);
+  React.useEffect( () => {
+    if ( repeat ) {
+      updateTaskFunc( [ "repeat" ] );
+    }
+  }, [ repeat ] );
 
   const deleteTaskFunc = () => {
-    if(window.confirm("Are you sure?")){
-      deleteTask({ variables: {
-        id: parseInt(match.params.taskID),
-      } }).then( ( response ) => {
-        if(inModal){
-          closeModal();
-        }else{
-          history.goBack();
-          history.push(match.url.substring(0,match.url.length-match.params.taskID.length));
-        }
-      }).catch( (err) => {
-        console.log(err.message);
-        console.log(err);
-      });
+    if ( window.confirm( "Are you sure?" ) ) {
+      deleteTask( {
+          variables: {
+            id: parseInt( match.params.taskID ),
+          }
+        } )
+        .then( ( response ) => {
+          if ( inModal ) {
+            closeModal();
+          } else {
+            history.goBack();
+            history.push( match.url.substring( 0, match.url.length - match.params.taskID.length ) );
+          }
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+          console.log( err );
+        } );
     }
   }
 
-	const updateProjectRightsFunc = (user) => {
-		const newProjectRights = project.projectRights.map(item => ({read: item.read, write: item.write, delete: item.delete, internal: item.internal, admin: item.admin, user: item.user.id}));
-		const newUser = {read: true, write: false, delete: false, internal: false, admin: false, user: user.id}
-		updateProjectRights({ variables: {
-			id: project.id,
-			projectRights: [ ...newProjectRights,  newUser],
-		} }).then( ( response ) => {
-		}).catch( (err) => {
-			console.log(err.message);
-		});
-	}
+  const updateProjectRightsFunc = ( user ) => {
+    const newProjectRights = project.projectRights.map( item => ( {
+      read: item.read,
+      write: item.write,
+      delete: item.delete,
+      internal: item.internal,
+      admin: item.admin,
+      user: item.user.id
+    } ) );
+    const newUser = {
+      read: true,
+      write: false,
+      delete: false,
+      internal: false,
+      admin: false,
+      user: user.id
+    }
+    updateProjectRights( {
+        variables: {
+          id: project.id,
+          projectRights: [ ...newProjectRights, newUser ],
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+  }
 
   const cannotSave = () => {
-  	return  title==="" || status===null || project === null || assignedTo === [] || saving || viewOnly;
+    return title === "" || status === null || project === null || assignedTo === [] || saving || viewOnly;
   }
 
-  const	updateTaskFunc = (what) => {
-  		if(cannotSave()){
-  			return;
-  		}
-      setSaving(true);
+  const updateTaskFunc = ( what ) => {
+    if ( cannotSave() ) {
+      return;
+    }
+    setSaving( true );
 
-			let variables = {id: parseInt(match.params.taskID)};
+    let variables = {
+      id: parseInt( match.params.taskID )
+    };
 
-			for (var i = 0; i < what.length; i++) {
-				switch(what[i]) {
-					case "important":
-						variables = {...variables, important};
-						break;
-				  case "title":
-						variables = {...variables, title};
-				    break;
-				  case "closeDate":
-						variables = {...variables, closeDate: (closeDate !== null && (status.action==='CloseDate' || status.action === 'Invoiced'|| status.action === 'CloseInvalid')) ? closeDate.unix().toString() : null};
-				    break;
-					case "assignedTo":
-						variables = {...variables, assignedTo: assignedTo.map((item)=>item.id)};
-				    break;
-				  case "company":
-						variables = {...variables, company: company ? company.id : null};
-				    break;
-				  case "deadline":
-						variables = {...variables, deadline: deadline !== null ? deadline.unix().toString() : null};
-				    break;
-				  case "description":
-						variables = {...variables, description};
-				    break;
-					case "milestone":
-						variables = {...variables, milestone: (milestone.id === null || milestone.id === -1 ? null : milestone.id),};
-				    break;
-				  case "overtime":
-						variables = {...variables, overtime: overtime.value};
-				    break;
-				  case "pausal":
-						variables = {...variables, pausal: pausal.value};
-				    break;
-				  case "pendingChangable":
-						variables = {...variables, pendingChangable};
-				    break;
-				  case "pendingDate":
-						variables = {...variables, pendingDate: (pendingDate !== null && status.action==='PendingDate') ? pendingDate.unix().toString() : null};
-				    break;
-				  case "project":
-						variables = {...variables, project: project ? project.id : null};
-				    break;
-				  case "requester":
-						variables = {...variables, requester: requester ? requester.id : null};
-				    break;
-				  case "status":
-						variables = {...variables, status: status ? status.id : null};
-				    break;
-				  case "tags":
-						variables = {...variables,   tags: tags.map((item)=>item.id)};
-				    break;
-				  case "taskType":
-						variables = {...variables, taskType: taskType ? taskType.id : null};
-				    break;
-				  case "repeat":
-						variables = {...variables, repeat: repeat};
-				    break;
-				  default:
-				   console.log("impossible", what[i]);
-				}
-			}
+    for ( var i = 0; i < what.length; i++ ) {
+      switch ( what[ i ] ) {
+        case "important":
+          variables = {
+            ...variables,
+            important
+          };
+          break;
+        case "title":
+          variables = {
+            ...variables,
+            title
+          };
+          break;
+        case "closeDate":
+          variables = {
+            ...variables,
+            closeDate: ( closeDate !== null && ( status.action === 'CloseDate' || status.action === 'Invoiced' || status.action === 'CloseInvalid' ) ) ? closeDate.unix()
+              .toString() : null
+          };
+          break;
+        case "assignedTo":
+          variables = {
+            ...variables,
+            assignedTo: assignedTo.map( ( item ) => item.id )
+          };
+          break;
+        case "company":
+          variables = {
+            ...variables,
+            company: company ? company.id : null
+          };
+          break;
+        case "deadline":
+          variables = {
+            ...variables,
+            deadline: deadline !== null ? deadline.unix()
+              .toString() : null
+          };
+          break;
+        case "description":
+          variables = {
+            ...variables,
+            description
+          };
+          break;
+        case "milestone":
+          variables = {
+            ...variables,
+            milestone: ( milestone.id === null || milestone.id === -1 ? null : milestone.id ),
+          };
+          break;
+        case "overtime":
+          variables = {
+            ...variables,
+            overtime: overtime.value
+          };
+          break;
+        case "pausal":
+          variables = {
+            ...variables,
+            pausal: pausal.value
+          };
+          break;
+        case "pendingChangable":
+          variables = {
+            ...variables,
+            pendingChangable
+          };
+          break;
+        case "pendingDate":
+          variables = {
+            ...variables,
+            pendingDate: ( pendingDate !== null && status.action === 'PendingDate' ) ? pendingDate.unix()
+              .toString() : null
+          };
+          break;
+        case "project":
+          variables = {
+            ...variables,
+            project: project ? project.id : null
+          };
+          break;
+        case "requester":
+          variables = {
+            ...variables,
+            requester: requester ? requester.id : null
+          };
+          break;
+        case "status":
+          variables = {
+            ...variables,
+            status: status ? status.id : null
+          };
+          break;
+        case "tags":
+          variables = {
+            ...variables,
+            tags: tags.map( ( item ) => item.id )
+          };
+          break;
+        case "taskType":
+          variables = {
+            ...variables,
+            taskType: taskType ? taskType.id : null
+          };
+          break;
+        case "repeat":
+          variables = {
+            ...variables,
+            repeat: repeat
+          };
+          break;
+        default:
+          console.log( "impossible", what[ i ] );
+      }
+    }
 
-      updateTask({ variables }).then( ( response ) => {
-      }).catch( (err) => {
-        console.log(err.message);
-      });
+    updateTask( {
+        variables
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-     setSaving( false );
-  	}
-
-	const	addSubtaskFunc = (sub) => {
-  		if(cannotSave()){
-  			return;
-  		}
-      setSaving(true);
-
-      addSubtask({ variables: {
-        title: sub.title,
-				order: sub.order,
-				done: sub.done,
-				discount: sub.discount,
-				quantity: sub.quantity,
-				type: sub.type.id,
-				task: parseInt(match.params.taskID),
-				assignedTo: sub.assignedTo.id,
-      } }).then( ( response ) => {
-				console.log(response);
-				setSubtasks([ ...subtasks, {...sub, id: response.data.addSubtask.id} ]);
-      }).catch( (err) => {
-        console.log(err.message);
-      });
-
-     setSaving( false );
-  	}
-
-  const	updateSubtaskFunc = (sub) => {
-  		if(cannotSave()){
-  			return;
-  		}
-      setSaving(true);
-
-      updateSubtask({ variables: {
-        id: sub.id,
-        title: sub.title,
-				order: sub.order,
-				done: sub.done,
-				discount: sub.discount,
-				quantity: sub.quantity,
-				type: sub.type.id,
-				assignedTo: sub.assignedTo.id,
-      } }).then( ( response ) => {
-      }).catch( (err) => {
-        console.log(err.message);
-      });
-
-     setSaving( false );
-  	}
-
-	const deleteSubtaskFunc = (id) => {
-    deleteSubtask({ variables: {
-      id,
-    } }).then( ( response ) => {
-    }).catch( (err) => {
-      console.log(err.message);
-      console.log(err);
-    });
+    setSaving( false );
   }
 
-	const	addWorkTripFunc = (wt) => {
-  		if(cannotSave()){
-  			return;
-  		}
-      setSaving(true);
+  const addSubtaskFunc = ( sub ) => {
+    if ( cannotSave() ) {
+      return;
+    }
+    setSaving( true );
 
-      addWorkTrip({ variables: {
-				order: wt.order,
-				done: wt.done,
-				discount: wt.discount,
-				quantity: wt.quantity,
-				type: wt.type.id,
-				task: parseInt(match.params.taskID),
-				assignedTo: wt.assignedTo.id,
-      } }).then( ( response ) => {
-				console.log(response);
-				setWorkTrips([ ...workTrips, {...wt, id: response.data.addWorkTrip.id} ]);
-      }).catch( (err) => {
-        console.log(err.message);
-      });
+    addSubtask( {
+        variables: {
+          title: sub.title,
+          order: sub.order,
+          done: sub.done,
+          discount: sub.discount,
+          quantity: sub.quantity,
+          type: sub.type.id,
+          task: parseInt( match.params.taskID ),
+          assignedTo: sub.assignedTo.id,
+        }
+      } )
+      .then( ( response ) => {
+        console.log( response );
+        setSubtasks( [ ...subtasks, {
+          ...sub,
+          id: response.data.addSubtask.id
+        } ] );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-     setSaving( false );
-  	}
-
-  const	updateWorkTripFunc = (item) => {
-  		if(cannotSave()){
-  			return;
-  		}
-      setSaving(true);
-
-      updateWorkTrip({ variables: {
-        id: item.id,
-				order: item.order,
-				done: item.done,
-				discount: item.discount,
-				quantity: item.quantity,
-				type: item.type.id,
-				assignedTo: item.assignedTo.id,
-      } }).then( ( response ) => {
-      }).catch( (err) => {
-        console.log(err.message);
-      });
-
-     setSaving( false );
-  	}
-
-	const deleteWorkTripFunc = (id) => {
-    deleteWorkTrip({ variables: {
-      id,
-    } }).then( ( response ) => {
-    }).catch( (err) => {
-      console.log(err.message);
-      console.log(err);
-    });
+    setSaving( false );
   }
 
-		const	addMaterialFunc = (item) => {
-	  		if(cannotSave()){
-	  			return;
-	  		}
-	      setSaving(true);
-	      addMaterial({ variables: {
-					title: item.title,
-					order: item.order,
-					done: item.done,
-					quantity: parseFloat(item.quantity),
-					margin: parseFloat(item.margin),
-					price: parseFloat(item.price),
-					task: parseInt(match.params.taskID),
-	      } }).then( ( response ) => {
-					console.log(response);
-					setMaterials([ ...materials, {...item, id: response.data.addMaterial.id} ]);
-	      }).catch( (err) => {
-	        console.log(err.message);
-	      });
+  const updateSubtaskFunc = ( sub ) => {
+    if ( cannotSave() ) {
+      return;
+    }
+    setSaving( true );
 
-	     setSaving( false );
-	  	}
+    updateSubtask( {
+        variables: {
+          id: sub.id,
+          title: sub.title,
+          order: sub.order,
+          done: sub.done,
+          discount: sub.discount,
+          quantity: sub.quantity,
+          type: sub.type.id,
+          assignedTo: sub.assignedTo.id,
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-	  const	updateMaterialFunc = (item) => {
-	  		if(cannotSave()){
-	  			return;
-	  		}
-	      setSaving(true);
-
-	      updateMaterial({ variables: {
-	        id: item.id,
-					title: item.title,
-					order: item.order,
-					done: item.done,
-					quantity: parseFloat(item.quantity),
-					margin: parseFloat(item.margin),
-					price: parseFloat(item.price),
-	      } }).then( ( response ) => {
-	      }).catch( (err) => {
-	        console.log(err.message);
-	      });
-
-	     setSaving( false );
-	  	}
-
-		const deleteMaterialFunc = (id) => {
-	    deleteMaterial({ variables: {
-	      id,
-	    } }).then( ( response ) => {
-	    }).catch( (err) => {
-	      console.log(err.message);
-	      console.log(err);
-	    });
-	  }
-
-	const	addCustomItemFunc = (item) => {
-  		if(cannotSave()){
-  			return;
-  		}
-      setSaving(true);
-      addCustomItem({ variables: {
-				title: item.title,
-				order: item.order,
-				done: item.done,
-				quantity: parseFloat(item.quantity),
-				price: parseFloat(item.price),
-				task: parseInt(match.params.taskID),
-      } }).then( ( response ) => {
-				console.log(response);
-				setCustomItems([ ...customItems, {...item, id: response.data.addCustomItem.id} ]);
-      }).catch( (err) => {
-        console.log(err.message);
-      });
-
-     setSaving( false );
-  	}
-
-  const	updateCustomItemFunc = (item) => {
-  		if(cannotSave()){
-  			return;
-  		}
-      setSaving(true);
-
-      updateCustomItem({ variables: {
-        id: item.id,
-				title: item.title,
-				order: item.order,
-				done: item.done,
-				quantity: parseFloat(item.quantity),
-				price: parseFloat(item.price),
-      } }).then( ( response ) => {
-      }).catch( (err) => {
-        console.log(err.message);
-      });
-
-     setSaving( false );
-  	}
-
-	const deleteCustomItemFunc = (id) => {
-    deleteCustomItem({ variables: {
-      id,
-    } }).then( ( response ) => {
-    }).catch( (err) => {
-      console.log(err.message);
-      console.log(err);
-    });
+    setSaving( false );
   }
-/*
-	const getHistoryMessage = (type, data) => {
-		let user = "Používateľ " + currentUser.userData.name + ' ' + currentUser.userData.surname;
-		switch (type) {
-			case 'status':{
-				return `${user} zmenil status z ${data.oldStatus?data.oldStatus.title:''} na ${data.newStatus?data.newStatus.title:''}.`;
-			}
-			case 'comment':{
-				return user + ' komentoval úlohu.';
-			}
-			default:{
-				return user + ' spravil nedefinovanú zmenu.';
-			}
-		}
-	}*/
 
-	const setDefaults = (projectID) => {
-		if(projectID===null){
-			setDefaultFields( noDef );
-			return;
-		}
-		let pro = projects.find((p)=>p.id===projectID);
-		if(!pro){
-			setDefaultFields( noDef );
-			return;
-		}
-	 setDefaultFields( {...noDef,...pro.def} );
-	}
+  const deleteSubtaskFunc = ( id ) => {
+    deleteSubtask( {
+        variables: {
+          id,
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+        console.log( err );
+      } );
+  }
 
-  const rights = project ? project.projectRights.find(r => r.user.id === currentUser.id) : undefined;
-  const userRights = rights === undefined ? {user: currentUser, read: false, write: false, delete: false, internal: false, isAdmin: false} : rights;
+  const addWorkTripFunc = ( wt ) => {
+    if ( cannotSave() ) {
+      return;
+    }
+    setSaving( true );
 
-	const canAdd = userRights.write || userRights.isAdmin;
-	const canDelete = userRights.delete || userRights.isAdmin;
-	const canCopy = userRights.write || userRights.isAdmin || title === "" || status === null || project === null || saving;
+    addWorkTrip( {
+        variables: {
+          order: wt.order,
+          done: wt.done,
+          discount: wt.discount,
+          quantity: wt.quantity,
+          type: wt.type.id,
+          task: parseInt( match.params.taskID ),
+          assignedTo: wt.assignedTo.id,
+        }
+      } )
+      .then( ( response ) => {
+        console.log( response );
+        setWorkTrips( [ ...workTrips, {
+          ...wt,
+          id: response.data.addWorkTrip.id
+        } ] );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-	const availableProjects = projects.filter((p)=>{
-		let userRights = p.projectRights.find(r => r.user.id === currentUser.id);
-		if((userRights && userRights.isAdmin) || (userRights && userRights.read) || (p.id ===-1 || p.id === null)){
-			return true;
-		} else {
-			return false;
-		}
-	});
+    setSaving( false );
+  }
 
-	const USERS_WITH_PERMISSIONS = project && project.projectRights ? project.projectRights.map((right)=>right.user) : [];
+  const updateWorkTripFunc = ( item ) => {
+    if ( cannotSave() ) {
+      return;
+    }
+    setSaving( true );
 
-	const REQUESTERS =  (project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users);
+    updateWorkTrip( {
+        variables: {
+          id: item.id,
+          order: item.order,
+          done: item.done,
+          discount: item.discount,
+          quantity: item.quantity,
+          type: item.type.id,
+          assignedTo: item.assignedTo.id,
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
 
-  const MILESTONES = [noMilestone].concat( (project ? toSelArr( project.milestones.filter((m)=> m.id !== milestone.id) ) : []) );
+    setSaving( false );
+  }
 
-	const renderCommandbar = () => {
-		return (
-			<div className={classnames({"commandbar-small": columns}, {"commandbar": !columns}, { "p-l-25": true})}> {/*Commandbar*/}
+  const deleteWorkTripFunc = ( id ) => {
+    deleteWorkTrip( {
+        variables: {
+          id,
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+        console.log( err );
+      } );
+  }
+
+  const addMaterialFunc = ( item ) => {
+    if ( cannotSave() ) {
+      return;
+    }
+    setSaving( true );
+    addMaterial( {
+        variables: {
+          title: item.title,
+          order: item.order,
+          done: item.done,
+          quantity: parseFloat( item.quantity ),
+          margin: parseFloat( item.margin ),
+          price: parseFloat( item.price ),
+          task: parseInt( match.params.taskID ),
+        }
+      } )
+      .then( ( response ) => {
+        console.log( response );
+        setMaterials( [ ...materials, {
+          ...item,
+          id: response.data.addMaterial.id
+        } ] );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+
+    setSaving( false );
+  }
+
+  const updateMaterialFunc = ( item ) => {
+    if ( cannotSave() ) {
+      return;
+    }
+    setSaving( true );
+
+    updateMaterial( {
+        variables: {
+          id: item.id,
+          title: item.title,
+          order: item.order,
+          done: item.done,
+          quantity: parseFloat( item.quantity ),
+          margin: parseFloat( item.margin ),
+          price: parseFloat( item.price ),
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+
+    setSaving( false );
+  }
+
+  const deleteMaterialFunc = ( id ) => {
+    deleteMaterial( {
+        variables: {
+          id,
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+        console.log( err );
+      } );
+  }
+
+  const addCustomItemFunc = ( item ) => {
+    if ( cannotSave() ) {
+      return;
+    }
+    setSaving( true );
+    addCustomItem( {
+        variables: {
+          title: item.title,
+          order: item.order,
+          done: item.done,
+          quantity: parseFloat( item.quantity ),
+          price: parseFloat( item.price ),
+          task: parseInt( match.params.taskID ),
+        }
+      } )
+      .then( ( response ) => {
+        console.log( response );
+        setCustomItems( [ ...customItems, {
+          ...item,
+          id: response.data.addCustomItem.id
+        } ] );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+
+    setSaving( false );
+  }
+
+  const updateCustomItemFunc = ( item ) => {
+    if ( cannotSave() ) {
+      return;
+    }
+    setSaving( true );
+
+    updateCustomItem( {
+        variables: {
+          id: item.id,
+          title: item.title,
+          order: item.order,
+          done: item.done,
+          quantity: parseFloat( item.quantity ),
+          price: parseFloat( item.price ),
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+
+    setSaving( false );
+  }
+
+  const deleteCustomItemFunc = ( id ) => {
+    deleteCustomItem( {
+        variables: {
+          id,
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( err ) => {
+        console.log( err.message );
+        console.log( err );
+      } );
+  }
+  /*
+  	const getHistoryMessage = (type, data) => {
+  		let user = "Používateľ " + currentUser.userData.name + ' ' + currentUser.userData.surname;
+  		switch (type) {
+  			case 'status':{
+  				return `${user} zmenil status z ${data.oldStatus?data.oldStatus.title:''} na ${data.newStatus?data.newStatus.title:''}.`;
+  			}
+  			case 'comment':{
+  				return user + ' komentoval úlohu.';
+  			}
+  			default:{
+  				return user + ' spravil nedefinovanú zmenu.';
+  			}
+  		}
+  	}*/
+
+  const setDefaults = ( projectID ) => {
+    if ( projectID === null ) {
+      setDefaultFields( noDef );
+      return;
+    }
+    let pro = projects.find( ( p ) => p.id === projectID );
+    if ( !pro ) {
+      setDefaultFields( noDef );
+      return;
+    }
+    setDefaultFields( {
+      ...noDef,
+      ...pro.def
+    } );
+  }
+
+  const rights = project ? project.projectRights.find( r => r.user.id === currentUser.id ) : undefined;
+  const userRights = rights === undefined ? {
+    user: currentUser,
+    read: false,
+    write: false,
+    delete: false,
+    internal: false,
+    isAdmin: false
+  } : rights;
+
+  const canAdd = userRights.write || userRights.isAdmin;
+  const canDelete = userRights.delete || userRights.isAdmin;
+  const canCopy = userRights.write || userRights.isAdmin || title === "" || status === null || project === null || saving;
+
+  const availableProjects = projects.filter( ( p ) => {
+    let userRights = p.projectRights.find( r => r.user.id === currentUser.id );
+    if ( ( userRights && userRights.isAdmin ) || ( userRights && userRights.read ) || ( p.id === -1 || p.id === null ) ) {
+      return true;
+    } else {
+      return false;
+    }
+  } );
+
+  const USERS_WITH_PERMISSIONS = project && project.projectRights ? project.projectRights.map( ( right ) => right.user ) : [];
+
+  const REQUESTERS = ( project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users );
+
+  const MILESTONES = [ noMilestone ].concat( ( project ? toSelArr( project.milestones.filter( ( m ) => m.id !== milestone.id ) ) : [] ) );
+
+  const renderCommandbar = () => {
+    return (
+      <div className={classnames({"commandbar-small": columns}, {"commandbar": !columns}, { "p-l-25": true})}> {/*Commandbar*/}
 				<div className={classnames("d-flex", "flex-row", "center-hor", {"m-b-10": columns})}>
 					<div className="display-inline center-hor">
 						{!columns &&
@@ -1417,12 +1649,12 @@ React.useEffect( () => {
 					</button>
 				</div>
 			</div>
-		)
-	}
+    )
+  }
 
-		const	renderTitle = () => {
-			return (
-				<div className="d-flex p-2">
+  const renderTitle = () => {
+    return (
+      <div className="d-flex p-2">
 					<div className="row flex">
 						<h2 className="center-hor text-extra-slim">{match.params.taskID}: </h2>
 						<span className="center-hor flex m-r-15">
@@ -1453,13 +1685,13 @@ React.useEffect( () => {
 						</div>
 					</div>
 				</div>
-		);
-	}
+    );
+  }
 
-	const renderStatusDate = () => {
-			if(status && status.action==='PendingDate'){
-				return (
-					<span className="text-muted task-info m-r--40">
+  const renderStatusDate = () => {
+    if ( status && status.action === 'PendingDate' ) {
+      return (
+        <span className="text-muted task-info m-r--40">
 						<span className="center-hor">
 							Pending date:
 						</span>
@@ -1474,12 +1706,12 @@ React.useEffect( () => {
 							{...datePickerConfig}
 							/>
 					</span>
-				)
-			}
+      )
+    }
 
-			if(status && (status.action==='CloseDate'||status.action==='Invoiced'||status.action==='CloseInvalid')){
-				return (
-					<span className="text-muted task-info m-r--40">
+    if ( status && ( status.action === 'CloseDate' || status.action === 'Invoiced' || status.action === 'CloseInvalid' ) ) {
+      return (
+        <span className="text-muted task-info m-r--40">
 						<span className="center-hor">
 							Closed at:
 						</span>
@@ -1494,83 +1726,82 @@ React.useEffect( () => {
 							{...datePickerConfig}
 							/>
 					</span>
-				)
-			}
-			return (
-				<span className="task-info ">
+      )
+    }
+    return (
+      <span className="task-info ">
 					<span className="center-hor text-muted">
 						{statusChange ? ('Status changed at ' + timestampToString(statusChange) ) : ""}
 					</span>
 				</span>
-			)
-		}
+    )
+  }
 
 
-	//Value Change
-	const changeProject = (pro) => {
-		let permissionIDs = [];
-		if(pro.projectRights){
-			permissionIDs = pro.projectRights.map((p) => p.user.id);
-		}
-		let newAssignedTo = assignedTo.filter((user)=>permissionIDs.includes(user.id));
-		setProject(pro);
-		setAssignedTo(newAssignedTo);
-		setProjectChangeDate(moment());
-		setMilestone(noMilestone);
-		setDefaults(project.id);
-	}
+  //Value Change
+  const changeProject = ( pro ) => {
+    let permissionIDs = [];
+    if ( pro.projectRights ) {
+      permissionIDs = pro.projectRights.map( ( p ) => p.user.id );
+    }
+    let newAssignedTo = assignedTo.filter( ( user ) => permissionIDs.includes( user.id ) );
+    setProject( pro );
+    setAssignedTo( newAssignedTo );
+    setProjectChangeDate( moment() );
+    setMilestone( noMilestone );
+    setDefaults( project.id );
+  }
 
-	const changeStatus = (s) => {
-		if(s.action==='PendingDate'){
-		//	setPendingStatus(s);
-			setPendingOpen(true);
-		}else if(s.action==='CloseDate'||s.action==='Invalid'){
-			setStatus(s);
-			setStatusChange(moment());
-			setImportant(false);
-			setCloseDate(moment());
-		}
-		else{
-			setStatus(s);
-			setStatusChange(moment());
-		}
-	}
+  const changeStatus = ( s ) => {
+    if ( s.action === 'PendingDate' ) {
+      //	setPendingStatus(s);
+      setPendingOpen( true );
+    } else if ( s.action === 'CloseDate' || s.action === 'Invalid' ) {
+      setStatus( s );
+      setStatusChange( moment() );
+      setImportant( false );
+      setCloseDate( moment() );
+    } else {
+      setStatus( s );
+      setStatusChange( moment() );
+    }
+  }
 
-	const changeMilestone = (mile) => {
-		if(status.action==='PendingDate'){
-			if(mile.startsAt!==null){
-        setMilestone(mile);
-        setPendingDate(moment(mile.startsAt));
-        setPendingChangable(false);
-			}else{
-        setMilestone(mile);
-        setPendingChangable(false);
-			}
-		}else{
-      setMilestone(mile);
-		}
-	}
+  const changeMilestone = ( mile ) => {
+    if ( status.action === 'PendingDate' ) {
+      if ( mile.startsAt !== null ) {
+        setMilestone( mile );
+        setPendingDate( moment( mile.startsAt ) );
+        setPendingChangable( false );
+      } else {
+        setMilestone( mile );
+        setPendingChangable( false );
+      }
+    } else {
+      setMilestone( mile );
+    }
+  }
 
-	const changeRequester = (req) => {
-		if (req.id === -1) {
-			setOpenUserAdd(true);
-		} else {
-      setRequester(req);
-		}
-	}
+  const changeRequester = ( req ) => {
+    if ( req.id === -1 ) {
+      setOpenUserAdd( true );
+    } else {
+      setRequester( req );
+    }
+  }
 
-	const changeCompany = (comp) => {
-		if (comp.id === -1) {
-			setOpenCompanyAdd(true);
-		} else {
-      setCompany(comp);
-      setPausal( parseInt(comp.taskWorkPausal) > 0 ? booleanSelects[1] : booleanSelects[0] );
-		}
-	}
+  const changeCompany = ( comp ) => {
+    if ( comp.id === -1 ) {
+      setOpenCompanyAdd( true );
+    } else {
+      setCompany( comp );
+      setPausal( parseInt( comp.taskWorkPausal ) > 0 ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
+    }
+  }
 
-	const renderSelectsLayout1 = () => {
-		return (
-			<div>
+  const renderSelectsLayout1 = () => {
+    return (
+      <div>
 				<div className="col-lg-12">
 					<div className="col-lg-4">
 						<div className="row p-r-10">
@@ -1754,12 +1985,12 @@ React.useEffect( () => {
 					}
 				</div>
 			</div>
-		)
-	}
+    )
+  }
 
-	const renderSelectsLayout2 = () => {
-		return (
-			<div className={"task-edit-right" + (columns ? " w-250px" : "")} >
+  const renderSelectsLayout2 = () => {
+    return (
+      <div className={"task-edit-right" + (columns ? " w-250px" : "")} >
 				<div>
 					<Label className="col-form-label-2">Projekt</Label>
 					<div className="col-form-value-2">
@@ -1951,13 +2182,13 @@ React.useEffect( () => {
 					</div>
 				}
 			</div>
-		);
+    );
   }
 
 
-	const renderTags = () => {
-		return (
-			<div className="row m-t-10">
+  const renderTags = () => {
+    return (
+      <div className="row m-t-10">
 				<div className="center-hor">
 					<Label className="center-hor">Tagy: </Label>
 				</div>
@@ -1975,20 +2206,20 @@ React.useEffect( () => {
 						/>
 				</div>
 			</div>
-		)
-	}
+    )
+  }
 
-	const renderPopis = () => {
-		let RenderDescription = null;
-		if( viewOnly ){
-			if( description.length !== 0 ){
-				RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
-			}else{
-				RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
-			}
-		}else{
-			if( showDescription ){
-				RenderDescription = <div onClick={()=> setShowDescription(true)}>
+  const renderPopis = () => {
+    let RenderDescription = null;
+    if ( viewOnly ) {
+      if ( description.length !== 0 ) {
+        RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
+      } else {
+        RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
+      }
+    } else {
+      if ( showDescription ) {
+        RenderDescription = <div onClick={()=> setShowDescription(true)}>
 					<CKEditor
 						editor={ ClassicEditor }
 						data={description}
@@ -2007,15 +2238,15 @@ React.useEffect( () => {
 						config={ck5config}
 						/>
 				</div>
-			}else{
-				RenderDescription = <div className="clickable task-edit-popis" onClick={()=>setShowDescription(true)}>
+      } else {
+        RenderDescription = <div className="clickable task-edit-popis" onClick={()=>setShowDescription(true)}>
 					<div dangerouslySetInnerHTML={{__html:description }} />
 					<span className="text-highlight"> <i	className="fas fa-pen"/> edit </span>
 				</div>
-			}
-		}
-		return (
-			<div style={{zIndex: "9999"}}>
+      }
+    }
+    return (
+      <div style={{zIndex: "9999"}}>
 				<div>
 				<Label className="col-form-label m-t-10 m-r-20">Popis úlohy</Label>
 				{ company && company.monthlyPausal &&
@@ -2033,13 +2264,13 @@ React.useEffect( () => {
 				</div>
 				{RenderDescription}
 			</div>
-		)
-	}
+    )
+  }
 
 
-	const renderAttachments = () => {
-		return (
-			<Attachments
+  const renderAttachments = () => {
+    return (
+      <Attachments
 				disabled={viewOnly}
 				taskID={match.params.taskID}
 				attachments={attachments}
@@ -2061,12 +2292,12 @@ React.useEffect( () => {
 					setAttachments([...newAttachments]);
 				}}
 				/>
-		)
-	}
+    )
+  }
 
-	const renderModalUserAdd = () => {
-		return (
-			<Modal isOpen={openUserAdd} >
+  const renderModalUserAdd = () => {
+    return (
+      <Modal isOpen={openUserAdd} >
 				<ModalHeader>
 					Add user
 				</ModalHeader>
@@ -2083,12 +2314,12 @@ React.useEffect( () => {
 						/>
 				</ModalBody>
 			</Modal>
-		)
-	}
+    )
+  }
 
-	const renderModalCompanyAdd = () => {
-		return (
-			<Modal isOpen={openCompanyAdd}>
+  const renderModalCompanyAdd = () => {
+    return (
+      <Modal isOpen={openCompanyAdd}>
 				<ModalBody>
 					<CompanyAdd
 						closeModal={() => setOpenCompanyAdd(false)}
@@ -2101,13 +2332,13 @@ React.useEffect( () => {
 						/>
 				</ModalBody>
 			</Modal>
-		)
-	}
+    )
+  }
 
 
-	const renderPendingPicker = () => {
-		return (
-			<PendingPicker
+  const renderPendingPicker = () => {
+    return (
+      <PendingPicker
 				open={pendingOpen}
 				prefferedMilestone={milestone}
 				milestones={ (project ? toSelArr( project.milestones.filter((m)=> m.id !== milestone.id && milestone.startsAt!==null) ) : []) }
@@ -2129,12 +2360,12 @@ React.useEffect( () => {
 					},this.submitTask.bind(this))*/
 				}}
 				/>
-		)
-	}
+    )
+  }
 
-	const renderVykazyTable = () => {
-		return (
-			<VykazyTable
+  const renderVykazyTable = () => {
+    return (
+      <VykazyTable
 				showColumns={ (viewOnly ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
 				showTotals={false}
 				disabled={viewOnly}
@@ -2248,12 +2479,12 @@ React.useEffect( () => {
 				units={[]}
 				defaultUnit={null}
 				/>
-		)
-	}
+    )
+  }
 
-	const renderComments = () => {
-		return (
-			<div className="comments">
+  const renderComments = () => {
+    return (
+      <div className="comments">
 				<Nav tabs className="b-0 m-b-22 m-l--10 m-t-15">
 					<NavItem>
 						<NavLink
@@ -2314,15 +2545,15 @@ React.useEffect( () => {
 					}
 				</TabContent>
 			</div>
-		)
-	}
+    )
+  }
 
-	if (taskLoading) {
-		return <Loading />
-	}
+  if ( taskLoading ) {
+    return <Loading />
+  }
 
-	return (
-		<div className="flex">
+  return (
+    <div className="flex">
 			{ showDescription &&
 				<div
 					style={{backgroundColor: "transparent", width: "100%", height: "100%", position: "absolute"}}
@@ -2366,5 +2597,5 @@ React.useEffect( () => {
 
 			</div>
 		</div>
-	);
+  );
 }

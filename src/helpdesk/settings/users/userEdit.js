@@ -53,7 +53,8 @@ export default function UserEdit( props ) {
   } = useQuery( GET_USER, {
     variables: {
       id
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const {
     data: rolesData,
@@ -78,13 +79,16 @@ export default function UserEdit( props ) {
   const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
   const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
 
-  const languages = [ {
-    label: "SK",
-    value: "sk"
-  }, {
-    label: "ENG",
-    value: "en"
-  } ]
+  const languages = [
+    {
+      label: "SK",
+      value: "sk"
+    },
+    {
+      label: "ENG",
+      value: "en"
+  }
+ ]
 
   //state
   const [ active, setActive ] = React.useState( true );

@@ -58,7 +58,8 @@ export default function IMAPEdit( props ) {
   } = useQuery( GET_IMAP, {
     variables: {
       id: parseInt( match.params.id )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const {
     data: roleData,

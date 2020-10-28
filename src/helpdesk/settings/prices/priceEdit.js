@@ -46,7 +46,8 @@ export default function PricelistEdit( props ) {
   } = useQuery( GET_PRICELIST, {
     variables: {
       id: ( props.listId ? props.listId : parseInt( props.match.params.id ) )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updatePricelist ] = useMutation( UPDATE_PRICELIST );
   const [ deletePricelist, {

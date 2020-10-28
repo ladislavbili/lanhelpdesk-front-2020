@@ -2,6 +2,6 @@ import {
   projectVar,
 } from './variables';
 
-export const project = () => {
+export const localProject = () => {
   return projectVar();
 }

@@ -34,7 +34,8 @@ export default function TaskTypeEdit( props ) {
   } = useQuery( GET_TASK_TYPE, {
     variables: {
       id: parseInt( props.match.params.id )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updateTaskType ] = useMutation( UPDATE_TASK_TYPE );
   const [ deleteTaskType, {

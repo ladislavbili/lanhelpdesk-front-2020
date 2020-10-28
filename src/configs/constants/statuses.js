@@ -24,6 +24,6 @@ export const actions = [ {
   },
   {
     label: `Set task as invoiced (can't be edited again, used only while invoicing tasks)`,
-    value: 'Invoice'
+    value: 'Invoiced'
   },
 ]

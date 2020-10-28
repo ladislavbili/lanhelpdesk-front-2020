@@ -46,7 +46,8 @@ export default function StatusEdit( props ) {
   } = useQuery( GET_STATUS, {
     variables: {
       id: parseInt( props.match.params.id )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updateStatus ] = useMutation( UPDATE_STATUS );
   const [ deleteStatus, {

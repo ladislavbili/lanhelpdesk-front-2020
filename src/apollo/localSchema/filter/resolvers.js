@@ -2,6 +2,6 @@ import {
   filterVar,
 } from './variables';
 
-export const filter = () => {
+export const localFilter = () => {
   return filterVar();
 }

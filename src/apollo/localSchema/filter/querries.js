@@ -3,7 +3,7 @@ import {
 } from "@apollo/client";
 
 export const GET_FILTER = gql `
-  query filter {
-    filter @client
+  query localFilter {
+    localFilter @client
   }
 `;

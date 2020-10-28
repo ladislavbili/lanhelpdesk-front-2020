@@ -38,7 +38,8 @@ export default function RoleEdit( props ) {
   } = useQuery( GET_ROLE, {
     variables: {
       id: parseInt( props.match.params.id )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updateRole ] = useMutation( UPDATE_ROLE );
   const [ deleteRole, {

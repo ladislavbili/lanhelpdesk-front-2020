@@ -48,7 +48,8 @@ export default function CompanyEdit( props ) {
   } = useQuery( GET_COMPANY, {
     variables: {
       id: parseInt( match.params.id )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updateCompany ] = useMutation( UPDATE_COMPANY );
   const [ deleteCompany, {

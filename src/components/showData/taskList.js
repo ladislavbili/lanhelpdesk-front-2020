@@ -189,7 +189,6 @@ export default function List( props ) {
   }
 
   //	const selectedFilter = showDataFilter();
-  //	console.log(selectedFilter);
   return (
     <div>
 				<CommandBar {...commandBar} listName={listName}/>

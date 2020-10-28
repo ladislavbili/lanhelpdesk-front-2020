@@ -40,7 +40,8 @@ export default function PausalEdit( props ) {
   } = useQuery( GET_COMPANY, {
     variables: {
       id: parseInt( match.params.id )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updateCompany ] = useMutation( UPDATE_COMPANY );
 
@@ -224,8 +225,6 @@ export default function PausalEdit( props ) {
   if ( loading ) {
     return <Loading />
   }
-
-  console.log( "aaaaaaaaaaaaaa" );
 
   return (
     <div className="fit-with-header-and-commandbar-2 scroll-visible">

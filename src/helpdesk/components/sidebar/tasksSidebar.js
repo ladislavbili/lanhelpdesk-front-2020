@@ -1,7 +1,6 @@
 import React from 'react';
 import {
-  useQuery,
-  useApolloClient
+  useQuery
 } from "@apollo/client";
 
 import {
@@ -66,12 +65,14 @@ import {
   setProject,
   setMilestone,
 } from 'apollo/localSchema/actions';
-
+import folderIcon from 'scss/icons/folder.svg';
+import filterIcon from 'scss/icons/filter.svg';
 
 export default function TasksSidebar( props ) {
   //data & queries
   const {
     history,
+    match,
     location
   } = props;
 
@@ -83,7 +84,8 @@ export default function TasksSidebar( props ) {
 
   const {
     data: myProjectsData,
-    loading: myProjectsLoading
+    loading: myProjectsLoading,
+    refetch: refetchMyProjects,
   } = useQuery( GET_MY_PROJECTS );
 
   const {
@@ -115,16 +117,8 @@ export default function TasksSidebar( props ) {
   // sync
   React.useEffect( () => {
     if ( !myFiltersLoading ) {
-      const startId = location.pathname.lastIndexOf( "i/" ) + 2;
-      const endId = location.pathname.lastIndexOf( "/" ) + 1;
-      let filterId = "";
-      if ( startId === endId ) {
-        filterId = location.pathname.slice( startId );
-      } else {
-        filterId = location.pathname.slice( startId, endId - 1 );
-      }
       if ( location.pathname.length > 12 ) {
-        const newFilter = myFiltersData.myFilters.find( item => item.id === parseInt( filterId ) );
+        const newFilter = myFiltersData.myFilters.find( item => item.id === parseInt( match.params.filterID ) );
         if ( newFilter ) {
           setFilter( newFilter )
         } else {
@@ -132,7 +126,7 @@ export default function TasksSidebar( props ) {
         }
       }
     }
-  }, [ myFiltersLoading ] );
+  }, [ myFiltersLoading, match.params.filterID ] );
 
   const dataLoading = (
     myDataLoading ||
@@ -147,22 +141,29 @@ export default function TasksSidebar( props ) {
     return ( <Loading /> )
   }
 
+  const canEditProject = projectData.localProject.id !== null && (
+    myData.getMyData.role.accessRights.projects ||
+    (
+      projectData.localProject.right !== undefined &&
+      projectData.localProject.right.admin
+    )
+  )
+
   const projects = [
     ...( myData.getMyData.role.accessRights.addProjects ? [ dashboard, addProject ] : [ dashboard ] ),
     ...myProjectsData.myProjects,
   ]
 
   let milestones = [];
-  if ( projectData.project.project.id === null ) {
+  if ( projectData.localProject.project.id === null ) {
     milestones = [ allMilestones ];
   } else {
-    if ( projectData.project.right && projectData.project.right.admin ) {
-      milestones = [ allMilestones, addMilestone, ...projectData.project.project.milestones ];
+    if ( canEditProject ) {
+      milestones = [ allMilestones, addMilestone, ...projectData.localProject.project.milestones ];
     } else {
-      milestones = [ allMilestones, ...projectData.project.project.milestones ];
+      milestones = [ allMilestones, ...projectData.localProject.project.milestones ];
     }
   }
-
   const DropdownIndicator = ( {
     innerProps,
     isDisabled
@@ -176,8 +177,8 @@ export default function TasksSidebar( props ) {
           color: "#212121",
           height: "17px"
         }}
-        src={require('scss/icons/folder.svg')}
-        alt="Generic placeholder XX"
+        src={folderIcon}
+        alt="Folder icon not found"
         />
       <i
         className="fa fa-chevron-down"
@@ -194,7 +195,7 @@ export default function TasksSidebar( props ) {
     <div>
       <Select
         options={toSelArr(projects.map((project) => ({...project, id: project.project.id, title: project.project.title}) ))}
-        value={projectData.project}
+        value={projectData.localProject}
         styles={sidebarSelectStyle}
         onChange={pro => {
           if (pro.id !== -1) {
@@ -205,107 +206,158 @@ export default function TasksSidebar( props ) {
         }}
         components={{ DropdownIndicator }}
         />
-      <hr className = "m-l-15 m-r-15" / >
-        { projectData.project.id !== null &&
-          <div className="">
-            <Select
-              options={toSelArr(milestones)}
-              value={milestoneData.milestone}
-              styles={sidebarSelectStyle}
-              onChange={mile => {
-                if (mile.id !== -1) {
-                  setMilestone(mile)
-                } else {
-                  setOpenMilestoneAdd(true);
-                }
-              }}
-              components={{ DropdownIndicator }}
-              />
-            <hr className = "m-l-15 m-r-15" />
-          </div>
-        }
-
-        <TaskAdd
-          history={history}
-          projectID={ projectData.project.id}
-          />
-        { activeTab !== 1 &&
-          <div className="sidebar-btn">
-            <div onClick={() => {
-                history.push(`/helpdesk/taskList/i/all`);
-                setActiveTab((
-                  activeTab === 0
-                  ? 1
-                  : 0
-                ));
-                setFilter(getEmptyGeneralFilter())
-              }}>
-              <i className="fa fa-plus pull-right m-r-5 m-t-5 clickable"/>
-            </div>
-            <div>
-              <img
-                className="m-r-5"
-                style={{
-                  color: "#212121",
-                  height: "17px",
-                  marginBottom: "3px"
-                }}
-                src={require('scss/icons/filter.svg')}
-                alt="Generic placeholder XX"
-                />
-              Filters
-            </div>
-          </div>
-        }
-
-        <TabContent activeTab={activeTab}>
-          <TabPane tabId={0}>
-            <Nav vertical>
-              {
-                myFiltersData.myFilters.map((filter) => (
-                  <NavItem key={filter.id} className="row full-width">
-                    <span
-                      className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === filterData.filter.id }) }
-                      onClick={() => {
-                        history.push(`/helpdesk/taskList/i/${filter.id}`)
-                        setFilter(filter);
-                      }}>
-                      {filter.title}
-                    </span>
-
-                    <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === filterData.filter.id })}
-                      onClick={() => {
-                        if (filter.id === filterData.filter.id) {
-                          setActiveTab(1);
-                        }
-                      }}>
-                      <i className="fa fa-cog"/>
-                    </div>
-                  </NavItem>
-                ))
-              }
-            </Nav>
-          </TabPane>
-        </TabContent>
-        { openProjectAdd &&
-          <ProjectAdd
-            open={openProjectAdd}
-            closeModal={(newProject, rights) => {
-              setOpenProjectAdd(false);
-              if(newProject!==null){
-                const project = {
-                  project: newProject,
-                  right: rights,
-                  id: newProject.id,
-                  value: newProject.id,
-                  title: newProject.title,
-                  label: newProject.title,
-                }
-                setProject(project);
+      <hr className = "m-l-15 m-r-15" />
+      { projectData.localProject.id !== null &&
+        <div className="">
+          <Select
+            options={toSelArr(milestones)}
+            value={milestoneData.localMilestone}
+            styles={sidebarSelectStyle}
+            onChange={mile => {
+              if (mile.id !== -1) {
+                setMilestone(mile)
+              } else {
+                setOpenMilestoneAdd(true);
               }
             }}
+            components={{ DropdownIndicator }}
             />
-        }
+          <hr className = "m-l-15 m-r-15" />
+        </div>
+      }
 
-      </div> );
+      <TaskAdd
+        history={history}
+        projectID={ projectData.localProject.id}
+        />
+      { activeTab !== 1 &&
+        <div className="sidebar-btn">
+          <div onClick={() => {
+              history.push(`/helpdesk/taskList/i/all`);
+              setActiveTab((
+                activeTab === 0
+                ? 1
+                : 0
+              ));
+              setFilter(getEmptyGeneralFilter())
+            }}>
+            <i className="fa fa-plus pull-right m-r-5 m-t-5 clickable"/>
+          </div>
+          <div>
+            <img
+              className="m-r-5"
+              style={{
+                color: "#212121",
+                height: "17px",
+                marginBottom: "3px"
+              }}
+              src={filterIcon}
+              alt="Filter icon not found"
+              />
+            Filters
+          </div>
+        </div>
+      }
+
+      <TabContent activeTab={activeTab}>
+        <TabPane tabId={0}>
+          <Nav vertical>
+            {
+              myFiltersData.myFilters.map((filter) => (
+                <NavItem key={filter.id} className="row full-width">
+                  <span
+                    className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === filterData.localFilter.id }) }
+                    onClick={() => {
+                      history.push(`/helpdesk/taskList/i/${filter.id}`)
+                    }}>
+                    {filter.title}
+                  </span>
+
+                  <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === filterData.localFilter.id })}
+                    onClick={() => {
+                      if (filter.id === filterData.localFilter.id) {
+                        setActiveTab(1);
+                      }
+                    }}>
+                    <i className="fa fa-cog"/>
+                  </div>
+                </NavItem>
+              ))
+            }
+          </Nav>
+        </TabPane>
+      </TabContent>
+      { openProjectAdd &&
+        <ProjectAdd
+          open={openProjectAdd}
+          closeModal={(newProject, rights) => {
+            setOpenProjectAdd(false);
+            if(newProject!==null){
+              const project = {
+                project: newProject,
+                right: rights,
+                id: newProject.id,
+                value: newProject.id,
+                title: newProject.title,
+                label: newProject.title,
+              }
+              setProject(project);
+            }
+          }}
+          />
+      }
+      { canEditProject &&
+        <ProjectEdit
+          closeModal={(editedProject, rights) => {
+            if(editedProject !== null){
+              const project = {
+                project: { ...projectData.localProject.project, ...editedProject },
+                right: rights,
+                id: editedProject.id,
+                value: editedProject.id,
+                title: editedProject.title,
+                label: editedProject.title,
+              }
+              setProject(project);
+              refetchMyProjects();
+            }
+          }}
+          projectDeleted={()=>{
+            setProject(dashboard);
+            refetchMyProjects();
+          }}
+          />
+      }
+
+      { canEditProject && openMilestoneAdd &&
+        <MilestoneAdd
+          open={openMilestoneAdd}
+          closeModal={(newMilestone) => {
+            if(newMilestone){
+              setMilestone(toSelItem(newMilestone));
+              refetchMyProjects();
+            }
+            setOpenMilestoneAdd(false);
+          }}
+          />
+      }
+
+      { canEditProject && milestoneData.localMilestone.id !== null &&
+        <MilestoneEdit
+          closeModal={(editedMilestone) => {
+            if(editedMilestone !== null){
+              const milestone = {
+                id: editedMilestone.id,
+                value: editedMilestone.id,
+                title: editedMilestone.title,
+                label: editedMilestone.title,
+              }
+              setProject(milestone);
+              refetchMyProjects();
+            }
+          }}
+          />
+      }
+
+    </div> );
 }

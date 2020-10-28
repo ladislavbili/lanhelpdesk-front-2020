@@ -35,7 +35,8 @@ export default function TripTypeEdit( props ) {
   } = useQuery( GET_TRIP_TYPE, {
     variables: {
       id: parseInt( match.params.id )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updateTripType ] = useMutation( UPDATE_TRIP_TYPE );
   const [ deleteTripType, {

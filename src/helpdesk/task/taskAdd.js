@@ -250,7 +250,6 @@ export default function TaskAdd( props ) {
                 setSaving( false );
                 closeModal();
               } else {
-                console.log( response2 );
                 setSaving( false );
               }
             } )

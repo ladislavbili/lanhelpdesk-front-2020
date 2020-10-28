@@ -41,8 +41,6 @@ export default class Login extends Component {
         } );
         localStorage.setItem( "acctok", response.data.loginUser.accessToken );
         setIsLoggedIn( true );
-        console.log( "LOGIN RESPONSE" );
-        console.log( response );
       } )
       .catch( ( err ) => {
         this.setState( {

@@ -40,7 +40,6 @@ export default function IMAPsList( props ) {
   }
 
   const getStatusIcon = ( imap ) => {
-    console.log( 'currentlyTested', imap.currentlyTested );
     let color = 'red';
     let iconName = 'far fa-times-circle';
     if ( imap.active ) {

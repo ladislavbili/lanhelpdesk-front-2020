@@ -53,7 +53,8 @@ export default function SMTPEdit( props ) {
   } = useQuery( GET_SMTP, {
     variables: {
       id: parseInt( props.match.params.id )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updateSmtp ] = useMutation( UPDATE_SMTP );
   const [ testSmtp ] = useMutation( TEST_SMTP );

@@ -140,7 +140,8 @@ export default function PublicFilterEdit( props ) {
   } = useQuery( GET_FILTER, {
     variables: {
       id
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updatePublicFilter, {
     client

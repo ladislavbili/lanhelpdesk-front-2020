@@ -35,7 +35,8 @@ export default function TagEdit( props ) {
   } = useQuery( GET_TAG, {
     variables: {
       id: parseInt( props.match.params.id )
-    }
+    },
+    notifyOnNetworkStatusChange: true,
   } );
   const [ updateTag ] = useMutation( UPDATE_TAG );
   const [ deleteTag, {

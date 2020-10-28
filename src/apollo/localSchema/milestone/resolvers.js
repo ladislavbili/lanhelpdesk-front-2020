@@ -2,6 +2,6 @@ import {
   milestoneVar
 } from './variables';
 
-export const milestone = () => {
+export const localMilestone = () => {
   return milestoneVar();
 }

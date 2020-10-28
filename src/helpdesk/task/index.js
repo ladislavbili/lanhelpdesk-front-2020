@@ -189,19 +189,25 @@ export default function TasksIndex( props ) {
   mappedFilter.company = mappedFilter.company ? mappedFilter.company.id : null;
   delete mappedFilter.__typename;
 
-  const {
-    data: tasksData,
-    loading: tasksLoading
-  } = useQuery( GET_TASKS, {
-    variables: {
-      filterId: ( generalFilter() ? generalFilter()
-        .id : null ),
-      filter: mappedFilter,
-      projectId: ( project()
-        .id !== null ? project()
-        .id : null )
-    }
-  } );
+  /*
+    const {
+      data: tasksData,
+      loading: tasksLoading
+    } = useQuery( GET_TASKS, {
+      variables: {
+        filterId: ( generalFilter() ? generalFilter()
+          .id : null ),
+        filter: mappedFilter,
+        projectId: ( project()
+          .id !== null ? project()
+          .id : null )
+      }
+    } );
+  */
+  const tasksLoading = true;
+  const taskData = {
+    tasks: []
+  };
   const {
     data: localCache
   } = useQuery( LOCAL_CACHE );
@@ -262,9 +268,7 @@ export default function TasksIndex( props ) {
         show: true,
         data: localCache ? localCache.filterName : null,
         label: localCache ? localCache.filterName : 'Invalid filter',
-        onClick: () => {
-          console.log( "bleh", localCache );
-        }
+        onClick: () => {}
       }
     ]
   }

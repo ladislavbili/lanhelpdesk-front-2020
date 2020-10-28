@@ -6,11 +6,25 @@ import {
   ModalHeader,
   Button
 } from 'reactstrap';
+import {
+  GET_PROJECT,
+} from 'apollo/localSchema/querries';
+import {
+  useQuery
+} from "@apollo/client";
 import ProjectEdit from 'helpdesk/settings/projects/projectEdit';
 
 export default function ProjectEditContainer( props ) {
+  const {
+    closeModal,
+    projectDeleted
+  } = props;
   //state
   const [ opened, setOpened ] = React.useState( false );
+  const {
+    data: projectData,
+    loading: projectLoading
+  } = useQuery( GET_PROJECT );
 
   return (
     <div className='p-l-15 p-r-15'>
@@ -26,7 +40,16 @@ export default function ProjectEditContainer( props ) {
           Edit project
         </ModalHeader>
         <ModalBody>
-          <ProjectEdit {...props} closeModal={() => setOpened(false)}/>
+          { !projectLoading &&
+            <ProjectEdit
+              projectID={ projectData.localProject.id }
+              projectDeleted={projectDeleted}
+              closeModal={(editedProject, rights) => {
+                closeModal(editedProject, rights);
+                setOpened(false);
+              }}
+              />
+          }
         </ModalBody>
     </Modal>
   </div>
