@@ -33,13 +33,7 @@ export default function MonthSelector ( props ) {
     onTrigger,
     blockedShow
   } = props;
-/*
-  const [ year, setYear ] = React.useState( {
-      label: moment().year(),
-      value: moment().year()
-  });
-  const [ month, setMonth ] = React.useState( months[moment().month()] );*/
-
+  
   return (
     <div className="p-20">
       <FormGroup>
