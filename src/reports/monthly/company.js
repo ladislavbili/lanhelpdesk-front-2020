@@ -91,19 +91,10 @@ export default function  MothlyReportsCompany (props) {
 		});
 	}
 
-	const onTriggerCheck = (taskId) => {
-		if (pickedTasks.includes(taskId)){
-			setPickedTasks( pickedTasks.filter(id => id !== taskId) );
-		} else {
-			setPickedTasks( [...pickedTasks, taskId] );
-		}
-	}
-
 	const onClickTask = (taskId) => {
 		console.log("clicked!");
 	}
 
-	const [ pickedTasks, setPickedTasks ] = React.useState( [] );
 	const [ showCompany, setShowCompany ] = React.useState( null );
 
 	React.useEffect( () => {
@@ -124,20 +115,28 @@ export default function  MothlyReportsCompany (props) {
 
 	React.useEffect( () => {
 		if (showCompany !== null){
+			console.log("HI");
 			fetchCompanyInvoice({
 				variables: {
 					fromDate: fromDate.valueOf().toString(),
 					toDate: toDate.valueOf().toString(),
 					statuses: chosenStatuses.map(status => status.id),
 					companyId: showCompany.id
-				}
+				},
+		//		options: { fetchPolicy: 'network-only' }
 			});
 		}
 	}, [ showCompany ] );
+	React.useEffect( () => {
+		console.log("LOADING", companyInvoiceLoading);
+		console.log(companyInvoiceData);
+	}, [ companyInvoiceLoading ] );
 
 	const invoiceTasks = () => {
 
 	}
+
+	console.log(companyInvoiceData);
 
 	const loading = statusesLoading || invoiceCompaniesLoading;
 
@@ -146,7 +145,6 @@ export default function  MothlyReportsCompany (props) {
 
  const statusIDs = chosenStatuses.map(status => status.id);
 
-	console.log(companyInvoiceData);
 	const currentInvoiceData = companyInvoiceData ? companyInvoiceData.getCompanyInvoiceData : {};
 
 	return (
@@ -231,14 +229,6 @@ export default function  MothlyReportsCompany (props) {
 							showCompany !== null &&
 							<div className="commandbar">
 								<Button
-									className="btn-primary center-hor"
-									onClick={()=>{console.log("fakturovanie");}}
-									>
-									{currentInvoiceData &&
-										currentInvoiceData.pausalTasks &&
-										(pickedTasks.length === currentInvoiceData.pausalTasks.length)  ? "Odznačiť všetky" : "Označiť všetky"}
-								</Button>
-								<Button
 									className="btn-danger m-l-5 center-hor"
 									onClick={invoiceTasks}
 									>
@@ -246,7 +236,15 @@ export default function  MothlyReportsCompany (props) {
 								</Button>
 							</div>
 						}
-						{showCompany !==null &&
+
+						{
+							showCompany !== null &&
+							Object.keys(currentInvoiceData).length === 0 &&
+							<Loading />
+						}
+
+						{showCompany !== null &&
+							Object.keys(currentInvoiceData).length > 0 &&
 							<div className="p-20">
 								<h2>Fakturačný výkaz firmy</h2>
 								<div className="flex-row m-b-30">
@@ -256,10 +254,10 @@ export default function  MothlyReportsCompany (props) {
 									</div>
 									<div className="m-l-10">
 										Počet prác vrámci paušálu: {currentInvoiceData && currentInvoiceData.pausalCounts && currentInvoiceData.pausalCounts.subtasks ?
-										currentInvoiceData.pausalCounts.subtasks.length : 0}
+										currentInvoiceData.pausalCounts.subtasks : 0}
 										<br/>
 										Počet výjazdov vrámci paušálu: {currentInvoiceData && currentInvoiceData.pausalCounts && currentInvoiceData.pausalCounts.trips ?
-										currentInvoiceData.pausalCounts.trips.length : 0}
+										currentInvoiceData.pausalCounts.trips : 0}
 									</div>
 								</div>
 
@@ -271,10 +269,11 @@ export default function  MothlyReportsCompany (props) {
 											tasks={
 												currentInvoiceData &&
 												currentInvoiceData.pausalTasks ?
-												currentInvoiceData.pausalTasks.map(invoiceTask =>
+												currentInvoiceData.pausalTasks.filter(invoiceTask =>
+													invoiceTask.subtasks.length > 0
+												).map(invoiceTask =>
 												({
 													...invoiceTask.task,
-													checked: pickedTasks.includes(invoiceTask.id),
 													subtasks: invoiceTask.subtasks,
 												})) :
 												[]
@@ -290,7 +289,6 @@ export default function  MothlyReportsCompany (props) {
 												'taskType',
 												'hours',
 											]}
-											onTriggerCheck={onTriggerCheck}
 											onClickTask={onClickTask}
 											/>
 
@@ -298,14 +296,14 @@ export default function  MothlyReportsCompany (props) {
 											currentInvoiceData &&
 											currentInvoiceData.pausalCounts &&
 											currentInvoiceData.pausalCounts.subtasks ?
-											currentInvoiceData.pausalCounts.subtasks : 0
+											currentInvoiceData.pausalCounts.subtasks.toFixed(2) : 0
 										}
 									</p>
 									<p className="m-0">Spolu počet hodín mimo pracovný čas: {
 											currentInvoiceData &&
 											currentInvoiceData.pausalCounts &&
 											currentInvoiceData.pausalCounts.subtasksAfterHours ?
-											currentInvoiceData.pausalCounts.subtasksAfterHours : 0
+											currentInvoiceData.pausalCounts.subtasksAfterHours.toFixed(2) : 0
 										} ( Čísla úloh: {
 												currentInvoiceData &&
 												currentInvoiceData.pausalCounts &&
@@ -317,7 +315,7 @@ export default function  MothlyReportsCompany (props) {
 											currentInvoiceData &&
 											currentInvoiceData.pausalCounts &&
 											currentInvoiceData.pausalCounts.subtasksAfterHoursPrice ?
-											currentInvoiceData.pausalCounts.subtasksAfterHoursPrice :
+											currentInvoiceData.pausalCounts.subtasksAfterHoursPrice.toFixed(2) :
 										0
 									} eur
 									</p>
@@ -328,11 +326,12 @@ export default function  MothlyReportsCompany (props) {
 											tasks={
 												currentInvoiceData &&
 												currentInvoiceData.pausalTasks ?
-												currentInvoiceData.pausalTasks.map(invoiceTask =>
+												currentInvoiceData.pausalTasks.filter(invoiceTask =>
+													invoiceTask.trips.length > 0
+												).map(invoiceTask =>
 												({
 													...invoiceTask.task,
-													checked: pickedTasks.includes(invoiceTask.id),
-													trips: invoiceTask.trips,
+													workTrips: invoiceTask.trips,
 												})) :
 												[]
 											}
@@ -346,21 +345,20 @@ export default function  MothlyReportsCompany (props) {
 												'tripType',
 												'quantity',
 											]}
-											onTriggerCheck={onTriggerCheck}
 											onClickTask={onClickTask}
 											/>
 											<p className="m-0">Spolu počet výjazdov: {
 													currentInvoiceData &&
 													currentInvoiceData.pausalCounts &&
 													currentInvoiceData.pausalCounts.trips ?
-													currentInvoiceData.pausalCounts.trips : 0
+													currentInvoiceData.pausalCounts.trips.toFixed(2) : 0
 												}
 											</p>
 											<p className="m-0">Spolu počet výjazdov mimo pracovný čas: {
 													currentInvoiceData &&
 													currentInvoiceData.pausalCounts &&
 													currentInvoiceData.pausalCounts.tripsAfterHours ?
-													currentInvoiceData.pausalCounts.tripsAfterHours : 0
+													currentInvoiceData.pausalCounts.tripsAfterHours.toFixed(2) : 0
 												} ( Čísla úloh: {
 														currentInvoiceData &&
 														currentInvoiceData.pausalCounts &&
@@ -372,11 +370,12 @@ export default function  MothlyReportsCompany (props) {
 													currentInvoiceData &&
 													currentInvoiceData.pausalCounts &&
 													currentInvoiceData.pausalCounts.tripsAfterHoursPrice ?
-													currentInvoiceData.pausalCounts.tripsAfterHoursPrice :
+													currentInvoiceData.pausalCounts.tripsAfterHoursPrice.toFixed(2) :
 													0
 												} eur
 											</p>
 							</div>
+
 							<div className="m-b-30">
 							<h3 className="m-b-10">Práce a výjazdy nad rámec paušálu</h3>
 							<h4>Práce</h4>
@@ -385,10 +384,11 @@ export default function  MothlyReportsCompany (props) {
 									tasks={
 										currentInvoiceData &&
 										currentInvoiceData.overPausalTasks ?
-										currentInvoiceData.overPausalTasks.map(invoiceTask => {
+										currentInvoiceData.overPausalTasks.filter(invoiceTask =>
+											invoiceTask.subtasks.length > 0
+										).map(invoiceTask => {
 											return {
 											...invoiceTask.task,
-											checked: pickedTasks.includes(invoiceTask.id),
 											subtasks: invoiceTask.subtasks,
 										}
 									}) :
@@ -407,7 +407,6 @@ export default function  MothlyReportsCompany (props) {
 										'pricePerHour',
 										'totalPrice'
 									]}
-									onTriggerCheck={onTriggerCheck}
 									onClickTask={onClickTask}
 									/>
 
@@ -415,14 +414,16 @@ export default function  MothlyReportsCompany (props) {
 											currentInvoiceData &&
 											currentInvoiceData.overPausalCounts &&
 											currentInvoiceData.overPausalCounts.subtasks ?
-											currentInvoiceData.overPausalCounts.subtasks : 0
+											currentInvoiceData.overPausalCounts.subtasks.toFixed(2) :
+											0
 										}
 									</p>
 									<p className="m-0">Spolu počet hodín mimo pracovný čas: {
 											currentInvoiceData &&
 											currentInvoiceData.overPausalCounts &&
 											currentInvoiceData.overPausalCounts.subtasksAfterHours ?
-											currentInvoiceData.overPausalCounts.subtasksAfterHours : 0
+											currentInvoiceData.overPausalCounts.subtasksAfterHours.toFixed(2) :
+											0
 										} ( Čísla úloh: {
 												currentInvoiceData &&
 												currentInvoiceData.overPausalCounts &&
@@ -434,7 +435,7 @@ export default function  MothlyReportsCompany (props) {
 											currentInvoiceData &&
 											currentInvoiceData.overPausalCounts &&
 											currentInvoiceData.overPausalCounts.subtasksAfterHoursPrice ?
-											currentInvoiceData.overPausalCounts.subtasksAfterHoursPrice :
+											currentInvoiceData.overPausalCounts.subtasksAfterHoursPrice.toFixed(2) :
 										0
 									} eur
 									</p>
@@ -442,7 +443,7 @@ export default function  MothlyReportsCompany (props) {
 											currentInvoiceData &&
 											currentInvoiceData.overPausalCounts &&
 											currentInvoiceData.overPausalCounts.subtasksTotalPriceWithoutDPH ?
-											currentInvoiceData.overPausalCounts.subtasksTotalPriceWithoutDPH :
+											currentInvoiceData.overPausalCounts.subtasksTotalPriceWithoutDPH.toFixed(2) :
 											0
 										} eur
 									</p>
@@ -450,7 +451,7 @@ export default function  MothlyReportsCompany (props) {
 											currentInvoiceData &&
 											currentInvoiceData.overPausalCounts &&
 											currentInvoiceData.overPausalCounts.subtasksTotalPriceWithDPH ?
-											currentInvoiceData.overPausalCounts.subtasksTotalPriceWithDPH :
+											currentInvoiceData.overPausalCounts.subtasksTotalPriceWithDPH.toFixed(2) :
 											0
 										} eur
 									</p>
@@ -461,11 +462,12 @@ export default function  MothlyReportsCompany (props) {
 								tasks={
 									currentInvoiceData &&
 									currentInvoiceData.overPausalTasks ?
-									currentInvoiceData.overPausalTasks.map(invoiceTask =>
+									currentInvoiceData.overPausalTasks.filter(invoiceTask =>
+										invoiceTask.trips.length > 0
+									).map(invoiceTask =>
 									({
 										...invoiceTask.task,
-										checked: pickedTasks.includes(invoiceTask.id),
-										trips: invoiceTask.trips,
+										workTrips: invoiceTask.trips,
 									})) :
 									[]
 								}
@@ -481,7 +483,6 @@ export default function  MothlyReportsCompany (props) {
 									'pricePerUnit',
 									'totalPrice'
 								]}
-								onTriggerCheck={onTriggerCheck}
 								onClickTask={onClickTask}
 								/>
 
@@ -489,14 +490,14 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.overPausalCounts &&
 										currentInvoiceData.overPausalCounts.trips ?
-										currentInvoiceData.overPausalCounts.trips : 0
+										currentInvoiceData.overPausalCounts.trips.toFixed(2) : 0
 									}
 								</p>
 								<p className="m-0">Spolu počet výjazdov mimo pracovný čas: {
 										currentInvoiceData &&
 										currentInvoiceData.overPausalCounts &&
 										currentInvoiceData.overPausalCounts.tripsAfterHours ?
-										currentInvoiceData.overPausalCounts.tripsAfterHours : 0
+										currentInvoiceData.overPausalCounts.tripsAfterHours.toFixed(2) : 0
 									} ( Čísla úloh: {
 											currentInvoiceData &&
 											currentInvoiceData.overPausalCounts &&
@@ -508,7 +509,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.overPausalCounts &&
 										currentInvoiceData.overPausalCounts.tripsAfterHoursPrice ?
-										currentInvoiceData.overPausalCounts.tripsAfterHoursPrice :
+										currentInvoiceData.overPausalCounts.tripsAfterHoursPrice.toFixed(2) :
 									0
 								} eur
 								</p>
@@ -516,7 +517,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.overPausalCounts &&
 										currentInvoiceData.overPausalCounts.tripsTotalPriceWithoutDPH ?
-										currentInvoiceData.overPausalCounts.tripsTotalPriceWithoutDPH :
+										currentInvoiceData.overPausalCounts.tripsTotalPriceWithoutDPH.toFixed(2) :
 										0
 									} eur
 								</p>
@@ -524,7 +525,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.overPausalCounts &&
 										currentInvoiceData.overPausalCounts.tripsTotalPriceWithDPH ?
-										currentInvoiceData.overPausalCounts.tripsTotalPriceWithDPH :
+										currentInvoiceData.overPausalCounts.tripsTotalPriceWithDPH.toFixed(2) :
 										0
 									} eur
 								</p>
@@ -538,11 +539,9 @@ export default function  MothlyReportsCompany (props) {
 										tasks={
 											currentInvoiceData &&
 											currentInvoiceData.projectTasks ?
-											currentInvoiceData.projectTasks.map(task =>
-											({
-												...task,
-												checked: pickedTasks.includes(task.id)
-											})) :
+											currentInvoiceData.projectTasks.filter(task =>
+												task.subtasks.length > 0
+											) :
 											[]
 										}
 										columnsToShow={[
@@ -558,7 +557,6 @@ export default function  MothlyReportsCompany (props) {
 											'pricePerHour',
 											'totalPrice'
 										]}
-										onTriggerCheck={onTriggerCheck}
 										onClickTask={onClickTask}
 										/>
 
@@ -566,7 +564,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.subtasks ?
-										currentInvoiceData.projectCounts.subtasks :
+										currentInvoiceData.projectCounts.subtasks.toFixed(2) :
 										0
 									}
 								</p>
@@ -574,7 +572,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.subtasksAfterHours ?
-										currentInvoiceData.projectCounts.subtasksAfterHours :
+										currentInvoiceData.projectCounts.subtasksAfterHours.toFixed(2) :
 										0
 									} ( Čísla úloh: {
 												currentInvoiceData &&
@@ -587,7 +585,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.subtasksAfterHoursPrice ?
-										currentInvoiceData.projectCounts.subtasksAfterHoursPrice :
+										currentInvoiceData.projectCounts.subtasksAfterHoursPrice.toFixed(2) :
 										0
 									} eur
 								</p>
@@ -595,7 +593,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.subtasksTotalPriceWithoutDPH ?
-										currentInvoiceData.projectCounts.subtasksTotalPriceWithoutDPH :
+										currentInvoiceData.projectCounts.subtasksTotalPriceWithoutDPH.toFixed(2) :
 										0
 									} eur
 								</p>
@@ -603,7 +601,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.subtasksTotalPriceWithDPH ?
-										currentInvoiceData.projectCounts.subtasksTotalPriceWithDPH :
+										currentInvoiceData.projectCounts.subtasksTotalPriceWithDPH.toFixed(2) :
 										0
 									} eur
 								</p>
@@ -614,11 +612,9 @@ export default function  MothlyReportsCompany (props) {
 										tasks={
 											currentInvoiceData &&
 											currentInvoiceData.projectTasks ?
-											currentInvoiceData.projectTasks.map(task =>
-											({
-												...task,
-												checked: pickedTasks.includes(task.id)
-											})) :
+											currentInvoiceData.projectTasks.filter(task =>
+												task.workTrips.length > 0
+											) :
 											[]
 										}
 										columnsToShow={[
@@ -633,7 +629,6 @@ export default function  MothlyReportsCompany (props) {
 											'pricePerUnit',
 											'totalPrice'
 										]}
-										onTriggerCheck={onTriggerCheck}
 										onClickTask={onClickTask}
 										/>
 
@@ -641,7 +636,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.trips ?
-										currentInvoiceData.projectCounts.trips :
+										currentInvoiceData.projectCounts.trips.toFixed(2) :
 										0
 									}
 								</p>
@@ -649,7 +644,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.tripsAfterHours ?
-										currentInvoiceData.projectCounts.tripsAfterHours :
+										currentInvoiceData.projectCounts.tripsAfterHours.toFixed(2) :
 										0
 									} ( Čísla úloh: {
 												currentInvoiceData &&
@@ -662,7 +657,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.tripsAfterHoursPrice ?
-										currentInvoiceData.projectCounts.tripsAfterHoursPrice :
+										currentInvoiceData.projectCounts.tripsAfterHoursPrice.toFixed(2) :
 										0
 									} eur
 								</p>
@@ -670,7 +665,7 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.tripsTotalPriceWithoutDPH ?
-										currentInvoiceData.projectCounts.tripsTotalPriceWithoutDPH :
+										currentInvoiceData.projectCounts.tripsTotalPriceWithoutDPH.toFixed(2) :
 										0
 									} eur
 								</p>
@@ -678,24 +673,24 @@ export default function  MothlyReportsCompany (props) {
 										currentInvoiceData &&
 										currentInvoiceData.projectCounts &&
 										currentInvoiceData.projectCounts.tripsTotalPriceWithDPH ?
-										currentInvoiceData.projectCounts.tripsTotalPriceWithDPH :
+										currentInvoiceData.projectCounts.tripsTotalPriceWithDPH.toFixed(2) :
 										0
 									} eur
 								</p>
 							</div>
-
 							<div className="m-b-30">
 								<h3>Materiále a voľné položky</h3>
 								<hr />
+
 									<ReportsTable
 										tasks={
 											currentInvoiceData &&
-											currentInvoiceData.materials ?
-											currentInvoiceData.materials.map(invoiceMaterial =>
+											currentInvoiceData.materialTasks ?
+											currentInvoiceData.materialTasks.map(invoiceMaterial =>
 											({
-												...invoiceMaterial,
-												price: invoiceMaterial.price,
-												totalPrice: invoiceMaterial.totalPrice
+												...invoiceMaterial.task,
+												materials: invoiceMaterial.materials,
+												customItems: invoiceMaterial.customItems
 											})) :
 											[]
 										}
@@ -705,56 +700,26 @@ export default function  MothlyReportsCompany (props) {
 											'requester',
 											'assignedTo',
 											'status',
-											'statusDate',
+											'statusChange',
 											'material',
 											'quantity',
 											'unit',
-											'pricePerUnit',
+											'pricePerQuantity',
 											'totalPrice'
 										]}
-										onTriggerCheck={onTriggerCheck}
 										onClickTask={onClickTask}
 										/>
-
-										<ReportsTable
-											tasks={
-												currentInvoiceData &&
-												currentInvoiceData.customItems ?
-												currentInvoiceData.customItems.map(invoiceCustomItem =>
-												({
-													...invoiceCustomItem,
-													price: invoiceCustomItem.price,
-													totalPrice: invoiceCustomItem.totalPrice
-												})) :
-												[]
-											}
-											columnsToShow={[
-												'id',
-												'title',
-												'requester',
-												'assignedTo',
-												'status',
-												'statusDate',
-												'material',
-												'quantity',
-												'unit',
-												'pricePerUnit',
-												'totalPrice'
-											]}
-											onTriggerCheck={onTriggerCheck}
-											onClickTask={onClickTask}
-											/>
 
 									<p className="m-0">Spolu cena bez DPH: {
 											currentInvoiceData &&
 											currentInvoiceData.totalMaterialAndCustomItemPriceWithoutDPH ?
-											currentInvoiceData.totalMaterialAndCustomItemPriceWithoutDPH :
+											currentInvoiceData.totalMaterialAndCustomItemPriceWithoutDPH.toFixed(2) :
 											0
 										} eur</p>
 								<p className="m-0">Spolu cena s DPH: {
 										currentInvoiceData &&
 										currentInvoiceData.totalMaterialAndCustomItemPriceWithDPH ?
-										currentInvoiceData.totalMaterialAndCustomItemPriceWithDPH :
+										currentInvoiceData.totalMaterialAndCustomItemPriceWithDPH.toFixed(2) :
 										0
 									} eur</p>
 							</div>

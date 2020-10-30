@@ -39,169 +39,227 @@ query getCompanyInvoiceData(
       companyId: $companyId
       statuses: $statuses
     ) {
-				company{
-					companyRents {
-						id
-						title
-						quantity
-						cost
-						price
-						total
-					}
+			company{
+				companyRents {
+					id
+					title
+					quantity
+					cost
+					price
+					total
 				}
-        companyRentsCounts {
-          totalWithoutDPH
-          totalWithDPH
-        }
-        pausalCounts{
-          subtasks
-          subtasksAfterHours
-          subtasksAfterHoursTaskIds
-          subtasksAfterHoursPrice
-          trips
-          tripsAfterHours
-          tripsAfterHoursTaskIds
-          tripsAfterHoursPrice
-        }
-        overPausalCounts{
-          subtasks
-          subtasksAfterHours
-          subtasksAfterHoursTaskIds
-          subtasksAfterHoursPrice
-          subtasksTotalPriceWithoutDPH
-          subtasksTotalPriceWithDPH
-          trips
-          tripsAfterHours
-          tripsAfterHoursTaskIds
-          tripsAfterHoursPrice
-          tripsTotalPriceWithoutDPH
-          tripsTotalPriceWithDPH
-        }
-        projectTasks{
-          id
-          title
-					assignedTo {
-						email
-						id
-					}
-					requester {
-						email
-						id
-					}
-					status {
-						id
-						title
-						action
-						color
-					}
-					closeDate
-					company {
-						title
-					}
-        }
-        projectCounts{
-          subtasks
-          subtasksAfterHours
-          subtasksAfterHoursTaskIds
-          subtasksAfterHoursPrice
-          subtasksTotalPriceWithoutDPH
-          subtasksTotalPriceWithDPH
-          trips
-          tripsAfterHours
-          tripsAfterHoursTaskIds
-          tripsAfterHoursPrice
-          tripsTotalPriceWithoutDPH
-          tripsTotalPriceWithDPH
-        }
-        pausalTasks{
-          task {
-            id
-						title
-            assignedTo {
-              email
-							id
-            }
-            requester {
-              email
-							id
-            }
-						status {
-							id
-							title
-							action
-							color
-						}
-						closeDate
-            company {
-              title
-            }
-          }
-          subtasks {
-            id
-            title
-          }
-          trips {
-            id
-            type {
-              title
-            }
-          }
-        }
-        overPausalTasks{
-          task {
-            id
-						title
-            assignedTo {
-							id
-              email
-            }
-            requester {
-              email
-							id
-            }
-						status {
-							id
-							title
-							action
-							color
-						}
-						closeDate
-            company {
-              title
-            }
-          }
-          subtasks {
-            id
-            title
-          }
-          trips {
-            id
-            type {
-              title
-            }
-          }
-        }
-        materials {
-          material {
-            id
-            title
-          }
-          totalPrice
-          price
-        }
-        customItems {
-          customItem{
-            id
-            title
-          }
-          price
-          totalPrice
-        }
-        totalMaterialAndCustomItemPriceWithoutDPH
-        totalMaterialAndCustomItemPriceWithDPH
+			}
+    companyRentsCounts {
+      totalWithoutDPH
+      totalWithDPH
+    }
+		pausalTasks{
+			task {
+				id
+				title
+				overtime
+				assignedTo {
+					email
+					id
+				}
+				requester {
+					email
+					id
+				}
+				status {
+					id
+					title
+					action
+					color
+				}
+				closeDate
+				company {
+					title
+				}
+			}
+			subtasks {
+				id
+				title
+				quantity
+				type {
+					title
+				}
+			}
+			trips {
+				id
+				quantity
+				type {
+					title
+				}
+			}
+		}
+		pausalCounts{
+			subtasks
+			subtasksAfterHours
+			subtasksAfterHoursTaskIds
+			subtasksAfterHoursPrice
+			trips
+			tripsAfterHours
+			tripsAfterHoursTaskIds
+			tripsAfterHoursPrice
+		}
+		overPausalCounts{
+			subtasks
+			subtasksAfterHours
+			subtasksAfterHoursTaskIds
+			subtasksAfterHoursPrice
+			subtasksTotalPriceWithoutDPH
+			subtasksTotalPriceWithDPH
+			trips
+			tripsAfterHours
+			tripsAfterHoursTaskIds
+			tripsAfterHoursPrice
+			tripsTotalPriceWithoutDPH
+			tripsTotalPriceWithDPH
+		}
+		overPausalTasks{
+			task {
+				id
+				title
+				overtime
+				assignedTo {
+					id
+					email
+				}
+				requester {
+					email
+					id
+				}
+				status {
+					id
+					title
+					action
+					color
+				}
+				closeDate
+				company {
+					title
+				}
+			}
+			subtasks {
+				id
+				title
+				quantity
+				discount
+				type {
+					title
+				}
+			}
+			trips {
+				id
+				quantity
+				discount
+				type {
+					title
+				}
+			}
+		}
+		projectTasks{
+			id
+			title
+			overtime
+			assignedTo {
+				email
+				id
+			}
+			requester {
+				email
+				id
+			}
+			status {
+				id
+				title
+				action
+				color
+			}
+			closeDate
+			company {
+				title
+			}
+			subtasks {
+				id
+				title
+				quantity
+				discount
+				type {
+					title
+				}
+			}
+			workTrips {
+				id
+				quantity
+				discount
+				type {
+					title
+				}
+			}
+		}
+		projectCounts{
+			subtasks
+			subtasksAfterHours
+			subtasksAfterHoursTaskIds
+			subtasksAfterHoursPrice
+			subtasksTotalPriceWithoutDPH
+			subtasksTotalPriceWithDPH
+			trips
+			tripsAfterHours
+			tripsAfterHoursTaskIds
+			tripsAfterHoursPrice
+			tripsTotalPriceWithoutDPH
+			tripsTotalPriceWithDPH
+		}
+		materialTasks{
+			task {
+				id
+				title
+				status{
+					id
+					title
+					color
+				}
+				statusChange
+				assignedTo{
+					id
+					email
+				}
+				requester{
+					id
+					email
+				}
+			}
+			materials {
+				id
+				title
+				quantity
+				price
+				totalPrice
+			}
+			customItems {
+				id
+				title
+				quantity
+				price
+				totalPrice
+			}
+		}
+		totalMaterialAndCustomItemPriceWithoutDPH
+		totalMaterialAndCustomItemPriceWithDPH
   }
 }
 `;
+
+/*
+
+
+
+}
+
+*/
 
 export const GET_STATUSES = gql `
 query {
