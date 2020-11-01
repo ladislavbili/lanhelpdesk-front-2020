@@ -3,6 +3,7 @@ import React from 'react';
 import {
 	useQuery,
 	useLazyQuery,
+	useMutation,
 	useApolloClient
 } from "@apollo/client";
 
@@ -48,7 +49,8 @@ import {
   GET_INVOICE_COMPANIES,
 	GET_COMPANY_INVOICE_DATA,
 	GET_STATUSES,
-	GET_LOCAL_CACHE
+	GET_LOCAL_CACHE,
+	CREATE_TASK_INVOICE
 } from './querries';
 
 export default function  MothlyReportsCompany (props) {
@@ -60,6 +62,8 @@ export default function  MothlyReportsCompany (props) {
     data: statusesData,
     loading: statusesLoading
   } = useQuery( GET_STATUSES );
+
+  const [ createTaskInvoiceFunc ] = useMutation( CREATE_TASK_INVOICE );
 
 	const [ fromDate, setFromDate ] = React.useState(
 		moment().startOf('month')
@@ -115,7 +119,6 @@ export default function  MothlyReportsCompany (props) {
 
 	React.useEffect( () => {
 		if (showCompany !== null){
-			console.log("HI");
 			fetchCompanyInvoice({
 				variables: {
 					fromDate: fromDate.valueOf().toString(),
@@ -127,16 +130,44 @@ export default function  MothlyReportsCompany (props) {
 			});
 		}
 	}, [ showCompany ] );
-	React.useEffect( () => {
-		console.log("LOADING", companyInvoiceLoading);
-		console.log(companyInvoiceData);
-	}, [ companyInvoiceLoading ] );
 
 	const invoiceTasks = () => {
+		let pausalTasks = currentInvoiceData.pausalTasks.map(task => ({id: task.id, title: task.title}));
+		let ids = pausalTasks.map(task => id);
+
+		let overPausalTasks = currentInvoiceData.overPausalTasks.filter(task => !ids.includes(task.id));
+		ids.concat( overPausalTasks.map(task => id) );
+		let allTasks = pausalTasks.concat( overPausalTasks.map(task => ({id: task.id, title: task.title})) );
+
+		let projectTasks = currentInvoiceData.projectTasks.filter(task => !ids.includes(task.id));
+		ids.concat( projectTasks.map(task => id) );
+		allTasks = pausalTasks.concat( projectTasks.map(task => ({id: task.id, title: task.title})) );
+
+		let materialTasks = currentInvoiceData.materialTasks.filter(task => !ids.includes(task.id));
+		ids.concat( materialTasks.map(task => id) );
+		allTasks = pausalTasks.concat( materialTasks.map(task => ({id: task.id, title: task.title})) );
+
+		allTasks.forEach((task) => {
+			createTaskInvoice( {
+	        variables: {
+						fromDate: fromDate.valueOf().toString(),
+						toDate: toDate.valueOf().toString(),
+						statuses: chosenStatuses.map(status => status.id),
+						companyId: showCompany.id,
+						title: task.title
+	        }
+	      } )
+	      .then( ( response ) => {
+	      } )
+	      .catch( ( err ) => {
+	        console.log( err.message );
+					console.log( task.id, task.title );
+	      } );
+		});
+
+
 
 	}
-
-	console.log(companyInvoiceData);
 
 	const loading = statusesLoading || invoiceCompaniesLoading;
 
@@ -686,7 +717,9 @@ export default function  MothlyReportsCompany (props) {
 										tasks={
 											currentInvoiceData &&
 											currentInvoiceData.materialTasks ?
-											currentInvoiceData.materialTasks.map(invoiceMaterial =>
+											currentInvoiceData.materialTasks.filter(invoiceMaterial =>
+												invoiceMaterial.materials.length + invoiceMaterial.customItems.length > 1
+											).map(invoiceMaterial =>
 											({
 												...invoiceMaterial.task,
 												materials: invoiceMaterial.materials,
@@ -769,6 +802,16 @@ export default function  MothlyReportsCompany (props) {
 							</div>
 
 						</div>}
+
+						<Modal isOpen={false} toggle={()=>{}} >
+							<ModalHeader toggle={()=>{}}>{}</ModalHeader>
+							<ModalBody>
+								{ /*false &&
+									<TaskEdit inModal={true} columns={true}  closeModal={()=>{}}/>
+								*/}
+							</ModalBody>
+						</Modal>
+
 				</div>
 			}
 		</div>

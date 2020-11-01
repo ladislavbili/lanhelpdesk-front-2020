@@ -81,6 +81,7 @@ query getCompanyInvoiceData(
 				id
 				title
 				quantity
+				price
 				type {
 					title
 				}
@@ -146,6 +147,7 @@ query getCompanyInvoiceData(
 				title
 				quantity
 				discount
+				price
 				type {
 					title
 				}
@@ -253,13 +255,23 @@ query getCompanyInvoiceData(
 }
 `;
 
-/*
-
-
-
+export const CREATE_TASK_INVOICE = gql`
+mutation createTaskInvoice(
+  $fromDate: String!,
+  $toDate: String!,
+  $statuses: [Int]!,
+	$companyId: Int!,
+	$title: String!
+){
+    createTaskInvoice(
+			fromDate: $fromDate,
+		  toDate: $toDate,
+		  statuses: $statuses,
+			companyId: $companyId,
+			title: $title
+    )
 }
-
-*/
+`;
 
 export const GET_STATUSES = gql `
 query {
