@@ -178,6 +178,8 @@ export default function  MothlyReportsCompany (props) {
 
 	const currentInvoiceData = companyInvoiceData ? companyInvoiceData.getCompanyInvoiceData : {};
 
+	console.log(currentInvoiceData);
+
 	return (
 		<div className="scrollable fit-with-header">
 			<h2 className="m-l-20 m-t-20">Firmy</h2>
@@ -570,9 +572,12 @@ export default function  MothlyReportsCompany (props) {
 										tasks={
 											currentInvoiceData &&
 											currentInvoiceData.projectTasks ?
-											currentInvoiceData.projectTasks.filter(task =>
-												task.subtasks.length > 0
-											) :
+											currentInvoiceData.projectTasks.filter(invoiceTask =>invoiceTask.subtasks.length > 0
+											).map(invoiceTask =>
+											({
+												...invoiceTask.task,
+												subtasks: invoiceTask.subtasks,
+											})) :
 											[]
 										}
 										columnsToShow={[
@@ -643,9 +648,13 @@ export default function  MothlyReportsCompany (props) {
 										tasks={
 											currentInvoiceData &&
 											currentInvoiceData.projectTasks ?
-											currentInvoiceData.projectTasks.filter(task =>
-												task.workTrips.length > 0
-											) :
+											currentInvoiceData.projectTasks.filter(invoiceTask =>
+												invoiceTask.trips.length > 0
+											).map(invoiceTask =>
+											({
+												...invoiceTask.task,
+												workTrips: invoiceTask.trips,
+											})) :
 											[]
 										}
 										columnsToShow={[

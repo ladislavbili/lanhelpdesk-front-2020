@@ -89,6 +89,7 @@ query getCompanyInvoiceData(
 			trips {
 				id
 				quantity
+				price
 				type {
 					title
 				}
@@ -148,6 +149,7 @@ query getCompanyInvoiceData(
 				quantity
 				discount
 				price
+				price
 				type {
 					title
 				}
@@ -156,46 +158,52 @@ query getCompanyInvoiceData(
 				id
 				quantity
 				discount
+				price
 				type {
 					title
 				}
 			}
 		}
 		projectTasks{
-			id
-			title
-			overtime
-			assignedTo {
-				email
-				id
-			}
-			requester {
-				email
-				id
-			}
-			status {
+			task {
 				id
 				title
-				action
-				color
-			}
-			closeDate
-			company {
-				title
+				overtime
+				assignedTo {
+					id
+					email
+				}
+				requester {
+					email
+					id
+				}
+				status {
+					id
+					title
+					action
+					color
+				}
+				closeDate
+				company {
+					title
+				}
 			}
 			subtasks {
 				id
 				title
 				quantity
 				discount
+				price
+				price
 				type {
 					title
 				}
 			}
-			workTrips {
+			trips {
 				id
 				quantity
 				discount
+				price
 				type {
 					title
 				}

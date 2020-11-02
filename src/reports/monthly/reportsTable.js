@@ -131,8 +131,8 @@ return (
 											<td key={subtask.id+ '-title'} style={{paddingLeft:0}}>{subtask.title}</td>
 											<td key={subtask.id+ '-type'} style={{width:'150px'}}>{subtask.type.title}</td>
 											<td key={subtask.id+ '-time'} style={{width:'50px'}}>{subtask.quantity}</td>
-											<td key={subtask.id+ '-pricePerUnit'} style={{width:'70px'}}>{subtask.price ? subtask.price.toFixed(2) : 0}</td>
-											<td key={subtask.id+ '-totalPrice'} style={{width:'70px'}}>{subtask.price ? subtask.price.toFixed(2) : 0}</td>
+											<td key={subtask.id+ '-pricePerUnit'} style={{width:'70px'}}>{subtask.price.toFixed(2)}</td>
+											<td key={subtask.id+ '-totalPrice'} style={{width:'70px'}}>{(subtask.price*subtask.quantity).toFixed(2)}</td>
 										</tr>
 									)}
 								</tbody>
@@ -153,8 +153,8 @@ return (
 											<td key={trip.id+ '-title'} style={{paddingLeft:0}}>{trip.title}</td>
 											<td key={trip.id+ '-type'} style={{width:'150px'}}>{trip.type.title}</td>
 											<td key={trip.id+ '-time'} style={{width:'50px'}}>{trip.quantity}</td>
-											<td key={trip.id+ '-pricePerUnit'} style={{width:'70px'}}> {0}</td>
-											<td key={trip.id+ '-totalPrice'} style={{width:'70px'}}>{0}</td>
+											<td key={trip.id+ '-pricePerUnit'} style={{width:'70px'}}> {trip.price}</td>
+											<td key={trip.id+ '-totalPrice'} style={{width:'70px'}}>{(trip.price*trip.quantity).toFixed(2)}</td>
 										</tr>
 									)}
 								</tbody>
@@ -174,8 +174,8 @@ return (
 										<tr key={trip.id}>
 											<td key={trip.id+ '-type'} style={{width:'150px'}}>{trip.type.title}</td>
 											<td key={trip.id+ '-time'} style={{width:'50px'}}>{trip.quantity}</td>
-											<td key={trip.id+ '-pricePerUnit'} style={{width:'70px'}}> {0}</td>
-											<td key={trip.id+ '-totalPrice'} style={{width:'70px'}}>{0}</td>
+											<td key={trip.id+ '-pricePerUnit'} style={{width:'70px'}}> {trip.price}</td>
+											<td key={trip.id+ '-totalPrice'} style={{width:'70px'}}>{(trip.price*trip.quantity).toFixed(2)}</td>
 										</tr>
 									)}
 								</tbody>
