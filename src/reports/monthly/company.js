@@ -178,8 +178,6 @@ export default function  MothlyReportsCompany (props) {
 
 	const currentInvoiceData = companyInvoiceData ? companyInvoiceData.getCompanyInvoiceData : {};
 
-	console.log(currentInvoiceData);
-
 	return (
 		<div className="scrollable fit-with-header">
 			<h2 className="m-l-20 m-t-20">Firmy</h2>
