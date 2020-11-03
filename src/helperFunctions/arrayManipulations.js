@@ -38,3 +38,12 @@ export const filterUnique = ( array, key = null ) => {
     return array.filter( ( item, index ) => keys.indexOf( item[ key ] ) === index );
   }
 }
+
+export const splitArrayByFilter = ( array, filter ) => {
+  return array.reduce( ( [ p, f ], e ) => ( filter( e ) ? [
+    [ ...p, e ], f
+  ] : [ p, [ ...f, e ] ] ), [
+    [],
+    []
+  ] );
+}

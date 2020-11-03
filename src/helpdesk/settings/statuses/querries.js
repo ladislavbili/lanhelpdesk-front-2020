@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 
 export const GET_STATUSES = gql `
 query {
@@ -6,6 +8,8 @@ query {
     title
     id
     order
+    color
+    action
   }
 }
 `;
@@ -65,6 +69,16 @@ mutation deleteStatus($id: Int!, $newId: Int!) {
     newId: $newId,
   ){
     id
+  }
+}
+`;
+
+export const SET_USER_STATUSES = gql `
+mutation setUserStatuses($ids: [Int]!) {
+  setUserStatuses(
+    ids: $ids
+  ){
+		id
   }
 }
 `;

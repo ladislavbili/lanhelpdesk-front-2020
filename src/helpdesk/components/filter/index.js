@@ -1,289 +1,208 @@
 import React from 'react';
 import {
-  useQuery,
   useMutation,
-  useApolloClient
+  useQuery,
 } from "@apollo/client";
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 import {
   Input
 } from 'reactstrap';
 import Select from 'react-select';
 import {
   toSelArr,
-  toSelItem,
-  toMomentInput
-} from '../../../helperFunctions';
+  fromObjectToState,
+  setDefaultFromObject
+} from 'helperFunctions';
 import AddFilter from './filterAdd';
+import Loading from 'components/loading';
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
-
+import {
+  setFilter,
+} from 'apollo/localSchema/actions';
 import {
   invisibleSelectStyleOtherFont
 } from 'configs/components/select';
 import {
-  oneOfOptions
+  oneOfOptions,
+  emptyFilter,
+  ofCurrentUser
 } from 'configs/constants/filter';
 
 import {
-  GET_USERS
+  GET_MY_DATA,
+  GET_MY_FILTERS,
+  DELETE_FILTER,
+} from './querries';
+import {
+  GET_FILTER
+} from 'apollo/localSchema/querries';
+import {
+  GET_BASIC_USERS
 } from 'helpdesk/settings/users/querries';
 import {
-  GET_COMPANIES
+  GET_BASIC_COMPANIES
 } from 'helpdesk/settings/companies/querries';
 import {
   GET_TASK_TYPES
 } from 'helpdesk/settings/taskTypes/querries';
-import {
-  GET_MY_FILTERS
-} from './querries';
-import {
-  GET_FILTER,
-  GET_GENERAL_FILTER
-} from 'apollo/localSchema/querries';
 
-
-const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    email
-    role {
-      id
-    }
-  }
-}
-`;
-
-const DELETE_FILTER = gql `
-mutation deleteFilter($id: Int!) {
-  deleteFilter(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
-/*
-const LOCAL_CACHE = gql `
-  query getLocalCache {
-    filterName @client
-  }
-`;
-*/
-
-const UPDATE_FILTER = gql `
-mutation updateFilter( $id: Int!, $title: String ) {
-  updateFilter(
-    id: $id,
-    title: $title,
-  )
-}
-`;
-
-export default function Filter( props ) {
+export default function FilterForm( props ) {
   //data & queries
   const {
-    history,
-    filterID,
-    filterData,
-    generalFilterData,
     close,
-    setToEmptyFilter,
-    setCurrentFilter
+    history
   } = props;
+
+  //apollo
   const {
-    data
+    data: myData,
+    loading: myDataLoading,
   } = useQuery( GET_MY_DATA );
 
-  /*
   const {
-    data: localCache
-  } = useQuery( LOCAL_CACHE );
-  */
+    data: usersData,
+    loading: usersLoading
+  } = useQuery( GET_BASIC_USERS );
+
   const {
-    data: userData,
-    loading: userLoading
-  } = useQuery( GET_USERS );
+    data: companiesData,
+    loading: companiesLoading
+  } = useQuery( GET_BASIC_COMPANIES );
+
   const {
-    data: companyData,
-    loading: companyLoading
-  } = useQuery( GET_COMPANIES );
-  const {
-    data: taskTypeData,
-    loading: taskTypeLoading
+    data: taskTypesData,
+    loading: taskTypesLoading
   } = useQuery( GET_TASK_TYPES );
-  const [ updateFilter ] = useMutation( UPDATE_FILTER );
-  const [ deleteFilter ] = useMutation( DELETE_FILTER );
 
-  const users = ( userLoading ? [] : toSelArr( userData.users, 'email' ) );
-  const companies = ( companyLoading ? [] : toSelArr( companyData.companies ) );
-  const taskTypes = ( taskTypeLoading ? [] : toSelArr( taskTypeData.taskTypes ) );
 
-  const client = useApolloClient();
+  const {
+    data: myFiltersData,
+    loading: myFiltersLoading
+  } = useQuery( GET_MY_FILTERS );
 
-  let currentUser = {};
+  const {
+    data: filterData,
+    loading: filterLoading
+  } = useQuery( GET_FILTER );
 
-  if ( data ) {
-    currentUser = data.getMyData;
+  const id = filterData.localFilter.id;
+
+  //state
+  const [ deleteFilter, {
+    client
+  } ] = useMutation( DELETE_FILTER );
+
+  const [ title, setTitle ] = React.useState( '' );
+  const [ editTitleOpen, setEditTitleOpen ] = React.useState( false );
+  const [ saving, setSaving ] = React.useState( null );
+
+  const {
+    requester,
+    setRequester,
+    company,
+    setCompany,
+    assigned,
+    setAssigned,
+    taskType,
+    setTaskType,
+    statusDateFrom,
+    setStatusDateFrom,
+    statusDateFromNow,
+    setStatusDateFromNow,
+    statusDateTo,
+    setStatusDateTo,
+    statusDateToNow,
+    setStatusDateToNow,
+    closeDateFrom,
+    setCloseDateFrom,
+    closeDateFromNow,
+    setCloseDateFromNow,
+    closeDateTo,
+    setCloseDateTo,
+    closeDateToNow,
+    setCloseDateToNow,
+    pendingDateFrom,
+    setPendingDateFrom,
+    pendingDateFromNow,
+    setPendingDateFromNow,
+    pendingDateTo,
+    setPendingDateTo,
+    pendingDateToNow,
+    setPendingDateToNow,
+    deadlineFrom,
+    setDeadlineFrom,
+    deadlineFromNow,
+    setDeadlineFromNow,
+    deadlineTo,
+    setDeadlineTo,
+    deadlineToNow,
+    setDeadlineToNow,
+    oneOf,
+    setOneOf,
+  } = fromObjectToState( emptyFilter );
+
+  const dataLoading = (
+    myDataLoading ||
+    usersLoading ||
+    companiesLoading ||
+    taskTypesLoading ||
+    filterLoading ||
+    myFiltersLoading
+  )
+
+  React.useEffect( () => {
+    if ( !dataLoading ) {
+      let filter = filterData.localFilter;
+      //filter information
+      setFilterState( filter );
+    }
+  }, [ id, dataLoading ] );
+
+  const applyFilter = () => {
+    let filter = getCurrentFilter();
+    setFilter( {
+      ...filterData.localFilter,
+      filter
+    } );
   }
-
-  const [ newFilterName, setNewFilterName ] = React.useState( "" );
-  const [ openEditName, setOpenEditName ] = React.useState( false );
-
-  const [ assignedToCur, setAssignedToCur ] = React.useState( false );
-  const [ assignedTo, setAssignedTo ] = React.useState( {
-    id: null,
-    label: 'Žiadny',
-    value: null
-  } );
-
-  const [ requesterCur, setRequesterCur ] = React.useState( false );
-  const [ requester, setRequester ] = React.useState( {
-    id: null,
-    label: 'Žiadny',
-    value: null
-  } );
-
-  const [ companyCur, setCompanyCur ] = React.useState( false );
-  const [ company, setCompany ] = React.useState( {
-    id: null,
-    label: 'Žiadny',
-    value: null
-  } );
-
-  const [ taskType, setTaskType ] = React.useState( null );
-  const [ oneOf, setOneOf ] = React.useState( [] );
-  const [ statusDateFrom, setStatusDateFrom ] = React.useState( "" );
-  const [ statusDateFromNow, setStatusDateFromNow ] = React.useState( false );
-  const [ statusDateTo, setStatusDateTo ] = React.useState( "" );
-  const [ statusDateToNow, setStatusDateToNow ] = React.useState( false );
-  const [ pendingDateFrom, setPendingDateFrom ] = React.useState( "" );
-  const [ pendingDateFromNow, setPendingDateFromNow ] = React.useState( false );
-  const [ pendingDateTo, setPendingDateTo ] = React.useState( "" );
-  const [ pendingDateToNow, setPendingDateToNow ] = React.useState( false );
-  const [ closeDateFrom, setCloseDateFrom ] = React.useState( "" );
-  const [ closeDateFromNow, setCloseDateFromNow ] = React.useState( false );
-  const [ closeDateTo, setCloseDateTo ] = React.useState( "" );
-  const [ closeDateToNow, setCloseDateToNow ] = React.useState( false );
-  const [ deadlineFrom, setDeadlineFrom ] = React.useState( "" );
-  const [ deadlineFromNow, setDeadlineFromNow ] = React.useState( false );
-  const [ deadlineTo, setDeadlineTo ] = React.useState( "" );
-  const [ deadlineToNow, setDeadlineToNow ] = React.useState( false );
-
-  React.useEffect( () => {
-    if ( !openEditName ) {
-      renameFilter();
+  const resetFilter = () => {
+    if ( id === null ) {
+      setTitle( '' );
+      setDefaultFromObject( {
+        setRequester,
+        setCompany,
+        setAssigned,
+        setTaskType,
+        setStatusDateFrom,
+        setStatusDateFromNow,
+        setStatusDateTo,
+        setStatusDateToNow,
+        setCloseDateFrom,
+        setCloseDateFromNow,
+        setCloseDateTo,
+        setCloseDateToNow,
+        setPendingDateFrom,
+        setPendingDateFromNow,
+        setPendingDateTo,
+        setPendingDateToNow,
+        setDeadlineFrom,
+        setDeadlineFromNow,
+        setDeadlineTo,
+        setDeadlineToNow,
+        setOneOf
+      }, emptyFilter );
+    } else {
+      setFilter( myFiltersData.myFilters.find( ( myFilter ) => myFilter.id === id ) );
+      setFilterState( filterData.localFilter );
     }
-  }, [ openEditName ] );
-
-  React.useEffect( () => {
-    if ( filterID ) {
-      setNewFilterName( generalFilterData.title );
-      setOpenEditName( false );
-
-      setAssignedToCur( filterData.assignedToCur );
-      let assigned = {
-        id: null,
-        label: 'Žiadny',
-        value: null
-      };
-      if ( filterID && filterData.assignedToCur ) {
-        assigned = {
-          label: 'Current',
-          value: 'cur',
-          id: 'cur'
-        };
-      } else if ( filterID && filterData.assignedTo ) {
-        assigned = toSelItem( filterData.assignedTo, 'email' );
-      }
-      setAssignedTo( assigned );
-
-      setRequesterCur( filterData.requesterCur );
-      let req = {
-        id: null,
-        label: 'Žiadny',
-        value: null
-      };
-      if ( filterData.requesterCur ) {
-        req = {
-          label: 'Current',
-          value: 'cur',
-          id: 'cur'
-        };
-      } else if ( filterData.requester ) {
-        req = toSelItem( filterData.requester, 'email' );
-      }
-      setRequester( req );
-
-      setCompanyCur( filterData.companyCur );
-      let com = {
-        id: null,
-        label: 'Žiadny',
-        value: null
-      };
-      if ( filterData.companyCur ) {
-        com = {
-          label: 'Current',
-          value: 'cur',
-          id: 'cur'
-        };
-      } else if ( filterData.company ) {
-        com = toSelItem( filterData.company );
-      }
-      setCompany( com );
-
-      setTaskType( filterData.taskType ? toSelItem( filterData.taskType ) : null );
-
-      let oneOfArr = filterData.oneOf ? toSelArr( filterData.oneOf ) : [];
-      oneOfArr.map( item => {
-        if ( item === 'requester' ) {
-          return {
-            id: 'req',
-            title: "Requester",
-            value: 'req',
-            label: "Requester"
-          }
-        } else if ( item === 'assigned' ) {
-          return {
-            id: 'as',
-            title: "Assigned",
-            value: 'as',
-            label: "Assigned"
-          }
-        } else {
-          return {
-            id: 'com',
-            title: "Company",
-            value: 'com',
-            label: "Company"
-          }
-        }
-      } )
-      setOneOf( oneOfArr );
-      setStatusDateFrom( toMomentInput( filterData.statusDateFrom ) );
-      setStatusDateFromNow( filterData.statusDateFromNow );
-      setStatusDateTo( toMomentInput( filterData.statusDateTo ) );
-      setStatusDateToNow( filterData.statusDateToNow );
-      setPendingDateFrom( toMomentInput( filterData.pendingDateFrom ) );
-      setPendingDateFromNow( filterData.pendingDateFromNow );
-      setPendingDateTo( toMomentInput( filterData.pendingDateTo ) );
-      setPendingDateToNow( filterData.pendingDateToNow );
-      setCloseDateFrom( toMomentInput( filterData.closeDateFrom ) );
-      setCloseDateFromNow( filterData.closeDateFromNow );
-      setCloseDateTo( toMomentInput( filterData.closeDateTo ) );
-      setCloseDateToNow( filterData.closeDateToNow );
-      setDeadlineFrom( toMomentInput( filterData.deadlineFrom ) );
-      setDeadlineFromNow( filterData.deadlineFromNow );
-      setDeadlineTo( toMomentInput( filterData.deadlineTo ) );
-      setDeadlineToNow( filterData.deadlineToNow );
-    }
-  }, [ filterID ] );
-
+  }
   const deleteFilterFunc = () => {
-    if ( filterID !== null && window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( "Are you sure?" ) ) {
       deleteFilter( {
           variables: {
-            id: filterID,
+            id,
           }
         } )
         .then( ( response ) => {
@@ -291,15 +210,15 @@ export default function Filter( props ) {
               query: GET_MY_FILTERS
             } )
             .myFilters;
-          const newFilters = allFilters.filter( item => item.id !== filterID );
+          const newFilters = [ ...allFilters ].filter( item => item.id !== id );
           client.writeQuery( {
             query: GET_MY_FILTERS,
             data: {
               myFilters: [ ...newFilters ]
             }
           } );
-          history.push( '/helpdesk/taskList/i/all' );
-          setToEmptyFilter();
+          history.push( `/helpdesk/taskList/i/all` );
+          setFilter( getEmptyGeneralFilter() );
           close();
         } )
         .catch( ( err ) => {
@@ -309,466 +228,280 @@ export default function Filter( props ) {
     }
   }
 
-  const resetFilter = () => {
-    if ( filterID === null ) {
-      setEmptyFilter();
+  const getCurrentFilter = () => ( {
+    assignedToCur: assigned.id === 'cur',
+    assignedTo: assigned.id === 'cur' ? null : assigned,
+    requesterCur: requester.id === 'cur',
+    requester: requester.id === 'cur' ? null : requester,
+    companyCur: company.id === 'cur',
+    company: company.id === 'cur' ? null : company,
+    taskType: taskType,
+    oneOf: oneOf.map( ( oneOf ) => oneOf.value ),
+
+    statusDateFrom: statusDateFrom === null ? null : statusDateFrom.valueOf()
+      .toString(),
+    statusDateFromNow,
+    statusDateTo: statusDateTo === null ? null : statusDateTo.valueOf()
+      .toString(),
+    statusDateToNow,
+    pendingDateFrom: pendingDateFrom === null ? null : pendingDateFrom.valueOf()
+      .toString(),
+    pendingDateFromNow,
+    pendingDateTo: pendingDateTo === null ? null : pendingDateTo.valueOf()
+      .toString(),
+    pendingDateToNow,
+    closeDateFrom: closeDateFrom === null ? null : closeDateFrom.valueOf()
+      .toString(),
+    closeDateFromNow,
+    closeDateTo: closeDateTo === null ? null : closeDateTo.valueOf()
+      .toString(),
+    closeDateToNow,
+    deadlineFrom: deadlineFrom === null ? null : deadlineFrom.valueOf()
+      .toString(),
+    deadlineFromNow,
+    deadlineTo: deadlineTo === null ? null : deadlineTo.valueOf()
+      .toString(),
+    deadlineToNow,
+  } )
+
+  const getCleanCurrentFilter = () => ( {
+    ...getCurrentFilter(),
+    assignedTo: assigned.id === 'cur' ? null : assigned.id,
+    requester: requester.id === 'cur' ? null : requester.id,
+    company: company.id === 'cur' ? null : company.id,
+    taskType: taskType.id
+  } )
+
+  const setFilterState = ( filter ) => {
+    setTitle( filter.title );
+    //filter data
+    filter = filter.filter;
+
+    if ( filter.companyCur ) {
+      setCompany( ofCurrentUser );
+    } else if ( filter.company === null ) {
+      setCompany( emptyFilter.company );
     } else {
-      setFilter();
+      setCompany( toSelArr( companiesData.basicCompanies )
+        .find( ( company ) => company.id === filter.company.id ) );
     }
+
+    if ( filter.requesterCur ) {
+      setRequester( ofCurrentUser );
+    } else if ( filter.requester === null ) {
+      setRequester( emptyFilter.requester );
+    } else {
+      setRequester( toSelArr( usersData.basicUsers )
+        .find( ( user ) => user.id === filter.requester.id ) );
+    }
+
+    if ( filter.assignedToCur ) {
+      setAssigned( emptyFilter.assigned );
+    } else if ( filter.assignedTo === null ) {
+      setAssigned( emptyFilter.assigned );
+    } else {
+      setAssigned( toSelArr( usersData.basicUsers )
+        .find( ( user ) => user.id === filter.assigned.id ) );
+    }
+
+    if ( filter.taskType !== null ) {
+      setTaskType( toSelArr( taskTypesData.taskTypes )
+        .find( ( taskType ) => taskType.id === filter.taskType.id ) );
+    } else {
+      setTaskType( emptyFilter.taskType );
+    }
+
+    setStatusDateFromNow( filter.statusDateFromNow );
+    setStatusDateFrom( filter.statusDateFrom === null ? null : moment( parseInt( filter.statusDateFrom ) ) );
+    setStatusDateToNow( filter.statusDateToNow );
+    setStatusDateTo( filter.statusDateTo === null ? null : moment( parseInt( filter.statusDateTo ) ) );
+    setCloseDateFromNow( filter.closeDateFromNow );
+    setCloseDateFrom( filter.closeDateFrom === null ? null : moment( parseInt( filter.closeDateFrom ) ) );
+    setCloseDateToNow( filter.closeDateToNow );
+    setCloseDateTo( filter.closeDateTo === null ? null : moment( parseInt( filter.closeDateTo ) ) );
+    setPendingDateFromNow( filter.pendingDateFromNow );
+    setPendingDateFrom( filter.pendingDateFrom === null ? null : moment( parseInt( filter.pendingDateFrom ) ) );
+    setPendingDateToNow( filter.pendingDateToNow );
+    setPendingDateTo( filter.pendingDateTo === null ? null : moment( parseInt( filter.pendingDateTo ) ) );
+    setDeadlineFromNow( filter.deadlineFromNow );
+    setDeadlineFrom( filter.deadlineFrom === null ? null : moment( parseInt( filter.deadlineFrom ) ) );
+    setDeadlineToNow( filter.deadlineToNow );
+    setDeadlineTo( filter.deadlineTo === null ? null : moment( parseInt( filter.deadlineTo ) ) );
+    setOneOf( oneOfOptions.filter( ( oneOf ) => filter.oneOf.includes( oneOf.value ) ) );
   }
 
-  const setFilter = () => {
-    setNewFilterName( generalFilterData.title );
-    setOpenEditName( false );
-
-    setAssignedToCur( filterData.assignedToCur );
-    let assigned = {
-      id: null,
-      label: 'Žiadny',
-      value: null
-    };
-    if ( filterID && filterData.assignedToCur ) {
-      assigned = {
-        label: 'Current',
-        value: 'cur',
-        id: 'cur'
-      };
-    } else if ( filterID && filterData.assignedTo ) {
-      assigned = toSelItem( filterData.assignedTo, 'email' );
-    }
-    setAssignedTo( assigned );
-
-    setRequesterCur( filterData.requesterCur );
-    let req = {
-      id: null,
-      label: 'Žiadny',
-      value: null
-    };
-    if ( filterData.requesterCur ) {
-      req = {
-        label: 'Current',
-        value: 'cur',
-        id: 'cur'
-      };
-    } else if ( filterData.requester ) {
-      req = toSelItem( filterData.requester, 'email' );
-    }
-    setRequester( req );
-
-    setCompanyCur( filterData.companyCur );
-    let com = {
-      id: null,
-      label: 'Žiadny',
-      value: null
-    };
-    if ( filterData.companyCur ) {
-      com = {
-        label: 'Current',
-        value: 'cur',
-        id: 'cur'
-      };
-    } else if ( filterData.company ) {
-      com = toSelItem( filterData.company );
-    }
-    setCompany( com );
-
-    setTaskType( filterData.taskType ? toSelItem( filterData.taskType ) : null );
-
-    let oneOfArr = filterData.oneOf ? toSelArr( filterData.oneOf ) : [];
-    oneOfArr.map( item => {
-      if ( item === 'requester' ) {
-        return {
-          id: 'req',
-          title: "Requester",
-          value: 'requester',
-          label: "Requester"
-        }
-      } else if ( item === 'assigned' ) {
-        return {
-          id: 'as',
-          title: "Assigned",
-          value: 'assigned',
-          label: "Assigned"
-        }
-      } else {
-        return {
-          id: 'com',
-          title: "Company",
-          value: 'company',
-          label: "Company"
-        }
-      }
-    } )
-    setOneOf( oneOfArr );
-    setStatusDateFrom( toMomentInput( filterData.statusDateFrom ) );
-    setStatusDateFromNow( filterData.statusDateFromNow );
-    setStatusDateTo( toMomentInput( filterData.statusDateTo ) );
-    setStatusDateToNow( filterData.statusDateToNow );
-    setPendingDateFrom( toMomentInput( filterData.pendingDateFrom ) );
-    setPendingDateFromNow( filterData.pendingDateFromNow );
-    setPendingDateTo( toMomentInput( filterData.pendingDateTo ) );
-    setPendingDateToNow( filterData.pendingDateToNow );
-    setCloseDateFrom( toMomentInput( filterData.closeDateFrom ) );
-    setCloseDateFromNow( filterData.closeDateFromNow );
-    setCloseDateTo( toMomentInput( filterData.closeDateTo ) );
-    setCloseDateToNow( filterData.closeDateToNow );
-    setDeadlineFrom( toMomentInput( filterData.deadlineFrom ) );
-    setDeadlineFromNow( filterData.deadlineFromNow );
-    setDeadlineTo( toMomentInput( filterData.deadlineTo ) );
-    setDeadlineToNow( filterData.deadlineToNow );
-    //TODO
-    //filter( filterData );
-    //generalFilter( generalFilterData );
+  if ( dataLoading ) {
+    return <Loading />
   }
+  const users = toSelArr( usersData.basicUsers, 'email' );
+  const companies = toSelArr( companiesData.basicCompanies );
+  const taskTypes = toSelArr( taskTypesData.taskTypes );
 
-
-  const setEmptyFilter = () => {
-    setNewFilterName( "" );
-    setOpenEditName( false );
-
-    setAssignedToCur( false );
-    setAssignedTo( {
-      id: null,
-      label: 'Žiadny',
-      value: null
-    } );
-
-    setRequesterCur( false );
-    setRequester( {
-      id: null,
-      label: 'Žiadny',
-      value: null
-    } );
-
-    setCompanyCur( false );
-    setCompany( {
-      id: null,
-      label: 'Žiadny',
-      value: null
-    } );
-
-    setTaskType( null );
-    setOneOf( [] );
-    setStatusDateFrom( "" );
-    setStatusDateFromNow( false );
-    setStatusDateTo( "" );
-    setStatusDateToNow( false );
-    setPendingDateFrom( "" );
-    setPendingDateFromNow( false );
-    setPendingDateTo( "" );
-    setPendingDateToNow( false );
-    setCloseDateFrom( "" );
-    setCloseDateFromNow( false );
-    setCloseDateTo( "" );
-    setCloseDateToNow( false );
-    setDeadlineFrom( "" );
-    setDeadlineFromNow( false );
-    setDeadlineTo( "" );
-    setDeadlineToNow( false );
-  }
-
-  const applyFilter = () => {
-    let newGeneralFilter = {
-      ...generalFilterData
-    };
-    //let newFilter = {};
-    /*
-    let body = {
-      requester: requester.id,
-      requesterCur: requesterCur,
-      company: company.id,
-      companyCur: companyCur,
-      assignedTo: assignedTo.id,
-      assignedToCur: assignedToCur,
-
-      taskType: taskType.id,
-      oneOf: oneOf.map( ( item ) => item.value ),
-
-      statusDateFrom: toMomentInput( statusDateFrom ),
-      statusDateFromNow: statusDateFromNow,
-      statusDateTo: toMomentInput( statusDateTo ),
-      statusDateToNow: statusDateToNow,
-
-      pendingDateFrom: toMomentInput( pendingDateFrom ),
-      pendingDateFromNow: pendingDateFromNow,
-      pendingDateTo: toMomentInput( pendingDateTo ),
-      pendingDateToNow: pendingDateToNow,
-
-      closeDateFrom: toMomentInput( closeDateFrom ),
-      closeDateFromNow: closeDateFromNow,
-      closeDateTo: toMomentInput( closeDateTo ),
-      closeDateToNow: closeDateToNow,
-
-      deadlineFrom: toMomentInput( deadlineFrom ),
-      deadlineFromNow: deadlineFromNow,
-      deadlineTo: toMomentInput( deadlineTo ),
-      deadlineToNow: deadlineToNow,
-
-      updatedAt: ( new Date() )
-        .getTime()
-    }
-    */
-    setCurrentFilter( newGeneralFilter );
-  }
-
-  const renameFilter = () => {
-    if ( generalFilterData && generalFilterData.title !== newFilterName && newFilterName.length > 0 ) {
-      updateFilter( {
-          variables: {
-            id: filterID,
-            title: newFilterName,
-          }
-        } )
-        .then( ( response ) => {
-          let allFilters = client.readQuery( {
-              query: GET_MY_FILTERS
-            } )
-            .myFilters;
-          const newFilters = allFilters.map( item => {
-            if ( item.id !== filterID ) {
-              return item;
-            }
-            return ( {
-              ...generalFilterData,
-              name: newFilterName,
-              __typename: "Filter"
-            } );
-          } );
-          client.writeQuery( {
-            query: GET_MY_FILTERS,
-            data: {
-              myFilters: [ ...newFilters ]
-            }
-          } );
-          /*
-          TODO
-          generalFilter( {
-            ...generalFilterData,
-            title: newFilterName
-          } );
-          */
-          setCurrentFilter( {
-            ...generalFilterData,
-            title: newFilterName
-          } );
-          client.writeData( {
-            data: {
-              filterName: newFilterName
-            }
-          } );
-        } )
-        .catch( ( err ) => {
-          console.log( err.message );
-        } );
-    }
-  }
-
-  const canSaveFilter = () => {
-    if ( filterID === null || filterID === undefined ) {
-      return true;
-    }
-    let filter = filterData;
-    return true || filter.roles.includes( currentUser.role.id ) || ( filter && filter.createdBy === currentUser.id );
-  }
+  let canModify = id !== null;
 
   return (
     <div>
       <div className="d-flex m-l-15 m-t-5">
         <button type="button" className="btn-link-reversed" onClick={applyFilter}><i className="fa fa-check icon-M"/></button>
-        {canSaveFilter() &&
+        {
           <AddFilter
-            filter={{
-              requester: requester && requester.value !== 'cur' && requester.value !== null ? requester.id : null,
-              requesterCur,
-              company: company && company.value !== 'cur' && company.value !== null ? company.id : null,
-              companyCur,
-              assignedTo: assignedTo && assignedTo.value !== 'cur' && assignedTo.value !== null ? assignedTo.id : null,
-              assignedToCur,
-              taskType: taskType ? taskType.id : null,
-              oneOf: oneOf.map( (item) => item.value ),
+            filter={getCleanCurrentFilter()}
+            title={title}
+            {...props}
+            />
+        }
 
-              statusDateFrom: toMomentInput(statusDateFrom),
-              statusDateFromNow,
-              statusDateTo: toMomentInput(statusDateTo),
-              statusDateToNow,
-
-              pendingDateFrom: toMomentInput(pendingDateFrom),
-              pendingDateFromNow,
-              pendingDateTo: toMomentInput(pendingDateTo),
-              pendingDateToNow,
-
-              closeDateFrom: toMomentInput(closeDateFrom),
-              closeDateFromNow,
-              closeDateTo: toMomentInput(closeDateTo),
-              closeDateToNow,
-
-              deadlineFrom: toMomentInput(deadlineFrom),
-              deadlineFromNow,
-              deadlineTo: toMomentInput(deadlineTo),
-              deadlineToNow,
-            }}
-            filterID={filterID}
-            bigFilter={filterData}
-            />}
-
-            <button type="button" className="btn-link-reversed m-2" onClick={resetFilter}><i className="fa fa-sync icon-M"/></button>
-            {canSaveFilter() &&
-              <button type="button" className="btn-link-reversed m-2" disabled={filterID===null} onClick={deleteFilterFunc}><i className="far fa-trash-alt icon-M"/></button>}
-            <button type="button" className="btn-link-reversed m-2" onClick={() => close()}><i className="fa fa-times icon-M"/></button>
-          </div>
-
-
-          { filterID!==null  &&
-            <div>
-              <div className="sidebar-filter-label">
-                Filter name
-              </div>
-              <div
-                className=""
-                onClick={() => setOpenEditName(filterID ? true : false)}
-                >
-                {(!openEditName || !canSaveFilter()) &&
-                  <h5 className="sidebar-filter-name">{filterID?' '+ (newFilterName ? newFilterName : filterData.title):' Všetky'}</h5>
-                }
-                {openEditName && canSaveFilter() &&
-                  <Input
-                    type="text"
-                    className="from-control sidebar-filter-input"
-                    placeholder="Enter filter name"
-                    autoFocus
-                    value={newFilterName ? newFilterName : filterData.title}
-                    onChange={(e) => {
-                      setNewFilterName(e.target.value);
-                      renameFilter()
-                    }}
-                    onBlur={() => setOpenEditName(false)}
-                    />
-                }
-              </div>
-            </div>
-          }
-
-          <div className=" p-r-15 p-l-15 sidebar-filter">
-            <div className="sidebar-filter-row">
-              <label htmlFor="example-input-small">Zadal</label>
-              <div className="flex">
-                <Select
-                  options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(users)}
-                  onChange={(newValue)=> {
-                    setRequester(newValue);
-                    setRequesterCur(newValue.value === 'cur')
-                  }}
-                  value={requester}
-                  styles={invisibleSelectStyleOtherFont} />
-              </div>
-            </div>
-            <div className="sidebar-filter-row">
-              <label htmlFor="example-input-small">Firma</label>
-              <div className="flex">
-                <Select
-                  options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companies))}
-                  onChange={(comp) => {
-                    setCompany(comp);
-                    setCompanyCur(comp.value === 'cur')
-                  }}
-                  value={company}
-                  styles={invisibleSelectStyleOtherFont} />
-              </div>
-            </div>
-
-            <div className="sidebar-filter-row">
-              <label htmlFor="example-input-small">Riesi</label>
-              <div className="flex">
-                <Select
-                  options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(users, 'email'))}
-                  onChange={(newValue)=> {
-                    setAssignedTo(newValue);
-                    setAssignedToCur(newValue.value === 'cur');
-                  }}
-                  value={assignedTo}
-                  styles={invisibleSelectStyleOtherFont} />
-              </div>
-            </div>
-
-            <FilterDatePickerInCalendar
-              label="Status date"
-              minimal
-              showNowFrom={statusDateFromNow}
-              dateFrom={statusDateFrom}
-              setShowNowFrom={(statusDateFromNow)=> setStatusDateFromNow(statusDateFromNow)}
-              setDateFrom={(statusDateFrom)=> setStatusDateFrom(statusDateFrom)}
-              showNowTo={statusDateToNow}
-              dateTo={statusDateTo}
-              setShowNowTo={(statusDateToNow)=> setStatusDateToNow(statusDateToNow)}
-              setDateTo={(statusDateTo)=>setStatusDateTo(statusDateTo)}
-              />
-
-              {/* Pending Date */}
-              <FilterDatePickerInCalendar
-                label="Pending date"
-                minimal
-                showNowFrom={pendingDateFromNow}
-                dateFrom={pendingDateFrom}
-                setShowNowFrom={(pendingDateFromNow) => setPendingDateFromNow( pendingDateFromNow )}
-                setDateFrom={(pendingDateFrom)=> setPendingDateFrom(pendingDateFrom)}
-                showNowTo={pendingDateToNow}
-                dateTo={pendingDateTo}
-                setShowNowTo={(pendingDateToNow)=> setPendingDateToNow( pendingDateToNow )}
-                setDateTo={(pendingDateTo)=> setPendingDateTo(pendingDateTo)}
-                />
-
-              {/* Close Date */}
-              <FilterDatePickerInCalendar
-                label="Close date"
-                minimal
-                showNowFrom={closeDateFromNow}
-                dateFrom={closeDateFrom}
-                setShowNowFrom={(closeDateFromNow) => setCloseDateFromNow( closeDateFromNow ) }
-                setDateFrom={(closeDateFrom) => setCloseDateFrom(closeDateFrom)}
-                showNowTo={closeDateToNow}
-                dateTo={closeDateTo}
-                setShowNowTo={(closeDateToNow) => setCloseDateToNow( closeDateToNow ) }
-                setDateTo={(closeDateTo)=> setCloseDateTo(closeDateTo)}
-                />
-
-              {/* Deadline */}
-              <FilterDatePickerInCalendar
-                label="Deadline"
-                minimal
-                showNowFrom={deadlineFromNow}
-                dateFrom={deadlineFrom}
-                setShowNowFrom={(deadlineFromNow)=> setDeadlineFromNow( deadlineFromNow )}
-                setDateFrom={(deadlineFrom)=> setDeadlineFrom( deadlineFrom )}
-                showNowTo={deadlineToNow}
-                dateTo={deadlineTo}
-                setShowNowTo={(deadlineToNow)=> setDeadlineToNow( deadlineToNow )}
-                setDateTo={(deadlineTo)=> setDeadlineTo( deadlineTo )}
-                />
-
-            <div className="sidebar-filter-row">
-              <label htmlFor="example-input-small">Typ práce</label>
-              <div className="flex">
-                <Select
-                  options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypes))}
-                  onChange={(newValue)=> setTaskType(newValue)}
-                  value={taskType}
-                  styles={invisibleSelectStyleOtherFont} />
-              </div>
-            </div>
-
-            <div className="sidebar-filter-row">
-              <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
-              <div className="flex">
-                <Select
-                  options={oneOfOptions}
-                  onChange={(oneOf)=> setOneOf(oneOf)}
-                  value={oneOf}
-                  isMulti
-                  styles={invisibleSelectStyleOtherFont} />
-              </div>
-            </div>
-          </div>
-
+        <button type="button" className="btn-link-reversed m-2" onClick={resetFilter}><i className="fa fa-sync icon-M"/></button>
+        { canModify &&
+          <button type="button" className="btn-link-reversed m-2" onClick={deleteFilterFunc}><i className="far fa-trash-alt icon-M"/></button>
+        }
+        <button type="button" className="btn-link-reversed m-2" onClick={() => close()}><i className="fa fa-times icon-M"/></button>
+      </div>
+      <div>
+        <div className="sidebar-filter-label">
+          Filter name
         </div>
+        <div
+          className=""
+          onClick={() => setEditTitleOpen(true)}
+          >
+          {!editTitleOpen &&
+            <h5 className="sidebar-filter-name">{ title.length !== 0 ? title : 'New filter title' }</h5>
+          }
+          {editTitleOpen &&
+            <Input
+              type="text"
+              className="from-control sidebar-filter-input"
+              placeholder="Enter filter name"
+              autoFocus
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+              }}
+              onBlur={() => setEditTitleOpen(false)}
+              />
+          }
+        </div>
+      </div>
+
+      <div className=" p-r-15 p-l-15 sidebar-filter">
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Zadal</label>
+          <div className="flex">
+            <Select
+              options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(users)}
+              onChange={(newValue)=> {
+                setRequester(newValue);
+              }}
+              value={requester}
+              styles={invisibleSelectStyleOtherFont} />
+          </div>
+        </div>
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Firma</label>
+          <div className="flex">
+            <Select
+              options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companies))}
+              onChange={(comp) => {
+                setCompany(comp);
+              }}
+              value={company}
+              styles={invisibleSelectStyleOtherFont} />
+          </div>
+        </div>
+
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Riesi</label>
+          <div className="flex">
+            <Select
+              options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(users, 'email'))}
+              onChange={(newValue)=> {
+                setAssigned(newValue);
+              }}
+              value={assigned}
+              styles={invisibleSelectStyleOtherFont} />
+          </div>
+        </div>
+
+        <FilterDatePickerInCalendar
+          label="Status date"
+          minimal
+          showNowFrom={statusDateFromNow}
+          dateFrom={statusDateFrom}
+          setShowNowFrom={(statusDateFromNow)=> setStatusDateFromNow(statusDateFromNow)}
+          setDateFrom={(statusDateFrom)=> setStatusDateFrom(statusDateFrom)}
+          showNowTo={statusDateToNow}
+          dateTo={statusDateTo}
+          setShowNowTo={(statusDateToNow)=> setStatusDateToNow(statusDateToNow)}
+          setDateTo={(statusDateTo)=>setStatusDateTo(statusDateTo)}
+          />
+
+        {/* Pending Date */}
+        <FilterDatePickerInCalendar
+          label="Pending date"
+          minimal
+          showNowFrom={pendingDateFromNow}
+          dateFrom={pendingDateFrom}
+          setShowNowFrom={(pendingDateFromNow) => setPendingDateFromNow( pendingDateFromNow )}
+          setDateFrom={(pendingDateFrom)=> setPendingDateFrom(pendingDateFrom)}
+          showNowTo={pendingDateToNow}
+          dateTo={pendingDateTo}
+          setShowNowTo={(pendingDateToNow)=> setPendingDateToNow( pendingDateToNow )}
+          setDateTo={(pendingDateTo)=> setPendingDateTo(pendingDateTo)}
+          />
+
+        {/* Close Date */}
+        <FilterDatePickerInCalendar
+          label="Close date"
+          minimal
+          showNowFrom={closeDateFromNow}
+          dateFrom={closeDateFrom}
+          setShowNowFrom={(closeDateFromNow) => setCloseDateFromNow( closeDateFromNow ) }
+          setDateFrom={(closeDateFrom) => setCloseDateFrom(closeDateFrom)}
+          showNowTo={closeDateToNow}
+          dateTo={closeDateTo}
+          setShowNowTo={(closeDateToNow) => setCloseDateToNow( closeDateToNow ) }
+          setDateTo={(closeDateTo)=> setCloseDateTo(closeDateTo)}
+          />
+
+        {/* Deadline */}
+        <FilterDatePickerInCalendar
+          label="Deadline"
+          minimal
+          showNowFrom={deadlineFromNow}
+          dateFrom={deadlineFrom}
+          setShowNowFrom={(deadlineFromNow)=> setDeadlineFromNow( deadlineFromNow )}
+          setDateFrom={(deadlineFrom)=> setDeadlineFrom( deadlineFrom )}
+          showNowTo={deadlineToNow}
+          dateTo={deadlineTo}
+          setShowNowTo={(deadlineToNow)=> setDeadlineToNow( deadlineToNow )}
+          setDateTo={(deadlineTo)=> setDeadlineTo( deadlineTo )}
+          />
+
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Typ práce</label>
+          <div className="flex">
+            <Select
+              options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypes))}
+              onChange={(newValue)=> setTaskType(newValue)}
+              value={taskType}
+              styles={invisibleSelectStyleOtherFont} />
+          </div>
+        </div>
+
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
+          <div className="flex">
+            <Select
+              options={oneOfOptions}
+              onChange={(oneOf)=> setOneOf(oneOf)}
+              value={oneOf}
+              isMulti
+              styles={invisibleSelectStyleOtherFont} />
+          </div>
+        </div>
+      </div>
+
+    </div>
   )
 }

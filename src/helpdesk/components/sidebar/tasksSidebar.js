@@ -287,6 +287,14 @@ export default function TasksSidebar( props ) {
             }
           </Nav>
         </TabPane>
+        <TabPane tabId={1}>
+          <Filter
+            history={history}
+            close={ () => {
+              setActiveTab(0);
+          }}
+            />
+        </TabPane>
       </TabContent>
       { openProjectAdd &&
         <ProjectAdd

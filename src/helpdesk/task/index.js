@@ -4,171 +4,56 @@ import {
   useMutation,
   useApolloClient
 } from "@apollo/client";
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';
 
 import Loading from 'components/loading';
 
-import ShowData from '../../components/showData';
+import ShowData from 'components/showData';
+
 import {
   timestampToString,
-  orderArr
+  orderArr,
+  splitArrayByFilter
 } from 'helperFunctions';
+
 import {
-  getEmptyFilter
+  getEmptyFilter,
+  getEmptyGeneralFilter
 } from 'configs/constants/filter';
+
+import {
+  allMilestones
+} from 'configs/constants/sidebar';
+
+import {
+  GET_STATUSES,
+  SET_USER_STATUSES
+} from 'helpdesk/settings/statuses/querries';
+
+import {
+  GET_TASKS,
+  DELETE_TASK,
+  GET_MY_DATA,
+} from './querries';
+
+import {
+  GET_FILTER,
+  GET_PROJECT,
+  GET_MILESTONE,
+} from 'apollo/localSchema/querries';
+
+import {
+  setFilter,
+  setProject,
+  setMilestone,
+} from 'apollo/localSchema/actions';
+
 import TaskEdit from './taskEdit';
 import TaskEmpty from './taskEmpty';
 import TaskCalendar from '../calendar';
 //TODO remove and make work
-const filter = () => ( {} );
-const generalFilter = () => ( {} );
-const project = () => ( {} );
-
-const GET_TASKS = gql `
-query tasks($filter: FilterInput, $projectId: Int){
-  tasks (
-    filter: $filter,
-    projectId: $projectId,
-  ){
-		tasks {
-			id
-			title
-			updatedAt
-			createdAt
-			important
-			closeDate
-			overtime
-			pausal
-			pendingChangable
-			statusChange
-			assignedTo {
-				id
-				fullName
-				email
-			}
-			company {
-				id
-				title
-			}
-			createdBy {
-				id
-				name
-				surname
-			}
-			deadline
-			description
-			milestone{
-				id
-				title
-			}
-			pendingDate
-			project{
-				id
-				title
-			}
-			requester{
-				id
-				name
-				surname
-				fullName
-				email
-			}
-			status {
-				id
-				title
-				color
-				action
-			}
-			tags {
-				id
-				title
-			}
-			taskType {
-				id
-				title
-			}
-			repeat {
-				repeatEvery
-				repeatInterval
-				startsAt
-			}
-		}
-    execTime
-    secondaryTimes {
-      time
-      source
-    }
-  }
-}
-`;
-
-const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-		statuses {
-			id
-			title
-			color
-			action
-		}
-		company {
-			id
-			title
-		}
-    role {
-			level
-      accessRights {
-        projects
-        publicFilters
-      }
-    }
-  }
-}
-`;
-
-const LOCAL_CACHE = gql `
-  query getLocalCache {
-    projectName @client
-    filterName @client
-    milestone @client {
-        id
-        title
-        label
-        value
-    }
-  }
-`;
-
-const DELETE_TASK = gql `
-mutation deleteTask($id: Int!) {
-  deleteTask(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
-
-const SET_USER_STATUSES = gql `
-mutation setUserStatuses($ids: [Int]!) {
-  setUserStatuses(
-    ids: $ids
-  ){
-		id
-  }
-}
-`;
-
-const GET_STATUSES = gql `
-query {
-  statuses {
-    title
-    id
-    order
-  }
-}
-`;
 
 export default function TasksIndex( props ) {
   const {
@@ -176,98 +61,130 @@ export default function TasksIndex( props ) {
     match,
     //calendarEvents
   } = props;
+
   const {
-    data,
-    loading
+    data: currentUserData,
+    loading: currentUserLoading
   } = useQuery( GET_MY_DATA );
 
-  let mappedFilter = {
-    ...filter()
-  };
-  mappedFilter.requester = mappedFilter.requester ? mappedFilter.requester.id : null;
-  mappedFilter.assignedTo = mappedFilter.assignedTo ? mappedFilter.assignedTo.id : null;
-  mappedFilter.company = mappedFilter.company ? mappedFilter.company.id : null;
-  delete mappedFilter.__typename;
-
-  /*
-    const {
-      data: tasksData,
-      loading: tasksLoading
-    } = useQuery( GET_TASKS, {
-      variables: {
-        filterId: ( generalFilter() ? generalFilter()
-          .id : null ),
-        filter: mappedFilter,
-        projectId: ( project()
-          .id !== null ? project()
-          .id : null )
-      }
-    } );
-  */
-  const tasksLoading = true;
-  const taskData = {
-    tasks: []
-  };
   const {
-    data: localCache
-  } = useQuery( LOCAL_CACHE );
-  const [ deleteTask ] = useMutation( DELETE_TASK );
-  const [ setUserStatuses ] = useMutation( SET_USER_STATUSES );
+    data: filterData,
+    loading: filterLoading
+  } = useQuery( GET_FILTER );
+
+  const {
+    data: projectData,
+    loading: projectLoading
+  } = useQuery( GET_PROJECT );
+
+  const {
+    data: milestoneData,
+    loading: milestoneLoading
+  } = useQuery( GET_MILESTONE );
+
   const {
     data: statusesData,
     loading: statusesLoading
   } = useQuery( GET_STATUSES );
+
+  const localFilter = filterData.localFilter;
+  const localProject = projectData.localProject;
+  const localMilestone = milestoneData.localMilestone;
+  let queryFilter = {
+    ...localFilter.filter,
+    assignedTo: localFilter.filter.assignedTo === null ? null : localFilter.filter.assignedTo.id,
+    requester: localFilter.filter.requester === null ? null : localFilter.filter.requester.id,
+    company: localFilter.filter.company === null ? null : localFilter.filter.company.id,
+    taskType: localFilter.filter.taskType === null ? null : localFilter.filter.taskType.id,
+  }
+  delete queryFilter.__typename;
+
+  const {
+    data: tasksData,
+    loading: tasksLoading,
+    refetch: tasksRefetch,
+  } = useQuery( GET_TASKS, {
+    variables: {
+      filterId: localFilter.id,
+      filter: queryFilter,
+      projectId: localProject.id
+    },
+    notifyOnNetworkStatusChange: true,
+  } );
+
+  const [ deleteTask, {
+    client
+  } ] = useMutation( DELETE_TASK );
+  const [ setUserStatuses ] = useMutation( SET_USER_STATUSES );
+
+  const dataLoading = (
+    currentUserLoading ||
+    filterLoading ||
+    projectLoading ||
+    milestoneLoading ||
+    tasksLoading ||
+    statusesLoading
+  );
+
+  //sync
+  React.useEffect( () => {
+    tasksRefetch( {
+      variables: {
+        filterId: localFilter.id,
+        filter: queryFilter,
+        projectId: localProject.id
+      }
+    } );
+  }, [ localFilter, localProject.id ] );
+
+  //state
+  const [ markedTasks, setMarkedTasks ] = React.useState( [] );
+
+
+  if ( dataLoading ) {
+    return ( <Loading /> );
+  }
+
+  //constants
+  let link = '';
+  if ( match.params.hasOwnProperty( 'listID' ) ) {
+    link = '/helpdesk/taskList/i/' + match.params.listID;
+  } else {
+    link = '/helpdesk/taskList'
+  }
+
+  const tasks = tasksData.tasks.tasks;
   const statuses = ( statusesLoading || !statusesData ? [] : orderArr( statusesData.statuses ) );
-
-  const currentUser = data ? data.getMyData : {};
-  const client = useApolloClient();
-
-  const [ filterName, setFilterName ] = React.useState( generalFilter ? generalFilter.title : "" );
-  const [ tasks, setTasks ] = React.useState( [] );
-
-  React.useEffect( () => {
-    setFilterName( generalFilter ? generalFilter.title : "" );
-  }, [ match.params.listID ] );
-
-  React.useEffect( () => {
-    if ( !tasksLoading ) {
-      setTasks( tasksData && tasksData.tasks && tasksData.tasks.tasks ? tasksData.tasks.tasks : [] );
-    }
-  }, [ tasksLoading ] );
+  const currentUser = currentUserData.getMyData;
 
   const getBreadcrumsData = () => {
-    return [ {
+    return [
+      {
         type: 'project',
-        show: true,
-        data: localCache ? localCache.projectName : null,
-        label: localCache ? localCache.projectName : 'Invalid project',
+        show: localProject.id === null,
+        data: localProject,
+        label: localProject.title,
         onClick: () => {
-          client.writeData( {
-            data: {
-              milestone: null,
-            }
-          } );
-          filter( getEmptyFilter() );
-          generalFilter( null );
+          setMilestone( allMilestones );
+          setFilter( getEmptyGeneralFilter() );
           history.push( '/helpdesk/taskList/i/all' );
         }
       },
       {
         type: 'milestone',
-        show: true,
-        data: localCache ? localCache.milestone : null,
-        label: localCache && localCache.milestone ? localCache.milestone.label : 'Invalid milestone',
+        show: localProject.id !== null,
+        data: localMilestone,
+        label: localMilestone.title,
         onClick: () => {
-          filter( getEmptyFilter() );
-          generalFilter( null );
+          setFilter( getEmptyGeneralFilter() );
           history.push( '/helpdesk/taskList/i/all' );
         }
       },
       {
         type: 'filter',
         show: true,
-        data: localCache ? localCache.filterName : null,
-        label: localCache ? localCache.filterName : 'Invalid filter',
+        data: localFilter,
+        label: localFilter.title,
         onClick: () => {}
       }
     ]
@@ -329,121 +246,67 @@ export default function TasksIndex( props ) {
 			</li> )
   }
 
-  /*
-  const displayCal = ( task, showEvent ) => {
-    return ( <div style={ showEvent ? { backgroundColor:'#eaf6ff', borderRadius:5 } : {} }>
-					<p className="m-0">
-						{showEvent && <span className="label label-event">
-						Event
-					</span>}
-						<span className="label label-info" style={{backgroundColor:task.status && task.status.color?task.status.color:'white'}}>
-							{task.status?task.status.title:'Neznámy status'}
-						</span>
-						<span className="attribute-label m-l-3">#{task.id} | {task.title}</span>
-					</p>
-					{false &&  <p className="m-0">
-						<span className="m-l-3">
-							<span className="attribute-label">Requested by: </span>
-									{task.requester?(" " + task.requester.fullName):' Neznámy používateľ '}
-						</span>
-						<span className="m-l-3">
-							<span className="attribute-label">	<i className="fa fa-star-of-life" /> </span>
-							{task.createdAt?timestampToString(task.createdAt):'None'}
-						</span>
-						<span className="m-l-3">
-							<span className="attribute-label">From: </span>
-							{task.company ? task.company.title : " Unknown"}
-						</span>
-						<span className="m-l-3">
-							<span className="attribute-label">Deadline: </span>
-							{task.deadline?timestampToString(task.deadline):'None'}
-						</span>
-						<span className="m-l-3">
-							<span className="attribute-label">Assigned: </span>
-							{task.assignedTo?task.assignedTo.reduce((total,user)=>total+=user.fullName+', ','').slice(0,-2):'Neznámy používateľ'}
-						</span>
-					</p>}
-			</div> )
-  }
-  */
-
-  const filterTasks = () => {
-    let newTasks = tasks.map( ( task ) => {
-      return {
-        ...task,
-        viewOnly: getViewOnly( task, task.status, task.project ),
-        checked: task.checked ? task.checked : false,
+  const checkTask = ( id ) => {
+    if ( id === 'all' ) {
+      if ( markedTasks.length === tasks.length ) {
+        setMarkedTasks( [] );
+      } else {
+        setMarkedTasks( tasks.map( ( task ) => task.id ) )
       }
-    } );
-    let filteredTasks = [];
-    if ( localCache ) {
-      filteredTasks = newTasks.filter( ( task ) => {
-        if ( task.project && task.milestone ) {
-          return task.milestone.id === localCache.milestone.id
-        }
-        return true;
-      } );
-    }
-    return filteredTasks;
-  }
-
-  const getViewOnly = ( task, status, project ) => {
-    if ( project === undefined ) {
-      return true;
-    }
-    let permission = {};
-    if ( project.projectRights ) {
-      permission = project.projectRights.find( ( permission ) => permission.user.id === currentUser.id );
-    }
-    return ( ( permission === undefined || !permission.write ) && currentUser.role.level === 0 ) || ( status && status.action === 'Invoiced' );
-  }
-
-  const checkTask = ( id, check ) => {
-    let newTasks = tasks.map( ( task ) => {
-      if ( task.id === id ) {
-        return {
-          ...task,
-          checked: check
-        }
-      } else if ( id === 'all' ) {
-        return {
-          ...task,
-          checked: check
-        }
+    } else {
+      if ( !markedTasks.includes( id ) ) {
+        setMarkedTasks( [ ...markedTasks, id ] );
+      } else {
+        setMarkedTasks( markedTasks.filter( ( taskId ) => taskId !== id ) );
       }
-      return {
-        ...task
-      }
-    } );
-
-    setTasks( newTasks );
+    }
   }
 
   const deleteTaskFunc = () => {
     if ( window.confirm( "Are you sure?" ) ) {
-      let filteredTasks = filterTasks();
-      let tasksToDelete = filteredTasks.filter( task => task.checked );
-      let failedTasks = tasksToDelete.filter( ( task ) => task.viewOnly );
-      tasksToDelete = tasksToDelete.filter( task => !task.viewOnly );
-      let newTasks = tasks.filter( task1 => !tasksToDelete.some( ( task2 ) => task1.id === task2.id ) );
+      let tasksForDelete = tasks.filter( ( task ) => markedTasks.includes( task.id ) );
+      const [ canDeleteTasks, cantDeleteTasks ] = splitArrayByFilter( tasks, ( task ) => currentUser.role.level === 0 || task.project.right.delete );
 
-      tasksToDelete.forEach( task => {
+      canDeleteTasks.map( task => {
         deleteTask( {
             variables: {
               id: task.id,
             }
           } )
-          .then( ( response ) => {} )
+          .then( ( response ) => {
+            const tasksResult = client.readQuery( {
+                query: GET_TASKS,
+                variables: {
+                  filterId: localFilter.id,
+                  filter: queryFilter,
+                  projectId: localProject.id
+                }
+              } )
+              .tasks;
+
+            client.writeQuery( {
+              query: GET_TASKS,
+              data: {
+                tasks: {
+                  ...tasksResult,
+                  tasks: tasksResult.tasks.filter( ( task2 ) => task2.id === task.id )
+                }
+              },
+              variables: {
+                filterId: localFilter.id,
+                filter: queryFilter,
+                projectId: localProject.id
+              }
+            } );
+          } )
           .catch( ( err ) => {
             console.log( err.message );
             console.log( err );
           } );
       } );
 
-      tasks( newTasks );
-
-      if ( failedTasks.length > 0 ) {
-        window.alert( `${tasksToDelete.length} were deleted. Some tasks couln't be deleted. This includes: \n` + failedTasks.reduce( ( acc, task ) => acc + `${task.id} ${task.title} \n`, '' ) )
+      if ( cantDeleteTasks.length > 0 ) {
+        window.alert( `${tasksToDelete.length} were deleted. Some tasks couln't be deleted. This includes: \n` + cantDeleteTasks.reduce( ( acc, task ) => acc + `${task.id} ${task.title} \n`, '' ) )
       }
     }
   }
@@ -526,24 +389,14 @@ export default function TasksIndex( props ) {
     }).map((task)=>({...task,end: task.status.action !== 'pendingOLD' ? task.start : task.end }))*/
   }
 
-  const dataLoading = loading || tasksLoading;
-
-  if ( dataLoading ) {
-    return ( <Loading /> );
-  }
-
-  let link = '';
-  if ( match.params.hasOwnProperty( 'listID' ) ) {
-    link = '/helpdesk/taskList/i/' + match.params.listID;
-  } else {
-    link = '/helpdesk/taskList'
-  }
   return (
       <ShowData
-			data={filterTasks()}
+			data={tasks.map((task) => ({
+        ...task,
+        checked: markedTasks.includes(task.id)
+      }) )}
 			filterBy={[
 				{value:'assignedTo',type:'list',func:((total,user)=>total+=user.email+' '+user.fullName+' ')},
-				//		{value:'tags',type:'list',func:((cur,item)=>cur+item.title+' ')},
 				{value:'statusChange',type:'date'},
 				{value:'createdAt',type:'date'},
 				{value:'requester',type:'user'},
@@ -601,7 +454,7 @@ export default function TasksIndex( props ) {
 			listID={match.params.listID}
 			match={match}
 			isTask={true}
-			listName={filterName}
+			listName={localFilter.title}
 			Edit={TaskEdit}
 			Empty={TaskEmpty}
 			useBreadcrums={true}

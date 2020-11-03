@@ -1,15 +1,79 @@
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';
 
 export const GET_MY_PROJECTS = gql `
 query {
   myProjects {
     project {
-      title
       id
-      updatedAt
+      title
+      lockedRequester
       milestones {
         id
         title
+      }
+      def {
+  			assignedTo {
+  				def
+  				fixed
+  				show
+  				value {
+  					id
+  				}
+  			}
+  			company {
+  				def
+  				fixed
+  				show
+  				value {
+  					id
+  				}
+  			}
+  			overtime {
+  				def
+  				fixed
+  				show
+  				value
+  			}
+  			pausal {
+  				def
+  				fixed
+  				show
+  				value
+  			}
+  			requester {
+  				def
+  				fixed
+  				show
+  				value {
+  					id
+  				}
+  			}
+  			status {
+  				def
+  				fixed
+  				show
+  				value {
+  					id
+  				}
+  			}
+  			tag {
+  				def
+  				fixed
+  				show
+  				value {
+  					id
+  				}
+  			}
+  			taskType {
+  				def
+  				fixed
+  				show
+  				value {
+  					id
+  				}
+  			}
       }
     }
     right {
@@ -18,6 +82,9 @@ query {
 			delete
 			internal
 			admin
+    }
+    usersWithRights {
+      id
     }
   }
 }

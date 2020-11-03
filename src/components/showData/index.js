@@ -3,7 +3,9 @@ import {
   useQuery,
   //useApolloClient
 } from "@apollo/client";
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 
 import TaskCol from './taskCol';
 import TaskList from './taskList';
@@ -76,7 +78,7 @@ export default function ShowDataContainer( props ) {
     data: localCache
   } = useQuery( LOCAL_CACHE );
 
-  const tasklistLayout = userData ? userData.getMyData.tasklistLayout : 0;
+  const tasklistLayout = 1;
 
   const search = ( localCache ? localCache.search : "" );
 
@@ -204,7 +206,7 @@ export default function ShowDataContainer( props ) {
 					)}
 
 
-					{tasklistLayout === 1 && localCache.showDataFilter.name === listName && (
+					{tasklistLayout === 1 && (
 						<div className='col-xl-12'>
 							{itemID && <this.props.edit match={match} columns={false} history={history} />}
 							{!itemID &&

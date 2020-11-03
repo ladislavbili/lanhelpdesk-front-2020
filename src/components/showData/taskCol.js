@@ -4,11 +4,25 @@ import CommandBar from './commandBar';
 import ListHeader from './listHeader';
 import classnames from "classnames";
 
-export default function ColumnDisplay(props) {
-	const {match, history, commandBar, listName, Empty, data, itemID, link, displayCol, setStatuses, statuses, allStatuses, Edit} = props;
-
-	return (
-		<div>
+export default function ColumnDisplay( props ) {
+  const {
+    match,
+    history,
+    commandBar,
+    listName,
+    Empty,
+    data,
+    itemID,
+    link,
+    displayCol,
+    setStatuses,
+    statuses,
+    allStatuses,
+    Edit
+  } = props;
+  console.log( data );
+  return (
+    <div>
 			<CommandBar {...commandBar} listName={listName} />
 			<ListHeader multiselect={false} greyBackground={true} {...commandBar} listName={listName} statuses={statuses} setStatuses={setStatuses} allStatuses={allStatuses} />
 
@@ -49,5 +63,5 @@ export default function ColumnDisplay(props) {
 
 			</div>
 		</div>
-	);
+  );
 }

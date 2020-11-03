@@ -73,7 +73,7 @@ export const getEmptyGeneralFilter = () => ( {
   id: null,
   project: null,
   pub: false,
-  title: "No filter",
+  title: "",
   filter: getEmptyFilter(),
   roles: null,
 } )

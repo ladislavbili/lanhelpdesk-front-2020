@@ -1,4 +1,42 @@
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
+
+export const GET_COMPANIES = gql `
+query {
+  companies {
+    title
+    id
+    monthly
+  }
+}
+`;
+
+export const GET_BASIC_COMPANIES = gql `
+query {
+  basicCompanies {
+    id
+    title
+    dph
+    monthly
+    pricelist {
+      id
+      title
+      materialMargin
+      prices {
+        type
+        price
+        taskType {
+          id
+        }
+        tripType {
+          id
+        }
+      }
+    }
+  }
+}
+`;
 
 export const ADD_COMPANY = gql `
 mutation addCompany($title: String!, $dph: Int!, $ico: String!, $dic: String!, $ic_dph: String!, $country: String!, $city: String!, $street: String!, $zip: String!, $email: String!, $phone: String!, $description: String!, $pricelistId: Int!, $monthly: Boolean!, $monthlyPausal: Float!, $taskWorkPausal: Float!, $taskTripPausal: Float!, $rents: [CompanyRentCreateInput]!) {
@@ -44,25 +82,6 @@ mutation addCompany($title: String!, $dph: Int!, $ico: String!, $dic: String!, $
         }
       }
     }
-  }
-}
-`;
-
-export const GET_COMPANIES = gql `
-query {
-  companies {
-    title
-    id
-    monthly
-  }
-}
-`;
-
-export const GET_BASIC_COMPANIES = gql `
-query {
-  basicCompanies {
-    title
-    id
   }
 }
 `;

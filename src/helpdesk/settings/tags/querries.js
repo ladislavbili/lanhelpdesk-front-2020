@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';
 
 export const GET_TAGS = gql `
 query {
@@ -6,6 +8,7 @@ query {
     title
     id
     order
+    color
   }
 }
 `;

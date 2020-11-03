@@ -1,10 +1,9 @@
 import React from 'react';
 import {
   useQuery,
-  useApolloClient
+  gql
 }
 from "@apollo/client";
-import { gql } from '@apollo/client';;
 import {
   Modal,
   ModalBody
@@ -19,130 +18,21 @@ import ListHeader from './listHeader';
 import Checkbox from '../checkbox';
 
 import MultipleTaskEdit from '../../helpdesk/task/multipleTaskEdit';
-/*
+
+
 import {
-  filterName,
-  filter
-}
-from 'localCache';
-*/
-/*
-const GET_MY_DATA = gql `
-query {
-  getMyData{
-		fullName
-  }
-}
-`;
-*/
-const LOCAL_CACHE = gql `
-  query getLocalCache {
-    project @client
-    milestone @client
-    generalFilter @client {
-      id
-      createdAt
-      updatedAt
-      createdBy {
-        id
-        email
-      }
-      title
-      pub
-      global
-      dashboard
-      order
-      filter {
-        assignedToCur
-        assignedTo {
-          id
-          email
-        }
-        requesterCur
-        requester {
-          id
-          email
-        }
-        companyCur
-        company {
-          id
-          title
-        }
-        taskType {
-          id
-          title
-        }
-        oneOf
-        updatedAt
+  GET_TASKS_ATTRIBUTES_FILTER,
+} from 'apollo/localSchema/querries';
 
-        statusDateFrom
-        statusDateFromNow
-        statusDateTo
-        statusDateToNow
-        pendingDateFrom
-        pendingDateFromNow
-        pendingDateTo
-        pendingDateToNow
-        closeDateFrom
-        closeDateFromNow
-        closeDateTo
-        closeDateToNow
-        deadlineFrom
-        deadlineFromNow
-        deadlineTo
-        deadlineToNow
-      }
-      roles {
-        id
-        title
-      }
-      project {
-        id
-        title
-      }
-    }
-    filter @client {
-      assignedToCur
-      assignedTo {
-        id
-        email
-      }
-      requesterCur
-      requester {
-        id
-        email
-      }
-      companyCur
-      company {
-        id
-        title
-      }
-      taskType {
-        id
-        title
-      }
-      oneOf
-      updatedAt
+import {
+  setTasksAttributeFilter,
+  setTasksAttributesFilter,
+} from 'apollo/localSchema/actions';
 
-      statusDateFrom
-      statusDateFromNow
-      statusDateTo
-      statusDateToNow
-      pendingDateFrom
-      pendingDateFromNow
-      pendingDateTo
-      pendingDateToNow
-      closeDateFrom
-      closeDateFromNow
-      closeDateTo
-      closeDateToNow
-      deadlineFrom
-      deadlineFromNow
-      deadlineTo
-      deadlineToNow
-    }
-  }
-`;
+import {
+  defaultTasksAttributesFilter
+} from 'configs/constants/tasks';
+
 
 export default function List( props ) {
   const {
@@ -158,37 +48,21 @@ export default function List( props ) {
     deleteTask,
     checkTask
   } = props;
-  const [ checkedAll, setCheckedAll ] = React.useState( false );
   const [ editOpen, setEditOpen ] = React.useState( false );
+
   const {
-    data: localCache
-  } = useQuery( LOCAL_CACHE );
+    data: tasksFilterData
+  } = useQuery( GET_TASKS_ATTRIBUTES_FILTER );
 
   const currentUser = data ? data.getMyData : {};
-  //const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
-
-  const client = useApolloClient();
 
   const clearFilter = () => {
     if ( window.confirm( "Are you sure you want to clear the filter?" ) ) {
-      client.writeData( {
-        data: {
-          showDataFilter: {
-            id: "",
-            title: "",
-            status: "",
-            requester: "",
-            company: "",
-            assignedTo: "",
-            createdAt: "",
-            deadline: "",
-          }
-        }
-      } );
+      setTasksAttributesFilter( defaultTasksAttributesFilter );
     }
   }
+  const filter = tasksFilterData.tasksAttributesFilter;
 
-  //	const selectedFilter = showDataFilter();
   return (
     <div>
 				<CommandBar {...commandBar} listName={listName}/>
@@ -252,14 +126,14 @@ export default function List( props ) {
 												return <th key={display.value} colSpan={'1'} >
 													<Checkbox
 														className = "m-l-7 m-t-3 p-l-0"
-														value = { checkedAll }
+														value = { data.every((item) => item.checked ) }
 														label = ""
-														onChange={(e)=> {checkTask('all', e.target.checked); setCheckedAll(!checkedAll) }}
+														onChange={ (e) => checkTask('all', e.target.checked) }
 														highlighted={false}
 														/>
 												</th>
 											}else {
-												const value = (localCache.showDataFilter[display.value] === "cur" ? currentUser().fullName : localCache.showDataFilter[display.value]);
+												const value = (filter[display.value] === "cur" ? currentUser().fullName : filter[display.value]);
 												return <th key={display.value} colSpan={((index===0 || index ===1 || displayValues[index-1].type!=='important') )?'1':'2'} >
 													<div className={(display.value === "deadline" ? "row" : "")}>
 
@@ -270,10 +144,9 @@ export default function List( props ) {
 																className="form-control hidden-input"
 																style={{fontSize: "12px", marginRight: "10px"}}
 																onChange={(e) => {
-																	let newShowDataFilter = {...localCache.showDataFilter};
-																	newShowDataFilter[display.value] = e.target.value;
-																	client.writeData({ data: { showDataFilter: newShowDataFilter } });
-																}}/>
+                                  setTasksAttributeFilter(display.value, e.target.value);
+																}}
+                                />
 															</div>
 													{display.value === "deadline" &&
 														<div>
@@ -318,7 +191,7 @@ export default function List( props ) {
 														if(display.value === 'checked'){
 															return true;
 														}
-														let result = value.toString().toLowerCase().includes(localCache.showDataFilter[display.value].toLowerCase());
+														let result = value.toString().toLowerCase().includes(filter[display.value].toLowerCase());
 														return result;
 													});
 									}).map((item)=>

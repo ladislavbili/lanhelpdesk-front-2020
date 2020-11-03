@@ -15,7 +15,8 @@ export {
   orderArr,
   sortBy,
   arraySelectToString,
-  filterUnique
+  filterUnique,
+  splitArrayByFilter,
 }
 from './arrayManipulations';
 
@@ -62,6 +63,7 @@ from './showData';
 
 export {
   fromObjectToState,
+  setDefaultFromObject
 }
 from './reactFunctions';
 

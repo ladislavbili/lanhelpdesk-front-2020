@@ -49,7 +49,6 @@ export default function TaskAdd( props ) {
   const {
     match,
     loading,
-    newID,
     projectID,
     currentUser,
     projects,
@@ -60,10 +59,10 @@ export default function TaskAdd( props ) {
     milestones,
     companies,
     statuses,
-    units,
     defaultUnit,
     closeModal
   } = props;
+  console.log( currentUser );
   const [ addTask ] = useMutation( ADD_TASK );
 
   //state
@@ -103,7 +102,16 @@ export default function TaskAdd( props ) {
     return counter++;
   }
 
-  const userRights = project ? project.projectRights.find( r => r.user.id === currentUser.id ) : false;
+  const userRights = (
+    project ?
+    project.right : {
+      admin: false,
+      delete: false,
+      internal: false,
+      read: false,
+      write: false
+    }
+  );
 
   const [ viewOnly, setViewOnly ] = React.useState( currentUser.role.level !== 0 && !userRights.write );
 
@@ -127,16 +135,14 @@ export default function TaskAdd( props ) {
 
     let maybeRequester = null;
     if ( users ) {
-      if ( pro.lockedRequester && pro.projectRights.some( ( right ) => right.user.id === currentUser.id ) ) {
+      if ( pro.lockedRequester ) {
         users.find( ( user ) => user.id === currentUser.id );
       } else {
         users.find( ( user ) => user.id === currentUser.id );
       }
     }
 
-    let permissionIDs = project ? project.projectRights.map( ( permission ) => permission.user.id ) : [];
-
-    let filterredAssignedTo = assignedTo.filter( ( user ) => permissionIDs.includes( user.id ) );
+    let filterredAssignedTo = assignedTo.filter( ( user ) => project && project.users.includes( user.id ) );
     let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.includes( item.id ) ) : filterredAssignedTo;
     setAssignedTo( newAssignedTo );
 
@@ -164,9 +170,7 @@ export default function TaskAdd( props ) {
     setPausal( newPausal );
 
     setProject( pro );
-
-    const userRights = pro.projectRights.find( r => r.user.id === currentUser.id );
-    setViewOnly( currentUser.role.level !== 0 && !userRights.write );
+    setViewOnly( currentUser.role.level !== 0 && !pro.right.write );
 
     setDefaultFields( def );
   }
@@ -323,7 +327,7 @@ export default function TaskAdd( props ) {
     );
   }
 
-  const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.projectRights.some( ( r ) => r.user.id === user.id ) );
+  const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
   const REQUESTERS = ( project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users );
 
   const renderSelectsLayout1 = () => {
@@ -340,8 +344,8 @@ export default function TaskAdd( props ) {
 								setProject(project);
 								setMilestone(noMilestone);
 								setPausal(booleanSelects[0]);
-								const userRights = project.projectRights.find(r => r.user.id === currentUser.id);
-								setViewOnly(currentUser.role.level !== 0 && !userRights.write);
+                const viewOnly = currentUser.role.level !== 0 && !project.right.write;
+								setViewOnly(viewOnly);
 
 								if(viewOnly){
 										setRepeat(null);
@@ -358,13 +362,7 @@ export default function TaskAdd( props ) {
 
 								setDefaults(project.id, true);
 							}}
-							options={projects.filter((project)=>{
-								if (currentUser.role.level === 0){
-									return true;
-								}
-								let permission = project.projectRights.find((permission)=>permission.user.id === currentUser.id);
-								return permission && permission.read;
-							})}
+							options={projects}
 							styles={invisibleSelectStyleNoArrow}
 							/>
 					</div>
@@ -384,13 +382,11 @@ export default function TaskAdd( props ) {
 								onChange={(project)=>{
 									setProject(project);
 									setMilestone(noMilestone);
-
-									let permissionIDs = project.projectRights.map((permission) => permission.user.id);
-									let newAssignedTo = assignedTo.filter((user)=>permissionIDs.includes(user.id));
+									let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
 									setAssignedTo(newAssignedTo);
 
-									const userRights = project.projectRights.find(r => r.user.id === currentUser.id);
-									setViewOnly(currentUser.role.level !== 0 && !userRights.write);
+                  const viewOnly = currentUser.role.level !== 0 && !project.right.write;
+  								setViewOnly(viewOnly);
 
 									if(viewOnly){
 											setRepeat(null);
@@ -406,13 +402,7 @@ export default function TaskAdd( props ) {
 									}
 									setDefaults(project.id, true);
 								}}
-								options={projects.filter((project)=>{
-									if (currentUser.role.level === 0){
-										return true;
-									}
-									let permission = project.projectRights.find((permission)=>permission.user.id === currentUser.id);
-									return permission && permission.read;
-								})}
+								options={projects}
 								styles={invisibleSelectStyleNoArrowRequired}
 								/>
 						</div>
@@ -543,7 +533,7 @@ export default function TaskAdd( props ) {
   								isDisabled={defaultFields.company.fixed || viewOnly}
   								onChange={(company)=> {
   									setCompany(company);
-  									setPausal(company.taskWorkPausal > 0 ? booleanSelects[1] : booleanSelects[0]);
+  									setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
   								}}
   								options={companies}
   								styles={invisibleSelectStyleNoArrowRequired}
@@ -559,7 +549,7 @@ export default function TaskAdd( props ) {
 								<Select
 									value={pausal}
 									placeholder="Select required"
-									isDisabled={viewOnly || !company || company.taskWorkPausal ===0 || defaultFields.pausal.fixed}
+									isDisabled={viewOnly || !company || company.monthly || defaultFields.pausal.fixed}
 									styles={invisibleSelectStyleNoArrowRequired}
 									onChange={(pausal)=> setPausal(pausal)}
 									options={booleanSelects}
@@ -635,8 +625,8 @@ export default function TaskAdd( props ) {
 									setProject(project);
 									setMilestone(noMilestone);
 									setPausal(booleanSelects[0]);
-									const userRights = project.projectRights.find(r => r.user.id === currentUser.id);
-									setViewOnly(currentUser.role.level !== 0 && !userRights.write);
+                  const viewOnly = currentUser.role.level !== 0 && !project.right.write;
+  								setViewOnly(viewOnly);
 
 									if(viewOnly){
 										setRepeat(null);
@@ -653,13 +643,7 @@ export default function TaskAdd( props ) {
 
 									setDefaults(project.id, true);
 								}}
-								options={projects.filter((project)=>{
-									if (currentUser.role.level === 0){
-										return true;
-									}
-									let permission = project.projectRights.find((permission)=>permission.user.id === currentUser.id);
-									return permission && permission.read;
-								})}
+								options={projects}
 								styles={invisibleSelectStyleNoArrow}
 								/>
 						</div>
@@ -677,12 +661,11 @@ export default function TaskAdd( props ) {
 									setProject(project);
 									setMilestone(noMilestone);
 
-									let permissionIDs = project.projectRights.map((permission) => permission.user.id);
-									let newAssignedTo = assignedTo.filter((user)=>permissionIDs.includes(user.id));
+									let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
 									setAssignedTo(newAssignedTo);
 
-									const userRights = project.projectRights.find(r => r.user.id === currentUser.id);
-									setViewOnly(currentUser.role.level !== 0 && !userRights.write);
+                  const viewOnly = currentUser.role.level !== 0 && !project.right.write;
+  								setViewOnly(viewOnly);
 
 									if(viewOnly){
 											setRepeat(null);
@@ -697,13 +680,7 @@ export default function TaskAdd( props ) {
 									}
 									setDefaults(project.id, true);
 								}}
-								options={projects.filter((project)=>{
-									if (currentUser.role.level === 0){
-										return true;
-									}
-									let permission = project.projectRights.find((permission)=>permission.user.id === currentUser.id);
-									return permission && permission.read;
-								})}
+								options={projects}
 								styles={invisibleSelectStyleNoArrowRequired}
 								/>
 						</div>
@@ -845,7 +822,7 @@ export default function TaskAdd( props ) {
   								isDisabled={defaultFields.company.fixed || viewOnly}
   								onChange={(company)=> {
   									setCompany(company);
-  									setPausal(company.taskWorkPausal > 0 ? booleanSelects[1] : booleanSelects[0]);
+  									setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
   								}}
   								options={companies}
 									styles={invisibleSelectStyleNoArrowRequired}
@@ -861,7 +838,7 @@ export default function TaskAdd( props ) {
 								<Select
 									value={pausal}
 									placeholder="Select required"
-									isDisabled={viewOnly || !company || company.taskWorkPausal ===0 || defaultFields.pausal.fixed}
+									isDisabled={viewOnly || !company || company.monthly || defaultFields.pausal.fixed}
 									styles={invisibleSelectStyleNoArrowRequired}
 									onChange={(pausal)=> setPausal(pausal)}
 									options={booleanSelects}
@@ -1099,7 +1076,7 @@ export default function TaskAdd( props ) {
 						setCustomItems(newCustomItems);
 					}}
 
-					units={units}
+					units={[]}
 					defaultUnit={defaultUnit}
 					/>
     )
@@ -1113,7 +1090,7 @@ export default function TaskAdd( props ) {
 				}
 				<button
 					className="btn pull-right"
-					disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading || newID===null}
+					disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
 					onClick={addTaskFunc}
 					> Create task
 				</button>
