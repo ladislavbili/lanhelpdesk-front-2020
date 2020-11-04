@@ -13,27 +13,41 @@ import {
   selectStyle
 } from 'configs/components/select';
 
-import { months } from './constants';
+import {
+  months
+} from 'configs/constants/reports';
 
 var years = [];
-for (let i = moment().year(); i >= 2000; i--) {
-  years.push({value:i,label:i});
+for ( let i = moment()
+    .year(); i >= 2000; i-- ) {
+  years.push( {
+    value: i,
+    label: i
+  } );
 }
 
-export default function MonthSelector ( props ) {
+export default function MonthSelector( props ) {
   const {
     fromDate,
     onChangeFromDate,
     toDate,
     onChangeToDate,
-    year,
-    onChangeYear,
-    month,
-    onChangeMonth,
     onTrigger,
     blockedShow
   } = props;
-  
+
+
+  const [ year, setYear ] = React.useState( {
+    label: moment()
+      .year(),
+    value: moment()
+      .year()
+  } );
+  const [ month, setMonth ] = React.useState(
+    months[ moment()
+      .month() ]
+  );
+
   return (
     <div className="p-20">
       <FormGroup>
@@ -42,7 +56,9 @@ export default function MonthSelector ( props ) {
           <div className="w-50 p-r-20">
             <Select
               value={month}
-              onChange={(e)=> onChangeMonth(e)}
+              onChange={(mn) => {
+                setMonth(mn);
+              }}
               options={months}
               styles={selectStyle}
               />
@@ -50,7 +66,9 @@ export default function MonthSelector ( props ) {
           <div className="w-50 p-r-20">
             <Select
               value={year}
-              onChange={(e)=> onChangeYear(e)}
+              onChange={(yr) => {
+                setYear(yr);
+              }}
               options={years}
               styles={selectStyle}
               />
@@ -71,7 +89,8 @@ export default function MonthSelector ( props ) {
               onChangeFromDate(firstDay);
               onChangeToDate(lastDay);
               onTrigger(firstDay, lastDay);
-            }}>
+            }}
+            >
             Show
           </Button>
         </div>
@@ -106,17 +125,18 @@ export default function MonthSelector ( props ) {
             disabled={
               blockedShow ||
               ( fromDate !== null &&
-              toDate !== null &&
-              ( fromDate.valueOf() > toDate.valueOf() ) )
-             }
-            className="btn-primary flex"
-            onClick={()=>{
-              onTrigger();
-            }}>
-            Show
-          </Button>
-        </div>
-      </FormGroup>
-    </div>
+                toDate !== null &&
+                ( fromDate.valueOf() > toDate.valueOf() ) )
+              }
+              className="btn-primary flex"
+              onClick={()=>{
+                onTrigger();
+              }}
+              >
+              Show
+            </Button>
+          </div>
+        </FormGroup>
+      </div>
   );
 }

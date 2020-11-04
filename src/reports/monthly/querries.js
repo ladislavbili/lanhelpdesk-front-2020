@@ -1,8 +1,8 @@
 import {
-	gql
+  gql
 } from "@apollo/client";
 
-export const GET_INVOICE_COMPANIES = gql`
+export const GET_INVOICE_COMPANIES = gql `
 query getInvoiceCompanies(
   $fromDate: String!,
   $toDate: String!,
@@ -26,7 +26,7 @@ query getInvoiceCompanies(
 }
 `;
 
-export const GET_COMPANY_INVOICE_DATA = gql`
+export const GET_COMPANY_INVOICE_DATA = gql `
 query getCompanyInvoiceData(
   $fromDate: String!,
   $toDate: String!,
@@ -263,7 +263,7 @@ query getCompanyInvoiceData(
 }
 `;
 
-export const CREATE_TASK_INVOICE = gql`
+export const CREATE_TASK_INVOICE = gql `
 mutation createTaskInvoice(
   $fromDate: String!,
   $toDate: String!,
@@ -278,27 +278,5 @@ mutation createTaskInvoice(
 			companyId: $companyId,
 			title: $title
     )
-}
-`;
-
-export const GET_STATUSES = gql `
-query {
-  statuses {
-    title
-    id
-    action
-    order
-    color
-  }
-}
-`;
-
-export const GET_LOCAL_CACHE = gql `
-query getLocalCache {
-  reportsYear @client
-  reportsMonth @client
-  reportsToDate @client
-  reportsFromDate @client
-  reportsChosenStatuses @client
 }
 `;

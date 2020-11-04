@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 
 export const GET_STATUSES = gql `
 query {
@@ -6,6 +8,18 @@ query {
     title
     id
     order
+  }
+}
+`;
+
+export const GET_STATUSES_EXPANDED = gql `
+query {
+  statuses {
+    title
+    id
+    action
+    order
+    color
   }
 }
 `;

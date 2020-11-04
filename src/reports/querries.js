@@ -1,8 +1,8 @@
 import {
-	gql
+  gql
 } from "@apollo/client";
 
-export const GET_MY_SETTINGS = gql`
+export const GET_MY_DATA = gql `
 query {
   getMyData{
     role {
