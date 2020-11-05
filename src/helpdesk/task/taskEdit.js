@@ -4,7 +4,9 @@ import {
   useQuery,
   useLazyQuery
 } from "@apollo/client";
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 
 import Select from 'react-select';
 import {
@@ -36,8 +38,6 @@ import VykazyTable from '../components/vykazyTable';
 import UserAdd from '../settings/users/userAdd';
 import CompanyAdd from '../settings/companies/companyAdd';
 
-import Loading from 'components/loading';
-
 import TaskAdd from './taskAddContainer';
 import TaskPrint from './taskPrint';
 import classnames from "classnames";
@@ -65,691 +65,22 @@ import {
   noDef
 } from 'configs/constants/projects';
 
-const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    role {
-			level
-      accessRights {
-				viewInternal
-        projects
-        publicFilters
-      }
-    }
-  }
-}
-`;
-
-const GET_TASK = gql `
-query task($id: Int!){
-	task(
-		id: $id
-	)  {
-		id
-		important
-		title
-		updatedAt
-		createdAt
-		closeDate
-		assignedTo {
-			id
-			name
-			surname
-			email
-		}
-		company {
-			id
-			title
-      dph
-      usedTripPausal
-      usedSubtaskPausal
-      taskWorkPausal
-      taskTripPausal
-      monthly
-      monthlyPausal
-      pricelist {
-        id
-        title
-        materialMargin
-        prices {
-          type
-          price
-          taskType {
-            id
-          }
-          tripType {
-            id
-          }
-        }
-      }
-		}
-		createdBy {
-			id
-			name
-			surname
-		}
-		deadline
-		description
-		milestone{
-			id
-			title
-		}
-		pendingDate
-		project{
-			id
-			title
-      milestones{
-        id
-        title
-      }
-	    lockedRequester
-	    projectRights {
-				read
-				write
-				delete
-				internal
-				admin
-				user {
-					id
-				}
-			}
-	    def {
-				assignedTo {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				company {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				overtime {
-					def
-					fixed
-					show
-					value
-				}
-				pausal {
-					def
-					fixed
-					show
-					value
-				}
-				requester {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				status {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				tag {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				taskType {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-	    }
-		}
-		requester{
-			id
-			name
-			surname
-		}
-		status {
-			id
-			title
-			color
-			action
-		}
-		tags {
-			id
-			title
-			color
-		}
-		taskType {
-			id
-			title
-		}
-		repeat {
-			repeatEvery
-			repeatInterval
-			startsAt
-		}
-		subtasks {
-			id
-			title
-			order
-			done
-			quantity
-			discount
-			type {
-				id
-				title
-			}
-			assignedTo {
-				id
-				email
-				company {
-					id
-				}
-			}
-		}
-		workTrips {
-			id
-			order
-			done
-			quantity
-			discount
-			type {
-				id
-				title
-			}
-			assignedTo {
-				id
-				email
-				company {
-					id
-				}
-			}
-		}
-		materials {
-			id
-			title
-			order
-			done
-			quantity
-			margin
-			price
-		}
-		customItems {
-			id
-			title
-			order
-			done
-			quantity
-			price
-		}
-		comments {
-      id
-      createdAt
-      message
-      childComments {
-        id
-        createdAt
-        message
-        user{
-          id
-          fullName
-          email
-        }
-      }
-		}
-	}
-}
-`;
-/*
-internal
-user {
-  id
-  fullName
-  email
-}
-parentCommentId*/
-
-const UPDATE_TASK = gql `
-mutation updateTask($id: Int!, $important: Boolean, $title: String, $closeDate: String, $assignedTo: [Int], $company: Int, $deadline: String, $description: String, $milestone: Int, $overtime: Boolean, $pausal: Boolean, $pendingChangable: Boolean, $pendingDate: String, $project: Int, $requester: Int, $status: Int, $tags: [Int], $taskType: Int, $repeat: RepeatInput ) {
-  updateTask(
-		id: $id,
-		important: $important,
-    title: $title,
-    closeDate: $closeDate,
-    assignedTo: $assignedTo,
-    company: $company,
-    deadline: $deadline,
-    description: $description,
-    milestone: $milestone,
-    overtime: $overtime,
-    pausal: $pausal,
-    pendingChangable: $pendingChangable,
-    pendingDate: $pendingDate,
-    project: $project,
-    requester: $requester,
-    status: $status,
-    tags: $tags,
-    taskType: $taskType,
-    repeat: $repeat,
-  ){
-    id
-    title
-  }
-}
-`;
-
-export const DELETE_TASK = gql `
-mutation deleteTask($id: Int!) {
-  deleteTask(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
-
-
-export const UPDATE_PROJECT_RIGHTS = gql `
-mutation updateProject($id: Int!, $projectRights: [ProjectRightInput]) {
-  updateProject(
-		id: $id,
-    projectRights: $projectRights,
-  ){
-		title
-    id
-    lockedRequester
-    milestones{
-      id
-      title
-    }
-    projectRights {
-			read
-			write
-			delete
-			internal
-			admin
-			user {
-				id
-			}
-		}
-    def {
-			assignedTo {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			company {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			overtime {
-				def
-				fixed
-				show
-				value
-			}
-			pausal {
-				def
-				fixed
-				show
-				value
-			}
-			requester {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			status {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			tag {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			taskType {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-    }
-  }
-}
-`;
-
-const ADD_SUBTASK = gql `
-mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
-  addSubtask(
-    title: $title,
-		order: $order,
-		done: $done,
-		quantity: $quantity,
-		discount: $discount,
-		type: $type,
-		task: $task,
-		assignedTo: $assignedTo,
-  ){
-    id
-  }
-}
-`;
-
-const UPDATE_SUBTASK = gql `
-mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
-  updateSubtask(
-		id: $id,
-    title: $title,
-		order: $order,
-		done: $done,
-		quantity: $quantity,
-		discount: $discount,
-		type: $type,
-		assignedTo: $assignedTo,
-  ){
-    id
-    title
-  }
-}
-`;
-
-export const DELETE_SUBTASK = gql `
-mutation deleteSubtask($id: Int!) {
-  deleteSubtask(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
-
-
-const ADD_WORKTRIP = gql `
-mutation addWorkTrip($order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
-  addWorkTrip(
-		order: $order,
-		done: $done,
-		quantity: $quantity,
-		discount: $discount,
-		type: $type,
-		task: $task,
-		assignedTo: $assignedTo,
-  ){
-    id
-  }
-}
-`;
-
-const UPDATE_WORKTRIP = gql `
-mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
-  updateWorkTrip(
-		id: $id,
-		order: $order,
-		done: $done,
-		quantity: $quantity,
-		discount: $discount,
-		type: $type,
-		assignedTo: $assignedTo,
-  ){
-    id
-  }
-}
-`;
-
-export const DELETE_WORKTRIP = gql `
-mutation deleteWorkTrip($id: Int!) {
-  deleteWorkTrip(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
-
-const ADD_MATERIAL = gql `
-mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $margin: Float!, $price: Float!, $task: Int!) {
-  addMaterial(
-    title: $title,
-		order: $order,
-		done: $done,
-		quantity: $quantity,
-		margin: $margin,
-		price: $price,
-		task: $task,
-  ){
-    id
-  }
-}
-`;
-
-const UPDATE_MATERIAL = gql `
-mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $margin: Float, $price: Float) {
-  updateMaterial(
-		id: $id,
-    title: $title,
-		order: $order,
-		done: $done,
-		quantity: $quantity,
-		margin: $margin,
-		price: $price,
-  ){
-    id
-    title
-  }
-}
-`;
-
-export const DELETE_MATERIAL = gql `
-mutation deleteMaterial($id: Int!) {
-  deleteMaterial(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
-
-
-const ADD_CUSTOM_ITEM = gql `
-mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $price: Float!, $task: Int!) {
-  addCustomItem(
-    title: $title,
-		order: $order,
-		done: $done,
-		quantity: $quantity,
-		price: $price,
-		task: $task,
-  ){
-    id
-  }
-}
-`;
-
-const UPDATE_CUSTOM_ITEM = gql `
-mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $price: Float) {
-  updateCustomItem(
-		id: $id,
-    title: $title,
-		order: $order,
-		done: $done,
-		quantity: $quantity,
-		price: $price,
-  ){
-    id
-    title
-  }
-}
-`;
-
-export const DELETE_CUSTOM_ITEM = gql `
-mutation deleteCustomItem($id: Int!) {
-  deleteCustomItem(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
-
-const GET_PROJECTS = gql `
-query {
-  projects {
-		id
-		title
-		milestones{
-			id
-			title
-		}
-		lockedRequester
-		projectRights {
-			read
-			write
-			delete
-			internal
-			admin
-			user {
-				id
-				fullName
-				email
-			}
-		}
-		def {
-			assignedTo {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			company {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			overtime {
-				def
-				fixed
-				show
-				value
-			}
-			pausal {
-				def
-				fixed
-				show
-				value
-			}
-			requester {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			status {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			tag {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			taskType {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-		}
-  }
-}
-`;
-
-const GET_USERS = gql `
-query {
-  users{
-    id
-    email
-    username
-    role {
-      id
-      title
-    }
-    company {
-      id
-      title
-    }
-  }
-}
-`;
-
-const GET_STATUSES = gql `
-query {
-  statuses {
-    title
-    id
-    order
-  }
-}
-`;
-
-const GET_COMPANIES = gql `
-query {
- companies {
-	 title
-	 id
-	 monthly
- }
-}
-`;
+import {
+  UPDATE_TASK,
+  DELETE_TASK,
+  ADD_SUBTASK,
+  UPDATE_SUBTASK,
+  DELETE_SUBTASK,
+  ADD_WORKTRIP,
+  UPDATE_WORKTRIP,
+  DELETE_WORKTRIP,
+  ADD_MATERIAL,
+  UPDATE_MATERIAL,
+  DELETE_MATERIAL,
+  ADD_CUSTOM_ITEM,
+  UPDATE_CUSTOM_ITEM,
+  DELETE_CUSTOM_ITEM,
+} from './querries';
 
 export default function TaskEdit( props ) {
   //data & queries
@@ -757,17 +88,22 @@ export default function TaskEdit( props ) {
     match,
     history,
     columns,
-    allTags,
+    inModal,
+    closeModal,
+    id,
+    task,
+    currentUser,
+    accessRights,
+    statuses,
+    companies,
+    users,
     taskTypes,
     tripTypes,
-    inModal,
-    closeModal
+    allTags,
+    projects,
+    emails,
   } = props;
-  const [ getTask, {
-    data: taskData,
-    loading: taskLoading
-  } ] = useLazyQuery( GET_TASK );
-  const [ updateProjectRights ] = useMutation( UPDATE_PROJECT_RIGHTS );
+
   const [ updateTask /*, {client}*/ ] = useMutation( UPDATE_TASK );
   const [ deleteTask ] = useMutation( DELETE_TASK );
   const [ addSubtask ] = useMutation( ADD_SUBTASK );
@@ -783,41 +119,8 @@ export default function TaskEdit( props ) {
   const [ updateCustomItem ] = useMutation( UPDATE_CUSTOM_ITEM );
   const [ deleteCustomItem ] = useMutation( DELETE_CUSTOM_ITEM );
 
-  const {
-    data: projectsData,
-    loading: projectsLoading
-  } = useQuery( GET_PROJECTS );
-  const projects = ( projectsLoading || !projectsData ? [] : projectsData.projects );
-
-  const {
-    data: usersData,
-    loading: usersLoading
-  } = useQuery( GET_USERS );
-  const users = ( usersLoading || !usersData ? [] : usersData.users );
-
-  const {
-    data: statusesData,
-    loading: statusesLoading
-  } = useQuery( GET_STATUSES );
-  const statuses = ( statusesLoading || !statusesData ? [] : orderArr( statusesData.statuses ) );
-
-  const {
-    data: companiesData,
-    loading: companiesLoading
-  } = useQuery( GET_COMPANIES );
-  const companies = ( companiesLoading || !companiesData ? [] : orderArr( companiesData.companies ) );
-
-  const {
-    data: myData,
-    loading: myDataLoading
-  } = useQuery( GET_MY_DATA );
-  const currentUser = myDataLoading && myData ? myData.getMyData : {};
-  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
-
   //state
   const [ layout, setLayout ] = React.useState( 1 );
-
-  const [ defaultFields, setDefaultFields ] = React.useState( noDef );
 
   const [ attachments, setAttachments ] = React.useState( [] );
   const [ assignedTo, setAssignedTo ] = React.useState( [] );
@@ -863,202 +166,77 @@ export default function TaskEdit( props ) {
 
   // sync
   React.useEffect( () => {
-    if ( !taskLoading && taskData ) {
-      setAssignedTo( toSelArr( taskData.task.assignedTo, 'email' ) );
-      setCloseDate( timestampToString( parseInt( taskData.task.closeDate ) ) );
-      setComments( taskData.task.comments );
-      setCompany( ( taskData.task.company ? {
-        ...taskData.task.company,
-        value: taskData.task.company.id,
-        label: taskData.task.company.title
-      } : null ) );
-      setCreatedBy( taskData.task.createdBy );
-      setCreatedAt( taskData.task.createdAt );
-      setDeadline( taskData.task.deadline ? timestampToString( parseInt( taskData.task.deadline ) ) : null );
-      setDescription( taskData.task.description );
-      setImportant( taskData.task.important );
-      //setInvoicedDate( timestampToString(parseInt(taskData.task.invoicedDate)) );
-      const pro = ( taskData.task.project ? {
-        ...taskData.task.project,
-        value: taskData.task.project.id,
-        label: taskData.task.project.title
-      } : null );
-      setMilestone( pro && pro.milestone ? {
-        ...pro.milestone,
-        value: pro.milestone.id,
-        label: pro.milestone.title
-      } : noMilestone );
-      setOvertime( ( taskData.task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
-      setPausal( ( taskData.task.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
-      setPendingChangable( taskData.task.pendingChangable );
-      setPendingDate( timestampToString( parseInt( taskData.task.pendingDate ) ) );
-      setProject( pro );
-      //	setReminder(taskData.task.reminder);
-      setRepeat( taskData.task.repeat );
-      setRequester( ( taskData.task.requester ? {
-        ...taskData.task.requester,
-        value: taskData.task.requester.id,
-        label: `${taskData.task.requester.name} ${taskData.task.requester.surname}`
-      } : null ) );
-      const sta = ( taskData.task.status ? toSelItem( taskData.task.status ) : null )
-      setStatus( sta );
-      setTags( taskData.task.tags ? toSelArr( taskData.task.tags ) : [] );
-      setTaskType( ( taskData.task.taskType ? {
-        ...taskData.task.taskType,
-        value: taskData.task.taskType.id,
-        label: taskData.task.taskType.title
-      } : null ) );
-      setTaskTripPausal( taskData.task.company ? taskData.task.company.taskTripPausal : 0 );
-      setTaskWorkPausal( taskData.task.company ? taskData.task.company.taskWorkPausal : 0 );
-      setTitle( taskData.task.title );
-      setCustomItems( taskData.task.customItems );
-      setMaterials( taskData.task.materials );
-      setSubtasks( ( taskData.task.subtasks ? taskData.task.subtasks.map( item => ( {
-        ...item,
-        assignedTo: toSelItem( item.assignedTo, 'email' ),
-        type: toSelItem( item.type )
-      } ) ) : [] ) );
-      setUsedSubtaskPausal( taskData.task.company ? taskData.task.company.usedSubtaskPausal : 0 );
-      setUsedTripPausal( taskData.task.company ? taskData.task.company.usedTripPausal : 0 );
-      setWorkTrips( ( taskData.task.workTrips ? taskData.task.workTrips.map( item => ( {
-        ...item,
-        assignedTo: toSelItem( item.assignedTo, 'email' ),
-        type: toSelItem( item.type )
-      } ) ) : [] ) );
+    setAssignedTo( toSelArr( task.assignedTo, 'email' ) );
+    setCloseDate( timestampToString( parseInt( task.closeDate ) ) );
+    setComments( task.comments );
+    setCompany( ( task.company ? {
+      ...task.company,
+      value: task.company.id,
+      label: task.company.title
+    } : null ) );
+    setCreatedBy( task.createdBy );
+    setCreatedAt( task.createdAt );
+    setDeadline( task.deadline ? timestampToString( parseInt( task.deadline ) ) : null );
+    setDescription( task.description );
+    setImportant( task.important );
+    //setInvoicedDate( timestampToString(parseInt(task.invoicedDate)) );
+    const pro = ( task.project ? {
+      ...task.project,
+      value: task.project.id,
+      label: task.project.title
+    } : null );
+    setMilestone( pro && pro.milestone ? {
+      ...pro.milestone,
+      value: pro.milestone.id,
+      label: pro.milestone.title
+    } : noMilestone );
+    setOvertime( ( task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
+    setPausal( ( task.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
+    setPendingChangable( task.pendingChangable );
+    setPendingDate( timestampToString( parseInt( task.pendingDate ) ) );
+    setProject( pro );
+    //	setReminder(task.reminder);
+    setRepeat( task.repeat );
+    setRequester( ( task.requester ? {
+      ...task.requester,
+      value: task.requester.id,
+      label: `${task.requester.name} ${task.requester.surname}`
+    } : null ) );
+    const sta = ( task.status ? toSelItem( task.status ) : null )
+    setStatus( sta );
+    setTags( task.tags ? toSelArr( task.tags ) : [] );
+    setTaskType( ( task.taskType ? {
+      ...task.taskType,
+      value: task.taskType.id,
+      label: task.taskType.title
+    } : null ) );
+    setTaskTripPausal( task.company ? task.company.taskTripPausal : 0 );
+    setTaskWorkPausal( task.company ? task.company.taskWorkPausal : 0 );
+    setTitle( task.title );
+    setCustomItems( task.customItems );
+    setMaterials( task.materials );
+    setSubtasks( ( task.subtasks ? task.subtasks.map( item => ( {
+      ...item,
+      assignedTo: toSelItem( item.assignedTo, 'email' ),
+      type: toSelItem( item.type )
+    } ) ) : [] ) );
+    setUsedSubtaskPausal( task.company ? task.company.usedSubtaskPausal : 0 );
+    setUsedTripPausal( task.company ? task.company.usedTripPausal : 0 );
+    setWorkTrips( ( task.workTrips ? task.workTrips.map( item => ( {
+      ...item,
+      assignedTo: toSelItem( item.assignedTo, 'email' ),
+      type: toSelItem( item.type )
+    } ) ) : [] ) );
 
-      if ( pro && currentUser !== {} ) {
-        setDefaults( pro );
-        const userRights = pro ? pro.projectRights.find( r => r.user.id === currentUser.id ) : {};
-        if ( sta && sta.action === 'Invoiced' && inModal && userRights && userRights.admin ) {
-          setViewOnly( false );
-        } else {
-          setViewOnly( ( sta && sta.action === 'Invoiced' ) || ( userRights && !userRights.admin && !userRights.write ) );
-        }
+    if ( pro && currentUser !== {} ) {
+      const userRights = pro ? pro.projectRights.find( r => r.user.id === currentUser.id ) : {};
+      if ( sta && sta.action === 'Invoiced' && inModal && userRights && userRights.admin ) {
+        setViewOnly( false );
+      } else {
+        setViewOnly( ( sta && sta.action === 'Invoiced' ) || ( userRights && !userRights.admin && !userRights.write ) );
       }
     }
-  }, [ taskLoading ] );
-
-  React.useEffect( () => {
-    getTask( {
-      variables: {
-        id: parseInt( match.params.taskID )
-      }
-    } );
-  }, [ match.params.taskID ] );
-
-  React.useEffect( () => {
-    if ( important ) {
-      updateTaskFunc( [ "important" ] );
-    }
-  }, [ important ] );
-
-  React.useEffect( () => {
-    if ( title ) {
-      updateTaskFunc( [ "title" ] );
-    }
-  }, [ title ] );
-
-  React.useEffect( () => {
-    if ( closeDate ) {
-      updateTaskFunc( [ "closeDate" ] );
-    }
-  }, [ closeDate ] );
-
-  React.useEffect( () => {
-    if ( assignedTo ) {
-      updateTaskFunc( [ "assignedTo" ] );
-    }
-  }, [ assignedTo ] );
-
-  React.useEffect( () => {
-    if ( attachments ) {
-      updateTaskFunc( [ "attachments" ] );
-    }
-  }, [ attachments ] );
-
-  React.useEffect( () => {
-    if ( company ) {
-      updateTaskFunc( [ "company" ] );
-    }
-  }, [ company ] );
-
-  React.useEffect( () => {
-    if ( deadline ) {
-      updateTaskFunc( [ "deadline" ] );
-    }
-  }, [ deadline ] );
-
-  React.useEffect( () => {
-    if ( description ) {
-      updateTaskFunc( [ "description" ] );
-    }
-  }, [ description ] );
-
-  React.useEffect( () => {
-    if ( milestone ) {
-      updateTaskFunc( [ "milestone" ] );
-    }
-  }, [ milestone ] );
-
-  React.useEffect( () => {
-    if ( overtime ) {
-      updateTaskFunc( [ "overtime" ] );
-    }
-  }, [ overtime ] );
-
-  React.useEffect( () => {
-    if ( pausal ) {
-      updateTaskFunc( [ "pausal" ] );
-    }
-  }, [ pausal ] );
-
-  React.useEffect( () => {
-    if ( pendingChangable ) {
-      updateTaskFunc( [ "pendingChangable" ] );
-    }
-  }, [ pendingChangable ] );
-
-  React.useEffect( () => {
-    if ( pendingDate ) {
-      updateTaskFunc( [ "pendingDate" ] );
-    }
-  }, [ pendingDate ] );
-
-  React.useEffect( () => {
-    if ( project ) {
-      updateTaskFunc( [ "project" ] );
-    }
-  }, [ project ] );
-
-  React.useEffect( () => {
-    if ( requester ) {
-      updateTaskFunc( [ "requester" ] );
-    }
-  }, [ requester ] );
-
-  React.useEffect( () => {
-    if ( status ) {
-      updateTaskFunc( [ "status" ] );
-    }
-  }, [ status ] );
-
-  React.useEffect( () => {
-    if ( tags ) {
-      updateTaskFunc( [ "tags" ] );
-    }
-  }, [ tags ] );
-
-  React.useEffect( () => {
-    if ( taskType ) {
-      updateTaskFunc( [ "taskType" ] );
-    }
-  }, [ taskType ] );
-
-  React.useEffect( () => {
-    if ( repeat ) {
-      updateTaskFunc( [ "repeat" ] );
-    }
-  }, [ repeat ] );
+  }, [ id ] );
 
   const deleteTaskFunc = () => {
     if ( window.confirm( "Are you sure?" ) ) {
@@ -1543,21 +721,10 @@ export default function TaskEdit( props ) {
   		}
   	}*/
 
-  const setDefaults = ( projectID ) => {
-    if ( projectID === null ) {
-      setDefaultFields( noDef );
-      return;
-    }
-    let pro = projects.find( ( p ) => p.id === projectID );
-    if ( !pro ) {
-      setDefaultFields( noDef );
-      return;
-    }
-    setDefaultFields( {
-      ...noDef,
-      ...pro.def
-    } );
-  }
+  const defaultFields = project === null ? noDef : {
+    ...noDef,
+    ...project.def
+  };
 
   const rights = project ? project.projectRights.find( r => r.user.id === currentUser.id ) : undefined;
   const userRights = rights === undefined ? {
@@ -1605,7 +772,7 @@ export default function TaskEdit( props ) {
 								history={taskHistory}
 								project={project.id}
 								triggerDate={projectChangeDate}
-								task={taskData.task}
+								task={task}
 								disabled={canCopy}
 								/>
 						}
@@ -1620,7 +787,7 @@ export default function TaskEdit( props ) {
 							workTrips={workTrips}
 							taskMaterials={materials}
 							customItems={customItems}
-							isLoaded={!taskLoading} />
+							isLoaded={true} />
 					}
 						{ canDelete &&
 							<button
@@ -1737,7 +904,6 @@ export default function TaskEdit( props ) {
     )
   }
 
-
   //Value Change
   const changeProject = ( pro ) => {
     let permissionIDs = [];
@@ -1749,7 +915,6 @@ export default function TaskEdit( props ) {
     setAssignedTo( newAssignedTo );
     setProjectChangeDate( moment() );
     setMilestone( noMilestone );
-    setDefaults( project.id );
   }
 
   const changeStatus = ( s ) => {
@@ -2185,7 +1350,6 @@ export default function TaskEdit( props ) {
     );
   }
 
-
   const renderTags = () => {
     return (
       <div className="row m-t-10">
@@ -2267,7 +1431,6 @@ export default function TaskEdit( props ) {
     )
   }
 
-
   const renderAttachments = () => {
     return (
       <Attachments
@@ -2334,7 +1497,6 @@ export default function TaskEdit( props ) {
 			</Modal>
     )
   }
-
 
   const renderPendingPicker = () => {
     return (
@@ -2546,10 +1708,6 @@ export default function TaskEdit( props ) {
 				</TabContent>
 			</div>
     )
-  }
-
-  if ( taskLoading ) {
-    return <Loading />
   }
 
   return (

@@ -165,9 +165,463 @@ query {
 			level
       accessRights {
         projects
+        mailViaComment
+        viewInternal
         publicFilters
       }
     }
+  }
+}
+`;
+
+export const GET_EMAILS = gql `
+query emails($task: Int!){
+	emails(
+		task: $task
+	)  {
+		id
+		createdAt
+    subject
+    message
+    user {
+      id
+      fullName
+    }
+    toEmails
+  }
+}
+`;
+
+export const GET_TASK = gql `
+query task($id: Int!){
+	task(
+		id: $id
+	)  {
+		id
+		important
+		title
+		updatedAt
+		createdAt
+		closeDate
+		assignedTo {
+			id
+			name
+			surname
+			email
+		}
+		company {
+			id
+			title
+      dph
+      usedTripPausal
+      usedSubtaskPausal
+      taskWorkPausal
+      taskTripPausal
+      monthly
+      monthlyPausal
+      pricelist {
+        id
+        title
+        materialMargin
+        prices {
+          type
+          price
+          taskType {
+            id
+          }
+          tripType {
+            id
+          }
+        }
+      }
+		}
+		createdBy {
+			id
+			name
+			surname
+		}
+		deadline
+		description
+		milestone{
+			id
+			title
+		}
+		pendingDate
+		project{
+			id
+			title
+      milestones{
+        id
+        title
+      }
+	    lockedRequester
+	    projectRights {
+				read
+				write
+				delete
+				internal
+				admin
+				user {
+					id
+				}
+			}
+	    def {
+				assignedTo {
+					def
+					fixed
+					show
+					value {
+						id
+					}
+				}
+				company {
+					def
+					fixed
+					show
+					value {
+						id
+					}
+				}
+				overtime {
+					def
+					fixed
+					show
+					value
+				}
+				pausal {
+					def
+					fixed
+					show
+					value
+				}
+				requester {
+					def
+					fixed
+					show
+					value {
+						id
+					}
+				}
+				status {
+					def
+					fixed
+					show
+					value {
+						id
+					}
+				}
+				tag {
+					def
+					fixed
+					show
+					value {
+						id
+					}
+				}
+				taskType {
+					def
+					fixed
+					show
+					value {
+						id
+					}
+				}
+	    }
+		}
+		requester{
+			id
+			name
+			surname
+		}
+		status {
+			id
+			title
+			color
+			action
+		}
+		tags {
+			id
+			title
+			color
+		}
+		taskType {
+			id
+			title
+		}
+		repeat {
+			repeatEvery
+			repeatInterval
+			startsAt
+		}
+		subtasks {
+			id
+			title
+			order
+			done
+			quantity
+			discount
+			type {
+				id
+				title
+			}
+			assignedTo {
+				id
+				email
+				company {
+					id
+				}
+			}
+		}
+		workTrips {
+			id
+			order
+			done
+			quantity
+			discount
+			type {
+				id
+				title
+			}
+			assignedTo {
+				id
+				email
+				company {
+					id
+				}
+			}
+		}
+		materials {
+			id
+			title
+			order
+			done
+			quantity
+			margin
+			price
+		}
+		customItems {
+			id
+			title
+			order
+			done
+			quantity
+			price
+		}
+		comments {
+      id
+      createdAt
+      message
+      childComments {
+        id
+        createdAt
+        message
+        user{
+          id
+          fullName
+          email
+        }
+      }
+		}
+	}
+}
+`;
+
+export const UPDATE_TASK = gql `
+mutation updateTask($id: Int!, $important: Boolean, $title: String, $closeDate: String, $assignedTo: [Int], $company: Int, $deadline: String, $description: String, $milestone: Int, $overtime: Boolean, $pausal: Boolean, $pendingChangable: Boolean, $pendingDate: String, $project: Int, $requester: Int, $status: Int, $tags: [Int], $taskType: Int, $repeat: RepeatInput ) {
+  updateTask(
+		id: $id,
+		important: $important,
+    title: $title,
+    closeDate: $closeDate,
+    assignedTo: $assignedTo,
+    company: $company,
+    deadline: $deadline,
+    description: $description,
+    milestone: $milestone,
+    overtime: $overtime,
+    pausal: $pausal,
+    pendingChangable: $pendingChangable,
+    pendingDate: $pendingDate,
+    project: $project,
+    requester: $requester,
+    status: $status,
+    tags: $tags,
+    taskType: $taskType,
+    repeat: $repeat,
+  ){
+    id
+    title
+  }
+}
+`;
+//table
+export const ADD_SUBTASK = gql `
+mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
+  addSubtask(
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		discount: $discount,
+		type: $type,
+		task: $task,
+		assignedTo: $assignedTo,
+  ){
+    id
+  }
+}
+`;
+
+export const UPDATE_SUBTASK = gql `
+mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+  updateSubtask(
+		id: $id,
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		discount: $discount,
+		type: $type,
+		assignedTo: $assignedTo,
+  ){
+    id
+    title
+  }
+}
+`;
+
+export const DELETE_SUBTASK = gql `
+mutation deleteSubtask($id: Int!) {
+  deleteSubtask(
+    id: $id,
+  ){
+    id
+  }
+}
+`;
+
+export const ADD_WORKTRIP = gql `
+mutation addWorkTrip($order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
+  addWorkTrip(
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		discount: $discount,
+		type: $type,
+		task: $task,
+		assignedTo: $assignedTo,
+  ){
+    id
+  }
+}
+`;
+
+export const UPDATE_WORKTRIP = gql `
+mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+  updateWorkTrip(
+		id: $id,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		discount: $discount,
+		type: $type,
+		assignedTo: $assignedTo,
+  ){
+    id
+  }
+}
+`;
+
+export const DELETE_WORKTRIP = gql `
+mutation deleteWorkTrip($id: Int!) {
+  deleteWorkTrip(
+    id: $id,
+  ){
+    id
+  }
+}
+`;
+
+export const ADD_MATERIAL = gql `
+mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $margin: Float!, $price: Float!, $task: Int!) {
+  addMaterial(
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		margin: $margin,
+		price: $price,
+		task: $task,
+  ){
+    id
+  }
+}
+`;
+
+export const UPDATE_MATERIAL = gql `
+mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $margin: Float, $price: Float) {
+  updateMaterial(
+		id: $id,
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		margin: $margin,
+		price: $price,
+  ){
+    id
+    title
+  }
+}
+`;
+
+export const DELETE_MATERIAL = gql `
+mutation deleteMaterial($id: Int!) {
+  deleteMaterial(
+    id: $id,
+  ){
+    id
+  }
+}
+`;
+
+export const ADD_CUSTOM_ITEM = gql `
+mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $price: Float!, $task: Int!) {
+  addCustomItem(
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		price: $price,
+		task: $task,
+  ){
+    id
+  }
+}
+`;
+
+export const UPDATE_CUSTOM_ITEM = gql `
+mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $price: Float) {
+  updateCustomItem(
+		id: $id,
+    title: $title,
+		order: $order,
+		done: $done,
+		quantity: $quantity,
+		price: $price,
+  ){
+    id
+    title
+  }
+}
+`;
+
+export const DELETE_CUSTOM_ITEM = gql `
+mutation deleteCustomItem($id: Int!) {
+  deleteCustomItem(
+    id: $id,
+  ){
+    id
   }
 }
 `;
