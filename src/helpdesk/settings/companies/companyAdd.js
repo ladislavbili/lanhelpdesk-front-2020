@@ -30,7 +30,8 @@ import {
 
 import {
   GET_COMPANIES,
-  ADD_COMPANY
+  ADD_COMPANY,
+  GET_BASIC_COMPANIES,
 } from './querries';
 
 export default function CompanyAdd( props ) {
@@ -138,25 +139,38 @@ export default function CompanyAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        console.log( "rRESPONSE" );
-        const allCompanies = client.readQuery( {
-            query: GET_COMPANIES
-          } )
-          .companies;
-        const newCompany = {
-          ...response.data.addCompany,
-          __typename: "Company"
-        };
-        client.writeQuery( {
-          query: GET_COMPANIES,
-          data: {
-            companies: [ ...allCompanies, newCompany ]
-          }
-        } );
         if ( closeModal ) {
+          const allCompanies = client.readQuery( {
+              query: GET_BASIC_COMPANIES
+            } )
+            .basicCompanies;
+          const newCompany = {
+            ...response.data.addCompany,
+            __typename: "BasicCompany"
+          };
+          client.writeQuery( {
+            query: GET_BASIC_COMPANIES,
+            data: {
+              basicCompanies: [ ...allCompanies, newCompany ]
+            }
+          } );
           addCompanyToList( toSelItem( newCompany ) );
           closeModal();
         } else {
+          const allCompanies = client.readQuery( {
+              query: GET_COMPANIES
+            } )
+            .companies;
+          const newCompany = {
+            ...response.data.addCompany,
+            __typename: "Company"
+          };
+          client.writeQuery( {
+            query: GET_COMPANIES,
+            data: {
+              companies: [ ...allCompanies, newCompany ]
+            }
+          } );
           history.push( '/helpdesk/settings/companies/' + newCompany.id );
         }
       } )

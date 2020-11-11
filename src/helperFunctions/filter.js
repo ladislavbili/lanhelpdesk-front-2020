@@ -64,3 +64,15 @@ export const filterProjectsByPermissions = ( projects, currentUser ) => {
     return permission && permission.read;
   } )
 }
+
+export const localFilterToValues = ( localFilter ) => {
+  let filterValues = {
+    ...localFilter.filter,
+    assignedTo: localFilter.filter.assignedTo === null ? null : localFilter.filter.assignedTo.id,
+    requester: localFilter.filter.requester === null ? null : localFilter.filter.requester.id,
+    company: localFilter.filter.company === null ? null : localFilter.filter.company.id,
+    taskType: localFilter.filter.taskType === null ? null : localFilter.filter.taskType.id,
+  }
+  delete filterValues.__typename;
+  return filterValues;
+}

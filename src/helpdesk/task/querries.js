@@ -55,6 +55,20 @@ mutation addTask(
 }
 `;
 
+export const ADD_USER_TO_PROJECT = gql `
+mutation addUserToProject(
+  $userId: Int!,
+  $projectId: Int!,
+){
+  addTask(
+    userId: $userId
+    projectId: $projectId,
+  ){
+    id
+  }
+}
+`;
+
 export const GET_TASKS = gql `
 query tasks($filter: FilterInput, $projectId: Int){
   tasks (
@@ -168,6 +182,8 @@ query {
         mailViaComment
         viewInternal
         publicFilters
+        users
+        companies
       }
     }
   }
@@ -235,6 +251,17 @@ query task($id: Int!){
         }
       }
 		}
+    taskChanges{
+      createdAt
+      user{
+        id
+        fullName
+      }
+      taskChangeMessages{
+        type
+        message
+      }
+    }
 		createdBy {
 			id
 			name
@@ -250,83 +277,6 @@ query task($id: Int!){
 		project{
 			id
 			title
-      milestones{
-        id
-        title
-      }
-	    lockedRequester
-	    projectRights {
-				read
-				write
-				delete
-				internal
-				admin
-				user {
-					id
-				}
-			}
-	    def {
-				assignedTo {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				company {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				overtime {
-					def
-					fixed
-					show
-					value
-				}
-				pausal {
-					def
-					fixed
-					show
-					value
-				}
-				requester {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				status {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				tag {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-				taskType {
-					def
-					fixed
-					show
-					value {
-						id
-					}
-				}
-	    }
 		}
 		requester{
 			id
@@ -410,11 +360,30 @@ query task($id: Int!){
 		comments {
       id
       createdAt
+      internal
+      isEmail
       message
+      html
+      subject
+      tos
+      emailSend
+      emailError
+      user{
+        id
+        fullName
+        email
+      }
       childComments {
         id
         createdAt
+        internal
+        isEmail
         message
+        html
+        subject
+        tos
+        emailSend
+        emailError
         user{
           id
           fullName
@@ -427,7 +396,27 @@ query task($id: Int!){
 `;
 
 export const UPDATE_TASK = gql `
-mutation updateTask($id: Int!, $important: Boolean, $title: String, $closeDate: String, $assignedTo: [Int], $company: Int, $deadline: String, $description: String, $milestone: Int, $overtime: Boolean, $pausal: Boolean, $pendingChangable: Boolean, $pendingDate: String, $project: Int, $requester: Int, $status: Int, $tags: [Int], $taskType: Int, $repeat: RepeatInput ) {
+mutation updateTask(
+  $id: Int!,
+  $important: Boolean,
+  $title: String,
+  $closeDate: String,
+  $assignedTo: [Int],
+  $company: Int,
+  $deadline: String,
+  $description: String,
+  $milestone: Int,
+  $overtime: Boolean,
+  $pausal: Boolean,
+  $pendingChangable: Boolean,
+  $pendingDate: String,
+  $project: Int,
+  $requester: Int,
+  $status: Int,
+  $tags: [Int],
+  $taskType: Int,
+  $repeat: RepeatInput
+) {
   updateTask(
 		id: $id,
 		important: $important,
@@ -449,9 +438,86 @@ mutation updateTask($id: Int!, $important: Boolean, $title: String, $closeDate: 
     taskType: $taskType,
     repeat: $repeat,
   ){
-    id
-    title
-  }
+      id
+      important
+      title
+      updatedAt
+      createdAt
+      closeDate
+      assignedTo {
+        id
+        name
+        surname
+        email
+      }
+      company {
+        id
+        title
+        dph
+        usedTripPausal
+        usedSubtaskPausal
+        taskWorkPausal
+        taskTripPausal
+        monthly
+        monthlyPausal
+        pricelist {
+          id
+          title
+          materialMargin
+          prices {
+            type
+            price
+            taskType {
+              id
+            }
+            tripType {
+              id
+            }
+          }
+        }
+      }
+      createdBy {
+        id
+        name
+        surname
+      }
+      deadline
+      description
+      milestone{
+        id
+        title
+      }
+      pendingDate
+      project{
+        id
+        title
+      }
+      requester{
+        id
+        name
+        surname
+      }
+      status {
+        id
+        title
+        color
+        action
+      }
+      tags {
+        id
+        title
+        color
+      }
+      taskType {
+        id
+        title
+      }
+      repeat {
+        repeatEvery
+        repeatInterval
+        startsAt
+      }
+    }
 }
 `;
 //table

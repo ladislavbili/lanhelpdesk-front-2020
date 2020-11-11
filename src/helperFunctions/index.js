@@ -17,6 +17,7 @@ export {
   arraySelectToString,
   filterUnique,
   splitArrayByFilter,
+  updateArrayItem,
 }
 from './arrayManipulations';
 
@@ -40,6 +41,7 @@ export {
   filterDateSatisfied,
   filterOneOf,
   filterProjectsByPermissions,
+  localFilterToValues,
 }
 from './filter';
 

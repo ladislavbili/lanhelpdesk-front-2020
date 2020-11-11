@@ -19,6 +19,7 @@ mutation registerUser($username: String!, $email: String!, $name: String!, $lang
     id
     email
     username
+    fullName
     role {
       id
       title
@@ -54,6 +55,7 @@ query {
     id
     email
     username
+    fullName
     role {
       level
       id

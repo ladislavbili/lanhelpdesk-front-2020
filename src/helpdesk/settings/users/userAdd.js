@@ -23,6 +23,7 @@ import Checkbox from 'components/checkbox';
 
 import {
   GET_USERS,
+  GET_BASIC_USERS,
   ADD_USER
 } from './querries';
 
@@ -99,24 +100,38 @@ export default function UserAddContainer( props ) {
         }
       } )
       .then( ( response ) => {
-        const allUsers = client.readQuery( {
-            query: GET_USERS
-          } )
-          .users;
-        let newUser = {
-          ...response.data.registerUser,
-          __typename: "User"
-        }
-        client.writeQuery( {
-          query: GET_USERS,
-          data: {
-            users: [ ...allUsers, newUser ]
-          }
-        } );
         if ( addUserToList ) {
+          const allUsers = client.readQuery( {
+              query: GET_BASIC_USERS
+            } )
+            .basicUsers;
+          let newUser = {
+            ...response.data.registerUser,
+            __typename: "BasicUser"
+          }
+          client.writeQuery( {
+            query: GET_BASIC_USERS,
+            data: {
+              basicUsers: [ ...allUsers, newUser ]
+            }
+          } );
           addUserToList();
           closeModal();
         } else {
+          const allUsers = client.readQuery( {
+              query: GET_USERS
+            } )
+            .users;
+          let newUser = {
+            ...response.data.registerUser,
+            __typename: "User"
+          }
+          client.writeQuery( {
+            query: GET_USERS,
+            data: {
+              users: [ ...allUsers, newUser ]
+            }
+          } );
           history.push( '/helpdesk/settings/users/' + newUser.id );
         }
 

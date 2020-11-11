@@ -47,3 +47,13 @@ export const splitArrayByFilter = ( array, filter ) => {
     []
   ] );
 }
+
+export const updateArrayItem = ( array, item ) => {
+  const index = array.findIndex( ( item2 ) => item2.id === item.id );
+  if ( index === -1 ) {
+    return array;
+  }
+  let newArray = [ ...array ];
+  newArray[ index ] = item;
+  return newArray;
+}

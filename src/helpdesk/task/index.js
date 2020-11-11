@@ -15,7 +15,8 @@ import ShowData from 'components/showData';
 import {
   timestampToString,
   orderArr,
-  splitArrayByFilter
+  splitArrayByFilter,
+  localFilterToValues
 } from 'helperFunctions';
 
 import {
@@ -90,14 +91,6 @@ export default function TasksIndex( props ) {
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
-  let queryFilter = {
-    ...localFilter.filter,
-    assignedTo: localFilter.filter.assignedTo === null ? null : localFilter.filter.assignedTo.id,
-    requester: localFilter.filter.requester === null ? null : localFilter.filter.requester.id,
-    company: localFilter.filter.company === null ? null : localFilter.filter.company.id,
-    taskType: localFilter.filter.taskType === null ? null : localFilter.filter.taskType.id,
-  }
-  delete queryFilter.__typename;
 
   const {
     data: tasksData,
@@ -106,7 +99,7 @@ export default function TasksIndex( props ) {
   } = useQuery( GET_TASKS, {
     variables: {
       filterId: localFilter.id,
-      filter: queryFilter,
+      filter: localFilterToValues( localFilter ),
       projectId: localProject.id
     },
     notifyOnNetworkStatusChange: true,
@@ -131,7 +124,7 @@ export default function TasksIndex( props ) {
     tasksRefetch( {
       variables: {
         filterId: localFilter.id,
-        filter: queryFilter,
+        filter: localFilterToValues( localFilter ),
         projectId: localProject.id
       }
     } );

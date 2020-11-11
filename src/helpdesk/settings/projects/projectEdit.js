@@ -104,10 +104,19 @@ export default function ProjectEdit( props ) {
     loading: taskTypesLoading
   } = useQuery( GET_TASK_TYPES, fetchNetOptions );
 
-  const allProjects = toSelArr( client.readQuery( {
-      query: GET_PROJECTS
-    } )
-    .projects );
+  let allProjects = [];
+  if ( projectID ) {
+    toSelArr( client.readQuery( {
+        query: GET_MY_PROJECTS
+      } )
+      .myProjects );
+
+  } else {
+    allProjects = toSelArr( client.readQuery( {
+        query: GET_PROJECTS
+      } )
+      .projects );
+  }
   const filteredProjects = allProjects.filter( project => project.id !== id );
   const theOnlyOneLeft = allProjects.length === 1;
 

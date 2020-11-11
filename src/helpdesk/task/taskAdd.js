@@ -199,8 +199,8 @@ export default function TaskAdd( props ) {
           tags: tags.map( tag => tag.id ),
           taskType: taskType ? taskType.id : null,
           repeat: repeat ? {
-            ...repeat,
-            startsAt: repeat.startsAt + "",
+            repeatInterval: repeat.repeatInterval.value,
+            startsAt: repeat.startsAt.valueOf() + "",
             repeatEvery: repeat.repeatEvery + ""
           } : null,
           subtasks: subtasks.map( item => ( {

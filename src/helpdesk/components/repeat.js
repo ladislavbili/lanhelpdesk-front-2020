@@ -1,89 +1,97 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Select from 'react-select';
-import { Button, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
-import { FormGroup, Label, Input } from 'reactstrap';
+import {
+  Button,
+  Popover,
+  PopoverHeader,
+  PopoverBody
+} from 'reactstrap';
+import {
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
 import DatePicker from 'react-datepicker';
 
-import {selectStyle} from 'configs/components/select';
+import {
+  selectStyle
+} from 'configs/components/select';
 import datePickerConfig from 'configs/components/datepicker';
-import {toMomentInput, fromMomentToUnix } from '../../helperFunctions';
-import { intervals } from 'configs/constants/repeat';
+import {
+  toMomentInput,
+  fromMomentToUnix
+} from 'helperFunctions';
+import {
+  intervals
+} from 'configs/constants/repeat';
 
-export default class Repeat extends Component{
-constructor(props) {
-  super(props);
-  this.state = {
-    open: false,
-    startsAt:null,
-    repeatEvery:1,
-    repeatInterval:intervals[0],
-  };
-  this.toggleRepeat = this.toggleRepeat.bind(this);
-}
+export default function Repeat( props ) {
+  const {
+    disabled,
+    taskID,
+    repeat,
+    submitRepeat,
+    deleteRepeat,
+    vertical
+  } = props;
 
-componentWillReceiveProps(props){
-  if(this.props.taskID!==props.taskID){
-    this.setState({open: false});
-    if(props.repeat===null){
-      this.setState({
-        startsAt:null,
-        repeatEvery:1,
-        repeatInterval:intervals[0],
-      });
+  const [ open, setOpen ] = React.useState( false );
+  const [ startsAt, setStartsAt ] = React.useState( repeat ? repeat.startsAt : null );
+  const [ repeatEvery, setRepeatEvery ] = React.useState( repeat ? repeat.repeatEvery : "1" );
+  const [ repeatInterval, setRepeatInterval ] = React.useState( repeat ? repeat.repeatInterval : intervals[ 0 ] );
+
+  React.useEffect( () => {
+    setOpen( false )
+    if ( repeat === null ) {
+      setStartsAt( null );
+      setRepeatEvery( "1" );
+      setRepeatInterval( intervals[ 0 ] );
+    } else {
+      setStartsAt( repeat.startsAt );
+      setRepeatEvery( repeat.repeatEvery );
+      setRepeatInterval( repeat.repeatInterval );
     }
-  }
-  if((this.props.repeat===null && props.repeat!==null)|| (this.props.repeat!==null && props.repeat!==null && props.repeat.id!==this.props.repeat.id)){
-      let repeatInterval = intervals.find((interval)=>interval.title===props.repeat.repeatInterval);
-      this.setState({
-        startsAt:toMomentInput(props.repeat.startsAt),
-        repeatEvery:props.repeat.repeatEvery/repeatInterval.value,
-        repeatInterval,
-      });
-  }
-}
+  }, [ taskID, repeat ] );
 
-/*
-začiatočný čas + opakovanie den/týžden/mesiac
-keď nastane čas opakovania tak sa vytvorí nová úloha
-všetky úlohy vytvorené z opakovanej úlohy sú spojené opakovaním - keď sa modifikuje opakovanie v jednej úlohe ta sa modifikuje vo všetkých
-doplniť zoznam do tabu opakovaných úloh
-kopirujú sa atribúty úlohy + popis + rozpočet bez komentárov
-nová úloha vytvorená z opakovania je v stave new
-*/
-
-toggleRepeat() {
-  if(this.props.disabled){
-    return;
+  const toggleRepeat = () => {
+    if ( disabled ) {
+      return;
+    }
+    setOpen( true );
   }
-  this.setState({open:true});
-}
 
-render() {
-  const repeatInterval = this.props.repeat?(intervals.find((interval)=>interval.title===this.props.repeat.repeatInterval)):null;
   return (
     <div  className="display-inline">
-      {this.props.vertical &&
+      {vertical &&
         <div className="">
           <Label className="col-form-label-2" style={{display: "block"}}>Repeat</Label>
           <div className="col-form-value-2">
-              <Button type="button" style={{paddingLeft: "7px"}} className="repeat-btn" id={"openPopover"+this.props.taskID} onClick={this.toggleRepeat}>
-                {this.props.repeat?("Opakovať každý "+ parseInt(this.props.repeat.repeatEvery/repeatInterval.value) + ' ' + repeatInterval.title) :"No repeat"}
-              </Button>
+            <Button type="button" style={{paddingLeft: "7px"}} className="repeat-btn" id={"openPopover"+taskID} onClick={toggleRepeat}>
+              {
+                repeat ?
+                ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
+                "No repeat"
+              }
+            </Button>
           </div>
         </div>
       }
-      {!this.props.vertical &&
+      {!vertical &&
         <div className="display-inline">
           <Label className="col-form-label w-8">Repeat</Label>
           <div className="display-inline-block w-25 p-r-10">
-            <Button type="button" className="repeat-btn flex" id={"openPopover"+this.props.taskID} onClick={this.toggleRepeat}>
-              {this.props.repeat?("Opakovať každý "+ parseInt(this.props.repeat.repeatEvery/repeatInterval.value) + ' ' + repeatInterval.title) :"No repeat"}
+            <Button type="button" className="repeat-btn flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
+              {
+                repeat ?
+                ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
+                "No repeat"
+              }
             </Button>
           </div>
         </div>
       }
 
-      <Popover placement="bottom" isOpen={this.state.open && !this.props.disabled} target={"openPopover"+this.props.taskID} toggle={this.toggleRepeat}>
+      <Popover placement="bottom" isOpen={open && !disabled} target={"openPopover"+taskID} toggle={toggleRepeat}>
         <PopoverHeader>Opakovanie</PopoverHeader>
         <PopoverBody>
           <div>
@@ -91,10 +99,8 @@ render() {
               <Label>Start date *</Label>
               <DatePicker
                 className="form-control hidden-input"
-                selected={this.state.startsAt}
-                onChange={startsAt => {
-                  this.setState({ startsAt });
-                }}
+                selected={startsAt}
+                onChange={setStartsAt}
                 placeholderText="No start date"
                 {...datePickerConfig}
                 />
@@ -102,50 +108,59 @@ render() {
 
             <FormGroup>
               <Label>Repeat every *</Label>
-                <div className="row">
+              <div className="row">
                 <div className="w-50 p-r-20">
                   <Input type="number"
-                    className={(this.state.repeatEvery < 0 ) ? "form-control-warning" : ""}
+                    className={(parseInt(repeatEvery) < 0 ) ? "form-control-warning" : ""}
                     placeholder="Enter number"
-                    value={(this.state.repeatEvery )}
-                    onChange={(e)=>{
-                      this.setState({repeatEvery: parseInt(e.target.value)})}
-                    }
+                    value={( repeatEvery )}
+                    onChange={(e)=> setRepeatEvery(e.target.value)}
                     />
                 </div>
                 <div className="w-50">
                   <Select
-                    value={this.state.repeatInterval}
-                    onChange={(e)=> this.setState({repeatInterval: e})}
+                    value={repeatInterval}
+                    onChange={setRepeatInterval}
                     options={intervals}
                     styles={selectStyle}
                     />
                 </div>
                 {
-                  this.state.repeatEvery <= 0 &&
+                  parseInt(repeatEvery) <= 0 &&
                   <Label className="warning">Must be bigger than 0.</Label>
                 }
               </div>
             </FormGroup>
             <div className="row">
               <div className="flex">
-                <Button type="button"
+                <Button
+                  type="button"
                   onClick={()=>{
-                     if(this.state.repeatInterval.value===null || this.state.repeatEvery <= 0 || isNaN(this.state.repeatEvery) || this.state.startsAt === null ){
-                       if(this.props.repeat!==null){
-                         this.props.deleteRepeat();
-                       }
-                     }else{
-                       this.props.submitRepeat({startsAt:fromMomentToUnix(this.state.startsAt),repeatEvery:this.state.repeatEvery*this.state.repeatInterval.value,repeatInterval:this.state.repeatInterval.title});
-                     }
-                    this.setState({open:false});
-                  }}>
+                    if(
+                      repeatInterval.value===null ||
+                      parseInt(repeatEvery) <= 0 ||
+                      isNaN(parseInt(repeatEvery)) ||
+                      startsAt === null
+                    ){
+                      if(repeat !== null){
+                        deleteRepeat();
+                      }
+                    }else{
+                      submitRepeat({
+                        startsAt,
+                        repeatEvery,
+                        repeatInterval
+                      });
+                    }
+                    setOpen(false);
+                  }}
+                  >
                   Save
                 </Button>
               </div>
               <div className="pull-right">
                 <Button type="button"
-                  onClick={()=>this.setState({open:false})}>
+                  onClick={() => setOpen(false) }>
                   Close
                 </Button>
               </div>
@@ -155,5 +170,4 @@ render() {
       </Popover>
     </div>
   );
-}
 }

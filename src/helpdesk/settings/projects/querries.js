@@ -12,6 +12,7 @@ query {
       milestones {
         id
         title
+        endsAt
       }
       def {
   			assignedTo {
@@ -85,6 +86,7 @@ query {
     }
     usersWithRights {
       id
+      fullName
     }
   }
 }

@@ -257,7 +257,9 @@ export default function CompanyEdit( props ) {
           rents: newRents,
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        //TODO update company list
+      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
