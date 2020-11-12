@@ -64,16 +64,13 @@ import {
   ADD_CUSTOM_ITEM,
   UPDATE_CUSTOM_ITEM,
   DELETE_CUSTOM_ITEM,
+  DELETE_TASK_ATTACHMENT,
 } from './querries';
 
 import {
   GET_FILTER,
   GET_PROJECT,
 } from 'apollo/localSchema/querries';
-
-import {
-  ADD_COMMENT
-} from '../components/comments/queries';
 
 import {
   REST_URL,
@@ -156,8 +153,7 @@ export default function TaskEditContainer( props ) {
   const [ updateCustomItem ] = useMutation( UPDATE_CUSTOM_ITEM );
   const [ deleteCustomItem ] = useMutation( DELETE_CUSTOM_ITEM );
   const [ addUserToProject ] = useMutation( ADD_USER_TO_PROJECT );
-  const [ addComment ] = useMutation( ADD_COMMENT );
-
+  const [ deleteTaskAttachment ] = useMutation( DELETE_TASK_ATTACHMENT );
 
   React.useEffect( () => {
     taskRefetch( {
@@ -610,6 +606,77 @@ export default function TaskEditContainer( props ) {
       } );
   }
 
+  const addAttachments = ( attachments ) => {
+    const formData = new FormData();
+    attachments.forEach( ( file ) => formData.append( `file`, file ) );
+    formData.append( "token", `Bearer ${localStorage.getItem('acctok')}` );
+    formData.append( "taskId", id );
+    axios.post( `${REST_URL}/upload-attachments`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      } )
+      .then( ( response ) => {
+        const newAttachments = response.data.attachments.map( ( attachment ) => ( {
+          ...attachment,
+          __typename: "TaskAttachment",
+        } ) )
+        const oldTask = client.readQuery( {
+            query: GET_TASK,
+            variables: {
+              id
+            }
+          } )
+          .task;
+        client.writeQuery( {
+          query: GET_TASK,
+          variables: {
+            id
+          },
+          data: {
+            task: {
+              ...oldTask,
+              taskAttachments: [ ...oldTask.taskAttachments, ...newAttachments ]
+            }
+          }
+        } )
+
+
+      } )
+  }
+
+  const removeAttachment = ( attachment ) => {
+    if ( window.confirm( "Are you sure?" ) ) {
+      deleteTaskAttachment( {
+          variables: {
+            id: attachment.id,
+          }
+        } )
+        .then( ( response ) => {
+          const oldTask = client.readQuery( {
+              query: GET_TASK,
+              variables: {
+                id
+              }
+            } )
+            .task;
+          client.writeQuery( {
+            query: GET_TASK,
+            variables: {
+              id
+            },
+            data: {
+              task: {
+                ...oldTask,
+                taskAttachments: oldTask.taskAttachments.filter( ( taskAttachment ) => taskAttachment.id !== attachment.id )
+              }
+            }
+          } )
+        } )
+    }
+
+  }
+
   const dataLoading = (
     myDataLoading ||
     statusesLoading ||
@@ -648,6 +715,8 @@ export default function TaskEditContainer( props ) {
       addCompanyToList={addCompanyToList}
       submitComment={submitComment}
       submitEmail={submitEmail}
+      addAttachments={addAttachments}
+      removeAttachment={removeAttachment}
       deleteTaskFunc={deleteTaskFunc}
       addSubtaskFunc={addSubtaskFunc}
       updateSubtaskFunc={updateSubtaskFunc}

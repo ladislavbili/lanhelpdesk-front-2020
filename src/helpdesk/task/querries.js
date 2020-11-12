@@ -219,6 +219,13 @@ query task($id: Int!){
 		updatedAt
 		createdAt
 		closeDate
+    taskAttachments{
+      id
+      path
+      filename
+      size
+      mimetype
+    }
 		assignedTo {
 			id
 			name
@@ -373,6 +380,13 @@ query task($id: Int!){
         fullName
         email
       }
+      commentAttachments{
+        id
+        path
+        filename
+        size
+        mimetype
+      }
       childComments {
         id
         createdAt
@@ -388,6 +402,13 @@ query task($id: Int!){
           id
           fullName
           email
+        }
+        commentAttachments{
+        id
+        path
+        filename
+        size
+        mimetype
         }
       }
 		}
@@ -685,6 +706,16 @@ mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean
 export const DELETE_CUSTOM_ITEM = gql `
 mutation deleteCustomItem($id: Int!) {
   deleteCustomItem(
+    id: $id,
+  ){
+    id
+  }
+}
+`;
+
+export const DELETE_TASK_ATTACHMENT = gql `
+mutation deleteTaskAttachment($id: Int!) {
+  deleteTaskAttachment(
     id: $id,
   ){
     id

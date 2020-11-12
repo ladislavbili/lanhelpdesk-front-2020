@@ -16,6 +16,7 @@
     "chroma-js": "^2.1.0",
     "ckeditor4-react": "^0.1.0",
     "ckeditor5-custom-build": "file:src/components/ckeditor5",
+    "downloadjs": "^1.4.7",
     "firebase": "^7.24.0",
     "graphql": "^15.4.0",
     "html-to-draftjs": "^1.4.0",

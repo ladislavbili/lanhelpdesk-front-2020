@@ -105,6 +105,8 @@ export default function TaskEdit( props ) {
     deleteTaskFunc,
     addUserToProject,
     addCompanyToList,
+    addAttachments,
+    removeAttachment,
     addSubtaskFunc,
     updateSubtaskFunc,
     deleteSubtaskFunc,
@@ -122,7 +124,6 @@ export default function TaskEdit( props ) {
   //state
   const [ layout, setLayout ] = React.useState( 1 );
 
-  const [ attachments, setAttachments ] = React.useState( [] );
   const [ assignedTo, setAssignedTo ] = React.useState( [] );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ comments, setComments ] = React.useState( [] );
@@ -1041,24 +1042,9 @@ export default function TaskEdit( props ) {
       <Attachments
         disabled={viewOnly}
         taskID={id}
-        attachments={attachments}
-        addAttachments={(newAttachments)=>{
-          let time = moment().valueOf();
-          newAttachments = newAttachments.map((attachment)=>{
-            return {
-              title:attachment.name,
-              size:attachment.size,
-              time,
-              data:attachment
-            }
-          });
-          setAttachments([...attachments, ...newAttachments]);
-        }}
-        removeAttachment={(attachment)=>{
-          let newAttachments = [...attachments];
-          newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
-          setAttachments([...newAttachments]);
-        }}
+        attachments={task.taskAttachments}
+        addAttachments={addAttachments}
+        removeAttachment={removeAttachment}
         />
     )
   }

@@ -22,6 +22,13 @@ import CKEditor from 'ckeditor4-react';
 import {
   selectStyle
 } from 'configs/components/select';
+import axios from 'axios';
+
+import {
+  REST_URL,
+} from 'configs/restAPI';
+
+import downloadjs from 'downloadjs';
 
 export default function Comments( props ) {
 
@@ -49,6 +56,32 @@ export default function Comments( props ) {
   React.useEffect( () => {
     setOpenedComments( [] )
   }, [ id ] );
+
+  const getAttachment = ( attachment ) => {
+    axios.get( `${REST_URL}/get-attachments`, {
+        params: {
+          type: "comment",
+          path: attachment.path
+        },
+        headers: {
+          'authorization': `Bearer ${localStorage.getItem('acctok')}`
+        },
+        responseType: 'arraybuffer',
+      } )
+      .then( ( response ) => {
+        /*
+        window.open(
+          URL.createObjectURL(
+            new Blob( [ response.data ], {
+              type: attachment.mimetype
+            } )
+          )
+        );
+        */
+        //download
+        downloadjs( response.data, attachment.filename, attachment.mimetype );
+      } )
+  }
 
   return (
     <div>
@@ -258,11 +291,9 @@ export default function Comments( props ) {
               </div>
             </div>
             <div className="m-l-40 m-b-30">
-              {comment.attachments && comment.attachments.map((attachment)=>
-                <span key={attachment.url} className="comment-attachment m-r-5">
-                  <a target="_blank" href={attachment.url} style={{cursor:'pointer'}} rel="noopener noreferrer">
-                    {attachment.title}
-                  </a>
+              {comment.commentAttachments && comment.commentAttachments.map((attachment)=>
+                <span key={attachment.id} className="comment-attachment link m-r-5" onClick={ () => getAttachment(attachment) }>
+                  {`${attachment.filename} (${attachment.size/1000}kb)`}
                 </span>
               )}
             </div>
@@ -284,11 +315,9 @@ export default function Comments( props ) {
               <div className="m-l-40 m-b-15 font-13" style={{marginTop: "-40px"}} dangerouslySetInnerHTML={{__html: comment.isEmail? comment.message : comment.message.replace(/(?:\r\n|\r|\n)/g, '<br>') }}>
               </div>
               <div className="m-l-40 m-b-30">
-                {comment.attachments && comment.attachments.map((attachment)=>
-                  <span key={attachment.url} className="comment-attachment m-r-5">
-                    <a target="_blank" href={attachment.url} style={{cursor:'pointer'}} rel="noopener noreferrer">
-                      {attachment.title}
-                    </a>
+                {comment.commentAttachments && comment.commentAttachments.map( (attachment) =>
+                  <span key={attachment.id} className="comment-attachment link m-r-5" onClick={ () => getAttachment(attachment) }>
+                    {`${attachment.filename} (${attachment.size/1000}kb)`}
                   </span>
                 )}
               </div>

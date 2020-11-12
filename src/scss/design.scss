@@ -654,8 +654,15 @@ h4{
 }
 
 .link{
-  color: $basic-button-color;
+  color: #007bff;
+  text-decoration: none;
 }
+
+.link:hover{
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .label{
   border-radius: 0px;
   background-color: $basic-button-color;
@@ -1091,7 +1098,7 @@ tr:last-child{
   color: white;
   margin-right: 10px;
 }
-.header-link:hover{
+.header-link:hover, .header-link:focus{
   text-decoration: none;
   border-bottom: 1px solid white;
   color: white;
