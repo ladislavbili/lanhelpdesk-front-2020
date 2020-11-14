@@ -7,9 +7,9 @@ query {
   statuses {
     title
     id
+    action
     order
     color
-    action
   }
 }
 `;
