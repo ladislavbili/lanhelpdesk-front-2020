@@ -25,33 +25,43 @@ export default function ReportsTable( props ) {
     onClickTask
   } = props;
 
-  const displayPausalSubtasks = columnsToShow.includes( 'description' ) &&
+  const displayPausalSubtasks = (
+    columnsToShow.includes( 'description' ) &&
     columnsToShow.includes( 'taskType' ) &&
     columnsToShow.includes( 'hours' ) &&
     !columnsToShow.includes( 'pricePerHour' ) &&
-    !columnsToShow.includes( 'totalPrice' );
+    !columnsToShow.includes( 'totalPrice' )
+  );
 
-  const displayPausalWorkTrips = columnsToShow.includes( 'tripType' ) &&
+  const displayPausalWorkTrips = (
+    columnsToShow.includes( 'tripType' ) &&
     columnsToShow.includes( 'quantity' ) &&
     !columnsToShow.includes( 'pricePerUnit' ) &&
-    !columnsToShow.includes( 'totalPrice' );
+    !columnsToShow.includes( 'totalPrice' )
+  );
 
-  const displayOverPausalSubtasks = columnsToShow.includes( 'description' ) &&
+  const displayOverPausalSubtasks = (
+    columnsToShow.includes( 'description' ) &&
     columnsToShow.includes( 'taskType' ) &&
     columnsToShow.includes( 'hours' ) &&
     columnsToShow.includes( 'pricePerHour' ) &&
-    columnsToShow.includes( 'totalPrice' );
+    columnsToShow.includes( 'totalPrice' )
+  );
 
-  const displayOverPausalWorkTrips = columnsToShow.includes( 'tripType' ) &&
+  const displayOverPausalWorkTrips = (
+    columnsToShow.includes( 'tripType' ) &&
     columnsToShow.includes( 'quantity' ) &&
     columnsToShow.includes( 'pricePerUnit' ) &&
-    columnsToShow.includes( 'totalPrice' );
+    columnsToShow.includes( 'totalPrice' )
+  );
 
-  const displayMaterials = columnsToShow.includes( 'material' ) &&
+  const displayMaterials = (
+    columnsToShow.includes( 'material' ) &&
     columnsToShow.includes( 'quantity' ) &&
     columnsToShow.includes( 'unit' ) &&
     columnsToShow.includes( 'pricePerQuantity' ) &&
-    columnsToShow.includes( 'totalPrice' );
+    columnsToShow.includes( 'totalPrice' )
+  );
 
   return (
     <table className="table m-b-10">

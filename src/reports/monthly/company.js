@@ -59,7 +59,7 @@ import {
 } from './querries';
 
 import {
-  GET_STATUSES_EXPANDED as GET_STATUSES
+  GET_STATUSES
 } from 'helpdesk/settings/statuses/querries';
 
 const columnsToShowPausalSubtasks = [
@@ -255,24 +255,24 @@ export default function MothlyReportsCompany( props ) {
 
   let allTasks = [];
   if ( newInvoice ) {
-    let pausalTasks = currentInvoiceData.pausalTasks.map( task => ( {
+    const pausalTasks = currentInvoiceData.pausalTasks.map( task => ( {
       id: task.id
     } ) );
     let ids = pausalTasks.map( task => id );
 
-    let overPausalTasks = currentInvoiceData.overPausalTasks.filter( task => !ids.includes( task.id ) );
+    const overPausalTasks = currentInvoiceData.overPausalTasks.filter( task => !ids.includes( task.id ) );
     ids.concat( overPausalTasks.map( task => id ) );
     allTasks = pausalTasks.concat( overPausalTasks.map( task => ( {
       id: task.id
     } ) ) );
 
-    let projectTasks = currentInvoiceData.projectTasks.filter( task => !ids.includes( task.id ) );
+    const projectTasks = currentInvoiceData.projectTasks.filter( task => !ids.includes( task.id ) );
     ids.concat( projectTasks.map( task => id ) );
     allTasks = pausalTasks.concat( projectTasks.map( task => ( {
       id: task.id
     } ) ) );
 
-    let materialTasks = currentInvoiceData.materialTasks.filter( task => !ids.includes( task.id ) );
+    const materialTasks = currentInvoiceData.materialTasks.filter( task => !ids.includes( task.id ) );
     ids.concat( materialTasks.map( task => id ) );
     allTasks = pausalTasks.concat( materialTasks.map( task => ( {
       id: task.id

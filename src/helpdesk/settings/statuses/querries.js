@@ -7,16 +7,6 @@ query {
   statuses {
     title
     id
-    order
-  }
-}
-`;
-
-export const GET_STATUSES_EXPANDED = gql `
-query {
-  statuses {
-    title
-    id
     action
     order
     color
