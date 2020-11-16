@@ -234,7 +234,7 @@ export default function Comments( props ) {
                 <div className="flex" >
                   <p>
                     <span className="media-meta pull-right text-muted">{timestampToString(comment.createdAt)}</span>
-                      <h2 className="font-13 m-0"><Label>From: {`${comment.user.fullName} (${comment.user.email})`}</Label></h2>
+                      <h2 className="font-13 m-0"><Label>From: {comment.user !== null ? `${comment.user.fullName} (${comment.user.email})` : 'Unknown user'}</Label></h2>
                       <h2 className="font-13 m-0"><Label>To: {comment.tos.toString()}</Label></h2>
                   </p>
                   <Dropdown className="center-hor pull-right"
@@ -309,7 +309,7 @@ export default function Comments( props ) {
                   />
                 <div className="flex">
                   <span className="media-meta pull-right text-muted">{timestampToString(comment.createdAt)}</span>
-                  <h2 className="font-13 m-0"><Label>{comment.user!==undefined?(comment.user.fullName):'Unknown sender'}</Label></h2>
+                  <h2 className="font-13 m-0"><Label>{comment.user !== null ? (comment.user.fullName) : 'Unknown sender'}</Label></h2>
                 </div>
               </div>
               <div className="m-l-40 m-b-15 font-13" style={{marginTop: "-40px"}} dangerouslySetInnerHTML={{__html: comment.isEmail? comment.message : comment.message.replace(/(?:\r\n|\r|\n)/g, '<br>') }}>

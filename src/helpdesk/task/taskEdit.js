@@ -230,17 +230,30 @@ export default function TaskEdit( props ) {
     }
   }, [ id ] );
 
-  const cantSave = (
-    title === "" ||
-    status === null ||
-    project === null ||
-    assignedTo.length === 0 ||
-    saving ||
-    viewOnly
-  );
+  const getCantSave = ( change = {} ) => {
+    const compare = {
+      title,
+      status,
+      project,
+      assignedTo,
+      saving,
+      viewOnly,
+      ...change,
+    }
+    return (
+      compare.title === "" ||
+      compare.status === null ||
+      compare.project === null ||
+      compare.assignedTo.length === 0 ||
+      compare.saving ||
+      compare.viewOnly
+    )
+  }
+
+  const cantSave = getCantSave();
 
   const autoUpdateTask = ( change ) => {
-    if ( cantSave ) {
+    if ( getCantSave( change ) ) {
       setChanges( {
         ...changes,
         ...change

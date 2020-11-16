@@ -62,7 +62,7 @@ export default function TaskAdd( props ) {
     defaultUnit,
     closeModal
   } = props;
-  console.log( currentUser );
+
   const [ addTask ] = useMutation( ADD_TASK );
 
   //state
