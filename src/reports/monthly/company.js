@@ -23,7 +23,9 @@ import Select from 'react-select';
 import {
   toSelArr,
   orderArr,
-  timestampToDate
+  timestampToDate,
+  timestampToString,
+  filterUnique
 } from 'helperFunctions';
 
 import MonthSelector from '../components/monthSelector';
@@ -253,32 +255,17 @@ export default function MothlyReportsCompany( props ) {
 
   const currentInvoiceData = companyInvoiceData ? companyInvoiceData.getCompanyInvoiceData : {};
 
-  let allTasks = [];
+  let allTasksIds = [];
   if ( newInvoice ) {
-    const pausalTasks = currentInvoiceData.pausalTasks.map( task => ( {
-      id: task.id
-    } ) );
-    let ids = pausalTasks.map( task => id );
-
-    const overPausalTasks = currentInvoiceData.overPausalTasks.filter( task => !ids.includes( task.id ) );
-    ids.concat( overPausalTasks.map( task => id ) );
-    allTasks = pausalTasks.concat( overPausalTasks.map( task => ( {
-      id: task.id
-    } ) ) );
-
-    const projectTasks = currentInvoiceData.projectTasks.filter( task => !ids.includes( task.id ) );
-    ids.concat( projectTasks.map( task => id ) );
-    allTasks = pausalTasks.concat( projectTasks.map( task => ( {
-      id: task.id
-    } ) ) );
-
-    const materialTasks = currentInvoiceData.materialTasks.filter( task => !ids.includes( task.id ) );
-    ids.concat( materialTasks.map( task => id ) );
-    allTasks = pausalTasks.concat( materialTasks.map( task => ( {
-      id: task.id
-    } ) ) );
+    allTasksIds = filterUnique( [
+      ...currentInvoiceData.pausalTasks.map( ( pausalTask ) => pausalTask.id ),
+      ...currentInvoiceData.overPausalTasks.map( ( overPausalTask ) => overPausalTask.task.id ),
+      ...currentInvoiceData.projectTasks.map( ( projectTask ) => projectTask.task.id ),
+      ...currentInvoiceData.materialTasks.map( ( materialTask ) => materialTask.task.id ),
+    ] )
   }
-
+  const invoiceLoaded = showCompany !== null && Object.keys( currentInvoiceData )
+    .length !== 0;
   return (
     <div className="scrollable fit-with-header">
       <h2 className="m-l-20 m-t-20">Firmy</h2>
@@ -343,10 +330,18 @@ export default function MothlyReportsCompany( props ) {
                 </tr>
               )
             }
+            {
+              INVOICE_COMPANIES.length === 0 &&
+              <tr
+                key="no-items"
+                >
+                <td colSpan="6">{`No invoiceable companies in date range ${timestampToString(fromDate.valueOf())} - ${timestampToString(toDate.valueOf())}`}</td>
+              </tr>
+            }
           </tbody>
         </table>
         {
-          showCompany !== null &&
+          invoiceLoaded &&
           <div className="commandbar">
             <Button
               className="btn-danger m-l-5 center-hor"
@@ -369,13 +364,11 @@ export default function MothlyReportsCompany( props ) {
         }
 
         {
-          showCompany !== null &&
-          Object.keys(currentInvoiceData).length === 0 &&
+          showCompany !== null && !invoiceLoaded &&
           <Loading />
         }
 
-        {showCompany !== null &&
-          Object.keys(currentInvoiceData).length > 0 &&
+        { invoiceLoaded &&
           <div className="p-20">
             <h2>Fakturačný výkaz firmy</h2>
             <div className="flex-row m-b-30">
@@ -815,15 +808,7 @@ export default function MothlyReportsCompany( props ) {
           toggle={ () => setNewInvoice(!newInvoice) }
           >
           <ModalHeader>
-            {
-              newInvoice ?
-              (
-                'Creating new invoice (' +
-                allTasks.reduce((acc,task) => acc + task.id + ',' , '' )
-                .slice(0,-1) + ')'
-              ) :
-              ''
-            }
+            { `Creating new invoice ( from tasks ${allTasksIds.toString()} )` }
           </ModalHeader>
           <ModalBody>
             <FormGroup>

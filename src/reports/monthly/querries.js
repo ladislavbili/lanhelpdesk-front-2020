@@ -277,6 +277,8 @@ mutation createTaskInvoice(
 		  statuses: $statuses,
 			companyId: $companyId,
 			title: $title
-    )
+    ){
+      title
+    }
 }
 `;

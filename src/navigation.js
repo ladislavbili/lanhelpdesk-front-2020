@@ -1,13 +1,19 @@
-import React, {Component} from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import React, {
+  Component
+} from 'react';
+import {
+  BrowserRouter,
+  Route,
+  Switch
+} from 'react-router-dom';
 
 import Reroute from 'reroute';
 import HelpdeskNavigation from 'helpdesk/navigation';
 import ReportsNavigation from 'reports/navigation';
 
 export default class Navigation extends Component {
-  render(){
-    return(
+  render() {
+    return (
       <BrowserRouter>
         <Switch>
           <Route exact path='/' component={Reroute} />
