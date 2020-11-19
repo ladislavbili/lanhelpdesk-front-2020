@@ -2,12 +2,18 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/client";
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
-  DropdownToggle
+  DropdownToggle,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
 } from 'reactstrap';
 import {
   Link
@@ -17,6 +23,8 @@ import {
 } from 'apollo/localSchema/actions';
 import classnames from 'classnames';
 
+import UserProfile from 'helpdesk/settings/users/userProfile';
+
 const GET_MY_DATA = gql `
 query {
   getMyData{
@@ -24,6 +32,7 @@ query {
     tasklistLayout
     role {
       accessRights {
+        viewVykaz
         publicFilters
         users
         companies
@@ -64,6 +73,7 @@ export default function PageHeader( props ) {
   const [ settingsOpen, setSettingsOpen ] = React.useState( false );
   const [ errorMessages /*, setErrorMessages*/ ] = React.useState( [] );
   const [ unreadNotifications /*, setUnreadNotifications */ ] = React.useState( [] );
+  const [ modalUserProfileOpen, setModalUserProfileOpen ] = React.useState( false );
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
@@ -129,29 +139,42 @@ export default function PageHeader( props ) {
       let unreadNotifications = [...props.currentUser.notifications].splice(5, props.currentUser.notifications.length - 1).filter((notification) => !notification.read);*/
   const URL = getLocation();
 
-  return ( <div className="page-header flex">
+  return (
+    <div className="page-header flex">
       <div className="d-flex full-height p-l-10">
         <div className="center-hor">
-          <Link to={{
-              pathname: `/helpdesk/taskList/i/all`
-            }} className={"header-link" + (
-              URL.includes("helpdesk/taskList")
-              ? " header-link-active"
-              : "")}>
+          <Link
+            to={{ pathname: `/helpdesk/taskList/i/all` }}
+            className={
+              "header-link" +
+              (
+                URL.includes("helpdesk/taskList") ?
+                " header-link-active" :
+                ""
+              )
+            }
+            >
             Úlohy
           </Link>
           {
-            (true) && <Link to={{
-                  pathname: `/reports`
-                }} className={"header-link" + (
-                  URL.includes("reports")
-                  ? " header-link-active"
-                  : "")}>
-                Vykazy
-              </Link>
+            accessRights.viewVykaz &&
+            <Link
+              to={{ pathname: `/reports` }}
+              className={
+                "header-link" +
+                (
+                  URL.includes("reports") ?
+                  " header-link-active" :
+                  ""
+                )
+              }
+              >
+              Vykazy
+            </Link>
           }
         </div>
         <div className="ml-auto center-hor row">
+          <i className="fas fa-user header-icon center-hor clickable w-25px" onClick={() => setModalUserProfileOpen(true)}></i>
           <i
             className={classnames({ "danger-color": errorMessages.length > 0 }, "header-icon fas fa-exclamation-triangle center-hor clickable")}
             style={{marginRight: 6}}
@@ -159,10 +182,12 @@ export default function PageHeader( props ) {
             />
           <span className={classnames({ "danger-color": errorMessages.length > 0 },"header-icon-text clickable")}>{errorMessages.length}</span>
 
-          { showLayoutSwitch &&
+          {
+            showLayoutSwitch &&
             <Dropdown className="center-hor"
               isOpen={layoutOpen}
-              toggle={() => setLayoutOpen(!layoutOpen)}>
+              toggle={() => setLayoutOpen(!layoutOpen)}
+              >
               <DropdownToggle className="header-dropdown">
                 <i className={"header-icon fa " + getLayoutIcon()}/>
               </DropdownToggle>
@@ -176,14 +201,16 @@ export default function PageHeader( props ) {
                     <input type="radio" name="options" checked={currentUser.tasklistLayout === 1} onChange={() => setTasklistLayout(1)}/>
                     <i className="fa fa-list"/>
                   </label>
-                  { dndLayout &&
+                  {
+                    dndLayout &&
                     <label className={classnames({'active':currentUser.tasklistLayout === 2}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
                       <input type="radio" name="options" onChange={() => setTasklistLayout(2)} checked={currentUser.tasklistLayout === 2}/>
                       <i className="fa fa-map"/>
                     </label>
                   }
 
-                  { calendarLayout &&
+                  {
+                    calendarLayout &&
                     <label className={classnames({'active':currentUser.tasklistLayout === 3}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
                       <input type="radio" name="options" onChange={() => setTasklistLayout(3)} checked={currentUser.tasklistLayout === 3}/>
                       <i className="fa fa-calendar-alt"/>
@@ -201,38 +228,46 @@ export default function PageHeader( props ) {
             <DropdownMenu right>
               <DropdownItem header={true}>Notifications</DropdownItem>
               <DropdownItem divider={true}/> {currentUser.notifications && currentUser.notifications.length === 0 && <DropdownItem>You have no notifications!</DropdownItem>}
-              {
-                processNotifications().splice(0, 5).map((notification) => <DropdownItem key={notification.id} onClick={() => {
-                    history.push('/helpdesk/notifications/' + notification.id + '/' + notification.task.id)
-                    if (!notification.read) {
-                  //    rebase.updateDoc('user_notifications/' + notification.id, {read: true});
-                    }
-                  }} className={classnames({
-                    'notification-read-small': notification.read,
-                    'notification-not-read-small': !notification.read
-                  })}>
-                  <div>
-                    <i className={classnames({
-                        'far fa-envelope-open': notification.read,
-                        'fas fa-envelope': !notification.read
-                      })}/> {notification.message}
-                  </div>
-                  <div style={{
-                      overflowX: 'hidden',
-                      maxWidth: 250
-                    }}>{notification.task.id}: {notification.task.title}
-                  </div>
-                </DropdownItem>)
+                {
+                  processNotifications().splice(0, 5).map( (notification) =>
+                  <DropdownItem
+                    key={notification.id}
+                    onClick={ () => {
+                      history.push('/helpdesk/notifications/' + notification.id + '/' + notification.task.id)
+                      if (!notification.read) {
+                        //    rebase.updateDoc('user_notifications/' + notification.id, {read: true});
+                      }
+                    }}
+                    className={classnames({
+                      'notification-read-small': notification.read,
+                      'notification-not-read-small': !notification.read
+                    })}
+                    >
+                    <div>
+                      <i className={classnames({
+                          'far fa-envelope-open': notification.read,
+                          'fas fa-envelope': !notification.read
+                        })}
+                        />
+                      {notification.message}
+                    </div>
+                    <div style={{
+                        overflowX: 'hidden',
+                        maxWidth: 250
+                      }}
+                      >
+                      {notification.task.id}: {notification.task.title}
+                    </div>
+                  </DropdownItem>
+                )
               }
               <DropdownItem divider={true}/>
               <DropdownItem onClick={() => history.push('/helpdesk/notifications/')}>
-                <span style={{
-                    fontWeight: 'bold'
-                  }}>Go to notifications</span>
+                <span style={{ fontWeight: 'bold' }} >Go to notifications</span>
                 {
-                  unreadNotifications.length > 0
-                    ? (' ' + unreadNotifications.length + ' more unread...')
-                    : ''
+                  unreadNotifications.length > 0 ?
+                  (' ' + unreadNotifications.length + ' more unread...') :
+                  ''
                 }
               </DropdownItem>
             </DropdownMenu>
@@ -240,40 +275,49 @@ export default function PageHeader( props ) {
           <span className="header-icon-text clickable">{unreadNotifications.length}</span>
 
           {
-            (currentUser) && settings && settings.length > 0 && <Dropdown className="center-hor" isOpen={settingsOpen} toggle={() =>setSettingsOpen(!settingsOpen)}>
-                <DropdownToggle className="header-dropdown">
-                  <i className="header-icon fa fa-cog"/>
-                </DropdownToggle>
-                <DropdownMenu right>
-                  <DropdownItem header={true}>Settings</DropdownItem>
-                  <DropdownItem divider={true} /> {
-                      settings.filter((setting) => accessRights[setting.value]
-                    ).map((item, index) =>
-                    <DropdownItem
-                      key={index}
-                      onClick={() => history.push(getLocation() + '/settings/' + item.link)}>{item.title}
-                    </DropdownItem>
-                  )}
-                </DropdownMenu>
-              </Dropdown>
-          }
-          <i className="header-icon clickable fa fa-sign-out-alt center-hor" onClick={() => {
-              if (window.confirm('Are you sure you want to log out?')) {
-                localStorage.removeItem("acctok");
-                setIsLoggedIn(false);
-              }
-            }}/>
-        </div>
+            (currentUser) &&
+            settings &&
+            settings.length > 0 &&
+            <Dropdown className="center-hor" isOpen={settingsOpen} toggle={() =>setSettingsOpen(!settingsOpen)}>
+              <DropdownToggle className="header-dropdown">
+                <i className="header-icon fa fa-cog"/>
+              </DropdownToggle>
+              <DropdownMenu right>
+                <DropdownItem header={true}>Settings</DropdownItem>
+                <DropdownItem divider={true} />
+                {settings.filter((setting) => accessRights[setting.value]).map((item, index) =>
+                  <DropdownItem
+                    key={index}
+                    onClick={() => history.push(getLocation() + '/settings/' + item.link)}
+                    >
+                    {item.title}
+                  </DropdownItem>
+                )}
+            </DropdownMenu>
+          </Dropdown>
+        }
+        <i
+          className="header-icon clickable fa fa-sign-out-alt center-hor"
+          onClick={() => {
+            if (window.confirm('Are you sure you want to log out?')) {
+              localStorage.removeItem("acctok");
+              setIsLoggedIn(false);
+            }
+          }}
+          />
       </div>
-    </div> );
+    </div>
+
+    <Modal style={{width: "800px"}} isOpen={modalUserProfileOpen}>
+      <ModalHeader>
+        User profile
+      </ModalHeader>
+        <ModalBody>
+          <UserProfile
+            closeModal={() => setModalUserProfileOpen(false)}
+            />
+        </ModalBody>
+      </Modal>
+  </div>
+  );
 }
-/*
-const mapStateToProps = ({userReducer, storageHelpTasks, storageErrorMessages}) => {
-  const {tasksActive, tasks} = storageHelpTasks;
-  const { errorMessagesActive, errorMessages } = storageErrorMessages;
-  return {
-    currentUser: userReducer,
-    tasksActive, tasks,
-    errorMessagesActive, errorMessages,
-  };
-};*/
