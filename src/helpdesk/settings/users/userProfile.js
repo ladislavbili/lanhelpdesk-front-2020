@@ -140,79 +140,79 @@ export default function UserProfile( props ) {
 
   return (
     <div className="p-t-10 p-b-20">
-        <FormGroup>
-          <Label for="username">Username</Label>
-          <Input type="text" name="username" id="username" placeholder="Enter username" value={ username } onChange={ (e) => setUsername(e.target.value) } />
-        </FormGroup>
-        <FormGroup>
-          <Label for="name">Name</Label>
-          <Input type="text" name="name" id="name" placeholder="Enter name" value={ name } onChange={ (e) => setName(e.target.value) } />
-        </FormGroup>
-        <FormGroup>
-          <Label for="surname">Surname</Label>
-          <Input type="text" name="surname" id="surname" placeholder="Enter surname" value={ surname } onChange={ (e) => setSurname(e.target.value) } />
-        </FormGroup>
-        <FormGroup>
-          <Label for="email">E-mail</Label>
-          <Input type="email" name="email" id="email" placeholder="Enter email" value={ email } onChange={ (e) => setEmail(e.target.value) } />
-        </FormGroup>
+      <FormGroup>
+        <Label for="username">Username</Label>
+        <Input type="text" name="username" id="username" placeholder="Enter username" value={ username } onChange={ (e) => setUsername(e.target.value) } />
+      </FormGroup>
+      <FormGroup>
+        <Label for="name">Name</Label>
+        <Input type="text" name="name" id="name" placeholder="Enter name" value={ name } onChange={ (e) => setName(e.target.value) } />
+      </FormGroup>
+      <FormGroup>
+        <Label for="surname">Surname</Label>
+        <Input type="text" name="surname" id="surname" placeholder="Enter surname" value={ surname } onChange={ (e) => setSurname(e.target.value) } />
+      </FormGroup>
+      <FormGroup>
+        <Label for="email">E-mail</Label>
+        <Input type="email" name="email" id="email" placeholder="Enter email" value={ email } onChange={ (e) => setEmail(e.target.value) } />
+      </FormGroup>
 
-        <FormGroup>
-          <Label for="language">Language</Label>
-          <Select
-            styles={ selectStyle }
-            options={ languages }
-            value={ language }
-            onChange={ lang => setLanguage(lang) }
-            />
-        </FormGroup>
-
-        <Checkbox
-          className = "m-b-5 p-l-0"
-          value = { receiveNotifications }
-          label = "Receive e-mail notifications"
-          onChange={()=> setReceiveNotifications(!receiveNotifications)}
+      <FormGroup>
+        <Label for="language">Language</Label>
+        <Select
+          styles={ selectStyle }
+          options={ languages }
+          value={ language }
+          onChange={ lang => setLanguage(lang) }
           />
+      </FormGroup>
 
-        <FormGroup>
-          <Label for="signature">Signature</Label>
-          <Input
-            type="textarea"
-            name="signature"
-            id="signature"
-            placeholder="Enter signature"
-            value={ signature }
-            onChange={ (e) => setSignature(e.target.value) }
-            />
-        </FormGroup>
+      <Checkbox
+        className = "m-b-5 p-l-0"
+        value = { receiveNotifications }
+        label = "Receive e-mail notifications"
+        onChange={()=> setReceiveNotifications(!receiveNotifications)}
+        />
 
-        <div className="row">
-          <Button
-            className="btn m-r-5"
-            disabled={ saving || ( COMPANIES.length === 0) || !isEmail(email) }
-            onClick={ updateProfileFunc }
-            >
-            { saving ? 'Saving user...' : 'Save user' }
-          </Button>
-            <Button
-              className="btn-link"
-              disabled={ saving || isDisabled }
-              onClick={ ()=>{
-                setPasswordChangeOpen(true);
-              }}
-              >{ password === null ? 'Change password' : 'Password change edit' }</Button>
-              <Button
-                className="btn-link ml-auto"
-                onClick={closeModal}
-                >Cancel</Button>
-        </div>
-        <PasswordChange
-          submitPass={(pass) => {
-            setPassword(pass);
-            setPasswordChangeOpen(false);
-           }}
-          isOpen={passwordChangeOpen}
+      <FormGroup>
+        <Label for="signature">Signature</Label>
+        <Input
+          type="textarea"
+          name="signature"
+          id="signature"
+          placeholder="Enter signature"
+          value={ signature }
+          onChange={ (e) => setSignature(e.target.value) }
           />
+      </FormGroup>
+
+      <div className="row">
+        <Button
+          className="btn m-r-5"
+          disabled={ saving || ( COMPANIES.length === 0) || !isEmail(email) }
+          onClick={ updateProfileFunc }
+          >
+          { saving ? 'Saving user...' : 'Save user' }
+        </Button>
+        <Button
+          className="btn-link"
+          disabled={ saving || isDisabled }
+          onClick={ ()=>{
+            setPasswordChangeOpen(true);
+          }}
+          >{ password === null ? 'Change password' : 'Password change edit' }</Button>
+        <Button
+          className="btn-link ml-auto"
+          onClick={closeModal}
+          >Cancel</Button>
+      </div>
+      <PasswordChange
+        submitPass={(pass) => {
+          setPassword(pass);
+          setPasswordChangeOpen(false);
+        }}
+        isOpen={passwordChangeOpen}
+        />
     </div>
   )
 }
