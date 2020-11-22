@@ -15,6 +15,8 @@ import {
   selectStyle
 } from "configs/components/select";
 
+import languages from "configs/constants/languages";
+
 import {
   isEmail,
   toSelArr
@@ -57,14 +59,6 @@ export default function UserAddContainer( props ) {
 
   const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
   const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
-
-  const languages = [ {
-    label: "SK",
-    value: "sk"
-  }, {
-    label: "ENG",
-    value: "en"
-  } ]
 
   //state
   const [ active ] = React.useState( true );

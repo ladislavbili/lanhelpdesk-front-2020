@@ -15,6 +15,8 @@ import {
   selectStyle
 } from "configs/components/select";
 
+import languages from "configs/constants/languages";
+
 import {
   isEmail,
   toSelArr
@@ -75,20 +77,6 @@ export default function UserEdit( props ) {
 
   const [ setUserActive ] = useMutation( SET_USER_ACTIVE );
 
-  const USER = ( userLoading ? [] : userData.user );
-  const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
-  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
-
-  const languages = [
-    {
-      label: "SK",
-      value: "sk"
-    },
-    {
-      label: "ENG",
-      value: "en"
-  }
- ]
 
   //state
   const [ active, setActive ] = React.useState( true );
@@ -109,24 +97,25 @@ export default function UserEdit( props ) {
   // sync
   React.useEffect( () => {
     if ( !userLoading ) {
-      setActive( USER.active );
-      setUsername( USER.username );
-      setEmail( USER.email );
-      setName( USER.name );
-      setSurname( USER.surname );
-      setReceiveNotifications( USER.receiveNotifications );
-      setSignature( ( USER.signature ? USER.signature : `${USER.name} ${USER.surname}, ${USER.company.title}` ) );
+      const user = myData.getMyData;
+      setActive( user.active );
+      setUsername( user.username );
+      setEmail( user.email );
+      setName( user.name );
+      setSurname( user.surname );
+      setReceiveNotifications( user.receiveNotifications );
+      setSignature( ( user.signature ? user.signature : `${user.name} ${user.surname}, ${user.company.title}` ) );
       setRole( {
-        ...USER.role,
-        label: USER.role.title,
-        value: USER.role.id
+        ...user.role,
+        label: user.role.title,
+        value: user.role.id
       } );
       setCompany( {
-        ...USER.company,
-        label: USER.company.title,
-        value: USER.company.id
+        ...user.company,
+        label: user.company.title,
+        value: user.company.id
       } );
-      setLanguage( USER.language === "sk" ? languages[ 0 ] : languages[ 1 ] );
+      setLanguage( languages.find( language => language.value === user.language ) );
     }
   }, [ userLoading ] );
 
@@ -235,6 +224,9 @@ export default function UserEdit( props ) {
     return <Loading />
   }
 
+  const USER = userData.user;
+  const ROLES = toSelArr( rolesData.roles );
+  const COMPANIES = toSelArr( companiesData.basicCompanies );
   const myRoleLevel = myData === undefined ? null : myData.getMyData.role.level;
   const isDisabled = myRoleLevel === null || ( myRoleLevel !== 0 && myRoleLevel >= role.level );
 

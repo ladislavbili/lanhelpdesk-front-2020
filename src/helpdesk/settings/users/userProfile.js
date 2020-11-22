@@ -15,6 +15,8 @@ import {
   selectStyle
 } from "configs/components/select";
 
+import languages from "configs/constants/languages";
+
 import {
   isEmail,
   toSelArr
@@ -26,10 +28,6 @@ import {
   GET_MY_DATA,
   GET_USERS
 } from './querries';
-
-import {
-  GET_ROLES,
-} from '../roles/querries';
 
 import {
   GET_BASIC_COMPANIES,
@@ -45,10 +43,6 @@ export default function UserProfile( props ) {
     closeModal
   } = props;
   const {
-    data: rolesData,
-    loading: rolesLoading
-  } = useQuery( GET_ROLES );
-  const {
     data: myData,
     loading: myDataLoading
   } = useQuery( GET_MY_DATA );
@@ -61,20 +55,7 @@ export default function UserProfile( props ) {
     client
   } ] = useMutation( UPDATE_PROFILE );
 
-  const USER = ( myDataLoading ? [] : myData.getMyData );
-  const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
-  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
 
-  const languages = [
-    {
-      label: "SK",
-      value: "sk"
-    },
-    {
-      label: "ENG",
-      value: "en"
-  }
- ]
 
   //state
   const [ username, setUsername ] = React.useState( "" );
@@ -91,13 +72,14 @@ export default function UserProfile( props ) {
   // sync
   React.useEffect( () => {
     if ( !myDataLoading ) {
-      setUsername( USER.username );
-      setEmail( USER.email );
-      setName( USER.name );
-      setSurname( USER.surname );
-      setReceiveNotifications( USER.receiveNotifications );
-      setSignature( ( USER.signature ? USER.signature : `${USER.name} ${USER.surname}, ${USER.company.title}` ) );
-      setLanguage( USER.language === "sk" ? languages[ 0 ] : languages[ 1 ] );
+      const user = myData.getMyData;
+      setUsername( user.username );
+      setEmail( user.email );
+      setName( user.name );
+      setSurname( user.surname );
+      setReceiveNotifications( user.receiveNotifications );
+      setSignature( ( user.signature ? user.signature : `${user.name} ${user.surname}, ${user.company.title}` ) );
+      setLanguage( languages.find( language => language.value === user.language ) );
     }
   }, [ myDataLoading ] );
 
@@ -131,12 +113,12 @@ export default function UserProfile( props ) {
     setSaving( false );
   };
 
-  if ( rolesLoading || companiesLoading || myDataLoading ) {
+  if ( companiesLoading || myDataLoading ) {
     return <Loading />
   }
 
-  const myRoleLevel = myData === undefined ? null : myData.getMyData.role.level;
-  const isDisabled = myRoleLevel === null || ( myRoleLevel !== 0 && myRoleLevel >= role.level );
+  const USER = myData.getMyData;
+  const COMPANIES = toSelArr( companiesData.basicCompanies );
 
   return (
     <div className="p-t-10 p-b-20">
@@ -196,7 +178,7 @@ export default function UserProfile( props ) {
         </Button>
         <Button
           className="btn-link"
-          disabled={ saving || isDisabled }
+          disabled={ saving }
           onClick={ ()=>{
             setPasswordChangeOpen(true);
           }}
