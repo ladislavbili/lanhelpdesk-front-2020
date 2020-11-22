@@ -1,50 +1,61 @@
-import React, { Component } from 'react';
-import { Label } from 'reactstrap';
-import { timestampToString } from 'helperFunctions';
+import React from 'react';
+import {
+  Label
+} from 'reactstrap';
+import {
+  timestampToString,
+  toMomentInput,
+  timestampToDate
+} from 'helperFunctions';
 
-export default class Attachments extends Component {
+export default function Attachments( props ) {
 
-	getLocation() {
-    let url = this.props.history.location.pathname;
-    if (url.includes('cmdb')) {
+  const {
+    history,
+    errorMessage
+  } = props;
+
+  const getLocation = () => {
+    let url = history.location.pathname;
+    if ( url.includes( 'cmdb' ) ) {
       return '/cmdb';
-    } else if (url.includes('helpdesk')) {
+    } else if ( url.includes( 'helpdesk' ) ) {
       return '/helpdesk';
-    } else if (url.includes('passmanager')) {
+    } else if ( url.includes( 'passmanager' ) ) {
       return '/passmanager';
-    } else if (url.includes('expenditures')) {
+    } else if ( url.includes( 'expenditures' ) ) {
       return '/expenditures';
-    } else if (url.includes('projects')) {
+    } else if ( url.includes( 'projects' ) ) {
       return '/projects';
-    } else if (url.includes('reports')) {
+    } else if ( url.includes( 'reports' ) ) {
       return '/reports';
-    } else if (url.includes('monitoring')) {
+    } else if ( url.includes( 'monitoring' ) ) {
       return '/monitoring';
     } else {
       return '/lanwiki';
     }
   }
 
-	getEditURL(){
-		switch (this.props.errorMessage.type) {
-			case 'smtps':{
-				return `${this.getLocation()}/settings/smtps/${this.props.errorMessage.sourceID}`
-			}
-			case 'imaps':{
-				return `${this.getLocation()}/settings/imaps/${this.props.errorMessage.sourceID}`
-			}
-			default:{
-				return this.getLocation();
-			}
+  const getEditURL = () => {
+    switch ( errorMessage.type ) {
+      case 'smtps': {
+        return `${getLocation()}/settings/smtps/${errorMessage.sourceId}`
+      }
+      case 'imaps': {
+        return `${getLocation()}/settings/imaps/${errorMessage.sourceId}`
+      }
+      default: {
+        return getLocation();
+      }
 
 
-		}
-	}
+    }
+  }
 
-	render() {
-		const error = this.props.errorMessage;
-		return (
-			<div>
+
+  const error = errorMessage;
+  return (
+    <div>
 				<div className="commandbar"></div>
 			<div className="p-20 scroll-visible fit-with-header-and-commandbar">
 				<div>
@@ -53,11 +64,7 @@ export default class Attachments extends Component {
 				</div>
 				<div>
 				<Label>Created at:</Label>
-				{` ${timestampToString(error.createdAt)}`}
-				</div>
-				<div>
-				<Label>Error message:</Label>
-				{` ${error.errorMessage}`}
+				{` ${timestampToString(error.createdAt / 1000)} ${error.user ? "by " + error.user.email : ""}`}
 				</div>
 				<div>
 				<Label>Source of the error:</Label>
@@ -66,35 +73,14 @@ export default class Attachments extends Component {
 				{ error.sourceID !== null &&
 				<div>
 					<Label>Related ID:</Label>
-					{` ${error.sourceID} `}<Label className="clickable" onClick={ ()=> this.props.history.push(this.getEditURL()) }>Open related item</Label>
+					{` ${error.sourceId} `}<Label className="clickable" onClick={ ()=> history.push(getEditURL()) }>Open related item</Label>
 				</div>
 				}
-				{ error.sourceItem !== null &&
-					<div>
-						<Label>Source of the error - data:</Label>
-						<div className="ml-5 mt-2">
-						{Object.keys(error.sourceItem).map((key)=>
-								<div key={key}>
-									<Label>{key}</Label>
-									{`: ${ key !== 'password' ? error.sourceItem[key]  : 'hidden'}`}
-								</div>
-							)}
-						</div>
-					</div>
-				}
 				<div>
-					<Label>Full error data:</Label>
-					<div className="ml-5 mt-2">
-					{Object.keys(error.error).filter((key) => error.error[key] !== null ).map((key)=>
-							<div key={key}>
-								<Label>{key}</Label>
-								{`: ${ error.error[key] }`}
-							</div>
-						)}
-					</div>
+				<Label>Error message:</Label>
+				{` ${error.errorMessage}`}
 				</div>
 			</div>
 		</div>
-		);
-	}
+  );
 }

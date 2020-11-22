@@ -1,80 +1,191 @@
-import React, { Component } from 'react';
-import { ListGroupItem, Label } from 'reactstrap';
+import React from 'react';
+import {
+  useMutation,
+  useQuery
+} from "@apollo/client";
+import {
+  ListGroupItem,
+  Label
+} from 'reactstrap';
 import Select from 'react-select';
 import classnames from 'classnames';
-import { rebase } from 'index';
-import { invisibleSelectStyleNoArrow } from 'configs/components/select';
+import Loading from 'components/loading';
+import {
+  invisibleSelectStyleNoArrow
+} from 'configs/components/select';
 import ErrorInfo from './errorInfo';
 
-import { timestampToString } from 'helperFunctions';
-import { connect } from "react-redux";
-import { storageErrorMessagesStart } from 'redux/actions';
+import {
+  timestampToString
+} from 'helperFunctions';
 
-const noTypeFilter = { value: null, label:'All types' }
+import {
+  GET_ERROR_MESSAGES,
+  SET_ERROR_MESSAGE_READ,
+  SET_ALL_ERROR_MESSAGES_READ,
+  DELETE_ALL_ERROR_MESSAGES,
+  DELETE_SELECTED_ERROR_MESSAGES,
+} from './queries';
 
-class ErrorList extends Component {
-  constructor(props){
-    super(props);
-    this.state={
-      searchFilter: '',
-      selectedErrorID: null,
-      type: noTypeFilter
+const noTypeFilter = {
+  value: null,
+  label: 'All types'
+};
+
+export default function ErrorList( props ) {
+  const {
+    data: errorMessagesData,
+    loading: errorMessagesLoading
+  } = useQuery( GET_ERROR_MESSAGES );
+
+  const [ setErrorMessageRead ] = useMutation( SET_ERROR_MESSAGE_READ );
+  const [ setAllErrorMessagesRead ] = useMutation( SET_ALL_ERROR_MESSAGES_READ );
+  const [ deleteAllErrorMessages ] = useMutation( DELETE_ALL_ERROR_MESSAGES );
+  const [ deleteSelectedErrorMessages ] = useMutation( DELETE_SELECTED_ERROR_MESSAGES );
+
+  const {
+    history
+  } = props;
+
+  const [ searchFilter, setSearchFilter ] = React.useState( '' );
+  const [ selectedErrorID, setSelectedErrorID ] = React.useState( null );
+  const [ type, setType ] = React.useState( noTypeFilter );
+
+  const [ errorMessages, setErrorMessages ] = React.useState( [] );
+
+  // sync
+  React.useEffect( () => {
+    if ( !errorMessagesLoading ) {
+      setErrorMessages( errorMessagesData.errorMessages );
     }
+  }, [ errorMessagesLoading ] );
+
+  const filterErrors = () => {
+    let search = searchFilter.toLowerCase();
+    return errorMessages.filter( ( errorMessage ) => (
+        (
+          type.value === null || errorMessage.type === type.value
+        ) && (
+          ( timestampToString( errorMessage.createdAt )
+            .includes( search ) ) ||
+          ( errorMessage.errorMessage && errorMessage.errorMessage.toLowerCase()
+            .includes( search ) ) ||
+          ( errorMessage.source && errorMessage.source.toLowerCase()
+            .includes( search ) ) ||
+          ( errorMessage.sourceID && errorMessage.sourceID.toString()
+            .toLowerCase()
+            .includes( search ) ) ||
+          ( errorMessage.type && errorMessage.type.toLowerCase()
+            .includes( search ) )
+        )
+      ) )
+      .sort( ( errorMessage1, errorMessage2 ) => errorMessage1.createdAt > errorMessage2.createdAt ? -1 : 1 )
   }
 
-  componentWillMount(){
-    if(!this.props.errorMessagesActive){
-      this.props.storageErrorMessagesStart();
-    }
-  }
-
-  filterErrors(){
-    let search = this.state.searchFilter.toLowerCase();
-    return this.props.errorMessages.filter((errorMessage)=>(
-      (
-        this.state.type.value === null || errorMessage.type === this.state.type.value
-      ) && (
-        ( timestampToString(errorMessage.createdAt).includes(search) ) ||
-        ( errorMessage.errorMessage && errorMessage.errorMessage.toLowerCase().includes(search) ) ||
-        ( errorMessage.source && errorMessage.source.toLowerCase().includes(search) ) ||
-        ( errorMessage.sourceID && errorMessage.sourceID.toLowerCase().includes(search) ) ||
-        ( errorMessage.type && errorMessage.type.toLowerCase().includes(search) )
-      )
-    )).sort( (errorMessage1, errorMessage2) => errorMessage1.createdAt > errorMessage2.createdAt ? -1 : 1 )
-  }
-
-  getTypes(){
+  const getTypes = () => {
     let typeFilter = [ noTypeFilter ];
-    this.props.errorMessages.forEach((errorMessage) => {
-      if(!typeFilter.some((type) => type.value === errorMessage.type)){
-        typeFilter.push({ value: errorMessage.type, label: errorMessage.type })
+    errorMessages.forEach( ( errorMessage ) => {
+      if ( !typeFilter.some( ( type ) => type.value === errorMessage.type ) ) {
+        typeFilter.push( {
+          value: errorMessage.type,
+          label: errorMessage.type
+        } )
       }
-    });
+    } );
     return typeFilter;
   }
 
-  markAllAsRead(){
-    if(window.confirm('Ste si istý že chcete všetky správy označiť ako prečítané?')){
-      this.filterErrors().filter((errorMessage)=>!errorMessage.read).forEach((errorMessage) => rebase.updateDoc('error_messages/' + errorMessage.id, {read:true}));
-    }
-  }
-  deleteAll(){
-    if(window.confirm('Ste si istý že chcete všetky správy vymazať?')){
-      this.filterErrors().forEach((errorMessage) => rebase.removeDoc('/error_messages/'+ errorMessage.id));
-      this.setState({ selectedErrorID: null });
-    }
-  }
-  deleteRead(){
-    if(window.confirm('Ste si istý že chcete všetky prečítané správy vymazať?')){
-      this.filterErrors().filter((errorMessage)=>errorMessage.read).forEach((errorMessage) => rebase.removeDoc('/error_messages/'+ errorMessage.id));
-      this.setState({ selectedErrorID: null });
+  const setErrorMessageReadFunc = ( error ) => {
+    setSelectedErrorID( error.id );
+    if ( !error.read ) {
+      setErrorMessageRead( {
+          variables: {
+            id: error.id,
+            read: true,
+          }
+        } )
+        .then( ( response ) => {
+          const newErrorMessages = errorMessages.map( errorMessage =>
+            errorMessage.id === error.id ?
+            ( {
+              ...errorMessage,
+              read: true
+            } ) :
+            ( {
+              ...errorMessage
+            } )
+          );
+          setErrorMessages( newErrorMessages );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
     }
   }
 
-  render(){
-    const errors = this.filterErrors();
-    return (
-			<div className="content">
+  const markAllAsRead = () => {
+    if ( window.confirm( 'Ste si istý že chcete všetky správy označiť ako prečítané?' ) ) {
+      setAllErrorMessagesRead( {
+          variables: {
+            read: true,
+          }
+        } )
+        .then( ( response ) => {
+          const newErrorMessages = errorMessages.map( errorMessage =>
+            ( {
+              ...errorMessage,
+              read: true
+            } )
+          );
+          setErrorMessages( newErrorMessages );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
+    }
+  }
+
+  const deleteAll = () => {
+    if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
+      deleteAllErrorMessages()
+        .then( ( response ) => {
+          setErrorMessages( [] );
+          setSelectedErrorID( null );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
+    }
+  }
+
+  const deleteRead = () => {
+    if ( window.confirm( 'Ste si istý že chcete všetky prečítané správy vymazať?' ) ) {
+      const readErrorMessages = errorMessages.filter( errorMessage => errorMessage.read )
+        .map( errorMessage => errorMessage.id );
+      deleteSelectedErrorMessages( {
+          variables: {
+            ids: readErrorMessages,
+          }
+        } )
+        .then( ( response ) => {
+          const newErrorMessages = errorMessages.filter( errorMessage => !errorMessage.read );
+          setErrorMessages( newErrorMessages );
+          setSelectedErrorID( null );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
+    }
+  }
+
+  if ( errorMessagesLoading ) {
+    return <Loading />
+  }
+
+  const errors = filterErrors();
+
+  return (
+    <div className="content">
         <div className="row m-0 p-0 taskList-container">
           <div className="col-lg-4">
             <div className="commandbar">
@@ -86,17 +197,17 @@ class ErrorList extends Component {
                   <input
                     type="text"
                     className="form-control search-text"
-                    value={this.state.searchFilter}
-                    onChange={(e)=>this.setState({searchFilter:e.target.value})}
+                    value={searchFilter}
+                    onChange={(e) => setSearchFilter( e.target.value )}
                     placeholder="Search"
                     />
                 </div>
               </div>
               <span className="ml-3 center-hor mr-3" style={{width:175}}>
               <Select
-                value={this.state.type}
-                onChange={(type)=> this.setState({ type }) }
-                options={this.getTypes()}
+                value={type}
+                onChange={(type) => setType( type ) }
+                options={getTypes()}
                 styles={invisibleSelectStyleNoArrow}
                 />
             </span>
@@ -108,9 +219,9 @@ class ErrorList extends Component {
                 </h2>
               </div>
               <div>
-                <button type="button" className="btn btn-link waves-effect" onClick={this.markAllAsRead.bind(this)} disabled={errors.every((error)=>error.read)}>Označit všetky ako prečítané</button>
-                <button type="button" className="btn btn-link waves-effect" onClick={this.deleteAll.bind(this)} disabled={errors.length === 0}>Vymazať všetky</button>
-                <button type="button" className="btn btn-link waves-effect" onClick={this.deleteRead.bind(this)} disabled={errors.filter((error)=>error.read).length === 0}>Vymazať prečítané</button>
+                <button type="button" className="btn btn-link waves-effect" onClick={markAllAsRead} disabled={errors.every((error)=>error.read)}>Označit všetky ako prečítané</button>
+                <button type="button" className="btn btn-link waves-effect" onClick={deleteAll} disabled={errors.length === 0}>Vymazať všetky</button>
+                <button type="button" className="btn btn-link waves-effect" onClick={deleteRead} disabled={errors.filter((error)=>error.read).length === 0}>Vymazať prečítané</button>
               </div>
               <div>
                 <table className="table table-hover">
@@ -121,48 +232,41 @@ class ErrorList extends Component {
                         key={error.id}
                         className={classnames({ 'notification-read': error.read,
                           'notification-not-read': !error.read,
-                          'sidebar-item-active': this.state.selectedErrorID === error.id },
+                          'sidebar-item-active': selectedErrorID === error.id },
                           "clickable")}
-                          onClick={()=> {
-                            this.setState({ selectedErrorID: error.id })
-                            if(!error.read){
-                              rebase.updateDoc('error_messages/' + error.id, {read:true} );
-                            }
-                          }}>
-                          <td className={(this.state.selectedErrorID === error.id ? "text-highlight":"")}>
-                            <i className={classnames({ 'far fa-envelope-open': error.read, 'fas fa-envelope': !error.read })} /> {error.errorMessage}
-                            <div>
-                              <Label>{timestampToString(error.createdAt)}</Label>
+                          onClick={() => setErrorMessageReadFunc(error)}
+                          >
+                          <td className={(selectedErrorID === error.id ? "text-highlight":"")}>
+                            <i className={classnames({ 'far fa-envelope-open': error.read, 'fas fa-envelope': !error.read })} /> {error.source}
+                            <div className="row">
+                              <div>
+                                {error.user ? error.user.email : "no user"}
+                              </div>
+                              <div className="ml-auto m-r-55">
+                                {timestampToString(error.createdAt/1000)}
+                              </div>
                             </div>
-                            <div style={{overflowX:'hidden'}}>{error.source}</div>
+                            <div style={{overflowX:'hidden'}}>{error.errorMessage.substring(0, 150)}...</div>
                             </td>
                           </tr>
                         )
                       }
                     </tbody>
                 </table>
-                {this.props.errorMessages.length === 0 && <ListGroupItem>There are no errors!</ListGroupItem>}
+                {errorMessages.length === 0 && <ListGroupItem>There are no errors!</ListGroupItem>}
               </div>
 
             </div>
           </div>
           <div className="col-lg-8">
-            { this.state.selectedErrorID !== null &&
-              <ErrorInfo errorMessage={ this.props.errorMessages.find((errorMessage) => errorMessage.id === this.state.selectedErrorID )} history={this.props.history} />
+            { selectedErrorID !== null &&
+              <ErrorInfo errorMessage={ errorMessages.find((errorMessage) => errorMessage.id === selectedErrorID )} history={history} />
             }
-            { this.state.selectedErrorID === null &&
+            { selectedErrorID === null &&
               <div className="commandbar"></div>
             }
           </div>
         </div>
       </div>
-    );
-  }
+  );
 }
-
-const mapStateToProps = ({ storageErrorMessages }) => {
-const { errorMessagesActive, errorMessages } = storageErrorMessages;
-  return { errorMessagesActive, errorMessages };
-};
-
-export default connect(mapStateToProps, { storageErrorMessagesStart })(ErrorList);

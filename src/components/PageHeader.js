@@ -178,7 +178,7 @@ export default function PageHeader( props ) {
           <i
             className={classnames({ "danger-color": errorMessages.length > 0 }, "header-icon fas fa-exclamation-triangle center-hor clickable")}
             style={{marginRight: 6}}
-            onClick={() => history.push(`${this.getLocation()}/errorMessages/`)}
+            onClick={() => history.push(`${getLocation()}/errorMessages/`)}
             />
           <span className={classnames({ "danger-color": errorMessages.length > 0 },"header-icon-text clickable")}>{errorMessages.length}</span>
 

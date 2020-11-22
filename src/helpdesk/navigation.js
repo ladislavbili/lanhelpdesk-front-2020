@@ -2,7 +2,9 @@ import React from 'react';
 import {
   useQuery
 } from "@apollo/client";
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 
 import {
   Route
@@ -109,8 +111,7 @@ export default function Navigation( props ) {
       </div>
 
       <div className="row center center-ver h-100vh">
-        <Route path="/helpdesk/taskList/i/:filterID" component={Sidebar} />
-        <Route path="/helpdesk/settings" component={Sidebar} />
+        <Route path="/helpdesk" component={Sidebar} />
         <div className="main">
           <Route exact path="/helpdesk/errorMessages" component={ErrorMessages} />
 
