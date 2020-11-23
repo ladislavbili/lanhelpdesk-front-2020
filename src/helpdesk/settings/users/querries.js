@@ -140,6 +140,45 @@ mutation updateUser(
 }
 `;
 
+export const UPDATE_PROFILE = gql `
+mutation updateProfile(
+  $username: String,
+  $email: String,
+  $name: String,
+  $surname: String,
+  $receiveNotifications: Boolean,
+  $signature: String,
+  $language: LanguageEnum
+  $password: String
+  ) {
+  updateProfile(
+    username: $username,
+    email: $email,
+    name: $name,
+    surname: $surname,
+    receiveNotifications: $receiveNotifications,
+    signature: $signature,
+    language: $language,
+    password: $password
+  ){
+    accessToken
+    user {
+      id
+      email
+      username
+      role {
+        id
+        title
+      }
+      company {
+        id
+        title
+      }
+    }
+  }
+}
+`;
+
 export const DELETE_USER = gql `
 mutation deleteUser($id: Int!) {
   deleteUser(
@@ -164,10 +203,16 @@ mutation setUserActive($id: Int!, $active: Boolean!) {
 export const GET_MY_DATA = gql `
 query {
   getMyData{
-    id
+    username
+    email
+    name
+    surname
+    receiveNotifications
+    signature
     role {
       level
     }
+    language
   }
 }
 `;
