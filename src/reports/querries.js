@@ -8,6 +8,7 @@ query {
     role {
       accessRights {
         viewVykaz
+        viewErrors
         viewRozpocet
         publicFilters
         users

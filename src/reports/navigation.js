@@ -48,9 +48,9 @@ export default function Navigation( props ) {
       <div className="row center center-ver h-100vh">
         <Sidebar {...props} canSeeVykazy={accessRights.viewVykaz} />
         <div className="main">
-          
+
           { accessRights.viewVykaz && <Route exact path="/reports" component={RerouteToMonthlyCompany} /> }
-          { accessRights.viewVykaz && <Route exact path="/reports/errorMessages" component={ErrorMessages} /> }
+          { accessRights.viewVykaz && accessRights.viewErrors && <Route exact path="/reports/errorMessages" component={ErrorMessages} /> }
           { accessRights.viewVykaz && <Route exact path="/reports/monthly/companies" component={CompanyMonthlyReport} /> }
           { accessRights.viewVykaz && <Route exact path="/reports/monthly/requester" component={AssignedMonthlyReport} /> }
           { accessRights.viewVykaz && <Route exact path="/reports/company_invoices" component={CompanyInvoices} /> }

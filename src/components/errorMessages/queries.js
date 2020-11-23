@@ -13,14 +13,11 @@ mutation setErrorMessageRead($id: Int!, $read: Boolean!) {
 }
 `;
 
-
 export const SET_ALL_ERROR_MESSAGES_READ = gql `
 mutation setAllErrorMessageSRead($read: Boolean!) {
   setAllErrorMessagesRead(
     read: $read
-  ) {
-    read
-  }
+  )
 }
 `;
 
@@ -34,9 +31,7 @@ export const DELETE_SELECTED_ERROR_MESSAGES = gql `
 mutation deleteSelectedErrorMessages($ids: [Int]!) {
   deleteSelectedErrorMessages(
     ids: $ids,
-  ) {
-    id
-  }
+  )
 }
 `;
 

@@ -1,7 +1,9 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  has,
+  cache
 } from "@apollo/client";
 import {
   Button,
@@ -26,12 +28,10 @@ import Checkbox from 'components/checkbox';
 import {
   UPDATE_PROFILE,
   GET_MY_DATA,
+  GET_BASIC_USERS,
   GET_USERS
 } from './querries';
 
-import {
-  GET_BASIC_COMPANIES,
-} from '../companies/querries';
 import PasswordChange from './passChange';
 
 
@@ -42,20 +42,15 @@ export default function UserProfile( props ) {
     match,
     closeModal
   } = props;
+
   const {
     data: myData,
     loading: myDataLoading
   } = useQuery( GET_MY_DATA );
-  const {
-    data: companiesData,
-    loading: companiesLoading
-  } = useQuery( GET_BASIC_COMPANIES );
 
   const [ updateProfile, {
     client
   } ] = useMutation( UPDATE_PROFILE );
-
-
 
   //state
   const [ username, setUsername ] = React.useState( "" );
@@ -105,20 +100,66 @@ export default function UserProfile( props ) {
         if ( password !== null && password.length >= 6 ) {
           localStorage.setItem( "acctok", response.data.updateProfile.accessToken );
         }
-        closeModal();
+        try {
+          const allUsers = client.readQuery( {
+              query: GET_USERS
+            } )
+            .users;
+          client.writeQuery( {
+            query: GET_USERS,
+            data: {
+              users: allUsers.map( user => ( user.id !== response.data.updateProfile.user.id ? user : {
+                ...user,
+                username,
+                email,
+                name,
+                surname,
+                receiveNotifications,
+                signature,
+                language
+              } ) )
+            }
+          } );
+        } catch ( err ) {
+          console.log( "Users are not yet in the cache." );
+        }
+        try {
+          let allBasicUsers = client.readQuery( {
+              query: GET_BASIC_USERS
+            } )
+            .basicUsers;
+          client.writeQuery( {
+            query: GET_BASIC_USERS,
+            data: {
+              basicUsers: allBasicUsers.map( user => ( user.id !== response.data.updateProfile.user.id ? user : {
+                ...user,
+                username,
+                email,
+                name,
+                surname,
+                receiveNotifications,
+                signature,
+                language
+              } ) )
+            }
+          } );
+        } catch ( err ) {
+          console.log( "BasicUsers are not yet in the cache." );
+        }
       } )
       .catch( ( err ) => {
         console.log( err.message );
+        console.log( err );
       } );
     setSaving( false );
+    closeModal();
   };
 
-  if ( companiesLoading || myDataLoading ) {
+  if ( myDataLoading ) {
     return <Loading />
   }
 
   const USER = myData.getMyData;
-  const COMPANIES = toSelArr( companiesData.basicCompanies );
 
   return (
     <div className="p-t-10 p-b-20">
@@ -171,8 +212,8 @@ export default function UserProfile( props ) {
       <div className="row">
         <Button
           className="btn m-r-5"
-          disabled={ saving || ( COMPANIES.length === 0) || !isEmail(email) }
-          onClick={ updateProfileFunc }
+          disabled={ saving || !isEmail(email) }
+          onClick={updateProfileFunc}
           >
           { saving ? 'Saving user...' : 'Save user' }
         </Button>
@@ -182,11 +223,15 @@ export default function UserProfile( props ) {
           onClick={ ()=>{
             setPasswordChangeOpen(true);
           }}
-          >{ password === null ? 'Change password' : 'Password change edit' }</Button>
+          >
+          { password === null ? 'Change password' : 'Password change edit' }
+        </Button>
         <Button
           className="btn-link ml-auto"
           onClick={closeModal}
-          >Cancel</Button>
+          >
+          Cancel
+        </Button>
       </div>
       <PasswordChange
         submitPass={(pass) => {

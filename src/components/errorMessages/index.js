@@ -186,24 +186,24 @@ export default function ErrorList( props ) {
 
   return (
     <div className="content">
-        <div className="row m-0 p-0 taskList-container">
-          <div className="col-lg-4">
-            <div className="commandbar">
-              <div className="search-row">
-                <div className="search">
-                  <button className="search-btn" type="button">
-                    <i className="fa fa-search" />
-                  </button>
-                  <input
-                    type="text"
-                    className="form-control search-text"
-                    value={searchFilter}
-                    onChange={(e) => setSearchFilter( e.target.value )}
-                    placeholder="Search"
-                    />
-                </div>
+      <div className="row m-0 p-0 taskList-container">
+        <div className="col-lg-4">
+          <div className="commandbar">
+            <div className="search-row">
+              <div className="search">
+                <button className="search-btn" type="button">
+                  <i className="fa fa-search" />
+                </button>
+                <input
+                  type="text"
+                  className="form-control search-text"
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter( e.target.value )}
+                  placeholder="Search"
+                  />
               </div>
-              <span className="ml-3 center-hor mr-3" style={{width:175}}>
+            </div>
+            <span className="ml-3 center-hor mr-3" style={{width:175}}>
               <Select
                 value={type}
                 onChange={(type) => setType( type ) }
@@ -211,62 +211,68 @@ export default function ErrorList( props ) {
                 styles={invisibleSelectStyleNoArrow}
                 />
             </span>
-            </div>
-            <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
-              <div className=" p-l-10 p-b-10 row">
-                <h2>
-                  Error messages
-                </h2>
-              </div>
-              <div>
-                <button type="button" className="btn btn-link waves-effect" onClick={markAllAsRead} disabled={errors.every((error)=>error.read)}>Označit všetky ako prečítané</button>
-                <button type="button" className="btn btn-link waves-effect" onClick={deleteAll} disabled={errors.length === 0}>Vymazať všetky</button>
-                <button type="button" className="btn btn-link waves-effect" onClick={deleteRead} disabled={errors.filter((error)=>error.read).length === 0}>Vymazať prečítané</button>
-              </div>
-              <div>
-                <table className="table table-hover">
-                  <tbody>
-                    {
-                      errors.map((error) =>
-                      <tr
-                        key={error.id}
-                        className={classnames({ 'notification-read': error.read,
-                          'notification-not-read': !error.read,
-                          'sidebar-item-active': selectedErrorID === error.id },
-                          "clickable")}
-                          onClick={() => setErrorMessageReadFunc(error)}
-                          >
-                          <td className={(selectedErrorID === error.id ? "text-highlight":"")}>
-                            <i className={classnames({ 'far fa-envelope-open': error.read, 'fas fa-envelope': !error.read })} /> {error.source}
-                            <div className="row">
-                              <div>
-                                {error.user ? error.user.email : "no user"}
-                              </div>
-                              <div className="ml-auto m-r-55">
-                                {timestampToString(error.createdAt/1000)}
-                              </div>
-                            </div>
-                            <div style={{overflowX:'hidden'}}>{error.errorMessage.substring(0, 150)}...</div>
-                            </td>
-                          </tr>
-                        )
-                      }
-                    </tbody>
-                </table>
-                {errorMessages.length === 0 && <ListGroupItem>There are no errors!</ListGroupItem>}
-              </div>
-
-            </div>
           </div>
-          <div className="col-lg-8">
-            { selectedErrorID !== null &&
-              <ErrorInfo errorMessage={ errorMessages.find((errorMessage) => errorMessage.id === selectedErrorID )} history={history} />
-            }
-            { selectedErrorID === null &&
-              <div className="commandbar"></div>
-            }
+          <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
+            <div className=" p-l-10 p-b-10 row">
+              <h2>
+                Error messages
+              </h2>
+            </div>
+            <div>
+              <button type="button" className="btn btn-link waves-effect" onClick={markAllAsRead} disabled={errors.every((error)=>error.read)}>Označit všetky ako prečítané</button>
+              <button type="button" className="btn btn-link waves-effect" onClick={deleteAll} disabled={errors.length === 0}>Vymazať všetky</button>
+              <button type="button" className="btn btn-link waves-effect" onClick={deleteRead} disabled={errors.filter((error)=>error.read).length === 0}>Vymazať prečítané</button>
+            </div>
+            <div>
+              <table className="table table-hover">
+                <tbody>
+                  {
+                    errors.map((error) =>
+                    <tr
+                      key={error.id}
+                      className={classnames({ 'notification-read': error.read,
+                        'notification-not-read': !error.read,
+                        'sidebar-item-active': selectedErrorID === error.id },
+                        "clickable")}
+                        onClick={() => setErrorMessageReadFunc(error)}
+                        >
+                        <td className={(selectedErrorID === error.id ? "text-highlight":"")}>
+                          <i className={classnames({ 'far fa-envelope-open': error.read, 'fas fa-envelope': !error.read })} />
+                          {error.source}
+                          <div className="row">
+                            <div>
+                              {error.user ? error.user.email : "no user"}
+                            </div>
+                            <div className="ml-auto m-r-55">
+                              {timestampToString(parseInt(error.createdAt))}
+                            </div>
+                          </div>
+                          <div style={{overflowX:'hidden'}}>{error.errorMessage.substring(0, 150)}...</div>
+                        </td>
+                      </tr>
+                    )
+                  }
+                </tbody>
+              </table>
+              {
+                errorMessages.length === 0 &&
+                <ListGroupItem>There are no errors!</ListGroupItem>
+              }
+            </div>
+
           </div>
         </div>
+        <div className="col-lg-8">
+          {
+            selectedErrorID !== null &&
+            <ErrorInfo errorMessage={ errorMessages.find((errorMessage) => errorMessage.id === selectedErrorID )} history={history} />
+          }
+          {
+            selectedErrorID === null &&
+            <div className="commandbar"></div>
+          }
+        </div>
       </div>
+    </div>
   );
 }

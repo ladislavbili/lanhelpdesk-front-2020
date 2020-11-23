@@ -33,6 +33,7 @@ query {
     role {
       accessRights {
         viewVykaz
+        viewErrors
         publicFilters
         users
         companies
@@ -175,12 +176,20 @@ export default function PageHeader( props ) {
         </div>
         <div className="ml-auto center-hor row">
           <i className="fas fa-user header-icon center-hor clickable w-25px" onClick={() => setModalUserProfileOpen(true)}></i>
-          <i
-            className={classnames({ "danger-color": errorMessages.length > 0 }, "header-icon fas fa-exclamation-triangle center-hor clickable")}
-            style={{marginRight: 6}}
-            onClick={() => history.push(`${getLocation()}/errorMessages/`)}
-            />
-          <span className={classnames({ "danger-color": errorMessages.length > 0 },"header-icon-text clickable")}>{errorMessages.length}</span>
+          {
+            accessRights.viewErrors &&
+            <i
+              className={classnames({ "danger-color": errorMessages.length > 0 }, "header-icon fas fa-exclamation-triangle center-hor clickable")}
+              style={{marginRight: 6}}
+              onClick={() => history.push(`${getLocation()}/errorMessages/`)}
+              />
+          }
+          {
+            accessRights.viewErrors &&
+            <span className={classnames({ "danger-color": errorMessages.length > 0 },"header-icon-text clickable")}>
+              {errorMessages.length}
+            </span>
+          }
 
           {
             showLayoutSwitch &&
