@@ -64,69 +64,13 @@ import {
   GET_STATUSES
 } from 'helpdesk/settings/statuses/querries';
 
-const columnsToShowPausalSubtasks = [
-  'id',
-  'title',
-  'requester',
-  'assignedTo',
-  'status',
-  'closeDate',
-  'description',
-  'taskType',
-  'hours',
-];
-
-const columnsToShowPausalWorkTrips = [
-  'id',
-  'title',
-  'requester',
-  'assignedTo',
-  'status',
-  'closeDate',
-  'tripType',
-  'quantity',
-];
-
-const columnsToShowOverPausalSubtasks = [
-  'id',
-  'title',
-  'requester',
-  'assignedTo',
-  'status',
-  'closeDate',
-  'description',
-  'taskType',
-  'hours',
-  'pricePerHour',
-  'totalPrice'
-];
-
-const columnsToShowOverPausalWorkTrips = [
-  'id',
-  'title',
-  'requester',
-  'assignedTo',
-  'status',
-  'closeDate',
-  'tripType',
-  'quantity',
-  'pricePerUnit',
-  'totalPrice'
-];
-
-const columnsToShowMaterials = [
-  'id',
-  'title',
-  'requester',
-  'assignedTo',
-  'status',
-  'statusChange',
-  'material',
-  'quantity',
-  'unit',
-  'pricePerQuantity',
-  'totalPrice'
-];
+import {
+  columnsToShowPausalSubtasks,
+  columnsToShowPausalWorkTrips,
+  columnsToShowOverPausalSubtasks,
+  columnsToShowOverPausalWorkTrips,
+  columnsToShowMaterials
+} from './tableConfig';
 
 export default function MothlyReportsCompany( props ) {
   //local
@@ -176,6 +120,9 @@ export default function MothlyReportsCompany( props ) {
           .toString() : toDate.valueOf()
           .toString(),
         statuses: chosenStatuses.map( status => status.id )
+      },
+      options: {
+        fetchPolicy: 'network-only'
       }
     } );
   }
@@ -212,7 +159,9 @@ export default function MothlyReportsCompany( props ) {
           statuses: chosenStatuses.map( status => status.id ),
           companyId: showCompany.id
         },
-        //		options: { fetchPolicy: 'network-only' }
+        options: {
+          fetchPolicy: 'network-only'
+        }
       } );
     }
   }, [ showCompany ] );
@@ -384,7 +333,7 @@ export default function MothlyReportsCompany( props ) {
                   currentInvoiceData.pausalCounts.trips : 0}
                 </div>
               </div>
-
+              
               <div className="m-b-30">
                 <h3 className="m-b-10">Práce a výjazdy v rámci paušálu</h3>
                 <h4>Práce</h4>

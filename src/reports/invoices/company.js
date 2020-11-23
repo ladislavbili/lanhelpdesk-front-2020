@@ -1,134 +1,123 @@
-import React, {
-  Component
-} from 'react';
-import {
-  connect
-} from "react-redux";
+import React from 'react';
 import {
   FormGroup,
   Label
 } from 'reactstrap';
+import Loading from 'components/loading';
 import Select from 'react-select';
-import {
-  storageCompaniesStart,
-  storageHelpCompanyInvoicesStart
-} from '../../redux/actions';
 import {
   timestampToDate,
   toSelArr
-} from '../../helperFunctions';
+} from 'helperFunctions';
+import {
+  useQuery,
+  useLazyQuery,
+} from "@apollo/client";
 import {
   selectStyle
 } from 'configs/components/select';
+import {
+  COMPANIES_WITH_INVOICES,
+  GET_COMPANY_INVOICES,
+  GET_TASK_INVOICE
+} from './queries';
+
 import CompanyInvoice from './companyInvoice';
-import CompanyInvoicePrint from './companyInvoicePrint';
 
-class CompanyReports extends Component {
-  render() {
-    return null;
-  }
-  /*
-  constructor(props){
-  	super(props);
-  	this.state={
-  		showCompany:null,
-  		showInvoice:null,
-  	}
-  	this.getFilteredCompanies.bind(this);
-  }
+export default function CompanyReports( props ) {
 
-  storageLoaded(props){
-  	return props.companiesLoaded &&
-  	props.companyInvoicesLoaded
-  }
+  //querries and mutations
+  const {
+    data: companiesData,
+    loading: companiesLoading
+  } = useQuery( COMPANIES_WITH_INVOICES );
 
-  componentWillMount(){
-  	if(!this.props.companiesActive){
-  		this.props.storageCompaniesStart();
-  	}
-  	if(!this.props.companyInvoicesActive){
-  		this.props.storageHelpCompanyInvoicesStart();
-  	}
-  }
+  const [ fetchCompanyInvoices, {
+    loading: companyInvoicesLoading,
+    data: companyInvoicesData
+		} ] = useLazyQuery( GET_COMPANY_INVOICES );
 
-  getFilteredCompanies(){
-  	return this.props.companies.filter((company)=>this.props.companyInvoices.some((invoice)=>invoice.company.id===company.id))
+  const [ fetchTaskInvoice, {
+    loading: taskInvoiceLoading,
+    data: taskInvoiceData
+    } ] = useLazyQuery( GET_TASK_INVOICE );
+
+  //state
+  const [ company, setCompany ] = React.useState( null );
+  const [ invoice, setInvoice ] = React.useState( null );
+
+  const loading = (
+    companiesLoading
+  );
+
+  if ( loading ) {
+    return <Loading/>
   }
 
-  render() {
-  	return (
-  			<div className="scrollable fit-with-header">
-  					<FormGroup className="flex-row p-20" style={{maxWidth:700}}>
-  						<Label className="center-hor p-r-5" for="name">Firma:</Label>
-  						<span className='flex'>
-  						<Select
-  							value={this.state.showCompany}
-  							placeholder="Vyberte firmu"
-  							onChange={(company)=>{
-  								this.setState({showCompany:company });
-  							}}
-  							options={toSelArr(this.getFilteredCompanies())}
-  							styles={selectStyle}
-  							/>
-  					</span>
-  					</FormGroup>
+  const Invoice = () => {
+    if ( !taskInvoiceData || taskInvoiceLoading ) {
+      return ( <Loading /> )
+    }
+    console.log( taskInvoiceData.getTaskInvoice );
+    return (
+      <CompanyInvoice invoice={taskInvoiceData.getTaskInvoice}/>
+    )
+  }
 
-  				{ this.state.showCompany!==null && <div className="p-20">
-  					<table className="table m-b-10">
-  						<thead>
-  							<tr>
-  								<th>Názov</th>
-  								<th>Obdobie</th>
-  								<th>Export</th>
-  							</tr>
-  						</thead>
-  						<tbody>
-  							{
-  								this.props.companyInvoices.filter((invoice)=>invoice.company.id===this.state.showCompany.id).sort((invoice1,invoice2)=>invoice1.createdAt>invoice2.createdAt?-1:1).map((invoice)=>
-  								<tr key={invoice.id}>
-  									<td className="clickable" onClick={()=>this.setState({showInvoice:invoice})}>{invoice.title}</td>
-  									<td className="clickable" onClick={()=>this.setState({showInvoice:invoice})}>{`od ${timestampToDate(invoice.from)} do ${timestampToDate(invoice.to)}`}</td>
-  									<td><CompanyInvoicePrint invoice={invoice}/></td>
-  								</tr>
-  							)}
-  						</tbody>
-  					</table>
-  				</div>}
+  const InvoiceList = () => {
+    if ( !companyInvoicesData || companyInvoicesLoading ) {
+      return ( <Loading /> )
+    }
+    return (
+      <div className="p-20">
+        <table className="table m-b-10">
+          <thead>
+            <tr>
+              <th>Názov</th>
+              <th>Obdobie</th>
+              <th>Export</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              companyInvoicesData.getCompanyInvoices.map((invoice) =>
+              <tr key={invoice.id}>
+                <td className="clickable" onClick={ () => { setInvoice(invoice); fetchTaskInvoice({variables:{ id: invoice.id }}) }}>{invoice.title}</td>
+                <td className="clickable" onClick={ () => { setInvoice(invoice); fetchTaskInvoice({variables:{ id: invoice.id }}) }}>
+                  {
+                    `od ${timestampToDate(parseInt(invoice.fromDate))} do ${timestampToDate(parseInt(invoice.toDate))}`
+                  }
+                  </td>
+                <td>print</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
 
-  				{this.state.showInvoice!==null &&
-  					<CompanyInvoice invoice={this.state.showInvoice}/>
-  					}
-  			 </div>
-  	);
-  }*/
+  return (
+    <div className="scrollable fit-with-header">
+        <FormGroup className="flex-row p-20" style={{maxWidth:700}}>
+          <Label className="center-hor p-r-5" for="name">Firma:</Label>
+          <span className='flex'>
+          <Select
+            value={company}
+            placeholder="Vyberte firmu"
+            onChange={(company) => {
+              setCompany(company);
+              fetchCompanyInvoices({variables: {id: company.id}})
+            }}
+            options={toSelArr(companiesData.companiesWithInvoices)}
+            styles={selectStyle}
+            />
+        </span>
+        </FormGroup>
+        { company !== null && <InvoiceList /> }
+        { invoice &&
+          <Invoice />
+          }
+      </div>
+  );
 }
-
-const mapStateToProps = ( {
-  storageCompanies,
-  storageHelpCompanyInvoices
-} ) => {
-  const {
-    companiesActive,
-    companies,
-    companiesLoaded
-  } = storageCompanies;
-  const {
-    companyInvoicesLoaded,
-    companyInvoicesActive,
-    companyInvoices
-  } = storageHelpCompanyInvoices;
-
-  return {
-    companiesActive,
-    companies,
-    companiesLoaded,
-    companyInvoicesLoaded,
-    companyInvoicesActive,
-    companyInvoices,
-  };
-};
-
-export default connect( mapStateToProps, {
-  storageCompaniesStart,
-  storageHelpCompanyInvoicesStart
-} )( CompanyReports );

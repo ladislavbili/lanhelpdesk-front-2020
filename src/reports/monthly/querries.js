@@ -8,20 +8,20 @@ query getInvoiceCompanies(
   $toDate: String!,
   $statuses: [Int]!
 ){
-    getInvoiceCompanies(
-      fromDate: $fromDate
-      toDate: $toDate
-      statuses: $statuses
-    ) {
-        company {
-          id
-          title
-        }
-        subtasksHours
-        tripsHours
-        materialsQuantity
-        customItemsQuantity
-        rentedItemsQuantity
+  getInvoiceCompanies(
+    fromDate: $fromDate
+    toDate: $toDate
+    statuses: $statuses
+  ) {
+    company {
+      id
+      title
+    }
+    subtasksHours
+    tripsHours
+    materialsQuantity
+    customItemsQuantity
+    rentedItemsQuantity
   }
 }
 `;
@@ -33,232 +33,233 @@ query getCompanyInvoiceData(
   $companyId: Int!,
   $statuses: [Int]!
 ){
-    getCompanyInvoiceData(
-      fromDate: $fromDate
-      toDate: $toDate
-      companyId: $companyId
-      statuses: $statuses
-    ) {
-			company{
-				companyRents {
-					id
-					title
-					quantity
-					cost
-					price
-					total
-				}
-			}
+  getCompanyInvoiceData(
+    fromDate: $fromDate
+    toDate: $toDate
+    companyId: $companyId
+    statuses: $statuses
+  ) {
+    company{
+      companyRents {
+        id
+        title
+        quantity
+        cost
+        price
+        total
+      }
+    }
     companyRentsCounts {
       totalWithoutDPH
       totalWithDPH
     }
-		pausalTasks{
-			task {
-				id
-				title
-				overtime
-				assignedTo {
-					email
-					id
-				}
-				requester {
-					email
-					id
-				}
-				status {
-					id
-					title
-					action
-					color
-				}
-				closeDate
-				company {
-					title
-				}
-			}
-			subtasks {
-				id
-				title
-				quantity
-				price
-				type {
-					title
-				}
-			}
-			trips {
-				id
-				quantity
-				price
-				type {
-					title
-				}
-			}
-		}
-		pausalCounts{
-			subtasks
-			subtasksAfterHours
-			subtasksAfterHoursTaskIds
-			subtasksAfterHoursPrice
-			trips
-			tripsAfterHours
-			tripsAfterHoursTaskIds
-			tripsAfterHoursPrice
-		}
-		overPausalCounts{
-			subtasks
-			subtasksAfterHours
-			subtasksAfterHoursTaskIds
-			subtasksAfterHoursPrice
-			subtasksTotalPriceWithoutDPH
-			subtasksTotalPriceWithDPH
-			trips
-			tripsAfterHours
-			tripsAfterHoursTaskIds
-			tripsAfterHoursPrice
-			tripsTotalPriceWithoutDPH
-			tripsTotalPriceWithDPH
-		}
-		overPausalTasks{
-			task {
-				id
-				title
-				overtime
-				assignedTo {
-					id
-					email
-				}
-				requester {
-					email
-					id
-				}
-				status {
-					id
-					title
-					action
-					color
-				}
-				closeDate
-				company {
-					title
-				}
-			}
-			subtasks {
-				id
-				title
-				quantity
-				discount
-				price
-				price
-				type {
-					title
-				}
-			}
-			trips {
-				id
-				quantity
-				discount
-				price
-				type {
-					title
-				}
-			}
-		}
-		projectTasks{
-			task {
-				id
-				title
-				overtime
-				assignedTo {
-					id
-					email
-				}
-				requester {
-					email
-					id
-				}
-				status {
-					id
-					title
-					action
-					color
-				}
-				closeDate
-				company {
-					title
-				}
-			}
-			subtasks {
-				id
-				title
-				quantity
-				discount
-				price
-				price
-				type {
-					title
-				}
-			}
-			trips {
-				id
-				quantity
-				discount
-				price
-				type {
-					title
-				}
-			}
-		}
-		projectCounts{
-			subtasks
-			subtasksAfterHours
-			subtasksAfterHoursTaskIds
-			subtasksAfterHoursPrice
-			subtasksTotalPriceWithoutDPH
-			subtasksTotalPriceWithDPH
-			trips
-			tripsAfterHours
-			tripsAfterHoursTaskIds
-			tripsAfterHoursPrice
-			tripsTotalPriceWithoutDPH
-			tripsTotalPriceWithDPH
-		}
-		materialTasks{
-			task {
-				id
-				title
-				status{
-					id
-					title
-					color
-				}
-				statusChange
-				assignedTo{
-					id
-					email
-				}
-				requester{
-					id
-					email
-				}
-			}
-			materials {
-				id
-				title
-				quantity
-				price
-				totalPrice
-			}
-			customItems {
-				id
-				title
-				quantity
-				price
-				totalPrice
-			}
-		}
-		totalMaterialAndCustomItemPriceWithoutDPH
-		totalMaterialAndCustomItemPriceWithDPH
+    pausalTasks{
+      task {
+        id
+        title
+        overtime
+        assignedTo {
+          email
+          id
+        }
+        requester {
+          email
+          id
+        }
+        status {
+          id
+          title
+          action
+          color
+        }
+        closeDate
+        company {
+          title
+        }
+      }
+      subtasks {
+        id
+        subtaskID
+        title
+        quantity
+        price
+        type {
+          title
+        }
+      }
+      trips {
+        id
+        quantity
+        price
+        type {
+          title
+        }
+      }
+    }
+    pausalCounts{
+      subtasks
+      subtasksAfterHours
+      subtasksAfterHoursTaskIds
+      subtasksAfterHoursPrice
+      trips
+      tripsAfterHours
+      tripsAfterHoursTaskIds
+      tripsAfterHoursPrice
+    }
+    overPausalCounts{
+      subtasks
+      subtasksAfterHours
+      subtasksAfterHoursTaskIds
+      subtasksAfterHoursPrice
+      subtasksTotalPriceWithoutDPH
+      subtasksTotalPriceWithDPH
+      trips
+      tripsAfterHours
+      tripsAfterHoursTaskIds
+      tripsAfterHoursPrice
+      tripsTotalPriceWithoutDPH
+      tripsTotalPriceWithDPH
+    }
+    overPausalTasks{
+      task {
+        id
+        title
+        overtime
+        assignedTo {
+          id
+          email
+        }
+        requester {
+          email
+          id
+        }
+        status {
+          id
+          title
+          action
+          color
+        }
+        closeDate
+        company {
+          title
+        }
+      }
+      subtasks {
+        id
+        title
+        quantity
+        discount
+        price
+        price
+        type {
+          title
+        }
+      }
+      trips {
+        id
+        quantity
+        discount
+        price
+        type {
+          title
+        }
+      }
+    }
+    projectTasks{
+      task {
+        id
+        title
+        overtime
+        assignedTo {
+          id
+          email
+        }
+        requester {
+          email
+          id
+        }
+        status {
+          id
+          title
+          action
+          color
+        }
+        closeDate
+        company {
+          title
+        }
+      }
+      subtasks {
+        id
+        title
+        quantity
+        discount
+        price
+        price
+        type {
+          title
+        }
+      }
+      trips {
+        id
+        quantity
+        discount
+        price
+        type {
+          title
+        }
+      }
+    }
+    projectCounts{
+      subtasks
+      subtasksAfterHours
+      subtasksAfterHoursTaskIds
+      subtasksAfterHoursPrice
+      subtasksTotalPriceWithoutDPH
+      subtasksTotalPriceWithDPH
+      trips
+      tripsAfterHours
+      tripsAfterHoursTaskIds
+      tripsAfterHoursPrice
+      tripsTotalPriceWithoutDPH
+      tripsTotalPriceWithDPH
+    }
+    materialTasks{
+      task {
+        id
+        title
+        status{
+          id
+          title
+          color
+        }
+        statusChange
+        assignedTo{
+          id
+          email
+        }
+        requester{
+          id
+          email
+        }
+      }
+      materials {
+        id
+        title
+        quantity
+        price
+        totalPrice
+      }
+      customItems {
+        id
+        title
+        quantity
+        price
+        totalPrice
+      }
+    }
+    totalMaterialAndCustomItemPriceWithoutDPH
+    totalMaterialAndCustomItemPriceWithDPH
   }
 }
 `;
@@ -268,17 +269,17 @@ mutation createTaskInvoice(
   $fromDate: String!,
   $toDate: String!,
   $statuses: [Int]!,
-	$companyId: Int!,
-	$title: String!
+  $companyId: Int!,
+  $title: String!
 ){
-    createTaskInvoice(
-			fromDate: $fromDate,
-		  toDate: $toDate,
-		  statuses: $statuses,
-			companyId: $companyId,
-			title: $title
-    ){
-      title
-    }
+  createTaskInvoice(
+    fromDate: $fromDate,
+    toDate: $toDate,
+    statuses: $statuses,
+    companyId: $companyId,
+    title: $title
+  ){
+    title
+  }
 }
 `;
