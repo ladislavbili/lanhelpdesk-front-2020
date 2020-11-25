@@ -218,9 +218,9 @@ export default function TasksIndex( props ) {
 							<img
 								className="dnd-item-icon"
 								src={require('../../scss/icons/excl-triangle.svg')}
-								alt="Generic placeholder XX"
+								alt="!"
 								/>
-							{task.deadline?timestampToString(task.deadline):'None'}
+							{task.deadline ? timestampToString(task.deadline) : 'None'}
 						</span>
 					</p>
 					<p >

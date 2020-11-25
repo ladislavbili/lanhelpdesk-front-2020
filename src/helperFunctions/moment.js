@@ -9,7 +9,7 @@ export const fromMomentToUnix = ( moment ) => moment !== null ?
   null;
 
 export const timestampToString = ( timestamp ) => {
-  return moment( timestamp ).format( 'HH:mm DD.MM.YYYY' );
+  return moment( parseInt( timestamp ) ).format( 'HH:mm DD.MM.YYYY' );
 }
 
 export const timestampToDate = ( timestamp ) => {

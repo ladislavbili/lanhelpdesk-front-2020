@@ -1,13 +1,11 @@
 import React from 'react';
 import {
+  gql,
   useMutation,
   useQuery,
   useLazyQuery,
-  useApolloClient
+  useApolloClient,
 } from "@apollo/client";
-import {
-  gql
-} from '@apollo/client';;
 
 import Select from 'react-select';
 import {
