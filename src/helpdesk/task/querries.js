@@ -311,6 +311,12 @@ query task($id: Int!){
 			startsAt
 		}
 		subtasks {
+      invoicedData{
+        price
+        quantity
+        type
+        assignedTo
+      }
 			id
 			title
 			order
@@ -330,6 +336,12 @@ query task($id: Int!){
 			}
 		}
 		workTrips {
+      invoicedData{
+        price
+        quantity
+        type
+        assignedTo
+      }
 			id
 			order
 			done
@@ -348,6 +360,13 @@ query task($id: Int!){
 			}
 		}
 		materials {
+      invoicedData{
+        title
+        quantity
+        price
+        totalPrice
+        margin
+      }
 			id
 			title
 			order
@@ -357,6 +376,12 @@ query task($id: Int!){
 			price
 		}
 		customItems {
+      invoicedData{
+        title
+        quantity
+        price
+        totalPrice
+      }
 			id
 			title
 			order

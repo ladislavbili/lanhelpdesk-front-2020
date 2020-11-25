@@ -119,11 +119,8 @@ export default function MothlyReportsCompany( props ) {
           newTo.valueOf()
           .toString() : toDate.valueOf()
           .toString(),
-        statuses: chosenStatuses.map( status => status.id )
+        statuses: chosenStatuses.map( status => status.id ),
       },
-      options: {
-        fetchPolicy: 'network-only'
-      }
     } );
   }
 
@@ -184,7 +181,22 @@ export default function MothlyReportsCompany( props ) {
           title: newInvoiceTitle,
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        setNewInvoice( !newInvoice );
+        fetchCompanyInvoice( {
+          variables: {
+            fromDate: fromDate.valueOf()
+              .toString(),
+            toDate: toDate.valueOf()
+              .toString(),
+            statuses: chosenStatuses.map( status => status.id ),
+            companyId: showCompany.id
+          },
+          options: {
+            fetchPolicy: 'network-only'
+          }
+        } );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -333,7 +345,7 @@ export default function MothlyReportsCompany( props ) {
                   currentInvoiceData.pausalCounts.trips : 0}
                 </div>
               </div>
-              
+
               <div className="m-b-30">
                 <h3 className="m-b-10">Práce a výjazdy v rámci paušálu</h3>
                 <h4>Práce</h4>
