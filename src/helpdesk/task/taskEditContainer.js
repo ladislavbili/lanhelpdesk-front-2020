@@ -239,8 +239,8 @@ export default function TaskEditContainer( props ) {
         variables: {
           order: wt.order,
           done: wt.done,
-          discount: wt.discount,
-          quantity: wt.quantity,
+          discount: parseFloat( wt.discount ),
+          quantity: parseFloat( wt.quantity ),
           type: wt.type.id,
           task: parseInt( match.params.taskID ),
           assignedTo: wt.assignedTo.id,

@@ -7,6 +7,9 @@ import {
 
 export default function CompanyReports( props ) {
   let invoice = props.invoice;
+  if ( invoice === null ) {
+    return <div>Invoice not loaded yet</div>;
+  }
   return (
     <div className="p-20">
 			<h2>Fakturačný výkaz firmy</h2>

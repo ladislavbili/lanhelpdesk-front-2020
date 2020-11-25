@@ -209,10 +209,17 @@ export default function TaskEdit( props ) {
     setTaskTripPausal( task.company ? task.company.taskTripPausal : 0 );
     setTaskWorkPausal( task.company ? task.company.taskWorkPausal : 0 );
     setTitle( task.title );
-    setCustomItems( task.customItems );
-    setMaterials( task.materials );
+    setCustomItems( task.customItems.map( ( item ) => ( {
+      ...item,
+      invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
+    } ) ) );
+    setMaterials( task.materials.map( ( item ) => ( {
+      ...item,
+      invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
+    } ) ) );
     setSubtasks( ( task.subtasks ? task.subtasks.map( item => ( {
       ...item,
+      invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
       assignedTo: toSelItem( item.assignedTo, 'email' ),
       type: toSelItem( item.type )
     } ) ) : [] ) );
@@ -220,6 +227,7 @@ export default function TaskEdit( props ) {
     setUsedTripPausal( task.company ? task.company.usedTripPausal : 0 );
     setWorkTrips( ( task.workTrips ? task.workTrips.map( item => ( {
       ...item,
+      invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
       assignedTo: toSelItem( item.assignedTo, 'email' ),
       type: toSelItem( item.type )
     } ) ) : [] ) );
@@ -230,6 +238,7 @@ export default function TaskEdit( props ) {
     }
   }, [ id ] );
 
+  const isInvoiced = task.status.action === 'Invoiced';
   const getCantSave = ( change = {} ) => {
     const compare = {
       title,
@@ -238,6 +247,7 @@ export default function TaskEdit( props ) {
       assignedTo,
       saving,
       viewOnly,
+      isInvoiced,
       ...change,
     }
     return (
@@ -604,7 +614,7 @@ export default function TaskEdit( props ) {
             onChange={date => {
               setCloseDate(date);
               if(date.valueOf() !== null){
-                autoUpdateTask({closeDate: date.valueOf()});
+                autoUpdateTask({closeDate: date.valueOf().toString()});
               }
             }}
             placeholderText="No pending date"
@@ -1147,6 +1157,7 @@ export default function TaskEdit( props ) {
         showColumns={ (viewOnly ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
         showTotals={false}
         disabled={viewOnly || cantSave}
+        isInvoiced={isInvoiced}
         company={company}
         match={match}
         taskID={id}

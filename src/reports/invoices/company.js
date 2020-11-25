@@ -23,6 +23,8 @@ import {
 } from './queries';
 
 import CompanyInvoice from './companyInvoice';
+import CompanyInvoicePrint from './companyInvoicePrint';
+import ExcelExport from './excelExport';
 
 export default function CompanyReports( props ) {
 
@@ -58,7 +60,6 @@ export default function CompanyReports( props ) {
     if ( !taskInvoiceData || taskInvoiceLoading ) {
       return ( <Loading /> )
     }
-    console.log( taskInvoiceData.getTaskInvoice );
     return (
       <CompanyInvoice invoice={taskInvoiceData.getTaskInvoice}/>
     )
@@ -88,7 +89,10 @@ export default function CompanyReports( props ) {
                     `od ${timestampToDate(parseInt(invoice.fromDate))} do ${timestampToDate(parseInt(invoice.toDate))}`
                   }
                   </td>
-                <td>print</td>
+                <td>
+                  <CompanyInvoicePrint basicInvoice={invoice}/>
+                  <ExcelExport filename={invoice.title} basicInvoice={invoice} />
+              </td>
               </tr>
             )}
           </tbody>

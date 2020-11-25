@@ -17,6 +17,8 @@
     "ckeditor4-react": "^0.1.0",
     "ckeditor5-custom-build": "file:src/components/ckeditor5",
     "downloadjs": "^1.4.7",
+    "exceljs": "^4.2.0",
+    "file-saver": "^2.0.5",
     "firebase": "^7.24.0",
     "graphql": "^15.4.0",
     "html-to-draftjs": "^1.4.0",
