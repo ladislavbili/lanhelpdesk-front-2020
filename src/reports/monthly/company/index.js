@@ -28,7 +28,7 @@ import {
   filterUnique
 } from 'helperFunctions';
 
-import MonthSelector from '../components/monthSelector';
+import MonthSelector from 'reports/components/monthSelector';
 import Loading from 'components/loading';
 
 import {

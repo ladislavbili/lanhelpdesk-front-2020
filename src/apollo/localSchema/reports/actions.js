@@ -1,7 +1,8 @@
 import {
   reportsChosenStatusesVar,
   reportsFromDateVar,
-  reportsToDateVar
+  reportsToDateVar,
+  reportsAgentStatusesVar
 } from './variables';
 
 
@@ -15,4 +16,8 @@ export function setReportsFromDate( newValue ) {
 
 export function setReportsToDate( newValue ) {
   reportsToDateVar( newValue );
+}
+
+export function setReportsAgentStatuses( newValue ) {
+  reportsAgentStatusesVar( newValue );
 }

@@ -1,7 +1,8 @@
 import {
   reportsChosenStatusesVar,
   reportsFromDateVar,
-  reportsToDateVar
+  reportsToDateVar,
+  reportsAgentStatusesVar
 } from './variables';
 
 export const reportsChosenStatuses = () => {
@@ -14,4 +15,8 @@ export const reportsFromDate = () => {
 
 export const reportsToDate = () => {
   return reportsToDateVar();
+}
+
+export const reportsAgentStatuses = () => {
+  return reportsAgentStatusesVar();
 }

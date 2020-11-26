@@ -19,3 +19,9 @@ export const GET_REPORTS_TO_DATE = gql `
     reportsToDate @client
   }
 `;
+
+export const GET_REPORTS_AGENT_STATUSES = gql `
+  query reportsAgentStatuses {
+    reportsAgentStatuses @client
+  }
+`;
