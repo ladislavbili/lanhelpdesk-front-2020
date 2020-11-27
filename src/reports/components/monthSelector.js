@@ -47,7 +47,6 @@ export default function MonthSelector( props ) {
     months[ moment()
       .month() ]
   );
-
   return (
     <div className="p-20">
       <FormGroup>

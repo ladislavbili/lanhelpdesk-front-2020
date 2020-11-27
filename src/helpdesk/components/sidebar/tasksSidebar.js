@@ -21,7 +21,7 @@ import {
 import classnames from 'classnames';
 
 import Filter from '../filter';
-import TaskAdd from '../../task/taskAddContainer';
+import TaskAdd from '../../task/add';
 import ProjectEdit from '../projects/projectEditContainer';
 import ProjectAdd from '../projects/projectAddContainer';
 import MilestoneEdit from '../milestones/milestoneEdit';

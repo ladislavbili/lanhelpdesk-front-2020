@@ -7,7 +7,7 @@ import {
 } from '@apollo/client';;
 import {
   toSelArr
-} from '../../helperFunctions';
+} from 'helperFunctions';
 import {
   Modal,
   ModalBody,
@@ -48,7 +48,7 @@ import {
 
 import {
   GET_MY_DATA
-} from './querries';
+} from '../querries';
 
 export default function TaskAddContainer( props ) {
   //data & queries

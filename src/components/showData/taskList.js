@@ -17,7 +17,7 @@ import CommandBar from './commandBar';
 import ListHeader from './listHeader';
 import Checkbox from '../checkbox';
 
-import MultipleTaskEdit from '../../helpdesk/task/multipleTaskEdit';
+import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
 
 
 import {

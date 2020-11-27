@@ -1,58 +1,78 @@
-import React, { Component } from 'react';
-import { ListGroupItem } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  ListGroupItem
+} from 'reactstrap';
 import classnames from 'classnames';
-import { rebase } from '../../index';
-import TaskEdit from '../task/taskEdit';
-
-import { connect } from "react-redux";
-import { storageHelpTasksStart } from '../../redux/actions';
+import {
+  rebase
+} from '../../index';
+//import TaskEdit from '../task/taskEdit';
+const TaskEdit = () => ( null );
+import {
+  connect
+} from "react-redux";
+import {
+  storageHelpTasksStart
+} from '../../redux/actions';
 
 class NotificationList extends Component {
-  constructor(props){
-    super(props);
-    this.state={
-      searchFilter:''
+  constructor( props ) {
+    super( props );
+    this.state = {
+      searchFilter: ''
     }
-    this.processNotifications.bind(this);
+    this.processNotifications.bind( this );
   }
 
-  componentWillMount(){
-    if(!this.props.tasksActive){
+  componentWillMount() {
+    if ( !this.props.tasksActive ) {
       this.props.storageHelpTasksStart();
     }
   }
 
-  processNotifications(){
-    return this.props.notifications.map((notification)=>{
-      let task = this.props.tasks.find((task)=>task.id === notification.task );
-      return{
-        ...notification,
-        task: task !== undefined ? task : {id:notification.task, title: 'Unknown task' }
-      }
-    }).filter((notification)=>(`${notification.task.id} ${notification.task.title} ${notification.message}`).toLowerCase().includes(this.state.searchFilter.toLowerCase()))
+  processNotifications() {
+    return this.props.notifications.map( ( notification ) => {
+        let task = this.props.tasks.find( ( task ) => task.id === notification.task );
+        return {
+          ...notification,
+          task: task !== undefined ? task : {
+            id: notification.task,
+            title: 'Unknown task'
+          }
+        }
+      } )
+      .filter( ( notification ) => ( `${notification.task.id} ${notification.task.title} ${notification.message}` )
+        .toLowerCase()
+        .includes( this.state.searchFilter.toLowerCase() ) )
   }
 
-  markAllAsRead(){
-    if(window.confirm('Ste si istý že chcete všetky správy označiť ako prečítané?')){
-      this.props.notifications.filter((notification)=>!notification.read).forEach((notification) => rebase.updateDoc('user_notifications/' + notification.id, {read:true}));
+  markAllAsRead() {
+    if ( window.confirm( 'Ste si istý že chcete všetky správy označiť ako prečítané?' ) ) {
+      this.props.notifications.filter( ( notification ) => !notification.read )
+        .forEach( ( notification ) => rebase.updateDoc( 'user_notifications/' + notification.id, {
+          read: true
+        } ) );
     }
   }
-  deleteAll(){
-    if(window.confirm('Ste si istý že chcete všetky správy vymazať?')){
-      this.props.notifications.forEach((notification) => rebase.removeDoc('/user_notifications/'+ notification.id));
-      this.props.history.push('/helpdesk/notifications/');
+  deleteAll() {
+    if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
+      this.props.notifications.forEach( ( notification ) => rebase.removeDoc( '/user_notifications/' + notification.id ) );
+      this.props.history.push( '/helpdesk/notifications/' );
     }
   }
-  deleteRead(){
-    if(window.confirm('Ste si istý že chcete všetky prečítané správy vymazať?')){
-      this.props.notifications.filter((notification)=>notification.read).forEach((notification) => rebase.removeDoc('/user_notifications/'+ notification.id));
-      this.props.history.push('/helpdesk/notifications/');
+  deleteRead() {
+    if ( window.confirm( 'Ste si istý že chcete všetky prečítané správy vymazať?' ) ) {
+      this.props.notifications.filter( ( notification ) => notification.read )
+        .forEach( ( notification ) => rebase.removeDoc( '/user_notifications/' + notification.id ) );
+      this.props.history.push( '/helpdesk/notifications/' );
     }
   }
 
-  render(){
+  render() {
     return (
-			<div className="content">
+      <div className="content">
         <div className="row m-0 p-0 taskList-container">
           <div className="col-lg-4">
             <div className="commandbar">
@@ -125,9 +145,21 @@ class NotificationList extends Component {
   }
 }
 
-const mapStateToProps = ({ userReducer, storageHelpTasks }) => {
-  const { tasksActive, tasks } = storageHelpTasks;
-  return { notifications: userReducer.notifications, tasksActive, tasks };
+const mapStateToProps = ( {
+  userReducer,
+  storageHelpTasks
+} ) => {
+  const {
+    tasksActive,
+    tasks
+  } = storageHelpTasks;
+  return {
+    notifications: userReducer.notifications,
+    tasksActive,
+    tasks
+  };
 };
 
-export default connect(mapStateToProps, { storageHelpTasksStart })(NotificationList);
+export default connect( mapStateToProps, {
+  storageHelpTasksStart
+} )( NotificationList );

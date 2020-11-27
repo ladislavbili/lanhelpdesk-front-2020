@@ -65,7 +65,7 @@ import {
   UPDATE_CUSTOM_ITEM,
   DELETE_CUSTOM_ITEM,
   DELETE_TASK_ATTACHMENT,
-} from './querries';
+} from '../querries';
 
 import {
   GET_FILTER,
@@ -80,9 +80,13 @@ import {
 export default function TaskEditContainer( props ) {
   //data & queries
   const {
-    match
+    match,
+    taskID,
+    closeModal
   } = props;
-  const id = parseInt( match.params.taskID );
+
+  const inModal = props.inModal === true;
+  const id = inModal ? taskID : parseInt( match.params.taskID );
   const client = useApolloClient();
 
   const {
@@ -697,6 +701,8 @@ export default function TaskEditContainer( props ) {
 			{...props}
       id={id}
       task={taskData.task}
+      inModal={inModal}
+      closeModal={closeModal}
 			currentUser={myData.getMyData}
 			accessRights={myData.getMyData.role.accessRights}
 			statuses={toSelArr(statusesData.statuses)}
@@ -707,7 +713,6 @@ export default function TaskEditContainer( props ) {
 			allTags={toSelArr(tagsData.tags)}
       projects={toSelArr(myProjectsData.myProjects.map((project) => ({...project, id: project.project.id, title: project.project.title}) ))}
       emails={/*emailsData && emailsData.emails ? emailsData.emails : */[]}
-      inModal={false}
       filterValues={localFilterToValues(filterData.localFilter)}
       originalProjectId={projectData.localProject.id}
       filterId={filterData.localFilter.id}

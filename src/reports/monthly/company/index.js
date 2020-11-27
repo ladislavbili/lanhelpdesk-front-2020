@@ -19,6 +19,7 @@ import {
 
 import moment from 'moment';
 import Select from 'react-select';
+import TaskEdit from 'helpdesk/task/edit';
 
 import {
   toSelArr,
@@ -97,6 +98,7 @@ export default function MothlyReportsCompany( props ) {
 
   const [ newInvoice, setNewInvoice ] = React.useState( false );
   const [ newInvoiceTitle, setNewInvoiceTitle ] = React.useState( "" );
+  const [ editedTask, setEditedTask ] = React.useState( null );
 
   const [ fetchInvoiceCompanies, {
     loading: invoiceCompaniesLoading,
@@ -124,8 +126,8 @@ export default function MothlyReportsCompany( props ) {
     } );
   }
 
-  const onClickTask = ( taskId ) => {
-    console.log( "clicked!" );
+  const onClickTask = ( task ) => {
+    setEditedTask( task );
   }
 
   const [ showCompany, setShowCompany ] = React.useState( null );
@@ -792,13 +794,11 @@ export default function MothlyReportsCompany( props ) {
           </ModalBody>
         </Modal>
 
-        <Modal isOpen={false} toggle={()=>{}}>
-          <ModalHeader toggle={()=>{}}>{}</ModalHeader>
+        <Modal isOpen={editedTask !== null} toggle={()=>{}}>
+          <ModalHeader toggle={()=>setEditedTask(null)}>{editedTask !== null && `Editing task: ${editedTask.id}: ${editedTask.title}`}</ModalHeader>
           <ModalBody>
-            {
-              /*false &&
-              <TaskEdit inModal={true} columns={true}  closeModal={()=>{}}/>
-              */
+            { editedTask !== null &&
+              <TaskEdit inModal={true} taskID={editedTask.id} closeModal={()=>setEditedTask(null)}/>
             }
           </ModalBody>
         </Modal>

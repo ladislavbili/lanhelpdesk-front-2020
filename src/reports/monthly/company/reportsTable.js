@@ -94,7 +94,7 @@ export default function ReportsTable( props ) {
           <tr key={task.id}>
             { columnsToShow.includes('id') && <td>{task.id}</td> }
 
-            { columnsToShow.includes('title') && <td className="clickable" style={{ color: "#1976d2" }} onClick={onClickTask}>{task.title}</td> }
+            { columnsToShow.includes('title') && <td className="clickable" style={{ color: "#1976d2" }} onClick={() => onClickTask(task)}>{task.title}</td> }
 
             { columnsToShow.includes('requester') && <td>{task.requester ? task.requester.email : 'Nikto'}</td> }
 

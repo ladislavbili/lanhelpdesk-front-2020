@@ -10,7 +10,6 @@ query getInvoiceUsers(
   getInvoiceUsers(
     fromDate: $fromDate
     toDate: $toDate
-    statuses: $statuses
   ) {
     user{
       id
@@ -32,7 +31,6 @@ query getUserInvoice(
   getUserInvoice(
     fromDate: $fromDate
     toDate: $toDate
-    statuses: $statuses
     userId: $userId
   ) {
     fromDate

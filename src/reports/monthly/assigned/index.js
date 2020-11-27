@@ -38,10 +38,6 @@ import {
 export default function MothlyReportsAssigned( props ) {
   //local
   const {
-    data: chosenStatusesData,
-    loading: chosenStatusesLoading
-  } = useQuery( GET_REPORTS_AGENT_STATUSES );
-  const {
     data: fromDateData,
     loading: fromDateLoading
   } = useQuery( GET_REPORTS_FROM_DATE );
@@ -61,17 +57,9 @@ export default function MothlyReportsAssigned( props ) {
     data: userInvoiceData,
   } ] = useLazyQuery( GET_USER_INVOICE );
 
-  //reactions
-  React.useEffect( () => {
-    if ( chosenStatusesData.reportsAgentStatuses.length > 0 ) {
-      fetchUsers();
-    }
-  }, [ chosenStatusesData.reportsAgentStatuses ] );
-
   //state
   //constants
   const loading = (
-    chosenStatusesLoading ||
     fromDateLoading ||
     toDateLoading
   )
@@ -138,14 +126,11 @@ export default function MothlyReportsAssigned( props ) {
   }
 
   const InvoiceRender = () => {
-    console.log( 'what' );
     if ( !userInvoiceLoading && !userInvoiceData ) {
       return null;
     } else if ( userInvoiceLoading && !userInvoiceData ) {
-      console.log( 'loading' );
       return ( <Loading /> )
     }
-    console.log( 'render' );
     return (
       <UserInvoice invoice={userInvoiceData.getUserInvoice} />
     )
@@ -160,7 +145,7 @@ export default function MothlyReportsAssigned( props ) {
       <h2 className="m-l-20 m-t-20">Agenti</h2>
       <div style={{maxWidth:500}}>
         <MonthSelector
-          blockedShow={chosenStatusesData.reportsAgentStatuses.length === 0}
+          blockedShow={false}
           fromDate={fromDate}
           onTrigger={() => fetchUsers()}
           onChangeFromDate={(date) => {

@@ -2,13 +2,24 @@ import React from 'react';
 import {
   timestampToString,
 } from 'helperFunctions';
+import TaskEdit from 'helpdesk/task/edit';
+import {
+  Modal,
+  ModalBody,
+  ModalHeader,
+} from 'reactstrap';
 
 
 export default function UserInvoice( props ) {
   const {
     invoice,
   } = props;
-  console.log( invoice );
+
+  const [ editedTask, setEditedTask ] = React.useState( null );
+  const onClickTask = ( task ) => {
+    setEditedTask( task );
+  }
+
   return (
     <div className="p-20">
       <h2>Mesačný výkaz faktúrovaných prác agenta</h2>
@@ -39,7 +50,7 @@ export default function UserInvoice( props ) {
           { invoice.subtaskTasks.map((subtaskTask) =>
             <tr key={subtaskTask.task.id}>
               <td>{subtaskTask.task.id}</td>
-              <td>{subtaskTask.task.title}</td>
+              <td className="clickable" onClick={() => onClickTask(subtaskTask.task)}>{subtaskTask.task.title}</td>
               <td>{subtaskTask.task.requester.fullName}</td>
               <td>
                 {subtaskTask.task.assignedTo.map( (assignedTo) =>
@@ -112,7 +123,7 @@ export default function UserInvoice( props ) {
           { invoice.tripTasks.map((tripTask) =>
             <tr key={tripTask.task.id}>
               <td>{tripTask.task.id}</td>
-              <td>{tripTask.task.title}</td>
+              <td className="clickable" onClick={() => onClickTask(tripTask.task)}>{tripTask.task.title}</td>
               <td>{tripTask.task.requester.fullName}</td>
               <td>
                 {tripTask.task.assignedTo.map( (assignedTo) =>
@@ -193,6 +204,14 @@ export default function UserInvoice( props ) {
           </tr>
         </tbody>
       </table>
+      <Modal isOpen={editedTask !== null} toggle={()=>{}}>
+        <ModalHeader toggle={()=>setEditedTask(null)}>{editedTask !== null && `Editing task: ${editedTask.id}: ${editedTask.title}`}</ModalHeader>
+        <ModalBody>
+          { editedTask !== null &&
+            <TaskEdit inModal={true} taskID={editedTask.id} closeModal={()=>setEditedTask(null)}/>
+          }
+        </ModalBody>
+      </Modal>
     </div>
   )
 }

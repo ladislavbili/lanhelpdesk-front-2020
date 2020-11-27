@@ -51,7 +51,7 @@ import {
   setMilestone,
 } from 'apollo/localSchema/actions';
 
-import TaskEdit from './taskEditContainer';
+import TaskEdit from './edit';
 import TaskEmpty from './taskEmpty';
 import TaskCalendar from '../calendar';
 //TODO remove and make work

@@ -11,10 +11,10 @@ import {
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 
-import Repeat from '../components/repeat';
-import Attachments from '../components/attachments';
+import Repeat from 'helpdesk/components/repeat';
+import Attachments from 'helpdesk/components/attachments';
 
-import VykazyTable from '../components/vykazyTable';
+import VykazyTable from 'helpdesk/components/vykazyTable';
 
 import classnames from "classnames";
 
@@ -38,7 +38,7 @@ import {
 } from 'configs/constants/projects';
 import {
   ADD_TASK
-} from './querries';
+} from '../querries';
 
 import {
   REST_URL

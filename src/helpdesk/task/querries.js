@@ -184,6 +184,7 @@ query {
         publicFilters
         users
         companies
+        vykazy
       }
     }
   }
@@ -287,8 +288,7 @@ query task($id: Int!){
 		}
 		requester{
 			id
-			name
-			surname
+			fullName
 		}
 		status {
 			id
@@ -437,6 +437,22 @@ query task($id: Int!){
         }
       }
 		}
+    invoicedTasks {
+      assignedTo {
+        title
+        UserId
+      }
+      tags {
+        title
+        color
+        TagId
+      }
+      project
+      requester
+      taskType
+      company
+      milestone
+    }
 	}
 }
 `;

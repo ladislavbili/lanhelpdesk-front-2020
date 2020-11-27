@@ -3,11 +3,9 @@ import {
   useMutation,
   useQuery,
   useLazyQuery,
-  useApolloClient
+  useApolloClient,
+  gql,
 } from "@apollo/client";
-import {
-  gql
-} from '@apollo/client';;
 
 import Select from 'react-select';
 import {
@@ -28,17 +26,16 @@ import moment from 'moment';
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-import Attachments from '../components/attachments';
-import Comments from '../components/comments';
-import Repeat from '../components/repeat';
-import TaskHistory from '../components/taskHistory';
+import Attachments from 'helpdesk/components/attachments';
+import Comments from 'helpdesk/components/comments';
+import Repeat from 'helpdesk/components/repeat';
+import TaskHistory from 'helpdesk/components/taskHistory';
+import VykazyTable from 'helpdesk/components/vykazyTable';
+import UserAdd from 'helpdesk/settings/users/userAdd';
+import CompanyAdd from 'helpdesk/settings/companies/companyAdd';
+import PendingPicker from 'helpdesk/components/pendingPicker';
 
-import VykazyTable from '../components/vykazyTable';
-
-import UserAdd from '../settings/users/userAdd';
-import CompanyAdd from '../settings/companies/companyAdd';
-
-import TaskAdd from './taskAddContainer';
+import TaskAdd from '../add';
 import TaskPrint from './taskPrint';
 import classnames from "classnames";
 import ck5config from 'configs/components/ck5config';
@@ -47,7 +44,6 @@ import {
 } from 'configs/constants/repeat';
 
 import datePickerConfig from 'configs/components/datepicker';
-import PendingPicker from '../components/pendingPicker';
 import {
   toSelArr,
   toSelItem,
@@ -72,7 +68,7 @@ import {
   UPDATE_TASK,
   GET_TASK,
   GET_TASKS,
-} from './querries';
+} from '../querries';
 
 export default function TaskEdit( props ) {
   const client = useApolloClient();
@@ -81,8 +77,8 @@ export default function TaskEdit( props ) {
     match,
     history,
     columns,
-    inModal,
     closeModal,
+    inModal,
     id,
     task,
     currentUser,
@@ -160,30 +156,33 @@ export default function TaskEdit( props ) {
 
   const [ viewOnly, setViewOnly ] = React.useState( true );
   const [ changes, setChanges ] = React.useState( {} );
+  const [ vykazyChanges, setVykazyChanges ] = React.useState( {} );
   const [ updateTask ] = useMutation( UPDATE_TASK );
+
+  const isInvoiced = task.status.action === 'Invoiced';
+  const canEditInvoiced = accessRights.vykazy;
+  const invoicedTask = isInvoiced ? task.invoicedTasks[ 0 ] : null;
+
   // sync
   React.useEffect( () => {
     setChanges( {} );
-    setAssignedTo( toSelArr( task.assignedTo, 'email' ) );
+    if ( isInvoiced ) {
+      setAssignedTo( toSelArr( invoicedTask.assignedTo ) );
+    } else {
+      setAssignedTo( toSelArr( task.assignedTo, 'email' ) );
+    }
     setCloseDate( moment( parseInt( task.closeDate ) ) );
     setComments( task.comments );
-    setCompany( ( task.company ? {
-      ...task.company,
-      value: task.company.id,
-      label: task.company.title
-    } : null ) );
     setDeadline( task.deadline ? moment( parseInt( task.deadline ) ) : null );
     setDescription( task.description );
     setImportant( task.important );
     const project = projects.find( ( project ) => project.id === task.project.id );
     const milestone = project && task.milestone ? toSelArr( project.project.milestones )
       .find( ( milestone ) => milestone.id === task.milestone.id ) : undefined;
-    setMilestone( milestone === undefined ? noMilestone : milestone );
     setOvertime( ( task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPausal( ( task.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPendingChangable( task.pendingChangable );
     setPendingDate( moment( parseInt( task.pendingDate ) ) );
-    setProject( project );
     if ( task.repeat === null ) {
       setRepeat( null );
     } else {
@@ -193,19 +192,37 @@ export default function TaskEdit( props ) {
         startsAt: moment( parseInt( task.repeat.startsAt ) )
       } );
     }
-    setRequester( ( task.requester ? {
-      ...task.requester,
-      value: task.requester.id,
-      label: `${task.requester.name} ${task.requester.surname}`
-    } : null ) );
     const status = ( task.status ? toSelItem( task.status ) : null )
     setStatus( status );
-    setTags( task.tags ? toSelArr( task.tags ) : [] );
-    setTaskType( ( task.taskType ? {
-      ...task.taskType,
-      value: task.taskType.id,
-      label: task.taskType.title
-    } : null ) );
+    if ( isInvoiced ) {
+      setTags( invoicedTask.tags );
+      console.log( createSelectInvoicedItem( task.taskType, invoicedTask.taskType ) );
+      setTaskType( createSelectInvoicedItem( task.taskType, invoicedTask.taskType ) );
+      setCompany( createSelectInvoicedItem( task.company, invoicedTask.company ) );
+      setMilestone( milestone === undefined ? noMilestone : {
+        ...milestone,
+        label: invoicedTask.milestone
+      } );
+      setRequester( createSelectInvoicedItem( task.requester, invoicedTask.requester ) );
+      setProject( {
+        ...project,
+        label: invoicedTask.project
+      } );
+    } else {
+      setTags( task.tags );
+      setTaskType( ( task.taskType ? toSelItem( task.taskType ) : null ) );
+      setCompany( ( task.company ? toSelItem( task.company ) : null ) );
+      setMilestone( milestone === undefined ? noMilestone : milestone );
+      setRequester(
+        task.requester ? {
+          ...task.requester,
+          value: task.requester.id,
+          label: task.requester.fullName
+        } :
+        null
+      );
+      setProject( project );
+    }
     setTaskTripPausal( task.company ? task.company.taskTripPausal : 0 );
     setTaskWorkPausal( task.company ? task.company.taskWorkPausal : 0 );
     setTitle( task.title );
@@ -233,12 +250,11 @@ export default function TaskEdit( props ) {
     } ) ) : [] ) );
 
     if ( project ) {
-      const viewOnly = !project.right.write || status.action === 'Invoiced';
+      const viewOnly = !project.right.write || ( status.action === 'Invoiced' && !canEditInvoiced );
       setViewOnly( viewOnly );
     }
   }, [ id ] );
 
-  const isInvoiced = task.status.action === 'Invoiced';
   const getCantSave = ( change = {} ) => {
     const compare = {
       title,
@@ -259,11 +275,18 @@ export default function TaskEdit( props ) {
       compare.viewOnly
     )
   }
-
-  const cantSave = getCantSave();
-
+  const createSelectInvoicedItem = ( original, invoiced ) => (
+    original ? {
+      ...original,
+      value: original.id,
+      label: invoiced
+    } : {
+      value: invoiced,
+      label: invoiced
+    }
+  )
   const autoUpdateTask = ( change ) => {
-    if ( getCantSave( change ) ) {
+    if ( getCantSave( change ) || isInvoiced ) {
       setChanges( {
         ...changes,
         ...change
@@ -473,7 +496,17 @@ export default function TaskEdit( props ) {
         <div className={classnames("d-flex", "flex-row", "center-hor", {"m-b-10": columns})}>
           <div className="display-inline center-hor">
             {!columns &&
-              <button type="button" className="btn btn-link-reversed waves-effect p-l-0" onClick={() => history.push(`/helpdesk/taskList/i/${match.params.listID}`)}>
+              <button
+                type="button"
+                className="btn btn-link-reversed waves-effect p-l-0"
+                onClick={() => {
+                  if(inModal){
+                    closeModal()
+                  }else{
+                    history.push(`/helpdesk/taskList/i/${match.params.listID}`)
+                  }
+                }}
+                >
                 <i
                   className="fas fa-arrow-left commandbar-command-icon"
                   />
@@ -525,6 +558,20 @@ export default function TaskEdit( props ) {
               <i className="far fa-star" />
               Important
             </button>
+            { isInvoiced &&
+              <button
+                type="button"
+                style={{color: important ? '#ffc107' : '#0078D4'}}
+                disabled={getCantSave()}
+                className="btn btn-link-reversed waves-effect"
+                onClick={()=>{
+                  console.log('save invoiced');
+                }}
+                >
+                <i className="far fa-save icon-M p-r-2" />
+                Save invoiced task
+              </button>
+            }
           </div>
           <button
             type="button"
@@ -1093,7 +1140,7 @@ export default function TaskEdit( props ) {
                   }
                 ]
               })
-             } }
+            } }
             />
         </ModalBody>
       </Modal>
@@ -1156,7 +1203,7 @@ export default function TaskEdit( props ) {
       <VykazyTable
         showColumns={ (viewOnly ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
         showTotals={false}
-        disabled={viewOnly || cantSave}
+        disabled={viewOnly || getCantSave()}
         isInvoiced={isInvoiced}
         company={company}
         match={match}
@@ -1173,7 +1220,7 @@ export default function TaskEdit( props ) {
         taskTypes={taskTypes}
         updateSubtask={(id,newData)=>{
           let newSubtasks=[...subtasks];
-          newSubtasks[newSubtasks.findIndex((item)=>item.id===id)]={...newSubtasks.find((item)=>item.id===id),...newData};
+          newSubtasks[newSubtasks.findIndex((item)=>item.id === id)] = {...newSubtasks.find((item)=>item.id===id),...newData};
           setSubtasks(newSubtasks);
           updateSubtaskFunc({...newSubtasks.find((item)=>item.id===id),...newData});
         }}

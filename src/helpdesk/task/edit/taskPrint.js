@@ -1,19 +1,24 @@
-import React, { Component } from 'react';
+import React, {
+  Component
+} from 'react';
 import ReactToPrint from 'react-to-print';
-import VykazyTablePrint from '../components/vykazyTablePrint';
-import { intervals } from 'configs/constants/repeat';
-import { timestampToString } from '../../helperFunctions';
+import VykazyTablePrint from 'helpdesk/components/vykazyTablePrint';
+import {
+  intervals
+} from 'configs/constants/repeat';
+import {
+  timestampToString
+} from 'helperFunctions';
 
 export default class TaskPrint extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-		};
-	}
+  constructor( props ) {
+    super( props );
+    this.state = {};
+  }
 
-	render() {
-		return (
-			<div className="display-inline">
+  render() {
+    return (
+      <div className="display-inline">
 					<ReactToPrint
 						trigger={() =>
 							<button className="btn btn-link-reversed waves-effect" disabled={!this.props.isLoaded}>
@@ -29,54 +34,55 @@ export default class TaskPrint extends Component {
 					<TaskInfo ref={el => (this.componentRef = el)} {...this.props}/>
 				</div>
 			</div>
-		)
-	}
+    )
+  }
 }
 
 class TaskInfo extends Component {
 
-	render() {
-		if(!this.props.isLoaded){
-			return null;
-		}
+  render() {
+    if ( !this.props.isLoaded ) {
+      return null;
+    }
 
 
-			let workTrips= this.props.workTrips.map((trip)=>{
-				let type= this.props.tripTypes.find((item)=>item.id===trip.type);
-				let assignedTo=trip.assignedTo?this.props.users.find((item)=>item.id===trip.assignedTo):null
+    let workTrips = this.props.workTrips.map( ( trip ) => {
+      let type = this.props.tripTypes.find( ( item ) => item.id === trip.type );
+      let assignedTo = trip.assignedTo ? this.props.users.find( ( item ) => item.id === trip.assignedTo ) : null
 
-				return {
-					...trip,
-					type,
-					assignedTo:assignedTo?assignedTo:null
-				}
-			});
+      return {
+        ...trip,
+        type,
+        assignedTo: assignedTo ? assignedTo : null
+      }
+    } );
 
-			let taskWorks= this.props.taskWorks.map((work)=>{
-				let assignedTo=work.assignedTo?this.props.users.find((item)=>item.id===work.assignedTo):null
-				return {
-					...work,
-					type:this.props.taskTypes.find((item)=>item.id===work.type),
-					assignedTo:assignedTo?assignedTo:null
-				}
-			});
-			let taskMaterials= this.props.taskMaterials.map((material)=>{
-				let finalUnitPrice=(parseFloat(material.price)*(1+parseFloat(material.margin)/100));
-				let totalPrice=(finalUnitPrice*parseFloat(material.quantity)).toFixed(3);
-				finalUnitPrice=finalUnitPrice.toFixed(3);
-				return {
-					...material,
-					unit:this.props.units.find((unit)=>unit.id===material.unit),
-					finalUnitPrice,
-					totalPrice
-				}
-			});
+    let taskWorks = this.props.taskWorks.map( ( work ) => {
+      let assignedTo = work.assignedTo ? this.props.users.find( ( item ) => item.id === work.assignedTo ) : null
+      return {
+        ...work,
+        type: this.props.taskTypes.find( ( item ) => item.id === work.type ),
+        assignedTo: assignedTo ? assignedTo : null
+      }
+    } );
+    let taskMaterials = this.props.taskMaterials.map( ( material ) => {
+      let finalUnitPrice = ( parseFloat( material.price ) * ( 1 + parseFloat( material.margin ) / 100 ) );
+      let totalPrice = ( finalUnitPrice * parseFloat( material.quantity ) )
+        .toFixed( 3 );
+      finalUnitPrice = finalUnitPrice.toFixed( 3 );
+      return {
+        ...material,
+        unit: this.props.units.find( ( unit ) => unit.id === material.unit ),
+        finalUnitPrice,
+        totalPrice
+      }
+    } );
 
-			let repeatInterval = (this.props.repeat ? intervals.find((interval)=>interval.title=== this.props.repeat.repeatInterval) : null);
+    let repeatInterval = ( this.props.repeat ? intervals.find( ( interval ) => interval.title === this.props.repeat.repeatInterval ) : null );
 
 
-		return (
-				<div className="m-100">
+    return (
+      <div className="m-100">
 					<div className="row flex">
 						<h2 className="center-hor text-extra-slim">{`${this.props.taskID}: ${this.props.title}`}</h2>
 
@@ -207,6 +213,6 @@ class TaskInfo extends Component {
 						/>
 
 				</div>
-		);
-	}
+    );
+  }
 }

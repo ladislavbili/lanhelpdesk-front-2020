@@ -18,30 +18,16 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import lodash from 'lodash';
 
-import Attachments from '../components/attachments';
-import Comments from '../components/comments';
-import Repeat from '../components/repeat';
+import Attachments from 'helpdesk/components/attachments';
+import Comments from 'helpdesk/components/comments';
+import Repeat from 'helpdesk/components/repeat';
 
 import classnames from "classnames";
-import {
-  rebase
-} from '../../index';
-import firebase from 'firebase';
 import datePickerConfig from 'configs/components/datepicker';
 import {
   toSelArr,
   sameStringForms
-} from '../../helperFunctions';
-import {
-  storageCompaniesStart,
-  storageHelpPricelistsStart,
-  storageHelpPricesStart,
-  storageHelpProjectsStart,
-  storageHelpStatusesStart,
-  storageHelpTaskTypesStart,
-  storageUsersStart,
-  storageHelpMilestonesStart
-} from '../../redux/actions';
+} from 'helperFunctions';
 import {
   invisibleSelectStyleNoArrow,
   invisibleSelectStyleNoArrowColoredRequired,
@@ -58,7 +44,7 @@ import {
   noDef
 } from 'configs/constants/projects';
 
-class MultipleTaskEdit extends Component {
+export default class MultipleTaskEdit extends Component {
   constructor( props ) {
     super( props );
     this.state = {
@@ -971,95 +957,3 @@ class MultipleTaskEdit extends Component {
   }
 
 }
-
-const mapStateToProps = ( {
-  userReducer,
-  storageCompanies,
-  storageHelpPricelists,
-  storageHelpPrices,
-  storageHelpProjects,
-  storageHelpStatuses,
-  storageHelpTaskTypes,
-  storageUsers,
-  storageHelpMilestones
-} ) => {
-  const {
-    companiesLoaded,
-    companiesActive,
-    companies
-  } = storageCompanies;
-  const {
-    pricelistsLoaded,
-    pricelistsActive,
-    pricelists
-  } = storageHelpPricelists;
-  const {
-    pricesLoaded,
-    pricesActive,
-    prices
-  } = storageHelpPrices;
-  const {
-    projectsLoaded,
-    projectsActive,
-    projects
-  } = storageHelpProjects;
-  const {
-    statusesLoaded,
-    statusesActive,
-    statuses
-  } = storageHelpStatuses;
-  const {
-    taskTypesLoaded,
-    taskTypesActive,
-    taskTypes
-  } = storageHelpTaskTypes;
-  const {
-    usersLoaded,
-    usersActive,
-    users
-  } = storageUsers;
-  const {
-    milestonesLoaded,
-    milestonesActive,
-    milestones
-  } = storageHelpMilestones;
-
-  return {
-    currentUser: userReducer,
-    companiesLoaded,
-    companiesActive,
-    companies,
-    pricelistsLoaded,
-    pricelistsActive,
-    pricelists,
-    pricesLoaded,
-    pricesActive,
-    prices,
-    projectsLoaded,
-    projectsActive,
-    projects,
-    statusesLoaded,
-    statusesActive,
-    statuses,
-    taskTypesLoaded,
-    taskTypesActive,
-    taskTypes,
-    usersLoaded,
-    usersActive,
-    users,
-    milestonesLoaded,
-    milestonesActive,
-    milestones,
-  };
-};
-
-export default connect( mapStateToProps, {
-  storageCompaniesStart,
-  storageHelpPricelistsStart,
-  storageHelpPricesStart,
-  storageHelpProjectsStart,
-  storageHelpStatusesStart,
-  storageHelpTaskTypesStart,
-  storageUsersStart,
-  storageHelpMilestonesStart
-} )( MultipleTaskEdit );
