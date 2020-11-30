@@ -293,7 +293,7 @@ export default function Rozpocet( props ) {
                 <td width="10">
                   <Checkbox
                     className="m-t-5"
-                    disabled= { disabled }
+                    disabled= { disabled || isInvoiced }
                     value={  isInvoiced || subtask.done }
                     onChange={()=>{
                       updateSubtask(subtask.id,{done:!subtask.done})
@@ -326,7 +326,7 @@ export default function Rozpocet( props ) {
                 <td>
                   <Select
                     isDisabled={disabled}
-                    value={ !isInvoiced ? subtask.assignedTo : { label: subtask.invoicedData.assignedTo, value: null } }
+                    value={ !isInvoiced ? subtask.assignedTo : subtask.invoicedData.assignedTo }
                     onChange={(assignedTo)=>{
                       updateSubtask(subtask.id,{assignedTo:assignedTo})
                     }}
@@ -340,7 +340,7 @@ export default function Rozpocet( props ) {
                 <td>
                   <Select
                     isDisabled={disabled}
-                    value={ !isInvoiced ? subtask.type : { label: subtask.invoicedData.type, value: null } }
+                    value={ !isInvoiced ? subtask.type : subtask.invoicedData.type }
                     onChange={(type)=>{
                       updateSubtask(subtask.id,{type:type})
                     }}
@@ -358,12 +358,13 @@ export default function Rozpocet( props ) {
                     pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                     className="form-control hidden-input h-30"
                     value={
-                      !isInvoiced ? (
-                        subtask.id === focusedSubtask
-                        ? editedSubtaskQuantity.toString()
-                        : subtask.quantity.toString()
-                      ):
-                      subtask.invoicedData.quantity
+                      subtask.id === focusedSubtask
+                      ? editedSubtaskQuantity.toString()
+                      : (
+                        !isInvoiced ?
+                        subtask.quantity.toString() :
+                        subtask.invoicedData.quantity
+                      )
                     }
                     onBlur={() => {
                       updateSubtask(subtask.id,{quantity:isNaN(parseFloat(editedSubtaskQuantity))?0:parseFloat(editedSubtaskQuantity)})
@@ -429,7 +430,7 @@ export default function Rozpocet( props ) {
                       'No price' :
                       getTotalDiscountedPrice(subtask) + " €"
                     ):
-                    `${subtask.invoicedData.price * subtask.invoicedData.quantity} €`
+                    `${parseFloat(subtask.invoicedData.price) * parseFloat(subtask.invoicedData.quantity)} €`
                   }
                 </td>
               }
@@ -485,7 +486,7 @@ export default function Rozpocet( props ) {
                   <td width="10">
                     <Checkbox
                       className="m-t-5"
-                      disabled= { disabled }
+                      disabled= { disabled || isInvoiced }
                       value={ isInvoiced || trip.done }
                       onChange={()=>{
                         updateTrip(trip.id,{done:!trip.done})
@@ -498,7 +499,7 @@ export default function Rozpocet( props ) {
                   <td>
                     <Select
                       isDisabled={disabled}
-                      value={ !isInvoiced ? trip.type : { label: trip.invoicedData.type, value: null } }
+                      value={ !isInvoiced ? trip.type : trip.invoicedData.type }
                       onChange={(type)=>{
                         updateTrip(trip.id,{type:type})
                       }}
@@ -512,7 +513,7 @@ export default function Rozpocet( props ) {
                   <td>
                     <Select
                       isDisabled={disabled}
-                      value={ !isInvoiced ? trip.assignedTo : { label: trip.invoicedData.assignedTo, value: null } }
+                      value={ !isInvoiced ? trip.assignedTo : trip.invoicedData.assignedTo }
                       onChange={(assignedTo)=>{
                         updateTrip(trip.id,{assignedTo:assignedTo})
                       }}
@@ -534,12 +535,13 @@ export default function Rozpocet( props ) {
                       pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                       className="form-control hidden-input h-30"
                       value={
-                        !isInvoiced ? (
-                          trip.id === focusedTrip
-                          ? editedTripQuantity.toString()
-                          : trip.quantity.toString()
-                        ):
-                        trip.invoicedData.quantity
+                        trip.id === focusedTrip ?
+                        editedTripQuantity.toString() :
+                        (
+                          !isInvoiced ?
+                          trip.quantity.toString() :
+                          trip.invoicedData.quantity
+                        )
                       }
                       onBlur={() => {
                         updateTrip(trip.id,{quantity:isNaN(parseFloat(editedTripQuantity))?0:parseFloat(editedTripQuantity)})
@@ -667,7 +669,7 @@ export default function Rozpocet( props ) {
                   <td width="10">
                     <Checkbox
                       className="m-t-5"
-                      disabled= { disabled }
+                      disabled= { disabled || isInvoiced }
                       value={ isInvoiced || material.done }
                       onChange={()=>{
                         updateMaterial(material.id,{done:!material.done})
@@ -682,12 +684,13 @@ export default function Rozpocet( props ) {
                       disabled={disabled}
                       className="form-control hidden-input"
                       value={
-                        !isInvoiced ? (
-                          material.id === focusedMaterial
-                          ? editedMaterialTitle
-                          : material.title
-                        ) :
-                        material.invoicedData.title
+                        material.id === focusedMaterial ?
+                        editedMaterialTitle :
+                        (
+                          !isInvoiced ?
+                          material.title :
+                          material.invoicedData.title
+                        )
                       }
                       onBlur={() => {
                         updateMaterial(material.id,{title:editedMaterialTitle})
@@ -717,13 +720,13 @@ export default function Rozpocet( props ) {
                       pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                       className="form-control hidden-input h-30"
                       value={
-                        !isInvoiced ?
+                        material.id === focusedMaterial ?
+                        editedMaterialQuantity.toString() :
                         (
-                          material.id === focusedMaterial
-                          ? editedMaterialQuantity.toString()
-                          : material.quantity.toString()
-                        ) :
-                        material.invoicedData.quantity
+                          !isInvoiced ?
+                          material.quantity.toString() :
+                          material.invoicedData.quantity
+                        )
                       }
                       onBlur={() => {
                         //submit
@@ -748,13 +751,13 @@ export default function Rozpocet( props ) {
                         style={{display: "inline", width: "70%", float: "right"}}
                         className="form-control hidden-input h-30"
                         value={
-                          !isInvoiced ?
+                          material.id === focusedMaterial ?
+                          editedMaterialPrice :
                           (
-                            material.id === focusedMaterial
-                            ? editedMaterialPrice
-                            : material.price
-                          ):
-                          material.invoicedData.price
+                            !isInvoiced ?
+                            material.price :
+                            material.invoicedData.price
+                          )
                         }
                         onBlur={() => {
                           //submit
@@ -778,15 +781,15 @@ export default function Rozpocet( props ) {
                         style={{display: "inline", width: "60%"}}
                         className="form-control hidden-input h-30"
                         value={
-                          !isInvoiced ?
-                          (
-                            parseInt(
-                              material.id === focusedMaterial ?
-                              editedMaterialMargin :
-                              material.margin
+                          parseInt(
+                            material.id === focusedMaterial ?
+                            editedMaterialMargin :
+                            (
+                              !isInvoiced ?
+                              material.margin :
+                              material.invoicedData.margin
                             )
-                          ):
-                          material.invoicedData.margin
+                          )
                         }
                         onBlur={() => {
                           updateMaterial(material.id,{margin:editedMaterialMargin})
@@ -803,13 +806,13 @@ export default function Rozpocet( props ) {
                 {showColumns.includes(7) &&
                   <td className="p-l-8 p-t-15 p-r-8 t-a-r font-14">
                     {
-                      !isInvoiced ?
+                      material.id === focusedMaterial ?
+                      (  getDiscountedMaterialPrice({price:editedMaterialPrice, margin:editedMaterialMargin}).toFixed(2) + " €" ) :
                       (
-                        material.id === focusedMaterial ?
-                        (  getDiscountedMaterialPrice({price:editedMaterialPrice, margin:editedMaterialMargin}).toFixed(2) + " €" ) :
-                        ( getDiscountedMaterialPrice(material) ).toFixed(2) + " €"
-                      ):
-                      `${material.invoicedData.price * material.invoicedData.quantity} €`
+                        !isInvoiced ?
+                        ( getDiscountedMaterialPrice(material) ).toFixed(2) + " €" :
+                        `${material.invoicedData.price * material.invoicedData.quantity} €`
+                      )
                     }
                   </td>
                 }
@@ -879,7 +882,7 @@ export default function Rozpocet( props ) {
                   <td width="10">
                     <Checkbox
                       className="m-t-5"
-                      disabled= { disabled }
+                      disabled= { disabled || isInvoiced }
                       value={ isInvoiced || customItem.done }
                       onChange={()=>{
                         updateCustomItem(customItem.id,{done:!customItem.done})
@@ -894,12 +897,13 @@ export default function Rozpocet( props ) {
                       disabled={disabled}
                       className="form-control hidden-input"
                       value={
-                        !isInvoiced ? (
-                          customItem.id === focusedCustomItem
-                          ? editedCustomItemTitle
-                          : customItem.title
-                        ) :
-                        customItem.invoicedData.title
+                        customItem.id === focusedCustomItem ?
+                        editedCustomItemTitle :
+                        (
+                          !isInvoiced ?
+                          customItem.title :
+                          customItem.invoicedData.title
+                        )
                       }
                       onBlur={() => {
                         updateCustomItem(customItem.id,{title:editedCustomItemTitle})
@@ -929,13 +933,13 @@ export default function Rozpocet( props ) {
                       pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                       className="form-control hidden-input h-30"
                       value={
-                        !isInvoiced ?
+                        customItem.id === focusedCustomItem ?
+                        editedCustomItemQuantity.toString() :
                         (
-                          customItem.id === focusedCustomItem
-                          ? editedCustomItemQuantity.toString()
-                          : customItem.quantity.toString()
-                        ) :
-                        customItem.invoicedData.quantity
+                          !isInvoiced ?
+                          customItem.quantity.toString() :
+                          customItem.invoicedData.quantity
+                        )
                       }
                       onBlur={() => {
                         //submit
@@ -970,13 +974,13 @@ export default function Rozpocet( props ) {
                         style={{display: "inline", width: "70%", float: "right"}}
                         className="form-control hidden-input h-30"
                         value={
-                          !isInvoiced ?
+                          customItem.id === focusedCustomItem ?
+                          editedCustomItemPrice :
                           (
-                            customItem.id === focusedCustomItem
-                            ? editedCustomItemPrice
-                            : customItem.price
-                          ):
-                          customItem.invoicedData.price
+                            !isInvoiced ?
+                            customItem.price :
+                            customItem.invoicedData.price
+                          )
                         }
                         onBlur={() => {
                           updateCustomItem(customItem.id,{price:editedCustomItemPrice})
@@ -1170,7 +1174,7 @@ export default function Rozpocet( props ) {
                       setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
                       setShowAddSubtask( false);
 
-                      submitService(body);
+                      submitService(body, getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity }));
                     }}
                     >
                     <i className="fa fa-plus" />
@@ -1285,7 +1289,7 @@ export default function Rozpocet( props ) {
                       setNewTripDiscount(0);
                       setShowAddTrip(false);
 
-                      submitTrip(body);
+                      submitTrip(body, getTotalDiscountedPrice({discount:newTripDiscount,quantity:newTripQuantity,type:newTripType}));
                     }}
                     >
                     <i className="fa fa-plus" />

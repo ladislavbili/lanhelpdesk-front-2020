@@ -78,6 +78,7 @@ export {
 from './renderFunctions';
 
 export {
-  toFloat
+  toFloat,
+  toFloatOrZero
 }
 from './numberManipulations';

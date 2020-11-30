@@ -171,6 +171,46 @@ export default function TaskEditContainer( props ) {
 
   //functions
 
+  const updateCasheStorage = ( response, key, type ) => {
+    const task = client.readQuery( {
+        query: GET_TASK,
+        variables: {
+          id
+        },
+      } )
+      .task;
+    let newTask = {
+      ...task,
+    };
+    newTask[ key ] = [ ...newTask[ key ] ]
+    switch ( type ) {
+      case 'ADD': {
+        newTask[ key ].push( response );
+        break;
+      }
+      case 'UPDATE': {
+        newTask[ key ][ newTask[ key ].findIndex( ( item ) => item.id === response.id ) ] = response;
+        break;
+      }
+      case 'DELETE': {
+        newTask[ key ] = newTask[ key ].filter( ( item ) => item.id === response.id );
+        break;
+      }
+      default: {
+        return;
+      }
+    }
+    client.writeQuery( {
+      query: GET_TASK,
+      variables: {
+        id
+      },
+      data: {
+        task: newTask
+      }
+    } );
+  }
+
   const addSubtaskFunc = ( sub ) => {
     setSaving( true );
 
@@ -187,11 +227,7 @@ export default function TaskEditContainer( props ) {
         }
       } )
       .then( ( response ) => {
-        console.log( response );
-        setSubtasks( [ ...subtasks, {
-          ...sub,
-          id: response.data.addSubtask.id
-        } ] );
+        updateCasheStorage( response.data.addSubtask, 'subtasks', 'ADD' );
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -215,7 +251,9 @@ export default function TaskEditContainer( props ) {
           assignedTo: sub.assignedTo.id,
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        updateCasheStorage( response.data.updateSubtask, 'subtasks', 'UPDATE' );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -229,7 +267,11 @@ export default function TaskEditContainer( props ) {
           id,
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        updateCasheStorage( {
+          id
+        }, 'subtasks', 'DELETE' );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
         console.log( err );
@@ -251,11 +293,7 @@ export default function TaskEditContainer( props ) {
         }
       } )
       .then( ( response ) => {
-        console.log( response );
-        setWorkTrips( [ ...workTrips, {
-          ...wt,
-          id: response.data.addWorkTrip.id
-        } ] );
+        updateCasheStorage( response.data.addWorkTrip, 'workTrips', 'ADD' );
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -278,7 +316,9 @@ export default function TaskEditContainer( props ) {
           assignedTo: item.assignedTo.id,
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        updateCasheStorage( response.data.updateWorkTrip, 'workTrips', 'UPDATE' );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -292,7 +332,11 @@ export default function TaskEditContainer( props ) {
           id,
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        updateCasheStorage( {
+          id
+        }, 'workTrips', 'DELETE' );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
         console.log( err );
@@ -313,11 +357,7 @@ export default function TaskEditContainer( props ) {
         }
       } )
       .then( ( response ) => {
-        console.log( response );
-        setMaterials( [ ...materials, {
-          ...item,
-          id: response.data.addMaterial.id
-        } ] );
+        updateCasheStorage( response.data.addMaterial, 'materials', 'ADD' );
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -340,7 +380,9 @@ export default function TaskEditContainer( props ) {
           price: parseFloat( item.price ),
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        updateCasheStorage( response.data.updateMaterial, 'materials', 'UPDATE' );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -354,10 +396,13 @@ export default function TaskEditContainer( props ) {
           id,
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        updateCasheStorage( {
+          id
+        }, 'materials', 'DELETE' );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
-        console.log( err );
       } );
   }
 
@@ -374,11 +419,7 @@ export default function TaskEditContainer( props ) {
         }
       } )
       .then( ( response ) => {
-        console.log( response );
-        setCustomItems( [ ...customItems, {
-          ...item,
-          id: response.data.addCustomItem.id
-        } ] );
+        updateCasheStorage( response.data.addCustomItem, 'customItems', 'ADD' );
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -400,7 +441,9 @@ export default function TaskEditContainer( props ) {
           price: parseFloat( item.price ),
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        updateCasheStorage( response.data.updateCustomItem, 'customItems', 'UPDATE' );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -414,7 +457,11 @@ export default function TaskEditContainer( props ) {
           id,
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        updateCasheStorage( {
+          id
+        }, 'customItems', 'DELETE' );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
         console.log( err );

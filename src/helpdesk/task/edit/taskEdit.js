@@ -49,7 +49,8 @@ import {
   toSelItem,
   timestampToString,
   orderArr,
-  updateArrayItem
+  updateArrayItem,
+  toFloatOrZero
 } from 'helperFunctions';
 import {
   invisibleSelectStyleNoArrow,
@@ -66,9 +67,60 @@ import {
 } from 'configs/constants/projects';
 import {
   UPDATE_TASK,
+  UPDATE_INVOICED_TASK,
   GET_TASK,
   GET_TASKS,
 } from '../querries';
+const defaultVykazyChanges = {
+  subtask: {
+    ADD: [],
+    EDIT: [],
+    DELETE: []
+  },
+  trip: {
+    ADD: [],
+    EDIT: [],
+    DELETE: []
+  },
+  material: {
+    ADD: [],
+    EDIT: [],
+    DELETE: []
+  },
+  customItem: {
+    ADD: [],
+    EDIT: [],
+    DELETE: []
+  },
+}
+const invoicedAttributes = {
+  subtask: [
+    'price',
+    'quantity',
+    'type',
+    'assignedTo',
+  ],
+  trip: [
+    'price',
+    'quantity',
+    'type',
+    'assignedTo',
+  ],
+  material: [
+    'title',
+    'quantity',
+    'price',
+    'totalPrice',
+    'margin',
+  ],
+  customItem: [
+    'title',
+    'quantity',
+    'price',
+    'totalPrice',
+  ],
+}
+let fakeID = -1;
 
 export default function TaskEdit( props ) {
   const client = useApolloClient();
@@ -124,11 +176,9 @@ export default function TaskEdit( props ) {
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ comments, setComments ] = React.useState( [] );
   const [ company, setCompany ] = React.useState( null );
-  const [ customItems, setCustomItems ] = React.useState( [] );
   const [ deadline, setDeadline ] = React.useState( null );
   const [ description, setDescription ] = React.useState( "" );
   const [ important, setImportant ] = React.useState( false );
-  const [ materials, setMaterials ] = React.useState( [] );
   const [ milestone, setMilestone ] = React.useState( [ noMilestone ] );
   const [ overtime, setOvertime ] = React.useState( booleanSelects[ 0 ] );
   const [ openUserAdd, setOpenUserAdd ] = React.useState( false );
@@ -143,7 +193,6 @@ export default function TaskEdit( props ) {
   const [ requester, setRequester ] = React.useState( null );
   const [ status, setStatus ] = React.useState( null );
   const [ showDescription, setShowDescription ] = React.useState( false );
-  const [ subtasks, setSubtasks ] = React.useState( [] );
   const [ tags, setTags ] = React.useState( [] );
   const [ taskType, setTaskType ] = React.useState( null );
   const [ taskTripPausal, setTaskTripPausal ] = React.useState( 0 );
@@ -152,12 +201,12 @@ export default function TaskEdit( props ) {
   const [ toggleTab, setToggleTab ] = React.useState( 1 );
   const [ usedSubtaskPausal, setUsedSubtaskPausal ] = React.useState( 0 );
   const [ usedTripPausal, setUsedTripPausal ] = React.useState( 0 );
-  const [ workTrips, setWorkTrips ] = React.useState( [] );
 
   const [ viewOnly, setViewOnly ] = React.useState( true );
   const [ changes, setChanges ] = React.useState( {} );
-  const [ vykazyChanges, setVykazyChanges ] = React.useState( {} );
+  const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
   const [ updateTask ] = useMutation( UPDATE_TASK );
+  const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
 
   const isInvoiced = task.status.action === 'Invoiced';
   const canEditInvoiced = accessRights.vykazy;
@@ -166,6 +215,7 @@ export default function TaskEdit( props ) {
   // sync
   React.useEffect( () => {
     setChanges( {} );
+    setVykazyChanges( defaultVykazyChanges );
     if ( isInvoiced ) {
       setAssignedTo( toSelArr( invoicedTask.assignedTo ) );
     } else {
@@ -195,8 +245,7 @@ export default function TaskEdit( props ) {
     const status = ( task.status ? toSelItem( task.status ) : null )
     setStatus( status );
     if ( isInvoiced ) {
-      setTags( invoicedTask.tags );
-      console.log( createSelectInvoicedItem( task.taskType, invoicedTask.taskType ) );
+      setTags( toSelArr( invoicedTask.tags ) );
       setTaskType( createSelectInvoicedItem( task.taskType, invoicedTask.taskType ) );
       setCompany( createSelectInvoicedItem( task.company, invoicedTask.company ) );
       setMilestone( milestone === undefined ? noMilestone : {
@@ -209,7 +258,7 @@ export default function TaskEdit( props ) {
         label: invoicedTask.project
       } );
     } else {
-      setTags( task.tags );
+      setTags( toSelArr( task.tags ) );
       setTaskType( ( task.taskType ? toSelItem( task.taskType ) : null ) );
       setCompany( ( task.company ? toSelItem( task.company ) : null ) );
       setMilestone( milestone === undefined ? noMilestone : milestone );
@@ -226,28 +275,8 @@ export default function TaskEdit( props ) {
     setTaskTripPausal( task.company ? task.company.taskTripPausal : 0 );
     setTaskWorkPausal( task.company ? task.company.taskWorkPausal : 0 );
     setTitle( task.title );
-    setCustomItems( task.customItems.map( ( item ) => ( {
-      ...item,
-      invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
-    } ) ) );
-    setMaterials( task.materials.map( ( item ) => ( {
-      ...item,
-      invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
-    } ) ) );
-    setSubtasks( ( task.subtasks ? task.subtasks.map( item => ( {
-      ...item,
-      invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
-      assignedTo: toSelItem( item.assignedTo, 'email' ),
-      type: toSelItem( item.type )
-    } ) ) : [] ) );
     setUsedSubtaskPausal( task.company ? task.company.usedSubtaskPausal : 0 );
     setUsedTripPausal( task.company ? task.company.usedTripPausal : 0 );
-    setWorkTrips( ( task.workTrips ? task.workTrips.map( item => ( {
-      ...item,
-      invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
-      assignedTo: toSelItem( item.assignedTo, 'email' ),
-      type: toSelItem( item.type )
-    } ) ) : [] ) );
 
     if ( project ) {
       const viewOnly = !project.right.write || ( status.action === 'Invoiced' && !canEditInvoiced );
@@ -255,6 +284,7 @@ export default function TaskEdit( props ) {
     }
   }, [ id ] );
 
+  //functions
   const getCantSave = ( change = {} ) => {
     const compare = {
       title,
@@ -378,6 +408,307 @@ export default function TaskEdit( props ) {
 
     setSaving( false );
   }
+
+  const submitInvoicedTask = () => {
+    const stmcChanges = {
+      subtasks: {
+        ADD: vykazyChanges.subtask.ADD.map( ( newSubtask ) => ( {
+          title: newSubtask.title,
+          order: newSubtask.order,
+          done: true,
+          quantity: toFloatOrZero( newSubtask.quantity ),
+          discount: toFloatOrZero( newSubtask.discount ),
+          type: newSubtask.type.id,
+          assignedTo: newSubtask.assignedTo.id,
+        } ) ),
+        EDIT: vykazyChanges.subtask.EDIT.map( ( subtask ) => {
+          let subtaskChanges = {};
+          Object.keys( subtask )
+            .forEach( ( key ) => {
+              switch ( key ) {
+                case 'assignedTo': {
+                  subtaskChanges[ key ] = subtask[ key ].id;
+                  break;
+                }
+                case 'type': {
+                  subtaskChanges[ key ] = subtask[ key ].id;
+                  break;
+                }
+                case 'discount': {
+                  subtaskChanges[ key ] = toFloatOrZero( subtask[ key ] );
+                  break;
+                }
+                case 'quantity': {
+                  subtaskChanges[ key ] = toFloatOrZero( subtask[ key ] );
+                  break;
+                }
+                default: {
+                  subtaskChanges[ key ] = subtask[ key ];
+                  break;
+                }
+              }
+            } )
+          return subtaskChanges;
+        } ),
+        DELETE: vykazyChanges.subtask.DELETE,
+      },
+      trips: {
+        ADD: vykazyChanges.trip.ADD.map( ( newTrip ) => ( {
+          order: newTrip.order,
+          done: true,
+          quantity: toFloatOrZero( newTrip.quantity ),
+          discount: toFloatOrZero( newTrip.discount ),
+          type: newTrip.type.id,
+          assignedTo: newTrip.assignedTo.id,
+        } ) ),
+        EDIT: vykazyChanges.trip.EDIT.map( ( trip ) => {
+          let tripChanges = {};
+          Object.keys( trip )
+            .forEach( ( key ) => {
+              switch ( key ) {
+                case 'discount': {
+                  subtaskChanges[ key ] = toFloatOrZero( subtask[ key ] );
+                  break;
+                }
+                case 'quantity': {
+                  subtaskChanges[ key ] = toFloatOrZero( subtask[ key ] );
+                  break;
+                }
+                case 'assignedTo': {
+                  tripChanges[ key ] = trip[ key ].id;
+                  break;
+                }
+                case 'type': {
+                  tripChanges[ key ] = trip[ key ].id;
+                  break;
+                }
+                default: {
+                  tripChanges[ key ] = trip[ key ];
+                  break;
+                }
+              }
+            } )
+          return tripChanges;
+        } ),
+        DELETE: vykazyChanges.trip.DELETE,
+      },
+      materials: {
+        ADD: vykazyChanges.material.ADD.map( ( newMaterial ) => ( {
+          title: newMaterial.title,
+          order: newMaterial.order,
+          done: true,
+          quantity: toFloatOrZero( newMaterial.quantity ),
+          margin: toFloatOrZero( newMaterial.margin ),
+          price: toFloatOrZero( newMaterial.price ),
+        } ) ),
+        EDIT: vykazyChanges.material.EDIT.map( ( material ) => {
+          let materialChanges = {};
+          Object.keys( material )
+            .forEach( ( key ) => {
+              switch ( key ) {
+                case 'quantity': {
+                  customItemChanges[ key ] = toFloatOrZero( customItem[ key ] );
+                  break;
+                }
+                case 'margin': {
+                  materialChanges[ key ] = toFloatOrZero( material[ key ] );
+                  break;
+                }
+                case 'price': {
+                  materialChanges[ key ] = toFloatOrZero( material[ key ] );
+                  break;
+                }
+                default: {
+                  materialChanges[ key ] = material[ key ];
+                  break;
+                }
+              }
+            } )
+          return materialChanges;
+        } ),
+        DELETE: vykazyChanges.material.DELETE,
+      },
+      customItems: {
+        ADD: vykazyChanges.customItem.ADD.map( ( newCustomItem ) => ( {
+          title: newCustomItem.title,
+          order: newCustomItem.order,
+          done: true,
+          quantity: toFloatOrZero( newCustomItem.quantity ),
+          price: toFloatOrZero( newCustomItem.price ),
+        } ) ),
+        EDIT: vykazyChanges.customItem.EDIT.map( ( customItem ) => {
+          let customItemChanges = {};
+          Object.keys( customItem )
+            .forEach( ( key ) => {
+              switch ( key ) {
+                case 'quantity': {
+                  customItemChanges[ key ] = toFloatOrZero( customItem[ key ] );
+                  break;
+                }
+                case 'price': {
+                  customItemChanges[ key ] = toFloatOrZero( customItem[ key ] );
+                  break;
+                }
+                default: {
+                  customItemChanges[ key ] = customItem[ key ];
+                  break;
+                }
+              }
+            } )
+          return customItemChanges;
+        } ),
+        DELETE: vykazyChanges.customItem.DELETE,
+      },
+    };
+    console.log( stmcChanges );
+    console.log( changes );
+    return;
+    updateInvoicedTask( {
+        variables: {
+          id,
+          taskChanges: changes,
+          stmcChanges,
+        }
+      } )
+      .then( ( response ) => {} )
+      .catch( ( error ) => {
+        console.log( error );
+      } )
+  }
+
+  const saveVykazyChanges = ( data, dataType, action ) => {
+    let newChanges = {
+      ...vykazyChanges
+    };
+    switch ( action ) {
+      case 'ADD': {
+        let invoicedData = {};
+        invoicedAttributes[ dataType ].forEach( ( attribute ) => {
+          invoicedData[ attribute ] = data[ attribute ];
+        } );
+        newChanges[ dataType ][ action ].push( {
+          ...data,
+          id: fakeID--,
+          invoicedData
+        } );
+        break;
+      }
+      case 'EDIT': {
+        if ( data.id < 0 ) {
+          const index = newChanges[ dataType ][ 'ADD' ].findIndex( ( item ) => item.id === data.id );
+          newChanges[ dataType ][ 'ADD' ][ index ] = {
+            ...newChanges[ dataType ][ 'ADD' ][ index ],
+            ...data.newData
+          }
+          Object.keys( data.newData )
+            .forEach( ( key ) => {
+              if ( invoicedAttributes[ dataType ].includes( key ) ) {
+                newChanges[ dataType ][ 'ADD' ][ index ].invoicedData[ key ] = data.newData[ key ];
+              }
+            } )
+        } else {
+          const index = newChanges[ dataType ][ 'EDIT' ].findIndex( ( item ) => item.id === data.id );
+          if ( index !== -1 ) {
+            newChanges[ dataType ][ 'EDIT' ][ index ] = {
+              ...newChanges[ dataType ][ 'EDIT' ][ index ],
+              ...data.newData
+            }
+          } else {
+            newChanges[ dataType ][ 'EDIT' ].push( {
+              id: data.id,
+              ...data.newData,
+            } )
+          }
+        }
+        break;
+      }
+      case 'DELETE': {
+        if ( data < 0 ) {
+          newChanges[ dataType ][ 'ADD' ].splice( newChanges[ dataType ][ 'ADD' ].findIndex( ( item ) => item.id === data ), 1 );
+        } else {
+          newChanges[ dataType ][ 'EDIT' ].splice( newChanges[ dataType ][ 'EDIT' ].findIndex( ( item ) => item.id === data ), 1 );
+          newChanges[ dataType ][ action ].push( data );
+        }
+        break;
+      }
+      default: {}
+    }
+    setVykazyChanges( newChanges );
+  }
+
+  const modifyInvoicedVykazy = ( data, type ) => {
+    if ( !isInvoiced ) {
+      return data;
+    }
+    //vykazyChanges, setVykazyChanges
+    let newData = data.filter( ( item ) => !vykazyChanges[ type ][ 'DELETE' ].includes( item.id ) );
+    newData = newData.map( ( item ) => {
+      switch ( type ) {
+        case 'subtask': {
+          return ( {
+            ...item,
+            invoicedData: {
+              ...item.invoicedData,
+              assignedTo: {
+                label: item.invoicedData.assignedTo,
+                value: item.assignedTo ? item.assignedTo.id : null
+              },
+              type: {
+                label: item.invoicedData.type,
+                value: item.type ? item.type.id : null
+              },
+            }
+          } )
+          break;
+        }
+        case 'trip': {
+          return ( {
+            ...item,
+            invoicedData: {
+              ...item.invoicedData,
+              assignedTo: {
+                label: item.invoicedData.assignedTo,
+                value: item.assignedTo ? item.assignedTo.id : null
+              },
+              type: {
+                label: item.invoicedData.type,
+                value: item.type ? item.type.id : null
+              },
+            }
+          } )
+          break;
+        }
+        default: {
+          return item
+          break;
+        }
+
+      }
+    } )
+    newData = newData.map( ( item ) => {
+      const change = vykazyChanges[ type ][ 'EDIT' ].find( ( item2 ) => item.id === item2.id );
+      if ( !change ) {
+        return item;
+      }
+      let newItem = {
+        ...item,
+        invoicedData: {
+          ...item.invoicedData
+        }
+      };
+      Object.keys( change )
+        .forEach( ( key ) => {
+          newItem[ key ] = change[ key ];
+          if ( invoicedAttributes[ type ].includes( key ) ) {
+            newItem.invoicedData[ key ] = change[ key ];
+          }
+        } )
+      return newItem;
+    } )
+    return newData.concat( vykazyChanges[ type ][ 'ADD' ] );
+  }
+
+  //constants
   const defaultFields = project === null ? noDef : {
     ...noDef,
     ...project.def
@@ -399,6 +730,28 @@ export default function TaskEdit( props ) {
 
   const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights, 'fullName' ) : users );
   const milestones = [ noMilestone ].concat( ( project ? toSelArr( project.project.milestones ) : [] ) );
+
+  //vykazyTable
+  const subtasks = task.subtasks.map( item => ( {
+    ...item,
+    invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
+    assignedTo: toSelItem( item.assignedTo, 'email' ),
+    type: toSelItem( item.type )
+  } ) );
+  const workTrips = task.workTrips.map( item => ( {
+    ...item,
+    invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
+    assignedTo: toSelItem( item.assignedTo, 'email' ),
+    type: toSelItem( item.type )
+  } ) );
+  const materials = task.materials.map( ( item ) => ( {
+    ...item,
+    invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
+  } ) );
+  const customItems = task.customItems.map( ( item ) => ( {
+    ...item,
+    invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
+  } ) );
 
   //Value Change
   const changeProject = ( project ) => {
@@ -527,7 +880,12 @@ export default function TaskEdit( props ) {
                 taskID={id}
                 createdBy={task.createdBy}
                 createdAt={task.createdAt}
-                taskWorks={subtasks}
+                taskWorks={task.subtasks.map( item => ( {
+                  ...item,
+                  invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
+                  assignedTo: toSelItem( item.assignedTo, 'email' ),
+                  type: toSelItem( item.type )
+                } ) )}
                 workTrips={workTrips}
                 taskMaterials={materials}
                 customItems={customItems}
@@ -564,9 +922,7 @@ export default function TaskEdit( props ) {
                 style={{color: important ? '#ffc107' : '#0078D4'}}
                 disabled={getCantSave()}
                 className="btn btn-link-reversed waves-effect"
-                onClick={()=>{
-                  console.log('save invoiced');
-                }}
+                onClick={submitInvoicedTask}
                 >
                 <i className="far fa-save icon-M p-r-2" />
                 Save invoiced task
@@ -1203,8 +1559,9 @@ export default function TaskEdit( props ) {
       <VykazyTable
         showColumns={ (viewOnly ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
         showTotals={false}
-        disabled={viewOnly || getCantSave()}
+        disabled={(viewOnly || getCantSave()) && !canEditInvoiced }
         isInvoiced={isInvoiced}
+        canEditInvoiced={canEditInvoiced}
         company={company}
         match={match}
         taskID={id}
@@ -1212,105 +1569,141 @@ export default function TaskEdit( props ) {
 
         showSubtasks={project ? project.showSubtasks : false}
 
-        submitService={(newService) => {
-          addSubtaskFunc(newService);
+        submitService={(newService, price) => {
+          if(isInvoiced){
+            saveVykazyChanges({...newService, price}, 'subtask', 'ADD' );
+          }else{
+            addSubtaskFunc(newService);
+          }
         }}
-        subtasks={subtasks ? subtasks : []}
+        subtasks={ isInvoiced ? modifyInvoicedVykazy(subtasks, 'subtask') : subtasks }
         defaultType={taskType}
         taskTypes={taskTypes}
         updateSubtask={(id,newData)=>{
-          let newSubtasks=[...subtasks];
-          newSubtasks[newSubtasks.findIndex((item)=>item.id === id)] = {...newSubtasks.find((item)=>item.id===id),...newData};
-          setSubtasks(newSubtasks);
-          updateSubtaskFunc({...newSubtasks.find((item)=>item.id===id),...newData});
+          if(isInvoiced){
+            saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
+          }else{
+            updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
+          }
         }}
         updateSubtasks={(multipleSubtasks)=>{
-          let newSubtasks=[...subtasks];
-          multipleSubtasks.forEach(({id, newData})=>{
-            newSubtasks[newSubtasks.findIndex((item)=>item.id===id)]={...newSubtasks.find((item)=>item.id===id),...newData};
-            updateSubtaskFunc({...newSubtasks.find((item)=>item.id===id),...newData});
-          });
-          setSubtasks(newSubtasks);
+          if(isInvoiced){
+            multipleSubtasks.forEach(({id, newData}) => {
+              saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
+            })
+          } else {
+            multipleSubtasks.forEach(({id, newData})=>{
+              updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
+            });
+          }
         }}
         removeSubtask={(id)=>{
-          let newSubtasks=[...subtasks];
-          newSubtasks.splice(newSubtasks.findIndex((item)=>item.id===id),1);
-          setSubtasks(newSubtasks);
-          deleteSubtaskFunc(id);
+          if(isInvoiced){
+            saveVykazyChanges( id, 'subtask', 'DELETE' );
+          }else{
+            deleteSubtaskFunc(id);
+          }
         }}
-        workTrips={workTrips ? workTrips : []}
-        tripTypes={tripTypes ? tripTypes : []}
-        submitTrip={(newTrip)=>{
-          addWorkTripFunc(newTrip);
+        workTrips={ isInvoiced ? modifyInvoicedVykazy(workTrips, 'trip') : workTrips }
+        tripTypes={tripTypes}
+        submitTrip={(newTrip, price)=>{
+          if(isInvoiced){
+            saveVykazyChanges( { ...newTrip, price }, 'trip', 'ADD' );
+          }else{
+            addWorkTripFunc(newTrip);
+          }
         }}
         updateTrip={(id,newData)=>{
-          let newTrips=[...workTrips];
-          newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-          setWorkTrips(newTrips);
-          updateWorkTripFunc({...newTrips.find((trip)=>trip.id===id),...newData});
+          if(isInvoiced){
+            saveVykazyChanges( {id, newData}, 'trip', 'EDIT' );
+          }else{
+            updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
+          }
         }}
         updateTrips={(multipleTrips)=>{
-          let newTrips=[...workTrips];
-          multipleTrips.forEach(({id, newData})=>{
-            newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-            updateWorkTripFunc({...newTrips.find((trip)=>trip.id===id),...newData});
-          });
-          setWorkTrips(newTrips);
+          if(isInvoiced){
+            multipleTrips.forEach(({id, newData}) => {
+              saveVykazyChanges({id,newData}, 'trip', 'EDIT' );
+            })
+          } else {
+            multipleTrips.forEach(({id, newData})=>{
+              updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
+            });
+          }
         }}
         removeTrip={(id)=>{
-          let newTrips=[...workTrips];
-          newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
-          setWorkTrips(newTrips);
-          deleteWorkTripFunc(id);
+          if(isInvoiced){
+            saveVykazyChanges( id, 'trip', 'DELETE' );
+          }else{
+            deleteWorkTripFunc(id);
+          }
         }}
 
-        materials={materials ? materials : []}
+        materials={ isInvoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
         submitMaterial={(newMaterial)=>{
-          addMaterialFunc(newMaterial);
+          if(isInvoiced){
+            saveVykazyChanges( newMaterial, 'material', 'ADD' );
+          }else{
+            addMaterialFunc(newMaterial);
+          }
         }}
         updateMaterial={(id,newData)=>{
-          let newMaterials=[...materials];
-          newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-          setMaterials(newMaterials);
-          updateMaterialFunc({...newMaterials.find((material)=>material.id===id),...newData});
+          if(isInvoiced){
+            saveVykazyChanges( {id,newData}, 'material', 'EDIT' );
+          }else{
+            updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+          }
         }}
         updateMaterials={(multipleMaterials)=>{
-          let newMaterials=[...materials];
-          multipleMaterials.forEach(({id, newData})=>{
-            newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-            updateMaterialFunc({...newMaterials.find((material)=>material.id===id),...newData});
-          });
-          setMaterials(newMaterials);
+          if(isInvoiced){
+            multipleMaterials.forEach(({id, newData}) => {
+              saveVykazyChanges({id,newData}, 'material', 'EDIT' );
+            })
+          } else {
+            multipleMaterials.forEach(({id, newData})=>{
+              updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+            });
+          }
         }}
         removeMaterial={(id)=>{
-          let newMaterials=[...materials];
-          newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-          setMaterials(newMaterials);
-          deleteMaterialFunc(id);
+          if(isInvoiced){
+            saveVykazyChanges( id, 'material', 'DELETE' );
+          }else{
+            deleteMaterialFunc(id);
+          }
         }}
-        customItems={customItems ? customItems : [] }
+        customItems={ isInvoiced ? modifyInvoicedVykazy(customItems, 'customItem') : customItems }
         submitCustomItem={(customItem)=>{
-          addCustomItemFunc(customItem);
+          if(isInvoiced){
+            saveVykazyChanges( customItem, 'customItem', 'ADD' );
+          }else{
+            addCustomItemFunc(customItem);
+          }
         }}
         updateCustomItem={(id,newData)=>{
-          let newCustomItems=[...customItems];
-          newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
-          setCustomItems(newCustomItems);
-          updateCustomItemFunc({...newCustomItems.find((customItem)=>customItem.id===id),...newData});
+          if(isInvoiced){
+            saveVykazyChanges( {id,newData}, 'customItem', 'EDIT' );
+          }else{
+            updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id ),...newData});
+          }
         }}
         updateCustomItems={(multipleCustomItems)=>{
-          let newCustomItems=[...customItems];
-          multipleCustomItems.forEach(({id, newData})=>{
-            newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
-            updateCustomItemFunc({...newCustomItems.find((customItem)=>customItem.id===id),...newData});
-          });
-          setCustomItems(newCustomItems);
+          if(isInvoiced){
+            multipleCustomItems.forEach(({id, newData}) => {
+              saveVykazyChanges({id,newData}, 'customItem', 'EDIT' );
+            })
+          } else {
+            multipleCustomItems.forEach(({id, newData})=>{
+              updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id),...newData});
+            });
+          }
         }}
         removeCustomItem={(id)=>{
-          let newCustomItems=[...customItems];
-          newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
-          setCustomItems(newCustomItems);
-          deleteCustomItemFunc();
+          if(isInvoiced){
+            saveVykazyChanges( id, 'customItem', 'DELETE' );
+          }else{
+            deleteCustomItemFunc(id);
+          }
         }}
         units={[]}
         defaultUnit={null}
