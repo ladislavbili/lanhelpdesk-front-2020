@@ -20,7 +20,6 @@ export default function ColumnDisplay( props ) {
     allStatuses,
     Edit
   } = props;
-  console.log( data );
   return (
     <div>
 			<CommandBar {...commandBar} listName={listName} />

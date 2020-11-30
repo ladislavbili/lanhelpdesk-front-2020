@@ -83,6 +83,8 @@ export default function TaskListDnD( props ) {
         variables: updateData
       } )
       .then( ( response ) => {
+        const updatedTask = response.data.updateTask;
+        delete updateTask.__typename;
         try {
           const originalTask = client.readQuery( {
               query: GET_TASK,
@@ -92,10 +94,10 @@ export default function TaskListDnD( props ) {
             } )
             .task;
 
-          const updatedTask = {
+          const newTask = {
             ...originalTask,
-            ...updateData
-          }
+            ...updatedTask
+          };
 
           client.writeQuery( {
             query: GET_TASK,
@@ -103,7 +105,7 @@ export default function TaskListDnD( props ) {
               id
             },
             data: {
-              task: updatedTask
+              task: newTask
             }
           } );
         } catch ( e ) {
@@ -111,7 +113,6 @@ export default function TaskListDnD( props ) {
         }
 
         try {
-          //update tasks if project changed or not
           let execTasks = client.readQuery( {
               query: GET_TASKS,
               variables: {
@@ -122,11 +123,10 @@ export default function TaskListDnD( props ) {
             } )
             .tasks;
 
-          const updatedTask = {
+          const newTask = {
             ...execTasks.tasks.find( task => task.id === id ),
             ...updateData
           };
-          console.log( execTasks );
 
           client.writeQuery( {
             query: GET_TASKS,
@@ -138,7 +138,7 @@ export default function TaskListDnD( props ) {
             data: {
               tasks: {
                 ...execTasks,
-                tasks: updateArrayItem( execTasks.tasks, updatedTask )
+                tasks: updateArrayItem( execTasks.tasks, newTask )
               }
             }
           } );
@@ -165,22 +165,22 @@ export default function TaskListDnD( props ) {
       .filter( item => statuses.includes( item.groupItem.id ) )
     );
 
-    const tagetStatus = allStatuses.find( ( status ) => status.id === parseInt( destination.droppableId ) )
+    const targetStatus = allStatuses.find( ( status ) => status.id === parseInt( destination.droppableId ) )
     const item = groups.find( ( group ) => group.groupItem.id === parseInt( source.droppableId ) )
       .data[ source.index ];
     let updateData = {
       id: item.id,
-      status: tagetStatus.id,
+      status: targetStatus.id,
     };
-    if ( tagetStatus.action === 'PendingDate' ) {
+    if ( targetStatus.action === 'PendingDate' ) {
       updateData.pendingDate = fromMomentToUnix( moment()
           .add( 1, 'days' ) )
         .toString();
       updateData.pendingChangable = true;
-    } else if ( tagetStatus.action === 'CloseDate' || tagetStatus.action === 'CloseInvalid' ) {
+    } else if ( targetStatus.action === 'CloseDate' || targetStatus.action === 'CloseInvalid' ) {
       updateData.important = false;
     }
-    updateTaskFunc( item.id, tagetStatus, updateData );
+    updateTaskFunc( item.id, targetStatus, updateData );
   }
 
   const GROUP_DATA = (
@@ -204,7 +204,7 @@ export default function TaskListDnD( props ) {
 						/>
 					<div className="flex-row">
 						<DragDropContext onDragEnd={onDragEnd}>
-							{ GROUP_DATA.filter( (group) => group.groupItem.action !== 'invoiced' ).map((group)=>
+							{ GROUP_DATA.filter( (group) => group.groupItem.action !== 'Invoiced' ).map((group)=>
 								<Card className="dnd-column" key={group.groupItem.id}>
 									<CardHeader className="dnd-header">{group.groupItem.title}</CardHeader>
 									<Droppable droppableId={group.groupItem.id.toString()}>
@@ -247,7 +247,7 @@ export default function TaskListDnD( props ) {
 							)}
 						</DragDropContext>
 						{
-							GROUP_DATA.filter( (group) => group.groupItem.action === 'invoiced' ).map((group)=>
+							GROUP_DATA.filter( (group) => group.groupItem.action === 'Invoiced' ).map((group)=>
 							<Card className="dnd-column" key={group.groupItem.id}>
 								<CardHeader className="dnd-header">{group.groupItem.title}</CardHeader>
 								<CardBody className="dnd-body">

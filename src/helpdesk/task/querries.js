@@ -722,3 +722,36 @@ mutation deleteTaskAttachment($id: Int!) {
   }
 }
 `;
+
+export const GET_CALENDAR_EVENTS = gql `
+query calendarEvents($filter: FilterInput, $projectId: Int){
+  calendarEvents (
+    filter: $filter,
+    projectId: $projectId,
+  ){
+    id
+    createdAt
+    updatedAt
+    startsAt
+    endsAt
+		task {
+			id
+			title
+			project{
+				id
+				title
+        right{
+          write
+          delete
+        }
+			}
+			status {
+				id
+				title
+				color
+				action
+			}
+    }
+  }
+}
+`;

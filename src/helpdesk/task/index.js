@@ -37,6 +37,7 @@ import {
   GET_TASKS,
   DELETE_TASK,
   GET_MY_DATA,
+  GET_CALENDAR_EVENTS,
 } from './querries';
 
 import {
@@ -60,7 +61,6 @@ export default function TasksIndex( props ) {
   const {
     history,
     match,
-    //calendarEvents
   } = props;
 
   const {
@@ -87,6 +87,18 @@ export default function TasksIndex( props ) {
     data: statusesData,
     loading: statusesLoading
   } = useQuery( GET_STATUSES );
+
+  const {
+    data: calendarEventsData,
+    loading: calendarEventsLoading
+  } = useQuery( GET_CALENDAR_EVENTS,
+    /*{
+       variables: {
+         filter: localFilterToValues( localFilter ),
+         projectId: localProject.id
+       },
+     } */
+  );
 
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
@@ -116,7 +128,8 @@ export default function TasksIndex( props ) {
     projectLoading ||
     milestoneLoading ||
     tasksLoading ||
-    statusesLoading
+    statusesLoading ||
+    calendarEventsLoading
   );
 
   //sync
@@ -317,6 +330,7 @@ export default function TasksIndex( props ) {
   }
 
   const getCalendarEventsData = ( tasks ) => {
+    return calendarEventsData.calendarEvents;
     /*let taskIDs = tasks.map((task)=>task.id);
     return this.props.calendarEvents.filter((event)=>taskIDs.includes(event.taskID)).map((event)=>{
     	let task = tasks.find((task)=>event.taskID===task.id);
@@ -332,6 +346,7 @@ export default function TasksIndex( props ) {
   }
 
   const getCalendarAllDayData = ( tasks ) => {
+    return []; //calendarEvents.calendarEvents;
     /*return tasks.map((task) => {
     	let newTask = {
     		...task,
@@ -382,6 +397,7 @@ export default function TasksIndex( props ) {
     }).map((task)=>({...task,end: task.status.action !== 'pendingOLD' ? task.start : task.end }))*/
   }
 
+  console.log( calendarEventsData );
   return (
       <ShowData
 			data={tasks.map((task) => ({
