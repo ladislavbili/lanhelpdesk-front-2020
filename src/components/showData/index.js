@@ -29,29 +29,6 @@ query {
 }
 `;
 
-const LOCAL_CACHE = gql `
-  query getLocalCache {
-    milestone @client {
-      id
-      title
-      value
-      label
-    }
-		search @client
-		showDataFilter @client {
-			name
-			id
-			title
-			status
-			requester
-			company
-			assignedTo
-			createdAt
-			deadline
-		}
-  }
-`;
-
 export default function ShowDataContainer( props ) {
   const {
     history,
@@ -82,9 +59,6 @@ export default function ShowDataContainer( props ) {
   const {
     data: myData
   } = useQuery( GET_MY_DATA );
-  const {
-    data: localCache
-  } = useQuery( LOCAL_CACHE );
 
   //local
   const {
@@ -97,6 +71,7 @@ export default function ShowDataContainer( props ) {
 
   const tasklistLayout = myData ? myData.getMyData.tasklistLayout : 1;
 
+  const localCache = null;
   const search = ( localCache ? localCache.search : "" );
 
   //	const client = useApolloClient();
@@ -287,7 +262,7 @@ export default function ShowDataContainer( props ) {
 								match={match}
 								data={
 									(calendarAllDayData ? calendarAllDayData(filterDataFunc()):[]).concat(
-										calendarEventsData ? calendarEventsData(filterDataFunc()):[]
+										calendarEventsData ? calendarEventsData():[]
 									)
 								}
 								link={link}

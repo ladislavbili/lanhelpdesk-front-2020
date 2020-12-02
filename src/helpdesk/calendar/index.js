@@ -70,7 +70,6 @@ export default function TaskCalendar( props ) {
   const {
     match,
     history,
-    calendarLayout,
     statuses,
     statusesLoaded,
     setUserFilterStatuses,
@@ -78,23 +77,25 @@ export default function TaskCalendar( props ) {
     commandBar,
     listName,
     link,
-    setCalendarLayout,
     Edit,
   } = props;
 
-  //TODO u sure?
   const {
     data: currentUserData,
     loading: currentUserLoading
   } = useQuery( GET_MY_DATA );
 
   const [ today, setToday ] = React.useState( moment() );
+  const [ calendarLayout, setCalendarLayout ] = React.useState( 'month' );
+
 
   const onEventResize = ( item ) => {
-    // TODO pozi rules
-    /*  if ( currentUser.userData.role.value === 0 ) {
-        return;
-      }*/
+    const canEdit = item.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
+
+    if ( !canEdit ) {
+      return;
+    }
+
     if ( calendarLayout === 'week' ) {
       if ( !item.event.isTask ) {
         /*    rebase.updateDoc( '/help-calendar_events/' + item.event.eventID, {
@@ -102,23 +103,23 @@ export default function TaskCalendar( props ) {
               end: item.end.getTime()
             } )*/
       }
-      /*else if(item.event.status.action==='pending'){
+      /*else if(item.event.status.action==='PendingDate'){
       				rebase.updateDoc('/help-tasks/'+item.event.id, { pendingDate:item.start.getTime(), pendingDateTo:item.end.getTime(), pendingChange:true })
       			}*/
     }
   };
 
   const getOnlyDaytime = ( date ) => {
-    // TODO yzmen na moment
     return ( new Date( date.getFullYear(), date.getMonth(), date.getDate() ) )
       .getTime();
   }
 
   const onEventDrop = ( item ) => {
-    // TODO pozi rules
-    /*    if ( currentUser.userData.role.value === 0 ) {
-          return;
-        }*/
+    const canEdit = item.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
+
+    if ( !canEdit ) {
+      return;
+    }
     //MOVING TASKS
     /*  if ( ( item.isAllDay || calendarLayout === 'month' ) && item.event.isTask ) {
         if ( [ 'new', 'open' ].includes( item.event.status.action ) ) {
@@ -127,7 +128,7 @@ export default function TaskCalendar( props ) {
             rebase.updateDoc( '/help-tasks/' + item.event.id, {
               pendingDate: item.start.getTime(),
               pendingChange: true,
-              status: this.props.statuses.find( ( status ) => status.action === 'pending' )
+              status: this.props.statuses.find( ( status ) => status.action === 'PendingDate' )
                 .id
             } )
           } else if ( this.getOnlyDaytime( item.start ) < this.getOnlyDaytime( new Date() ) && this.props.statusesLoaded ) {
@@ -143,7 +144,7 @@ export default function TaskCalendar( props ) {
           rebase.updateDoc( '/help-tasks/' + item.event.id, {
             closeDate: item.start.getTime()
           } );
-        } else if ( item.event.status.action === 'pending' && this.getOnlyDaytime( item.start ) >= this.getOnlyDaytime( new Date() ) ) {
+        } else if ( item.event.status.action === 'PendingDate' && this.getOnlyDaytime( item.start ) >= this.getOnlyDaytime( new Date() ) ) {
           // UPDATE PENDING DATE
           rebase.updateDoc( '/help-tasks/' + item.event.id, {
             pendingDate: item.start.getTime()
@@ -166,7 +167,7 @@ export default function TaskCalendar( props ) {
           } else if ( item.event.status.action === 'new' && this.props.statusesLoaded ) {
             newEvent.end = fromMomentToUnix( moment( newEvent.start )
               .add( 2, 'hours' ) );
-          } else if ( item.event.status.action === 'pending' ) {
+          } else if ( item.event.status.action === 'PendingDate' ) {
             newEvent.end = fromMomentToUnix( moment( newEvent.start )
               .add( 30, 'minutes' ) );
           }
@@ -183,9 +184,12 @@ export default function TaskCalendar( props ) {
 
 
   const onEventDropTASKS = ( item ) => {
-    /*  if ( currentUser.userData.role.value === 0 ) {
-        return;
-      }*/
+    const canEdit = item.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
+
+    if ( !canEdit ) {
+      return;
+    }
+
     //manage calendar all day
     /*  if ( ( item.isAllDay || this.props.calendarLayout === 'month' ) && item.event.isTask ) {
         if ( [ 'new', 'open' ].includes( item.event.status.action ) ) {
@@ -199,7 +203,7 @@ export default function TaskCalendar( props ) {
               pendingDateTo: fromMomentToUnix( moment( item.end.getTime() )
                 .add( 30, 'minutes' ) ),
               pendingChange: true,
-              status: this.props.statuses.find( ( status ) => status.action === 'pending' )
+              status: this.props.statuses.find( ( status ) => status.action === 'PendingDate' )
                 .id
             } )
           } else if ( this.getOnlyDaytime( item.start ) < this.getOnlyDaytime( new Date() ) && this.props.statusesLoaded ) {
@@ -213,7 +217,7 @@ export default function TaskCalendar( props ) {
           rebase.updateDoc( '/help-tasks/' + item.event.id, {
             closeDate: item.start.getTime()
           } );
-        } else if ( item.event.status.action === 'pending' && this.getOnlyDaytime( item.start ) >= this.getOnlyDaytime( new Date() ) ) {
+        } else if ( item.event.status.action === 'PendingDate' && this.getOnlyDaytime( item.start ) >= this.getOnlyDaytime( new Date() ) ) {
           rebase.updateDoc( '/help-tasks/' + item.event.id, {
             pendingDate: item.start.getTime(),
             pendingDateTo: item.end.getTime(),
@@ -241,7 +245,7 @@ export default function TaskCalendar( props ) {
               } );
 
             rebase.updateDoc( '/help-tasks/' + item.event.id, {
-              status: this.props.statuses.find( ( status ) => status.action === 'pending' )
+              status: this.props.statuses.find( ( status ) => status.action === 'PendingDate' )
                 .id,
               pendingDate: item.start.getTime(),
               pendingDateTo: fromMomentToUnix( moment( newEvent.start )
@@ -258,7 +262,7 @@ export default function TaskCalendar( props ) {
               status: this.props.statuses.find( ( status ) => status.action === 'open' )
                 .id
             } )
-          } else if ( item.event.status.action === 'pending' ) {
+          } else if ( item.event.status.action === 'PendingDate' ) {
             rebase.updateDoc( '/help-tasks/' + item.event.id, {
               pendingDate: item.start.getTime(),
               pendingDateTo: item.end.getTime()
@@ -289,7 +293,8 @@ export default function TaskCalendar( props ) {
     return ( <Edit match={match} columns={true} history={history} /> );
   }
 
-  console.log( data );
+  console.log( events );
+
   return (
     <div>
   			<CommandBar { ...commandBar } />
@@ -303,7 +308,7 @@ export default function TaskCalendar( props ) {
             />
   				<DnDCalendar
   					events = { events }
-            defaultDate = { new Date() }
+            defaultDate = {new Date() }
             defaultView = { calendarLayout }
   					style = {{ height: "100vh" }}
   					views={['month', 'week']}
@@ -315,9 +320,9 @@ export default function TaskCalendar( props ) {
 
             min={
               new Date(
-                today.getFullYear(),
-                today.getMonth(),
-                today.getDate(),
+                today.get('year'),
+                today.get('month'),
+                today.get('date'),
                 8
               )
             }

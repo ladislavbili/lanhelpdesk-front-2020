@@ -88,21 +88,20 @@ export default function TasksIndex( props ) {
     loading: statusesLoading
   } = useQuery( GET_STATUSES );
 
-  const {
-    data: calendarEventsData,
-    loading: calendarEventsLoading
-  } = useQuery( GET_CALENDAR_EVENTS,
-    /*{
-       variables: {
-         filter: localFilterToValues( localFilter ),
-         projectId: localProject.id
-       },
-     } */
-  );
-
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
+
+  const {
+    data: calendarEventsData,
+    loading: calendarEventsLoading,
+    refetch: calendarEventsRefetch
+  } = useQuery( GET_CALENDAR_EVENTS, {
+    variables: {
+      filter: localFilterToValues( localFilter ),
+      projectId: localProject.id
+    },
+  } );
 
   const {
     data: tasksData,
@@ -141,11 +140,16 @@ export default function TasksIndex( props ) {
         projectId: localProject.id
       }
     } );
+    calendarEventsRefetch( {
+      variables: {
+        filter: localFilterToValues( localFilter ),
+        projectId: localProject.id
+      }
+    } );
   }, [ localFilter, localProject.id ] );
 
   //state
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
-
 
   if ( dataLoading ) {
     return ( <Loading /> );
@@ -252,6 +256,20 @@ export default function TasksIndex( props ) {
 			</li> )
   }
 
+  const displayCal = ( task, showEvent ) => {
+    return ( <div style={ showEvent ? { backgroundColor:'#eaf6ff', borderRadius:5 } : {} }>
+  					<p className="m-0">
+  						{showEvent && <span className="label label-event">
+  						Event
+  					</span>}
+  						<span className="label label-info" style={{backgroundColor:task.status && task.status.color?task.status.color:'white'}}>
+  							{task.status?task.status.title:'Neznámy status'}
+  						</span>
+  						<span className="attribute-label m-l-3">#{task.id} | {task.title}</span>
+  					</p>
+  			</div> )
+  }
+
   const checkTask = ( id ) => {
     if ( id === 'all' ) {
       if ( markedTasks.length === tasks.length ) {
@@ -329,72 +347,72 @@ export default function TasksIndex( props ) {
       } );
   }
 
-  const getCalendarEventsData = ( tasks ) => {
-    return calendarEventsData.calendarEvents;
-    /*let taskIDs = tasks.map((task)=>task.id);
-    return this.props.calendarEvents.filter((event)=>taskIDs.includes(event.taskID)).map((event)=>{
-    	let task = tasks.find((task)=>event.taskID===task.id);
-    	return {
-    		...task,
-    		isTask:false,
-    		eventID:event.id,
-    		titleFunction:this.displayCal,
-    		start:new Date(event.start),
-    		end:new Date(event.end),
-    	}
-    })*/
+  const getCalendarEventsData = () => {
+    return calendarEventsData.calendarEvents.map( ( event ) => {
+      return {
+        ...event,
+        isTask: false,
+        eventID: event.id,
+        titleFunction: displayCal,
+        start: new Date( event.start ),
+        end: new Date( event.end ),
+      }
+    } )
   }
 
   const getCalendarAllDayData = ( tasks ) => {
-    return []; //calendarEvents.calendarEvents;
-    /*return tasks.map((task) => {
-    	let newTask = {
-    		...task,
-    		isTask:true,
-    		titleFunction:this.displayCal,
-    		allDay: !task.status || task.status.action !== 'pendingOLD',
-    	}
-    	if(!task.status){
-    		return {
-    			...newTask,
-    			status: this.props.statuses.find((status)=>status.action==='new'),
-    			start:new Date(),
-    		}
-    	}
-    	switch (task.status.action) {
-    		case 'invoiced':{
-    			return {
-    				...newTask,
-    				start:new Date(task.invoicedDate),
-    			}
-    		}
-    		case 'close':{
-    			return {
-    				...newTask,
-    				start:new Date(task.closeDate),
-    			}
-    		}
-    		case 'invalid':{
-    			return {
-    				...newTask,
-    				start:new Date(task.closeDate),
-    			}
-    		}
-    		case 'pending':{
-    			return {
-    				...newTask,
-    				start:new Date(task.pendingDate),
-    				//end:new Date(task.pendingDateTo ? task.pendingDateTo: fromMomentToUnix(moment(task.pendingDate).add(30,'minutes')) ),
-    			}
-    		}
-    		default:{
-    			return {
-    				...newTask,
-    				start:new Date(),
-    			}
-    		}
-    	}
-    }).map((task)=>({...task,end: task.status.action !== 'pendingOLD' ? task.start : task.end }))*/
+    return tasks.map( ( task ) => {
+        let newTask = {
+          ...task,
+          isTask: true,
+          titleFunction: displayCal,
+          allDay: !task.status || task.status.action !== 'pendingOLD',
+        }
+        if ( !task.status ) {
+          return {
+            ...newTask,
+            status: statuses.find( ( status ) => status.action === 'new' ),
+            start: new Date(),
+          }
+        }
+        switch ( task.status.action ) {
+          case 'invoiced': {
+            return {
+              ...newTask,
+              start: new Date( task.invoicedDate ),
+            }
+          }
+          case 'close': {
+            return {
+              ...newTask,
+              start: new Date( task.closeDate ),
+            }
+          }
+          case 'invalid': {
+            return {
+              ...newTask,
+              start: new Date( task.closeDate ),
+            }
+          }
+          case 'pending': {
+            return {
+              ...newTask,
+              start: new Date( task.pendingDate ),
+              //end:new Date(task.pendingDateTo ? task.pendingDateTo: fromMomentToUnix(moment(task.pendingDate).add(30,'minutes')) ),
+            }
+          }
+          default: {
+            return {
+              ...newTask,
+              start: new Date(),
+            }
+          }
+        }
+      } )
+      .map( ( task ) => ( {
+        ...task,
+        end: task.status.action !== 'pendingOLD' ? task.start : task.end
+      } ) )
   }
 
   console.log( calendarEventsData );
