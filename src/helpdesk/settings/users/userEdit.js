@@ -24,7 +24,7 @@ import {
 import Checkbox from 'components/checkbox';
 
 import {
-  GET_BASIC_USERS as GET_USERS,
+  GET_USERS,
   GET_USER,
   UPDATE_USER,
   DELETE_USER,
@@ -149,7 +149,7 @@ export default function UserEdit( props ) {
         const allUsers = client.readQuery( {
             query: GET_USERS
           } )
-          .basicUsers;
+          .users;
         let newUser = {
           id,
           username,
@@ -161,7 +161,7 @@ export default function UserEdit( props ) {
         client.writeQuery( {
           query: GET_USERS,
           data: {
-            basicUsers: allUsers.map( user => ( user.id !== id ? user : {
+            users: allUsers.map( user => ( user.id !== id ? user : {
               ...newUser
             } ) )
           }
@@ -184,11 +184,11 @@ export default function UserEdit( props ) {
           const allUsers = client.readQuery( {
               query: GET_USERS
             } )
-            .basicUsers;
+            .users;
           client.writeQuery( {
             query: GET_USERS,
             data: {
-              basicUsers: allUsers.filter( user => user.id !== id )
+              users: allUsers.filter( user => user.id !== id )
             }
           } );
           history.goBack();
@@ -203,13 +203,13 @@ export default function UserEdit( props ) {
     const newUsers = client.readQuery( {
         query: GET_USERS
       } )
-      .basicUsers;
+      .users;
     let index = newUsers.findIndex( ( user ) => user.id === id );
     newUsers[ index ].active = !active;
     client.writeQuery( {
       query: GET_USERS,
       data: {
-        basicUsers: newUsers
+        users: newUsers
       }
     } );
     setUserActive( {

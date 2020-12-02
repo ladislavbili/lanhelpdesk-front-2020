@@ -1,10 +1,8 @@
 import React from 'react';
 import {
-  useQuery
-} from "@apollo/client";
-import {
+  useQuery,
   gql
-} from '@apollo/client';;
+} from "@apollo/client";
 
 import {
   Route

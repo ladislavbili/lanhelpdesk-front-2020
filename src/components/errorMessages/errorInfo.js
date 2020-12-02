@@ -3,7 +3,8 @@ import {
   Label
 } from 'reactstrap';
 import {
-  timestampToString
+  timestampToString,
+  getLocation,
 } from 'helperFunctions';
 
 export default function Attachments( props ) {
@@ -12,37 +13,13 @@ export default function Attachments( props ) {
     errorMessage
   } = props;
 
-  const getLocation = () => {
-    let url = history.location.pathname;
-    if ( url.includes( 'cmdb' ) ) {
-      return '/cmdb';
-    } else if ( url.includes( 'helpdesk' ) ) {
-      return '/helpdesk';
-    } else if ( url.includes( 'passmanager' ) ) {
-      return '/passmanager';
-    } else if ( url.includes( 'expenditures' ) ) {
-      return '/expenditures';
-    } else if ( url.includes( 'projects' ) ) {
-      return '/projects';
-    } else if ( url.includes( 'reports' ) ) {
-      return '/reports';
-    } else if ( url.includes( 'monitoring' ) ) {
-      return '/monitoring';
-    } else {
-      return '/lanwiki';
-    }
-  }
-
   const getEditURL = () => {
     switch ( errorMessage.type ) {
-      case 'smtps': {
-        return `${getLocation()}/settings/smtps/${errorMessage.sourceId}`
-      }
-      case 'imaps': {
-        return `${getLocation()}/settings/imaps/${errorMessage.sourceId}`
+      case 'smtp_email': {
+        return `${getLocation(history)}/settings/smtps/${errorMessage.sourceId}`
       }
       default: {
-        return getLocation();
+        return getLocation( history );
       }
     }
   }

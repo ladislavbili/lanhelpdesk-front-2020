@@ -31,11 +31,20 @@ const noTypeFilter = {
   value: null,
   label: 'All types'
 };
+const readTypeFilter = {
+  value: 'read',
+  label: 'Read'
+};
+const unreadTypeFilter = {
+  value: 'unread',
+  label: 'Unread'
+};
 
 export default function ErrorList( props ) {
   const {
     data: errorMessagesData,
-    loading: errorMessagesLoading
+    loading: errorMessagesLoading,
+    refetch: errorMessagesRefetch,
   } = useQuery( GET_ERROR_MESSAGES );
 
   const [ setErrorMessageRead ] = useMutation( SET_ERROR_MESSAGE_READ );
@@ -51,20 +60,16 @@ export default function ErrorList( props ) {
   const [ selectedErrorID, setSelectedErrorID ] = React.useState( null );
   const [ type, setType ] = React.useState( noTypeFilter );
 
-  const [ errorMessages, setErrorMessages ] = React.useState( [] );
-
-  // sync
-  React.useEffect( () => {
-    if ( !errorMessagesLoading ) {
-      setErrorMessages( errorMessagesData.errorMessages );
-    }
-  }, [ errorMessagesLoading ] );
+  const errorMessages = errorMessagesData ? errorMessagesData.errorMessages : [];
 
   const filterErrors = () => {
     let search = searchFilter.toLowerCase();
     return errorMessages.filter( ( errorMessage ) => (
         (
-          type.value === null || errorMessage.type === type.value
+          type.value === null ||
+          ( errorMessage.type === type.value ) ||
+          ( type.value === 'read' && errorMessage.read ) ||
+          ( type.value === 'unread' && !errorMessage.read )
         ) && (
           ( timestampToString( errorMessage.createdAt )
             .includes( search ) ) ||
@@ -83,7 +88,7 @@ export default function ErrorList( props ) {
   }
 
   const getTypes = () => {
-    let typeFilter = [ noTypeFilter ];
+    let typeFilter = [ noTypeFilter, readTypeFilter, unreadTypeFilter ];
     errorMessages.forEach( ( errorMessage ) => {
       if ( !typeFilter.some( ( type ) => type.value === errorMessage.type ) ) {
         typeFilter.push( {
@@ -105,17 +110,7 @@ export default function ErrorList( props ) {
           }
         } )
         .then( ( response ) => {
-          const newErrorMessages = errorMessages.map( errorMessage =>
-            errorMessage.id === error.id ?
-            ( {
-              ...errorMessage,
-              read: true
-            } ) :
-            ( {
-              ...errorMessage
-            } )
-          );
-          setErrorMessages( newErrorMessages );
+          errorMessagesRefetch()
         } )
         .catch( ( err ) => {
           console.log( err.message );
@@ -131,13 +126,7 @@ export default function ErrorList( props ) {
           }
         } )
         .then( ( response ) => {
-          const newErrorMessages = errorMessages.map( errorMessage =>
-            ( {
-              ...errorMessage,
-              read: true
-            } )
-          );
-          setErrorMessages( newErrorMessages );
+          errorMessagesRefetch()
         } )
         .catch( ( err ) => {
           console.log( err.message );
@@ -149,7 +138,7 @@ export default function ErrorList( props ) {
     if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
       deleteAllErrorMessages()
         .then( ( response ) => {
-          setErrorMessages( [] );
+          errorMessagesRefetch();
           setSelectedErrorID( null );
         } )
         .catch( ( err ) => {
@@ -168,8 +157,7 @@ export default function ErrorList( props ) {
           }
         } )
         .then( ( response ) => {
-          const newErrorMessages = errorMessages.filter( errorMessage => !errorMessage.read );
-          setErrorMessages( newErrorMessages );
+          errorMessagesRefetch();
           setSelectedErrorID( null );
         } )
         .catch( ( err ) => {
