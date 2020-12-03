@@ -1,4 +1,4 @@
-const testingREST = false;
+const testingREST = true;
 //const protectedREST = 'http://nodejs01.lanhelpdesk.com:4000';
 const protectedREST = 'http://nodejs02.lanhelpdesk.com:4000';
 const localREST = 'http://localhost:4000';
