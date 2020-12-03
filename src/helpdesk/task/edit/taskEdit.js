@@ -415,7 +415,6 @@ export default function TaskEdit( props ) {
         ADD: vykazyChanges.subtask.ADD.map( ( newSubtask ) => ( {
           title: newSubtask.title,
           order: newSubtask.order,
-          done: true,
           quantity: toFloatOrZero( newSubtask.quantity ),
           discount: toFloatOrZero( newSubtask.discount ),
           type: newSubtask.type.id,
@@ -455,7 +454,6 @@ export default function TaskEdit( props ) {
       trips: {
         ADD: vykazyChanges.trip.ADD.map( ( newTrip ) => ( {
           order: newTrip.order,
-          done: true,
           quantity: toFloatOrZero( newTrip.quantity ),
           discount: toFloatOrZero( newTrip.discount ),
           type: newTrip.type.id,
@@ -467,11 +465,11 @@ export default function TaskEdit( props ) {
             .forEach( ( key ) => {
               switch ( key ) {
                 case 'discount': {
-                  subtaskChanges[ key ] = toFloatOrZero( subtask[ key ] );
+                  tripChanges[ key ] = toFloatOrZero( trip[ key ] );
                   break;
                 }
                 case 'quantity': {
-                  subtaskChanges[ key ] = toFloatOrZero( subtask[ key ] );
+                  tripChanges[ key ] = toFloatOrZero( trip[ key ] );
                   break;
                 }
                 case 'assignedTo': {
@@ -496,7 +494,6 @@ export default function TaskEdit( props ) {
         ADD: vykazyChanges.material.ADD.map( ( newMaterial ) => ( {
           title: newMaterial.title,
           order: newMaterial.order,
-          done: true,
           quantity: toFloatOrZero( newMaterial.quantity ),
           margin: toFloatOrZero( newMaterial.margin ),
           price: toFloatOrZero( newMaterial.price ),
@@ -507,7 +504,7 @@ export default function TaskEdit( props ) {
             .forEach( ( key ) => {
               switch ( key ) {
                 case 'quantity': {
-                  customItemChanges[ key ] = toFloatOrZero( customItem[ key ] );
+                  materialChanges[ key ] = toFloatOrZero( material[ key ] );
                   break;
                 }
                 case 'margin': {
@@ -532,7 +529,6 @@ export default function TaskEdit( props ) {
         ADD: vykazyChanges.customItem.ADD.map( ( newCustomItem ) => ( {
           title: newCustomItem.title,
           order: newCustomItem.order,
-          done: true,
           quantity: toFloatOrZero( newCustomItem.quantity ),
           price: toFloatOrZero( newCustomItem.price ),
         } ) ),
@@ -560,9 +556,6 @@ export default function TaskEdit( props ) {
         DELETE: vykazyChanges.customItem.DELETE,
       },
     };
-    console.log( stmcChanges );
-    console.log( changes );
-    return;
     updateInvoicedTask( {
         variables: {
           id,
@@ -570,7 +563,32 @@ export default function TaskEdit( props ) {
           stmcChanges,
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        setChanges( {} );
+        setVykazyChanges( defaultVykazyChanges );
+        const originalTask = client.readQuery( {
+            query: GET_TASK,
+            variables: {
+              id
+            },
+          } )
+          .task;
+
+        const updatedTask = {
+          ...originalTask,
+          ...response.data.updateInvoicedTask
+        }
+
+        client.writeQuery( {
+          query: GET_TASK,
+          variables: {
+            id
+          },
+          data: {
+            task: updatedTask
+          }
+        } );
+      } )
       .catch( ( error ) => {
         console.log( error );
       } )
@@ -1565,7 +1583,7 @@ export default function TaskEdit( props ) {
         company={company}
         match={match}
         taskID={id}
-        taskAssigned={assignedTo}
+        taskAssigned={assignedTo.filter((user) => user.id !== null )}
 
         showSubtasks={project ? project.showSubtasks : false}
 

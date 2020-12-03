@@ -498,7 +498,7 @@ export default function Rozpocet( props ) {
                 {showColumns.includes(1) &&
                   <td>
                     <Select
-                      isDisabled={disabled}
+                      isDisabled={disabled }
                       value={ !isInvoiced ? trip.type : trip.invoicedData.type }
                       onChange={(type)=>{
                         updateTrip(trip.id,{type:type})

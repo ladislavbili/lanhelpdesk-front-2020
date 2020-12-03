@@ -2,6 +2,248 @@ import {
   gql
 } from '@apollo/client';
 
+const responseTask = `
+  id
+  important
+  title
+  updatedAt
+  createdAt
+  closeDate
+  taskAttachments{
+    id
+    path
+    filename
+    size
+    mimetype
+  }
+  assignedTo {
+    id
+    name
+    surname
+    email
+  }
+  company {
+    id
+    title
+    dph
+    usedTripPausal
+    usedSubtaskPausal
+    taskWorkPausal
+    taskTripPausal
+    monthly
+    monthlyPausal
+    pricelist {
+      id
+      title
+      materialMargin
+      prices {
+        type
+        price
+        taskType {
+          id
+        }
+        tripType {
+          id
+        }
+      }
+    }
+  }
+  taskChanges{
+    createdAt
+    user{
+      id
+      fullName
+    }
+    taskChangeMessages{
+      type
+      message
+    }
+  }
+  createdBy {
+    id
+    name
+    surname
+  }
+  deadline
+  description
+  milestone{
+    id
+    title
+  }
+  pendingDate
+  project{
+    id
+    title
+  }
+  requester{
+    id
+    fullName
+  }
+  status {
+    id
+    title
+    color
+    action
+  }
+  tags {
+    id
+    title
+    color
+  }
+  taskType {
+    id
+    title
+  }
+  repeat {
+    repeatEvery
+    repeatInterval
+    startsAt
+  }
+  subtasks {
+    invoicedData{
+      price
+      quantity
+      type
+      assignedTo
+    }
+    id
+    title
+    order
+    done
+    quantity
+    discount
+    type {
+      id
+      title
+    }
+    assignedTo {
+      id
+      email
+      company {
+        id
+      }
+    }
+  }
+  workTrips {
+    invoicedData{
+      price
+      quantity
+      type
+      assignedTo
+    }
+    id
+    order
+    done
+    quantity
+    discount
+    type {
+      id
+      title
+    }
+    assignedTo {
+      id
+      email
+      company {
+        id
+      }
+    }
+  }
+  materials {
+    invoicedData{
+      title
+      quantity
+      price
+      totalPrice
+      margin
+    }
+    id
+    title
+    order
+    done
+    quantity
+    margin
+    price
+  }
+  customItems {
+    invoicedData{
+      title
+      quantity
+      price
+      totalPrice
+    }
+    id
+    title
+    order
+    done
+    quantity
+    price
+  }
+  comments {
+    id
+    createdAt
+    internal
+    isEmail
+    message
+    html
+    subject
+    tos
+    emailSend
+    emailError
+    user{
+      id
+      fullName
+      email
+    }
+    commentAttachments{
+      id
+      path
+      filename
+      size
+      mimetype
+    }
+    childComments {
+      id
+      createdAt
+      internal
+      isEmail
+      message
+      html
+      subject
+      tos
+      emailSend
+      emailError
+      user{
+        id
+        fullName
+        email
+      }
+      commentAttachments{
+      id
+      path
+      filename
+      size
+      mimetype
+      }
+    }
+  }
+  invoicedTasks {
+    assignedTo {
+      title
+      UserId
+    }
+    tags {
+      title
+      color
+      TagId
+    }
+    project
+    requester
+    taskType
+    company
+    milestone
+  }
+`
+
 export const ADD_TASK = gql `
 mutation addTask(
   $title: String!,
@@ -214,245 +456,7 @@ query task($id: Int!){
 	task(
 		id: $id
 	)  {
-		id
-		important
-		title
-		updatedAt
-		createdAt
-		closeDate
-    taskAttachments{
-      id
-      path
-      filename
-      size
-      mimetype
-    }
-		assignedTo {
-			id
-			name
-			surname
-			email
-		}
-		company {
-			id
-			title
-      dph
-      usedTripPausal
-      usedSubtaskPausal
-      taskWorkPausal
-      taskTripPausal
-      monthly
-      monthlyPausal
-      pricelist {
-        id
-        title
-        materialMargin
-        prices {
-          type
-          price
-          taskType {
-            id
-          }
-          tripType {
-            id
-          }
-        }
-      }
-		}
-    taskChanges{
-      createdAt
-      user{
-        id
-        fullName
-      }
-      taskChangeMessages{
-        type
-        message
-      }
-    }
-		createdBy {
-			id
-			name
-			surname
-		}
-		deadline
-		description
-		milestone{
-			id
-			title
-		}
-		pendingDate
-		project{
-			id
-			title
-		}
-		requester{
-			id
-			fullName
-		}
-		status {
-			id
-			title
-			color
-			action
-		}
-		tags {
-			id
-			title
-			color
-		}
-		taskType {
-			id
-			title
-		}
-		repeat {
-			repeatEvery
-			repeatInterval
-			startsAt
-		}
-		subtasks {
-      invoicedData{
-        price
-        quantity
-        type
-        assignedTo
-      }
-			id
-			title
-			order
-			done
-			quantity
-			discount
-			type {
-				id
-				title
-			}
-			assignedTo {
-				id
-				email
-				company {
-					id
-				}
-			}
-		}
-		workTrips {
-      invoicedData{
-        price
-        quantity
-        type
-        assignedTo
-      }
-			id
-			order
-			done
-			quantity
-			discount
-			type {
-				id
-				title
-			}
-			assignedTo {
-				id
-				email
-				company {
-					id
-				}
-			}
-		}
-		materials {
-      invoicedData{
-        title
-        quantity
-        price
-        totalPrice
-        margin
-      }
-			id
-			title
-			order
-			done
-			quantity
-			margin
-			price
-		}
-		customItems {
-      invoicedData{
-        title
-        quantity
-        price
-        totalPrice
-      }
-			id
-			title
-			order
-			done
-			quantity
-			price
-		}
-		comments {
-      id
-      createdAt
-      internal
-      isEmail
-      message
-      html
-      subject
-      tos
-      emailSend
-      emailError
-      user{
-        id
-        fullName
-        email
-      }
-      commentAttachments{
-        id
-        path
-        filename
-        size
-        mimetype
-      }
-      childComments {
-        id
-        createdAt
-        internal
-        isEmail
-        message
-        html
-        subject
-        tos
-        emailSend
-        emailError
-        user{
-          id
-          fullName
-          email
-        }
-        commentAttachments{
-        id
-        path
-        filename
-        size
-        mimetype
-        }
-      }
-		}
-    invoicedTasks {
-      assignedTo {
-        title
-        UserId
-      }
-      tags {
-        title
-        color
-        TagId
-      }
-      project
-      requester
-      taskType
-      company
-      milestone
-    }
+		${responseTask}
 	}
 }
 `;
@@ -846,251 +850,13 @@ mutation deleteTaskAttachment($id: Int!) {
 `;
 
 export const UPDATE_INVOICED_TASK = gql `
-mutation updateInvoicedTask($id: Int!, $taskChanges: InvoicedTaskChange, $stmcChanges: InvoicedSMTCChanges) {
+mutation updateInvoicedTask($id: Int!, $taskChanges: TaskChangeInput, $stmcChanges: SMTCChangesInput) {
   updateInvoicedTask(
 		id: $id,
     taskChanges: $taskChanges,
 		stmcChanges: $stmcChanges,
   ){
-		id
-		important
-		title
-		updatedAt
-		createdAt
-		closeDate
-    taskAttachments{
-      id
-      path
-      filename
-      size
-      mimetype
-    }
-		assignedTo {
-			id
-			name
-			surname
-			email
-		}
-		company {
-			id
-			title
-      dph
-      usedTripPausal
-      usedSubtaskPausal
-      taskWorkPausal
-      taskTripPausal
-      monthly
-      monthlyPausal
-      pricelist {
-        id
-        title
-        materialMargin
-        prices {
-          type
-          price
-          taskType {
-            id
-          }
-          tripType {
-            id
-          }
-        }
-      }
-		}
-    taskChanges{
-      createdAt
-      user{
-        id
-        fullName
-      }
-      taskChangeMessages{
-        type
-        message
-      }
-    }
-		createdBy {
-			id
-			name
-			surname
-		}
-		deadline
-		description
-		milestone{
-			id
-			title
-		}
-		pendingDate
-		project{
-			id
-			title
-		}
-		requester{
-			id
-			fullName
-		}
-		status {
-			id
-			title
-			color
-			action
-		}
-		tags {
-			id
-			title
-			color
-		}
-		taskType {
-			id
-			title
-		}
-		repeat {
-			repeatEvery
-			repeatInterval
-			startsAt
-		}
-		subtasks {
-      invoicedData{
-        price
-        quantity
-        type
-        assignedTo
-      }
-			id
-			title
-			order
-			done
-			quantity
-			discount
-			type {
-				id
-				title
-			}
-			assignedTo {
-				id
-				email
-				company {
-					id
-				}
-			}
-		}
-		workTrips {
-      invoicedData{
-        price
-        quantity
-        type
-        assignedTo
-      }
-			id
-			order
-			done
-			quantity
-			discount
-			type {
-				id
-				title
-			}
-			assignedTo {
-				id
-				email
-				company {
-					id
-				}
-			}
-		}
-		materials {
-      invoicedData{
-        title
-        quantity
-        price
-        totalPrice
-        margin
-      }
-			id
-			title
-			order
-			done
-			quantity
-			margin
-			price
-		}
-		customItems {
-      invoicedData{
-        title
-        quantity
-        price
-        totalPrice
-      }
-			id
-			title
-			order
-			done
-			quantity
-			price
-		}
-		comments {
-      id
-      createdAt
-      internal
-      isEmail
-      message
-      html
-      subject
-      tos
-      emailSend
-      emailError
-      user{
-        id
-        fullName
-        email
-      }
-      commentAttachments{
-        id
-        path
-        filename
-        size
-        mimetype
-      }
-      childComments {
-        id
-        createdAt
-        internal
-        isEmail
-        message
-        html
-        subject
-        tos
-        emailSend
-        emailError
-        user{
-          id
-          fullName
-          email
-        }
-        commentAttachments{
-        id
-        path
-        filename
-        size
-        mimetype
-        }
-      }
-		}
-    invoicedTasks {
-      assignedTo {
-        title
-        UserId
-      }
-      tags {
-        title
-        color
-        TagId
-      }
-      project
-      requester
-      taskType
-      company
-      milestone
-    }
+		${responseTask}
 	}
 }
 `
