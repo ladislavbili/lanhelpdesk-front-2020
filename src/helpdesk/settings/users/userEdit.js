@@ -97,7 +97,7 @@ export default function UserEdit( props ) {
   // sync
   React.useEffect( () => {
     if ( !userLoading ) {
-      const user = myData.getMyData;
+      const user = userData.user;
       setActive( user.active );
       setUsername( user.username );
       setEmail( user.email );
@@ -130,20 +130,23 @@ export default function UserEdit( props ) {
   // functions
   const updateUserFunc = () => {
     setSaving( true );
+    let data = {
+      id,
+      username,
+      email,
+      name,
+      surname,
+      receiveNotifications,
+      signature,
+      roleId: role.id,
+      companyId: company.id,
+      language: language.value,
+    }
+    if ( password !== null && password.length >= 6 ) {
+      data.password = password;
+    }
     updateUser( {
-        variables: {
-          id,
-          username,
-          email,
-          name,
-          surname,
-          password,
-          receiveNotifications,
-          signature,
-          roleId: role.id,
-          companyId: company.id,
-          language: language.value,
-        }
+        variables: data
       } )
       .then( ( response ) => {
         const allUsers = client.readQuery( {
