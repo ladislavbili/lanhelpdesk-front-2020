@@ -164,16 +164,6 @@ mutation updateProfile(
     accessToken
     user {
       id
-      email
-      username
-      role {
-        id
-        title
-      }
-      company {
-        id
-        title
-      }
     }
   }
 }

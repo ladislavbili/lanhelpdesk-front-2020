@@ -82,3 +82,8 @@ export {
   toFloatOrZero
 }
 from './numberManipulations';
+
+export {
+  getLocation
+}
+from './navigationFunctions';

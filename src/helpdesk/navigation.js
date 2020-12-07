@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  gql
 } from "@apollo/client";
-import { gql } from '@apollo/client';;
 
 import {
   Route
@@ -28,6 +28,7 @@ query {
     tasklistLayout
     role {
       accessRights {
+        viewErrors
         publicFilters
         users
         companies
@@ -109,10 +110,9 @@ export default function Navigation( props ) {
       </div>
 
       <div className="row center center-ver h-100vh">
-        <Route path="/helpdesk/taskList/i/:filterID" component={Sidebar} />
-        <Route path="/helpdesk/settings" component={Sidebar} />
+        <Route path="/helpdesk" component={Sidebar} />
         <div className="main">
-          <Route exact path="/helpdesk/errorMessages" component={ErrorMessages} />
+          <Route exact path="/helpdesk/errorMessages" component={accessRights.viewErrors ? ErrorMessages : AccessDenied} />
 
           <Route exact path="/helpdesk" component={TaskList} />
           <Route exact path="/helpdesk/taskList" component={TaskList} />

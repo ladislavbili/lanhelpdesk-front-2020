@@ -1,15 +1,16 @@
 import {
   gql
-} from "@apollo/client";
+} from '@apollo/client';
 
 export const GET_MY_DATA = gql `
 query {
   getMyData{
+    id
+    tasklistLayout
     role {
       accessRights {
         viewVykaz
         viewErrors
-        viewRozpocet
         publicFilters
         users
         companies
@@ -29,5 +30,11 @@ query {
       }
     }
   }
+}
+`;
+
+export const GET_ERROR_MESSAGES_COUNT = gql `
+query {
+  errorMessageCount
 }
 `;

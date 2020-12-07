@@ -23,37 +23,17 @@ import {
 } from 'apollo/localSchema/actions';
 import classnames from 'classnames';
 
+import {
+  getLocation,
+} from 'helperFunctions';
+
+
 import UserProfile from 'helpdesk/settings/users/userProfile';
 
-const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    tasklistLayout
-    role {
-      accessRights {
-        viewVykaz
-        publicFilters
-        users
-        companies
-        pausals
-        projects
-        statuses
-        units
-        prices
-        suppliers
-        tags
-        invoices
-        roles
-        taskTypes
-        tripTypes
-        imaps
-        smtps
-      }
-    }
-  }
-}
-`;
+import {
+  GET_MY_DATA,
+  GET_ERROR_MESSAGES_COUNT,
+} from './queries';
 
 export default function PageHeader( props ) {
   //data & queries
@@ -65,39 +45,22 @@ export default function PageHeader( props ) {
     calendarLayout
   } = props;
   const {
-    data
+    data: myData
   } = useQuery( GET_MY_DATA );
+  const {
+    data: errorMessageCountData
+  } = useQuery( GET_ERROR_MESSAGES_COUNT );
+
   //state
   const [ notificationsOpen, setNotificationsOpen ] = React.useState( false );
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
   const [ settingsOpen, setSettingsOpen ] = React.useState( false );
-  const [ errorMessages /*, setErrorMessages*/ ] = React.useState( [] );
   const [ unreadNotifications /*, setUnreadNotifications */ ] = React.useState( [] );
   const [ modalUserProfileOpen, setModalUserProfileOpen ] = React.useState( false );
 
-  const currentUser = data ? data.getMyData : {};
+  const currentUser = myData ? myData.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
-  const getLocation = () => {
-    let url = history.location.pathname;
-    if ( url.includes( 'cmdb' ) ) {
-      return '/cmdb';
-    } else if ( url.includes( 'helpdesk' ) ) {
-      return '/helpdesk';
-    } else if ( url.includes( 'passmanager' ) ) {
-      return '/passmanager';
-    } else if ( url.includes( 'expenditures' ) ) {
-      return '/expenditures';
-    } else if ( url.includes( 'projects' ) ) {
-      return '/projects';
-    } else if ( url.includes( 'reports' ) ) {
-      return '/reports';
-    } else if ( url.includes( 'monitoring' ) ) {
-      return '/monitoring';
-    } else {
-      return '/lanwiki';
-    }
-  }
 
   const getLayoutIcon = () => {
     switch ( currentUser.tasklistLayout ) {
@@ -135,9 +98,8 @@ export default function PageHeader( props ) {
     })*/
   }
 
-  /*    const errorMessages = props.errorMessages.filter((message) => !message.read )
-      let unreadNotifications = [...props.currentUser.notifications].splice(5, props.currentUser.notifications.length - 1).filter((notification) => !notification.read);*/
-  const URL = getLocation();
+  const errorMessages = errorMessageCountData ? errorMessageCountData.errorMessageCount : 0;
+  const URL = getLocation( history );
 
   return (
     <div className="page-header flex">
@@ -175,12 +137,20 @@ export default function PageHeader( props ) {
         </div>
         <div className="ml-auto center-hor row">
           <i className="fas fa-user header-icon center-hor clickable w-25px" onClick={() => setModalUserProfileOpen(true)}></i>
-          <i
-            className={classnames({ "danger-color": errorMessages.length > 0 }, "header-icon fas fa-exclamation-triangle center-hor clickable")}
-            style={{marginRight: 6}}
-            onClick={() => history.push(`${this.getLocation()}/errorMessages/`)}
-            />
-          <span className={classnames({ "danger-color": errorMessages.length > 0 },"header-icon-text clickable")}>{errorMessages.length}</span>
+          {
+            accessRights.viewErrors &&
+            <i
+              className={classnames({ "danger-color": errorMessages > 0 }, "header-icon fas fa-exclamation-triangle center-hor clickable")}
+              style={{marginRight: 6}}
+              onClick={() => history.push(`${getLocation(history)}/errorMessages/`)}
+              />
+          }
+          {
+            accessRights.viewErrors &&
+            <span className={classnames({ "danger-color": errorMessages > 0 },"header-icon-text clickable")}>
+              {errorMessages}
+            </span>
+          }
 
           {
             showLayoutSwitch &&
@@ -288,7 +258,7 @@ export default function PageHeader( props ) {
                 {settings.filter((setting) => accessRights[setting.value]).map((item, index) =>
                   <DropdownItem
                     key={index}
-                    onClick={() => history.push(getLocation() + '/settings/' + item.link)}
+                    onClick={() => history.push(getLocation(history) + '/settings/' + item.link)}
                     >
                     {item.title}
                   </DropdownItem>
