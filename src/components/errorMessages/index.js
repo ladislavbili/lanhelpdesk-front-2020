@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient
 } from "@apollo/client";
 import {
   ListGroupItem,
@@ -44,7 +45,6 @@ export default function ErrorList( props ) {
   const {
     data: errorMessagesData,
     loading: errorMessagesLoading,
-    refetch: errorMessagesRefetch,
   } = useQuery( GET_ERROR_MESSAGES );
 
   const [ setErrorMessageRead ] = useMutation( SET_ERROR_MESSAGE_READ );
@@ -59,6 +59,111 @@ export default function ErrorList( props ) {
   const [ searchFilter, setSearchFilter ] = React.useState( '' );
   const [ selectedErrorID, setSelectedErrorID ] = React.useState( null );
   const [ type, setType ] = React.useState( noTypeFilter );
+
+  const client = useApolloClient();
+
+  const writeDataToCache = ( newData ) => {
+    client.writeQuery( {
+      query: GET_ERROR_MESSAGES,
+      data: {
+        errorMessages: newData,
+      }
+    } );
+  }
+
+  const setErrorMessageReadFunc = ( error ) => {
+    setSelectedErrorID( error.id );
+
+    if ( !error.read ) {
+      setErrorMessageRead( {
+          variables: {
+            id: error.id,
+            read: true,
+          }
+        } )
+        .then( ( response ) => {
+          const allErrorMessages = client.readQuery( {
+              query: GET_ERROR_MESSAGES
+            } )
+            .errorMessages;
+          const newData = allErrorMessages.map( message => message.id !== error.id ? ( {
+            ...message
+          } ) : ( {
+            ...message,
+            read: true
+          } ) );
+          writeDataToCache( newData );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
+    }
+  }
+
+  const markAllAsRead = () => {
+    if ( window.confirm( 'Ste si istý že chcete všetky správy označiť ako prečítané?' ) ) {
+      setAllErrorMessagesRead( {
+          variables: {
+            read: true,
+          }
+        } )
+        .then( ( response ) => {
+          const allErrorMessages = client.readQuery( {
+              query: GET_ERROR_MESSAGES
+            } )
+            .errorMessages;
+          const newData = allErrorMessages.map( message => ( {
+            ...message,
+            read: true
+          } ) );
+          writeDataToCache( newData );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
+    }
+  }
+
+  const deleteAll = () => {
+    if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
+      deleteAllErrorMessages()
+        .then( ( response ) => {
+          writeDataToCache( [] );
+          setSelectedErrorID( null );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
+    }
+  }
+
+  const deleteRead = () => {
+    if ( window.confirm( 'Ste si istý že chcete všetky prečítané správy vymazať?' ) ) {
+      const readErrorMessages = errorMessages.filter( errorMessage => errorMessage.read )
+        .map( errorMessage => errorMessage.id );
+      deleteSelectedErrorMessages( {
+          variables: {
+            ids: readErrorMessages,
+          }
+        } )
+        .then( ( response ) => {
+          const allErrorMessages = client.readQuery( {
+              query: GET_ERROR_MESSAGES
+            } )
+            .errorMessages;
+          const newData = allErrorMessages.filter( message => !message.read );
+          writeDataToCache( newData );
+          setSelectedErrorID( null );
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+        } );
+    }
+  }
+
+  if ( errorMessagesLoading ) {
+    return <Loading />
+  }
 
   const errorMessages = errorMessagesData ? errorMessagesData.errorMessages : [];
 
@@ -100,76 +205,6 @@ export default function ErrorList( props ) {
     return typeFilter;
   }
 
-  const setErrorMessageReadFunc = ( error ) => {
-    setSelectedErrorID( error.id );
-    if ( !error.read ) {
-      setErrorMessageRead( {
-          variables: {
-            id: error.id,
-            read: true,
-          }
-        } )
-        .then( ( response ) => {
-          errorMessagesRefetch()
-        } )
-        .catch( ( err ) => {
-          console.log( err.message );
-        } );
-    }
-  }
-
-  const markAllAsRead = () => {
-    if ( window.confirm( 'Ste si istý že chcete všetky správy označiť ako prečítané?' ) ) {
-      setAllErrorMessagesRead( {
-          variables: {
-            read: true,
-          }
-        } )
-        .then( ( response ) => {
-          errorMessagesRefetch()
-        } )
-        .catch( ( err ) => {
-          console.log( err.message );
-        } );
-    }
-  }
-
-  const deleteAll = () => {
-    if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
-      deleteAllErrorMessages()
-        .then( ( response ) => {
-          errorMessagesRefetch();
-          setSelectedErrorID( null );
-        } )
-        .catch( ( err ) => {
-          console.log( err.message );
-        } );
-    }
-  }
-
-  const deleteRead = () => {
-    if ( window.confirm( 'Ste si istý že chcete všetky prečítané správy vymazať?' ) ) {
-      const readErrorMessages = errorMessages.filter( errorMessage => errorMessage.read )
-        .map( errorMessage => errorMessage.id );
-      deleteSelectedErrorMessages( {
-          variables: {
-            ids: readErrorMessages,
-          }
-        } )
-        .then( ( response ) => {
-          errorMessagesRefetch();
-          setSelectedErrorID( null );
-        } )
-        .catch( ( err ) => {
-          console.log( err.message );
-        } );
-    }
-  }
-
-  if ( errorMessagesLoading ) {
-    return <Loading />
-  }
-
   const errors = filterErrors();
 
   return (
@@ -207,9 +242,27 @@ export default function ErrorList( props ) {
               </h2>
             </div>
             <div>
-              <button type="button" className="btn btn-link waves-effect" onClick={markAllAsRead} disabled={errors.every((error)=>error.read)}>Označit všetky ako prečítané</button>
-              <button type="button" className="btn btn-link waves-effect" onClick={deleteAll} disabled={errors.length === 0}>Vymazať všetky</button>
-              <button type="button" className="btn btn-link waves-effect" onClick={deleteRead} disabled={errors.filter((error)=>error.read).length === 0}>Vymazať prečítané</button>
+              <button
+                type="button"
+                className="btn btn-link waves-effect"
+                onClick={markAllAsRead}
+                disabled={errors.every((error)=>error.read)}>
+                Označit všetky ako prečítané
+              </button>
+              <button
+                type="button"
+                className="btn btn-link waves-effect"
+                onClick={deleteAll}
+                disabled={errors.length === 0}>
+                Vymazať všetky
+              </button>
+              <button
+                type="button"
+                className="btn btn-link waves-effect"
+                onClick={deleteRead}
+                disabled={errors.filter((error)=>error.read).length === 0}>
+                Vymazať prečítané
+              </button>
             </div>
             <div>
               <table className="table table-hover">
