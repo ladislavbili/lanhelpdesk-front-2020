@@ -18,8 +18,9 @@ import {
   fromMomentToUnix,
   timestampToString,
   timestampToDate,
-  timestampToHoursAndMinutes
-} from '../../helperFunctions';
+  timestampToHoursAndMinutes,
+  updateArrayItem
+} from 'helperFunctions';
 
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -28,7 +29,17 @@ import Loading from 'components/loading';
 
 import {
   GET_MY_DATA,
+  ADD_CALENDAR_EVENT,
+  UPDATE_CALENDAR_EVENT,
+  DELETE_CALENDAR_EVENT
 } from './querries';
+
+import {
+  GET_TASK,
+  GET_TASKS,
+  UPDATE_TASK,
+  GET_CALENDAR_EVENTS,
+} from 'helpdesk/task/querries';
 
 const localizer = momentLocalizer( moment );
 const formats = {
@@ -71,6 +82,7 @@ export default function TaskCalendar( props ) {
     match,
     history,
     statuses,
+    allStatuses,
     statusesLoaded,
     setUserFilterStatuses,
     data,
@@ -78,7 +90,12 @@ export default function TaskCalendar( props ) {
     listName,
     link,
     Edit,
+    filterId,
+    filterValues,
+    originalProjectId,
   } = props;
+
+  console.log( allStatuses );
 
   const {
     data: currentUserData,
@@ -88,9 +105,171 @@ export default function TaskCalendar( props ) {
   const [ today, setToday ] = React.useState( moment() );
   const [ calendarLayout, setCalendarLayout ] = React.useState( 'month' );
 
+  //const [ addCalendarEvent ] = useMutation( ADD_CALENDAR_EVENT );
+  //const [ deleteCalendarEvent ] = useMutation( DELETE_CALENDAR_EVENT );
+  //  const [ updateCalendarEvent ] = useMutation( UPDATE_CALENDAR_EVENT );
+  //const [ updateTask ] = useMutation( UPDATE_TASK );
+
+  const client = useApolloClient();
+
+  const updateTaskFunc = ( id, updateData ) => {
+    updateTask( {
+        variables: {
+          ...updateData,
+          id,
+        }
+      } )
+      .then( ( response ) => {
+        const updatedTask = response.data.updateTask;
+        delete updateTask.__typename;
+        try {
+          const originalTask = client.readQuery( {
+              query: GET_TASK,
+              variables: {
+                id
+              },
+            } )
+            .task;
+
+          const newTask = {
+            ...originalTask,
+            ...updatedTask
+          };
+
+          client.writeQuery( {
+            query: GET_TASK,
+            variables: {
+              id
+            },
+            data: {
+              task: newTask
+            }
+          } );
+        } catch ( e ) {
+          console.log( e.message );
+        }
+
+        try {
+          let execTasks = client.readQuery( {
+              query: GET_TASKS,
+              variables: {
+                filterId,
+                filter: filterValues,
+                projectId: originalProjectId
+              }
+            } )
+            .tasks;
+
+          const newTask = {
+            ...execTasks.tasks.find( task => task.id === id ),
+            ...updateData
+          };
+
+          client.writeQuery( {
+            query: GET_TASKS,
+            variables: {
+              filterId,
+              filter: filterValues,
+              projectId: originalProjectId
+            },
+            data: {
+              tasks: {
+                ...execTasks,
+                tasks: updateArrayItem( execTasks.tasks, newTask )
+              }
+            }
+          } );
+        } catch ( e ) {
+          console.log( e.message );
+        } finally {
+
+        }
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+  }
+
+  const updateCalendarEventFunc = ( id, updateData ) => {
+    updateCalendarEvent( {
+        variables: {
+          ...updateData,
+          id,
+        }
+      } )
+      .then( ( response ) => {
+        const allCalendarEvents = client.readQuery( {
+            query: GET_CALENDAR_EVENTS
+          } )
+          .calendarEvents;
+        client.writeQuery( {
+          query: GET_CALENDAR_EVENTS,
+          data: {
+            calendarEvents: allCalendarEvents.map( event =>
+              ( event.id !== id ? event : {
+                ...event,
+                ...updateData
+              } )
+            )
+          }
+        } );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+  }
+
+  const addCalendarEventFunc = ( addData ) => {
+    /*     addCalendarEvent( {
+              variables: {
+                ...addData,
+              }
+            } )
+            .then( ( response ) => {
+              const allCalendarEvents = client.readQuery( {
+                  query: GET_CALENDAR_EVENTS
+                } )
+                .calendarEvents;
+              client.writeQuery( {
+                query: GET_CALENDAR_EVENTS,
+                data: {
+                  calendarEvents: [ ...allCalendarEvents, {
+                    ...response.data.addCalendarEvent,
+                    __typename: 'CalendarEvent'
+                  } ]
+                }
+              } );
+            } )
+            .catch( ( err ) => {
+              console.log( err.message );
+            } );*/
+  }
+
+  const deleteCalendarEventFunc = ( id ) => {
+    /*    deleteCalendarEvent( {
+            variables: {
+              id
+            }
+          } )
+          .then( ( response ) => {
+            const allCalendarEvents = client.readQuery( {
+                query: GET_CALENDAR_EVENTS
+              } )
+              .calendarEvents;
+            client.writeQuery( {
+              query: GET_CALENDAR_EVENTS,
+              data: {
+                calendarEvents: allCalendarEvents.map(event => event.id !== id)
+              }
+            } );
+          } )
+          .catch( ( err ) => {
+            console.log( err.message );
+          } );*/
+  }
 
   const onEventResize = ( item ) => {
-    const canEdit = item.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
+    const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
 
     if ( !canEdit ) {
       return;
@@ -98,14 +277,15 @@ export default function TaskCalendar( props ) {
 
     if ( calendarLayout === 'week' ) {
       if ( !item.event.isTask ) {
-        /*    rebase.updateDoc( '/help-calendar_events/' + item.event.eventID, {
-              start: item.start.getTime(),
-              end: item.end.getTime()
-            } )*/
+        updateCalendarEventFunc( item.id, {
+          startsAt: item.start.getTime(),
+          endsAt: item.end.getTime(),
+        } )
+      } else if ( item.event.status.action === 'PendingDate' ) {
+        updateTaskFunc( item.id, {
+          pendingDate: item.start.getTime(),
+        } );
       }
-      /*else if(item.event.status.action==='PendingDate'){
-      				rebase.updateDoc('/help-tasks/'+item.event.id, { pendingDate:item.start.getTime(), pendingDateTo:item.end.getTime(), pendingChange:true })
-      			}*/
     }
   };
 
@@ -115,170 +295,171 @@ export default function TaskCalendar( props ) {
   }
 
   const onEventDrop = ( item ) => {
-    const canEdit = item.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
+    const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
 
     if ( !canEdit ) {
       return;
     }
     //MOVING TASKS
-    /*  if ( ( item.isAllDay || calendarLayout === 'month' ) && item.event.isTask ) {
-        if ( [ 'new', 'open' ].includes( item.event.status.action ) ) {
-          if ( this.getOnlyDaytime( item.start ) > this.getOnlyDaytime( new Date() ) ) {
-            //SET PENDING
-            rebase.updateDoc( '/help-tasks/' + item.event.id, {
-              pendingDate: item.start.getTime(),
-              pendingChange: true,
-              status: this.props.statuses.find( ( status ) => status.action === 'PendingDate' )
-                .id
-            } )
-          } else if ( this.getOnlyDaytime( item.start ) < this.getOnlyDaytime( new Date() ) && this.props.statusesLoaded ) {
-            //SET CLOSED
-            rebase.updateDoc( '/help-tasks/' + item.event.id, {
-              closeDate: item.start.getTime(),
-              status: this.props.statuses.find( ( status ) => status.action === 'close' )
-                .id
-            } )
-          }
-        } else if ( item.event.status.action === 'close' ) {
-          //UPDATE CLOSE DATE
-          rebase.updateDoc( '/help-tasks/' + item.event.id, {
-            closeDate: item.start.getTime()
+    if ( ( item.isAllDay || calendarLayout === 'month' ) && item.event.isTask ) {
+      if ( [ 'IsNew', 'IsOpen' ].includes( item.event.status.action ) ) {
+        if ( getOnlyDaytime( item.start ) > getOnlyDaytime( new Date( moment()
+            .valueOf() ) ) ) {
+          //SET PENDING
+          updateTaskFunc( item.id, {
+            pendingDate: item.start.getTime(),
+            pendingChange: true,
+            status: allStatuses.find( ( status ) => status.action === 'PendingDate' )
+              .id
           } );
-        } else if ( item.event.status.action === 'PendingDate' && this.getOnlyDaytime( item.start ) >= this.getOnlyDaytime( new Date() ) ) {
-          // UPDATE PENDING DATE
-          rebase.updateDoc( '/help-tasks/' + item.event.id, {
-            pendingDate: item.start.getTime()
+        } else if ( getOnlyDaytime( item.start ) < getOnlyDaytime( new Date( moment()
+            .valueOf() ) ) && statusesLoaded ) {
+          //SET CLOSED
+          updateTaskFunc( item.id, {
+            closeDate: item.start.getTime(),
+            status: allStatuses.find( ( status ) => status.action === 'CloseDate' || status.action === 'CloseInvalid' )
+              .id
           } );
         }
-        return;
-  }*/
+      } else if ( item.event.status.action === 'close' ) {
+        //UPDATE CLOSE DATE
+        updateTaskFunc( item.id, {
+          closeDate: item.start.getTime(),
+        } );
+      } else if ( item.event.status.action === 'PendingDate' && getOnlyDaytime( item.start ) >= getOnlyDaytime( new Date( moment()
+          .valueOf() ) ) ) {
+        // UPDATE PENDING DATE
+        updateTaskFunc( item.id, {
+          pendingDate: item.start.getTime(),
+        } );
+      }
+      return;
+    }
     //MOVING EVENTS (IN WEEK)
-    /*  if ( this.props.calendarLayout === 'week' && !item.isAllDay ) {
-        //if TASK
-        if ( item.event.isTask ) {
-          let newEvent = {
-            taskID: item.event.id,
-            start: item.start.getTime(),
-            end: fromMomentToUnix( moment( item.start )
-              .add( 1, 'hours' ) ),
-          }
-          if ( [ 'new', 'open' ].includes( item.event.status.action ) ) {
-            //if new it will be open
-          } else if ( item.event.status.action === 'new' && this.props.statusesLoaded ) {
-            newEvent.end = fromMomentToUnix( moment( newEvent.start )
-              .add( 2, 'hours' ) );
-          } else if ( item.event.status.action === 'PendingDate' ) {
-            newEvent.end = fromMomentToUnix( moment( newEvent.start )
-              .add( 30, 'minutes' ) );
-          }
-          rebase.addToCollection( 'help-calendar_events', newEvent );
-        } else {
-          //UPDATE EVENT
-          rebase.updateDoc( '/help-calendar_events/' + item.event.eventID, {
-            start: item.start.getTime(),
-            end: item.end.getTime()
-          } )
+    if ( calendarLayout === 'week' && !item.isAllDay ) {
+      //if TASK
+      if ( item.event.isTask ) {
+        let newEvent = {
+          task: item.event.id,
+          startsAt: item.start.getTime(),
+          endsAt: fromMomentToUnix( moment( item.start )
+              .add( 1, 'hours' ) )
+            .valueOf(),
         }
-      }*/
+        if ( [ 'IsNew', 'IsOpen' ].includes( item.event.status.action ) ) {
+          //if new it will be open
+        } else if ( item.event.status.action === 'IsNew' && statusesLoaded ) {
+          newEvent.end = fromMomentToUnix( moment( newEvent.start )
+            .add( 2, 'hours' ) );
+        } else if ( item.event.status.action === 'PendingDate' ) {
+          newEvent.end = fromMomentToUnix( moment( newEvent.start )
+            .add( 30, 'minutes' ) );
+        }
+        addCalendarEventFunc( newEvent );
+      } else {
+        //UPDATE EVENT
+        updateCalendarEventFunc( item.id, {
+          startsAt: item.start.getTime(),
+          endsAt: item.end.getTime(),
+        } );
+      }
+    }
   };
 
 
   const onEventDropTASKS = ( item ) => {
-    const canEdit = item.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
+    const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
 
     if ( !canEdit ) {
       return;
     }
 
     //manage calendar all day
-    /*  if ( ( item.isAllDay || this.props.calendarLayout === 'month' ) && item.event.isTask ) {
-        if ( [ 'new', 'open' ].includes( item.event.status.action ) ) {
-          if ( this.getOnlyDaytime( item.start ) > this.getOnlyDaytime( new Date() ) ) {
-            this.props.data.filter( ( event ) => !event.isTask )
-              .forEach( ( event ) => {
-                rebase.removeDoc( '/help-calendar_events/' + event.eventID );
-              } );
-            rebase.updateDoc( '/help-tasks/' + item.event.id, {
-              pendingDate: item.start.getTime(),
-              pendingDateTo: fromMomentToUnix( moment( item.end.getTime() )
-                .add( 30, 'minutes' ) ),
-              pendingChange: true,
-              status: this.props.statuses.find( ( status ) => status.action === 'PendingDate' )
-                .id
-            } )
-          } else if ( this.getOnlyDaytime( item.start ) < this.getOnlyDaytime( new Date() ) && this.props.statusesLoaded ) {
-            rebase.updateDoc( '/help-tasks/' + item.event.id, {
-              closeDate: item.start.getTime(),
-              status: this.props.statuses.find( ( status ) => status.action === 'close' )
-                .id
-            } )
-          }
-        } else if ( item.event.status.action === 'close' ) {
-          rebase.updateDoc( '/help-tasks/' + item.event.id, {
-            closeDate: item.start.getTime()
-          } );
-        } else if ( item.event.status.action === 'PendingDate' && this.getOnlyDaytime( item.start ) >= this.getOnlyDaytime( new Date() ) ) {
-          rebase.updateDoc( '/help-tasks/' + item.event.id, {
+    if ( ( item.isAllDay || calendarLayout === 'month' ) && item.event.isTask ) {
+      if ( [ 'IsNew', 'IsOpen' ].includes( item.event.status.action ) ) {
+        if ( getOnlyDaytime( item.start ) > getOnlyDaytime( new Date( moment()
+            .valueOf() ) ) ) {
+          data.filter( ( event ) => !event.isTask )
+            .forEach( ( event ) => {
+              deleteCalendarEventFunc( event.eventID )
+            } );
+          updateTaskFunc( item.event.id, {
             pendingDate: item.start.getTime(),
-            pendingDateTo: item.end.getTime(),
+            pendingChangeable: true,
+            status: allStatuses.find( ( status ) => status.action === 'PendingDate' )
+              .id
+          } );
+        } else if ( getOnlyDaytime( item.start ) < getOnlyDaytime( new Date( moment()
+            .valueOf() ) ) && statusesLoaded ) {
+          updateTaskFunc( item.event.id, {
+            closeDate: item.start.getTime(),
+            status: allStatuses.find( ( status ) => status.action === 'CloseDate' || status.action === 'CloseInvalid' )
+              .id
           } );
         }
+      } else if ( item.event.status.action === 'CloseDate' || item.event.status.action === 'CloseInvalid' ) {
+        updateTaskFunc( item.event.id, {
+          closeDate: item.start.getTime()
+        } );
+      } else if ( item.event.status.action === 'PendingDate' && getOnlyDaytime( item.start ) >= getOnlyDaytime( new Date( moment()
+          .valueOf() ) ) ) {
+        updateTaskFunc( item.event.id, {
+          pendingDate: item.start.getTime(),
+        } );
+      }
+      return false;
+    }
+    //manage calendar with time
+    if ( calendarLayout === 'week' ) {
+      if ( item.isAllDay ) {
         return false;
       }
-      //manage calendar with time
-      if ( this.props.calendarLayout === 'week' ) {
-        if ( item.isAllDay ) {
-          return false;
+      //if TASK
+      if ( item.event.isTask ) {
+        let newEvent = {
+          task: item.event.id,
+          start: item.start.getTime(),
+          end: item.end.getTime(),
         }
-        //if TASK
-        if ( item.event.isTask ) {
-          let newEvent = {
-            taskID: item.event.id,
-            start: item.start.getTime(),
-            end: item.end.getTime(),
-          }
-          //if in fucture, set as PENDING
-          if ( [ 'new', 'open' ].includes( item.event.status.action ) && this.getOnlyDaytime( item.start ) > this.getOnlyDaytime( new Date() ) ) {
-            this.props.data.filter( ( event ) => !event.isTask )
-              .forEach( ( event ) => {
-                rebase.removeDoc( '/help-calendar_events/' + event.eventID );
-              } );
+        //if in fucture, set as PENDING
+        if ( [ 'IsNew', 'IsOpen' ].includes( item.event.status.action ) && getOnlyDaytime( item.start ) > getOnlyDaytime( new Date( moment()
+            .valueOf() ) ) ) {
+          data.filter( ( event ) => !event.isTask )
+            .forEach( ( event ) => {
+              deleteCalendarEventFunc( event.eventID )
+            } );
 
-            rebase.updateDoc( '/help-tasks/' + item.event.id, {
-              status: this.props.statuses.find( ( status ) => status.action === 'PendingDate' )
-                .id,
-              pendingDate: item.start.getTime(),
-              pendingDateTo: fromMomentToUnix( moment( newEvent.start )
-                .add( 30, 'minutes' ) ),
-              pendingChange: true
-            } )
-            //if new it will be open
-          } else if ( item.event.status.action === 'new' && this.props.statusesLoaded ) {
-            //new task is open
-            newEvent.end = fromMomentToUnix( moment( newEvent.start )
-              .add( 2, 'hours' ) );
-            rebase.addToCollection( 'help-calendar_events', newEvent );
-            rebase.updateDoc( '/help-tasks/' + item.event.id, {
-              status: this.props.statuses.find( ( status ) => status.action === 'open' )
-                .id
-            } )
-          } else if ( item.event.status.action === 'PendingDate' ) {
-            rebase.updateDoc( '/help-tasks/' + item.event.id, {
-              pendingDate: item.start.getTime(),
-              pendingDateTo: item.end.getTime()
-            } )
-          } else {
-            rebase.addToCollection( 'help-calendar_events', newEvent );
-          }
-        } else { //if EVENT
-          rebase.updateDoc( '/help-calendar_events/' + item.event.eventID, {
-            start: item.start.getTime(),
-            end: item.end.getTime()
-          } )
+          updateTaskFunc( item.event.id, {
+            pendingDate: item.start.getTime(),
+            pendingChangeable: true,
+            status: allStatuses.find( ( status ) => status.action === 'PendingDate' )
+              .id
+          } );
+          //if new it will be open
+        } else if ( item.event.status.action === 'new' && statusesLoaded ) {
+          //new task is open
+          newEvent.end = fromMomentToUnix( moment( newEvent.start )
+            .add( 2, 'hours' ) );
+          addCalendarEventFunc( newEvent );
+          updateTaskFunc( item.event.id, {
+            status: allStatuses.find( ( status ) => status.action === 'open' )
+              .id
+          } );
+        } else if ( item.event.status.action === 'PendingDate' ) {
+          updateTaskFunc( item.event.id, {
+            pendingDate: item.start.getTime(),
+          } );
+        } else {
+          addCalendarEventFunc( newEvent );
         }
-      }*/
+      } else { //if EVENT
+        updateCalendarEventFunc( item.event.eventID, {
+          startsAt: item.start.getTime(),
+          endsAt: item.end.getTime()
+        } );
+      }
+    }
   };
-
 
   if ( currentUserLoading ) {
     return ( <Loading /> );
@@ -293,8 +474,6 @@ export default function TaskCalendar( props ) {
     return ( <Edit match={match} columns={true} history={history} /> );
   }
 
-  console.log( events );
-
   return (
     <div>
   			<CommandBar { ...commandBar } />
@@ -304,11 +483,11 @@ export default function TaskCalendar( props ) {
             listName={ listName }
             statuses={currentUserData.getMyData.statuses}
             setStatuses={setUserFilterStatuses}
-            allStatuses={statuses}
+            allStatuses={allStatuses}
             />
   				<DnDCalendar
   					events = { events }
-            defaultDate = {new Date() }
+            defaultDate = { new Date( moment().valueOf() ) }
             defaultView = { calendarLayout }
   					style = {{ height: "100vh" }}
   					views={['month', 'week']}

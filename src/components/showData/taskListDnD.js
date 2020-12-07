@@ -58,6 +58,8 @@ export default function TaskListDnD( props ) {
 
   const [ updateTask ] = useMutation( UPDATE_TASK );
 
+  console.log( data );
+
   const client = useApolloClient();
 
   const groupDataFunc = () => {
@@ -84,6 +86,7 @@ export default function TaskListDnD( props ) {
       } )
       .then( ( response ) => {
         const updatedTask = response.data.updateTask;
+        console.log( updatedTask );
         delete updateTask.__typename;
         try {
           const originalTask = client.readQuery( {
@@ -173,8 +176,9 @@ export default function TaskListDnD( props ) {
       status: targetStatus.id,
     };
     if ( targetStatus.action === 'PendingDate' ) {
-      updateData.pendingDate = fromMomentToUnix( moment()
-          .add( 1, 'days' ) )
+      updateData.pendingDate = moment()
+        .add( 1, 'days' )
+        .valueOf()
         .toString();
       updateData.pendingChangable = true;
     } else if ( targetStatus.action === 'CloseDate' || targetStatus.action === 'CloseInvalid' ) {

@@ -9,6 +9,7 @@ import {
 } from '@apollo/client';
 
 import Loading from 'components/loading';
+import moment from 'moment';
 
 import ShowData from 'components/showData';
 
@@ -354,8 +355,10 @@ export default function TasksIndex( props ) {
         isTask: false,
         eventID: event.id,
         titleFunction: displayCal,
-        start: new Date( event.start ),
-        end: new Date( event.end ),
+        start: new Date( moment( parseInt( event.startsAt ) )
+          .valueOf() ),
+        end: new Date( moment( parseInt( event.endsAt ) )
+          .valueOf() ),
       }
     } )
   }
@@ -366,56 +369,60 @@ export default function TasksIndex( props ) {
           ...task,
           isTask: true,
           titleFunction: displayCal,
-          allDay: !task.status || task.status.action !== 'pendingOLD',
+          allDay: true,
         }
         if ( !task.status ) {
           return {
             ...newTask,
-            status: statuses.find( ( status ) => status.action === 'new' ),
-            start: new Date(),
+            status: statuses.find( ( status ) => status.action === 'IsNew' ),
+            start: new Date( moment()
+              .valueOf() ),
           }
         }
         switch ( task.status.action ) {
-          case 'invoiced': {
+          case 'Invoiced': {
             return {
               ...newTask,
-              start: new Date( task.invoicedDate ),
+              start: new Date( moment( parseInt( task.invoicedDate ) )
+                .valueOf() ),
             }
           }
-          case 'close': {
+          case 'CloseDate': {
             return {
               ...newTask,
-              start: new Date( task.closeDate ),
+              start: new Date( moment( parseInt( task.closeDate ) )
+                .valueOf() ),
             }
           }
-          case 'invalid': {
+          case 'CloseInvalid': {
             return {
               ...newTask,
-              start: new Date( task.closeDate ),
+              start: new Date( moment( parseInt( task.closeDate ) )
+                .valueOf() ),
             }
           }
-          case 'pending': {
+          case 'PendingDate': {
             return {
               ...newTask,
-              start: new Date( task.pendingDate ),
-              //end:new Date(task.pendingDateTo ? task.pendingDateTo: fromMomentToUnix(moment(task.pendingDate).add(30,'minutes')) ),
+              start: new Date( moment( parseInt( task.pendingDate ) )
+                .valueOf() ),
             }
           }
           default: {
             return {
               ...newTask,
-              start: new Date(),
+              start: new Date( moment()
+                .valueOf() ),
             }
           }
         }
       } )
       .map( ( task ) => ( {
         ...task,
-        end: task.status.action !== 'pendingOLD' ? task.start : task.end
+        end: task.start
       } ) )
   }
 
-  console.log( calendarEventsData );
   return (
       <ShowData
 			data={tasks.map((task) => ({

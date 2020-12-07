@@ -273,6 +273,9 @@ export default function ShowDataContainer( props ) {
 								statuses={statuses}
 								allStatuses={allStatuses}
 								Edit={Edit}
+                filterValues={localFilterToValues(filterData.localFilter)}
+                originalProjectId={projectData.localProject.id}
+                filterId={filterData.localFilter.id}
 								/>
 						</div>
 					)}
