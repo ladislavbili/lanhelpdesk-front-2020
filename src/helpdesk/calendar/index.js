@@ -127,7 +127,6 @@ export default function TaskCalendar( props ) {
   const [ today, setToday ] = React.useState( moment() );
   const [ calendarLayout, setCalendarLayout ] = React.useState( 'month' );
 
-
   const client = useApolloClient();
 
   const updateTaskFunc = ( id, updateData ) => {
@@ -216,31 +215,26 @@ export default function TaskCalendar( props ) {
         }
       } )
       .then( ( response ) => {
-        console.log( client );
-        try {
-          const allCalendarEvents = client.readQuery( {
-              query: GET_CALENDAR_EVENTS,
-              variables: {
-                filter: localFilterToValues( localFilter ),
-                projectId: localProject.id
-              },
-            } )
-            .calendarEvents;
-
-          client.writeQuery( {
+        const allCalendarEvents = client.readQuery( {
             query: GET_CALENDAR_EVENTS,
-            data: {
-              calendarEvents: allCalendarEvents.map( event =>
-                ( event.id !== id ? event : {
-                  ...event,
-                  ...updateData
-                } )
-              )
-            }
-          } );
-        } catch ( e ) {
-          console.log( e.message );
-        }
+            variables: {
+              filter: localFilterToValues( localFilter ),
+              projectId: localProject.id
+            },
+          } )
+          .calendarEvents;
+
+        client.writeQuery( {
+          query: GET_CALENDAR_EVENTS,
+          data: {
+            calendarEvents: allCalendarEvents.map( event =>
+              ( event.id !== id ? event : {
+                ...event,
+                ...updateData
+              } )
+            )
+          }
+        } );
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -326,7 +320,6 @@ export default function TaskCalendar( props ) {
   }
 
   const onEventDrop = ( item ) => {
-    console.log( item );
     const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
 
     if ( !canEdit ) {
@@ -396,7 +389,6 @@ export default function TaskCalendar( props ) {
         }
         addCalendarEventFunc( newEvent );
       } else {
-        console.log( "HI", item );
         //UPDATE EVENT
         updateCalendarEventFunc( item.event.eventID, {
           startsAt: item.start.getTime()
@@ -410,7 +402,6 @@ export default function TaskCalendar( props ) {
 
 
   const onEventDropTASKS = ( item ) => {
-    console.log( item );
     const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
 
     if ( !canEdit ) {
@@ -526,8 +517,6 @@ export default function TaskCalendar( props ) {
   if ( match.params.taskID ) {
     return ( <Edit match={match} columns={true} history={history} /> );
   }
-
-  console.log( events );
 
   return (
     <div>
