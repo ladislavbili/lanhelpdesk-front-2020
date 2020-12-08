@@ -199,6 +199,7 @@ export default function PublicFilterAdd( props ) {
         variables
       } )
       .then( ( response ) => {
+        console.log( response );
         const newPublicFilter = {
           ...response.data.addPublicFilter,
           __typename: "Filter"

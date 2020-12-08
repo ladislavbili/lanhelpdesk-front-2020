@@ -64,15 +64,22 @@ export default function TaskAdd( props ) {
     closeModal
   } = props;
 
-  const [ addTask ] = useMutation( ADD_TASK );
+  const userIfInProject = ( project ) => {
+    let USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
+    let user = USERS_WITH_PERMISSIONS.find( ( user ) => user.id === currentUser.id );
+    return user ? user : null;
+  }
 
+  const [ addTask ] = useMutation( ADD_TASK );
   //state
   const [ layout, setLayout ] = React.useState( 1 );
 
+  const [ project, setProject ] = React.useState( projectID ? projects.find( p => p.id === projectID ) : null );
+  const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
   const [ defaultFields, setDefaultFields ] = React.useState( noDef );
 
   const [ attachments, setAttachments ] = React.useState( [] );
-  const [ assignedTo, setAssignedTo ] = React.useState( [] );
+  const [ assignedTo, setAssignedTo ] = React.useState( USERS_WITH_PERMISSIONS.filter( ( user ) => user.id === currentUser.id ) );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
   const [ customItems, setCustomItems ] = React.useState( [] );
@@ -84,12 +91,15 @@ export default function TaskAdd( props ) {
   const [ pausal, setPausal ] = React.useState( booleanSelects[ 0 ] );
   const [ pendingDate, setPendingDate ] = React.useState( null );
   const [ pendingChangable, setPendingChangable ] = React.useState( false );
-  const [ project, setProject ] = React.useState( projectID ? projects.find( p => p.id === projectID ) : null );
   //  const [ reminder, setReminder ] = React.useState(null);
   const [ repeat, setRepeat ] = React.useState( null );
-  const [ requester, setRequester ] = React.useState( null );
+  const [ requester, setRequester ] = React.useState(
+    project !== null ?
+    userIfInProject( project ) :
+    null
+  );
   const [ saving, setSaving ] = React.useState( false );
-  const [ status, setStatus ] = React.useState( null );
+  const [ status, setStatus ] = React.useState( statuses ? statuses.find( ( status ) => status.action === 'IsNew' ) : null );
   const [ subtasks, setSubtasks ] = React.useState( [] );
   const [ tags, setTags ] = React.useState( [] );
   const [ materials, setMaterials ] = React.useState( [] );
@@ -116,14 +126,13 @@ export default function TaskAdd( props ) {
 
   const [ viewOnly, setViewOnly ] = React.useState( currentUser.role.level !== 0 && !userRights.write );
 
-  const setDefaults = ( id, forced ) => {
-    if ( id === null ) {
+  const setDefaults = ( project, forced ) => {
+    if ( project === null ) {
       setDefaultFields( noDef );
       return;
     }
 
-    let pro = projects.find( ( proj ) => proj.id === id );
-    let def = pro.def;
+    let def = project.def;
     if ( !def ) {
       setDefaultFields( noDef );
       return;
@@ -134,23 +143,30 @@ export default function TaskAdd( props ) {
       return;
     }
 
+    const potencialUser = userIfInProject( project );
+
     let maybeRequester = null;
     if ( users ) {
-      if ( pro.lockedRequester ) {
-        users.find( ( user ) => user.id === currentUser.id );
+      if ( project.lockedRequester ) {
+        maybeRequester = USERS_WITH_PERMISSIONS.find( ( user ) => user.id === currentUser.id );
       } else {
-        users.find( ( user ) => user.id === currentUser.id );
+        maybeRequester = users.find( ( user ) => user.id === currentUser.id );
+      }
+      if ( maybeRequester === undefined ) {
+        maybeRequester = null;
       }
     }
 
-    let filterredAssignedTo = assignedTo.filter( ( user ) => project && project.users.includes( user.id ) );
-    let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.includes( item.id ) ) : filterredAssignedTo;
+    let filteredAssignedTo = assignedTo.filter( ( user ) => project && project.users.includes( user.id ) );
+    if ( filteredAssignedTo.length === 0 && potencialUser ) {
+      filteredAssignedTo = [ potencialUser ];
+    }
+    let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.includes( item.id ) ) : filteredAssignedTo;
     setAssignedTo( newAssignedTo );
-
     let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
     setRequester( newRequester );
 
-    let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value ) : ( companies && newRequester ? companies.find( ( company ) => company.id === currentUser.company.id ) : null );
+    let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value ) : ( companies && newRequester ? companies.find( ( company ) => company.id === newRequester.company.id ) : null );
     setCompany( newCompany );
 
 
@@ -170,11 +186,14 @@ export default function TaskAdd( props ) {
     let newPausal = def.pausal && ( def.pausal.fixed || def.pausal.def ) ? booleanSelects.find( ( item ) => def.pausal.value === item.value ) : pausal;
     setPausal( newPausal );
 
-    setProject( pro );
-    setViewOnly( currentUser.role.level !== 0 && !pro.right.write );
+    setViewOnly( currentUser.role.level !== 0 && !project.right.write );
 
     setDefaultFields( def );
   }
+
+  React.useEffect( () => {
+    setDefaults( project );
+  }, [ project ] );
   const addTaskFunc = () => {
     let link = '';
     if ( match.params.hasOwnProperty( 'listID' ) ) {
@@ -337,7 +356,6 @@ export default function TaskAdd( props ) {
     );
   }
 
-  const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
   const REQUESTERS = ( project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users );
 
   const renderSelectsLayout1 = () => {
@@ -370,7 +388,6 @@ export default function TaskAdd( props ) {
                     //		setReminder(null);
                   }
 
-                  setDefaults(project.id, true);
                 }}
                 options={projects}
                 styles={invisibleSelectStyleNoArrow}
@@ -380,9 +397,9 @@ export default function TaskAdd( props ) {
         }
 
         {!viewOnly &&
-          <div className="col-lg-12">
-            <div className="col-lg-12">
-              <div className="col-lg-4">
+          <div className="col-12">
+            <div className="col-12">
+              <div className="col-4">
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Projekt</Label>
                   <div className="col-9">
@@ -410,7 +427,6 @@ export default function TaskAdd( props ) {
                           setPendingDate(null);
                           //		setReminder(null);
                         }
-                        setDefaults(project.id, true);
                       }}
                       options={projects}
                       styles={invisibleSelectStyleNoArrowRequired}
@@ -420,7 +436,7 @@ export default function TaskAdd( props ) {
               </div>
               {!viewOnly &&
                 defaultFields.assignedTo.show &&
-                <div className="col-lg-8">
+                <div className="col-8">
                   <div className="row p-r-10">
                     <Label className="col-1-5 col-form-label">Assigned</Label>
                     <div className="col-10-5">
@@ -439,7 +455,7 @@ export default function TaskAdd( props ) {
               }
             </div>
 
-            <div className="col-lg-4">
+            <div className="col-4">
               {!viewOnly &&
                 defaultFields.status.show &&
                 <div className="row p-r-10">
@@ -465,669 +481,684 @@ export default function TaskAdd( props ) {
                       options={statuses}
                       />
                   </div>
-                </div>}
-                {!viewOnly &&
-                  defaultFields.taskType.show &&
-                  <div className="row p-r-10">
-                    <Label className="col-3 col-form-label">Typ</Label>
-                    <div className="col-9">
-                      <Select
-                        placeholder="Select required"
-                        value={taskType}
-                        isDisabled={defaultFields.taskType.fixed || viewOnly}
-                        styles={invisibleSelectStyleNoArrowRequired}
-                        onChange={(taskType)=>setTaskType(taskType)}
-                        options={taskTypes}
-                        />
-                    </div>
-                  </div>}
-                  {!viewOnly &&
-                    <div className="row p-r-10">
-                      <Label className="col-3 col-form-label">Milestone</Label>
-                      <div className="col-9">
-                        <Select
-                          isDisabled={viewOnly}
-                          placeholder="None"
-                          value={milestone}
-                          onChange={(milestone)=> {
-                            if(status.action==='PendingDate'){
-                              if(milestone.startsAt !== null){
-                                setMilestone(milestone);
-                                setPendingDate(moment(milestone.startsAt));
-                                setPendingChangable(false);
-                              }else{
-                                setMilestone(milestone);
-                                setPendingChangable(true);
-                              }
-                            }else{
-                              setMilestone(milestone);
-                            }
-                          }}
-                          options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-                          styles={invisibleSelectStyleNoArrow}
-                          />
-                      </div>
-                    </div>
-                  }
                 </div>
+              }
+              {!viewOnly &&
+                defaultFields.taskType.show &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Typ</Label>
+                  <div className="col-9">
+                    <Select
+                      placeholder="Select required"
+                      value={taskType}
+                      isDisabled={defaultFields.taskType.fixed || viewOnly}
+                      styles={invisibleSelectStyleNoArrowRequired}
+                      onChange={(taskType)=>setTaskType(taskType)}
+                      options={taskTypes}
+                      />
+                  </div>
+                </div>
+              }
+              {!viewOnly &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Milestone</Label>
+                  <div className="col-9">
+                    <Select
+                      isDisabled={viewOnly}
+                      placeholder="None"
+                      value={milestone}
+                      onChange={(milestone)=> {
+                        if(status.action==='PendingDate'){
+                          if(milestone.startsAt !== null){
+                            setMilestone(milestone);
+                            setPendingDate(moment(milestone.startsAt));
+                            setPendingChangable(false);
+                          }else{
+                            setMilestone(milestone);
+                            setPendingChangable(true);
+                          }
+                        }else{
+                          setMilestone(milestone);
+                        }
+                      }}
+                      options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
+                      styles={invisibleSelectStyleNoArrow}
+                      />
+                  </div>
+                </div>
+              }
+            </div>
 
-                <div className="col-lg-4">
-                  {!viewOnly &&
-                    defaultFields.requester.show &&
-                    <div className="row p-r-10">
-                      <Label className="col-3 col-form-label">Zadal</Label>
-                      <div className="col-9">
-                        <Select
-                          value={requester}
-                          placeholder="Select required"
-                          isDisabled={defaultFields.requester.fixed || viewOnly}
-                          onChange={(requester)=>setRequester(requester)}
-                          options={REQUESTERS}
-                          styles={invisibleSelectStyleNoArrowRequired}
-                          />
-                      </div>
-                    </div>}
-                    {!viewOnly &&
-                      defaultFields.company.show &&
-                      <div className="row p-r-10">
-                        <Label className="col-3 col-form-label">Firma</Label>
-                        <div className="col-9">
-                          <Select
-                            value={company}
-                            placeholder="Select required"
-                            isDisabled={defaultFields.company.fixed || viewOnly}
-                            onChange={(company)=> {
-                              setCompany(company);
-                              setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
-                            }}
-                            options={companies}
-                            styles={invisibleSelectStyleNoArrowRequired}
-                            />
-                        </div>
-                      </div>
+            <div className="col-4">
+              {!viewOnly &&
+                defaultFields.requester.show &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Zadal</Label>
+                  <div className="col-9">
+                    <Select
+                      value={requester}
+                      placeholder="Select required"
+                      isDisabled={defaultFields.requester.fixed || viewOnly}
+                      onChange={(requester)=>{
+                        setRequester(requester);
+                        setCompany(companies.find((company) => company.id === requester.id ))
+                      }}
+                      options={REQUESTERS}
+                      styles={invisibleSelectStyleNoArrowRequired}
+                      />
+                  </div>
+                </div>
+              }
+              {!viewOnly &&
+                defaultFields.company.show &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Firma</Label>
+                  <div className="col-9">
+                    <Select
+                      value={company}
+                      placeholder="Select required"
+                      isDisabled={defaultFields.company.fixed || viewOnly}
+                      onChange={(company)=> {
+                        setCompany(company);
+                        setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
+                      }}
+                      options={companies}
+                      styles={invisibleSelectStyleNoArrowRequired}
+                      />
+                  </div>
+                </div>
+              }
+              {!viewOnly &&
+                defaultFields.pausal.show &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Paušál</Label>
+                  <div className="col-9">
+                    <Select
+                      value={pausal}
+                      placeholder="Select required"
+                      isDisabled={viewOnly || !company || company.monthly || defaultFields.pausal.fixed}
+                      styles={invisibleSelectStyleNoArrowRequired}
+                      onChange={(pausal)=> setPausal(pausal)}
+                      options={booleanSelects}
+                      />
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div className="col-4">
+              <div className="row p-r-10">
+                <Label className="col-3 col-form-label">Deadline</Label>
+                <div className="col-9">
+                  <DatePicker
+                    className="form-control hidden-input"
+                    selected={deadline}
+                    disabled={viewOnly}
+                    onChange={date => setDeadline(date)}
+                    placeholderText="No deadline"
+                    {...datePickerConfig}
+                    />
+                </div>
+              </div>
+              {!viewOnly &&
+                <Repeat
+                  taskID={null}
+                  repeat={repeat}
+                  disabled={viewOnly}
+                  submitRepeat={(repeat)=>{
+                    if(viewOnly){
+                      return;
                     }
-                    {!viewOnly &&
-                      defaultFields.pausal.show &&
-                      <div className="row p-r-10">
-                        <Label className="col-3 col-form-label">Paušál</Label>
-                        <div className="col-9">
-                          <Select
-                            value={pausal}
-                            placeholder="Select required"
-                            isDisabled={viewOnly || !company || company.monthly || defaultFields.pausal.fixed}
-                            styles={invisibleSelectStyleNoArrowRequired}
-                            onChange={(pausal)=> setPausal(pausal)}
-                            options={booleanSelects}
-                            />
-                        </div>
-                      </div>}
-                    </div>
-
-                    <div className="col-lg-4">
-                      <div className="row p-r-10">
-                        <Label className="col-3 col-form-label">Deadline</Label>
-                        <div className="col-9">
-                          <DatePicker
-                            className="form-control hidden-input"
-                            selected={deadline}
-                            disabled={viewOnly}
-                            onChange={date => setDeadline(date)}
-                            placeholderText="No deadline"
-                            {...datePickerConfig}
-                            />
-                        </div>
-                      </div>
-                      {!viewOnly &&
-                        <Repeat
-                          taskID={null}
-                          repeat={repeat}
-                          disabled={viewOnly}
-                          submitRepeat={(repeat)=>{
-                            if(viewOnly){
-                              return;
-                            }
-                            setRepeat(repeat);
-                          }}
-                          deleteRepeat={()=>{
-                            setRepeat(null);
-                          }}
-                          columns={true}
-                          />
-                      }
-                      {!viewOnly &&
-                        defaultFields.overtime.show &&
-                        <div className="row p-r-10">
-                          <Label className="col-3 col-form-label">Mimo PH</Label>
-                          <div className="col-9">
-                            <Select
-                              placeholder="Select required"
-                              value={overtime}
-                              isDisabled={viewOnly || defaultFields.overtime.fixed}
-                              styles={invisibleSelectStyleNoArrowRequired}
-                              onChange={(overtime) => setOvertime(overtime)}
-                              options={booleanSelects}
-                              />
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  </div>}
+                    setRepeat(repeat);
+                  }}
+                  deleteRepeat={()=>{
+                    setRepeat(null);
+                  }}
+                  columns={true}
+                  />
+              }
+              {!viewOnly &&
+                defaultFields.overtime.show &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Mimo PH</Label>
+                  <div className="col-9">
+                    <Select
+                      placeholder="Select required"
+                      value={overtime}
+                      isDisabled={viewOnly || defaultFields.overtime.fixed}
+                      styles={invisibleSelectStyleNoArrowRequired}
+                      onChange={(overtime) => setOvertime(overtime)}
+                      options={booleanSelects}
+                      />
+                  </div>
                 </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
     )
   }
 
   const renderSelectsLayout2 = () => {
     return (
       <div className="task-edit-right">
-                  {viewOnly &&
-                    <div className="">
-                      <Label className="col-form-label-2">Projekt</Label>
-                      <div className="col-form-value-2">
-                        <Select
-                          value={project}
-                          placeholder="None"
-                          onChange={(project)=>{
-                            setProject(project);
-                            setMilestone(noMilestone);
-                            setPausal(booleanSelects[0]);
-                            const viewOnly = currentUser.role.level !== 0 && !project.right.write;
-                            setViewOnly(viewOnly);
+        {viewOnly &&
+          <div className="">
+            <Label className="col-form-label-2">Projekt</Label>
+            <div className="col-form-value-2">
+              <Select
+                value={project}
+                placeholder="None"
+                onChange={(project)=>{
+                  setProject(project);
+                  setMilestone(noMilestone);
+                  setPausal(booleanSelects[0]);
+                  const viewOnly = currentUser.role.level !== 0 && !project.right.write;
+                  setViewOnly(viewOnly);
 
-                            if(viewOnly){
-                              setRepeat(null);
-                              setSubtasks([]);
-                              setSubtasks([]);
-                              setMaterials([]);
-                              setCustomItems([]);
-                              setWorkTrips([]);
-                              setDeadline(null);
-                              setCloseDate(null);
-                              setPendingDate(null);
-                              //		setReminder(null);
-                            }
-
-                            setDefaults(project.id, true);
-                          }}
-                          options={projects}
-                          styles={invisibleSelectStyleNoArrow}
-                          />
-                      </div>
-                    </div>
+                  if(viewOnly){
+                    setRepeat(null);
+                    setSubtasks([]);
+                    setSubtasks([]);
+                    setMaterials([]);
+                    setCustomItems([]);
+                    setWorkTrips([]);
+                    setDeadline(null);
+                    setCloseDate(null);
+                    setPendingDate(null);
+                    //		setReminder(null);
                   }
 
-                  {!viewOnly &&
-                    <div className="">
-                      <Label className="col-form-label-2">Projekt</Label>
-                      <div className="col-form-value-2">
-                        <Select
-                          placeholder="Select required"
-                          value={project}
-                          onChange={(project)=>{
-                            setProject(project);
-                            setMilestone(noMilestone);
+                }}
+                options={projects}
+                styles={invisibleSelectStyleNoArrow}
+                />
+            </div>
+          </div>
+        }
 
-                            let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
-                            setAssignedTo(newAssignedTo);
+        {!viewOnly &&
+          <div className="">
+            <Label className="col-form-label-2">Projekt</Label>
+            <div className="col-form-value-2">
+              <Select
+                placeholder="Select required"
+                value={project}
+                onChange={(project)=>{
+                  setProject(project);
+                  setMilestone(noMilestone);
 
-                            const viewOnly = currentUser.role.level !== 0 && !project.right.write;
-                            setViewOnly(viewOnly);
+                  let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
+                  setAssignedTo(newAssignedTo);
 
-                            if(viewOnly){
-                              setRepeat(null);
-                              setSubtasks([]);
-                              setSubtasks([]);
-                              setMaterials([]);
-                              setCustomItems([]);
-                              setDeadline(null);
-                              setCloseDate(null);
-                              setPendingDate(null);
-                              //					setReminder(null);
-                            }
-                            setDefaults(project.id, true);
-                          }}
-                          options={projects}
-                          styles={invisibleSelectStyleNoArrowRequired}
-                          />
-                      </div>
-                    </div>
+                  const viewOnly = currentUser.role.level !== 0 && !project.right.write;
+                  setViewOnly(viewOnly);
+
+                  if(viewOnly){
+                    setRepeat(null);
+                    setSubtasks([]);
+                    setSubtasks([]);
+                    setMaterials([]);
+                    setCustomItems([]);
+                    setDeadline(null);
+                    setCloseDate(null);
+                    setPendingDate(null);
+                    //					setReminder(null);
                   }
-                  {!viewOnly &&
-                    defaultFields.assignedTo.show &&
-                    <div className="">
-                      <Label className="col-form-label-2">Assigned</Label>
-                      <div className="col-form-value-2">
-                        <Select
-                          placeholder="Select required"
-                          value={assignedTo}
-                          isDisabled={defaultFields.assignedTo.fixed || viewOnly}
-                          isMulti
-                          onChange={(users)=> setAssignedTo(users)}
-                          options={USERS_WITH_PERMISSIONS}
-                          styles={invisibleSelectStyleNoArrowRequired}
-                          />
-                      </div>
-                    </div>}
+                }}
+                options={projects}
+                styles={invisibleSelectStyleNoArrowRequired}
+                />
+            </div>
+          </div>
+        }
+        {!viewOnly &&
+          defaultFields.assignedTo.show &&
+          <div className="">
+            <Label className="col-form-label-2">Assigned</Label>
+            <div className="col-form-value-2">
+              <Select
+                placeholder="Select required"
+                value={assignedTo}
+                isDisabled={defaultFields.assignedTo.fixed || viewOnly}
+                isMulti
+                onChange={(users)=> setAssignedTo(users)}
+                options={USERS_WITH_PERMISSIONS}
+                styles={invisibleSelectStyleNoArrowRequired}
+                />
+            </div>
+          </div>
+        }
 
-                    {!viewOnly &&
-                      defaultFields.status.show &&
-                      <div className="">
-                        <Label className="col-form-label-2">Status</Label>
-                        <div className="col-form-value-2">
-                          <Select
-                            placeholder="Select required"
-                            value={status}
-                            isDisabled={defaultFields.status.fixed || viewOnly}
-                            styles={invisibleSelectStyleNoArrowColoredRequired}
-                            onChange={(status)=>{
-                              if(status.action==='PendingDate'){
-                                setStatus(status);
-                                setPendingDate( moment().add(1,'d') );
-                              }else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
-                                setStatus(status);
-                                setCloseDate( moment() );
-                              }
-                              else{
-                                setStatus(status);
-                              }
-                            }}
-                            options={statuses.filter((status)=>status.action!=='invoiced').sort((item1,item2)=>{
-                              if(item1.order &&item2.order){
-                                return item1.order > item2.order? 1 :-1;
-                              }
-                              return -1;
-                            })}
-                            />
-                        </div>
-                      </div>}
+        {!viewOnly &&
+          defaultFields.status.show &&
+          <div className="">
+            <Label className="col-form-label-2">Status</Label>
+            <div className="col-form-value-2">
+              <Select
+                placeholder="Select required"
+                value={status}
+                isDisabled={defaultFields.status.fixed || viewOnly}
+                styles={invisibleSelectStyleNoArrowColoredRequired}
+                onChange={(status)=>{
+                  if(status.action==='PendingDate'){
+                    setStatus(status);
+                    setPendingDate( moment().add(1,'d') );
+                  }else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
+                    setStatus(status);
+                    setCloseDate( moment() );
+                  }
+                  else{
+                    setStatus(status);
+                  }
+                }}
+                options={statuses.filter((status)=>status.action!=='invoiced').sort((item1,item2)=>{
+                  if(item1.order &&item2.order){
+                    return item1.order > item2.order? 1 :-1;
+                  }
+                  return -1;
+                })}
+                />
+            </div>
+          </div>
+        }
 
-                      {!viewOnly &&
-                        defaultFields.taskType.show &&
-                        <div className="">
-                          <Label className="col-form-label-2">Typ</Label>
-                          <div className="col-form-value-2">
-                            <Select
-                              placeholder="Select required"
-                              value={taskType}
-                              isDisabled={defaultFields.taskType.fixed || viewOnly}
-                              styles={invisibleSelectStyleNoArrowRequired}
-                              onChange={(taskType)=>setTaskType(taskType)}
-                              options={taskTypes}
-                              />
-                          </div>
-                        </div>}
-                        {!viewOnly &&
-                          <div className="">
-                            <Label className="col-form-label-2">Milestone</Label>
-                            <div className="col-form-value-2">
-                              <Select
-                                isDisabled={viewOnly}
-                                placeholder="None"
-                                value={milestone}
-                                onChange={(milestone)=> {
-                                  if(status.action==='PendingDate'){
-                                    if(milestone.startsAt !== null){
-                                      setMilestone(milestone);
-                                      setPendingDate(moment(milestone.startsAt));
-                                      setPendingChangable(false);
-                                    }else{
-                                      setMilestone(milestone);
-                                      setPendingChangable(true);
-                                    }
-                                  }else{
-                                    setMilestone(milestone);
-                                  }
-                                }}
-                                options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-                                styles={invisibleSelectStyleNoArrow}
-                                />
-                            </div>
-                          </div>
-                        }
+        {!viewOnly &&
+          defaultFields.taskType.show &&
+          <div className="">
+            <Label className="col-form-label-2">Typ</Label>
+            <div className="col-form-value-2">
+              <Select
+                placeholder="Select required"
+                value={taskType}
+                isDisabled={defaultFields.taskType.fixed || viewOnly}
+                styles={invisibleSelectStyleNoArrowRequired}
+                onChange={(taskType)=>setTaskType(taskType)}
+                options={taskTypes}
+                />
+            </div>
+          </div>}
+          {!viewOnly &&
+            <div className="">
+              <Label className="col-form-label-2">Milestone</Label>
+              <div className="col-form-value-2">
+                <Select
+                  isDisabled={viewOnly}
+                  placeholder="None"
+                  value={milestone}
+                  onChange={(milestone)=> {
+                    if(status.action==='PendingDate'){
+                      if(milestone.startsAt !== null){
+                        setMilestone(milestone);
+                        setPendingDate(moment(milestone.startsAt));
+                        setPendingChangable(false);
+                      }else{
+                        setMilestone(milestone);
+                        setPendingChangable(true);
+                      }
+                    }else{
+                      setMilestone(milestone);
+                    }
+                  }}
+                  options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
+                  styles={invisibleSelectStyleNoArrow}
+                  />
+              </div>
+            </div>
+          }
 
-                        {defaultFields.tag.show &&
-                          <div className="">
-                            <Label className="col-form-label-2">Tagy: </Label>
-                            <div className="col-form-value-2">
-                              <Select
-                                value={tags}
-                                placeholder="None"
-                                isDisabled={defaultFields.tag.fixed || viewOnly}
-                                isMulti
-                                onChange={(t)=>setTags(t)}
-                                options={allTags}
-                                styles={invisibleSelectStyleNoArrowColored}
-                                />
-                            </div>
-                          </div>}
+          {defaultFields.tag.show &&
+            <div className="">
+              <Label className="col-form-label-2">Tagy: </Label>
+              <div className="col-form-value-2">
+                <Select
+                  value={tags}
+                  placeholder="None"
+                  isDisabled={defaultFields.tag.fixed || viewOnly}
+                  isMulti
+                  onChange={(t)=>setTags(t)}
+                  options={allTags}
+                  styles={invisibleSelectStyleNoArrowColored}
+                  />
+              </div>
+            </div>
+          }
 
-                          {!viewOnly &&
-                            defaultFields.requester.show &&
-                            <div className="">
-                              <Label className="col-form-label-2">Zadal</Label>
-                              <div className="col-form-value-2">
-                                <Select
-                                  value={requester}
-                                  placeholder="Select required"
-                                  isDisabled={defaultFields.requester.fixed || viewOnly}
-                                  onChange={(requester)=>setRequester(requester)}
-                                  options={REQUESTERS}
-                                  styles={invisibleSelectStyleNoArrowRequired}
-                                  />
-                              </div>
-                            </div>}
+          {!viewOnly &&
+            defaultFields.requester.show &&
+            <div className="">
+              <Label className="col-form-label-2">Zadal</Label>
+              <div className="col-form-value-2">
+                <Select
+                  value={requester}
+                  placeholder="Select required"
+                  isDisabled={defaultFields.requester.fixed || viewOnly}
+                  onChange={(requester)=>setRequester(requester)}
+                  options={REQUESTERS}
+                  styles={invisibleSelectStyleNoArrowRequired}
+                  />
+              </div>
+            </div>
+          }
 
-                            {!viewOnly &&
-                              defaultFields.company.show &&
-                              <div className="">
-                                <Label className="col-form-label-2">Firma</Label>
-                                <div className="col-form-value-2">
-                                  <Select
-                                    value={company}
-                                    placeholder="Select required"
-                                    isDisabled={defaultFields.company.fixed || viewOnly}
-                                    onChange={(company)=> {
-                                      setCompany(company);
-                                      setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
-                                    }}
-                                    options={companies}
-                                    styles={invisibleSelectStyleNoArrowRequired}
-                                    />
-                                </div>
-                              </div>}
+          {!viewOnly &&
+            defaultFields.company.show &&
+            <div className="">
+              <Label className="col-form-label-2">Firma</Label>
+              <div className="col-form-value-2">
+                <Select
+                  value={company}
+                  placeholder="Select required"
+                  isDisabled={defaultFields.company.fixed || viewOnly}
+                  onChange={(company)=> {
+                    setCompany(company);
+                    setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
+                  }}
+                  options={companies}
+                  styles={invisibleSelectStyleNoArrowRequired}
+                  />
+              </div>
+            </div>
+          }
 
-                              {!viewOnly &&
-                                defaultFields.pausal.show &&
-                                <div className="">
-                                  <Label className="col-form-label-2">Paušál</Label>
-                                  <div className="col-form-value-2">
-                                    <Select
-                                      value={pausal}
-                                      placeholder="Select required"
-                                      isDisabled={viewOnly || !company || company.monthly || defaultFields.pausal.fixed}
-                                      styles={invisibleSelectStyleNoArrowRequired}
-                                      onChange={(pausal)=> setPausal(pausal)}
-                                      options={booleanSelects}
-                                      />
-                                  </div>
-                                </div>}
+          {!viewOnly &&
+            defaultFields.pausal.show &&
+            <div className="">
+              <Label className="col-form-label-2">Paušál</Label>
+              <div className="col-form-value-2">
+                <Select
+                  value={pausal}
+                  placeholder="Select required"
+                  isDisabled={viewOnly || !company || company.monthly || defaultFields.pausal.fixed}
+                  styles={invisibleSelectStyleNoArrowRequired}
+                  onChange={(pausal)=> setPausal(pausal)}
+                  options={booleanSelects}
+                  />
+              </div>
+            </div>
+          }
 
-                                {!viewOnly &&
-                                  <div className="">
-                                    <Label className="col-form-label-2">Deadline</Label>
-                                    <div className="col-form-value-2">
-                                      <DatePicker
-                                        className="form-control hidden-input"
-                                        selected={deadline}
-                                        disabled={viewOnly}
-                                        onChange={date => setDeadline(date)}
-                                        placeholderText="No deadline"
-                                        {...datePickerConfig}
-                                        />
-                                    </div>
-                                  </div>}
+          {!viewOnly &&
+            <div className="">
+              <Label className="col-form-label-2">Deadline</Label>
+              <div className="col-form-value-2">
+                <DatePicker
+                  className="form-control hidden-input"
+                  selected={deadline}
+                  disabled={viewOnly}
+                  onChange={date => setDeadline(date)}
+                  placeholderText="No deadline"
+                  {...datePickerConfig}
+                  />
+              </div>
+            </div>
+          }
 
-                                  {!viewOnly &&
-                                    <Repeat
-                                      taskID={null}
-                                      repeat={repeat}
-                                      disabled={viewOnly}
-                                      submitRepeat={(repeat)=>{
-                                        if(viewOnly){
-                                          return;
-                                        }
-                                        setRepeat(repeat);
-                                      }}
-                                      deleteRepeat={()=>{
-                                        setRepeat(null);
-                                      }}
-                                      columns={true}
-                                      />}
+          {!viewOnly &&
+            <Repeat
+              taskID={null}
+              repeat={repeat}
+              disabled={viewOnly}
+              submitRepeat={(repeat)=>{
+                if(viewOnly){
+                  return;
+                }
+                setRepeat(repeat);
+              }}
+              deleteRepeat={()=>{
+                setRepeat(null);
+              }}
+              columns={true}
+              />
+          }
 
-                                      {!viewOnly &&
-                                        defaultFields.overtime.show &&
-                                        <div className="">
-                                          <Label className="col-form-label-2">Mimo PH</Label>
-                                          <div className="col-form-value-2">
-                                            <Select
-                                              placeholder="Select required"
-                                              value={overtime}
-                                              isDisabled={viewOnly || defaultFields.overtime.fixed}
-                                              styles={invisibleSelectStyleNoArrowRequired}
-                                              onChange={(overtime) => setOvertime(overtime)}
-                                              options={booleanSelects}
-                                              />
-                                          </div>
-                                        </div>}
+          {!viewOnly &&
+            defaultFields.overtime.show &&
+            <div className="">
+              <Label className="col-form-label-2">Mimo PH</Label>
+              <div className="col-form-value-2">
+                <Select
+                  placeholder="Select required"
+                  value={overtime}
+                  isDisabled={viewOnly || defaultFields.overtime.fixed}
+                  styles={invisibleSelectStyleNoArrowRequired}
+                  onChange={(overtime) => setOvertime(overtime)}
+                  options={booleanSelects}
+                  />
+              </div>
+            </div>
+          }
 
-                                      </div>
+        </div>
     )
   }
 
   const renderPopis = () => {
     return (
       <div>
-                                        <Label className="m-b-10 col-form-label m-t-10">Popis úlohy</Label>
-                                        {!descriptionVisible &&
-                                          <span className="task-edit-popis p-20 text-muted" onClick={()=>setDescriptionVisible(true)}>
-                                            Napíšte krátky popis úlohy
-                                          </span>}
-                                          {descriptionVisible &&
-                                            <CKEditor5
-                                              editor={ ClassicEditor }
-                                              data={description}
-                                              onInit={(editor)=>{
-                                              }}
-                                              onChange={(e, editor)=>{
-                                                setDescription(editor.getData());
-                                              }}
-                                              readOnly={viewOnly}
-                                              config={ck5config}
-                                              />
-                                          }
-                                        </div>
+          <Label className="m-b-10 col-form-label m-t-10">Popis úlohy</Label>
+          {!descriptionVisible &&
+            <span className="task-edit-popis p-20 text-muted" onClick={()=>setDescriptionVisible(true)}>
+              Napíšte krátky popis úlohy
+            </span>}
+            {descriptionVisible &&
+              <CKEditor5
+                editor={ ClassicEditor }
+                data={description}
+                onInit={(editor)=>{
+                }}
+                onChange={(e, editor)=>{
+                  setDescription(editor.getData());
+                }}
+                readOnly={viewOnly}
+                config={ck5config}
+                />
+            }
+          </div>
     )
   }
 
   const renderTags = () => {
     return (
       <div className="row m-t-10">
-                                          <div className="center-hor">
-                                            <Label className="center-hor">Tagy: </Label>
-                                          </div>
-                                          <div className="f-1 ">
-                                            <Select
-                                              value={tags}
-                                              placeholder="None"
-                                              isDisabled={defaultFields.tag.fixed || viewOnly}
-                                              isMulti
-                                              onChange={(t)=>setTags(t)}
-                                              options={viewOnly ? [] : allTags}
-                                              styles={invisibleSelectStyleNoArrowColored}
-                                              />
-                                          </div>
-                                        </div>
+            <div className="center-hor">
+              <Label className="center-hor">Tagy: </Label>
+            </div>
+            <div className="f-1 ">
+              <Select
+                value={tags}
+                placeholder="None"
+                isDisabled={defaultFields.tag.fixed || viewOnly}
+                isMulti
+                onChange={(t)=>setTags(t)}
+                options={viewOnly ? [] : allTags}
+                styles={invisibleSelectStyleNoArrowColored}
+                />
+            </div>
+          </div>
     )
   }
 
   const renderAttachments = () => {
     return (
       <Attachments
-                                          disabled={viewOnly}
-                                          taskID={null}
-                                          attachments={attachments}
-                                          addAttachments={(newAttachments)=>{
-                                            let time = moment().valueOf();
-                                            newAttachments = newAttachments.map((attachment)=>{
-                                              return {
-                                                title:attachment.name,
-                                                size:attachment.size,
-                                                time,
-                                                data:attachment
-                                              }
-                                            });
-                                            setAttachments([...attachments, ...newAttachments]);
-                                          }}
-                                          removeAttachment={(attachment)=>{
-                                            let newAttachments = [...attachments];
-                                            newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
-                                            setAttachments([...newAttachments]);
-                                          }}
-                                          />
+            disabled={viewOnly}
+            taskID={null}
+            attachments={attachments}
+            addAttachments={(newAttachments)=>{
+              let time = moment().valueOf();
+              newAttachments = newAttachments.map((attachment)=>{
+                return {
+                  title:attachment.name,
+                  size:attachment.size,
+                  time,
+                  data:attachment
+                }
+              });
+              setAttachments([...attachments, ...newAttachments]);
+            }}
+            removeAttachment={(attachment)=>{
+              let newAttachments = [...attachments];
+              newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
+              setAttachments([...newAttachments]);
+            }}
+            />
     )
   }
 
   const renderVykazyTable = ( subtasks, workTrips, materials, customItems ) => {
     return (
       <VykazyTable
-                                          id={company ? company.id : 0}
-                                          showColumns={ [0,1,2,3,4,5,6,7,8] }
+            id={company ? company.id : 0}
+            showColumns={ [0,1,2,3,4,5,6,7,8] }
 
-                                          showTotals={false}
-                                          disabled={viewOnly}
-                                          company={company}
-                                          match={match}
-                                          taskID={null}
-                                          taskAssigned={assignedTo}
+            showTotals={false}
+            disabled={viewOnly}
+            company={company}
+            match={match}
+            taskID={null}
+            taskAssigned={assignedTo}
 
-                                          showSubtasks={project ? project.showSubtasks : false}
+            showSubtasks={project ? project.showSubtasks : false}
 
-                                          submitService={(newService)=>{
-                                            setSubtasks([...subtasks,{id:getNewID(), ...newService}]);
-                                          }}
-                                          subtasks={subtasks}
-                                          defaultType={taskType}
-                                          taskTypes={taskTypes}
-                                          updateSubtask={(id,newData)=>{
-                                            let newSubtasks=[...subtasks];
-                                            newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
-                                            setSubtasks(newSubtasks);
-                                          }}
-                                          updateSubtasks={(multipleSubtasks)=>{
-                                            let newSubtasks=[...subtasks];
-                                            multipleSubtasks.forEach(({id, newData})=>{
-                                              newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
-                                            });
-                                            setSubtasks(newSubtasks);
-                                          }}
-                                          removeSubtask={(id)=>{
-                                            let newSubtasks=[...subtasks];
-                                            newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
-                                            setSubtasks(newSubtasks);
-                                          }}
-                                          workTrips={workTrips}
-                                          tripTypes={tripTypes}
-                                          submitTrip={(newTrip)=>{
-                                            setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
-                                          }}
-                                          updateTrip={(id,newData)=>{
-                                            let newTrips=[...workTrips];
-                                            newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-                                            setWorkTrips(newTrips);
-                                          }}
-                                          updateTrips={(multipleTrips)=>{
-                                            let newTrips=[...workTrips];
-                                            multipleTrips.forEach(({id, newData})=>{
-                                              newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-                                            });
-                                            setWorkTrips(newTrips);
-                                          }}
-                                          removeTrip={(id)=>{
-                                            let newTrips=[...workTrips];
-                                            newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
-                                            setWorkTrips(newTrips);
-                                          }}
+            submitService={(newService)=>{
+              setSubtasks([...subtasks,{id:getNewID(), ...newService}]);
+            }}
+            subtasks={subtasks}
+            defaultType={taskType}
+            taskTypes={taskTypes}
+            updateSubtask={(id,newData)=>{
+              let newSubtasks=[...subtasks];
+              newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
+              setSubtasks(newSubtasks);
+            }}
+            updateSubtasks={(multipleSubtasks)=>{
+              let newSubtasks=[...subtasks];
+              multipleSubtasks.forEach(({id, newData})=>{
+                newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
+              });
+              setSubtasks(newSubtasks);
+            }}
+            removeSubtask={(id)=>{
+              let newSubtasks=[...subtasks];
+              newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
+              setSubtasks(newSubtasks);
+            }}
+            workTrips={workTrips}
+            tripTypes={tripTypes}
+            submitTrip={(newTrip)=>{
+              setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
+            }}
+            updateTrip={(id,newData)=>{
+              let newTrips=[...workTrips];
+              newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
+              setWorkTrips(newTrips);
+            }}
+            updateTrips={(multipleTrips)=>{
+              let newTrips=[...workTrips];
+              multipleTrips.forEach(({id, newData})=>{
+                newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
+              });
+              setWorkTrips(newTrips);
+            }}
+            removeTrip={(id)=>{
+              let newTrips=[...workTrips];
+              newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
+              setWorkTrips(newTrips);
+            }}
 
-                                          materials={materials}
-                                          submitMaterial={(newMaterial)=>{
-                                            setMaterials([...materials,{id:getNewID(),...newMaterial}]);
-                                          }}
-                                          updateMaterial={(id,newData)=>{
-                                            let newMaterials=[...materials];
-                                            newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-                                            setMaterials(newMaterials);
-                                          }}
-                                          updateMaterials={(multipleMaterials)=>{
-                                            let newMaterials=[...materials];
-                                            multipleMaterials.forEach(({id, newData})=>{
-                                              newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-                                            });
-                                            setMaterials(newMaterials);
-                                          }}
-                                          removeMaterial={(id)=>{
-                                            let newMaterials=[...materials];
-                                            newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-                                            setMaterials(newMaterials);
-                                          }}
+            materials={materials}
+            submitMaterial={(newMaterial)=>{
+              setMaterials([...materials,{id:getNewID(),...newMaterial}]);
+            }}
+            updateMaterial={(id,newData)=>{
+              let newMaterials=[...materials];
+              newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
+              setMaterials(newMaterials);
+            }}
+            updateMaterials={(multipleMaterials)=>{
+              let newMaterials=[...materials];
+              multipleMaterials.forEach(({id, newData})=>{
+                newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
+              });
+              setMaterials(newMaterials);
+            }}
+            removeMaterial={(id)=>{
+              let newMaterials=[...materials];
+              newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
+              setMaterials(newMaterials);
+            }}
 
-                                          customItems={customItems}
-                                          submitCustomItem={(customItem)=>{
-                                            setCustomItems([...customItems,{id:getNewID(),...customItem}]);
-                                          }}
-                                          updateCustomItem={(id,newData)=>{
-                                            let newCustomItems=[...customItems];
-                                            newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
-                                            setCustomItems(newCustomItems);
-                                          }}
-                                          updateCustomItems={(multipleCustomItems)=>{
-                                            let newCustomItems=[...customItems];
-                                            multipleCustomItems.forEach(({id, newData})=>{
-                                              newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
-                                            });
-                                            setCustomItems(newCustomItems);
-                                          }}
-                                          removeCustomItem={(id)=>{
-                                            let newCustomItems=[...customItems];
-                                            newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
-                                            setCustomItems(newCustomItems);
-                                          }}
+            customItems={customItems}
+            submitCustomItem={(customItem)=>{
+              setCustomItems([...customItems,{id:getNewID(),...customItem}]);
+            }}
+            updateCustomItem={(id,newData)=>{
+              let newCustomItems=[...customItems];
+              newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
+              setCustomItems(newCustomItems);
+            }}
+            updateCustomItems={(multipleCustomItems)=>{
+              let newCustomItems=[...customItems];
+              multipleCustomItems.forEach(({id, newData})=>{
+                newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
+              });
+              setCustomItems(newCustomItems);
+            }}
+            removeCustomItem={(id)=>{
+              let newCustomItems=[...customItems];
+              newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
+              setCustomItems(newCustomItems);
+            }}
 
-                                          units={[]}
-                                          defaultUnit={defaultUnit}
-                                          />
+            units={[]}
+            defaultUnit={defaultUnit}
+            />
     )
   }
 
   const renderButtons = () => {
     return (
       <div>
-                                          {closeModal &&
-                                            <Button className="btn-link-remove" onClick={() => closeModal()}>Cancel</Button>
-                                          }
-                                          <button
-                                            className="btn pull-right"
-                                            disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
-                                            onClick={addTaskFunc}
-                                            > Create task
-                                          </button>
-                                        </div>
+            {closeModal &&
+              <Button className="btn-link-remove" onClick={() => closeModal()}>Cancel</Button>
+            }
+            <button
+              className="btn pull-right"
+              disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
+              onClick={addTaskFunc}
+              > Create task
+            </button>
+          </div>
     )
   }
 
   return (
     <div className={classnames("scrollable", { "p-20": layout === 1}, { "row": layout === 2})}>
 
-                                        <div className={classnames({ "task-edit-left p-l-20 p-r-20 p-b-15 p-t-15": layout === 2})}>
+          <div className={classnames({ "task-edit-left p-l-20 p-r-20 p-b-15 p-t-15": layout === 2})}>
 
-                                          { renderTitle() }
+            { renderTitle() }
 
-                                          <hr className="m-t-15 m-b-10"/>
+            <hr className="m-t-15 m-b-10"/>
 
-                                          { layout === 1 && renderSelectsLayout1() }
+            { layout === 1 && renderSelectsLayout1() }
 
-                                          { renderPopis() }
+            { renderPopis() }
 
-                                          { layout === 1 && defaultFields.tag.show && renderTags() }
+            { layout === 1 && defaultFields.tag.show && renderTags() }
 
-                                          { renderAttachments() }
+            { renderAttachments() }
 
-                                          { !viewOnly && renderVykazyTable(subtasks, workTrips, materials, customItems) }
+            { !viewOnly && renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
-                                          { renderButtons() }
+            { renderButtons() }
 
-                                        </div>
+          </div>
 
-                                        { layout === 2 && renderSelectsLayout2() }
+          { layout === 2 && renderSelectsLayout2() }
 
-                                      </div>
+        </div>
   );
 }

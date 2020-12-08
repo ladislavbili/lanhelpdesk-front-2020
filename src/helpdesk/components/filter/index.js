@@ -47,6 +47,7 @@ import {
 import {
   GET_TASK_TYPES
 } from 'helpdesk/settings/taskTypes/querries';
+import moment from 'moment';
 
 export default function FilterForm( props ) {
   //data & queries

@@ -1664,7 +1664,6 @@ export const getCreationError = ( newSubtaskType, newSubtaskAssigned, company ) 
   let noType = newSubtaskType === null;
   let noAssigned = newSubtaskAssigned.length === 0;
   let noCompany = company === null;
-  console.log();
   if ( !noType && !noAssigned && !noCompany ) {
     return ''
   }
