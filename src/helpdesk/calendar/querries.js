@@ -15,6 +15,20 @@ query {
   }
 }
 `;
+export const ADD_TAG = gql `
+mutation addTag($title: String!, $color: String, $order: Int) {
+  addTag(
+    title: $title,
+    color: $color,
+    order: $order,
+  ){
+    id
+    title
+    color
+    order
+  }
+}
+`;
 
 export const ADD_CALENDAR_EVENT = gql `
 mutation addCalendarEvent(
@@ -26,9 +40,9 @@ mutation addCalendarEvent(
     startsAt: $startsAt,
     endsAt: $endsAt,
     task: $task,
-  )
-}{
-      id
+  ){
+    id
+  }
 }`;
 
 export const UPDATE_CALENDAR_EVENT = gql `
@@ -41,9 +55,9 @@ mutation updateCalendarEvent(
     id: $id
     startsAt: $startsAt
     endsAt: $endsAt
-  )
-}{
-      id
+  ){
+    id
+  }
 }`;
 
 export const DELETE_CALENDAR_EVENT = gql `
@@ -52,7 +66,7 @@ mutation deleteCalendarEvent(
 ) {
   deleteCalendarEvent(
     id: $id
-  )
-}{
-      id
+  ){
+    id
+  }
 }`;

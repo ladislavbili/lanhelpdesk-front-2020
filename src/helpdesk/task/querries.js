@@ -751,6 +751,13 @@ query calendarEvents($filter: FilterInput, $projectId: Int){
           write
           delete
         }
+        projectRights{
+          write
+          delete
+          user {
+            id
+          }
+        }
 			}
 			status {
 				id

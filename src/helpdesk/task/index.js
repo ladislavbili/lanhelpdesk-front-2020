@@ -350,16 +350,19 @@ export default function TasksIndex( props ) {
 
   const getCalendarEventsData = () => {
     return calendarEventsData.calendarEvents.map( ( event ) => {
-      return {
+      let newEvent = {
+        eventID: event.id,
+        ...event.task,
         ...event,
         isTask: false,
-        eventID: event.id,
         titleFunction: displayCal,
         start: new Date( moment( parseInt( event.startsAt ) )
           .valueOf() ),
         end: new Date( moment( parseInt( event.endsAt ) )
           .valueOf() ),
-      }
+      };
+      delete newEvent.task;
+      return newEvent;
     } )
   }
 

@@ -16,10 +16,10 @@ import CommandBar from '../../components/showData/commandBar';
 import ListHeader from '../../components/showData/listHeader';
 import {
   fromMomentToUnix,
-  timestampToString,
   timestampToDate,
   timestampToHoursAndMinutes,
-  updateArrayItem
+  updateArrayItem,
+  localFilterToValues,
 } from 'helperFunctions';
 
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
@@ -40,6 +40,11 @@ import {
   UPDATE_TASK,
   GET_CALENDAR_EVENTS,
 } from 'helpdesk/task/querries';
+
+import {
+  GET_FILTER,
+  GET_PROJECT,
+} from 'apollo/localSchema/querries';
 
 const localizer = momentLocalizer( moment );
 const formats = {
@@ -95,20 +100,33 @@ export default function TaskCalendar( props ) {
     originalProjectId,
   } = props;
 
-  console.log( allStatuses );
-
   const {
     data: currentUserData,
     loading: currentUserLoading
   } = useQuery( GET_MY_DATA );
 
+  const {
+    data: filterData,
+    loading: filterLoading
+  } = useQuery( GET_FILTER );
+
+
+  const {
+    data: projectData,
+    loading: projectLoading
+  } = useQuery( GET_PROJECT );
+
+  const localFilter = filterData.localFilter;
+  const localProject = projectData.localProject;
+
+  const [ addCalendarEvent ] = useMutation( ADD_CALENDAR_EVENT );
+  const [ deleteCalendarEvent ] = useMutation( DELETE_CALENDAR_EVENT );
+  const [ updateCalendarEvent ] = useMutation( UPDATE_CALENDAR_EVENT );
+  const [ updateTask ] = useMutation( UPDATE_TASK );
+
   const [ today, setToday ] = React.useState( moment() );
   const [ calendarLayout, setCalendarLayout ] = React.useState( 'month' );
 
-  //const [ addCalendarEvent ] = useMutation( ADD_CALENDAR_EVENT );
-  //const [ deleteCalendarEvent ] = useMutation( DELETE_CALENDAR_EVENT );
-  //  const [ updateCalendarEvent ] = useMutation( UPDATE_CALENDAR_EVENT );
-  //const [ updateTask ] = useMutation( UPDATE_TASK );
 
   const client = useApolloClient();
 
@@ -198,6 +216,44 @@ export default function TaskCalendar( props ) {
         }
       } )
       .then( ( response ) => {
+        console.log( client );
+        try {
+          const allCalendarEvents = client.readQuery( {
+              query: GET_CALENDAR_EVENTS,
+              variables: {
+                filter: localFilterToValues( localFilter ),
+                projectId: localProject.id
+              },
+            } )
+            .calendarEvents;
+
+          client.writeQuery( {
+            query: GET_CALENDAR_EVENTS,
+            data: {
+              calendarEvents: allCalendarEvents.map( event =>
+                ( event.id !== id ? event : {
+                  ...event,
+                  ...updateData
+                } )
+              )
+            }
+          } );
+        } catch ( e ) {
+          console.log( e.message );
+        }
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+  }
+
+  const addCalendarEventFunc = ( addData ) => {
+    addCalendarEvent( {
+        variables: {
+          ...addData,
+        }
+      } )
+      .then( ( response ) => {
         const allCalendarEvents = client.readQuery( {
             query: GET_CALENDAR_EVENTS
           } )
@@ -205,12 +261,10 @@ export default function TaskCalendar( props ) {
         client.writeQuery( {
           query: GET_CALENDAR_EVENTS,
           data: {
-            calendarEvents: allCalendarEvents.map( event =>
-              ( event.id !== id ? event : {
-                ...event,
-                ...updateData
-              } )
-            )
+            calendarEvents: [ ...allCalendarEvents, {
+              ...response.data.addCalendarEvent,
+              __typename: 'CalendarEvent'
+                  } ]
           }
         } );
       } )
@@ -219,53 +273,27 @@ export default function TaskCalendar( props ) {
       } );
   }
 
-  const addCalendarEventFunc = ( addData ) => {
-    /*     addCalendarEvent( {
-              variables: {
-                ...addData,
-              }
-            } )
-            .then( ( response ) => {
-              const allCalendarEvents = client.readQuery( {
-                  query: GET_CALENDAR_EVENTS
-                } )
-                .calendarEvents;
-              client.writeQuery( {
-                query: GET_CALENDAR_EVENTS,
-                data: {
-                  calendarEvents: [ ...allCalendarEvents, {
-                    ...response.data.addCalendarEvent,
-                    __typename: 'CalendarEvent'
-                  } ]
-                }
-              } );
-            } )
-            .catch( ( err ) => {
-              console.log( err.message );
-            } );*/
-  }
-
   const deleteCalendarEventFunc = ( id ) => {
-    /*    deleteCalendarEvent( {
-            variables: {
-              id
-            }
+    deleteCalendarEvent( {
+        variables: {
+          id
+        }
+      } )
+      .then( ( response ) => {
+        const allCalendarEvents = client.readQuery( {
+            query: GET_CALENDAR_EVENTS
           } )
-          .then( ( response ) => {
-            const allCalendarEvents = client.readQuery( {
-                query: GET_CALENDAR_EVENTS
-              } )
-              .calendarEvents;
-            client.writeQuery( {
-              query: GET_CALENDAR_EVENTS,
-              data: {
-                calendarEvents: allCalendarEvents.map(event => event.id !== id)
-              }
-            } );
-          } )
-          .catch( ( err ) => {
-            console.log( err.message );
-          } );*/
+          .calendarEvents;
+        client.writeQuery( {
+          query: GET_CALENDAR_EVENTS,
+          data: {
+            calendarEvents: allCalendarEvents.map( event => event.id !== id )
+          }
+        } );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
   }
 
   const onEventResize = ( item ) => {
@@ -277,13 +305,16 @@ export default function TaskCalendar( props ) {
 
     if ( calendarLayout === 'week' ) {
       if ( !item.event.isTask ) {
-        updateCalendarEventFunc( item.id, {
-          startsAt: item.start.getTime(),
-          endsAt: item.end.getTime(),
+        updateCalendarEventFunc( item.event.eventID, {
+          startsAt: item.start.getTime()
+            .toString(),
+          endsAt: item.end.getTime()
+            .toString(),
         } )
       } else if ( item.event.status.action === 'PendingDate' ) {
         updateTaskFunc( item.id, {
-          pendingDate: item.start.getTime(),
+          pendingDate: item.start.getTime()
+            .toString(),
         } );
       }
     }
@@ -295,19 +326,22 @@ export default function TaskCalendar( props ) {
   }
 
   const onEventDrop = ( item ) => {
+    console.log( item );
     const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
 
     if ( !canEdit ) {
       return;
     }
+
     //MOVING TASKS
     if ( ( item.isAllDay || calendarLayout === 'month' ) && item.event.isTask ) {
       if ( [ 'IsNew', 'IsOpen' ].includes( item.event.status.action ) ) {
         if ( getOnlyDaytime( item.start ) > getOnlyDaytime( new Date( moment()
             .valueOf() ) ) ) {
           //SET PENDING
-          updateTaskFunc( item.id, {
-            pendingDate: item.start.getTime(),
+          updateTaskFunc( item.event.id, {
+            pendingDate: item.start.getTime()
+              .toString(),
             pendingChange: true,
             status: allStatuses.find( ( status ) => status.action === 'PendingDate' )
               .id
@@ -315,22 +349,25 @@ export default function TaskCalendar( props ) {
         } else if ( getOnlyDaytime( item.start ) < getOnlyDaytime( new Date( moment()
             .valueOf() ) ) && statusesLoaded ) {
           //SET CLOSED
-          updateTaskFunc( item.id, {
-            closeDate: item.start.getTime(),
+          updateTaskFunc( item.event.id, {
+            closeDate: item.start.getTime()
+              .toString(),
             status: allStatuses.find( ( status ) => status.action === 'CloseDate' || status.action === 'CloseInvalid' )
               .id
           } );
         }
-      } else if ( item.event.status.action === 'close' ) {
+      } else if ( item.event.status.action === 'CloseDate' || item.event.status.action === 'CloseInvalid' ) {
         //UPDATE CLOSE DATE
-        updateTaskFunc( item.id, {
-          closeDate: item.start.getTime(),
+        updateTaskFunc( item.event.id, {
+          closeDate: item.start.getTime()
+            .toString(),
         } );
       } else if ( item.event.status.action === 'PendingDate' && getOnlyDaytime( item.start ) >= getOnlyDaytime( new Date( moment()
           .valueOf() ) ) ) {
         // UPDATE PENDING DATE
-        updateTaskFunc( item.id, {
-          pendingDate: item.start.getTime(),
+        updateTaskFunc( item.event.id, {
+          pendingDate: item.start.getTime()
+            .toString(),
         } );
       }
       return;
@@ -341,10 +378,12 @@ export default function TaskCalendar( props ) {
       if ( item.event.isTask ) {
         let newEvent = {
           task: item.event.id,
-          startsAt: item.start.getTime(),
+          startsAt: item.start.getTime()
+            .toString(),
           endsAt: fromMomentToUnix( moment( item.start )
               .add( 1, 'hours' ) )
-            .valueOf(),
+            .valueOf()
+            .toString(),
         }
         if ( [ 'IsNew', 'IsOpen' ].includes( item.event.status.action ) ) {
           //if new it will be open
@@ -357,10 +396,13 @@ export default function TaskCalendar( props ) {
         }
         addCalendarEventFunc( newEvent );
       } else {
+        console.log( "HI", item );
         //UPDATE EVENT
-        updateCalendarEventFunc( item.id, {
-          startsAt: item.start.getTime(),
-          endsAt: item.end.getTime(),
+        updateCalendarEventFunc( item.event.eventID, {
+          startsAt: item.start.getTime()
+            .toString(),
+          endsAt: item.end.getTime()
+            .toString(),
         } );
       }
     }
@@ -368,6 +410,7 @@ export default function TaskCalendar( props ) {
 
 
   const onEventDropTASKS = ( item ) => {
+    console.log( item );
     const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
 
     if ( !canEdit ) {
@@ -384,7 +427,8 @@ export default function TaskCalendar( props ) {
               deleteCalendarEventFunc( event.eventID )
             } );
           updateTaskFunc( item.event.id, {
-            pendingDate: item.start.getTime(),
+            pendingDate: item.start.getTime()
+              .toString(),
             pendingChangeable: true,
             status: allStatuses.find( ( status ) => status.action === 'PendingDate' )
               .id
@@ -392,7 +436,8 @@ export default function TaskCalendar( props ) {
         } else if ( getOnlyDaytime( item.start ) < getOnlyDaytime( new Date( moment()
             .valueOf() ) ) && statusesLoaded ) {
           updateTaskFunc( item.event.id, {
-            closeDate: item.start.getTime(),
+            closeDate: item.start.getTime()
+              .toString(),
             status: allStatuses.find( ( status ) => status.action === 'CloseDate' || status.action === 'CloseInvalid' )
               .id
           } );
@@ -400,11 +445,13 @@ export default function TaskCalendar( props ) {
       } else if ( item.event.status.action === 'CloseDate' || item.event.status.action === 'CloseInvalid' ) {
         updateTaskFunc( item.event.id, {
           closeDate: item.start.getTime()
+            .toString()
         } );
       } else if ( item.event.status.action === 'PendingDate' && getOnlyDaytime( item.start ) >= getOnlyDaytime( new Date( moment()
           .valueOf() ) ) ) {
         updateTaskFunc( item.event.id, {
-          pendingDate: item.start.getTime(),
+          pendingDate: item.start.getTime()
+            .toString(),
         } );
       }
       return false;
@@ -418,8 +465,10 @@ export default function TaskCalendar( props ) {
       if ( item.event.isTask ) {
         let newEvent = {
           task: item.event.id,
-          start: item.start.getTime(),
-          end: item.end.getTime(),
+          start: item.start.getTime()
+            .toString(),
+          end: item.end.getTime()
+            .toString(),
         }
         //if in fucture, set as PENDING
         if ( [ 'IsNew', 'IsOpen' ].includes( item.event.status.action ) && getOnlyDaytime( item.start ) > getOnlyDaytime( new Date( moment()
@@ -430,7 +479,8 @@ export default function TaskCalendar( props ) {
             } );
 
           updateTaskFunc( item.event.id, {
-            pendingDate: item.start.getTime(),
+            pendingDate: item.start.getTime()
+              .toString(),
             pendingChangeable: true,
             status: allStatuses.find( ( status ) => status.action === 'PendingDate' )
               .id
@@ -447,15 +497,18 @@ export default function TaskCalendar( props ) {
           } );
         } else if ( item.event.status.action === 'PendingDate' ) {
           updateTaskFunc( item.event.id, {
-            pendingDate: item.start.getTime(),
+            pendingDate: item.start.getTime()
+              .toString(),
           } );
         } else {
           addCalendarEventFunc( newEvent );
         }
       } else { //if EVENT
         updateCalendarEventFunc( item.event.eventID, {
-          startsAt: item.start.getTime(),
+          startsAt: item.start.getTime()
+            .toString(),
           endsAt: item.end.getTime()
+            .toString()
         } );
       }
     }
@@ -474,49 +527,51 @@ export default function TaskCalendar( props ) {
     return ( <Edit match={match} columns={true} history={history} /> );
   }
 
+  console.log( events );
+
   return (
     <div>
-  			<CommandBar { ...commandBar } />
-  			<div className="full-width scroll-visible fit-with-header-and-commandbar task-container p-20">
-  				<ListHeader
-            { ...commandBar }
-            listName={ listName }
-            statuses={currentUserData.getMyData.statuses}
-            setStatuses={setUserFilterStatuses}
-            allStatuses={allStatuses}
-            />
-  				<DnDCalendar
-  					events = { events }
-            defaultDate = { new Date( moment().valueOf() ) }
-            defaultView = { calendarLayout }
-  					style = {{ height: "100vh" }}
-  					views={['month', 'week']}
-  					drilldownView="day"
-            localizer = { localizer }
-            resizable
-  					popup={true}
-  					formats={formats}
+      <CommandBar { ...commandBar } />
+      <div className="full-width scroll-visible fit-with-header-and-commandbar task-container p-20">
+        <ListHeader
+          { ...commandBar }
+          listName={ listName }
+          statuses={currentUserData.getMyData.statuses}
+          setStatuses={setUserFilterStatuses}
+          allStatuses={allStatuses}
+          />
+        <DnDCalendar
+          events = { events }
+          defaultDate = { new Date( moment().valueOf() ) }
+          defaultView = { calendarLayout }
+          style = {{ height: "100vh" }}
+          views={['month', 'week']}
+          drilldownView="day"
+          localizer = { localizer }
+          resizable
+          popup={true}
+          formats={formats}
 
-            min={
-              new Date(
-                today.get('year'),
-                today.get('month'),
-                today.get('date'),
-                8
-              )
-            }
+          min={
+            new Date(
+              today.get('year'),
+              today.get('month'),
+              today.get('date'),
+              8
+            )
+          }
 
-  					onEventDrop = { onEventDrop }
-  					onEventResize = { onEventResize }
+          onEventDrop = { onEventDrop }
+          onEventResize = { onEventResize }
 
-  					onDoubleClickEvent={(event)=>{
-  						history.push(link+'/'+event.id);
-  					}}
-  					onView={(viewType)=>{
-  						setCalendarLayout(viewType);
-  					}}
-            />
-  			</div>
+          onDoubleClickEvent={(event)=>{
+            history.push(link+'/'+event.id);
+          }}
+          onView={(viewType)=>{
+            setCalendarLayout(viewType);
+          }}
+          />
       </div>
+    </div>
   );
 }
