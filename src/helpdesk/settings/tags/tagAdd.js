@@ -86,7 +86,11 @@ export default function TagAdd( props ) {
           onChangeComplete={value => setColor( value.hex )}
           />
 
-        <Button className="btn m-t-5"  disabled={saving} onClick={addTagFunc}>{saving?'Adding...':'Add tag'}</Button>
+        <div className="row">
+          <Button className="btn m-t-5 ml-auto"  disabled={saving} onClick={addTagFunc}>
+            {saving?'Adding...':'Add tag'}
+          </Button>
+        </div>
       </div>
   );
 }

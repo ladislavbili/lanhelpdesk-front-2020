@@ -735,7 +735,14 @@ export default function CompanyEdit( props ) {
 
           {newData &&
             <Button
-              className="btn m-r-5"
+              className="btn-link"
+              disabled={saving}
+              onClick={cancel}>Cancel changes</Button>
+          }
+          <Button className="btn-red" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</Button>
+          {newData &&
+            <Button
+              className="btn m-r-5 ml-auto"
               disabled={ cannotSave }
               onClick={()=>{
                 if (pricelist.value === "0" && pricelistName !== ""){
@@ -745,14 +752,7 @@ export default function CompanyEdit( props ) {
                 }
             }}>{saving?'Saving...':'Save changes'}</Button>
           }
-           <Button className="btn-red" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</Button>
 
-          {newData &&
-            <Button
-              className="btn-link"
-              disabled={saving}
-              onClick={cancel}>Cancel changes</Button>
-          }
         </div>
         <DeleteReplacement
           isOpen={deleteOpen}

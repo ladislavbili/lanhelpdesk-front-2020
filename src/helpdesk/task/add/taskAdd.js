@@ -587,6 +587,8 @@ export default function TaskAdd( props ) {
   					setRepeat(null);
   					}}
   					columns={true}
+            vertical={false}
+            addTask={true}
   					/>
         }
 					{!viewOnly &&
@@ -876,6 +878,8 @@ export default function TaskAdd( props ) {
 					setRepeat(null);
 					}}
 					columns={true}
+          addTask={true}
+          vertical={true}
 					/>}
 
 			{!viewOnly &&
@@ -902,23 +906,17 @@ export default function TaskAdd( props ) {
     return (
       <div>
 				<Label className="m-b-10 col-form-label m-t-10">Popis úlohy</Label>
-					{!descriptionVisible &&
-						<span className="task-edit-popis p-20 text-muted" onClick={()=>setDescriptionVisible(true)}>
-							Napíšte krátky popis úlohy
-						</span>}
-					{descriptionVisible &&
-						<CKEditor5
-							editor={ ClassicEditor }
-							data={description}
-							onInit={(editor)=>{
-							}}
-							onChange={(e, editor)=>{
-								setDescription(editor.getData());
-							}}
-							readOnly={viewOnly}
-							config={ck5config}
-							/>
-					}
+        <CKEditor5
+          editor={ ClassicEditor }
+          data={description}
+          onInit={(editor)=>{
+          }}
+          onChange={(e, editor)=>{
+            setDescription(editor.getData());
+          }}
+          readOnly={viewOnly}
+          config={ck5config}
+          />
 		</div>
     )
   }

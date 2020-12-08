@@ -297,7 +297,7 @@ export default function PausalEdit( props ) {
          />
 
        <Button
-         className="btn m-r-5"
+         className="btn ml-auto m-r-5"
          disabled={ cannotSave }
          onClick={()=>{
            if (pricelist.value === "0" && pricelistName !== ""){

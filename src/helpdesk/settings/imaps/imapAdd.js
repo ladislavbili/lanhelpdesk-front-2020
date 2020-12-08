@@ -263,7 +263,9 @@ export default function IMAPAdd( props ) {
           />
       </FormGroup>
 
-      <Button className="btn" disabled={cannotSave} onClick={addIMAPFunc}>{saving?'Adding...':'Add Imap'}</Button>
+      <div className="row">
+        <Button className="btn ml-auto" disabled={cannotSave} onClick={addIMAPFunc}>{saving?'Adding...':'Add Imap'}</Button>
+      </div>
     </div>
   );
 }

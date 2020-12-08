@@ -261,15 +261,15 @@ export default function MilestoneEdit( props ) {
           </ModalBody>
 
           <ModalFooter>
-            <Button className="btn-link mr-auto" disabled={saving} onClick={toggle}>
+            <Button className="btn-link" disabled={saving} onClick={toggle}>
               Close
             </Button>
 
-            <Button className="ml-auto btn-danger" disabled={saving} onClick={deleteMilestoneFunc}>
+            <Button className="btn-danger" disabled={saving} onClick={deleteMilestoneFunc}>
               Delete
             </Button>
 
-            <Button className="btn"
+            <Button className="btn ml-auto"
               disabled={ saving || title === "" }
               onClick={updateMilestoneFunc}>
               {saving?'Saving...':'Save milestone'}

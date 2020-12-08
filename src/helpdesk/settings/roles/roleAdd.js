@@ -286,16 +286,24 @@ export default function RoleAdd( props ) {
       </table>
     </div>
 
-    <Button className="btn" disabled={currentUserLevel === null || currentUserLevel >= level} onClick={addRoleFunc}>{
-        saving
+    <div className="row">
+      {
+        props.close &&
+        <Button className="btn-link" onClick={() => {
+            props.close()
+          }}
+          >
+          Cancel
+        </Button>
+      }
+
+      <Button className="btn ml-auto" disabled={currentUserLevel === null || currentUserLevel >= level} onClick={addRoleFunc}>
+        {
+          saving
           ? 'Adding...'
           : 'Add role'
-      }</Button>
-
-    {
-      props.close && <Button className="btn-link" onClick={() => {
-            props.close()
-          }}>Cancel</Button>
-    }
+        }
+      </Button>
+    </div>
   </div> );
 }

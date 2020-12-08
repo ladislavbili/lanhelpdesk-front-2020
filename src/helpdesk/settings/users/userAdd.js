@@ -241,22 +241,23 @@ export default function UserAddContainer( props ) {
             />
         </FormGroup>
 
-        <Button
-          className="btn"
-          disabled={ cannotAddUser() }
-          onClick={ addUserFunc }
-          >
-          { saving ? 'Adding...' : 'Add user' }
-        </Button>
-
-        {closeModal &&
+        <div className="row">
+          {closeModal &&
+            <Button
+              className="btn-link"
+              onClick={ closeModal }
+              >
+              Cancel
+            </Button>
+          }
           <Button
-            className="btn-link ml-auto"
-            onClick={ closeModal }
+            className="btn ml-auto"
+            disabled={ cannotAddUser() }
+            onClick={ addUserFunc }
             >
-            Cancel
+            { saving ? 'Adding...' : 'Add user' }
           </Button>
-        }
+        </div>
     </div>
   )
 }

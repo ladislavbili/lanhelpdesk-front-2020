@@ -72,7 +72,11 @@ export default function TripTypeAdd( props ) {
         <Label for="order">Order</Label>
         <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
       </FormGroup>
-      <Button className="btn" disabled={saving} onClick={addTripTypeFunc}>{saving?'Adding...':'Add trip type'}</Button>
+      <div className="row">
+        <Button className="btn ml-auto" disabled={saving} onClick={addTripTypeFunc}>
+          {saving?'Adding...':'Add trip type'}
+        </Button>
+      </div>
   </div>
   )
 }

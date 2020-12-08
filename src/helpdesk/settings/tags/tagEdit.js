@@ -135,8 +135,8 @@ export default function TagEdit( props ) {
           />
 
         <div className="row">
-          <Button className="btn m-t-5"  disabled={saving} onClick={updateTagFunc}>{saving?'Saving tag...':'Save tag'}</Button>
           <Button className="btn-red m-l-5 m-t-5"  disabled={saving} onClick={deleteTagFunc}>Delete</Button>
+          <Button className="btn m-t-5 ml-auto"  disabled={saving} onClick={updateTagFunc}>{saving?'Saving tag...':'Save tag'}</Button>
         </div>
       </div>
   );

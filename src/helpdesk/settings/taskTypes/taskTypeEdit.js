@@ -132,7 +132,6 @@ export default function TaskTypeEdit( props ) {
       </FormGroup>
 
       <div className="row">
-        <Button className="btn" disabled={saving} onClick={updateTaskTypeFunc}>{saving?'Saving task type...':'Save task type'}</Button>
         <Button
           className="btn-red m-l-5"
           disabled={saving || theOnlyOneLeft}
@@ -140,6 +139,7 @@ export default function TaskTypeEdit( props ) {
           >
           Delete
         </Button>
+        <Button className="btn ml-auto" disabled={saving} onClick={updateTaskTypeFunc}>{saving?'Saving task type...':'Save task type'}</Button>
       </div>
       <DeleteReplacement
         isOpen={deleteOpen}
