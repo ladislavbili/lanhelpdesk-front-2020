@@ -23,6 +23,10 @@
 .comments>.tab-content>.tab-pane:active{
   display: block;
 }*/
+
+.col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9 {
+    float: none !important;
+}
 .error-style{
   color: #ff1919;
   padding: 2px 10px;
@@ -112,7 +116,7 @@
 
 body{
   font-family: $main-font;
-  background: #F6F6F6;
+  background: $main-background-color;
   font-size: $main-font-size;
   color: $main-font-color;
 }
@@ -125,10 +129,15 @@ body{
 }
 
 .main{
-  background-color: white;
+  background-color: #F9F9F9;
   width: calc( 100% - #{$sidebar-width} - 2px );
 }
 
+/*
+#root{
+  width: fit-content;
+}
+*/
 //-------------------overflow----------------------
 html{
 	overflow-y: hidden;
@@ -291,6 +300,10 @@ html{
 }
 .position-inherit{
   position: inherit;
+}
+
+.make-space-30-r{
+  width: calc( 100% - 30px )
 }
 
 .m-r--40{
@@ -532,6 +545,10 @@ h4{
   height: $button-height;
   font-weight: 400;
   font-size: $main-font-size;
+}
+.btn-link-add:hover {
+  background-color: transparent !important;
+  color: #A0A0A0 !important;
 }
 
 .btn-link-add{
@@ -917,70 +934,8 @@ tr:last-child{
   border: 1px solid red;
 }
 
-.task-edit-right{
-  width: 300px;
-  padding: 20px 20px 20px 13px;
-  background-color: #F6F6F6;
-}
-
-.task-edit-left{
-  max-width: 1620px;
-  width: calc(100% - 300px) !important;
-}
-
-.task-edit-left-columns{
-  max-width: 1670px;
-  width: calc(100% - 250px) !important;
-}
-
-.task-edit-popis{
-  background-color: #f4f8fb;
-  padding: 20px 20px 0px 20px;
-}
-
-.task-edit-popis>div>p{
-  margin-bottom: 0px;
-}
-
-.task-add-right-half{
-  width: 220px;
-  padding-left: 20px;
-  height: 600px;
-}
-
-.task-add-left-half{
-  flex: 1;
-  padding-right: 20px;
-  border-right: 1px solid #EAEAEA;
-}
-
-.attachments{
-  background-color: #f4f8fb;
-  padding: 5px 20px 20px 20px;
-}
-
-.comment-attachment{
-  background-color: #EAEAEA;
-  padding: 2px 5px;
-//  display: inline;
-}.attachment{
-  background-color: #F2F1F1;
-  display: inline-block;
-  height: 21px;
-  color: black;
-  font-size:12px;
-  padding-left:3px;
-  margin-left:5px;
-}
-
-.attachment{
-  background-color: #F2F1F1;
-  display: inline-block;
-  height: 23px;
-  color: black;
-  font-size:12px;
-  padding-left:3px;
-  margin-left:5px;
+.highlight-form{
+  background-color: $form-highlighted-background;
 }
 
 .attachment-label{
@@ -1175,7 +1130,7 @@ tr:last-child{
   width: $sidebar-width;
   border: none;
   list-style-type: none;
-  background: #F6F6F6;
+  background: white;
   position: relative;
   top: inherit;
   z-index: 999;
@@ -1335,7 +1290,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .commandbar{
   display: flex;
   width: 100%;
-  background-color: #F6F6F6;
+  background-color: $main-background-color;
   padding: 0px 1px 0px 1px;
   height: 70px;
 }
@@ -1343,7 +1298,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .commandbar-small{
   display: flex;
   width: 100%;
-  background-color: #F6F6F6;
+  background-color: $main-background-color;
   padding: 0px 1px 0px 1px;
   height: 40px;
 }
@@ -1481,7 +1436,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 //---------------------TaskList----------------------
 .task-container{
-  background-color: #F6F6F6;
+  background-color: $form-background-color;
 }
 
 .task-container-col{
@@ -1545,7 +1500,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   background-color: white;
   font-family: $main-font;
   font-size: 14px;
-  text-transform: capitalize;
   color: #333 !important;
 }
 
@@ -1697,8 +1651,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .card-box-lanwiki{
   border: none;
   margin-bottom: 0px;
-  background-color: #ffffff;
-  background: white;
+  background-color: $form-background-color;
   border-radius: 0px;
 }
 
@@ -1720,6 +1673,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .dropdown-menu{
   min-width: auto;
+}
+
+.vykazyTable{
+  background-color: white;
 }
 
 .vykazyTable>.table{
@@ -1777,8 +1734,77 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .comments{
-  background-color: #FFF;
+  background-color: $form-background-color;
   padding: 10px 0px 10px 0px;
+}
+
+.task-edit-align-select-labels{
+  label{
+    padding-left: 8px;
+  }
+}
+
+.task-edit-width{
+  min-width: 1000px;
+}
+
+.task-edit-popis{
+  background-color: inherit;
+  padding: 20px 20px 0px 20px;
+}
+
+.task-edit-popis>div>p{
+  margin-bottom: 0px;
+}
+
+.task-add-right-half{
+  width: 220px;
+  padding-left: 20px;
+  height: 600px;
+}
+
+.task-add-left-half{
+  flex: 1;
+  padding-right: 20px;
+  border-right: 1px solid #EAEAEA;
+}
+
+
+.task-edit-right{
+  width: 250px;
+  margin: 55px 20px 45px 40px;
+  background-color: $secondary-form-background-color;
+}
+
+.task-edit-left{
+  max-width: 1620px;
+  width: calc(100% - 400px) !important;
+}
+
+.task-edit-left-columns{
+  max-width: 1670px;
+  width: calc(100% - 250px) !important;
+}
+
+.attachments{
+  background-color: inherit;
+  padding: 5px 20px 20px 20px;
+}
+
+.comment-attachment{
+  background-color: #EAEAEA;
+  padding: 2px 5px;
+//  display: inline;
+}
+
+.attachment{
+  background-color: #F2F1F1;
+  display: inline-block;
+  height: 21px;
+  color: black;
+  font-size:12px;
+  padding-left:3px;
+  margin-left:5px;
 }
 
 //-------------------END-taskEdit-------------------------
@@ -1975,6 +2001,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .rbc-time-content{
   overflow-y: visible;
+}
+
+.overflowX{
+  overflow-x: auto;
 }
 
 .noselect {

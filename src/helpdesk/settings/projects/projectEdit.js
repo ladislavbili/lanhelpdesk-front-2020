@@ -21,8 +21,8 @@ import {
   defBool,
   defItem
 } from 'configs/constants/projects';
-import Permissions from "helpdesk/components/projectPermissions";
-import ProjectDefaultValues from "helpdesk/components/projects/defaultValues";
+import Permissions from "./projectPermissions";
+import ProjectDefaultValues from "./defaultValues";
 import DeleteReplacement from 'components/deleteReplacement';
 import Loading from 'components/loading';
 import {
@@ -59,6 +59,7 @@ export default function ProjectEdit( props ) {
     history,
     match,
     closeModal,
+    projectDeleted,
     projectID
   } = props;
 
@@ -105,11 +106,11 @@ export default function ProjectEdit( props ) {
   } = useQuery( GET_TASK_TYPES, fetchNetOptions );
 
   let allProjects = [];
-  if ( projectID ) {
-    toSelArr( client.readQuery( {
+  if ( closeModal ) {
+    allProjects = toSelArr( client.readQuery( {
         query: GET_MY_PROJECTS
       } )
-      .myProjects );
+      .myProjects.map( ( projectData ) => projectData.project ) );
 
   } else {
     allProjects = toSelArr( client.readQuery( {
@@ -358,7 +359,7 @@ export default function ProjectEdit( props ) {
 
   const deleteProjectFunc = ( replacement ) => {
     setDeleteOpen( false );
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( "Deleting a project deletes all tasks in the project. Do you still want to delete the project?" ) ) {
       deleteProject( {
           variables: {
             id,
@@ -420,7 +421,6 @@ export default function ProjectEdit( props ) {
   let canReadUserIDs = projectRights.map( ( permission ) => permission.user.id );
   let canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
     .filter( ( user ) => canReadUserIDs.includes( user.id ) );
-
   return (
     <div className="p-20 fit-with-header-and-commandbar scroll-visible">
       <FormGroup>

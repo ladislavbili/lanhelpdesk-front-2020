@@ -23,35 +23,16 @@ import {
 } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
+import classnames from "classnames";
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-import Attachments from 'helpdesk/components/attachments';
-import Comments from 'helpdesk/components/comments';
-import Repeat from 'helpdesk/components/repeat';
-import TaskHistory from 'helpdesk/components/taskHistory';
-import VykazyTable from 'helpdesk/components/vykazyTable';
-import UserAdd from 'helpdesk/settings/users/userAdd';
-import CompanyAdd from 'helpdesk/settings/companies/companyAdd';
-import PendingPicker from 'helpdesk/components/pendingPicker';
-
-import TaskAdd from '../add';
-import TaskPrint from './taskPrint';
-import classnames from "classnames";
 import ck5config from 'configs/components/ck5config';
 import {
   intervals
 } from 'configs/constants/repeat';
 
 import datePickerConfig from 'configs/components/datepicker';
-import {
-  toSelArr,
-  toSelItem,
-  timestampToString,
-  orderArr,
-  updateArrayItem,
-  toFloatOrZero
-} from 'helperFunctions';
 import {
   invisibleSelectStyleNoArrow,
   invisibleSelectStyleNoArrowColored,
@@ -65,6 +46,31 @@ import {
 import {
   noDef
 } from 'configs/constants/projects';
+
+import Attachments from 'helpdesk/components/attachments';
+import Comments from 'helpdesk/components/comments';
+import Repeat from 'helpdesk/components/repeat';
+import TaskHistory from 'helpdesk/components/taskHistory';
+import VykazyTable, {
+  getCreationError as getVykazyError
+} from 'helpdesk/components/vykazyTable';
+import CheckboxList from 'helpdesk/components/checkboxList';
+import Scheduled from 'helpdesk/components/scheduled';
+import TaskAdd from '../add';
+import TaskPrint from './taskPrint';
+
+import PendingPicker from 'helpdesk/components/pendingPicker';
+import UserAdd from 'helpdesk/settings/users/userAdd';
+import CompanyAdd from 'helpdesk/settings/companies/companyAdd';
+
+import {
+  toSelArr,
+  toSelItem,
+  timestampToString,
+  orderArr,
+  updateArrayItem,
+  toFloatOrZero
+} from 'helperFunctions';
 import {
   UPDATE_TASK,
   UPDATE_INVOICED_TASK,
@@ -121,6 +127,23 @@ const invoicedAttributes = {
   ],
 }
 let fakeID = -1;
+const defaultCheckboxList = [
+  {
+    id: 1,
+    title: 'Test item 1',
+    done: false,
+  },
+  {
+    id: 2,
+    title: 'Test item 2',
+    done: true,
+  },
+  {
+    id: 3,
+    title: 'Test item 3',
+    done: false,
+  },
+]
 
 export default function TaskEdit( props ) {
   const client = useApolloClient();
@@ -207,6 +230,9 @@ export default function TaskEdit( props ) {
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
   const [ updateTask ] = useMutation( UPDATE_TASK );
   const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
+
+  const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( defaultCheckboxList );
+  const [ scheduled, setScheduled ] = React.useState( [] );
 
   const isInvoiced = task.status.action === 'Invoiced';
   const canEditInvoiced = accessRights.vykazy;
@@ -959,6 +985,17 @@ export default function TaskEdit( props ) {
     )
   }
 
+  const canCreateVykazyError = () => {
+    if ( getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company ) === '' ) {
+      return null;
+    }
+    return (
+      <div className="center-hor" style={{color: "#FF4500", height: "20px"}}>
+        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
+      </div>
+    )
+  }
+
   const renderTitle = () => {
     return (
       <div className="d-flex p-2">
@@ -1181,8 +1218,8 @@ export default function TaskEdit( props ) {
   const renderSelectsLayout1 = () => {
     return (
       <div>
-        <div className="col-lg-12">
-          <div className="col-lg-4">
+        <div className="col-12">
+          <div className="col-4">
             <div className="row p-r-10">
               <Label className="col-3 col-form-label">Projekt</Label>
               <div className="col-9">
@@ -1191,7 +1228,7 @@ export default function TaskEdit( props ) {
             </div>
           </div>
           { defaultFields.assignedTo.show &&
-            <div className="col-lg-8">
+            <div className="col-8">
               <div className="row p-r-10">
                 <Label className="col-1-5 col-form-label">Assigned</Label>
                 <div className="col-10-5">
@@ -1289,15 +1326,49 @@ export default function TaskEdit( props ) {
     )
   }
 
-  const renderSelectsLayout2 = () => {
+  const renderSelectsLayout2Form = () => {
+    return (
+      <div className="col-12 row task-edit-align-select-labels">
+        <div className="col-2" >
+          <Label className="col-form-label">Status</Label>
+          { layoutComponents.Status }
+        </div>
+
+        <div className="col-2">
+          <Label className="col-form-label">Projekt</Label>
+          { layoutComponents.Project }
+        </div>
+
+        <div className="col-2">
+          <Label className="col-form-label">Milestone</Label>
+          { layoutComponents.Milestone }
+        </div>
+        { defaultFields.requester.show &&
+          <div className="col-2">
+            <Label className="col-form-label">Zadal</Label>
+            { layoutComponents.Requester }
+          </div>
+        }
+        { defaultFields.company.show &&
+          <div className="col-2">
+            <Label className="col-form-label">Firma</Label>
+            { layoutComponents.Company }
+          </div>
+        }
+        { defaultFields.taskType.show &&
+          <div className="col-2">
+            <Label className="col-form-label">Typ</Label>
+            { layoutComponents.Type }
+          </div>
+        }
+
+      </div>
+    )
+  }
+
+  const renderSelectsLayout2Side = () => {
     return (
       <div className={"task-edit-right" + (columns ? " w-250px" : "")} >
-        <div>
-          <Label className="col-form-label-2">Projekt</Label>
-          <div className="col-form-value-2">
-            {layoutComponents.Project}
-          </div>
-        </div>
         { defaultFields.assignedTo.show &&
           <div>
             <Label className="col-form-label-2">Assigned</Label>
@@ -1306,66 +1377,14 @@ export default function TaskEdit( props ) {
             </div>
           </div>
         }
-        { defaultFields.status.show &&
-          <div>
-            <Label className="col-form-label-2">Status</Label>
-            <div className="col-form-value-2">
-              {layoutComponents.Status}
-            </div>
-          </div>
-        }
-        { defaultFields.taskType.show &&
-          <div>
-            <Label className="col-form-label-2">Typ</Label>
-            <div className="col-form-value-2">
-              {layoutComponents.Type}
-            </div>
-          </div>
-        }
-        <div>
-          <Label className="col-form-label-2">Milestone</Label>
-          <div className="col-form-value-2">
-            {layoutComponents.Milestone}
-          </div>
-        </div>
-        { defaultFields.tag.show &&
-          <div style={{maxWidth:"250px"}}>
-            <Label className="col-form-label-2">Tagy: </Label>
-            <div className="col-form-value-2">
-              {layoutComponents.Tags}
-            </div>
-          </div>
-        }
-        { defaultFields.requester.show &&
-          <div>
-            <Label className="col-form-label-2">Zadal</Label>
-            <div className="col-form-value-2">
-              {layoutComponents.Requester}
-            </div>
-          </div>
-        }
-        { defaultFields.company.show &&
-          <div>
-            <Label className="col-form-label-2">Firma</Label>
-            <div className="col-form-value-2">
-              {layoutComponents.Company}
-            </div>
-          </div>
-        }
-        {	defaultFields.pausal.show &&
-          <div>
-            <label className="col-form-label m-l-7">Paušál</label>
-            <div className="col-form-value-2">
-              {layoutComponents.Pausal}
-            </div>
-          </div>
-        }
+
         <div>
           <Label className="col-form-label m-l-7">Deadline</Label>
           <div className="col-form-value-2" style={{marginLeft: "-1px"}}>
             {layoutComponents.Deadline}
           </div>
         </div>
+
         <Repeat
           disabled={viewOnly}
           taskID={id}
@@ -1386,6 +1405,60 @@ export default function TaskEdit( props ) {
           }}
           vertical={true}
           />
+
+        <Scheduled
+          items={scheduled}
+          users={assignedTos}
+          disabled={false}
+          onChange={(item) => {
+            let newScheduled = [...scheduled];
+            newScheduled[newScheduled.findIndex((item2) => item2.id === item.id )] = item;
+            setScheduled(newScheduled);
+          }}
+          submitItem = { (newScheduled) => {
+            setScheduled([
+              ...scheduled,
+              {
+                ...newScheduled,
+                id: fakeID--,
+              }
+            ])
+          }}
+          deleteItem = { (newScheduled) => {
+            setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
+          } }
+          />
+
+        <Label className="col-form-label m-l-7">Attachments</Label>
+        { renderAttachments(true) }
+
+        { defaultFields.tag.show &&
+          <div style={{maxWidth:"250px"}}>
+            <Label className="col-form-label-2">Tagy: </Label>
+            <div className="col-form-value-2">
+              <Select
+                placeholder="Zvoľte tagy"
+                value={tags}
+                isMulti
+                onChange={(tags)=> {
+                  setTags(tags);
+                  autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
+                }}
+                options={allTags}
+                isDisabled={defaultFields.tag.fixed||viewOnly}
+                styles={invisibleSelectStyleNoArrowColored}
+                />
+            </div>
+          </div>
+        }
+        {	defaultFields.pausal.show &&
+          <div>
+            <label className="col-form-label m-l-7">Paušál</label>
+            <div className="col-form-value-2">
+              {layoutComponents.Pausal}
+            </div>
+          </div>
+        }
         {	defaultFields.overtime.show &&
           <div>
             <label className="col-form-label-2">Mimo PH</label>
@@ -1432,14 +1505,14 @@ export default function TaskEdit( props ) {
       }
     } else {
       if ( showDescription ) {
-        RenderDescription = <div onClick={()=> setShowDescription(true)}>
+        RenderDescription = <div>
           <CKEditor
             editor={ ClassicEditor }
             data={description}
-            onBlur={() => { autoUpdateTask({ description  }) }}
             onInit={(editor) => {
               editor.editing.view.document.on( 'keydown', ( evt, data ) => {
                 if ( data.keyCode === 27 ) {
+                  autoUpdateTask({ description  });
                   setShowDescription(false);
                   data.preventDefault();
                   evt.stop();
@@ -1453,16 +1526,29 @@ export default function TaskEdit( props ) {
             />
         </div>
       } else {
-        RenderDescription = <div className="clickable task-edit-popis" onClick={()=>setShowDescription(true)}>
+        RenderDescription = <div className="task-edit-popis">
           <div dangerouslySetInnerHTML={{__html:description }} />
-          <span className="text-highlight"> <i	className="fas fa-pen"/> edit </span>
         </div>
       }
     }
     return (
       <div style={{zIndex: "9999"}}>
         <div>
-          <Label className="col-form-label m-t-10 m-r-20">Popis úlohy</Label>
+          <Label className="col-form-label m-t-10 m-r-20">
+            Popis úlohy
+            <button
+              className="btn btn-link-add waves-effect"
+              onClick={()=>{
+                if(showDescription){
+                  autoUpdateTask({ description  })
+                }
+                setShowDescription(!showDescription);
+              }}
+              >
+              <i className={`fa fa-${!showDescription ? 'pen' : 'save' } p-r-5`} />
+              { !showDescription ? 'edit' : 'save' }
+            </button>
+          </Label>
           { company && company.monthlyPausal &&
             <span> {`Pausal subtasks:`}
               <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
@@ -1481,11 +1567,41 @@ export default function TaskEdit( props ) {
     )
   }
 
-  const renderAttachments = () => {
+  const renderSimpleSubtasks = () => {
+    return (
+      <CheckboxList
+        disabled={false}
+        items={simpleSubtasks}
+        onChange={(simpleSubtask) => {
+          let newSimpleSubtasks = [...simpleSubtasks];
+          newSimpleSubtasks[newSimpleSubtasks.findIndex((simpleSubtask2) => simpleSubtask2.id === simpleSubtask.id )] = simpleSubtask;
+          setSimpleSubtasks(newSimpleSubtasks);
+        }}
+        submitItem = { (newSimpleSubtask) => {
+          setSimpleSubtasks([
+            ...simpleSubtasks,
+            {
+              ...newSimpleSubtask,
+              id: fakeID--,
+            }
+          ])
+        }}
+        deleteItem = { (simpleSubtask) => {
+          setSimpleSubtasks(simpleSubtasks.filter((simpleSubtask2) => simpleSubtask.id !== simpleSubtask2.id ))
+        } }
+        placeholder="Short subtask title"
+        newPlaceholder="New short subtask title"
+        label="Short subtask"
+        />
+    )
+  }
+
+  const renderAttachments = ( top ) => {
     return (
       <Attachments
         disabled={viewOnly}
         taskID={id}
+        top={top}
         attachments={task.taskAttachments}
         addAttachments={addAttachments}
         removeAttachment={removeAttachment}
@@ -1780,42 +1896,45 @@ export default function TaskEdit( props ) {
   }
 
   return (
-    <div className="flex">
-      { showDescription &&
-        <div
-          style={{backgroundColor: "transparent", width: "100%", height: "100%", position: "absolute"}}
-          onClick={()=>setShowDescription(false)}
-          />
-      }
+    <div
+      className={classnames(
+        {
+          'task-edit-width': !inModal
+        },
+        "flex"
+      )}
+      >
 
       { renderCommandbar() }
-
       <div
         className={classnames(
           {"fit-with-header-and-commandbar": !columns},
           {"fit-with-header-and-commandbar-3": columns},
-          "scroll-visible", "bkg-white",
-          { "row": layout === '2'}
+          "scroll-visible",
+          { "row": layout === 2}
         )}
         >
-        <div className={classnames(
+        <div
+          className={classnames(
             "card-box-lanwiki",
             {
-              "task-edit-left": layout === '2' && !columns,
-              "task-edit-left-columns": layout === '2' && columns
+              "task-edit-left": layout === 2 && !columns,
+              "task-edit-left-columns": layout === 2 && columns
             }
           )}
           >
 
-          <div className="p-t-20 p-l-30 p-r-30">
+          <div className="p-l-30 p-r-30">
             { renderTitle() }
 
             <hr className="m-t-5 m-b-5"/>
-            { layout === 1 && renderSelectsLayout1() }
-
+            {canCreateVykazyError()}
+            { layout === 1 ? renderSelectsLayout1() : renderSelectsLayout2Form() }
             { renderPopis() }
-
-            { renderAttachments() }
+            <div className="highlight-form">
+              { renderSimpleSubtasks() }
+              { layout === 1 && renderAttachments(false) }
+            </div>
 
             { layout === 1 && defaultFields.tag.show && renderTags() }
 
@@ -1834,7 +1953,7 @@ export default function TaskEdit( props ) {
 
         </div>
 
-        { layout === 2 && renderSelectsLayout2() }
+        { layout === 2 && renderSelectsLayout2Side() }
 
       </div>
     </div>
