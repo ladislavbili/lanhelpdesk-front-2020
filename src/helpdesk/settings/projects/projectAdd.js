@@ -20,9 +20,9 @@ import {
   defBool,
   defItem
 } from 'configs/constants/projects';
-import Permissions from "helpdesk/components/projectPermissions";
+import Permissions from "./projectPermissions";
+import ProjectDefaultValues from "./defaultValues";
 import Loading from 'components/loading';
-import ProjectDefaultValues from "helpdesk/components/projects/defaultValues";
 import {
   GET_BASIC_COMPANIES,
 } from '../companies/querries';

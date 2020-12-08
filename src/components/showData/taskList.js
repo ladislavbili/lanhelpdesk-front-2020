@@ -12,7 +12,7 @@ from 'reactstrap';
 import {
   getItemDisplayValue
 }
-from '../../helperFunctions';
+from 'helperFunctions';
 import CommandBar from './commandBar';
 import ListHeader from './listHeader';
 import Checkbox from '../checkbox';

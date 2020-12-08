@@ -28,11 +28,11 @@ export default class Attachments extends Component {
         console.log( response );
         /*
         window.open(
-          URL.createObjectURL(
-            new Blob( [ response.data ], {
-              type: attachment.mimetype
-            } )
-          )
+        URL.createObjectURL(
+        new Blob( [ response.data ], {
+        type: attachment.mimetype
+        } )
+        )
         );
         */
         //download
@@ -51,39 +51,51 @@ export default class Attachments extends Component {
     } = this.props;
     return (
       <div className="full-width attachments">
-        {!disabled &&
+        <input
+          type="file"
+          id={"uploadAttachment" + taskID}
+          multiple={true}
+          style={{display:'none'}}
+          onChange={(e)=>{
+            if(e.target.files.length>0){
+              let files = [...e.target.files];
+              addAttachments(files);
+            }
+          }}
+          />
+        { !disabled && !top &&
           <div className="attachment-label">
             <label htmlFor={"uploadAttachment"+taskID} className="btn-link-add" >
-              <i className="fa fa-plus" /> Add attachment
-              </label>
-              <input type="file" id={"uploadAttachment" + taskID} multiple={true} style={{display:'none'}}
-                onChange={(e)=>{
-                  if(e.target.files.length>0){
-                    let files = [...e.target.files];
-                    addAttachments(files);
-                  }
-                }}/>
-              </div>
+              <i className="fa fa-plus" />
+              Add attachment
+            </label>
+          </div>
+        }
+        { attachments.map((attachment,index)=>
+          <div key={index}  className="attachment">
+            <span key={attachment.id} className="comment-attachment link m-r-5" onClick={ () => this.getAttachment(attachment) }>
+              {`${attachment.filename} (${attachment.size/1000}kb)`}
+            </span>
+            {!disabled &&
+              <button className="btn-link-remove"
+                disabled={disabled}
+                onClick={()=>{
+                  removeAttachment(attachment);
+                }}>
+                <i className="fa fa-times"  />
+              </button>
             }
-            {
-              attachments.map((attachment,index)=>
-              <div key={index}  className="attachment">
-                <span key={attachment.id} className="comment-attachment link m-r-5" onClick={ () => this.getAttachment(attachment) }>
-                  {`${attachment.filename} (${attachment.size/1000}kb)`}
-                </span>
-                {!disabled &&
-                  <button className="btn-link-remove"
-                    disabled={disabled}
-                    onClick={()=>{
-                        removeAttachment(attachment);
-                    }}>
-                    <i className="fa fa-times"  />
-                  </button>
-                }
-              </div>
-            )
-          }
-        </div>
+          </div>
+        )}
+        { !disabled && top &&
+          <div className="attachment-label">
+            <label htmlFor={"uploadAttachment"+taskID} className="btn-link-add clickable" >
+              <i className="fa fa-plus" />
+              Add attachment
+            </label>
+          </div>
+        }
+      </div>
 
     );
   }

@@ -97,6 +97,11 @@ query {
   projects {
       title
       id
+      projectRights{
+        user{
+          id
+        }
+      }
   }
 }
 `;

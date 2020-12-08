@@ -116,37 +116,6 @@ export default function Rozpocet( props ) {
     setNewSubtaskType( defaultType )
   }, [ defaultType ] )
 
-  const getCreationError = () => {
-    let noType = newSubtaskType === null;
-    let noAssigned = newSubtaskAssigned === null;
-    let noCompany = company === null;
-    console.log();
-    if ( !noType && !noAssigned && !noCompany ) {
-      return ''
-    }
-    if ( noType && noAssigned && noCompany ) {
-      return 'First assign the task to someone, pick task type and company!';
-    }
-    if ( !noType && noAssigned && noCompany ) {
-      return 'First assign the task to someone and pick company!';
-    }
-    if ( !noType && !noAssigned && noCompany ) {
-      return 'First pick company!';
-    }
-    if ( !noType && noAssigned && !noCompany ) {
-      return 'First assign the task to someone!';
-    }
-    if ( noType && !noAssigned && noCompany ) {
-      return 'First pick task type and company!';
-    }
-    if ( noType && !noAssigned && !noCompany ) {
-      return 'First pick task type!';
-    }
-    if ( noType && noAssigned && !noCompany ) {
-      return 'First assign the task to someone and pick task type!';
-    }
-  }
-
   const onFocusWorkTrip = ( trip ) => {
     setEditedTripQuantity( trip.quantity );
     setEditedTripDiscount( trip.discount );
@@ -228,9 +197,6 @@ export default function Rozpocet( props ) {
   let sortedCustomItems = customItems.sort( ( customItem1, customItem2 ) => customItem1.order - customItem2.order );
   return (
     <div className="vykazyTable">
-      <div className="" style={{color: "#FF4500", height: "20px"}}>
-        {getCreationError()}
-      </div>
       <table className="table">
         <thead>
           <tr>
@@ -1617,75 +1583,109 @@ export default function Rozpocet( props ) {
                       setShowAddSubtask(true);
                     }}
                     >
-                    <i className="fa fa-plus" /> Práca
-                    </button>
-                  }
-                  {!showAddTrip && !showSubtasks &&
-                    <button className="btn"
-                      disabled={disabled}
-                      onClick={()=>{
-                        setShowAddTrip(true);
-                      }}
-                      >
-                      <i className="fa fa-plus" /> Výjazd
-                      </button>
-                    }
-                    {!showAddMaterial && !showSubtasks &&
-                      <button className="btn"
-                        disabled={disabled}
-                        onClick={()=>{
-                          setShowAddMaterial(true);
-                        }}
-                        >
-                        <i className="fa fa-plus" /> Materiál
-                        </button>
-                      }
-                      {!showAddCustomItem && !showSubtasks &&
-                        <button className="btn"
-                          disabled={disabled}
-                          onClick={()=>{
-                            setShowAddCustomItem(true);
-                          }}
-                          >
-                          <i className="fa fa-plus" /> Vlastná položka
-                          </button>
-                        }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-              {/* Statistics */}
-              {(workTrips.length + subtasks.length + materials.length + customItems.length > 0) &&
-                <div className="row">
-                  <div className="text-right ml-auto m-r-5">
-                    <b>Cena bez DPH: </b>
-                    {
-                      (
-                        subtasks.concat(workTrips).reduce((acc, cur)=> acc+(isNaN(getTotalPrice(cur))?0:getTotalPrice(cur)),0)
-                        + materials.reduce((acc, cur)=> acc+(isNaN(parseFloat(getDiscountedMaterialPrice(cur))) || isNaN(parseInt(cur.quantity)) ? 0 : parseFloat(getDiscountedMaterialPrice(cur))*parseInt(cur.quantity)),0)
-                        + customItems.reduce((acc, cur)=> acc+(isNaN(parseFloat(cur.price))||isNaN(parseInt(cur.quantity)) ? 0 : parseFloat(cur.price) * parseInt(cur.quantity)),0)
-                      ).toFixed(2)
-                    }
-                  </div>
-                  <div className="text-right m-r-5">
-                    <b>DPH: </b>
-                    {((getDPH()-1)*100).toFixed(2) + ' %' }
-                  </div>
-                  <div className="text-right">
-                    <b>Cena s DPH: </b>
-                    {
-                      (
-                        (
-                          subtasks.concat(workTrips).reduce((acc, cur)=> acc+(isNaN(getTotalPrice(cur))?0:getTotalPrice(cur)),0)
-                          + materials.reduce((acc, cur)=> acc+(isNaN(parseFloat(getDiscountedMaterialPrice(cur))) || isNaN(parseInt(cur.quantity)) ? 0 : parseFloat(getDiscountedMaterialPrice(cur))*parseInt(cur.quantity)),0)
-                          + customItems.reduce((acc, cur)=> acc+(isNaN(parseFloat(cur.price))||isNaN(parseInt(cur.quantity)) ? 0 : parseFloat(cur.price) * parseInt(cur.quantity)),0)
-                        )*getDPH()
-                      ).toFixed(2)
-                    }
-                  </div>
-                </div>
-              }
-            </div>
+                    <i className="fa fa-plus" />
+                    Práca
+                  </button>
+                }
+                {!showAddTrip && !showSubtasks &&
+                  <button className="btn"
+                    disabled={disabled}
+                    onClick={()=>{
+                      setShowAddTrip(true);
+                    }}
+                    >
+                    <i className="fa fa-plus" />
+                    Výjazd
+                  </button>
+                }
+                {!showAddMaterial && !showSubtasks &&
+                  <button className="btn"
+                    disabled={disabled}
+                    onClick={()=>{
+                      setShowAddMaterial(true);
+                    }}
+                    >
+                    <i className="fa fa-plus" />
+                    Materiál
+                  </button>
+                }
+                {!showAddCustomItem && !showSubtasks &&
+                  <button className="btn"
+                    disabled={disabled}
+                    onClick={()=>{
+                      setShowAddCustomItem(true);
+                    }}
+                    >
+                    <i className="fa fa-plus" />
+                    Vlastná položka
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      {/* Statistics */}
+      {(workTrips.length + subtasks.length + materials.length + customItems.length > 0) &&
+        <div className="row">
+          <div className="text-right ml-auto m-r-5">
+            <b>Cena bez DPH: </b>
+            {
+              (
+                subtasks.concat(workTrips).reduce((acc, cur)=> acc+(isNaN(getTotalPrice(cur))?0:getTotalPrice(cur)),0)
+                + materials.reduce((acc, cur)=> acc+(isNaN(parseFloat(getDiscountedMaterialPrice(cur))) || isNaN(parseInt(cur.quantity)) ? 0 : parseFloat(getDiscountedMaterialPrice(cur))*parseInt(cur.quantity)),0)
+                + customItems.reduce((acc, cur)=> acc+(isNaN(parseFloat(cur.price))||isNaN(parseInt(cur.quantity)) ? 0 : parseFloat(cur.price) * parseInt(cur.quantity)),0)
+              ).toFixed(2)
+            }
+          </div>
+          <div className="text-right m-r-5">
+            <b>DPH: </b>
+            {((getDPH()-1)*100).toFixed(2) + ' %' }
+          </div>
+          <div className="text-right">
+            <b>Cena s DPH: </b>
+            {
+              (
+                (
+                  subtasks.concat(workTrips).reduce((acc, cur)=> acc+(isNaN(getTotalPrice(cur))?0:getTotalPrice(cur)),0)
+                  + materials.reduce((acc, cur)=> acc+(isNaN(parseFloat(getDiscountedMaterialPrice(cur))) || isNaN(parseInt(cur.quantity)) ? 0 : parseFloat(getDiscountedMaterialPrice(cur))*parseInt(cur.quantity)),0)
+                  + customItems.reduce((acc, cur)=> acc+(isNaN(parseFloat(cur.price))||isNaN(parseInt(cur.quantity)) ? 0 : parseFloat(cur.price) * parseInt(cur.quantity)),0)
+                )*getDPH()
+              ).toFixed(2)
+            }
+          </div>
+        </div>
+      }
+    </div>
   );
+}
+
+export const getCreationError = ( newSubtaskType, newSubtaskAssigned, company ) => {
+  let noType = newSubtaskType === null;
+  let noAssigned = newSubtaskAssigned.length === 0;
+  let noCompany = company === null;
+  if ( !noType && !noAssigned && !noCompany ) {
+    return ''
+  }
+  if ( noType && noAssigned && noCompany ) {
+    return 'First assign the task to someone, pick task type and company!';
+  }
+  if ( !noType && noAssigned && noCompany ) {
+    return 'First assign the task to someone and pick company!';
+  }
+  if ( !noType && !noAssigned && noCompany ) {
+    return 'First pick company!';
+  }
+  if ( !noType && noAssigned && !noCompany ) {
+    return 'First assign the task to someone!';
+  }
+  if ( noType && !noAssigned && noCompany ) {
+    return 'First pick task type and company!';
+  }
+  if ( noType && !noAssigned && !noCompany ) {
+    return 'First pick task type!';
+  }
+  if ( noType && noAssigned && !noCompany ) {
+    return 'First assign the task to someone and pick task type!';
+  }
 }

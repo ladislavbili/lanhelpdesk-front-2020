@@ -229,6 +229,7 @@ export default function TasksSidebar( props ) {
 
       <TaskAdd
         history={history}
+        match={match}
         projectID={ projectData.localProject.id}
         />
       { activeTab !== 1 &&
@@ -259,10 +260,20 @@ export default function TasksSidebar( props ) {
           </div>
         </div>
       }
-
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0}>
           <Nav vertical>
+            <NavItem key='all' className="row full-width">
+              <span
+                className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
+                onClick={() => {
+                  setMilestone(allMilestones);
+                  setProject(dashboard);
+                  history.push(`/helpdesk/taskList/i/all`)
+                }}>
+                All tasks
+              </span>
+            </NavItem>
             {
               myFiltersData.myFilters.map((filter) => (
                 <NavItem key={filter.id} className="row full-width">

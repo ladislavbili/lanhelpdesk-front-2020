@@ -160,13 +160,12 @@ export default function TaskAddContainer( props ) {
 				</button>
 			}
 
-
 			<Modal isOpen={openAddTaskModal}  >
 					<ModalBody className="scrollable" >
             {  openAddTaskModal && !loading &&
 						   <TaskAdd {...props}
                  loading={loading}
-                 statuses={ toSelArr(statusesData.statuses) }
+                 statuses={ toSelArr(statusesData.statuses.filter((status) => !status.action.toLowerCase().includes('invoiced') )) }
                  projects={
                     toSelArr(projectsData.myProjects.map((myProject) => ({
                       ...myProject.project,
