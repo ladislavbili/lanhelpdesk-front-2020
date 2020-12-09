@@ -222,7 +222,11 @@ export default function PricelistAdd( props ) {
             </FormGroup>
           </div>
 
-          <Button className="btn" disabled={saving} onClick={addPricelistFunc}>{saving?'Saving prices...':'Save prices'}</Button>
+          <div className="row">
+            <Button className="btn ml-auto" disabled={saving} onClick={addPricelistFunc}>
+              {saving?'Saving prices...':'Save prices'}
+            </Button>
+          </div>
       </div>
   );
 }

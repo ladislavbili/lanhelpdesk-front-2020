@@ -172,8 +172,8 @@ export default function StatusEdit( props ) {
         />
 
       <div className="row">
-        <Button className="btn m-t-5" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</Button>
         {action.value!=='Invoiced' && <Button className="btn-red m-l-5 m-t-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</Button>}
+        <Button className="btn m-t-5 ml-auto" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</Button>
       </div>
       <DeleteReplacement
         isOpen={deleteOpen}

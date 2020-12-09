@@ -303,14 +303,16 @@ export default function UserEdit( props ) {
         </FormGroup>
 
         <div className="row">
-          <Button
-            className="btn m-r-5"
-            disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
-            onClick={ updateUserFunc }
-            >
-            { saving ? 'Saving user...' : 'Save user' }
-          </Button>
-            { !isDisabled && myData !== undefined && id !== myData.getMyData.id &&
+              { !isDisabled && myData !== undefined && id !== myData.getMyData.id &&
+                <Button
+                  className="btn-red m-r-5"
+                  disabled={deletingUser}
+                  onClick={deleteUserFunc}
+                  >
+                  Delete
+                </Button>
+              }
+              { !isDisabled && myData !== undefined && id !== myData.getMyData.id &&
                 <Button
                   className={ active ? "btn-grey" : "btn-green"}
                   onClick={()=> deactivateUser(active)}
@@ -318,22 +320,20 @@ export default function UserEdit( props ) {
                   {active ? 'Deactivate user' : 'Activate user'}
                 </Button>
               }
-              { !isDisabled && myData !== undefined && id !== myData.getMyData.id &&
-                <Button
-                  className="btn-red m-l-5"
-                  disabled={deletingUser}
-                  onClick={deleteUserFunc}
-                  >
-                  Delete
-                </Button>
-              }
             <Button
-              className="btn-link"
+              className="btn-link ml-auto"
               disabled={ saving || isDisabled }
               onClick={ ()=>{
                 setPasswordChangeOpen(true);
               }}
               >{ password === null ? 'Change password' : 'Password change edit' }</Button>
+            <Button
+              className="btn m-l-5"
+              disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
+              onClick={ updateUserFunc }
+              >
+              { saving ? 'Saving user...' : 'Save user' }
+            </Button>
         </div>
         <PasswordChange
           submitPass={(pass) => {

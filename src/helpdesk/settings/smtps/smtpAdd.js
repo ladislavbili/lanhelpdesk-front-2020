@@ -155,7 +155,11 @@ export default function SMTPAdd( props ) {
         label = "Reject unauthorized"
         />
 
-      <Button className="btn" disabled={cannotSave} onClick={addSMTPFunc}>{saving?'Adding...':'Add SMTP'}</Button>
+      <div className="row">
+        <Button className="btn ml-auto" disabled={cannotSave} onClick={addSMTPFunc}>
+          {saving?'Adding...':'Add SMTP'}
+        </Button>
+      </div>
   </div>
   );
 }

@@ -211,14 +211,13 @@ export default function UserProfile( props ) {
 
       <div className="row">
         <Button
-          className="btn m-r-5"
-          disabled={ saving || !isEmail(email) }
-          onClick={updateProfileFunc}
+          className="btn-link"
+          onClick={closeModal}
           >
-          { saving ? 'Saving user...' : 'Save user' }
+          Cancel
         </Button>
         <Button
-          className="btn-link"
+          className="btn-link ml-auto"
           disabled={ saving }
           onClick={ ()=>{
             setPasswordChangeOpen(true);
@@ -227,10 +226,11 @@ export default function UserProfile( props ) {
           { password === null ? 'Change password' : 'Password change edit' }
         </Button>
         <Button
-          className="btn-link ml-auto"
-          onClick={closeModal}
+          className="btn m-l-5"
+          disabled={ saving || !isEmail(email) }
+          onClick={updateProfileFunc}
           >
-          Cancel
+          { saving ? 'Saving user...' : 'Save user' }
         </Button>
       </div>
       <PasswordChange

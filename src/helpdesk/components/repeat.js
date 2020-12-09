@@ -32,7 +32,8 @@ export default function Repeat( props ) {
     repeat,
     submitRepeat,
     deleteRepeat,
-    vertical
+    vertical,
+    addTask
   } = props;
 
   const [ open, setOpen ] = React.useState( false );
@@ -77,9 +78,25 @@ export default function Repeat( props ) {
         </div>
       }
       {!vertical &&
+        !addTask &&
         <div className="display-inline">
           <Label className="col-form-label w-8">Repeat</Label>
           <div className="display-inline-block w-25 p-r-10">
+            <Button type="button" className="repeat-btn flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
+              {
+                repeat ?
+                ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
+                "No repeat"
+              }
+            </Button>
+          </div>
+        </div>
+      }
+      {!vertical &&
+        addTask &&
+        <div className="row p-r-10">
+          <Label className="col-3 col-form-label">Repeat</Label>
+          <div className="col-9">
             <Button type="button" className="repeat-btn flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
               {
                 repeat ?
@@ -132,38 +149,35 @@ export default function Repeat( props ) {
               </div>
             </FormGroup>
             <div className="row">
-              <div className="flex">
-                <Button
-                  type="button"
-                  onClick={()=>{
-                    if(
-                      repeatInterval.value===null ||
-                      parseInt(repeatEvery) <= 0 ||
-                      isNaN(parseInt(repeatEvery)) ||
-                      startsAt === null
-                    ){
-                      if(repeat !== null){
-                        deleteRepeat();
-                      }
-                    }else{
-                      submitRepeat({
-                        startsAt,
-                        repeatEvery,
-                        repeatInterval
-                      });
+              <Button
+                className="btn-link"
+                onClick={() => setOpen(false) }>
+                Close
+              </Button>
+              <Button
+                className="btn ml-auto"
+                onClick={()=>{
+                  if(
+                    repeatInterval.value===null ||
+                    parseInt(repeatEvery) <= 0 ||
+                    isNaN(parseInt(repeatEvery)) ||
+                    startsAt === null
+                  ){
+                    if(repeat !== null){
+                      deleteRepeat();
                     }
-                    setOpen(false);
-                  }}
-                  >
-                  Save
-                </Button>
-              </div>
-              <div className="pull-right">
-                <Button type="button"
-                  onClick={() => setOpen(false) }>
-                  Close
-                </Button>
-              </div>
+                  }else{
+                    submitRepeat({
+                      startsAt,
+                      repeatEvery,
+                      repeatInterval
+                    });
+                  }
+                  setOpen(false);
+                }}
+                >
+                Save
+              </Button>
             </div>
           </div>
         </PopoverBody>

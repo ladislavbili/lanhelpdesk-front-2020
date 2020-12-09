@@ -589,9 +589,21 @@ export default function CompanyAdd( props ) {
         <div
           className={classnames({ "form-footer": newData || props.addCompany}, "row")}
           style={(newData ? {zIndex: "99999"} : {})}>
+          { closeModal &&
+            <Button
+              className="btn-link"
+              disabled={saving}
+              onClick={closeModal}>Cancel</Button>
+          }
+          { !closeModal && newData &&
+            <Button
+              className="btn-link"
+              disabled={saving}
+              onClick={cancel}>Cancel</Button>
+          }
           {(newData  || props.addCompany) &&
             <Button
-              className="btn"
+              className="btn ml-auto"
               disabled={cannotSave}
               onClick={()=>{
                 if (pricelist.value === "0" && pricelistName !== ""){
@@ -601,22 +613,6 @@ export default function CompanyAdd( props ) {
                 }
               }}>{(pricelist.value === "0" && pricelistName !== "" ? "Save changes" : (saving?'Adding...':'Add company'))}</Button>
             }
-
-            { !closeModal && newData &&
-              <Button
-                  className="btn-link ml-auto"
-                  disabled={saving}
-                  onClick={cancel}>Cancel</Button>
-          }
-
-
-            { closeModal &&
-              <Button
-                  className="btn-link ml-auto"
-                  disabled={saving}
-                  onClick={closeModal}>Cancel</Button>
-          }
-
         </div>
       </div>
   );

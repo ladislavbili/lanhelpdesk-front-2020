@@ -331,12 +331,12 @@ export default function PricelistEdit( props ) {
         </Modal>
 
         <div className="row">
+          <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewPricelist(true)}>Delete price list</Button>
             <Button
-              className="btn"
+              className="btn ml-auto"
               disabled={saving}
               onClick={updatePricelistFunc}>{saving?'Saving prices...':'Save prices'}</Button>
 
-            <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewPricelist(true)}>Delete price list</Button>
         </div>
 
     </div>

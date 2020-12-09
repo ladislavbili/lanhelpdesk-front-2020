@@ -314,15 +314,19 @@ export default function ProjectAdd( props ) {
         </div>
       }
 
-      <div>
-  			<Button className="btn"
-  				disabled={cannotSave}
-  				onClick={addProjectFunc}>
-  				{saving?'Adding...':'Add project'}
-  			</Button>
-        { closeModal &&
-          <Button className="btn-link ml-auto" onClick={() => closeModal(null, null)}> Cancel </Button>
+
+      <div className="row">
+        {
+          closeModal &&
+          <Button className="btn-link" onClick={() => closeModal(null, null)}> Cancel </Button>
         }
+
+        <Button className="btn ml-auto"
+          disabled={cannotSave}
+          onClick={addProjectFunc}
+          >
+          {saving?'Adding...':'Add project'}
+        </Button>
       </div>
     </div>
   );

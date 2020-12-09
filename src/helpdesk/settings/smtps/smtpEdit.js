@@ -342,10 +342,10 @@ export default function SMTPEdit( props ) {
       </Modal>
 
       <div className="row">
-        <Button className="btn" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</Button>
-        <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</Button>
+        <Button className="btn-red m-l-5 mr-auto" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</Button>
         <ErrorMessage show={ !loading && !data.smtp.currentlyTested && !data.smtp.working  } message={data.smtp.errorMessage} />
-        <Button className="btn ml-auto" disabled={saving || tested} onClick={ startTest }>Test SMTP</Button>
+        <Button className="btn" disabled={saving || tested} onClick={ startTest }>Test SMTP</Button>
+        <Button className="btn m-l-5" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</Button>
       </div>
     </div>
   );

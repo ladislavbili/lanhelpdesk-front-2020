@@ -500,19 +500,21 @@ export default function ProjectEdit( props ) {
       }
 
       <div className="row">
+        {
+          closeModal &&
+          <Button className="btn-link" onClick={() => closeModal(null, null)}>
+            Close
+          </Button>
+        }
+        <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
+          Delete
+        </Button>
         <Button
-          className="btn"
+          className="btn ml-auto"
           disabled={cannotSave}
           onClick={updateProjectFunc}>
           {(saving?'Saving...':'Save project')}
         </Button>
-        <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
-          Delete
-        </Button>
-        {closeModal &&
-          <Button className="btn-link ml-auto" onClick={() => closeModal(null, null)}>
-            Close
-          </Button>}
         </div>
         <DeleteReplacement
           isOpen={deleteOpen}

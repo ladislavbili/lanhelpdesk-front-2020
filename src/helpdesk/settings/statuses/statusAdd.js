@@ -106,7 +106,11 @@ export default function StatusAdd( props ) {
             color={color}
             onChangeComplete={value => setColor( value.hex )}
           />
-        <Button className="btn m-t-5" disabled={saving} onClick={addStatusFunc}>{saving?'Adding...':'Add status'}</Button>
+        <div className="row">
+          <Button className="btn m-t-5 ml-auto" disabled={saving} onClick={addStatusFunc}>
+            {saving?'Adding...':'Add status'}
+          </Button>
+        </div>
       </div>
   );
 }

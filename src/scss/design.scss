@@ -762,7 +762,7 @@ Label{
 
 
 .modal-content{
-  background-color: $form-background-color;
+  background-color: white;
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -934,8 +934,74 @@ tr:last-child{
   border: 1px solid red;
 }
 
+
 .highlight-form{
   background-color: $form-highlighted-background;
+  
+.task-edit-right{
+  width: 300px;
+  padding: 20px 20px 20px 13px;
+  background-color: white;
+}
+
+.task-edit-left{
+  max-width: 1620px;
+  width: calc(100% - 300px) !important;
+}
+
+.task-edit-left-columns{
+  max-width: 1670px;
+  width: calc(100% - 250px) !important;
+}
+
+.task-edit-popis{
+  background-color: #f4f8fb;
+  padding: 20px 20px 0px 20px;
+}
+
+.task-edit-popis>div>p{
+  margin-bottom: 0px;
+}
+
+.task-add-right-half{
+  width: 220px;
+  padding-left: 20px;
+  height: 600px;
+}
+
+.task-add-left-half{
+  flex: 1;
+  padding-right: 20px;
+  border-right: 1px solid #EAEAEA;
+}
+
+.attachments{
+  background-color: #f4f8fb;
+  padding: 5px 20px 20px 20px;
+}
+
+.comment-attachment{
+  background-color: #EAEAEA;
+  padding: 2px 5px;
+//  display: inline;
+}.attachment{
+  background-color: #F2F1F1;
+  display: inline-block;
+  height: 21px;
+  color: black;
+  font-size:12px;
+  padding-left:3px;
+  margin-left:5px;
+}
+
+.attachment{
+  background-color: #F2F1F1;
+  display: inline-block;
+  height: 23px;
+  color: black;
+  font-size:12px;
+  padding-left:3px;
+  margin-left:5px;
 }
 
 .attachment-label{
