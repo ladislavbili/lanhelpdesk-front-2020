@@ -261,6 +261,7 @@ export default function ProjectEdit( props ) {
 
   // functions
   const updateProjectFunc = () => {
+    console.log( 'aaa' );
     setSaving( true );
 
     let newProjectRights = projectRights.map( r => ( {
@@ -341,10 +342,12 @@ export default function ProjectEdit( props ) {
             closeModal( null, null );
           }
         } else {
+          let newProjects = [ ...allProjects ]
+          newProjects[ newProjects.findIndex( ( project ) => project.id === id ) ] = updateProject;
           client.writeQuery( {
             query: GET_PROJECTS,
             data: {
-              projects: [ ...allProjects.filter( project => project.id !== id ), updatedProject ]
+              projects: newProjects
             }
           } );
 
@@ -441,12 +444,13 @@ export default function ProjectEdit( props ) {
         givePermission={(user, right)=>{
           let newProjectRights=[...projectRights];
           let index = projectRights.findIndex((r)=>r.user.id === user.id);
-          let item = newProjectRights[index];
+          let item = {...newProjectRights[index]};
           item.read = right.read;
           item.write = right.write;
           item.delete = right.delete;
           item.internal= right.internal;
           item.admin = right.admin;
+
 
           if(!item.read){
             newProjectRights.splice(index,1);
@@ -457,6 +461,7 @@ export default function ProjectEdit( props ) {
               setAssignedTo(newAssignedTo);
             }
           }else{
+            newProjectRights[index] = item;
             setProjectRights(newProjectRights);
           }
         }}

@@ -5,7 +5,8 @@ import {
 } from "@apollo/client";
 
 import {
-  Route
+  Route,
+  Switch
 } from 'react-router-dom';
 import settings from 'configs/constants/settings';
 
@@ -27,6 +28,7 @@ query {
     id
     tasklistLayout
     role {
+      id
       accessRights {
         viewErrors
         publicFilters
@@ -109,8 +111,11 @@ export default function Navigation( props ) {
         </div>
       </div>
 
-      <div className="row center center-ver h-100vh">
+      <div className="row center center-ver">
+        <Switch>
+        <Route path="/helpdesk/taskList/i/:filterID" component={Sidebar} />
         <Route path="/helpdesk" component={Sidebar} />
+        </Switch>
         <div className="main">
           <Route exact path="/helpdesk/errorMessages" component={accessRights.viewErrors ? ErrorMessages : AccessDenied} />
 

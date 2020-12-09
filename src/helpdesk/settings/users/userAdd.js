@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient
 } from "@apollo/client";
 
 import {
@@ -45,6 +46,7 @@ export default function UserAddContainer( props ) {
     addUserToList,
     closeModal
   } = props;
+  const client = useApolloClient();
   const {
     data: rolesData,
     loading: rolesLoading
@@ -53,9 +55,7 @@ export default function UserAddContainer( props ) {
     data: companiesData,
     loading: companiesLoading
   } = useQuery( GET_BASIC_COMPANIES );
-  const [ registerUser, {
-    client
-  } ] = useMutation( ADD_USER );
+  const [ registerUser ] = useMutation( ADD_USER );
 
   const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
   const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
@@ -95,14 +95,14 @@ export default function UserAddContainer( props ) {
       } )
       .then( ( response ) => {
         if ( addUserToList ) {
-          const allUsers = client.readQuery( {
-              query: GET_BASIC_USERS
-            } )
-            .basicUsers;
           let newUser = {
             ...response.data.registerUser,
             __typename: "BasicUser"
           }
+          const allUsers = client.readQuery( {
+              query: GET_BASIC_USERS
+            } )
+            .basicUsers;
           client.writeQuery( {
             query: GET_BASIC_USERS,
             data: {
@@ -112,20 +112,23 @@ export default function UserAddContainer( props ) {
           addUserToList();
           closeModal();
         } else {
-          const allUsers = client.readQuery( {
-              query: GET_USERS
-            } )
-            .users;
           let newUser = {
             ...response.data.registerUser,
             __typename: "User"
           }
+          console.log( newUser );
+          const allUsers = client.readQuery( {
+              query: GET_USERS
+            } )
+            .users;
+          console.log( allUsers, 'allUsers' );
           client.writeQuery( {
             query: GET_USERS,
             data: {
               users: [ ...allUsers, newUser ]
             }
           } );
+          console.log( 'just push' );
           history.push( '/helpdesk/settings/users/' + newUser.id );
         }
 
@@ -197,7 +200,7 @@ export default function UserAddContainer( props ) {
           <Select
             styles={ selectStyle }
             options={ languages }
-            value={ role }
+            value={ language }
             onChange={ lang => setLanguage(lang) }
             />
         </FormGroup>

@@ -127,7 +127,6 @@ export default function TasksSidebar( props ) {
       }
     }
   }, [ myFiltersLoading, match.params.filterID ] );
-
   const dataLoading = (
     myDataLoading ||
     myProjectsLoading ||

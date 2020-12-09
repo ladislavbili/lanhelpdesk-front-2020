@@ -164,7 +164,7 @@ export default function ProjectPermissions( props ) {
 										<td>
 											<button className="btn btn-link waves-effect" disabled={(userID===permission.user.id && !isAdmin)} onClick={()=>{
 													if(window.confirm('Are you sure?')){
-														givePermission(permission.user,{read:false, write:false, delete:false, isAdmin:false, internal:false});
+														givePermission(permission.user,{read:false, write:false, delete:false, admin:false, internal:false});
 													}
 												}}>
 												<i className="fa fa-times"  />

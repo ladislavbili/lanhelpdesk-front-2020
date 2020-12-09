@@ -177,10 +177,13 @@ export default function UserEdit( props ) {
   };
 
   const deleteUserFunc = () => {
-    if ( !window.confirm( "Are you sure you want to delete the user?" ) ) {
+    if ( window.confirm( "Are you sure you want to delete the user?" ) ) {
       deleteUser( {
           variables: {
-            id
+            id,
+            taskPairs: [],
+            subtaskPairs: [],
+            workTripPairs: [],
           }
         } )
         .then( ( response ) => {
