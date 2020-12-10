@@ -10,6 +10,7 @@ query {
       id
     }
     role {
+      id
       level
       accessRights {
         addProjects

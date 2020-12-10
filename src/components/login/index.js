@@ -3,7 +3,9 @@ import {
   useMutation
 } from "@apollo/client";
 import Login from './login';
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 
 const LOGIN_USER = gql `
 mutation loginUser($email: String!, $password: String!) {
@@ -18,6 +20,7 @@ mutation loginUser($email: String!, $password: String!) {
       surname
       id
       role {
+        id
         accessRights {
           users
           companies

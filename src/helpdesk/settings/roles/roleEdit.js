@@ -41,6 +41,8 @@ export default function RoleEdit( props ) {
     },
     notifyOnNetworkStatusChange: true,
   } );
+  console.log( data );
+  console.log( loading );
   const [ updateRole ] = useMutation( UPDATE_ROLE );
   const [ deleteRole, {
     client
@@ -272,6 +274,7 @@ export default function RoleEdit( props ) {
   if ( loading ) {
     return <Loading />
   }
+  console.log( data );
   const disabled = currentUserLevel === null || currentUserLevel >= data.role.level;
 
   return (

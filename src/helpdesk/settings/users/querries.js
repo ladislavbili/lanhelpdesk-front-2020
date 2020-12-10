@@ -25,6 +25,7 @@ mutation registerUser($username: String!, $email: String!, $name: String!, $lang
       title
     }
     company {
+      id
       title
     }
   }
@@ -37,6 +38,7 @@ query {
     id
     email
     username
+    fullName
     role {
       id
       title
@@ -170,9 +172,12 @@ mutation updateProfile(
 `;
 
 export const DELETE_USER = gql `
-mutation deleteUser($id: Int!) {
+mutation deleteUser($id: Int!, $taskPairs: [TaskPairInput]!, $subtaskPairs: [SubtaskPairInput]!, $workTripPairs: [WorkTripPairInput]!) {
   deleteUser(
     id: $id,
+    taskPairs: $taskPairs,
+    subtaskPairs: $subtaskPairs,
+    workTripPairs: $workTripPairs,
   ){
     id
   }
@@ -200,6 +205,7 @@ query {
     receiveNotifications
     signature
     role {
+      id
       level
     }
     language
