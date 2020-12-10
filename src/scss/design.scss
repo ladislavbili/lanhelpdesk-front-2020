@@ -1832,12 +1832,12 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .task-edit-right{
   width: 250px;
   margin: 55px 20px 45px 40px;
-  background-color: $secondary-form-background-color;
+  background-color: white;
 }
 
 .task-edit-left{
   max-width: 1620px;
-  width: calc(100% - 400px) !important;
+  width: calc(100% - 310px) !important;
 }
 
 .task-edit-left-columns{
