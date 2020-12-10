@@ -937,7 +937,8 @@ tr:last-child{
 
 .highlight-form{
   background-color: $form-highlighted-background;
-  
+}
+
 .task-edit-right{
   width: 300px;
   padding: 20px 20px 20px 13px;
@@ -984,20 +985,12 @@ tr:last-child{
   background-color: #EAEAEA;
   padding: 2px 5px;
 //  display: inline;
-}.attachment{
-  background-color: #F2F1F1;
-  display: inline-block;
-  height: 21px;
-  color: black;
-  font-size:12px;
-  padding-left:3px;
-  margin-left:5px;
 }
 
 .attachment{
   background-color: #F2F1F1;
   display: inline-block;
-  height: 23px;
+  height: 21px;
   color: black;
   font-size:12px;
   padding-left:3px;
@@ -2084,7 +2077,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .danger-color{
-  color: #dc3545
+  color: #dc3545;
 }
 // /0078D4
 //background: $main-background-color;
