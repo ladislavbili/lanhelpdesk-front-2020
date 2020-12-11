@@ -2,14 +2,11 @@ import React from 'react';
 import {
   useQuery,
   useMutation,
-  useApolloClient
-} from "@apollo/client";
-import {
+  useApolloClient,
   gql
-} from '@apollo/client';
+} from "@apollo/client";
 
 import Loading from 'components/loading';
-
 import ShowData from 'components/showData';
 
 import {
@@ -28,6 +25,8 @@ import {
   allMilestones
 } from 'configs/constants/sidebar';
 
+import RowTaskAdd from './add/row';
+
 import {
   GET_STATUSES,
   SET_USER_STATUSES
@@ -43,6 +42,7 @@ import {
   GET_FILTER,
   GET_PROJECT,
   GET_MILESTONE,
+  GET_TASK_SEARCH,
 } from 'apollo/localSchema/querries';
 
 import {
@@ -65,7 +65,8 @@ export default function TasksIndex( props ) {
 
   const {
     data: currentUserData,
-    loading: currentUserLoading
+    loading: currentUserLoading,
+    refetch: userDataRefetch
   } = useQuery( GET_MY_DATA );
 
   const {
@@ -82,6 +83,12 @@ export default function TasksIndex( props ) {
     data: milestoneData,
     loading: milestoneLoading
   } = useQuery( GET_MILESTONE );
+
+
+  const {
+    data: taskSearchData,
+    loading: taskSearchLoading
+  } = useQuery( GET_TASK_SEARCH );
 
   const {
     data: statusesData,
@@ -147,7 +154,7 @@ export default function TasksIndex( props ) {
   }
 
   const tasks = tasksData.tasks.tasks;
-  const statuses = ( statusesLoading || !statusesData ? [] : orderArr( statusesData.statuses ) );
+  const statuses = orderArr( statusesData.statuses );
   const currentUser = currentUserData.getMyData;
 
   const getBreadcrumsData = () => {
@@ -313,7 +320,10 @@ export default function TasksIndex( props ) {
           ids
         }
       } )
-      .then( ( response ) => {} )
+      .then( ( response ) => {
+        console.log( 'got response' );
+        console.log( response );
+      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -385,12 +395,23 @@ export default function TasksIndex( props ) {
     }).map((task)=>({...task,end: task.status.action !== 'pendingOLD' ? task.start : task.end }))*/
   }
 
+  const filterTasks = ( tasks ) => {
+    return tasks.filter( ( task ) => (
+      ( currentUser.statuses.length === 0 || currentUser.statuses.some( ( status ) => status.id === task.status.id ) )
+    ) )
+  }
+
+  const processTasks = ( tasks ) => {
+    return tasks.map( ( task ) => ( {
+      ...task,
+      checked: markedTasks.includes( task.id )
+    } ) )
+  }
+
+
   return (
       <ShowData
-        data={tasks.map((task) => ({
-          ...task,
-          checked: markedTasks.includes(task.id)
-        }) )}
+        data={processTasks(filterTasks(tasks))}
         filterBy={[
           {value:'assignedTo',type:'list',func:((total,user)=>total+=user.email+' '+user.fullName+' ')},
           {value:'statusChange',type:'date'},
@@ -456,7 +477,8 @@ export default function TasksIndex( props ) {
         useBreadcrums={true}
         breadcrumsData={getBreadcrumsData()}
         setStatuses={setUserStatusesFunc}
-        statuses={currentUser.statuses}
+        underSearch={RowTaskAdd}
+        statuses={currentUser.statuses.map((status) => status.id )}
         allStatuses={statuses}
         checkTask={checkTask}
         deleteTask={deleteTaskFunc}

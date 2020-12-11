@@ -46,7 +46,8 @@ export default function List( props ) {
     displayValues,
     data,
     deleteTask,
-    checkTask
+    checkTask,
+    underSearch: UnderSearch,
   } = props;
   const [ editOpen, setEditOpen ] = React.useState( false );
 
@@ -62,12 +63,14 @@ export default function List( props ) {
     }
   }
   const filter = tasksFilterData.tasksAttributesFilter;
-
   return (
     <div>
 				<CommandBar {...commandBar} listName={listName}/>
 				<div className="full-width scroll-visible fit-with-header-and-commandbar task-container">
 					<ListHeader {...commandBar} listName={listName} statuses={statuses} setStatuses={setStatuses} allStatuses={allStatuses} />
+          {
+            UnderSearch !== undefined && <UnderSearch/>
+          }
 					<table className="table">
 						<thead>
 								<tr>

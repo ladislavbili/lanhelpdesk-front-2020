@@ -30,7 +30,7 @@ export default function Scheduled( props ) {
 
   const [ newUser, setNewUser ] = React.useState( null );
   const [ newFrom, setNewFrom ] = React.useState( null );
-  const [ newTo, setNewTo ] = React.useState( false );
+  const [ newTo, setNewTo ] = React.useState( null );
 
   return (
     <div>
@@ -82,6 +82,7 @@ export default function Scheduled( props ) {
                 disabled={disabled}
                 onChange={date => {
                   setNewFrom(date);
+                  console.log(newTo);
                   if(newTo === null){
                     setNewTo(date);
                   }

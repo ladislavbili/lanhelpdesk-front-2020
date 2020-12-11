@@ -1,20 +1,17 @@
 import React from 'react';
 import {
-  useQuery
-} from "@apollo/client";
-import {
+  useQuery,
   gql
-} from '@apollo/client';;
+} from "@apollo/client";
 import {
   toSelArr
 } from 'helperFunctions';
 import {
   Modal,
   ModalBody,
-  ModalHeader,
   Button
 } from 'reactstrap';
-import TaskAdd from './taskAdd';
+import RowTaskAdd from './rowTaskAdd';
 
 import {
   noMilestone
@@ -49,9 +46,13 @@ import {
 
 import {
   GET_MY_DATA
-} from '../querries';
+} from '../../querries';
 
-export default function TaskAddContainer( props ) {
+import {
+  GET_PROJECT,
+} from 'apollo/localSchema/querries';
+
+export default function RowTaskAddContainer( props ) {
   //data & queries
   const {
     data: statusesData,
@@ -118,8 +119,12 @@ export default function TaskAddContainer( props ) {
     }
   } );
 
+  const {
+    data: localProjectData,
+    loading: localProjectLoading
+  } = useQuery( GET_PROJECT );
+
   //state
-  const [ openAddTaskModal, setOpenAddTaskModal ] = React.useState( false );
 
   const loading = (
     statusesLoading ||
@@ -129,67 +134,34 @@ export default function TaskAddContainer( props ) {
     tripTypesLoading ||
     tagsLoading ||
     projectsLoading ||
+    localProjectLoading ||
     currentUserLoading
   );
-
+  if ( !localProjectData.localProject.id ) {
+    return null;
+  }
   return (
-    <div className="display-inline">
-			{
-				!props.task &&
-				<Button
-					className="btn sidebar-btn"
-					onClick={() => {
-            setOpenAddTaskModal(true);
-          }}
-				>  Add task
-				</Button>
-			}
-
-			{
-				props.task &&
-				<button
-					type="button"
-					className="btn btn-link-reversed waves-effect"
-					disabled={props.disabled}
-					onClick={()=> {
-            setOpenAddTaskModal(true);
-          }}
-          >
-					<i
-						className="far fa-copy"
-						/> Copy
-				</button>
-			}
-
-			<Modal isOpen={openAddTaskModal} className="task-add-container" >
-        <ModalHeader>
-          Create new task
-        </ModalHeader>
-					<ModalBody className="scrollable" >
-            {  openAddTaskModal && !loading &&
-						   <TaskAdd {...props}
-                 loading={loading}
-                 statuses={ toSelArr(statusesData.statuses.filter((status) => !status.action.toLowerCase().includes('invoiced') )) }
-                 projects={
-                    toSelArr(projectsData.myProjects.map((myProject) => ({
-                      ...myProject.project,
-                      right: myProject.right,
-                      users: myProject.usersWithRights.map((user) => user.id)
-                    }) ))
-                 }
-                 users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }
-                 companies={ toSelArr(companiesData.basicCompanies) }
-                 taskTypes={ toSelArr(taskTypesData.taskTypes) }
-                 allTags={ toSelArr(tagsData.tags) }
-                 tripTypes={ toSelArr(tripTypesData.tripTypes) }
-                 currentUser={ currentUserData.getMyData }
-                 milestones={[noMilestone]}
-                 defaultUnit={null}
-                 closeModal={ () => setOpenAddTaskModal(false)}
-                 />
-             }
-					</ModalBody>
-				</Modal>
-		</div>
+    <RowTaskAdd
+      {...props}
+      loading={loading}
+      statuses={ toSelArr(statusesData.statuses.filter((status) => !status.action.toLowerCase().includes('invoiced') )) }
+      projects={
+        toSelArr(projectsData.myProjects.map((myProject) => ({
+          ...myProject.project,
+          right: myProject.right,
+          users: myProject.usersWithRights.map((user) => user.id)
+        }) ))
+      }
+      project={localProjectData.localProject}
+      users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }
+      companies={ toSelArr(companiesData.basicCompanies) }
+      taskTypes={ toSelArr(taskTypesData.taskTypes) }
+      allTags={ toSelArr(tagsData.tags) }
+      tripTypes={ toSelArr(tripTypesData.tripTypes) }
+      currentUser={ currentUserData.getMyData }
+      milestones={[noMilestone]}
+      defaultUnit={null}
+      closeModal={ () => setOpenAddTaskModal(false)}
+      />
   );
 }

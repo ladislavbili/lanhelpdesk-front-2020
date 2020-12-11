@@ -7,6 +7,10 @@ import {
   gql
 } from '@apollo/client';;
 
+import {
+  GET_TASK_SEARCH,
+} from 'apollo/localSchema/querries';
+
 import TaskCol from './taskCol';
 import TaskList from './taskList';
 import TaskListDnD from './taskListDnD';
@@ -19,29 +23,6 @@ query {
     tasklistLayout
   }
 }
-`;
-
-const LOCAL_CACHE = gql `
-  query getLocalCache {
-    milestone @client {
-      id
-      title
-      value
-      label
-    }
-		search @client
-		showDataFilter @client {
-			name
-			id
-			title
-			status
-			requester
-			company
-			assignedTo
-			createdAt
-			deadline
-		}
-  }
 `;
 
 export default function ShowDataContainer( props ) {
@@ -69,18 +50,20 @@ export default function ShowDataContainer( props ) {
     dndGroupAttribute,
     dndGroupData,
     calendarAllDayData,
-    calendarEventsData
+    calendarEventsData,
+    underSearch
   } = props;
+
+  const {
+    data: taskSearchData,
+    loading: taskSearchLoading
+  } = useQuery( GET_TASK_SEARCH );
+
   const {
     data: userData
   } = useQuery( GET_MY_DATA );
-  const {
-    data: localCache
-  } = useQuery( LOCAL_CACHE );
 
   const tasklistLayout = 1;
-
-  const search = ( localCache ? localCache.search : "" );
 
   //	const client = useApolloClient();
 
@@ -103,15 +86,18 @@ export default function ShowDataContainer( props ) {
   	}*/
 
   const filterData = () => {
-    let aaa = data.filter( ( item ) => {
+    return data.filter( ( item ) => {
+        if ( taskSearchData.taskSearch === "" ) {
+          return true;
+        }
         let filterString = "";
         filterBy.forEach( ( value ) => {
           if ( !item[ value.value ] ) {
             return;
           }
           if ( value.type === 'object' ) {
-            if ( value.value === "status" ) {
-              filterString += ( 100 - item[ value.value ].order ) + " " + item.statusChange + " ";
+            if ( value.value === "statusX" ) {
+              //status specific disabled
             } else {
               filterString += item[ value.value ].title + " ";
             }
@@ -128,12 +114,12 @@ export default function ShowDataContainer( props ) {
           }
         } );
         return filterString.toLowerCase()
-          .includes( search.toLowerCase() );
+          .includes( taskSearchData.taskSearch.toLowerCase() );
       } )
       .sort( ( item1, item2 ) => {
         let val1 = getSortValue( item1 );
         let val2 = getSortValue( item2 );
-        if ( localCache && localCache.ascending ) {
+        if ( false ) {
           if ( val1 === null ) {
             return 1;
           }
@@ -153,11 +139,10 @@ export default function ShowDataContainer( props ) {
         }
         return 0;
       } );
-    return aaa;
   }
 
   const getSortValue = ( item ) => {
-    let value = orderByValues.find( ( val ) => val.value === ( localCache ? localCache.orderBy : "id" ) );
+    let value = orderByValues.find( ( val ) => val.value === ( false ? 'no' : "id" ) );
     if ( value.type === 'object' ) {
       if ( value.value === "status" ) {
         return item[ value.value ] ? ( ( 100 - item[ value.value ].order ) + " " + item.statusChange ) : null;
@@ -201,6 +186,7 @@ export default function ShowDataContainer( props ) {
 								statuses={statuses}
 								allStatuses={allStatuses}
 								Edit={Edit}
+                underSearch={underSearch}
 								/>
 						</div>
 					)}
@@ -227,6 +213,7 @@ export default function ShowDataContainer( props ) {
 									link={link}
 									checkTask={checkTask}
 									deleteTask={deleteTask}
+                  underSearch={underSearch}
 									/>}
 						</div>
 					)}
@@ -252,6 +239,7 @@ export default function ShowDataContainer( props ) {
 									setStatuses={setStatuses}
 									statuses={statuses}
 									allStatuses={allStatuses}
+                  underSearch={underSearch}
 									/>
 							}
 						</div>
@@ -278,6 +266,7 @@ export default function ShowDataContainer( props ) {
 								statuses={statuses}
 								allStatuses={allStatuses}
 								Edit={Edit}
+                underSearch={underSearch}
 								/>
 						</div>
 					)}

@@ -132,7 +132,7 @@ export default function TaskEditContainer( props ) {
     variables: {
       id
     },
-    notifyOnNetworkStatusChange: true,
+    //notifyOnNetworkStatusChange: true,
   } );
   //local
   const {

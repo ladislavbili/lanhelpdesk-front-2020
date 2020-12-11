@@ -91,6 +91,7 @@
 
 .modal-without-borders{
   .modal-content{
+    background-color: $main-background-color;
     padding: 0px;
     .modal-body{
       padding:0px;
@@ -1496,6 +1497,17 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 //---------------------TaskList----------------------
 .task-container{
   background-color: $form-background-color;
+  .modal-content{
+    background-color: $form-background-color;
+    width: 1200px;
+  }
+}
+
+.task-add-container{
+  width: 1200px !important;
+  .modal-content{
+    background-color: $form-background-color;
+  }
 }
 
 .task-container-col{
@@ -1782,16 +1794,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   -moz-appearance:textfield;
 }
 
-.vykazyTable .btn {
+.vykazyTable .btn.waves-effect {
   background-color: transparent;
   color: $basic-button-color;
 }
-
-.vykazyTable .btn:hover {
+/*
+.vykazyTable .btn.waves-effect {
   background-color: transparent;
   color: #A0A0A0;
 }
-
+*/
 .comments{
   background-color: $form-background-color;
   padding: 10px 0px 10px 0px;

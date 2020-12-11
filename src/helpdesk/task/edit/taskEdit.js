@@ -77,73 +77,14 @@ import {
   GET_TASK,
   GET_TASKS,
 } from '../querries';
-const defaultVykazyChanges = {
-  subtask: {
-    ADD: [],
-    EDIT: [],
-    DELETE: []
-  },
-  trip: {
-    ADD: [],
-    EDIT: [],
-    DELETE: []
-  },
-  material: {
-    ADD: [],
-    EDIT: [],
-    DELETE: []
-  },
-  customItem: {
-    ADD: [],
-    EDIT: [],
-    DELETE: []
-  },
-}
-const invoicedAttributes = {
-  subtask: [
-    'price',
-    'quantity',
-    'type',
-    'assignedTo',
-  ],
-  trip: [
-    'price',
-    'quantity',
-    'type',
-    'assignedTo',
-  ],
-  material: [
-    'title',
-    'quantity',
-    'price',
-    'totalPrice',
-    'margin',
-  ],
-  customItem: [
-    'title',
-    'quantity',
-    'price',
-    'totalPrice',
-  ],
-}
 let fakeID = -1;
-const defaultCheckboxList = [
-  {
-    id: 1,
-    title: 'Test item 1',
-    done: false,
-  },
-  {
-    id: 2,
-    title: 'Test item 2',
-    done: true,
-  },
-  {
-    id: 3,
-    title: 'Test item 3',
-    done: false,
-  },
-]
+
+import {
+  defaultVykazyChanges,
+  invoicedAttributes,
+  defaultCheckboxList,
+  noTaskType
+} from '../constants';
 
 export default function TaskEdit( props ) {
   const client = useApolloClient();
@@ -193,7 +134,7 @@ export default function TaskEdit( props ) {
   } = props;
 
   //state
-  const [ layout, setLayout ] = React.useState( 1 );
+  const [ layout, setLayout ] = React.useState( 2 );
 
   const [ assignedTo, setAssignedTo ] = React.useState( [] );
   const [ closeDate, setCloseDate ] = React.useState( null );
@@ -285,7 +226,7 @@ export default function TaskEdit( props ) {
       } );
     } else {
       setTags( toSelArr( task.tags ) );
-      setTaskType( ( task.taskType ? toSelItem( task.taskType ) : null ) );
+      setTaskType( ( task.taskType ? toSelItem( task.taskType ) : noTaskType ) );
       setCompany( ( task.company ? toSelItem( task.company ) : null ) );
       setMilestone( milestone === undefined ? noMilestone : milestone );
       setRequester(
@@ -1090,6 +1031,7 @@ export default function TaskEdit( props ) {
     )
   }
 
+
   const layoutComponents = {
     Project: (
       <Select
@@ -1142,7 +1084,7 @@ export default function TaskEdit( props ) {
           setTaskType(type);
           autoUpdateTask({ taskType: type.id })
         }}
-        options={taskTypes}
+        options={[noTaskType, ...taskTypes]}
         />
     ),
     Milestone: (
@@ -1218,7 +1160,7 @@ export default function TaskEdit( props ) {
   const renderSelectsLayout1 = () => {
     return (
       <div>
-        <div className="col-12">
+        <div className="col-12 row">
           <div className="col-4">
             <div className="row p-r-10">
               <Label className="col-3 col-form-label">Projekt</Label>
@@ -1228,7 +1170,7 @@ export default function TaskEdit( props ) {
             </div>
           </div>
           { defaultFields.assignedTo.show &&
-            <div className="col-8">
+            <div className="col-8" style={{ marginLeft: -5 }}>
               <div className="row p-r-10">
                 <Label className="col-1-5 col-form-label">Assigned</Label>
                 <div className="col-10-5">
@@ -1355,13 +1297,6 @@ export default function TaskEdit( props ) {
             { layoutComponents.Company }
           </div>
         }
-        { defaultFields.taskType.show &&
-          <div className="col-2">
-            <Label className="col-form-label">Typ</Label>
-            { layoutComponents.Type }
-          </div>
-        }
-
       </div>
     )
   }
@@ -1448,6 +1383,14 @@ export default function TaskEdit( props ) {
                 isDisabled={defaultFields.tag.fixed||viewOnly}
                 styles={invisibleSelectStyleNoArrowColored}
                 />
+            </div>
+          </div>
+        }
+        { defaultFields.taskType.show &&
+          <div>
+            <label className="col-form-label m-l-7">Task Type</label>
+            <div className="col-form-value-2">
+              { layoutComponents.Type }
             </div>
           </div>
         }

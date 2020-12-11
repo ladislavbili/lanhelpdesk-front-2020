@@ -9,7 +9,8 @@ import {
 import Select from 'react-select';
 import {
   selectStyle,
-  invisibleSelectStyle
+  invisibleSelectStyle,
+  invisibleSelectStyleNoArrow
 } from 'configs/components/select';
 import Checkbox from '../../components/checkbox';
 
@@ -1057,7 +1058,7 @@ export default function Rozpocet( props ) {
                       setNewSubtaskAssigned(newSubtaskAssigned);
                     }}
                     options={taskAssigned}
-                    styles={selectStyle}
+                    styles={invisibleSelectStyleNoArrow}
                     />
                 </td>
               }
@@ -1121,8 +1122,8 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn waves-effect"
-                    disabled={newSubtaskType===null||disabled|| newSubtaskAssigned===null}
+                  <button className="btn btn-secondary m-r-5"
+                    disabled={newSubtaskType.id === null || disabled || newSubtaskAssigned===null}
                     onClick={()=>{
                       let body={
                         done:false,
@@ -1143,7 +1144,7 @@ export default function Rozpocet( props ) {
                       submitService(body, getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity }));
                     }}
                     >
-                    <i className="fa fa-plus" />
+                    ADD
                   </button>
                   <button className="btn waves-effect"
                     disabled={disabled}
@@ -1184,7 +1185,7 @@ export default function Rozpocet( props ) {
                       setNewTripAssigned(newTripAssigned)
                     }}
                     options={taskAssigned}
-                    styles={selectStyle}
+                    styles={invisibleSelectStyleNoArrow}
                     />
                 </td>
               }
@@ -1238,7 +1239,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn waves-effect"
+                  <button className="btn btn-secondary m-r-5"
                     disabled={newTripType===null||isNaN(parseInt(newTripQuantity))||disabled|| newTripAssigned===null}
                     onClick={()=>{
                       let body={
@@ -1258,7 +1259,7 @@ export default function Rozpocet( props ) {
                       submitTrip(body, getTotalDiscountedPrice({discount:newTripDiscount,quantity:newTripQuantity,type:newTripType}));
                     }}
                     >
-                    <i className="fa fa-plus" />
+                    ADD
                   </button>
                   <button className="btn waves-effect"
                     disabled={disabled}
@@ -1436,7 +1437,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn waves-effect"
+                  <button className="btn btn-secondary m-r-5"
                     disabled={disabled}
                     onClick={()=>{
                       let body={
@@ -1457,7 +1458,7 @@ export default function Rozpocet( props ) {
                       submitMaterial(body);
                     }}
                     >
-                    <i className="fa fa-plus" />
+                    ADD
                   </button>
                   <button className="btn waves-effect"
                     disabled={disabled}
@@ -1542,7 +1543,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn waves-effect"
+                  <button className="btn btn-secondary m-r-5"
                     disabled={disabled}
                     onClick={()=>{
                       let body={
@@ -1559,7 +1560,7 @@ export default function Rozpocet( props ) {
                       submitCustomItem(body);
                     }}
                     >
-                    <i className="fa fa-plus" />
+                    ADD
                   </button>
                   <button className="btn waves-effect"
                     disabled={disabled}
@@ -1577,7 +1578,7 @@ export default function Rozpocet( props ) {
             <tr>
               <td colSpan={(toggleTab === '1' ? 8 : 10)}>
                 {!showAddSubtask &&
-                  <button className="btn"
+                  <button className="btn waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddSubtask(true);
@@ -1588,7 +1589,7 @@ export default function Rozpocet( props ) {
                   </button>
                 }
                 {!showAddTrip && !showSubtasks &&
-                  <button className="btn"
+                  <button className="btn waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddTrip(true);
@@ -1599,7 +1600,7 @@ export default function Rozpocet( props ) {
                   </button>
                 }
                 {!showAddMaterial && !showSubtasks &&
-                  <button className="btn"
+                  <button className="btn waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddMaterial(true);
@@ -1610,7 +1611,7 @@ export default function Rozpocet( props ) {
                   </button>
                 }
                 {!showAddCustomItem && !showSubtasks &&
-                  <button className="btn"
+                  <button className="btn waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddCustomItem(true);
@@ -1661,31 +1662,31 @@ export default function Rozpocet( props ) {
 }
 
 export const getCreationError = ( newSubtaskType, newSubtaskAssigned, company ) => {
-  let noType = newSubtaskType === null;
+  //let noType = newSubtaskType.id === null;
+  let noType = false;
   let noAssigned = newSubtaskAssigned.length === 0;
   let noCompany = company === null;
-  if ( !noType && !noAssigned && !noCompany ) {
+  let messages = [];
+  if ( noAssigned ) {
+    messages.push( 'assign the task to someone' );
+  }
+  if ( noType ) {
+    messages.push( 'pick task type' );
+  }
+  if ( noCompany ) {
+    messages.push( 'pick company' );
+  }
+
+  if ( messages.length === 0 ) {
     return ''
   }
-  if ( noType && noAssigned && noCompany ) {
-    return 'First assign the task to someone, pick task type and company!';
+  let errorMessage = 'First ';
+  for ( let i = 0; i < messages.length; i++ ) {
+    if ( i === messages.length - 1 ) {
+      errorMessage += `${messages.length > 1 ? 'and ' : ''} ${messages[i]}!`
+    } else {
+      errorMessage += `${messages[i]}${messages.length-2 === i ? ' ' : ', '}`
+    }
   }
-  if ( !noType && noAssigned && noCompany ) {
-    return 'First assign the task to someone and pick company!';
-  }
-  if ( !noType && !noAssigned && noCompany ) {
-    return 'First pick company!';
-  }
-  if ( !noType && noAssigned && !noCompany ) {
-    return 'First assign the task to someone!';
-  }
-  if ( noType && !noAssigned && noCompany ) {
-    return 'First pick task type and company!';
-  }
-  if ( noType && !noAssigned && !noCompany ) {
-    return 'First pick task type!';
-  }
-  if ( noType && noAssigned && !noCompany ) {
-    return 'First assign the task to someone and pick task type!';
-  }
+  return errorMessage;
 }

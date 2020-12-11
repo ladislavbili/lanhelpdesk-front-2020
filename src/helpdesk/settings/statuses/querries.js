@@ -1,6 +1,6 @@
 import {
   gql
-} from '@apollo/client';;
+} from '@apollo/client';
 
 export const GET_STATUSES = gql `
 query {
@@ -78,7 +78,29 @@ mutation setUserStatuses($ids: [Int]!) {
   setUserStatuses(
     ids: $ids
   ){
-		id
+    id
+		statuses {
+			id
+			title
+			color
+			action
+		}
+		company {
+			id
+			title
+		}
+    role {
+			level
+      accessRights {
+        projects
+        mailViaComment
+        viewInternal
+        publicFilters
+        users
+        companies
+        vykazy
+      }
+    }
   }
 }
 `;
