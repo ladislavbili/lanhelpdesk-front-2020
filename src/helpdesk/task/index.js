@@ -286,7 +286,6 @@ export default function TasksIndex( props ) {
               }
             } )
             .tasks;
-          console.log( existingTasks );
 
           client.writeQuery( {
             query: GET_TASKS,

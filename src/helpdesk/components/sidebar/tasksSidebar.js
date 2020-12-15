@@ -7,7 +7,8 @@ import {
   Nav,
   NavItem,
   TabPane,
-  TabContent
+  TabContent,
+  Button
 } from 'reactstrap';
 import {
   NavLink as Link
@@ -101,7 +102,8 @@ export default function TasksSidebar( props ) {
 
   const {
     data: projectData,
-    loading: projectLoading
+    loading: projectLoading,
+    refetch: reloadProject
   } = useQuery( GET_PROJECT );
 
   const {
@@ -148,21 +150,26 @@ export default function TasksSidebar( props ) {
     )
   )
 
+  /*
   const projects = [
-    ...( myData.getMyData.role.accessRights.addProjects ? [ dashboard, addProject ] : [ dashboard ] ),
-    ...myProjectsData.myProjects,
+  ...( myData.getMyData.role.accessRights.addProjects ? [ dashboard, addProject ] : [ dashboard ] ),
+  ...myProjectsData.myProjects,
   ]
-
+  */
+  const projects = [ dashboard, ...myProjectsData.myProjects ];
+  /*
   let milestones = [];
   if ( projectData.localProject.project.id === null ) {
-    milestones = [ allMilestones ];
+  milestones = [ allMilestones ];
   } else {
-    if ( canEditProject ) {
-      milestones = [ allMilestones, addMilestone, ...projectData.localProject.project.milestones ];
-    } else {
-      milestones = [ allMilestones, ...projectData.localProject.project.milestones ];
-    }
+  if ( canEditProject ) {
+  milestones = [ allMilestones, addMilestone, ...projectData.localProject.project.milestones ];
+  } else {
+  milestones = [ allMilestones, ...projectData.localProject.project.milestones ];
   }
+  }
+  */
+  const milestones = [ allMilestones, ...( projectData.localProject.project.id !== null ? projectData.localProject.project.milestones : [] ) ]
 
   const DropdownIndicator = ( {
     innerProps,
@@ -198,11 +205,7 @@ export default function TasksSidebar( props ) {
         value={projectData.localProject}
         styles={sidebarSelectStyle}
         onChange={pro => {
-          if (pro.id !== -1) {
-            setProject(pro)
-          } else {
-            setOpenProjectAdd(true);
-          }
+          setProject(pro)
         }}
         components={{ DropdownIndicator }}
         />
@@ -214,11 +217,7 @@ export default function TasksSidebar( props ) {
             value={milestoneData.localMilestone}
             styles={sidebarSelectStyle}
             onChange={mile => {
-              if (mile.id !== -1) {
-                setMilestone(mile)
-              } else {
-                setOpenMilestoneAdd(true);
-              }
+              setOpenMilestoneAdd(true);
             }}
             components={{ DropdownIndicator }}
             />
@@ -273,28 +272,26 @@ export default function TasksSidebar( props ) {
                 All tasks
               </span>
             </NavItem>
-            {
-              myFiltersData.myFilters.map((filter) => (
-                <NavItem key={filter.id} className="row full-width">
-                  <span
-                    className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === filterData.localFilter.id }) }
-                    onClick={() => {
-                      history.push(`/helpdesk/taskList/i/${filter.id}`)
-                    }}>
-                    {filter.title}
-                  </span>
+            { myFiltersData.myFilters.map((filter) => (
+              <NavItem key={filter.id} className="row full-width">
+                <span
+                  className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === filterData.localFilter.id }) }
+                  onClick={() => {
+                    history.push(`/helpdesk/taskList/i/${filter.id}`)
+                  }}>
+                  {filter.title}
+                </span>
 
-                  <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === filterData.localFilter.id })}
-                    onClick={() => {
-                      if (filter.id === filterData.localFilter.id) {
-                        setActiveTab(1);
-                      }
-                    }}>
-                    <i className="fa fa-cog"/>
-                  </div>
-                </NavItem>
-              ))
-            }
+                <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === filterData.localFilter.id })}
+                  onClick={() => {
+                    if (filter.id === filterData.localFilter.id) {
+                      setActiveTab(1);
+                    }
+                  }}>
+                  <i className="fa fa-cog"/>
+                </div>
+              </NavItem>
+            )) }
           </Nav>
         </TabPane>
         <TabPane tabId={1}>
@@ -302,10 +299,33 @@ export default function TasksSidebar( props ) {
             history={history}
             close={ () => {
               setActiveTab(0);
-          }}
+            }}
             />
         </TabPane>
       </TabContent>
+      <div className='p-l-15 p-r-15'>
+        <hr className='m-t-10 m-b-10'/>
+        { myData.getMyData.role.accessRights.addProjects &&
+          <NavItem className="row full-width">
+          <Button
+            className='btn-link p-0'
+            onClick={() => setOpenProjectAdd(true)}
+            >
+            { addProject.project.title }
+          </Button>
+        </NavItem>
+        }
+        { projectData.localProject.project.id !== null && canEditProject &&
+          <NavItem className="row full-width">
+          <Button
+            className='btn-link p-0'
+            onClick={() => setOpenMilestoneAdd(true)}
+            >
+            { addMilestone.title }
+          </Button>
+        </NavItem>
+        }
+      </div>
       { openProjectAdd &&
         <ProjectAdd
           open={openProjectAdd}
@@ -396,5 +416,6 @@ export default function TasksSidebar( props ) {
           />
       }
 
-    </div> );
+    </div>
+  );
 }

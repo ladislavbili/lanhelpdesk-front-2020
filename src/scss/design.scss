@@ -1190,7 +1190,7 @@ tr:last-child{
   width: $sidebar-width;
   border: none;
   list-style-type: none;
-  background: white;
+  background: $sidebar-background-color;
   position: relative;
   top: inherit;
   z-index: 999;
@@ -1842,9 +1842,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 
 .task-edit-right{
-  width: 250px;
-  margin: 55px 20px 45px 40px;
-  background-color: white;
+  width: 300px;
+  margin: 30px 5px 45px 5px;
+  background-color: $task-right-background-color;
 }
 
 .task-edit-left{

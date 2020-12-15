@@ -850,6 +850,22 @@ export default function TaskEdit( props ) {
                   />
               </button>
             }
+            {
+              statuses.filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
+                <button
+                  type="button"
+                  className="btn btn-link-reversed waves-effect p-l-0"
+                  onClick={changeStatus}
+                  >
+                  { status.icon.length > 3 &&
+                    <i
+                    className={`${status.icon} commandbar-command-icon p-r-2`}
+                    />
+                }
+                  {status.title}
+                </button>
+              ))
+            }
             { project &&
               <TaskAdd
                 project={project.id}
@@ -955,25 +971,33 @@ export default function TaskEdit( props ) {
               }}
               placeholder="Enter task name" />
           </span>
-
-          <div className="ml-auto center-hor">
-            <p className="m-b-0 task-info">
-              <span className="text-muted">
-                {task.createdBy?"Created by ":""}
-              </span>
-              {task.createdBy? (task.createdBy.name + " " +task.createdBy.surname) :''}
-              <span className="text-muted">
-                {task.createdBy?' at ':'Created at '}
-                {task.createdAt?(timestampToString(task.createdAt)):''}
-              </span>
-            </p>
-            <p className="m-b-0">
-              { renderStatusDate() }
-            </p>
-          </div>
         </div>
       </div>
     );
+  }
+
+  const renderTaskInfoAndDates = () => {
+    return (
+      <div className="ml-auto center-hor">
+        <p className="m-b-0 task-info">
+          <span className="text-muted">
+            {task.createdBy?"Created by ":""}
+          </span>
+          <span className="bolder">
+            {task.createdBy? (task.createdBy.name + " " +task.createdBy.surname) :''}
+          </span>
+          <span className="text-muted">
+            {task.createdBy?' at ':'Created at '}
+          </span>
+          <span className="bolder">
+            {task.createdAt?(timestampToString(task.createdAt)):''}
+          </span>
+        </p>
+        <p className="m-b-0">
+          { renderStatusDate() }
+        </p>
+      </div>
+    )
   }
 
   const renderStatusDate = () => {
@@ -984,7 +1008,7 @@ export default function TaskEdit( props ) {
             Pending date:
           </span>
           <DatePicker
-            className="form-control hidden-input"
+            className="form-control hidden-input bolder"
             selected={pendingDate}
             disabled={!status || status.action!=='PendingDate'||viewOnly||!pendingChangable}
             onChange={ (date) => {
@@ -1007,7 +1031,7 @@ export default function TaskEdit( props ) {
             Closed at:
           </span>
           <DatePicker
-            className="form-control hidden-input"
+            className="form-control hidden-input bolder"
             selected={closeDate}
             disabled={!status || (status.action!=='CloseDate' && status.action!=='CloseInvalid')||viewOnly}
             onChange={date => {
@@ -1024,7 +1048,7 @@ export default function TaskEdit( props ) {
     }
     return (
       <span className="task-info ">
-        <span className="center-hor text-muted">
+        <span className="center-hor text-muted bolder">
           {task.statusChange ? ('Status changed at ' + timestampToString(task.statusChange) ) : ""}
         </span>
       </span>
@@ -1304,6 +1328,32 @@ export default function TaskEdit( props ) {
   const renderSelectsLayout2Side = () => {
     return (
       <div className={"task-edit-right" + (columns ? " w-250px" : "")} >
+        <div className="col-form-label-2" >
+          <Label className="col-form-value-2">Status</Label>
+          { layoutComponents.Status }
+        </div>
+
+        <div className="col-form-label-2">
+          <Label className="col-form-value-2">Projekt</Label>
+          { layoutComponents.Project }
+        </div>
+
+        <div className="col-form-label-2">
+          <Label className="col-form-value-2">Milestone</Label>
+          { layoutComponents.Milestone }
+        </div>
+        { defaultFields.requester.show &&
+          <div className="col-form-label-2">
+            <Label className="col-form-value-2">Zadal</Label>
+            { layoutComponents.Requester }
+          </div>
+        }
+        { defaultFields.company.show &&
+          <div className="col-form-label-2">
+            <Label className="col-form-value-2">Firma</Label>
+            { layoutComponents.Company }
+          </div>
+        }
         { defaultFields.assignedTo.show &&
           <div>
             <Label className="col-form-label-2">Assigned</Label>
@@ -1364,28 +1414,6 @@ export default function TaskEdit( props ) {
           } }
           />
 
-        <Label className="col-form-label m-l-7">Attachments</Label>
-        { renderAttachments(true) }
-
-        { defaultFields.tag.show &&
-          <div style={{maxWidth:"250px"}}>
-            <Label className="col-form-label-2">Tagy: </Label>
-            <div className="col-form-value-2">
-              <Select
-                placeholder="Zvoľte tagy"
-                value={tags}
-                isMulti
-                onChange={(tags)=> {
-                  setTags(tags);
-                  autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
-                }}
-                options={allTags}
-                isDisabled={defaultFields.tag.fixed||viewOnly}
-                styles={invisibleSelectStyleNoArrowColored}
-                />
-            </div>
-          </div>
-        }
         { defaultFields.taskType.show &&
           <div>
             <label className="col-form-label m-l-7">Task Type</label>
@@ -1415,6 +1443,9 @@ export default function TaskEdit( props ) {
   }
 
   const renderTags = () => {
+    if ( !defaultFields.tag.show ) {
+      return null;
+    }
     return (
       <div className="row m-t-10">
         <div className="center-hor">
@@ -1438,7 +1469,7 @@ export default function TaskEdit( props ) {
     )
   }
 
-  const renderPopis = () => {
+  const renderDescription = () => {
     let RenderDescription = null;
     if ( viewOnly ) {
       if ( description.length !== 0 ) {
@@ -1492,20 +1523,29 @@ export default function TaskEdit( props ) {
               { !showDescription ? 'edit' : 'save' }
             </button>
           </Label>
-          { company && company.monthlyPausal &&
-            <span> {`Pausal subtasks:`}
-              <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
-                {` ${usedSubtaskPausal}`}
-              </span>
-              {` / ${taskWorkPausal} Pausal trips:`}
-              <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
-                {` ${usedTripPausal}`}
-              </span>
-              {` / ${taskTripPausal}`}
-            </span>
-          }
         </div>
         {RenderDescription}
+      </div>
+    )
+  }
+
+  const renderCompanyPausalInfo = () => {
+    if ( !company || !company.monthlyPausal ) {
+      return null;
+    }
+    return (
+      <div>
+        { `Pausal ${company.title}: ` }
+        <span> {`Pausal subtasks:`}
+          <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
+            {` ${usedSubtaskPausal}`}
+          </span>
+          {` / ${taskWorkPausal} Pausal trips:`}
+          <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
+            {` ${usedTripPausal}`}
+          </span>
+          {` / ${taskTripPausal}`}
+        </span>
       </div>
     )
   }
@@ -1848,11 +1888,10 @@ export default function TaskEdit( props ) {
       )}
       >
 
-      { renderCommandbar() }
       <div
         className={classnames(
-          {"fit-with-header-and-commandbar": !columns},
-          {"fit-with-header-and-commandbar-3": columns},
+          {"fit-with-header": !columns},
+          {"fit-with-header-and-commandbar": columns},
           "scroll-visible",
           { "row": layout === 2}
         )}
@@ -1866,20 +1905,23 @@ export default function TaskEdit( props ) {
             }
           )}
           >
+          { renderCommandbar() }
 
           <div className="p-l-30 p-r-30">
             { renderTitle() }
-
             <hr className="m-t-5 m-b-5"/>
+            { renderTaskInfoAndDates() }
             {canCreateVykazyError()}
-            { layout === 1 ? renderSelectsLayout1() : renderSelectsLayout2Form() }
-            { renderPopis() }
+            { layout === 1 ? renderSelectsLayout1() : renderTags() }
+            { renderDescription() }
             <div className="highlight-form">
               { renderSimpleSubtasks() }
-              { layout === 1 && renderAttachments(false) }
             </div>
 
-            { layout === 1 && defaultFields.tag.show && renderTags() }
+            { renderAttachments(false) }
+            { renderCompanyPausalInfo() }
+
+            { layout === 1 && renderTags() }
 
             { renderModalUserAdd() }
 

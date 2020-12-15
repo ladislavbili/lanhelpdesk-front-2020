@@ -261,7 +261,7 @@ mutation addTask(
   $requester: Int,
   $status: Int!,
   $tags: [Int]!,
-  $taskType: Int!,
+  $taskType: Int,
   $repeat: RepeatInput,
   $subtasks: [SubtaskInput],
   $workTrips: [WorkTripInput],
@@ -307,6 +307,70 @@ mutation addUserToProject(
     projectId: $projectId,
   ){
     id
+    title
+    updatedAt
+    createdAt
+    important
+    closeDate
+    overtime
+    pausal
+    pendingChangable
+    statusChange
+    assignedTo {
+      id
+      fullName
+      email
+    }
+    company {
+      id
+      title
+    }
+    createdBy {
+      id
+      name
+      surname
+    }
+    deadline
+    description
+    milestone{
+      id
+      title
+    }
+    pendingDate
+    project{
+      id
+      title
+      right{
+        write
+        delete
+      }
+    }
+    requester{
+      id
+      name
+      surname
+      fullName
+      email
+    }
+    status {
+      id
+      title
+      color
+      action
+    }
+    tags {
+      id
+      title
+    }
+    taskType {
+      id
+      title
+    }
+    repeat {
+      repeatEvery
+      repeatInterval
+      startsAt
+    }
   }
 }
 `;

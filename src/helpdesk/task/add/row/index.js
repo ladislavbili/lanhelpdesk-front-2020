@@ -137,9 +137,10 @@ export default function RowTaskAddContainer( props ) {
     localProjectLoading ||
     currentUserLoading
   );
-  if ( !localProjectData.localProject.id ) {
+  if ( !localProjectData.localProject.id || loading ) {
     return null;
   }
+
   return (
     <RowTaskAdd
       {...props}
@@ -153,6 +154,7 @@ export default function RowTaskAddContainer( props ) {
         }) ))
       }
       project={localProjectData.localProject}
+      projectID={localProjectData.localProject.id}
       users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }
       companies={ toSelArr(companiesData.basicCompanies) }
       taskTypes={ toSelArr(taskTypesData.taskTypes) }

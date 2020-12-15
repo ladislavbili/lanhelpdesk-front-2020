@@ -7,6 +7,7 @@ query {
   statuses {
     title
     id
+    icon
     action
     order
     color

@@ -66,7 +66,7 @@ export default class Attachments extends Component {
         { !disabled && !top &&
           <div className="attachment-label">
             <label htmlFor={"uploadAttachment"+taskID} className="btn-link-add" >
-              <i className="fa fa-plus" />
+              <i className="fa fa-plus p-r-5" />
               Add attachment
             </label>
           </div>
@@ -90,7 +90,7 @@ export default class Attachments extends Component {
         { !disabled && top &&
           <div className="attachment-label">
             <label htmlFor={"uploadAttachment"+taskID} className="btn-link-add clickable" >
-              <i className="fa fa-plus" />
+              <i className="fa fa-plus p-r-5" />
               Add attachment
             </label>
           </div>

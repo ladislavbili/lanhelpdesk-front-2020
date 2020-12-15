@@ -20,6 +20,7 @@ import {
   defBool,
   defItem
 } from 'configs/constants/projects';
+import classnames from 'classnames';
 import Permissions from "./projectPermissions";
 import ProjectDefaultValues from "./defaultValues";
 import Loading from 'components/loading';
@@ -237,7 +238,15 @@ export default function ProjectAdd( props ) {
     .filter( ( user ) => canReadUserIDs.includes( user.id ) );
 
   return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+    <div
+      className={ classnames(
+        {
+          "scroll-visible": !closeModal,
+          "fit-with-header-and-commandbar": !closeModal
+        },
+        "p-20"
+      )}
+      >
 				<FormGroup>
 					<Label for="name">Project name</Label>
 					<Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />

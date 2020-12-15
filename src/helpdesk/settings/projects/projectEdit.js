@@ -21,6 +21,7 @@ import {
   defBool,
   defItem
 } from 'configs/constants/projects';
+import classnames from 'classnames';
 import Permissions from "./projectPermissions";
 import ProjectDefaultValues from "./defaultValues";
 import DeleteReplacement from 'components/deleteReplacement';
@@ -261,7 +262,6 @@ export default function ProjectEdit( props ) {
 
   // functions
   const updateProjectFunc = () => {
-    console.log( 'aaa' );
     setSaving( true );
 
     let newProjectRights = projectRights.map( r => ( {
@@ -425,7 +425,15 @@ export default function ProjectEdit( props ) {
   let canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
     .filter( ( user ) => canReadUserIDs.includes( user.id ) );
   return (
-    <div className="p-20 fit-with-header-and-commandbar scroll-visible">
+    <div
+      className={ classnames(
+        {
+          "scroll-visible": !closeModal,
+          "fit-with-header-and-commandbar": !closeModal
+        },
+        "p-20"
+      )}
+      >
       <FormGroup>
         <Label for="name">Project name</Label>
         <Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />

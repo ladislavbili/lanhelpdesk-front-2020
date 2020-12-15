@@ -699,7 +699,33 @@ export default function TaskAdd( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className="task-edit-right">
+      <div className="task-edit-right  m-t-0 p-t-0">
+        <div className="col-form-label-2" >
+          <Label className="col-form-value-2">Status</Label>
+          { layoutComponents.Status }
+        </div>
+
+        <div className="col-form-label-2">
+          <Label className="col-form-value-2">Projekt</Label>
+          { layoutComponents.Project(viewOnly) }
+        </div>
+
+        <div className="col-form-label-2">
+          <Label className="col-form-value-2">Milestone</Label>
+          { layoutComponents.Milestone }
+        </div>
+        { defaultFields.requester.show &&
+          <div className="col-form-label-2">
+            <Label className="col-form-value-2">Zadal</Label>
+            { layoutComponents.Requester }
+          </div>
+        }
+        { defaultFields.company.show &&
+          <div className="col-form-label-2">
+            <Label className="col-form-value-2">Firma</Label>
+            { layoutComponents.Company }
+          </div>
+        }
         {!viewOnly &&
           defaultFields.assignedTo.show &&
           <div className="">
@@ -777,31 +803,10 @@ export default function TaskAdd( props ) {
           } }
           />
 
-
-        <Label className="col-form-label m-l-7">Attachments</Label>
-        { renderAttachments(true) }
-
-        {defaultFields.tag.show &&
-          <div className="">
-            <Label className="col-form-label-2">Tagy: </Label>
-            <div className="col-form-value-2">
-              <Select
-                value={tags}
-                placeholder="None"
-                isDisabled={defaultFields.tag.fixed || viewOnly}
-                isMulti
-                onChange={(t)=>setTags(t)}
-                options={allTags}
-                styles={invisibleSelectStyleNoArrowColored}
-                />
-            </div>
-          </div>
-        }
-
         {!viewOnly &&
           defaultFields.taskType.show &&
           <div className="">
-            <Label className="col-form-label-2">Typ</Label>
+            <Label className="col-form-label-2">Task Type</Label>
             <div className="col-form-value-2">
               <Select
                 placeholder="Select required"
@@ -855,19 +860,19 @@ export default function TaskAdd( props ) {
   const renderPopis = () => {
     return (
       <div>
-          <Label className="m-b-10 col-form-label m-t-10">Popis úlohy</Label>
-          <CKEditor5
-            editor={ ClassicEditor }
-            data={description}
-            onInit={(editor)=>{
-            }}
-            onChange={(e, editor)=>{
-              setDescription(editor.getData());
-            }}
-            readOnly={viewOnly}
-            config={ck5config}
-            />
-        </div>
+        <Label className="m-b-10 col-form-label m-t-10">Popis úlohy</Label>
+        <CKEditor5
+          editor={ ClassicEditor }
+          data={description}
+          onInit={(editor)=>{
+          }}
+          onChange={(e, editor)=>{
+            setDescription(editor.getData());
+          }}
+          readOnly={viewOnly}
+          config={ck5config}
+          />
+      </div>
     )
   }
 
@@ -903,176 +908,176 @@ export default function TaskAdd( props ) {
   const renderTags = () => {
     return (
       <div className = "row m-t-10" >
-          <div className="center-hor">
-            <Label className="center-hor">Tagy: </Label>
-          </div>
-          <div className="f-1 ">
-            <Select
-              value={tags}
-              placeholder="None"
-              isDisabled={defaultFields.tag.fixed || viewOnly}
-              isMulti
-              onChange={(t)=>setTags(t)}
-              options={viewOnly ? [] : allTags}
-              styles={invisibleSelectStyleNoArrowColored}
-              />
-          </div>
+        <div className="center-hor">
+          <Label className="center-hor">Tagy: </Label>
         </div>
+        <div className="f-1 ">
+          <Select
+            value={tags}
+            placeholder="None"
+            isDisabled={defaultFields.tag.fixed || viewOnly}
+            isMulti
+            onChange={(t)=>setTags(t)}
+            options={viewOnly ? [] : allTags}
+            styles={invisibleSelectStyleNoArrowColored}
+            />
+        </div>
+      </div>
     )
   }
 
   const renderAttachments = ( top ) => {
     return (
       <Attachments
-          disabled={viewOnly}
-          taskID={null}
-          top={top}
-          attachments={attachments}
-          addAttachments={(newAttachments)=>{
-            let time = moment().valueOf();
-            newAttachments = newAttachments.map((attachment)=>{
-              return {
-                title:attachment.name,
-                size:attachment.size,
-                time,
-                data:attachment
-              }
-            });
-            setAttachments([...attachments, ...newAttachments]);
-          }}
-          removeAttachment={(attachment)=>{
-            let newAttachments = [...attachments];
-            newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
-            setAttachments([...newAttachments]);
-          }}
-          />
+        disabled={viewOnly}
+        taskID={null}
+        top={top}
+        attachments={attachments}
+        addAttachments={(newAttachments)=>{
+          let time = moment().valueOf();
+          newAttachments = newAttachments.map((attachment)=>{
+            return {
+              title:attachment.name,
+              size:attachment.size,
+              time,
+              data:attachment
+            }
+          });
+          setAttachments([...attachments, ...newAttachments]);
+        }}
+        removeAttachment={(attachment)=>{
+          let newAttachments = [...attachments];
+          newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
+          setAttachments([...newAttachments]);
+        }}
+        />
     )
   }
 
   const renderVykazyTable = ( subtasks, workTrips, materials, customItems ) => {
     return (
       <VykazyTable
-          id={company ? company.id : 0}
-          showColumns={ [0,1,2,3,4,5,6,7,8] }
+        id={company ? company.id : 0}
+        showColumns={ [0,1,2,3,4,5,6,7,8] }
 
-          showTotals={false}
-          disabled={viewOnly}
-          company={company}
-          match={match}
-          taskID={null}
-          taskAssigned={assignedTo}
+        showTotals={false}
+        disabled={viewOnly}
+        company={company}
+        match={match}
+        taskID={null}
+        taskAssigned={assignedTo}
 
-          showSubtasks={project ? project.showSubtasks : false}
+        showSubtasks={project ? project.showSubtasks : false}
 
-          submitService={(newService)=>{
-            setSubtasks([...subtasks,{id:getNewID(), ...newService}]);
-          }}
-          subtasks={subtasks}
-          defaultType={taskType}
-          taskTypes={taskTypes}
-          updateSubtask={(id,newData)=>{
-            let newSubtasks=[...subtasks];
+        submitService={(newService)=>{
+          setSubtasks([...subtasks,{id:getNewID(), ...newService}]);
+        }}
+        subtasks={subtasks}
+        defaultType={taskType}
+        taskTypes={taskTypes}
+        updateSubtask={(id,newData)=>{
+          let newSubtasks=[...subtasks];
+          newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
+          setSubtasks(newSubtasks);
+        }}
+        updateSubtasks={(multipleSubtasks)=>{
+          let newSubtasks=[...subtasks];
+          multipleSubtasks.forEach(({id, newData})=>{
             newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
-            setSubtasks(newSubtasks);
-          }}
-          updateSubtasks={(multipleSubtasks)=>{
-            let newSubtasks=[...subtasks];
-            multipleSubtasks.forEach(({id, newData})=>{
-              newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
-            });
-            setSubtasks(newSubtasks);
-          }}
-          removeSubtask={(id)=>{
-            let newSubtasks=[...subtasks];
-            newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
-            setSubtasks(newSubtasks);
-          }}
-          workTrips={workTrips}
-          tripTypes={tripTypes}
-          submitTrip={(newTrip)=>{
-            setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
-          }}
-          updateTrip={(id,newData)=>{
-            let newTrips=[...workTrips];
+          });
+          setSubtasks(newSubtasks);
+        }}
+        removeSubtask={(id)=>{
+          let newSubtasks=[...subtasks];
+          newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
+          setSubtasks(newSubtasks);
+        }}
+        workTrips={workTrips}
+        tripTypes={tripTypes}
+        submitTrip={(newTrip)=>{
+          setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
+        }}
+        updateTrip={(id,newData)=>{
+          let newTrips=[...workTrips];
+          newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
+          setWorkTrips(newTrips);
+        }}
+        updateTrips={(multipleTrips)=>{
+          let newTrips=[...workTrips];
+          multipleTrips.forEach(({id, newData})=>{
             newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-            setWorkTrips(newTrips);
-          }}
-          updateTrips={(multipleTrips)=>{
-            let newTrips=[...workTrips];
-            multipleTrips.forEach(({id, newData})=>{
-              newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-            });
-            setWorkTrips(newTrips);
-          }}
-          removeTrip={(id)=>{
-            let newTrips=[...workTrips];
-            newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
-            setWorkTrips(newTrips);
-          }}
+          });
+          setWorkTrips(newTrips);
+        }}
+        removeTrip={(id)=>{
+          let newTrips=[...workTrips];
+          newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
+          setWorkTrips(newTrips);
+        }}
 
-          materials={materials}
-          submitMaterial={(newMaterial)=>{
-            setMaterials([...materials,{id:getNewID(),...newMaterial}]);
-          }}
-          updateMaterial={(id,newData)=>{
-            let newMaterials=[...materials];
+        materials={materials}
+        submitMaterial={(newMaterial)=>{
+          setMaterials([...materials,{id:getNewID(),...newMaterial}]);
+        }}
+        updateMaterial={(id,newData)=>{
+          let newMaterials=[...materials];
+          newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
+          setMaterials(newMaterials);
+        }}
+        updateMaterials={(multipleMaterials)=>{
+          let newMaterials=[...materials];
+          multipleMaterials.forEach(({id, newData})=>{
             newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-            setMaterials(newMaterials);
-          }}
-          updateMaterials={(multipleMaterials)=>{
-            let newMaterials=[...materials];
-            multipleMaterials.forEach(({id, newData})=>{
-              newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-            });
-            setMaterials(newMaterials);
-          }}
-          removeMaterial={(id)=>{
-            let newMaterials=[...materials];
-            newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-            setMaterials(newMaterials);
-          }}
+          });
+          setMaterials(newMaterials);
+        }}
+        removeMaterial={(id)=>{
+          let newMaterials=[...materials];
+          newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
+          setMaterials(newMaterials);
+        }}
 
-          customItems={customItems}
-          submitCustomItem={(customItem)=>{
-            setCustomItems([...customItems,{id:getNewID(),...customItem}]);
-          }}
-          updateCustomItem={(id,newData)=>{
-            let newCustomItems=[...customItems];
+        customItems={customItems}
+        submitCustomItem={(customItem)=>{
+          setCustomItems([...customItems,{id:getNewID(),...customItem}]);
+        }}
+        updateCustomItem={(id,newData)=>{
+          let newCustomItems=[...customItems];
+          newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
+          setCustomItems(newCustomItems);
+        }}
+        updateCustomItems={(multipleCustomItems)=>{
+          let newCustomItems=[...customItems];
+          multipleCustomItems.forEach(({id, newData})=>{
             newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
-            setCustomItems(newCustomItems);
-          }}
-          updateCustomItems={(multipleCustomItems)=>{
-            let newCustomItems=[...customItems];
-            multipleCustomItems.forEach(({id, newData})=>{
-              newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
-            });
-            setCustomItems(newCustomItems);
-          }}
-          removeCustomItem={(id)=>{
-            let newCustomItems=[...customItems];
-            newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
-            setCustomItems(newCustomItems);
-          }}
+          });
+          setCustomItems(newCustomItems);
+        }}
+        removeCustomItem={(id)=>{
+          let newCustomItems=[...customItems];
+          newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
+          setCustomItems(newCustomItems);
+        }}
 
-          units={[]}
-          defaultUnit={defaultUnit}
-          />
+        units={[]}
+        defaultUnit={defaultUnit}
+        />
     )
   }
 
   const renderButtons = () => {
     return (
       <div>
-          {closeModal &&
-            <Button className="btn-link-remove" onClick={() => closeModal()}>Cancel</Button>
-          }
-          <button
-            className="btn pull-right"
-            disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
-            onClick={addTaskFunc}
-            > Create task
-          </button>
-        </div>
+        {closeModal &&
+          <Button className="btn-link-remove" onClick={() => closeModal()}>Cancel</Button>
+        }
+        <button
+          className="btn pull-right"
+          disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
+          onClick={addTaskFunc}
+          > Create task
+        </button>
+      </div>
 
     )
   }
@@ -1083,53 +1088,53 @@ export default function TaskAdd( props ) {
     }
     return (
       <div className="center-hor" style={{color: "#FF4500", height: "20px"}}>
-          {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
-        </div>
+        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
+      </div>
     )
   }
 
   return (
     <div>
+      <div
+        className={classnames(
+          "scrollable",
+          { "p-20": layout === 1},
+          { "row": layout === 2}
+        )}
+        >
+
         <div
           className={classnames(
-            "scrollable",
-            { "p-20": layout === 1},
-            { "row": layout === 2}
-          )}
-          >
+            {
+              "task-edit-left": layout === 2
+            }
+          )}>
 
-          <div
-            className={classnames(
-              {
-                "task-edit-left": layout === 2
-              }
-            )}>
+          { renderTitle() }
 
-            { renderTitle() }
+          <hr className="m-t-15 m-b-10"/>
+          {canCreateVykazyError()}
 
-            <hr className="m-t-15 m-b-10"/>
-            {canCreateVykazyError()}
+          { layout === 1 ? renderSelectsLayout1() : renderTags() }
 
-            { layout === 1 ? renderSelectsLayout1() : renderSelectsLayout2Form() }
+          { renderPopis() }
 
-            { renderPopis() }
+          { layout === 1 && defaultFields.tag.show && renderTags() }
 
-            { layout === 1 && defaultFields.tag.show && renderTags() }
-
-            <div className="highlight-form">
-              { renderSimpleSubtasks() }
-              { layout === 1 && renderAttachments(false) }
-            </div>
-
-            { !viewOnly && renderVykazyTable(subtasks, workTrips, materials, customItems) }
-
-
+          <div className="highlight-form">
+            { renderSimpleSubtasks() }
           </div>
 
-          { layout === 2 && renderSelectsLayout2Side() }
+          { renderAttachments(false) }
+          { !viewOnly && renderVykazyTable(subtasks, workTrips, materials, customItems) }
+
 
         </div>
-        { renderButtons() }
+
+        { layout === 2 && renderSelectsLayout2Side() }
+
       </div>
+      { renderButtons() }
+    </div>
   );
 }

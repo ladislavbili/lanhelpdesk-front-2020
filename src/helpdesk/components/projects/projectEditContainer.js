@@ -28,7 +28,6 @@ export default function ProjectEditContainer( props ) {
 
   return (
     <div className='p-l-15 p-r-15'>
-    <hr className='m-t-10 m-b-10'/>
       <Button
         className='btn-link p-0'
         onClick={() => setOpened(true)}
