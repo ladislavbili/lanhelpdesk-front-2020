@@ -130,7 +130,7 @@ body{
 }
 
 .main{
-  background-color: #F9F9F9;
+  background-color: $main-background-color;
   width: calc( 100% - #{$sidebar-width} - 2px );
 }
 
@@ -317,6 +317,13 @@ html{
 
 .p-t-17p{
   padding-top: 17% !important;
+}
+
+p-auto{
+  padding-left: auto;
+  padding-right: auto;
+  padding-top: auto;
+  padding-bottom: auto;
 }
 
 .cke{
@@ -1012,6 +1019,11 @@ tr:last-child{
 
 .public-filters>.react-datepicker-wrapper:nth-child(2)>.react-datepicker__input-container{
   width: 100% !important;
+}
+
+.input-error{
+  border-color: #f19a9aed;
+  border-width: 1px;
 }
 
 //----------------END-všeobecné-elementy----------------

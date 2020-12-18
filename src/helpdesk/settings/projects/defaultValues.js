@@ -1,7 +1,8 @@
 import React from 'react';
 import Select from 'react-select';
 import {
-  invisibleSelectStyle
+  invisibleSelectStyle,
+  invisibleSelectStyleNoArrowColored
 } from 'configs/components/select';
 import Checkbox from '../../../components/checkbox';
 import booleanSelects from 'configs/constants/boolSelect'
@@ -55,7 +56,7 @@ export default function ProjectDefaultValues( props ) {
                       value={status.value}
                       onChange={(e)=>setStatus({...status, value:e})}
                       options={statuses}
-                      styles={invisibleSelectStyle}
+                      styles={invisibleSelectStyleNoArrowColored}
                       />
                   </div>
                 </div>
@@ -98,7 +99,7 @@ export default function ProjectDefaultValues( props ) {
                       value={tag.value}
                       onChange={(e)=>setTag({...tag,value:e})}
                       options={allTags}
-                      styles={invisibleSelectStyle}
+                      styles={invisibleSelectStyleNoArrowColored}
                       />
                   </div>
                 </div>

@@ -14,6 +14,12 @@ query {
         title
         endsAt
       }
+      tags {
+        id
+        title
+        order
+        color
+      }
       def {
   			assignedTo {
   				def
@@ -107,13 +113,14 @@ query {
 `;
 
 export const ADD_PROJECT = gql `
-mutation addProject($title: String!, $description: String!, $lockedRequester: Boolean!, $projectRights: [ProjectRightInput]!, $def: ProjectDefaultsInput!) {
+mutation addProject($title: String!, $description: String!, $lockedRequester: Boolean!, $projectRights: [ProjectRightInput]!, $def: ProjectDefaultsInput!, $tags: [NewTagInput]!) {
   addProject(
     title: $title,
     description: $description,
     lockedRequester: $lockedRequester,
     projectRights: $projectRights,
     def: $def,
+    tags: $tags
   ){
     id
     title
@@ -122,6 +129,12 @@ mutation addProject($title: String!, $description: String!, $lockedRequester: Bo
     milestones {
       id
       title
+    }
+    tags {
+      id
+      title
+      order
+      color
     }
     projectRights {
 			read
@@ -210,6 +223,12 @@ query project($id: Int!) {
     title
     description
     lockedRequester
+    tags {
+      id
+      title
+      order
+      color
+    }
     projectRights {
 			read
 			write
@@ -288,17 +307,101 @@ query project($id: Int!) {
 `;
 
 export const UPDATE_PROJECT = gql `
-mutation updateProject($id: Int!, $title: String, $description: String, $lockedRequester: Boolean, $projectRights: [ProjectRightInput], $def: ProjectDefaultsInput) {
+mutation updateProject($id: Int!, $title: String, $description: String, $lockedRequester: Boolean, $projectRights: [ProjectRightInput], $def: ProjectDefaultsInput, $deleteTags: [Int]!, $updateTags: [TagUpdateInput]!, $addTags: [NewTagInput]!) {
   updateProject(
-		id: $id,
-    title: $title,
-    description: $description,
-    lockedRequester: $lockedRequester,
-    projectRights: $projectRights,
-    def: $def,
+		id: $id
+    title: $title
+    description: $description
+    lockedRequester: $lockedRequester
+    projectRights: $projectRights
+    def: $def
+    deleteTags: $deleteTags
+    updateTags: $updateTags
+    addTags: $addTags
   ){
     id
     title
+    description
+    lockedRequester
+    tags {
+      id
+      title
+      order
+      color
+    }
+    projectRights {
+			read
+			write
+			delete
+			internal
+			admin
+			user {
+				id
+        email
+			}
+		}
+    def {
+			assignedTo {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			company {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			overtime {
+				def
+				fixed
+				show
+				value
+			}
+			pausal {
+				def
+				fixed
+				show
+				value
+			}
+			requester {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			status {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			tag {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+			taskType {
+				def
+				fixed
+				show
+				value {
+					id
+				}
+			}
+		}
   }
 }
 `;

@@ -41,10 +41,6 @@ import {
 } from 'helpdesk/settings/statuses/querries';
 
 import {
-  GET_TAGS
-} from 'helpdesk/settings/tags/querries';
-
-import {
   GET_MY_DATA
 } from '../../querries';
 
@@ -94,14 +90,7 @@ export default function RowTaskAddContainer( props ) {
       fetchPolicy: 'network-only'
     }
   } );
-  const {
-    data: tagsData,
-    loading: tagsLoading
-  } = useQuery( GET_TAGS, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
+
   const {
     data: projectsData,
     loading: projectsLoading
@@ -132,7 +121,6 @@ export default function RowTaskAddContainer( props ) {
     usersLoading ||
     taskTypesLoading ||
     tripTypesLoading ||
-    tagsLoading ||
     projectsLoading ||
     localProjectLoading ||
     currentUserLoading
@@ -158,7 +146,7 @@ export default function RowTaskAddContainer( props ) {
       users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }
       companies={ toSelArr(companiesData.basicCompanies) }
       taskTypes={ toSelArr(taskTypesData.taskTypes) }
-      allTags={ toSelArr(tagsData.tags) }
+      allTags={ [] }
       tripTypes={ toSelArr(tripTypesData.tripTypes) }
       currentUser={ currentUserData.getMyData }
       milestones={[noMilestone]}

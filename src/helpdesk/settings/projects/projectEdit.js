@@ -24,6 +24,7 @@ import {
 import classnames from 'classnames';
 import Permissions from "./projectPermissions";
 import ProjectDefaultValues from "./defaultValues";
+import Tags from './tags';
 import DeleteReplacement from 'components/deleteReplacement';
 import Loading from 'components/loading';
 import {
@@ -40,9 +41,6 @@ import {
   GET_STATUSES,
 } from '../statuses/querries';
 import {
-  GET_TAGS,
-} from '../tags/querries';
-import {
   GET_TASK_TYPES,
 } from '../taskTypes/querries';
 import {
@@ -53,6 +51,7 @@ import {
   DELETE_PROJECT,
   GET_MY_DATA
 } from './querries';
+let fakeID = -1;
 
 export default function ProjectEdit( props ) {
   //data & queries
@@ -98,10 +97,6 @@ export default function ProjectEdit( props ) {
     loading: usersLoading
   } = useQuery( GET_BASIC_USERS, fetchNetOptions );
   const {
-    data: allTagsData,
-    loading: allTagsLoading
-  } = useQuery( GET_TAGS, fetchNetOptions );
-  const {
     data: taskTypesData,
     loading: taskTypesLoading
   } = useQuery( GET_TASK_TYPES, fetchNetOptions );
@@ -129,6 +124,9 @@ export default function ProjectEdit( props ) {
   const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
   const [ projectRights, setProjectRights ] = React.useState( [] );
+  const [ addTags, setAddTags ] = React.useState( [] );
+  const [ updateTags, setUpdateTags ] = React.useState( [] );
+  const [ deleteTags, setDeleteTags ] = React.useState( [] );
 
   const [ assignedTo, setAssignedTo ] = React.useState( defList );
   const [ company, setCompany ] = React.useState( defItem );
@@ -136,7 +134,8 @@ export default function ProjectEdit( props ) {
   const [ pausal, setPausal ] = React.useState( defBool );
   const [ requester, setRequester ] = React.useState( defItem );
   const [ status, setStatus ] = React.useState( defItem );
-  const [ tag, setTag ] = React.useState( defList );
+  const [ defTag, setDefTag ] = React.useState( defList );
+
   const [ taskType, setTaskType ] = React.useState( defItem );
 
   const [ saving, setSaving ] = React.useState( false );
@@ -225,19 +224,19 @@ export default function ProjectEdit( props ) {
   }, [ projectLoading, statusesLoading ] );
 
   React.useEffect( () => {
-    if ( !projectLoading && !allTagsLoading ) {
-      let tags = toSelArr( allTagsData.tags );
+    if ( !projectLoading ) {
+      let tags = toSelArr( getAllTags() );
       let ids = projectData.project.def.tag.value.map( v => v.id );
       let newValue = tags.filter( t => ids.includes( t.id ) );
-      let newTag = {
+      let newDefTag = {
         def: projectData.project.def.tag.def,
         fixed: projectData.project.def.tag.fixed,
         show: projectData.project.def.tag.show,
         value: newValue
       };
-      setTag( newTag );
+      setDefTag( newDefTag );
     }
-  }, [ projectLoading, allTagsLoading ] );
+  }, [ projectLoading ] );
 
   React.useEffect( () => {
     if ( !projectLoading && !taskTypesLoading ) {
@@ -253,6 +252,9 @@ export default function ProjectEdit( props ) {
   }, [ projectLoading, taskTypesLoading ] );
 
   React.useEffect( () => {
+    setAddTags( [] );
+    setUpdateTags( [] );
+    setDeleteTags( [] );
     refetch( {
       variables: {
         id
@@ -261,6 +263,20 @@ export default function ProjectEdit( props ) {
   }, [ id ] );
 
   // functions
+  const getAllTags = () => {
+    let allTags = projectData.project.tags.filter( ( tag ) => !deleteTags.includes( tag.id ) );
+    updateTags.map( ( tagChange ) => {
+      let index = allTags.findIndex( ( tag ) => tag.id === tagChange.id );
+      if ( index !== -1 ) {
+        allTags[ index ] = {
+          ...allTags[ index ],
+          ...tagChange
+        };
+      }
+    } );
+    return allTags.concat( addTags );
+  }
+
   const updateProjectFunc = () => {
     setSaving( true );
 
@@ -299,8 +315,8 @@ export default function ProjectEdit( props ) {
         value: ( status.value ? status.value.id : null )
       },
       tag: {
-        ...tag,
-        value: tag.value.map( u => u.id )
+        ...defTag,
+        value: defTag.value.map( u => u.id )
       },
       taskType: {
         ...taskType,
@@ -316,12 +332,27 @@ export default function ProjectEdit( props ) {
           lockedRequester,
           projectRights: newProjectRights,
           def: newDef,
+          addTags,
+          updateTags,
+          deleteTags
         }
       } )
       .then( ( response ) => {
         const updatedProject = {
           ...response.data.updateProject
         };
+        setAddTags( [] );
+        setUpdateTags( [] );
+        setDeleteTags( [] );
+        client.writeQuery( {
+          query: GET_PROJECT,
+          variables: {
+            id
+          },
+          data: {
+            project: updatedProject
+          },
+        } );
         if ( closeModal ) {
           const myRights = newProjectRights.find( ( projectRight ) => projectRight.UserId === currentUser.id );
           if ( myRights ) {
@@ -343,7 +374,7 @@ export default function ProjectEdit( props ) {
           }
         } else {
           let newProjects = [ ...allProjects ]
-          newProjects[ newProjects.findIndex( ( project ) => project.id === id ) ] = updateProject;
+          newProjects[ newProjects.findIndex( ( project ) => project.id === id ) ] = updatedProject;
           client.writeQuery( {
             query: GET_PROJECTS,
             data: {
@@ -401,7 +432,6 @@ export default function ProjectEdit( props ) {
     statusesLoading ||
     companiesLoading ||
     usersLoading ||
-    allTagsLoading ||
     taskTypesLoading ||
     myDataLoading
   ) {
@@ -415,11 +445,22 @@ export default function ProjectEdit( props ) {
     ( status && status.value === null && status.fixed ) ||
     ( assignedTo && assignedTo.value.length === 0 && assignedTo.fixed ) ||
     ( taskType && taskType.value === null && taskType.fixed ) ||
-    !projectRights.some( ( projectRight ) => projectRight.admin )
+    !projectRights.some( ( projectRight ) => projectRight.admin ) ||
+    addTags.some( ( tag ) => (
+      tag.title.length === 0 ||
+      !tag.color.includes( '#' ) ||
+      isNaN( parseInt( tag.order ) )
+    ) ) ||
+    updateTags.some( ( tag ) => (
+      ( tag.title !== undefined && tag.title.length === 0 ) ||
+      ( tag.color !== undefined && !tag.color.includes( '#' ) ) ||
+      ( tag.order !== undefined && isNaN( parseInt( tag.order ) ) )
+    ) )
   )
 
   const myProjectRights = projectRights.find( p => p.user.id === currentUser.id );
   const isAdmin = myProjectRights !== undefined && myProjectRights.admin;
+  const allTags = getAllTags();
 
   let canReadUserIDs = projectRights.map( ( permission ) => permission.user.id );
   let canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
@@ -494,16 +535,48 @@ export default function ProjectEdit( props ) {
         setRequester={setRequester}
         status={status}
         setStatus={setStatus}
-        tag={tag}
-        setTag={setTag}
+        tag={defTag}
+        setTag={setDefTag}
         taskType={taskType}
         setTaskType={setTaskType}
         statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
         companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
         canBeAssigned={canBeAssigned}
         users={lockedRequester ? (toSelArr(projectRights.map(r => r.user), 'email')) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-        allTags={(allTagsLoading ? [] : toSelArr(allTagsData.tags))}
+        allTags={toSelArr(allTags)}
         taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
+        />
+
+      <Tags
+        tags={allTags}
+        addTag={(newTag) => {
+          setAddTags([ ...addTags, {...newTag, id: fakeID -- } ])
+        }}
+        deleteTag={(id) => {
+          if(id > -1){
+            setUpdateTags(updateTags.filter((tag) => tag.id !== id ));
+            setDeleteTags([ ...deleteTags, id ]);
+          }else{
+            setAddTags(addTags.filter((tag) => tag.id !== id ));
+          }
+        }}
+        updateTag={(newTag) => {
+          if(newTag.id > -1){
+            let newTags = [...updateTags];
+            let index = newTags.findIndex((tag) => tag.id === newTag.id );
+            if(index === -1){
+              newTags = newTags.concat(newTag);
+            }else{
+              newTags[index] = { ...newTags[index], ...newTag }
+            }
+            setUpdateTags(newTags);
+          }else{
+            let newTags = [...addTags];
+            let index = newTags.findIndex((tag) => tag.id === newTag.id );
+            newTags[index] = { ...newTags[index], ...newTag }
+            setAddTags(newTags);
+          }
+        }}
         />
 
       { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) || ( taskType.value === null && taskType.fixed)) &&

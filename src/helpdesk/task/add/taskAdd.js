@@ -51,9 +51,12 @@ import {
 import {
   defaultVykazyChanges,
   invoicedAttributes,
-  defaultCheckboxList,
   noTaskType
 } from '../constants';
+
+import {
+  toSelArr
+} from 'helperFunctions';
 
 let fakeID = -1;
 
@@ -68,7 +71,6 @@ export default function TaskAdd( props ) {
     currentUser,
     projects,
     users,
-    allTags,
     taskTypes,
     tripTypes,
     milestones,
@@ -121,7 +123,7 @@ export default function TaskAdd( props ) {
   const [ title, setTitle ] = React.useState( "" );
   const [ workTrips, setWorkTrips ] = React.useState( [] );
 
-  const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( defaultCheckboxList );
+  const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
   const [ scheduled, setScheduled ] = React.useState( [] );
 
 
@@ -192,7 +194,7 @@ export default function TaskAdd( props ) {
     setStatus( newStatus );
 
     let mappedTags = def.tag.value.map( t => t.id );
-    let newTags = def.tag && ( def.tag.fixed || def.tag.def ) ? allTags.filter( ( item ) => mappedTags.includes( item.id ) ) : allTags;
+    let newTags = def.tag && ( def.tag.fixed || def.tag.def ) ? project.tags.filter( ( item ) => mappedTags.includes( item.id ) ) : [];
     setTags( newTags );
 
     let newTaskType = def.taskType && ( def.taskType.fixed || def.taskType.def ) ? taskTypes.find( ( item ) => item.id === def.taskType.value ) : taskType;
@@ -212,6 +214,7 @@ export default function TaskAdd( props ) {
   React.useEffect( () => {
     setDefaults( project );
   }, [ project ] );
+
   const addTaskFunc = () => {
     let link = '';
     if ( match.params.hasOwnProperty( 'listID' ) ) {
@@ -280,6 +283,10 @@ export default function TaskAdd( props ) {
             quantity: item.quantity,
             price: parseFloat( item.price )
           } ) ),
+          shortSubtasks: shortSubtasks.map( ( item ) => ( {
+            done: item.done,
+            title: item.title,
+          } ) )
         }
       } )
       .then( ( response ) => {
@@ -384,6 +391,7 @@ export default function TaskAdd( props ) {
         onChange={(project)=>{
           setProject(project);
           setMilestone(noMilestone);
+          setTags([]);
 
           if(!viewOnly){
             let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
@@ -918,7 +926,7 @@ export default function TaskAdd( props ) {
             isDisabled={defaultFields.tag.fixed || viewOnly}
             isMulti
             onChange={(t)=>setTags(t)}
-            options={viewOnly ? [] : allTags}
+            options={viewOnly || project === null ? [] : toSelArr(project.tags)}
             styles={invisibleSelectStyleNoArrowColored}
             />
         </div>

@@ -99,6 +99,11 @@ const responseTask = `
     repeatInterval
     startsAt
   }
+  shortSubtasks{
+    id
+    title
+    done
+  }
   subtasks {
     invoicedData{
       price
@@ -266,7 +271,8 @@ mutation addTask(
   $subtasks: [SubtaskInput],
   $workTrips: [WorkTripInput],
   $materials: [MaterialInput],
-  $customItems: [CustomItemInput]
+  $customItems: [CustomItemInput],
+  $shortSubtasks: [ShortSubtaskInput],
 ){
   addTask(
     title: $title,
@@ -290,6 +296,7 @@ mutation addTask(
     workTrips: $workTrips,
     materials: $materials,
     customItems: $customItems,
+    shortSubtasks: $shortSubtasks,
   ){
     id
     title
@@ -650,6 +657,47 @@ mutation updateTask(
     }
 }
 `;
+
+//short subtasks
+export const ADD_SHORT_SUBTASK = gql `
+mutation addShortSubtask($title: String!, $done: Boolean!, $task: Int!) {
+  addShortSubtask(
+    title: $title,
+		done: $done,
+    task: $task
+  ){
+    id
+    title
+    done
+  }
+}
+`;
+
+export const UPDATE_SHORT_SUBTASK = gql `
+mutation updateShortSubtask($id: Int!, $title: String, $done: Boolean) {
+  updateShortSubtask(
+		id: $id,
+    title: $title,
+		done: $done,
+  ){
+    id
+    title
+    done
+  }
+}
+`;
+
+export const DELETE_SHORT_SUBTASK = gql `
+mutation deleteShortSubtask($id: Int!) {
+  deleteShortSubtask(
+    id: $id,
+  ){
+    id
+  }
+}
+`;
+
+
 //table
 export const ADD_SUBTASK = gql `
 mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {

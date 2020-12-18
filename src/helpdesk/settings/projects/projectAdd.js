@@ -22,6 +22,7 @@ import {
 } from 'configs/constants/projects';
 import classnames from 'classnames';
 import Permissions from "./projectPermissions";
+import Tags from './tags';
 import ProjectDefaultValues from "./defaultValues";
 import Loading from 'components/loading';
 import {
@@ -34,9 +35,6 @@ import {
   GET_STATUSES,
 } from '../statuses/querries';
 import {
-  GET_TAGS,
-} from '../tags/querries';
-import {
   GET_TASK_TYPES,
 } from '../taskTypes/querries';
 import {
@@ -45,6 +43,8 @@ import {
   ADD_PROJECT,
   GET_MY_DATA
 } from './querries';
+
+let fakeID = -1;
 
 export default function ProjectAdd( props ) {
   //data & queries
@@ -72,10 +72,6 @@ export default function ProjectAdd( props ) {
     loading: usersLoading
   } = useQuery( GET_BASIC_USERS, fetchNetOptions );
   const {
-    data: allTagsData,
-    loading: allTagsLoading
-  } = useQuery( GET_TAGS, fetchNetOptions );
-  const {
     data: taskTypesData,
     loading: taskTypesLoading
   } = useQuery( GET_TASK_TYPES, fetchNetOptions );
@@ -94,8 +90,9 @@ export default function ProjectAdd( props ) {
   const [ pausal, setPausal ] = React.useState( defBool );
   const [ requester, setRequester ] = React.useState( defItem );
   const [ status, setStatus ] = React.useState( defItem );
-  const [ tag, setTag ] = React.useState( defList );
+  const [ defTag, setDefTag ] = React.useState( defList );
   const [ taskType, setTaskType ] = React.useState( defItem );
+  const [ tags, setTags ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
 
@@ -154,8 +151,8 @@ export default function ProjectAdd( props ) {
         value: ( status.value ? status.value.id : null )
       },
       tag: {
-        ...tag,
-        value: tag.value.map( u => u.id )
+        ...defTag,
+        value: defTag.value.map( u => u.id )
       },
       taskType: {
         ...taskType,
@@ -170,6 +167,7 @@ export default function ProjectAdd( props ) {
           lockedRequester,
           projectRights: newProjectRights,
           def: newDef,
+          tags
         }
       } )
       .then( ( response ) => {
@@ -220,13 +218,17 @@ export default function ProjectAdd( props ) {
     ( status.value === null && status.fixed ) ||
     ( assignedTo.value.length === 0 && assignedTo.fixed ) ||
     ( taskType.value === null && taskType.fixed ) ||
-    !projectRights.some( ( projectRight ) => projectRight.admin )
+    !projectRights.some( ( projectRight ) => projectRight.admin ) ||
+    tags.some( ( tag ) => (
+      tag.title.length === 0 ||
+      !tag.color.includes( '#' ) ||
+      isNaN( parseInt( tag.order ) )
+    ) )
   )
   if (
     statusesLoading ||
     companiesLoading ||
     usersLoading ||
-    allTagsLoading ||
     taskTypesLoading ||
     myDataLoading
   ) {
@@ -247,52 +249,68 @@ export default function ProjectAdd( props ) {
         "p-20"
       )}
       >
-				<FormGroup>
-					<Label for="name">Project name</Label>
-					<Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
-				</FormGroup>
+      <FormGroup>
+        <Label for="name">Project name</Label>
+        <Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
+      </FormGroup>
 
-				<FormGroup>
-					<Label htmlFor="description">Popis</Label>
-					<Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription( e.target.value )}/>
-				</FormGroup>
+      <FormGroup>
+        <Label htmlFor="description">Popis</Label>
+        <Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription( e.target.value )}/>
+      </FormGroup>
 
-				<Permissions
-					addUser={(user)=>{
-            let newProjectRights = [...projectRights, {user, read: true, write: false, delete: false, internal: false, admin: false}];
-						setProjectRights(newProjectRights);
-					}}
-					givePermission={(user, right)=>{
-						let newProjectRights=[...projectRights];
-						let index = projectRights.findIndex((r)=>r.user.id === user.id);
-						let item = newProjectRights[index];
-						item.read = right.read;
-						item.write = right.write;
-						item.delete = right.delete;
-						item.internal= right.internal;
-						item.admin = right.admin;
+      <Permissions
+        addUser={(user)=>{
+          let newProjectRights = [...projectRights, {user, read: true, write: false, delete: false, internal: false, admin: false}];
+          setProjectRights(newProjectRights);
+        }}
+        givePermission={(user, right)=>{
+          let newProjectRights=[...projectRights];
+          let index = projectRights.findIndex((r)=>r.user.id === user.id);
+          let item = newProjectRights[index];
+          item.read = right.read;
+          item.write = right.write;
+          item.delete = right.delete;
+          item.internal= right.internal;
+          item.admin = right.admin;
 
-						if(!item.read){
-							newProjectRights.splice(index,1);
-              setProjectRights(newProjectRights);
-              if (lockedRequester){
-                let newAssignedTo = {...assignedTo};
-                newAssignedTo.value = newAssignedTo.value.filter(u => u.id !== item.user.id);
-                setAssignedTo(newAssignedTo);
-              }
-						}else{
+          if(!item.read){
+            newProjectRights.splice(index,1);
             setProjectRights(newProjectRights);
-						}
-					}}
-          users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-					permissions={projectRights}
-					userID={currentUser.id}
-					isAdmin={currentUser.role.accessRights.projects || currentUser.role.accessRights.addProjects}
-					lockedRequester={lockedRequester}
-					lockRequester={() => setLockedRequester( !lockedRequester) }
-					/>
+            if (lockedRequester){
+              let newAssignedTo = {...assignedTo};
+              newAssignedTo.value = newAssignedTo.value.filter(u => u.id !== item.user.id);
+              setAssignedTo(newAssignedTo);
+            }
+          }else{
+            setProjectRights(newProjectRights);
+          }
+        }}
+        users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+        permissions={projectRights}
+        userID={currentUser.id}
+        isAdmin={currentUser.role.accessRights.projects || currentUser.role.accessRights.addProjects}
+        lockedRequester={lockedRequester}
+        lockRequester={() => setLockedRequester( !lockedRequester) }
+        />
 
-			<ProjectDefaultValues
+      <Tags
+        tags={tags}
+        addTag={(newTag) => {
+          setTags([ ...tags, {...newTag, id: fakeID -- } ])
+        }}
+        deleteTag={(id) => {
+          setTags( tags.filter((tag) => tag.id !== id ) )
+        }}
+        updateTag={(newTag) => {
+          let newTags = [...tags];
+          let index = newTags.findIndex((tag) => tag.id === newTag.id );
+          newTags[index] = { ...newTags[index], ...newTag }
+          setTags(newTags);
+        }}
+        />
+
+      <ProjectDefaultValues
         assignedTo={assignedTo}
         setAssignedTo={setAssignedTo}
         company={company}
@@ -305,20 +323,20 @@ export default function ProjectAdd( props ) {
         setRequester={setRequester}
         status={status}
         setStatus={setStatus}
-        tag={tag}
-        setTag={setTag}
+        tag={defTag}
+        setTag={setDefTag}
         taskType={taskType}
         setTaskType={setTaskType}
         statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
         companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
         canBeAssigned={canBeAssigned}
         users={lockedRequester ? (projectRights.map(r => r.user)) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-        allTags={(allTagsLoading ? [] : toSelArr(allTagsData.tags))}
+        allTags={toSelArr(tags)}
         taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
-				/>
+        />
 
       { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) || ( taskType.value === null && taskType.fixed)) &&
-          <div className="red" style={{color:'red'}}>
+        <div className="red" style={{color:'red'}}>
           Status, assigned to, task type and company can't be empty if they are fixed!
         </div>
       }

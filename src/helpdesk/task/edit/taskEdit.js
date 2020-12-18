@@ -82,7 +82,6 @@ let fakeID = -1;
 import {
   defaultVykazyChanges,
   invoicedAttributes,
-  defaultCheckboxList,
   noTaskType
 } from '../constants';
 
@@ -104,7 +103,6 @@ export default function TaskEdit( props ) {
     users,
     taskTypes,
     tripTypes,
-    allTags,
     projects,
     emails,
     saving,
@@ -131,6 +129,9 @@ export default function TaskEdit( props ) {
     addCustomItemFunc,
     updateCustomItemFunc,
     deleteCustomItemFunc,
+    addShortSubtask,
+    updateShortSubtask,
+    deleteShortSubtask,
   } = props;
 
   //state
@@ -172,7 +173,6 @@ export default function TaskEdit( props ) {
   const [ updateTask ] = useMutation( UPDATE_TASK );
   const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
 
-  const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( defaultCheckboxList );
   const [ scheduled, setScheduled ] = React.useState( [] );
 
   const isInvoiced = task.status.action === 'Invoiced';
@@ -744,8 +744,10 @@ export default function TaskEdit( props ) {
     setProject( project );
     setAssignedTo( newAssignedTo );
     setMilestone( noMilestone );
+    setTags( [] );
     autoUpdateTask( {
       project: project.id,
+      tags: [],
       assignedTo: newAssignedTo.map( ( user ) => user.id ),
       milestone: null
     } )
@@ -859,9 +861,9 @@ export default function TaskEdit( props ) {
                   >
                   { status.icon.length > 3 &&
                     <i
-                    className={`${status.icon} commandbar-command-icon p-r-2`}
-                    />
-                }
+                      className={`${status.icon} commandbar-command-icon p-r-2`}
+                      />
+                  }
                   {status.title}
                 </button>
               ))
@@ -1460,7 +1462,7 @@ export default function TaskEdit( props ) {
               setTags(tags);
               autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
             }}
-            options={allTags}
+            options={toSelArr(project === null ? [] : project.project.tags)}
             isDisabled={defaultFields.tag.fixed||viewOnly}
             styles={invisibleSelectStyleNoArrowColored}
             />
@@ -1554,23 +1556,15 @@ export default function TaskEdit( props ) {
     return (
       <CheckboxList
         disabled={false}
-        items={simpleSubtasks}
+        items={task.shortSubtasks}
         onChange={(simpleSubtask) => {
-          let newSimpleSubtasks = [...simpleSubtasks];
-          newSimpleSubtasks[newSimpleSubtasks.findIndex((simpleSubtask2) => simpleSubtask2.id === simpleSubtask.id )] = simpleSubtask;
-          setSimpleSubtasks(newSimpleSubtasks);
+          updateShortSubtask(simpleSubtask);
         }}
         submitItem = { (newSimpleSubtask) => {
-          setSimpleSubtasks([
-            ...simpleSubtasks,
-            {
-              ...newSimpleSubtask,
-              id: fakeID--,
-            }
-          ])
+          addShortSubtask({...newSimpleSubtask, task: id});
         }}
         deleteItem = { (simpleSubtask) => {
-          setSimpleSubtasks(simpleSubtasks.filter((simpleSubtask2) => simpleSubtask.id !== simpleSubtask2.id ))
+          deleteShortSubtask(simpleSubtask.id)
         } }
         placeholder="Short subtask title"
         newPlaceholder="New short subtask title"

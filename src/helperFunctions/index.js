@@ -8,6 +8,7 @@ export {
   isEmail,
   sameStringForms,
   textIncluded,
+  inputError,
 }
 from './dataChecks';
 

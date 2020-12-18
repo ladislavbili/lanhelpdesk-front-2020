@@ -22,10 +22,6 @@ import {
 } from 'helpdesk/settings/statuses/querries';
 
 import {
-  GET_TAGS
-} from 'helpdesk/settings/tags/querries';
-
-import {
   GET_TASK_TYPES
 } from 'helpdesk/settings/taskTypes/querries';
 
@@ -52,6 +48,9 @@ import {
 
   ADD_USER_TO_PROJECT,
   DELETE_TASK,
+  ADD_SHORT_SUBTASK,
+  UPDATE_SHORT_SUBTASK,
+  DELETE_SHORT_SUBTASK,
   ADD_SUBTASK,
   UPDATE_SUBTASK,
   DELETE_SUBTASK,
@@ -116,10 +115,6 @@ export default function TaskEditContainer( props ) {
     loading: tripTypesLoading,
   } = useQuery( GET_TRIP_TYPES );
   const {
-    data: tagsData,
-    loading: tagsLoading,
-  } = useQuery( GET_TAGS );
-  const {
     data: myProjectsData,
     loading: myProjectsLoading,
     refetch: refetchMyProjects,
@@ -143,6 +138,9 @@ export default function TaskEditContainer( props ) {
     data: projectData,
   } = useQuery( GET_PROJECT );
 
+  const [ addShortSubtask ] = useMutation( ADD_SHORT_SUBTASK );
+  const [ updateShortSubtask ] = useMutation( UPDATE_SHORT_SUBTASK );
+  const [ deleteShortSubtask ] = useMutation( DELETE_SHORT_SUBTASK );
   const [ deleteTask ] = useMutation( DELETE_TASK );
   const [ addSubtask ] = useMutation( ADD_SUBTASK );
   const [ updateSubtask ] = useMutation( UPDATE_SUBTASK );
@@ -193,7 +191,7 @@ export default function TaskEditContainer( props ) {
         break;
       }
       case 'DELETE': {
-        newTask[ key ] = newTask[ key ].filter( ( item ) => item.id === response.id );
+        newTask[ key ] = newTask[ key ].filter( ( item ) => item.id !== response.id );
         break;
       }
       default: {
@@ -209,6 +207,59 @@ export default function TaskEditContainer( props ) {
         task: newTask
       }
     } );
+  }
+
+  const addShortSubtaskFunc = ( sub ) => {
+    setSaving( true );
+
+    addShortSubtask( {
+        variables: sub
+      } )
+      .then( ( response ) => {
+        updateCasheStorage( response.data.addShortSubtask, 'shortSubtasks', 'ADD' );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+
+    setSaving( false );
+  }
+
+  const updateShortSubtaskFunc = ( sub ) => {
+    setSaving( true );
+
+    updateShortSubtask( {
+        variables: {
+          id: sub.id,
+          title: sub.title,
+          done: sub.done,
+        }
+      } )
+      .then( ( response ) => {
+        updateCasheStorage( response.data.updateShortSubtask, 'shortSubtasks', 'UPDATE' );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+
+    setSaving( false );
+  }
+
+  const deleteShortSubtaskFunc = ( id ) => {
+    deleteShortSubtask( {
+        variables: {
+          id,
+        }
+      } )
+      .then( ( response ) => {
+        updateCasheStorage( {
+          id
+        }, 'shortSubtasks', 'DELETE' );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+        console.log( err );
+      } );
   }
 
   const addSubtaskFunc = ( sub ) => {
@@ -735,7 +786,6 @@ export default function TaskEditContainer( props ) {
     basicUsersLoading ||
     taskTypesLoading ||
     tripTypesLoading ||
-    tagsLoading ||
     myProjectsLoading ||
     taskLoading
   )
@@ -745,19 +795,18 @@ export default function TaskEditContainer( props ) {
 
   return (
     <TaskEdit
-			{...props}
+      {...props}
       id={id}
       task={taskData.task}
       inModal={inModal}
       closeModal={closeModal}
-			currentUser={myData.getMyData}
-			accessRights={myData.getMyData.role.accessRights}
-			statuses={toSelArr(statusesData.statuses)}
-			companies={toSelArr(basicCompaniesData.basicCompanies)}
-			users={toSelArr(basicUsersData.basicUsers, 'fullName')}
-			taskTypes={toSelArr(taskTypesData.taskTypes)}
-			tripTypes={toSelArr(tripTypesData.tripTypes)}
-			allTags={toSelArr(tagsData.tags)}
+      currentUser={myData.getMyData}
+      accessRights={myData.getMyData.role.accessRights}
+      statuses={toSelArr(statusesData.statuses)}
+      companies={toSelArr(basicCompaniesData.basicCompanies)}
+      users={toSelArr(basicUsersData.basicUsers, 'fullName')}
+      taskTypes={toSelArr(taskTypesData.taskTypes)}
+      tripTypes={toSelArr(tripTypesData.tripTypes)}
       projects={toSelArr(myProjectsData.myProjects.map((project) => ({...project, id: project.project.id, title: project.project.title}) ))}
       emails={/*emailsData && emailsData.emails ? emailsData.emails : */[]}
       filterValues={localFilterToValues(filterData.localFilter)}
@@ -782,9 +831,12 @@ export default function TaskEditContainer( props ) {
       addCustomItemFunc={addCustomItemFunc}
       updateCustomItemFunc={updateCustomItemFunc}
       deleteCustomItemFunc={deleteCustomItemFunc}
+      addShortSubtask={addShortSubtaskFunc}
+      updateShortSubtask={updateShortSubtaskFunc}
+      deleteShortSubtask={deleteShortSubtaskFunc}
       saving={saving}
       setSaving={setSaving}
-			 />
+      />
   );
 
 }

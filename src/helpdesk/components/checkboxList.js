@@ -16,6 +16,8 @@ export default function CheckboxList( props ) {
   const [ addItem, setAddItem ] = React.useState( false );
   const [ title, setTitle ] = React.useState( '' );
   const [ done, setDone ] = React.useState( false );
+  const [ editedItem, setEditedItem ] = React.useState( null );
+
   return (
     <div className="attachments">
       { items.map((item) =>
@@ -30,9 +32,11 @@ export default function CheckboxList( props ) {
             />
           <input type="text"
             disabled={disabled}
-            value={item.title}
+            value={ ( editedItem && editedItem.id === item.id) ? editedItem.title : item.title }
             className="hidden-input flex"
-            onChange={(e) => onChange({...item, title: e.target.value })}
+            onFocus={ () => setEditedItem(item) }
+            onBlur={() => onChange(editedItem)}
+            onChange={(e) => setEditedItem({ ...editedItem, title: e.target.value }) }
             placeholder={placeholder}
             />
             <button
