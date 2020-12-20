@@ -178,7 +178,7 @@ export default function ShowDataContainer( props ) {
   }
 
   return (
-      <div className="content-page">
+    <div className="content-page">
 			<div className="content" style={{ paddingTop: 0 }}>
 				<div className="row m-0">
 					{tasklistLayout === 0 && (
@@ -286,5 +286,6 @@ export default function ShowDataContainer( props ) {
 					)}
 				</div>
 			</div>
+    </div>
   );
 }
