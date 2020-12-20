@@ -7,6 +7,8 @@ import {
 } from "@apollo/client";
 
 import Loading from 'components/loading';
+import moment from 'moment';
+
 import ShowData from 'components/showData';
 
 import {
@@ -36,6 +38,7 @@ import {
   GET_TASKS,
   DELETE_TASK,
   GET_MY_DATA,
+  GET_CALENDAR_EVENTS,
 } from './querries';
 
 import {
@@ -60,7 +63,6 @@ export default function TasksIndex( props ) {
   const {
     history,
     match,
-    //calendarEvents
   } = props;
 
   const {
@@ -100,6 +102,17 @@ export default function TasksIndex( props ) {
   const localMilestone = milestoneData.localMilestone;
 
   const {
+    data: calendarEventsData,
+    loading: calendarEventsLoading,
+    refetch: calendarEventsRefetch
+  } = useQuery( GET_CALENDAR_EVENTS, {
+    variables: {
+      filter: localFilterToValues( localFilter ),
+      projectId: localProject.id
+    },
+  } );
+
+  const {
     data: tasksData,
     loading: tasksLoading,
     refetch: tasksRefetch,
@@ -123,7 +136,8 @@ export default function TasksIndex( props ) {
     projectLoading ||
     milestoneLoading ||
     tasksLoading ||
-    statusesLoading
+    statusesLoading ||
+    calendarEventsLoading
   );
 
   //sync
@@ -135,11 +149,16 @@ export default function TasksIndex( props ) {
         projectId: localProject.id
       }
     } );
+    calendarEventsRefetch( {
+      variables: {
+        filter: localFilterToValues( localFilter ),
+        projectId: localProject.id
+      }
+    } );
   }, [ localFilter, localProject.id ] );
 
   //state
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
-
 
   if ( dataLoading ) {
     return ( <Loading /> );
@@ -246,6 +265,20 @@ export default function TasksIndex( props ) {
       </li> )
   }
 
+  const displayCal = ( task, showEvent ) => {
+    return ( <div style={ showEvent ? { backgroundColor:'#eaf6ff', borderRadius:5 } : {} }>
+  					<p className="m-0">
+  						{showEvent && <span className="label label-event">
+  						Event
+  					</span>}
+  						<span className="label label-info" style={{backgroundColor:task.status && task.status.color?task.status.color:'white'}}>
+  							{task.status?task.status.title:'Neznámy status'}
+  						</span>
+  						<span className="attribute-label m-l-3">#{task.id} | {task.title}</span>
+  					</p>
+  			</div> )
+  }
+
   const checkTask = ( id ) => {
     if ( id === 'all' ) {
       if ( markedTasks.length === tasks.length ) {
@@ -328,70 +361,82 @@ export default function TasksIndex( props ) {
       } );
   }
 
-  const getCalendarEventsData = ( tasks ) => {
-    /*let taskIDs = tasks.map((task)=>task.id);
-    return this.props.calendarEvents.filter((event)=>taskIDs.includes(event.taskID)).map((event)=>{
-    let task = tasks.find((task)=>event.taskID===task.id);
-    return {
-    ...task,
-    isTask:false,
-    eventID:event.id,
-    titleFunction:this.displayCal,
-    start:new Date(event.start),
-    end:new Date(event.end),
-    }
-    })*/
+  const getCalendarEventsData = () => {
+    return calendarEventsData.calendarEvents.map( ( event ) => {
+      let newEvent = {
+        eventID: event.id,
+        ...event.task,
+        ...event,
+        isTask: false,
+        titleFunction: displayCal,
+        start: new Date( moment( parseInt( event.startsAt ) )
+          .valueOf() ),
+        end: new Date( moment( parseInt( event.endsAt ) )
+          .valueOf() ),
+      };
+      delete newEvent.task;
+      return newEvent;
+    } )
   }
 
   const getCalendarAllDayData = ( tasks ) => {
-    /*return tasks.map((task) => {
-    let newTask = {
-    ...task,
-    isTask:true,
-    titleFunction:this.displayCal,
-    allDay: !task.status || task.status.action !== 'pendingOLD',
-    }
-    if(!task.status){
-    return {
-    ...newTask,
-    status: this.props.statuses.find((status)=>status.action==='new'),
-    start:new Date(),
-    }
-    }
-    switch (task.status.action) {
-    case 'invoiced':{
-    return {
-    ...newTask,
-    start:new Date(task.invoicedDate),
-    }
-    }
-    case 'close':{
-    return {
-    ...newTask,
-    start:new Date(task.closeDate),
-    }
-    }
-    case 'invalid':{
-    return {
-    ...newTask,
-    start:new Date(task.closeDate),
-    }
-    }
-    case 'pending':{
-    return {
-    ...newTask,
-    start:new Date(task.pendingDate),
-    //end:new Date(task.pendingDateTo ? task.pendingDateTo: fromMomentToUnix(moment(task.pendingDate).add(30,'minutes')) ),
-    }
-    }
-    default:{
-    return {
-    ...newTask,
-    start:new Date(),
-    }
-    }
-    }
-    }).map((task)=>({...task,end: task.status.action !== 'pendingOLD' ? task.start : task.end }))*/
+    return tasks.map( ( task ) => {
+        let newTask = {
+          ...task,
+          isTask: true,
+          titleFunction: displayCal,
+          allDay: true,
+        }
+        if ( !task.status ) {
+          return {
+            ...newTask,
+            status: statuses.find( ( status ) => status.action === 'IsNew' ),
+            start: new Date( moment()
+              .valueOf() ),
+          }
+        }
+        switch ( task.status.action ) {
+          case 'Invoiced': {
+            return {
+              ...newTask,
+              start: new Date( moment( parseInt( task.invoicedDate ) )
+                .valueOf() ),
+            }
+          }
+          case 'CloseDate': {
+            return {
+              ...newTask,
+              start: new Date( moment( parseInt( task.closeDate ) )
+                .valueOf() ),
+            }
+          }
+          case 'CloseInvalid': {
+            return {
+              ...newTask,
+              start: new Date( moment( parseInt( task.closeDate ) )
+                .valueOf() ),
+            }
+          }
+          case 'PendingDate': {
+            return {
+              ...newTask,
+              start: new Date( moment( parseInt( task.pendingDate ) )
+                .valueOf() ),
+            }
+          }
+          default: {
+            return {
+              ...newTask,
+              start: new Date( moment()
+                .valueOf() ),
+            }
+          }
+        }
+      } )
+      .map( ( task ) => ( {
+        ...task,
+        end: task.start
+      } ) )
   }
 
   const filterTasks = ( tasks ) => {
@@ -440,13 +485,6 @@ export default function TasksIndex( props ) {
             </div>)
           },
           {value:'createdAt',label:'Created at',type:'date'},
-          /*		{value:'tags',label:'Tags',type:'list',func:(items)=>
-          (<div>
-          {items.map((item)=>
-          <span key={item.id} className="label label-info m-r-5">{item.title}</span>)
-          }
-          </div>)
-          },*/
           {value:'deadline',label:'Deadline',type:'date'}
         ]}
         orderByValues={[
@@ -456,7 +494,6 @@ export default function TasksIndex( props ) {
           {value:'requester',label:'Requester',type:'user'},
           {value:'assignedTo',label:'Assigned',type:'list',func:((total,user)=>total+=user.email+' '+user.name+' '+user.surname+' ')},
           {value:'createdAt',label:'Created at',type:'date'},
-          //		{value:'tags',label:'Tags',type:'list',func:((cur,item)=>cur+item.title+' ')},
           {value:'deadline',label:'Deadline',type:'date'}
         ]}
         dndGroupAttribute="status"

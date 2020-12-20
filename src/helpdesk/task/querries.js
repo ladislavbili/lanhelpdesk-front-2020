@@ -427,6 +427,13 @@ query tasks($filter: FilterInput, $projectId: Int){
           write
           delete
         }
+        projectRights{
+          write
+          delete
+          user {
+            id
+          }
+        }
 			}
 			requester{
 				id
@@ -961,6 +968,7 @@ mutation deleteTaskAttachment($id: Int!) {
 }
 `;
 
+
 export const UPDATE_INVOICED_TASK = gql `
 mutation updateInvoicedTask($id: Int!, $taskChanges: TaskChangeInput, $stmcChanges: SMTCChangesInput) {
   updateInvoicedTask(
@@ -972,3 +980,43 @@ mutation updateInvoicedTask($id: Int!, $taskChanges: TaskChangeInput, $stmcChang
 	}
 }
 `
+
+export const GET_CALENDAR_EVENTS = gql `
+query calendarEvents($filter: FilterInput, $projectId: Int){
+  calendarEvents (
+    filter: $filter,
+    projectId: $projectId,
+  ){
+    id
+    createdAt
+    updatedAt
+    startsAt
+    endsAt
+		task {
+			id
+			title
+			project{
+				id
+				title
+        right{
+          write
+          delete
+        }
+        projectRights{
+          write
+          delete
+          user {
+            id
+          }
+        }
+			}
+			status {
+				id
+				title
+				color
+				action
+			}
+    }
+  }
+}
+`;

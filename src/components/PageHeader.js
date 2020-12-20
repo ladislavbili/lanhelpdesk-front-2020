@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useMutation
 } from "@apollo/client";
 import {
   gql
@@ -39,11 +40,13 @@ export default function PageHeader( props ) {
   //data & queries
   const {
     history,
+    setLayout,
     settings,
     showLayoutSwitch,
     dndLayout,
     calendarLayout
   } = props;
+
   const {
     data: myData
   } = useQuery( GET_MY_DATA );
@@ -77,9 +80,7 @@ export default function PageHeader( props ) {
     }
   }
 
-  const setTasklistLayout = ( value ) => {
 
-  }
 
   const processNotifications = () => {
     return [];
@@ -164,17 +165,17 @@ export default function PageHeader( props ) {
               <DropdownMenu right>
                 <div className="btn-group-vertical" data-toggle="buttons">
                   <label className={classnames({'active':currentUser.tasklistLayout === 0}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" onChange={() => setTasklistLayout(0)} checked={currentUser.tasklistLayout === 0}/>
+                    <input type="radio" name="options" onChange={() => setLayout(0)} checked={currentUser.tasklistLayout === 0}/>
                     <i className="fa fa-columns"/>
                   </label>
                   <label className={classnames({'active':currentUser.tasklistLayout === 1}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" checked={currentUser.tasklistLayout === 1} onChange={() => setTasklistLayout(1)}/>
+                    <input type="radio" name="options" checked={currentUser.tasklistLayout === 1} onChange={() => setLayout(1)}/>
                     <i className="fa fa-list"/>
                   </label>
                   {
                     dndLayout &&
                     <label className={classnames({'active':currentUser.tasklistLayout === 2}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => setTasklistLayout(2)} checked={currentUser.tasklistLayout === 2}/>
+                      <input type="radio" name="options" onChange={() => setLayout(2)} checked={currentUser.tasklistLayout === 2}/>
                       <i className="fa fa-map"/>
                     </label>
                   }
@@ -182,7 +183,7 @@ export default function PageHeader( props ) {
                   {
                     calendarLayout &&
                     <label className={classnames({'active':currentUser.tasklistLayout === 3}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => setTasklistLayout(3)} checked={currentUser.tasklistLayout === 3}/>
+                      <input type="radio" name="options" onChange={() => setLayout(3)} checked={currentUser.tasklistLayout === 3}/>
                       <i className="fa fa-calendar-alt"/>
                     </label>
                   }

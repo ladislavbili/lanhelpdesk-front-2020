@@ -1,7 +1,9 @@
 import React from 'react';
 import {
   useQuery,
-  gql
+  useMutation,
+  gql,
+  useApolloClient,
 } from "@apollo/client";
 
 import {
@@ -22,80 +24,39 @@ import TaskList from './task';
 
 import NotificationList from './notifications';
 
-const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    tasklistLayout
-    role {
-      id
-      accessRights {
-        viewErrors
-        publicFilters
-        users
-        companies
-        pausals
-        projects
-        statuses
-        units
-        prices
-        suppliers
-        tags
-        invoices
-        roles
-        taskTypes
-        tripTypes
-        imaps
-        smtps
-      }
-    }
-  }
-}
-`;
+import Loading from 'components/loading';
 
-
-/*const UPDATE_USER = gql`
-mutation updateUser($id: Int!, $tasklistLayout: Int) {
-updateUser(
-id: $id,
-tasklistLayout: $tasklistLayout,
-){
-id
-}
-}
-`;*/
-
+import {
+  SET_TASKLIST_LAYOUT,
+  GET_MY_DATA,
+} from 'helpdesk/settings/users/querries';
 
 export default function Navigation( props ) {
   //data & queries
   const {
-    layout
-  } = props;
-  const {
-    data
+    data: myData,
+    refetch: myDataRefetch
   } = useQuery( GET_MY_DATA );
-  //  const [updateUser, {updateData}] = useMutation(UPDATE_USER);
 
-  const currentUser = data ? data.getMyData : {};
-  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+  const [ setTasklistLayout ] = useMutation( SET_TASKLIST_LAYOUT );
 
-  const setLayout = ( value ) => {
-    updateUserFunc( value );
+  const client = useApolloClient();
+
+  const setTasklistLayoutFunc = ( value ) => {
+    setTasklistLayout( {
+        variables: {
+          tasklistLayout: value,
+        }
+      } )
+      .then( ( response ) => {
+        myDataRefetch();
+      } )
+      .catch( ( err ) => console.log( err ) );
   }
 
-  // functions
-  const updateUserFunc = ( value ) => {
-    /*
-        updateUser({ variables: {
-        id: parseInt(match.params.id),
-        tasklistLayout: parseInt(value),
-        } }).then( ( response ) => {
-        }).catch( (err) => {
-        console.log(err.message);
-        });*/
-  };
+  const currentUser = myData ? myData.getMyData : {};
+  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
-  //	accessRights["users"] = false;
   return (
     <div>
       <div className="page-header">
@@ -103,8 +64,7 @@ export default function Navigation( props ) {
           <SelectPage />
           <PageHeader {...props}
             showLayoutSwitch={true}
-            setLayout={(value) => setLayout(value)}
-            layout={layout}
+            setLayout={setTasklistLayoutFunc}
             dndLayout={true}
             calendarLayout={true}
             settings={settings} />

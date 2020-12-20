@@ -1,11 +1,8 @@
 import React from 'react';
 import {
   useQuery,
-  //useApolloClient
-} from "@apollo/client";
-import {
   gql
-} from '@apollo/client';;
+} from "@apollo/client";
 
 import {
   GET_TASK_SEARCH,
@@ -14,8 +11,16 @@ import {
 import TaskCol from './taskCol';
 import TaskList from './taskList';
 import TaskListDnD from './taskListDnD';
+import {
+  localFilterToValues
+} from 'helperFunctions';
 
 import moment from 'moment';
+
+import {
+  GET_FILTER,
+  GET_PROJECT,
+} from 'apollo/localSchema/querries';
 
 const GET_MY_DATA = gql `
 query {
@@ -60,10 +65,19 @@ export default function ShowDataContainer( props ) {
   } = useQuery( GET_TASK_SEARCH );
 
   const {
-    data: userData
+    data: myData
   } = useQuery( GET_MY_DATA );
 
-  const tasklistLayout = 1;
+  //local
+  const {
+    data: filterData,
+  } = useQuery( GET_FILTER );
+
+  const {
+    data: projectData,
+  } = useQuery( GET_PROJECT );
+
+  const tasklistLayout = myData ? myData.getMyData.tasklistLayout : 1;
 
   //	const client = useApolloClient();
 
@@ -85,7 +99,7 @@ export default function ShowDataContainer( props ) {
   		}
   	}*/
 
-  const filterData = () => {
+  const filterDataFunc = () => {
     return data.filter( ( item ) => {
         if ( taskSearchData.taskSearch === "" ) {
           return true;
@@ -164,7 +178,7 @@ export default function ShowDataContainer( props ) {
   }
 
   return (
-    <div className="content-page">
+      <div className="content-page">
 			<div className="content" style={{ paddingTop: 0 }}>
 				<div className="row m-0">
 					{tasklistLayout === 0 && (
@@ -177,7 +191,7 @@ export default function ShowDataContainer( props ) {
 								history={history}
 								Empty={Empty}
 								match={match}
-								data={filterData()}
+								data={filterDataFunc()}
 								itemID={itemID}
 								link={link}
 								displayCol={displayCol}
@@ -203,7 +217,7 @@ export default function ShowDataContainer( props ) {
 									listName={listName}
 									history={history}
 									match={match}
-									data={filterData()}
+									data={filterDataFunc()}
 									displayValues={displayValues}
 									filterName={listName}
 									isTask={isTask}
@@ -229,7 +243,7 @@ export default function ShowDataContainer( props ) {
 									listName={listName}
 									history={history}
 									match={match}
-									data={filterData()}
+									data={filterDataFunc()}
 									displayValues={displayValues}
 									displayCol={displayCol}
 									link={link}
@@ -254,8 +268,8 @@ export default function ShowDataContainer( props ) {
 								history={history}
 								match={match}
 								data={
-									(calendarAllDayData ? calendarAllDayData(filterData()):[]).concat(
-										calendarEventsData ? calendarEventsData(filterData()):[]
+									(calendarAllDayData ? calendarAllDayData(filterDataFunc()):[]).concat(
+										calendarEventsData ? calendarEventsData(filterDataFunc()):[]
 									)
 								}
 								link={link}
@@ -272,6 +286,5 @@ export default function ShowDataContainer( props ) {
 					)}
 				</div>
 			</div>
-		</div>
   );
 }

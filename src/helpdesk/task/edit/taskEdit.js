@@ -1,10 +1,10 @@
 import React from 'react';
 import {
+  gql,
   useMutation,
   useQuery,
   useLazyQuery,
   useApolloClient,
-  gql,
 } from "@apollo/client";
 
 import Select from 'react-select';

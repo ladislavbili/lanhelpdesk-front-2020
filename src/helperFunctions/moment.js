@@ -5,7 +5,7 @@ export const toMomentInput = ( unix ) => ( unix !== null && unix !== undefined )
   null;
 
 export const fromMomentToUnix = ( moment ) => moment !== null ?
-  moment.unix() :
+  moment.valueOf() :
   null;
 
 export const timestampToString = ( timestamp ) => {

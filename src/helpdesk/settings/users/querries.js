@@ -195,20 +195,52 @@ mutation setUserActive($id: Int!, $active: Boolean!) {
 }
 `;
 
+export const SET_TASKLIST_LAYOUT = gql `
+mutation setTasklistLayout($tasklistLayout: Int!) {
+  setTasklistLayout(
+    tasklistLayout: $tasklistLayout
+  ){
+    tasklistLayout
+  }
+}
+`;
+
 export const GET_MY_DATA = gql `
 query {
   getMyData{
+    id
+    tasklistLayout
     username
-    email
     name
     surname
+    email
     receiveNotifications
     signature
+    language
     role {
       id
       level
+      accessRights {
+        viewVykaz
+        viewErrors
+        publicFilters
+        users
+        companies
+        pausals
+        projects
+        statuses
+        units
+        prices
+        suppliers
+        tags
+        invoices
+        roles
+        taskTypes
+        tripTypes
+        imaps
+        smtps
+      }
     }
-    language
   }
 }
 `;
