@@ -428,79 +428,71 @@ export default function TasksIndex( props ) {
 
   return (
       <ShowData
-			data={tasks.map((task) => ({
+      data={tasks.map((task) => ({
         ...task,
         checked: markedTasks.includes(task.id)
       }) )}
-			filterBy={[
-				{value:'assignedTo',type:'list',func:((total,user)=>total+=user.email+' '+user.fullName+' ')},
-				{value:'statusChange',type:'date'},
-				{value:'createdAt',type:'date'},
-				{value:'requester',type:'user'},
-				{value:'deadline',type:'date'},
-				{value:'status',type:'object'},
-				{value:'title',type:'text'},
-				{value:'id',type:'int'},
-				{value:'company',type:'object'},
-			]}
-			displayCol={displayCol}
-			filterName="help-tasks"
-			displayValues={[
-				{value:'checked', label: '', type:'checkbox'},
-				{value:'important',label:'',type:'important'},
-				{value:'title',label:'Title',type:'text'},
-				{value:'id',label:'ID',type:'int'},
-				{value:'status',label:'Status',type:'object'},
-				{value:'requester',label:'Requester',type:'user'},
-				{value:'company',label:'Company',type:'object'},
-				{value:'assignedTo',label:'Assigned',type:'list',func:(items)=>
-					(<div>
-						{
-							items.map((item)=><div key={item.id}>{item.fullName}</div>)
-						}
-					</div>)
-				},
-				{value:'createdAt',label:'Created at',type:'date'},
-				/*		{value:'tags',label:'Tags',type:'list',func:(items)=>
-							(<div>
-							{items.map((item)=>
-								<span key={item.id} className="label label-info m-r-5">{item.title}</span>)
-							}
-							</div>)
-						},*/
-				{value:'deadline',label:'Deadline',type:'date'}
-			]}
-			orderByValues={[
-				{value:'id',label:'ID',type:'int'},
-				{value:'status',label:'Status',type:'object'},
-				{value:'title',label:'Title',type:'text'},
-				{value:'requester',label:'Requester',type:'user'},
-				{value:'assignedTo',label:'Assigned',type:'list',func:((total,user)=>total+=user.email+' '+user.name+' '+user.surname+' ')},
-				{value:'createdAt',label:'Created at',type:'date'},
-				//		{value:'tags',label:'Tags',type:'list',func:((cur,item)=>cur+item.title+' ')},
-				{value:'deadline',label:'Deadline',type:'date'}
-			]}
-			dndGroupAttribute="status"
-			dndGroupData={statuses}
-			calendar={TaskCalendar}
-			calendarAllDayData={getCalendarAllDayData}
-			calendarEventsData={getCalendarEventsData}
-			link={link}
-			history={history}
-			itemID={match.params.taskID ? match.params.taskID : ""}
-			listID={match.params.listID}
-			match={match}
-			isTask={true}
-			listName={localFilter.title}
-			Edit={TaskEdit}
-			Empty={TaskEmpty}
-			useBreadcrums={true}
-			breadcrumsData={getBreadcrumsData()}
-			setStatuses={setUserStatusesFunc}
-			statuses={currentUser.statuses}
-			allStatuses={statuses}
-			checkTask={checkTask}
-			deleteTask={deleteTaskFunc}
-		 />
+      filterBy={[
+        {value:'assignedTo',type:'list',func:((total,user)=>total+=user.email+' '+user.fullName+' ')},
+        {value:'statusChange',type:'date'},
+        {value:'createdAt',type:'date'},
+        {value:'requester',type:'user'},
+        {value:'deadline',type:'date'},
+        {value:'status',type:'object'},
+        {value:'title',type:'text'},
+        {value:'id',type:'int'},
+        {value:'company',type:'object'},
+      ]}
+      displayCol={displayCol}
+      filterName="help-tasks"
+      displayValues={[
+        {value:'checked', label: '', type:'checkbox'},
+        {value:'important',label:'',type:'important'},
+        {value:'title',label:'Title',type:'text'},
+        {value:'id',label:'ID',type:'int'},
+        {value:'status',label:'Status',type:'object'},
+        {value:'requester',label:'Requester',type:'user'},
+        {value:'company',label:'Company',type:'object'},
+        {value:'assignedTo',label:'Assigned',type:'list',func:(items)=>
+          (<div>
+            {
+              items.map((item)=><div key={item.id}>{item.fullName}</div>)
+            }
+          </div>)
+        },
+        {value:'createdAt',label:'Created at',type:'date'},
+        {value:'deadline',label:'Deadline',type:'date'}
+      ]}
+      orderByValues={[
+        {value:'id',label:'ID',type:'int'},
+        {value:'status',label:'Status',type:'object'},
+        {value:'title',label:'Title',type:'text'},
+        {value:'requester',label:'Requester',type:'user'},
+        {value:'assignedTo',label:'Assigned',type:'list',func:((total,user)=>total+=user.email+' '+user.name+' '+user.surname+' ')},
+        {value:'createdAt',label:'Created at',type:'date'},
+        {value:'deadline',label:'Deadline',type:'date'}
+      ]}
+      dndGroupAttribute="status"
+      dndGroupData={statuses}
+      calendar={TaskCalendar}
+      calendarAllDayData={getCalendarAllDayData}
+      calendarEventsData={getCalendarEventsData}
+      link={link}
+      history={history}
+      itemID={match.params.taskID ? match.params.taskID : ""}
+      listID={match.params.listID}
+      match={match}
+      isTask={true}
+      listName={localFilter.title}
+      Edit={TaskEdit}
+      Empty={TaskEmpty}
+      useBreadcrums={true}
+      breadcrumsData={getBreadcrumsData()}
+      setStatuses={setUserStatusesFunc}
+      statuses={currentUser.statuses}
+      allStatuses={statuses}
+      checkTask={checkTask}
+      deleteTask={deleteTaskFunc}
+      />
 	);
 }

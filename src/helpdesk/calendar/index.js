@@ -12,8 +12,8 @@ import {
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 
-import CommandBar from '../../components/showData/commandBar';
-import ListHeader from '../../components/showData/listHeader';
+import CommandBar from 'components/showData/commandBar';
+import ListHeader from 'components/showData/listHeader';
 import {
   fromMomentToUnix,
   timestampToDate,

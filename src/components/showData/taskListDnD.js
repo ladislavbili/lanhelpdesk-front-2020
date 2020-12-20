@@ -78,8 +78,7 @@ export default function TaskListDnD( props ) {
         variables: updateData
       } )
       .then( ( response ) => {
-        const updatedTask = response.data.updateTask;
-        //  console.log( updatedTask );
+        let updatedTask = response.data.updateTask;
         delete updateTask.__typename;
         try {
           const originalTask = client.readQuery( {

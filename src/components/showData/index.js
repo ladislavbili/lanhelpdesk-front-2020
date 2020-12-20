@@ -1,11 +1,8 @@
 import React from 'react';
 import {
   useQuery,
-  //useApolloClient
-} from "@apollo/client";
-import {
   gql
-} from '@apollo/client';;
+} from "@apollo/client";
 
 import TaskCol from './taskCol';
 import TaskList from './taskList';
@@ -172,115 +169,115 @@ export default function ShowDataContainer( props ) {
 
   return (
     <div className="content-page">
-			<div className="content" style={{ paddingTop: 0 }}>
-				<div className="row m-0">
-					{tasklistLayout === 0 && (
-						<div className='col-xl-12'>
-							<TaskCol
-								commandBar={props}
-								useBreadcrums={useBreadcrums}
-								breadcrumsData={breadcrumsData}
-								listName={listName}
-								history={history}
-								Empty={Empty}
-								match={match}
-								data={filterDataFunc()}
-								itemID={itemID}
-								link={link}
-								displayCol={displayCol}
-								isTask={isTask}
-								setStatuses={setStatuses}
-								statuses={statuses}
-								allStatuses={allStatuses}
-								Edit={Edit}
-								/>
-						</div>
-					)}
+      <div className="content" style={{ paddingTop: 0 }}>
+        <div className="row m-0">
+          {tasklistLayout === 0 && (
+            <div className='col-xl-12'>
+              <TaskCol
+                commandBar={props}
+                useBreadcrums={useBreadcrums}
+                breadcrumsData={breadcrumsData}
+                listName={listName}
+                history={history}
+                Empty={Empty}
+                match={match}
+                data={filterDataFunc()}
+                itemID={itemID}
+                link={link}
+                displayCol={displayCol}
+                isTask={isTask}
+                setStatuses={setStatuses}
+                statuses={statuses}
+                allStatuses={allStatuses}
+                Edit={Edit}
+                />
+            </div>
+          )}
 
+          {tasklistLayout === 1 && (
+            <div className='col-xl-12'>
+              {itemID && <props.Edit match={match} columns={false} history={history} />}
+              {!itemID &&
+                <TaskList
+                  commandBar={props}
+                  useBreadcrums={useBreadcrums}
+                  breadcrumsData={breadcrumsData}
+                  listName={listName}
+                  history={history}
+                  match={match}
+                  data={filterDataFunc()}
+                  displayValues={displayValues}
+                  filterName={listName}
+                  isTask={isTask}
+                  setStatuses={setStatuses}
+                  statuses={statuses}
+                  allStatuses={allStatuses}
+                  link={link}
+                  checkTask={checkTask}
+                  deleteTask={deleteTask}
+                  />
+              }
+            </div>
+          )}
 
-					{tasklistLayout === 1 && (
-						<div className='col-xl-12'>
-							{itemID && <props.Edit match={match} columns={false} history={history} />}
-							{!itemID &&
-								<TaskList
-									commandBar={props}
-									useBreadcrums={useBreadcrums}
-									breadcrumsData={breadcrumsData}
-									listName={listName}
-									history={history}
-									match={match}
-									data={filterDataFunc()}
-									displayValues={displayValues}
-									filterName={listName}
-									isTask={isTask}
-									setStatuses={setStatuses}
-									statuses={statuses}
-									allStatuses={allStatuses}
-									link={link}
-									checkTask={checkTask}
-									deleteTask={deleteTask}
-									/>}
-						</div>
-					)}
-
-					{tasklistLayout === 2 && (
-						<div className='col-xl-12'>
-							{itemID && <props.Edit match={match} columns={false} history={history} />}
-							{!itemID &&
-								<TaskListDnD
-									commandBar={props}
-									useBreadcrums={useBreadcrums}
-									breadcrumsData={breadcrumsData}
-									listName={listName}
-									history={history}
-									match={match}
-									data={filterDataFunc()}
-									displayValues={displayValues}
-									displayCol={displayCol}
-									link={link}
-									groupBy={dndGroupAttribute}
-									groupData={dndGroupData}
-									isTask={isTask}
-									setStatuses={setStatuses}
-									statuses={statuses}
-									allStatuses={allStatuses}
+          {tasklistLayout === 2 && (
+            <div className='col-xl-12'>
+              {itemID && <props.Edit match={match} columns={false} history={history} />}
+              {!itemID &&
+                <TaskListDnD
+                  commandBar={props}
+                  useBreadcrums={useBreadcrums}
+                  breadcrumsData={breadcrumsData}
+                  listName={listName}
+                  history={history}
+                  match={match}
+                  data={filterDataFunc()}
+                  displayValues={displayValues}
+                  displayCol={displayCol}
+                  link={link}
+                  groupBy={dndGroupAttribute}
+                  groupData={dndGroupData}
+                  isTask={isTask}
+                  setStatuses={setStatuses}
+                  statuses={statuses}
+                  allStatuses={allStatuses}
                   filterValues={localFilterToValues(filterData.localFilter)}
                   originalProjectId={projectData.localProject.id}
                   filterId={filterData.localFilter.id}
-									/>
-							}
-						</div>
-					)}
-					{tasklistLayout === 3 && (
-						<div className='col-xl-12'>
-							<props.calendar
-								commandBar={props}
-								useBreadcrums={useBreadcrums}
-								breadcrumsData={breadcrumsData}
-								listName={listName}
-								history={history}
-								match={match}
-								data={
-									(calendarAllDayData ? calendarAllDayData(filterDataFunc()):[]).concat(
-										calendarEventsData ? calendarEventsData():[]
-									)
-								}
-								link={link}
-								groupBy={dndGroupAttribute}
-								groupData={dndGroupData}
-								isTask={isTask}
-								setStatuses={setStatuses}
-								statuses={statuses}
-								allStatuses={allStatuses}
-								Edit={Edit}
+                  />
+              }
+            </div>
+          )}
+          {tasklistLayout === 3 && (
+            <div className='col-xl-12'>
+              <props.calendar
+                commandBar={props}
+                useBreadcrums={useBreadcrums}
+                breadcrumsData={breadcrumsData}
+                listName={listName}
+                history={history}
+                match={match}
+                data={
+                  (calendarAllDayData ? calendarAllDayData(filterDataFunc()):[]).concat(
+                    calendarEventsData ? calendarEventsData():[]
+                  )
+                }
+                link={link}
+                groupBy={dndGroupAttribute}
+                groupData={dndGroupData}
+                isTask={isTask}
+                setStatuses={setStatuses}
+                statuses={statuses}
+                allStatuses={allStatuses}
+                Edit={Edit}
                 filterValues={localFilterToValues(filterData.localFilter)}
                 originalProjectId={projectData.localProject.id}
                 filterId={filterData.localFilter.id}
-								/>
-						</div>
-					)}
-				</div>
-			</div>
-		</div>
+                />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
