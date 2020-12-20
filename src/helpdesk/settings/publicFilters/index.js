@@ -110,6 +110,12 @@ export default function PublicFilterList( props ) {
               ):
               (
                 <table className="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Order</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     { getFilteredFilters().map( (filter) =>
                       <tr

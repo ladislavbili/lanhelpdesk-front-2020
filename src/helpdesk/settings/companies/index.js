@@ -75,6 +75,12 @@ export default function CompanysList( props ) {
                 </div>
               </div>
               <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Monthly</th>
+                  </tr>
+                </thead>
                 <tbody>
                     {
                       COMPANIES.filter((item) => {

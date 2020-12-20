@@ -66,7 +66,7 @@ export default function RolesList( props ) {
               <table className="table table-hover">
                 <thead>
                   <tr>
-                    <th></th>
+                    <th>Title</th>
                     <th> Level </th>
                     <th> Order </th>
                   </tr>

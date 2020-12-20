@@ -227,10 +227,34 @@ export default function CompanyAdd( props ) {
         <div style={{position: "fixed", zIndex: "999", backgroundColor: "rgba(255,255,255,0.5)", top: "0", left: "0", width: "100%", height: "100vh"}}></div>
       }
 
-      <h2 className="p-t-10 p-l-20" style={(newData ? {position: "relative", zIndex: "99999"} : {})}>Add new company</h2>
-      <hr style={(newData ? {position: "relative", zIndex: "99999"} : {})}/>
+      <h2 className={ classnames(
+          "p-t-10",
+          "p-l-20",
+          "p-b-5",
+          {
+            "bring-to-front": newData
+          },
+        )}
+        >
+        Add new company
+      </h2>
 
-      <div className="form-body-highlighted scroll-visible">
+      <hr className={ classnames(
+          {
+            "bring-to-front": newData
+          },
+        )}
+        />
+
+        <div
+          className={ classnames(
+            "form-body-highlighted",
+            "scroll-visible",
+            {
+              "bring-to-front": newData
+            },
+          )}
+          >
         <div className="p-20">
           <FormGroup className="row m-b-10">
             <div className="m-r-10 w-20">
@@ -587,8 +611,14 @@ export default function CompanyAdd( props ) {
         </div>
 
         <div
-          className={classnames({ "form-footer": newData || props.addCompany}, "row")}
-          style={(newData ? {zIndex: "99999"} : {})}>
+          className={ classnames(
+            "row",
+            {
+              "form-footer": newData || props.addCompany,
+              "bring-to-front": newData
+            }
+          )}
+          >
           { closeModal &&
             <Button
               className="btn-link"

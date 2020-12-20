@@ -506,8 +506,12 @@ h4{
 
 .form-body-highlighted{
   position: relative;
-  z-index: 99999;
   height: calc(  100vh - 40px - 70px - 40px - 60px); //header, commandbar, nadpis, buttons
+}
+
+.bring-to-front{
+  position: relative;
+  z-index: 99999 !important;
 }
 
 .form-footer{

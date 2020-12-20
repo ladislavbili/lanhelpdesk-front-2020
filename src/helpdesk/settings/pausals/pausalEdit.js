@@ -296,16 +296,19 @@ export default function PausalEdit( props ) {
         match={match}
          />
 
-       <Button
-         className="btn ml-auto m-r-5"
-         disabled={ cannotSave }
-         onClick={()=>{
-           if (pricelist.value === "0" && pricelistName !== ""){
-             savePriceList();
-           } else {
-             updateCompanyFunc();
-           }
-       }}>{saving?'Saving...':'Save changes'}</Button>
+       <div className="row">
+         <Button
+           className="btn ml-auto m-r-5"
+           disabled={ cannotSave }
+           onClick={()=>{
+             if (pricelist.value === "0" && pricelistName !== ""){
+               savePriceList();
+             } else {
+               updateCompanyFunc();
+             }
+           }}>{saving?'Saving...':'Save changes'}</Button>
+         </div>
+
       </div>
     </div>
   );

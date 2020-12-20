@@ -64,7 +64,7 @@ export default function TaskTypeList( props ) {
             <table className="table table-hover">
               <thead>
                 <tr>
-                  <th></th>
+                  <th>Title</th>
                   <th> Order </th>
                 </tr>
               </thead>
