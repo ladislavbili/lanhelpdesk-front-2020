@@ -48,6 +48,8 @@ import {
 
   ADD_USER_TO_PROJECT,
   DELETE_TASK,
+  ADD_SCHEDULED_TASK,
+  DELETE_SCHEDULED_TASK,
   ADD_SHORT_SUBTASK,
   UPDATE_SHORT_SUBTASK,
   DELETE_SHORT_SUBTASK,
@@ -138,6 +140,8 @@ export default function TaskEditContainer( props ) {
     data: projectData,
   } = useQuery( GET_PROJECT );
 
+  const [ addScheduledTask ] = useMutation( ADD_SCHEDULED_TASK );
+  const [ deleteScheduledTask ] = useMutation( DELETE_SCHEDULED_TASK );
   const [ addShortSubtask ] = useMutation( ADD_SHORT_SUBTASK );
   const [ updateShortSubtask ] = useMutation( UPDATE_SHORT_SUBTASK );
   const [ deleteShortSubtask ] = useMutation( DELETE_SHORT_SUBTASK );
@@ -208,6 +212,40 @@ export default function TaskEditContainer( props ) {
       }
     } );
   }
+
+  const addScheduledTaskFunc = ( scheduled ) => {
+    setSaving( true );
+
+    addScheduledTask( {
+        variables: scheduled
+      } )
+      .then( ( response ) => {
+        updateCasheStorage( response.data.addScheduledTask, 'scheduled', 'ADD' );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+
+    setSaving( false );
+  }
+
+  const deleteScheduledTaskFunc = ( id ) => {
+    deleteScheduledTask( {
+        variables: {
+          id,
+        }
+      } )
+      .then( ( response ) => {
+        updateCasheStorage( {
+          id
+        }, 'scheduled', 'DELETE' );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+        console.log( err );
+      } );
+  }
+
 
   const addShortSubtaskFunc = ( sub ) => {
     setSaving( true );
@@ -818,6 +856,8 @@ export default function TaskEditContainer( props ) {
       submitEmail={submitEmail}
       addAttachments={addAttachments}
       removeAttachment={removeAttachment}
+      addScheduledTaskFunc={addScheduledTaskFunc}
+      deleteScheduledTaskFunc={deleteScheduledTaskFunc}
       deleteTaskFunc={deleteTaskFunc}
       addSubtaskFunc={addSubtaskFunc}
       updateSubtaskFunc={updateSubtaskFunc}

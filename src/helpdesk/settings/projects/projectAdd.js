@@ -22,6 +22,7 @@ import {
 } from 'configs/constants/projects';
 import classnames from 'classnames';
 import Permissions from "./projectPermissions";
+import CustomAttributes from "./customAttributes";
 import Tags from './tags';
 import ProjectDefaultValues from "./defaultValues";
 import Loading from 'components/loading';
@@ -93,6 +94,7 @@ export default function ProjectAdd( props ) {
   const [ defTag, setDefTag ] = React.useState( defList );
   const [ taskType, setTaskType ] = React.useState( defItem );
   const [ tags, setTags ] = React.useState( [] );
+  const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
 
@@ -341,6 +343,23 @@ export default function ProjectAdd( props ) {
         </div>
       }
 
+
+      <CustomAttributes
+        disabled={false}
+        customAttributes={customAttributes}
+        addCustomAttribute={(newCustomAttribute) => {
+          setCustomAttributes([...customAttributes, newCustomAttribute]);
+        }}
+        updateCustomAttribute={(changedCustomAttribute) => {
+          let newCustomAttributes = [...customAttributes];
+          let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
+          newCustomAttribute[index] = changedCustomAttribute;
+          setCustomAttributes(newCustomAttributes);
+        }}
+        deleteCustomAttribute={(id) => {
+          setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
+        }}
+        />
 
       <div className="row">
         {

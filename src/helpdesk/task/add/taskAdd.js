@@ -283,10 +283,17 @@ export default function TaskAdd( props ) {
             quantity: item.quantity,
             price: parseFloat( item.price )
           } ) ),
-          shortSubtasks: shortSubtasks.map( ( item ) => ( {
+          shortSubtasks: simpleSubtasks.map( ( item ) => ( {
             done: item.done,
             title: item.title,
-          } ) )
+          } ) ),
+          scheduled: scheduled.map( ( item ) => ( {
+            to: item.to.valueOf()
+              .toString(),
+            from: item.from.valueOf()
+              .toString(),
+            UserId: item.user.id,
+          } ) ),
         }
       } )
       .then( ( response ) => {
@@ -405,7 +412,8 @@ export default function TaskAdd( props ) {
 
           if(newViewOnly){
             setRepeat(null);
-            setSubtasks([]);
+            setSimpleSubtasks([]);
+            setScheduled([]);
             setSubtasks([]);
             setMaterials([]);
             setCustomItems([]);

@@ -112,6 +112,8 @@ export default function TaskEdit( props ) {
     filterId,
     submitComment,
     submitEmail,
+    addScheduledTaskFunc,
+    deleteScheduledTaskFunc,
     deleteTaskFunc,
     addUserToProject,
     addCompanyToList,
@@ -172,8 +174,6 @@ export default function TaskEdit( props ) {
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
   const [ updateTask ] = useMutation( UPDATE_TASK );
   const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
-
-  const [ scheduled, setScheduled ] = React.useState( [] );
 
   const isInvoiced = task.status.action === 'Invoiced';
   const canEditInvoiced = accessRights.vykazy;
@@ -1392,27 +1392,19 @@ export default function TaskEdit( props ) {
           }}
           vertical={true}
           />
-
         <Scheduled
-          items={scheduled}
+          items={task.scheduled.map((item) => ({
+            ...item,
+            from: moment(parseInt(item.from)),
+            to: moment(parseInt(item.to)),
+          }))}
           users={assignedTos}
           disabled={false}
-          onChange={(item) => {
-            let newScheduled = [...scheduled];
-            newScheduled[newScheduled.findIndex((item2) => item2.id === item.id )] = item;
-            setScheduled(newScheduled);
-          }}
           submitItem = { (newScheduled) => {
-            setScheduled([
-              ...scheduled,
-              {
-                ...newScheduled,
-                id: fakeID--,
-              }
-            ])
+            addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from , to: newScheduled.to });
           }}
-          deleteItem = { (newScheduled) => {
-            setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
+          deleteItem = { (scheduled) => {
+            deleteScheduledTaskFunc(scheduled.id);
           } }
           />
 
