@@ -113,6 +113,12 @@ export default function UserListContainer( props ) {
                 </div>
               </div>
               <table className="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Company</th>
+                  </tr>
+                </thead>
                 <tbody>
                   {FILTERED_USERS.filter((item)=>item.email.toLowerCase().includes(userFilter.toLowerCase())).sort((user1,user2)=>user1.email>user2.email?1:-1).map((user)=>
                     <tr

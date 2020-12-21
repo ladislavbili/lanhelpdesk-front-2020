@@ -14,9 +14,7 @@ import moment from 'moment';
 import Repeat from 'helpdesk/components/repeat';
 import Attachments from 'helpdesk/components/attachments';
 
-import VykazyTable, {
-  getCreationError as getVykazyError
-} from 'helpdesk/components/vykazyTable';
+import VykazyTable from 'helpdesk/components/vykazyTable';
 
 import classnames from "classnames";
 
@@ -77,7 +75,10 @@ export default function TaskAdd( props ) {
     companies,
     statuses,
     defaultUnit,
-    closeModal
+    closeModal,
+    setTaskTypeCreationError,
+    setAssignedToCreationError,
+    setCompanyCreationError,
   } = props;
 
   const userIfInProject = ( project ) => {
@@ -183,12 +184,13 @@ export default function TaskAdd( props ) {
     }
     let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.includes( item.id ) ) : filteredAssignedTo;
     setAssignedTo( newAssignedTo );
+    setAssignedToCreationError( newAssignedTo );
     let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
     setRequester( newRequester );
 
     let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value ) : ( companies && newRequester ? companies.find( ( company ) => company.id === newRequester.company.id ) : null );
     setCompany( newCompany );
-
+    setCompanyCreationError( newCompany );
 
     let newStatus = def.status && ( def.status.fixed || def.status.def ) ? statuses.find( ( item ) => item.id === def.status.value.is ) : statuses[ 0 ];
     setStatus( newStatus );
@@ -199,6 +201,7 @@ export default function TaskAdd( props ) {
 
     let newTaskType = def.taskType && ( def.taskType.fixed || def.taskType.def ) ? taskTypes.find( ( item ) => item.id === def.taskType.value ) : taskType;
     setTaskType( newTaskType );
+    setTaskTypeCreationError( newTaskType );
 
     let newOvertime = def.overtime && ( def.overtime.fixed || def.overtime.def ) ? booleanSelects.find( ( item ) => def.overtime.value === item.value ) : overtime;
     setOvertime( newOvertime );
@@ -396,6 +399,7 @@ export default function TaskAdd( props ) {
           if(!viewOnly){
             let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
             setAssignedTo(newAssignedTo);
+            setAssignedToCreationError(newAssignedTo);
           }else{
             setPausal(booleanSelects[0]);
           }
@@ -427,7 +431,10 @@ export default function TaskAdd( props ) {
         value={assignedTo}
         isDisabled={defaultFields.assignedTo.fixed || viewOnly}
         isMulti
-        onChange={(users)=> setAssignedTo(users)}
+        onChange={(users)=> {
+          setAssignedTo(users);
+          setAssignedToCreationError(users);
+        }}
         options={USERS_WITH_PERMISSIONS}
         styles={invisibleSelectStyleNoArrowRequired}
         />
@@ -459,7 +466,10 @@ export default function TaskAdd( props ) {
         value={taskType}
         isDisabled={defaultFields.taskType.fixed || viewOnly}
         styles={invisibleSelectStyleNoArrowRequired}
-        onChange={(taskType)=>setTaskType(taskType)}
+        onChange={(taskType)=> {
+          setTaskType(taskType);
+          setTaskTypeCreationError(taskType);
+        }}
         options={taskTypes}
         />
     ),
@@ -493,7 +503,9 @@ export default function TaskAdd( props ) {
         isDisabled={defaultFields.requester.fixed || viewOnly}
         onChange={(requester)=>{
           setRequester(requester);
-          setCompany(companies.find((company) => company.id === requester.id ))
+          const newCompany = companies.find((company) => company.id === requester.id );
+          setCompany(newCompany);
+          setCompanyCreationError(newCompany);
         }}
         options={REQUESTERS}
         styles={invisibleSelectStyleNoArrowRequired}
@@ -506,6 +518,7 @@ export default function TaskAdd( props ) {
         isDisabled={defaultFields.company.fixed || viewOnly}
         onChange={(company)=> {
           setCompany(company);
+          setCompanyCreationError(company);
           setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
         }}
         options={companies}
@@ -744,7 +757,10 @@ export default function TaskAdd( props ) {
                 value={assignedTo}
                 isDisabled={defaultFields.assignedTo.fixed || viewOnly}
                 isMulti
-                onChange={(users)=> setAssignedTo(users)}
+                onChange={(users)=> {
+                  setAssignedTo(users);
+                  setAssignedToCreationError(users);
+                }}
                 options={USERS_WITH_PERMISSIONS}
                 styles={invisibleSelectStyleNoArrowRequired}
                 />
@@ -821,7 +837,10 @@ export default function TaskAdd( props ) {
                 value={taskType}
                 isDisabled={defaultFields.taskType.fixed || viewOnly}
                 styles={invisibleSelectStyleNoArrowRequired}
-                onChange={(taskType)=>setTaskType(taskType)}
+                onChange={(taskType)=> {
+                  setTaskType(taskType);
+                  setTaskTypeCreationError(taskType);
+                }}
                 options={taskTypes}
                 />
             </div>
@@ -1090,17 +1109,6 @@ export default function TaskAdd( props ) {
     )
   }
 
-  const canCreateVykazyError = () => {
-    if ( getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company ) === '' ) {
-      return null;
-    }
-    return (
-      <div className="center-hor" style={{color: "#FF4500", height: "20px"}}>
-        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
-      </div>
-    )
-  }
-
   return (
     <div>
       <div
@@ -1121,7 +1129,6 @@ export default function TaskAdd( props ) {
           { renderTitle() }
 
           <hr className="m-t-15 m-b-10"/>
-          {canCreateVykazyError()}
 
           { layout === 1 ? renderSelectsLayout1() : renderTags() }
 

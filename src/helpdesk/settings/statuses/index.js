@@ -63,7 +63,7 @@ export default function StatusesList( props ) {
               <table className="table table-hover">
                 <thead>
                   <tr>
-                    <th></th>
+                    <th>Title</th>
                     <th> Order </th>
                   </tr>
                 </thead>

@@ -101,7 +101,7 @@ export default function SMTPsList( props ) {
             </div>
             <table className="table table-hover">
               <thead>
-                <tr className="clickable">
+                <tr>
                   <th>Title</th>
                   <th>Host</th>
                   <th>Port</th>

@@ -61,7 +61,7 @@ export default function PricelistsList( props ) {
                 <table className="table table-hover">
                   <thead>
                     <tr>
-                      <th></th>
+                      <th>Title</th>
                       <th>Default</th>
                       <th> Order </th>
                     </tr>

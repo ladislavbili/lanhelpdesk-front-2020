@@ -50,6 +50,11 @@ export default function CompaniesList( props ) {
               Service level agreements
 						</h2>
             <table className="table table-hover">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                </tr>
+              </thead>
               <tbody>
                 {
                   COMPANIES.filter(item => item.monthly)
