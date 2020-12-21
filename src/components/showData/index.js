@@ -233,7 +233,7 @@ export default function ShowDataContainer( props ) {
 					)}
 
 					{tasklistLayout === 2 && (
-						<div>
+						<div className="flex" >
 							{itemID && <props.Edit match={match} columns={false} history={history} />}
 							{!itemID &&
 								<TaskListDnD

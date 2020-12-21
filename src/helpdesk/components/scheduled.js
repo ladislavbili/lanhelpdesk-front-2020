@@ -62,7 +62,7 @@ export default function Scheduled( props ) {
           </div>
         ) }
         <button
-          className="btn btn-link-add waves-effect"
+          className="btn btn-link-add waves-effect p-l-0"
           disabled={disabled}
           onClick={()=>{
             setAddItem(true);

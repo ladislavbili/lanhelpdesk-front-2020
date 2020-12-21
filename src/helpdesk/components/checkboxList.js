@@ -33,7 +33,7 @@ export default function CheckboxList( props ) {
           <input type="text"
             disabled={disabled}
             value={ ( editedItem && editedItem.id === item.id) ? editedItem.title : item.title }
-            className="hidden-input flex"
+            className="form-control hidden-input flex"
             onFocus={ () => setEditedItem(item) }
             onBlur={() => onChange(editedItem)}
             onChange={(e) => setEditedItem({ ...editedItem, title: e.target.value }) }
@@ -65,7 +65,7 @@ export default function CheckboxList( props ) {
             type="text"
             disabled={disabled}
             value={title}
-            className="hidden-input flex"
+            className="form-control hidden-input flex"
             onChange={(e) => setTitle(e.target.value)}
             placeholder={newPlaceholder}
             />

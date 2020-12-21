@@ -25,9 +25,12 @@ import axios from 'axios';
 import datePickerConfig from 'configs/components/datepicker';
 import {
   invisibleSelectStyleNoArrow,
+  invisibleSelectStyleNoArrowNoPadding,
   invisibleSelectStyleNoArrowColored,
   invisibleSelectStyleNoArrowColoredRequired,
-  invisibleSelectStyleNoArrowRequired
+  invisibleSelectStyleNoArrowColoredRequiredNoPadding,
+  invisibleSelectStyleNoArrowRequired,
+  invisibleSelectStyleNoArrowRequiredNoPadding,
 } from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect'
 import CheckboxList from 'helpdesk/components/checkboxList';
@@ -336,7 +339,7 @@ export default function TaskAdd( props ) {
         <span className="center-hor flex m-r-15">
           <input type="text"
             value={title}
-            className="task-title-input text-extra-slim full-width"
+            className="task-title-input text-extra-slim full-width form-control"
             onChange={ (e) => setTitle(e.target.value) }
             placeholder="ENTER NEW TASK NAME" />
         </span>
@@ -422,7 +425,7 @@ export default function TaskAdd( props ) {
 
         }}
         options={projects}
-        styles={invisibleSelectStyleNoArrow}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrow}
         />
     ),
     Assigned: (
@@ -444,7 +447,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={status}
         isDisabled={defaultFields.status.fixed || viewOnly}
-        styles={invisibleSelectStyleNoArrowColoredRequired}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowColoredRequiredNoPadding : invisibleSelectStyleNoArrowColoredRequired}
         onChange={(status)=>{
           if(status.action==='PendingDate'){
             setStatus(status);
@@ -493,7 +496,7 @@ export default function TaskAdd( props ) {
           }
         }}
         options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={invisibleSelectStyleNoArrow}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrow}
         />
     ),
     Requester: (
@@ -508,7 +511,7 @@ export default function TaskAdd( props ) {
           setCompanyCreationError(newCompany);
         }}
         options={REQUESTERS}
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Company: (
@@ -522,7 +525,7 @@ export default function TaskAdd( props ) {
           setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
         }}
         options={companies}
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Pausal: (

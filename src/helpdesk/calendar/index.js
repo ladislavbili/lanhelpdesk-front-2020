@@ -215,26 +215,33 @@ export default function TaskCalendar( props ) {
         }
       } )
       .then( ( response ) => {
-        const allCalendarEvents = client.readQuery( {
-            query: GET_CALENDAR_EVENTS,
-            variables: {
-              filter: localFilterToValues( localFilter ),
-              projectId: localProject.id
-            },
-          } )
-          .calendarEvents;
+        try {
 
-        client.writeQuery( {
-          query: GET_CALENDAR_EVENTS,
-          data: {
-            calendarEvents: allCalendarEvents.map( event =>
-              ( event.id !== id ? event : {
-                ...event,
-                ...updateData
-              } )
-            )
-          }
-        } );
+          const allCalendarEvents = client.readQuery( {
+              query: GET_CALENDAR_EVENTS,
+              variables: {
+                filter: localFilterToValues( localFilter ),
+                projectId: localProject.id
+              },
+            } )
+            .calendarEvents;
+
+          client.writeQuery( {
+            query: GET_CALENDAR_EVENTS,
+            data: {
+              calendarEvents: allCalendarEvents.map( event =>
+                ( event.id !== id ? event : {
+                  ...event,
+                  ...updateData
+                } )
+              )
+            }
+          } );
+        } catch ( e ) {
+          console.log( e.message );
+        } finally {
+
+        }
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -291,7 +298,7 @@ export default function TaskCalendar( props ) {
   }
 
   const onEventResize = ( item ) => {
-    const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
+    const canEdit = item.event.project.right.write;
 
     if ( !canEdit ) {
       return;
@@ -320,7 +327,7 @@ export default function TaskCalendar( props ) {
   }
 
   const onEventDrop = ( item ) => {
-    const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
+    const canEdit = item.event.project.right.write;
 
     if ( !canEdit ) {
       return;
@@ -402,7 +409,7 @@ export default function TaskCalendar( props ) {
 
 
   const onEventDropTASKS = ( item ) => {
-    const canEdit = item.event.project.projectRights.find( right => right.write && right.user.id === currentUserData.getMyData.id ) ? true : false;
+    const canEdit = item.event.project.right.write;
 
     if ( !canEdit ) {
       return;
@@ -512,7 +519,7 @@ export default function TaskCalendar( props ) {
   let events = data.map( ( event ) => ( {
     ...event,
     title: event.titleFunction( event, !event.isTask && calendarLayout === 'month' )
-  } ) )
+  } ) );
 
   if ( match.params.taskID ) {
     return ( <Edit match={match} columns={true} history={history} /> );

@@ -159,7 +159,7 @@ export default function TaskAddContainer( props ) {
             setOpenAddTaskModal(true);
           }}
           >
-          <i className="far fa-copy"/>
+          <i className="far fa-copy p-r-5"/>
           Copy
         </button>
       }

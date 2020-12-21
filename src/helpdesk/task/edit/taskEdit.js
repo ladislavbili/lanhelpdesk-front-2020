@@ -35,9 +35,12 @@ import {
 import datePickerConfig from 'configs/components/datepicker';
 import {
   invisibleSelectStyleNoArrow,
+  invisibleSelectStyleNoArrowNoPadding,
   invisibleSelectStyleNoArrowColored,
   invisibleSelectStyleNoArrowColoredRequired,
-  invisibleSelectStyleNoArrowRequired
+  invisibleSelectStyleNoArrowColoredRequiredNoPadding,
+  invisibleSelectStyleNoArrowRequired,
+  invisibleSelectStyleNoArrowRequiredNoPadding,
 } from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect';
 import {
@@ -861,7 +864,7 @@ export default function TaskEdit( props ) {
                   >
                   { status.icon.length > 3 &&
                     <i
-                      className={`${status.icon} commandbar-command-icon p-r-2`}
+                      className={`${status.icon} commandbar-command-icon p-r-5`}
                       />
                   }
                   {status.title}
@@ -902,7 +905,7 @@ export default function TaskEdit( props ) {
                 className="btn btn-link-reversed waves-effect"
                 onClick={deleteTaskFunc}
                 >
-                <i className="far fa-trash-alt" />
+                <i className="far fa-trash-alt p-r-5" />
                 Delete
               </button>
             }
@@ -916,7 +919,7 @@ export default function TaskEdit( props ) {
                 setImportant(!important);
               }}
               >
-              <i className="far fa-star" />
+              <i className="far fa-star p-r-5" />
               Important
             </button>
             { isInvoiced &&
@@ -927,7 +930,7 @@ export default function TaskEdit( props ) {
                 className="btn btn-link-reversed waves-effect"
                 onClick={submitInvoicedTask}
                 >
-                <i className="far fa-save icon-M p-r-2" />
+                <i className="far fa-save icon-M p-r-5" />
                 Save invoiced task
               </button>
             }
@@ -964,7 +967,7 @@ export default function TaskEdit( props ) {
             <input type="text"
               disabled={viewOnly}
               value={title}
-              className="task-title-input text-extra-slim hidden-input m-l-10"
+              className="task-title-input text-extra-slim hidden-input m-l-10 form-control "
               onChange={(e)=> {
                 setTitle(e.target.value);
               }}
@@ -1066,7 +1069,7 @@ export default function TaskEdit( props ) {
         value={ project }
         onChange={ changeProject }
         options={ availableProjects }
-        styles={ invisibleSelectStyleNoArrowRequired }
+        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired }
         />
     ),
     Assigned: (
@@ -1095,7 +1098,7 @@ export default function TaskEdit( props ) {
         placeholder="Status required"
         value={status}
         isDisabled={defaultFields.status.fixed || viewOnly}
-        styles={invisibleSelectStyleNoArrowColoredRequired}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowColoredRequiredNoPadding : invisibleSelectStyleNoArrowColoredRequired}
         onChange={ changeStatus }
         options={statuses.filter((status)=>status.action!=='Invoiced')}
         />
@@ -1119,7 +1122,7 @@ export default function TaskEdit( props ) {
         value={milestone}
         onChange={changeMilestone}
         options={milestones}
-        styles={invisibleSelectStyleNoArrow}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrow}
         />
     ),
     Requester: (
@@ -1129,7 +1132,7 @@ export default function TaskEdit( props ) {
         isDisabled={defaultFields.requester.fixed || viewOnly}
         onChange={changeRequester}
         options={(canAddUser?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(requesters)}
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Company: (
@@ -1139,7 +1142,7 @@ export default function TaskEdit( props ) {
         isDisabled={defaultFields.company.fixed || viewOnly}
         onChange={changeCompany}
         options={(canAddCompany ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Pausal: (

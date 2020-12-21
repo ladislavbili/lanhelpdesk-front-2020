@@ -241,12 +241,10 @@ export default function TasksIndex( props ) {
 
           <p className="pull-right">
             <span>
-              <img
-                className="dnd-item-icon"
-                src={require('../../scss/icons/excl-triangle.svg')}
-                alt="Generic placeholder XX"
+              <i
+                className="fas fa-exclamation-triangle attribute-label m-r-3"
                 />
-              {task.deadline?timestampToString(task.deadline):'None'}
+              {task.deadline?timestampToString(task.deadline):'No deadline'}
             </span>
           </p>
           <p >
@@ -451,7 +449,6 @@ export default function TasksIndex( props ) {
       checked: markedTasks.includes( task.id )
     } ) )
   }
-
 
   return (
       <ShowData

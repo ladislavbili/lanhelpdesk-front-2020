@@ -1123,7 +1123,7 @@ export default function Rozpocet( props ) {
               {showColumns.includes(8) &&
                 <td className="t-a-r">
                   <button className="btn btn-secondary m-r-5"
-                    disabled={newSubtaskType.id === null || disabled || newSubtaskAssigned===null}
+                    disabled={!newSubtaskType || newSubtaskType.id === null || disabled || newSubtaskAssigned===null}
                     onClick={()=>{
                       let body={
                         done:false,
@@ -1584,7 +1584,7 @@ export default function Rozpocet( props ) {
                       setShowAddSubtask(true);
                     }}
                     >
-                    <i className="fa fa-plus" />
+                    <i className="fa fa-plus p-r-5" />
                     Práca
                   </button>
                 }
@@ -1595,7 +1595,7 @@ export default function Rozpocet( props ) {
                       setShowAddTrip(true);
                     }}
                     >
-                    <i className="fa fa-plus" />
+                    <i className="fa fa-plus p-r-5" />
                     Výjazd
                   </button>
                 }
@@ -1606,7 +1606,7 @@ export default function Rozpocet( props ) {
                       setShowAddMaterial(true);
                     }}
                     >
-                    <i className="fa fa-plus" />
+                    <i className="fa fa-plus p-r-5" />
                     Materiál
                   </button>
                 }
@@ -1617,7 +1617,7 @@ export default function Rozpocet( props ) {
                       setShowAddCustomItem(true);
                     }}
                     >
-                    <i className="fa fa-plus" />
+                    <i className="fa fa-plus p-r-5" />
                     Vlastná položka
                   </button>
                 }

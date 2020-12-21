@@ -427,13 +427,6 @@ query tasks($filter: FilterInput, $projectId: Int){
           write
           delete
         }
-        projectRights{
-          write
-          delete
-          user {
-            id
-          }
-        }
 			}
 			requester{
 				id
@@ -1001,13 +994,6 @@ query calendarEvents($filter: FilterInput, $projectId: Int){
         right{
           write
           delete
-        }
-        projectRights{
-          write
-          delete
-          user {
-            id
-          }
         }
 			}
 			status {
