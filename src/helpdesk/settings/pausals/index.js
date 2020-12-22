@@ -4,6 +4,7 @@ import {
 } from "@apollo/client";
 
 import PausalEdit from './pausalEdit';
+import classnames from 'classnames';
 
 import {
   GET_COMPANIES
@@ -64,7 +65,12 @@ export default function CompaniesList( props ) {
                     .map((company)=>
                       <tr
                         key={company.id}
-                        className={"clickable" + (match.params.id === company.id ? " active":"")}
+                        className={classnames (
+                          "clickable",
+                          {
+                            "active": parseInt(match.params.id) === company.id
+                          }
+                        )}
                         onClick={()=>history.push('/helpdesk/settings/pausals/'+company.id)}>
                         <td>
                           {company.title}

@@ -136,34 +136,36 @@ export default function TaskAddContainer( props ) {
     );
   }
 
-  return (
-    <div className="display-inline">
-      {
-        !props.task &&
-        <Button
-          className="btn sidebar-btn"
-          onClick={() => {
-            setOpenAddTaskModal(true);
-          }}
-          >  Add task
-        </Button>
-      }
+  const renderCopyButton = () => {
+    return (
+      <button
+        type="button"
+        className="btn btn-link waves-effect"
+        disabled={props.disabled}
+        onClick={()=> {
+          setOpenAddTaskModal(true);
+        }}
+        >
+        <i className="far fa-copy"/>
+        Copy
+      </button>
+    )
+  }
 
-      {
-        props.task &&
-        <button
-          type="button"
-          className="btn btn-link-reversed waves-effect"
-          disabled={props.disabled}
-          onClick={()=> {
-            setOpenAddTaskModal(true);
-          }}
-          >
-          <i className="far fa-copy p-r-5"/>
-          Copy
-        </button>
-      }
+  const renderAddTaskButton = () => {
+    return (
+      <Button
+        className="btn sidebar-btn"
+        onClick={() => {
+          setOpenAddTaskModal(true);
+        }}
+        >  Add task
+      </Button>
+    )
+  }
 
+  const renderModal = () => {
+    return (
       <Modal isOpen={openAddTaskModal} className="task-add-container" >
         <ModalHeader>
           Create new task
@@ -201,6 +203,29 @@ export default function TaskAddContainer( props ) {
           }
         </ModalBody>
       </Modal>
+    )
+  }
+
+  if ( props.task && !openAddTaskModal ) {
+    return (
+      renderCopyButton()
+    );
+  }
+
+  if ( props.task && openAddTaskModal ) {
+    return (
+      renderModal()
+    );
+  }
+  return (
+    <div className="display-inline">
+      {
+        !props.task &&
+        renderAddTaskButton()
+      }
+
+      { renderModal() }
+
     </div>
   );
 }

@@ -216,7 +216,7 @@ export default function TasksIndex( props ) {
         </div>
         <div className="taskCol-body">
           <p className="pull-right m-0">
-            <span className="label label-info" style={{backgroundColor:task.status && task.status.color?task.status.color:'white'}}>
+            <span className="label-info" style={{backgroundColor:task.status && task.status.color?task.status.color:'white'}}>
               {task.status?task.status.title:'Neznámy status'}
             </span>
           </p>
@@ -256,7 +256,7 @@ export default function TasksIndex( props ) {
 
         <div className="taskCol-tags">
           {task.tags.map((tag)=>
-            <span key={tag.id} className="label label-info m-r-5" style={{backgroundColor: tag.color, color: "white"}}>{tag.title}</span>
+            <span key={tag.id} className="label-info m-r-5" style={{backgroundColor: tag.color, color: "white"}}>{tag.title}</span>
           )}
         </div>
 
@@ -266,10 +266,10 @@ export default function TasksIndex( props ) {
   const displayCal = ( task, showEvent ) => {
     return ( <div style={ showEvent ? { backgroundColor:'#eaf6ff', borderRadius:5 } : {} }>
   					<p className="m-0">
-  						{showEvent && <span className="label label-event">
+  						{showEvent && <span className="label-event">
   						Event
   					</span>}
-  						<span className="label label-info" style={{backgroundColor:task.status && task.status.color?task.status.color:'white'}}>
+  						<span className="label-info" style={{backgroundColor:task.status && task.status.color?task.status.color:'white'}}>
   							{task.status?task.status.title:'Neznámy status'}
   						</span>
   						<span className="attribute-label m-l-3">#{task.id} | {task.title}</span>
@@ -511,6 +511,7 @@ export default function TasksIndex( props ) {
         breadcrumsData={getBreadcrumsData()}
         setStatuses={setUserStatusesFunc}
         underSearch={RowTaskAdd}
+        underSearchLabel={'Task'}
         statuses={currentUser.statuses.map((status) => status.id )}
         allStatuses={statuses}
         checkTask={checkTask}

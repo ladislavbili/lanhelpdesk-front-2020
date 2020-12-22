@@ -1,5 +1,18 @@
 import chroma from 'chroma-js';
 
+const value = {
+  font: '14px Segoe UI',
+  color: '#333',
+}
+const noValue = {
+  font: '14px Segoe UI',
+  color: '#777',
+}
+const noValueMandatory = {
+  font: '14px Segoe UI',
+  color: '#E81123',
+}
+
 export const invisibleSelectStyleNoArrow = {
   control: ( base, state ) => ( {
     ...base,
@@ -46,7 +59,8 @@ export const invisibleSelectStyleNoArrow = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 6px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value,
   } ),
   input: base => ( {
     ...base,
@@ -58,6 +72,10 @@ export const invisibleSelectStyleNoArrow = {
   indicatorSeparator: base => ( {
     ...base,
     width: 0,
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValue
   } ),
   menu: base => ( {
     ...base,
@@ -112,7 +130,8 @@ export const invisibleSelectStyleNoArrowNoPadding = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 6px 0px 0px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value,
   } ),
   input: base => ( {
     ...base,
@@ -124,6 +143,10 @@ export const invisibleSelectStyleNoArrowNoPadding = {
   indicatorSeparator: base => ( {
     ...base,
     width: 0,
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValueMandatory
   } ),
   menu: base => ( {
     ...base,
@@ -206,7 +229,8 @@ export const invisibleSelectStyleNoArrowColored = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 5px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value,
   } ),
   input: base => ( {
     ...base,
@@ -218,6 +242,10 @@ export const invisibleSelectStyleNoArrowColored = {
   indicatorSeparator: base => ( {
     ...base,
     width: 0,
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValue
   } ),
   singleValue: ( styles, {
     data
@@ -281,7 +309,8 @@ export const invisibleSelectStyleNoArrowRequired = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 6px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value,
   } ),
   input: base => ( {
     ...base,
@@ -296,11 +325,12 @@ export const invisibleSelectStyleNoArrowRequired = {
   } ),
   placeholder: base => ( {
     ...base,
-    color: '#FF4500'
+    ...noValueMandatory
   } ),
   menu: base => ( {
     ...base,
     zIndex: 50,
+    ...value
   } ),
 
 };
@@ -351,14 +381,16 @@ export const invisibleSelectStyleNoArrowRequiredNoPadding = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 6px 0px 0px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value
   } ),
   input: base => ( {
     ...base,
     margin: 0,
     padding: 0,
     backgroundColor: "inherit",
-    borderRadius: 0
+    borderRadius: 0,
+    ...value
   } ),
   indicatorSeparator: base => ( {
     ...base,
@@ -366,11 +398,12 @@ export const invisibleSelectStyleNoArrowRequiredNoPadding = {
   } ),
   placeholder: base => ( {
     ...base,
-    color: '#FF4500'
+    ...noValueMandatory
   } ),
   menu: base => ( {
     ...base,
     zIndex: 50,
+    ...value
   } ),
 
 };
@@ -449,7 +482,9 @@ export const invisibleSelectStyleNoArrowColoredRequired = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 5px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value
+
   } ),
   input: base => ( {
     ...base,
@@ -461,6 +496,10 @@ export const invisibleSelectStyleNoArrowColoredRequired = {
   indicatorSeparator: base => ( {
     ...base,
     width: 0,
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValueMandatory
   } ),
   singleValue: ( styles, {
     data
@@ -474,7 +513,8 @@ export const invisibleSelectStyleNoArrowColoredRequired = {
   },
   placeholder: base => ( {
     ...base,
-    color: '#FF4500'
+    font: '14px Segoe UI',
+    color: '#E81123',
   } ),
   menu: base => ( {
     ...base,
@@ -556,7 +596,8 @@ export const invisibleSelectStyleNoArrowColoredRequiredNoPadding = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 6px 0px 0px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value
   } ),
   input: base => ( {
     ...base,
@@ -581,7 +622,7 @@ export const invisibleSelectStyleNoArrowColoredRequiredNoPadding = {
   },
   placeholder: base => ( {
     ...base,
-    color: '#FF4500'
+    ...noValueMandatory
   } ),
   menu: base => ( {
     ...base,
@@ -606,7 +647,7 @@ export const sidebarSelectStyle = {
   control: ( provided, state ) => {
     return {
       ...provided,
-      background: "white",
+      background: "#F9F9F9",
       borderRadius: 0,
       borderWidth: "0",
       height: 40,
@@ -792,7 +833,8 @@ export const selectStyle = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 6px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value
   } ),
   input: base => ( {
     ...base,
@@ -804,6 +846,10 @@ export const selectStyle = {
   indicatorSeparator: base => ( {
     ...base,
     width: 0,
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValue
   } ),
   menu: base => ( {
     ...base,
@@ -857,7 +903,8 @@ export const selectStyleNoArrow = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 6px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value,
   } ),
   input: base => ( {
     ...base,
@@ -872,6 +919,10 @@ export const selectStyleNoArrow = {
   placeholder: base => ( {
     ...base,
     color: '#FF4500'
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValue
   } ),
   menu: base => ( {
     ...base,
@@ -904,7 +955,8 @@ export const invisibleSelectStyle = {
   valueContainer: base => ( {
     ...base,
     padding: '0px 6px',
-    borderRadius: 0
+    borderRadius: 0,
+    ...value
   } ),
   input: base => ( {
     ...base,
@@ -912,6 +964,10 @@ export const invisibleSelectStyle = {
     padding: 0,
     backgroundColor: "inherit",
     borderRadius: 0
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValue
   } ),
   indicatorSeparator: base => ( {
     ...base,

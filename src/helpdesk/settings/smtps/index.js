@@ -10,6 +10,7 @@ import {
 import SMTPAdd from './smtpAdd';
 import SMTPEdit from './smtpEdit';
 import Loading from 'components/loading';
+import classnames from 'classnames';
 import {
   GET_SMTPS,
   TEST_SMTPS
@@ -119,7 +120,12 @@ export default function SMTPsList( props ) {
                 ).map((smtp)=>
                   <tr
                     key={smtp.id}
-                    className={"clickable" + (parseInt(match.params.id) === smtp.id ? " active":"")}
+                    className={classnames (
+                      "clickable",
+                      {
+                        "active": parseInt(match.params.id) === smtp.id
+                      }
+                    )}
                     onClick={()=>history.push('/helpdesk/settings/smtps/'+smtp.id)}>
                     <td style={{maxWidth: 100, overflow: 'hidden'}}>
                       {smtp.title}

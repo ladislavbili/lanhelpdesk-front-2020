@@ -14,8 +14,7 @@ import {
 import ImapAdd from './imapAdd';
 import ImapEdit from './imapEdit';
 import Loading from 'components/loading';
-
-
+import classnames from 'classnames';
 
 export default function IMAPsList( props ) {
   // state
@@ -123,7 +122,12 @@ export default function IMAPsList( props ) {
                   ).map((imap)=>
                   <tr
                     key={imap.id}
-                    className={"clickable" + (match.params.id === imap.id ? " active":"")}
+                    className={classnames (
+                      "clickable",
+                      {
+                        "active": parseInt(match.params.id) === imap.id
+                      }
+                    )}
                     onClick={()=>history.push('/helpdesk/settings/imaps/'+imap.id)}>
                     <td style={{maxWidth: 100, overflow: 'hidden'}}>
                       {imap.title}

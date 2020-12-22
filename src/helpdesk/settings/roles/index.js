@@ -12,6 +12,7 @@ import Loading from 'components/loading';
 import {
   orderArr
 } from 'helperFunctions';
+import classnames from 'classnames';
 
 import {
   GET_ROLES
@@ -75,7 +76,12 @@ export default function RolesList( props ) {
                   {ROLES.map((role)=>
                     <tr
                       key={role.id}
-                      className={"clickable" + (parseInt(match.params.id) === role.id ? " active":"")}
+                      className={classnames (
+                        "clickable",
+                        {
+                          "active": parseInt(match.params.id) === role.id
+                        }
+                      )}
                       style={{whiteSpace: "nowrap",  overflow: "hidden"}}
                       onClick={()=>history.push('/helpdesk/settings/roles/'+role.id)}>
                       <td

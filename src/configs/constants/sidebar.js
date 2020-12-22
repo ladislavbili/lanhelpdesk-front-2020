@@ -14,8 +14,8 @@ export const dashboard = {
 export const addProject = {
   project: {
     id: -1,
-    title: '+ Add project',
-    label: '+ Add project',
+    title: 'Project',
+    label: 'Project',
     value: -1
   }
 };
@@ -28,8 +28,8 @@ export const allMilestones = {
 };
 export const addMilestone = {
   id: -1,
-  title: '+ Add milestone',
-  label: '+ Add milestone',
+  title: 'Milestone',
+  label: 'Milestone',
   value: -1
 };
 export const noMilestone = {

@@ -289,7 +289,7 @@ export default function TaskAdd( props ) {
             quantity: item.quantity,
             price: parseFloat( item.price )
           } ) ),
-          shortSubtasks: shortSubtasks.map( ( item ) => ( {
+          shortSubtasks: simpleSubtasks.map( ( item ) => ( {
             done: item.done,
             title: item.title,
           } ) )
@@ -343,45 +343,35 @@ export default function TaskAdd( props ) {
             onChange={ (e) => setTitle(e.target.value) }
             placeholder="ENTER NEW TASK NAME" />
         </span>
-        { status && (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) && <div className="ml-auto center-hor">
-          <span>
-            { (status.action==='CloseDate' || status.action==='CloseInvalid') &&
-              <span className="text-muted">
-                Close date:
-                <DatePicker
-                  className="form-control hidden-input"
-                  selected={closeDate}
-                  disabled={viewOnly}
-                  onChange={date => {
-                    setCloseDate(date);
-                  }}
-                  placeholderText="No close date"
-                  {...datePickerConfig}
-                  />
-              </span>
-            }
-            { status.action==='PendingDate' &&
-              <span className="text-muted">
-                Pending date:
-                <DatePicker
-                  className="form-control hidden-input"
-                  selected={pendingDate}
-                  disabled={viewOnly}
-                  onChange={date => {
-                    setPendingDate(date);
-                  }}
-                  placeholderText="No pending date"
-                  {...datePickerConfig}
-                  />
-              </span>
-            }
+        {
+          status &&
+          (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) &&
+          <div className="task-info-add ml-auto center-hor">
+          <span className="">
+            {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Close date: " : "PendingDate: "}
           </span>
-        </div>}
+          <DatePicker
+            className="form-control hidden-input bolder"
+            selected={(status.action==='CloseDate' || status.action==='CloseInvalid') ? closeDate : pendingDate }
+            disabled={viewOnly}
+            onChange={date => {
+              if (status.action==='CloseDate' || status.action==='CloseInvalid'){
+                setCloseDate(date);
+              } else {
+                setPendingDate(date);
+              }
+            }}
+            placeholderText="No close date"
+            {...datePickerConfig}
+            />
+        </div>
+      }
         <button
           type="button"
           className="btn btn-link waves-effect ml-auto asc"
           onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
-          Switch layout
+          <i className="fas fa-retweet "/>
+          Layout
         </button>
       </div>
     );
@@ -425,7 +415,7 @@ export default function TaskAdd( props ) {
 
         }}
         options={projects}
-        styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrow}
+        styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Assigned: (
@@ -890,7 +880,7 @@ export default function TaskAdd( props ) {
   const renderPopis = () => {
     return (
       <div>
-        <Label className="m-b-10 col-form-label m-t-10">Popis úlohy</Label>
+        <Label className="col-form-label-description">Popis úlohy</Label>
         <CKEditor5
           editor={ ClassicEditor }
           data={description}
@@ -930,7 +920,7 @@ export default function TaskAdd( props ) {
         } }
         placeholder="Short subtask title"
         newPlaceholder="New short subtask title"
-        label="Short subtask"
+        label="Subtask"
         />
     )
   }
@@ -1099,7 +1089,7 @@ export default function TaskAdd( props ) {
     return (
       <div>
         {closeModal &&
-          <Button className="btn-link-remove" onClick={() => closeModal()}>Cancel</Button>
+          <Button className="btn btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
         }
         <button
           className="btn pull-right"
@@ -1139,9 +1129,7 @@ export default function TaskAdd( props ) {
 
           { layout === 1 && defaultFields.tag.show && renderTags() }
 
-          <div className="highlight-form">
             { renderSimpleSubtasks() }
-          </div>
 
           { renderAttachments(false) }
           { !viewOnly && renderVykazyTable(subtasks, workTrips, materials, customItems) }

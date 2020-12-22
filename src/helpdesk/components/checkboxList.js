@@ -19,11 +19,14 @@ export default function CheckboxList( props ) {
   const [ editedItem, setEditedItem ] = React.useState( null );
 
   return (
-    <div className="attachments">
+    <div className="task-edit-popis">
+      <div>
+        Subtasks
+      </div>
       { items.map((item) =>
         <div className="row" id={item.id}>
           <Checkbox
-            className = "m-l-5 m-r-5"
+            className = "m-r-5"
             centerVer
             centerHor
             disabled = {disabled}
@@ -40,7 +43,7 @@ export default function CheckboxList( props ) {
             placeholder={placeholder}
             />
             <button
-              className="btn btn-link-add waves-effect"
+              className="btn btn-link waves-effect"
               disabled={disabled}
               onClick={()=>{
                 deleteItem(item);
@@ -54,7 +57,7 @@ export default function CheckboxList( props ) {
       { addItem &&
         <div className="row" id="add">
           <Checkbox
-            className = "m-l-5 m-r-5"
+            className = "m-r-5"
             centerVer
             centerHor
             disabled = {disabled}
@@ -70,7 +73,7 @@ export default function CheckboxList( props ) {
             placeholder={newPlaceholder}
             />
           <button
-            className="btn btn-link-add waves-effect"
+            className="btn btn-link waves-effect"
             disabled={disabled}
             onClick={()=>{
               submitItem({
@@ -85,7 +88,7 @@ export default function CheckboxList( props ) {
             <i className="fa fa-plus" />
           </button>
           <button
-            className="btn btn-link-add waves-effect"
+            className="btn btn-link waves-effect"
             disabled={disabled}
             onClick={()=>{
               setAddItem(false);
@@ -97,7 +100,7 @@ export default function CheckboxList( props ) {
       }
       { !addItem &&
         <button
-          className="btn btn-link-add waves-effect"
+          className="btn btn-link waves-effect"
           disabled={disabled}
           onClick={()=>{
             setAddItem(true);

@@ -9,6 +9,7 @@ import {
 import CompanyAdd from './companyAdd';
 import CompanyEdit from './companyEdit';
 import Loading from 'components/loading';
+import classnames from 'classnames';
 import {
   GET_COMPANIES
 } from './querries';
@@ -96,7 +97,12 @@ export default function CompanysList( props ) {
                         .map((company)=>
                           <tr
                             key={company.id}
-                            className={"clickable" + (match.params.id === company.id ? " active":"")}
+                            className={classnames (
+                              "clickable",
+                              {
+                                "active": parseInt(match.params.id) === company.id
+                              }
+                            )}
                             onClick={()=>history.push('/helpdesk/settings/companies/'+company.id)}>
                             <td>
                               {company.title}

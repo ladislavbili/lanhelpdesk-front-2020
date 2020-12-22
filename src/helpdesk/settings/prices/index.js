@@ -9,6 +9,7 @@ import {
 import PriceAdd from './priceAdd';
 import PriceEdit from './priceEdit';
 import Loading from 'components/loading';
+import classnames from 'classnames';
 
 import {
   GET_PRICELISTS
@@ -69,7 +70,12 @@ export default function PricelistsList( props ) {
                   <tbody>
                     {PRICELISTS.filter((item)=>item.title.toLowerCase().includes(pricelistFilter.toLowerCase())).map((pricelist)=>
                       <tr key={pricelist.id}
-                        className={"clickable" + (parseInt(match.params.id) === pricelist.id ? " active":"")}
+                        className={classnames (
+                          "clickable",
+                          {
+                            "active": parseInt(match.params.id) === pricelist.id
+                          }
+                        )}
                         onClick={()=>{history.push('/helpdesk/settings/pricelists/'+pricelist.id)}}>
                         <td>
                           {pricelist.title}
