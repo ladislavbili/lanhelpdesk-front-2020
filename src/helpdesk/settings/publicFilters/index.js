@@ -14,6 +14,7 @@ import {
   toSelArr
 } from 'helperFunctions';
 import Loading from 'components/loading';
+import classnames from 'classnames';
 
 import {
   GET_BASIC_ROLES
@@ -120,7 +121,12 @@ export default function PublicFilterList( props ) {
                     { getFilteredFilters().map( (filter) =>
                       <tr
                         key={filter.id}
-                        className={"clickable" + (match.params.id === filter.id ? " active":"")}
+                        className={classnames (
+                          "clickable",
+                          {
+                            "active": parseInt(match.params.id) === filter.id
+                          }
+                        )}
                         style={{whiteSpace: "nowrap",  overflow: "hidden"}}
                         onClick={()=>history.push('/helpdesk/settings/publicFilters/'+filter.id.toString())}>
                         <td

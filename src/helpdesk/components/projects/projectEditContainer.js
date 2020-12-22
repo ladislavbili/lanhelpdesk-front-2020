@@ -32,7 +32,7 @@ export default function ProjectEditContainer( props ) {
         className='btn-link p-0'
         onClick={() => setOpened(true)}
         >
-        Project settings
+        <i className="fa fa-cog"/> Project
       </Button>
     <Modal isOpen={opened}>
         <ModalHeader>

@@ -19,7 +19,7 @@ export default function ProjecAddContainer( props ) {
   return (
     <div>
       <Modal isOpen={open}  >
-        <ModalHeader>Add project</ModalHeader>
+        <ModalHeader><i className="fa fa-plus" />Project</ModalHeader>
         <ModalBody>
           <ProjectAdd
             closeModal = {closeModal}

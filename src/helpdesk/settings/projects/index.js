@@ -9,6 +9,7 @@ import {
 import ProjectAdd from './projectAdd';
 import ProjectEdit from './projectEdit';
 import Loading from 'components/loading';
+import classnames from 'classnames';
 import {
   GET_PROJECTS,
   GET_MY_DATA
@@ -99,7 +100,12 @@ export default function ProjectsList( props ) {
                 <tbody>
                   {PROJECTS.filter((item)=>item.title.toLowerCase().includes(projectFilter.toLowerCase())).map((project)=>
                     <tr key={project.id}
-                      className={"clickable" + (parseInt(match.params.id) === project.id ? " active":"")}
+                      className={classnames (
+                        "clickable",
+                        {
+                          "active": parseInt(match.params.id) === project.id
+                        }
+                      )}
                       onClick={()=>history.push('/helpdesk/settings/projects/'+project.id)}>
                       <td>
                         {project.title}

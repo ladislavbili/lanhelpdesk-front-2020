@@ -14,6 +14,7 @@ import {
 import UserAdd from './userAdd';
 import UserEdit from './userEdit';
 import Loading from 'components/loading';
+import classnames from 'classnames';
 import {
   GET_USERS,
 } from './querries';
@@ -123,7 +124,12 @@ export default function UserListContainer( props ) {
                   {FILTERED_USERS.filter((item)=>item.email.toLowerCase().includes(userFilter.toLowerCase())).sort((user1,user2)=>user1.email>user2.email?1:-1).map((user)=>
                     <tr
                       key={user.id}
-                      className={"clickable" + (match.params.id === user.id ? " active":"")}
+                      className={classnames (
+                        "clickable",
+                        {
+                          "active": parseInt(match.params.id) === user.id
+                        }
+                      )}
                       style={{whiteSpace: "nowrap",  overflow: "hidden"}}
                       onClick={()=>history.push('/helpdesk/settings/users/'+user.id)}>
                       <td

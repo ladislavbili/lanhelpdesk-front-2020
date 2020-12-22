@@ -311,6 +311,7 @@ export default function TasksSidebar( props ) {
             className='btn-link p-0'
             onClick={() => setOpenProjectAdd(true)}
             >
+            <i className="fa fa-plus" />
             { addProject.project.title }
           </Button>
         </NavItem>
@@ -321,6 +322,7 @@ export default function TasksSidebar( props ) {
             className='btn-link p-0'
             onClick={() => setOpenMilestoneAdd(true)}
             >
+            <i className="fa fa-plus" />
             { addMilestone.title }
           </Button>
         </NavItem>

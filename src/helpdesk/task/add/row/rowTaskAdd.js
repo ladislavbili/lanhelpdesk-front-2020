@@ -285,7 +285,7 @@ export default function RowTaskAdd( props ) {
   return (
     <div className="col-12 row task-edit-align-select-labels">
       <div className="col-3 m-r-5 m-l-15" >
-        <Label className="col-form-label">Write a new task name</Label>
+        <Label className="col-form-label-3">Write a new task name</Label>
         <input
           className="form-control"
           value={title}
@@ -294,7 +294,7 @@ export default function RowTaskAdd( props ) {
           />
       </div>
       <div className="col-1 m-r-5" >
-        <Label className="col-form-label">Status</Label>
+        <Label className="col-form-label-3">Status</Label>
         <Select
           placeholder="Select required"
           value={status}
@@ -317,7 +317,7 @@ export default function RowTaskAdd( props ) {
       </div>
 
       <div className="col-2 m-r-5">
-        <Label className="col-form-label">Requester</Label>
+        <Label className="col-form-label-3">Requester</Label>
         <Select
           value={requester}
           placeholder="Select required"
@@ -333,7 +333,7 @@ export default function RowTaskAdd( props ) {
 
       { defaultFields.company.show &&
         <div className="col-2 m-r-5">
-          <Label className="col-form-label">Firma</Label>
+          <Label className="col-form-label-3">Firma</Label>
           <Select
             value={company}
             placeholder="Select required"
@@ -350,7 +350,7 @@ export default function RowTaskAdd( props ) {
 
 
       <div className="col-2 m-r-5">
-        <Label className="col-form-label">Assigned to</Label>
+        <Label className="col-form-label-3">Assigned to</Label>
         <Select
           placeholder="Select required"
           value={assignedTo}
@@ -362,7 +362,7 @@ export default function RowTaskAdd( props ) {
       </div>
 
       <div className="col-1 m-r-5">
-        <Label className="col-form-label-2 m-r-5">Deadline</Label>
+        <Label className="col-form-label-3">Deadline</Label>
         <div className="col-form-value-2">
           <DatePicker
             className="form-control fullWidth"

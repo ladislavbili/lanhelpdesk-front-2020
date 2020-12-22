@@ -56,7 +56,8 @@ export default function ShowDataContainer( props ) {
     dndGroupData,
     calendarAllDayData,
     calendarEventsData,
-    underSearch
+    underSearch,
+    underSearchLabel
   } = props;
 
   const {
@@ -201,6 +202,7 @@ export default function ShowDataContainer( props ) {
 								allStatuses={allStatuses}
 								Edit={Edit}
                 underSearch={underSearch}
+                underSearchLabel={underSearchLabel}
 								/>
 						</div>
 					)}
@@ -228,6 +230,7 @@ export default function ShowDataContainer( props ) {
 									checkTask={checkTask}
 									deleteTask={deleteTask}
                   underSearch={underSearch}
+                  underSearchLabel={underSearchLabel}
 									/>}
 						</div>
 					)}
@@ -254,6 +257,7 @@ export default function ShowDataContainer( props ) {
 									statuses={statuses}
 									allStatuses={allStatuses}
                   underSearch={underSearch}
+                  underSearchLabel={underSearchLabel}
 									/>
 							}
 						</div>
@@ -281,6 +285,7 @@ export default function ShowDataContainer( props ) {
 								allStatuses={allStatuses}
 								Edit={Edit}
                 underSearch={underSearch}
+                underSearchLabel={underSearchLabel}
 								/>
 						</div>
 					)}

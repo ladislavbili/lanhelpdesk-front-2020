@@ -67,7 +67,7 @@ export default function Repeat( props ) {
         <div className="">
           <Label className="col-form-label-2" style={{display: "block"}}>Repeat</Label>
           <div className="col-form-value-2">
-            <Button type="button" style={{paddingLeft: "7px"}} className="repeat-btn" id={"openPopover"+taskID} onClick={toggleRepeat}>
+            <Button type="button" style={{paddingLeft: "7px"}} className="btn repeat-btn" id={"openPopover"+taskID} onClick={toggleRepeat}>
               {
                 repeat ?
                 ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
@@ -82,7 +82,7 @@ export default function Repeat( props ) {
         <div className="display-inline">
           <Label className="col-form-label w-8">Repeat</Label>
           <div className="display-inline-block w-25 p-r-10">
-            <Button type="button" className="repeat-btn flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
+            <Button type="button" className="btn repeat-btn flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
               {
                 repeat ?
                 ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
@@ -97,7 +97,7 @@ export default function Repeat( props ) {
         <div className="row p-r-10">
           <Label className="col-3 col-form-label">Repeat</Label>
           <div className="col-9">
-            <Button type="button" className="repeat-btn flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
+            <Button type="button" className="btn repeat-btn flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
               {
                 repeat ?
                 ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
@@ -150,7 +150,7 @@ export default function Repeat( props ) {
             </FormGroup>
             <div className="row">
               <Button
-                className="btn-link"
+                className="btn btn-link"
                 onClick={() => setOpen(false) }>
                 Close
               </Button>

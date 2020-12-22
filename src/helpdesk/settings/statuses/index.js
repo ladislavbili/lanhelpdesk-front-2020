@@ -11,6 +11,7 @@ import StatusEdit from './statusEdit';
 import {
   orderArr
 } from 'helperFunctions';
+import classnames from 'classnames';
 
 import {
   GET_STATUSES
@@ -70,7 +71,12 @@ export default function StatusesList( props ) {
                 <tbody>
                   {statuses.filter((item)=>item.title.toLowerCase().includes(statusFilter.toLowerCase())).map((status)=>
                     <tr key={status.id}
-                       className={"clickable" + (parseInt(match.params.id) === status.id ? " active":"")}
+                       className={classnames (
+                         "clickable",
+                         {
+                           "active": parseInt(match.params.id) === status.id
+                         }
+                       )}
                        onClick={()=>history.push('/helpdesk/settings/statuses/'+status.id)}>
                       <td>
                         {status.title}

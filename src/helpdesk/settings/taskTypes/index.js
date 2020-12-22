@@ -12,6 +12,7 @@ import Loading from 'components/loading';
 import {
   orderArr
 } from 'helperFunctions';
+import classnames from 'classnames';
 
 import {
   GET_TASK_TYPES,
@@ -71,7 +72,12 @@ export default function TaskTypeList( props ) {
               <tbody>
                 { (loading || !data ? [] : orderArr(data.taskTypes)).filter((item)=>item.title.toLowerCase().includes(taskTypeFilter.toLowerCase())).map((taskType)=>
                   <tr key={taskType.id}
-                    className={"clickable" + (parseInt(match.params.id) === taskType.id ? " active":"")}
+                    className={classnames (
+                      "clickable",
+                      {
+                        "active": parseInt(match.params.id) === taskType.id
+                      }
+                    )}
                     onClick={()=>history.push('/helpdesk/settings/taskTypes/'+taskType.id)}>
                     <td>
                       {taskType.title}

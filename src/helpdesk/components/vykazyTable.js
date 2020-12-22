@@ -1578,46 +1578,46 @@ export default function Rozpocet( props ) {
             <tr>
               <td colSpan={(toggleTab === '1' ? 8 : 10)}>
                 {!showAddSubtask &&
-                  <button className="btn waves-effect"
+                  <button className="btn btn-link waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddSubtask(true);
                     }}
                     >
-                    <i className="fa fa-plus p-r-5" />
+                    <i className="fa fa-plus" />
                     Práca
                   </button>
                 }
                 {!showAddTrip && !showSubtasks &&
-                  <button className="btn waves-effect"
+                  <button className="btn btn-link waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddTrip(true);
                     }}
                     >
-                    <i className="fa fa-plus p-r-5" />
+                    <i className="fa fa-plus" />
                     Výjazd
                   </button>
                 }
                 {!showAddMaterial && !showSubtasks &&
-                  <button className="btn waves-effect"
+                  <button className="btn btn-link waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddMaterial(true);
                     }}
                     >
-                    <i className="fa fa-plus p-r-5" />
+                    <i className="fa fa-plus" />
                     Materiál
                   </button>
                 }
                 {!showAddCustomItem && !showSubtasks &&
-                  <button className="btn waves-effect"
+                  <button className="btn btn-link waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddCustomItem(true);
                     }}
                     >
-                    <i className="fa fa-plus p-r-5" />
+                    <i className="fa fa-plus" />
                     Vlastná položka
                   </button>
                 }

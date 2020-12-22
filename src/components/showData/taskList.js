@@ -48,8 +48,10 @@ export default function List( props ) {
     deleteTask,
     checkTask,
     underSearch: UnderSearch,
+    underSearchLabel
   } = props;
   const [ editOpen, setEditOpen ] = React.useState( false );
+  const [ underSearchOpen, setUnderSearchOpen ] = React.useState( false );
 
   const {
     data: tasksFilterData
@@ -67,9 +69,19 @@ export default function List( props ) {
     <div>
 				<CommandBar {...commandBar} listName={listName}/>
 				<div className="full-width scroll-visible fit-with-header-and-commandbar task-container">
-					<ListHeader {...commandBar} listName={listName} statuses={statuses} setStatuses={setStatuses} allStatuses={allStatuses} />
+					<ListHeader
+            {...commandBar}
+            listName={listName}
+            statuses={statuses}
+            setStatuses={setStatuses}
+            allStatuses={allStatuses}
+            underSearchButtonEvent={() => setUnderSearchOpen(!underSearchOpen)}
+            underSearchButtonLabel={underSearchLabel}
+            />
           {
-            UnderSearch !== undefined && <UnderSearch/>
+            UnderSearch !== undefined &&
+            underSearchOpen &&
+             <UnderSearch/>
           }
 					<table className="table">
 						<thead>

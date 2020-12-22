@@ -12,6 +12,7 @@ import Loading from 'components/loading';
 import {
   orderArr
 } from 'helperFunctions';
+import classnames from 'classnames';
 import {
   GET_TRIP_TYPES
 } from './querries';
@@ -69,7 +70,12 @@ export default function TripTypeListContainer( props ) {
               <tbody>
                   { (loading || !data ? [] : orderArr(data.tripTypes)).filter((item)=>item.title.toLowerCase().includes(tripTypeFilter.toLowerCase())).map((tripType)=>
                   <tr key={tripType.id}
-                    className={"clickable" + (match.params.id === tripType.id ? " active":"")}
+                    className={classnames (
+                      "clickable",
+                      {
+                        "active": parseInt(match.params.id) === tripType.id
+                      }
+                    )}
                     onClick={()=>history.push('/helpdesk/settings/tripTypes/'+tripType.id)}>
                     <td>
                       {tripType.title}

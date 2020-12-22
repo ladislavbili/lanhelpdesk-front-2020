@@ -835,13 +835,13 @@ export default function TaskEdit( props ) {
   //render
   const renderCommandbar = () => {
     return (
-      <div className={classnames({"commandbar-small": columns}, {"commandbar": !columns}, { "p-l-25": true})}> {/*Commandbar*/}
+      <div className={classnames( "bkg-white", "p-l-30", {"commandbar-small": columns}, {"commandbar": !columns})}> {/*Commandbar*/}
         <div className={classnames("d-flex", "flex-row", "center-hor", {"m-b-10": columns})}>
           <div className="display-inline center-hor">
             {!columns &&
               <button
                 type="button"
-                className="btn btn-link-reversed waves-effect p-l-0"
+                className="btn btn-link waves-effect"
                 onClick={() => {
                   if(inModal){
                     closeModal()
@@ -853,18 +853,19 @@ export default function TaskEdit( props ) {
                 <i
                   className="fas fa-arrow-left commandbar-command-icon"
                   />
+                Back
               </button>
             }
             {
               statuses.filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
                 <button
                   type="button"
-                  className="btn btn-link-reversed waves-effect p-l-0"
+                  className="btn btn-link waves-effect"
                   onClick={changeStatus}
                   >
                   { status.icon.length > 3 &&
                     <i
-                      className={`${status.icon} commandbar-command-icon p-r-5`}
+                      className={`${status.icon} commandbar-command-icon`}
                       />
                   }
                   {status.title}
@@ -878,8 +879,6 @@ export default function TaskEdit( props ) {
                 disabled={canCopy}
                 />
             }
-          </div>
-          <div className="ml-auto center-hor">
             { false &&
               <TaskPrint
                 match={match}
@@ -902,10 +901,10 @@ export default function TaskEdit( props ) {
               <button
                 type="button"
                 disabled={!canDelete}
-                className="btn btn-link-reversed waves-effect"
+                className="btn btn-link waves-effect"
                 onClick={deleteTaskFunc}
                 >
-                <i className="far fa-trash-alt p-r-5" />
+                <i className="far fa-trash-alt" />
                 Delete
               </button>
             }
@@ -913,13 +912,13 @@ export default function TaskEdit( props ) {
               type="button"
               style={{color: important ? '#ffc107' : '#0078D4'}}
               disabled={viewOnly}
-              className="btn btn-link-reversed waves-effect"
+              className="btn btn-link waves-effect"
               onClick={()=>{
                 autoUpdateTask({ important: !important })
                 setImportant(!important);
               }}
               >
-              <i className="far fa-star p-r-5" />
+              <i className="far fa-star" />
               Important
             </button>
             { isInvoiced &&
@@ -927,21 +926,22 @@ export default function TaskEdit( props ) {
                 type="button"
                 style={{color: important ? '#ffc107' : '#0078D4'}}
                 disabled={getCantSave()}
-                className="btn btn-link-reversed waves-effect"
+                className="btn btn-link waves-effect"
                 onClick={submitInvoicedTask}
                 >
-                <i className="far fa-save icon-M p-r-5" />
+                <i className="far fa-save" />
                 Save invoiced task
               </button>
             }
+            <button
+              type="button"
+              className="btn btn-link waves-effect"
+              onClick={() => setLayout(layout === 1 ? 2 : 1)}
+              >
+              <i className="fas fa-retweet "/>
+              Layout
+            </button>
           </div>
-          <button
-            type="button"
-            className="btn btn-link-reversed waves-effect"
-            onClick={() => setLayout(layout === 1 ? 2 : 1)}
-            >
-            Switch layout
-          </button>
         </div>
       </div>
     )
@@ -984,23 +984,21 @@ export default function TaskEdit( props ) {
   const renderTaskInfoAndDates = () => {
     return (
       <div className="ml-auto center-hor">
-        <p className="m-b-0 task-info">
-          <span className="text-muted">
+        <div className="task-info">
+          <span className="">
             {task.createdBy?"Created by ":""}
           </span>
           <span className="bolder">
             {task.createdBy? (task.createdBy.name + " " +task.createdBy.surname) :''}
           </span>
-          <span className="text-muted">
+          <span className="">
             {task.createdBy?' at ':'Created at '}
           </span>
           <span className="bolder">
             {task.createdAt?(timestampToString(task.createdAt)):''}
           </span>
-        </p>
-        <p className="m-b-0">
-          { renderStatusDate() }
-        </p>
+        </div>
+      { renderStatusDate() }
       </div>
     )
   }
@@ -1008,58 +1006,57 @@ export default function TaskEdit( props ) {
   const renderStatusDate = () => {
     if ( status && status.action === 'PendingDate' ) {
       return (
-        <span className="text-muted task-info m-r--40">
-          <span className="center-hor">
-            Pending date:
-          </span>
-          <DatePicker
-            className="form-control hidden-input bolder"
-            selected={pendingDate}
-            disabled={!status || status.action!=='PendingDate'||viewOnly||!pendingChangable}
-            onChange={ (date) => {
-              setPendingDate(date);
-              if(date.valueOf() !== null){
-                autoUpdateTask({pendingDate: date.valueOf().toString()});
-              }
-            }}
-            placeholderText="No pending date"
-            {...datePickerConfig}
-            />
-        </span>
+        <div className="task-info">
+            <span className="center-hor">
+              Pending date:
+            </span>
+            <DatePicker
+              className="form-control hidden-input bolder"
+              selected={pendingDate}
+              disabled={!status || status.action!=='PendingDate'||viewOnly||!pendingChangable}
+              onChange={ (date) => {
+                setPendingDate(date);
+                if(date.valueOf() !== null){
+                  autoUpdateTask({pendingDate: date.valueOf().toString()});
+                }
+              }}
+              placeholderText="No pending date"
+              {...datePickerConfig}
+              />
+        </div>
       )
     }
 
     if ( status && ( status.action === 'CloseDate' || status.action === 'Invoiced' || status.action === 'CloseInvalid' ) ) {
       return (
-        <span className="text-muted task-info m-r--40">
-          <span className="center-hor">
-            Closed at:
-          </span>
-          <DatePicker
-            className="form-control hidden-input bolder"
-            selected={closeDate}
-            disabled={!status || (status.action!=='CloseDate' && status.action!=='CloseInvalid')||viewOnly}
-            onChange={date => {
-              setCloseDate(date);
-              if(date.valueOf() !== null){
-                autoUpdateTask({closeDate: date.valueOf().toString()});
-              }
-            }}
-            placeholderText="No pending date"
-            {...datePickerConfig}
-            />
-        </span>
+        <div className="task-info">
+            <span className="center-hor">
+              Closed at:
+            </span>
+            <DatePicker
+              className="form-control hidden-input bolder"
+              selected={closeDate}
+              disabled={!status || (status.action!=='CloseDate' && status.action!=='CloseInvalid')||viewOnly}
+              onChange={date => {
+                setCloseDate(date);
+                if(date.valueOf() !== null){
+                  autoUpdateTask({closeDate: date.valueOf().toString()});
+                }
+              }}
+              placeholderText="No pending date"
+              {...datePickerConfig}
+              />
+        </div>
       )
     }
     return (
-      <span className="task-info ">
-        <span className="center-hor text-muted bolder">
+      <div className="task-info">
+        <span className="center-hor bolder">
           {task.statusChange ? ('Status changed at ' + timestampToString(task.statusChange) ) : ""}
         </span>
-      </span>
+      </div>
     )
   }
-
 
   const layoutComponents = {
     Project: (
@@ -1452,11 +1449,11 @@ export default function TaskEdit( props ) {
       return null;
     }
     return (
-      <div className="row m-t-10">
+      <div className="row f-1">
         <div className="center-hor">
           <Label className="center-hor">Tagy: </Label>
         </div>
-        <div className="f-1 ">
+        <div className="f-1 center-hor">
           <Select
             placeholder="Zvoľte tagy"
             value={tags}
@@ -1471,6 +1468,15 @@ export default function TaskEdit( props ) {
             />
         </div>
       </div>
+    )
+  }
+
+  const renderTagsAndInfo = () => {
+    return (
+      <div className="row">
+      {renderTags()}
+      {renderTaskInfoAndDates()}
+    </div>
     )
   }
 
@@ -1505,18 +1511,20 @@ export default function TaskEdit( props ) {
             />
         </div>
       } else {
-        RenderDescription = <div className="task-edit-popis">
-          <div dangerouslySetInnerHTML={{__html:description }} />
-        </div>
+        if ( description.length !== 0 ) {
+          RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
+        } else {
+          RenderDescription = <div className=""></div>
+        }
       }
     }
     return (
-      <div style={{zIndex: "9999"}}>
+      <div>
         <div>
-          <Label className="col-form-label m-t-10 m-r-20">
+          <Label className="col-form-label-description">
             Popis úlohy
             <button
-              className="btn btn-link-add waves-effect"
+              className="btn btn-link waves-effect m-l-5"
               onClick={()=>{
                 if(showDescription){
                   autoUpdateTask({ description  })
@@ -1524,7 +1532,7 @@ export default function TaskEdit( props ) {
                 setShowDescription(!showDescription);
               }}
               >
-              <i className={`fa fa-${!showDescription ? 'pen' : 'save' } p-r-5`} />
+              <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
               { !showDescription ? 'edit' : 'save' }
             </button>
           </Label>
@@ -1540,8 +1548,9 @@ export default function TaskEdit( props ) {
     }
     return (
       <div>
-        { `Pausal ${company.title}: ` }
-        <span> {`Pausal subtasks:`}
+        { `Pausal ${company.title}  ` }
+        <span>
+          {`Pausal subtasks:`}
           <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
             {` ${usedSubtaskPausal}`}
           </span>
@@ -1571,7 +1580,7 @@ export default function TaskEdit( props ) {
         } }
         placeholder="Short subtask title"
         newPlaceholder="New short subtask title"
-        label="Short subtask"
+        label="Subtask"
         />
     )
   }
@@ -1907,18 +1916,18 @@ export default function TaskEdit( props ) {
           <div className="p-l-30 p-r-30">
             { renderTitle() }
             <hr className="m-t-5 m-b-5"/>
-            { renderTaskInfoAndDates() }
+            { renderTagsAndInfo() }
+
             {canCreateVykazyError()}
-            { layout === 1 ? renderSelectsLayout1() : renderTags() }
+
+            { layout === 1 ? renderSelectsLayout1() : null }
+
             { renderDescription() }
-            <div className="highlight-form">
+
               { renderSimpleSubtasks() }
-            </div>
 
             { renderAttachments(false) }
             { renderCompanyPausalInfo() }
-
-            { layout === 1 && renderTags() }
 
             { renderModalUserAdd() }
 
