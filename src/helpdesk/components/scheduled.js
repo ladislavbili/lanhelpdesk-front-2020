@@ -46,8 +46,11 @@ export default function Scheduled( props ) {
                   item.to.format( 'HH:mm' ):
                   item.to.format( 'HH:mm DD.MM.YYYY' )
                 }
-                ${item.user.fullName}
                 `
+              }
+              <br/>
+              {
+                `${item.user.fullName}`
               }
             </span>
             <button

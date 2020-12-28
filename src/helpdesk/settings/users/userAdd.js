@@ -116,19 +116,16 @@ export default function UserAddContainer( props ) {
             ...response.data.registerUser,
             __typename: "User"
           }
-          console.log( newUser );
           const allUsers = client.readQuery( {
               query: GET_USERS
             } )
             .users;
-          console.log( allUsers, 'allUsers' );
           client.writeQuery( {
             query: GET_USERS,
             data: {
               users: [ ...allUsers, newUser ]
             }
           } );
-          console.log( 'just push' );
           history.push( '/helpdesk/settings/users/' + newUser.id );
         }
 

@@ -99,6 +99,16 @@ const responseTask = `
     repeatInterval
     startsAt
   }
+  scheduled{
+    id
+    user{
+      id
+      fullName
+      email
+    }
+    from
+    to
+  }
   shortSubtasks{
     id
     title
@@ -273,6 +283,7 @@ mutation addTask(
   $materials: [MaterialInput],
   $customItems: [CustomItemInput],
   $shortSubtasks: [ShortSubtaskInput],
+  $scheduled: [ScheduledTaskInput],
 ){
   addTask(
     title: $title,
@@ -297,6 +308,7 @@ mutation addTask(
     materials: $materials,
     customItems: $customItems,
     shortSubtasks: $shortSubtasks,
+    scheduled: $scheduled,
   ){
     id
     title
@@ -655,6 +667,37 @@ mutation updateTask(
         startsAt
       }
     }
+}
+`;
+
+//scheduled
+export const ADD_SCHEDULED_TASK = gql `
+mutation addScheduledTask($from: String!, $to: String!, $task: Int!, $UserId: Int!) {
+  addScheduledTask(
+    from: $from,
+		to: $to,
+		task: $task,
+    UserId: $UserId
+  ){
+    id
+    from
+    to
+    user{
+      id
+      fullName
+      email
+    }
+  }
+}
+`;
+
+export const DELETE_SCHEDULED_TASK = gql `
+mutation deleteScheduledTask($id: Int!) {
+  deleteScheduledTask(
+    id: $id,
+  ){
+    id
+  }
 }
 `;
 

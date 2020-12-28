@@ -26,6 +26,7 @@ import Permissions from "./projectPermissions";
 import ProjectDefaultValues from "./defaultValues";
 import Tags from './tags';
 import DeleteReplacement from 'components/deleteReplacement';
+import CustomAttributes from "./customAttributes";
 import Loading from 'components/loading';
 import {
   setProject,
@@ -137,6 +138,7 @@ export default function ProjectEdit( props ) {
   const [ defTag, setDefTag ] = React.useState( defList );
 
   const [ taskType, setTaskType ] = React.useState( defItem );
+  const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
@@ -584,6 +586,23 @@ export default function ProjectEdit( props ) {
           Status, assigned to, task type and company can't be empty if they are fixed!
         </div>
       }
+
+      <CustomAttributes
+        disabled={false}
+        customAttributes={customAttributes}
+        addCustomAttribute={(newCustomAttribute) => {
+          setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
+        }}
+        updateCustomAttribute={(changedCustomAttribute) => {
+          let newCustomAttributes = [...customAttributes];
+          let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
+          newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
+          setCustomAttributes(newCustomAttributes);
+        }}
+        deleteCustomAttribute={(id) => {
+          setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
+        }}
+        />
 
       <div className="row">
         {
