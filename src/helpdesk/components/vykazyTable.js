@@ -12,7 +12,7 @@ import {
   invisibleSelectStyle,
   invisibleSelectStyleNoArrow
 } from 'configs/components/select';
-import Checkbox from '../../components/checkbox';
+import Checkbox from 'components/checkbox';
 
 export default function Rozpocet( props ) {
   //data & queries

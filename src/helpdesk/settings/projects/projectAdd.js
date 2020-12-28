@@ -348,12 +348,12 @@ export default function ProjectAdd( props ) {
         disabled={false}
         customAttributes={customAttributes}
         addCustomAttribute={(newCustomAttribute) => {
-          setCustomAttributes([...customAttributes, newCustomAttribute]);
+          setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
         }}
         updateCustomAttribute={(changedCustomAttribute) => {
           let newCustomAttributes = [...customAttributes];
           let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
-          newCustomAttribute[index] = changedCustomAttribute;
+          newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
           setCustomAttributes(newCustomAttributes);
         }}
         deleteCustomAttribute={(id) => {
