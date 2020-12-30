@@ -32,7 +32,7 @@ import RowTaskAdd from './add/row';
 import {
   GET_STATUSES,
   SET_USER_STATUSES
-} from 'helpdesk/settings/statuses/querries';
+} from 'helpdesk/settings/templateStatuses/querries';
 
 import {
   GET_TASKS,

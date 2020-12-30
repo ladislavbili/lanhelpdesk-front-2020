@@ -21,15 +21,11 @@ import {
   defItem
 } from 'configs/constants/projects';
 import classnames from 'classnames';
+import Permissions from "./projectPermissions";
+import CustomAttributes from "./customAttributes";
+import Tags from './tags';
+import ProjectDefaultValues from "./defaultValues";
 import Loading from 'components/loading';
-import Checkbox from 'components/checkbox';
-import Permissions from "./components/projectPermissions";
-import CustomAttributes from "./components/customAttributes";
-import Tags from './components/tags';
-import Statuses from './components/statuses';
-import Groups from './components/groups';
-import ProjectAcl from './components/acl';
-import ProjectDefaultValues from "./components/defaultValues";
 import {
   GET_BASIC_COMPANIES,
 } from '../companies/querries';
@@ -48,79 +44,8 @@ import {
   ADD_PROJECT,
   GET_MY_DATA
 } from './querries';
-import {
-  projectACLS,
-  projectDoubleACLS
-} from './components/acl';
 
 let fakeID = -1;
-let defaultGroups = [];
-[ 'Admin', 'Manager', 'Agent', 'Customer' ].map( ( name, index ) => {
-  let rights = {};
-  projectACLS.forEach( ( acl ) => {
-    rights[ acl.id ] = Math.random() > 0.5;
-  } )
-  projectDoubleACLS.forEach( ( acl ) => {
-    rights[ acl.id ] = {
-      read: Math.random() > 0.5,
-      write: false
-    };
-  } )
-
-  defaultGroups.push( {
-    title: name,
-    id: fakeID--,
-    order: index,
-    rights
-  } )
-} )
-
-const defaultStatuses = [
-  {
-    action: {
-      label: "None (nothing happens when status is selected)",
-      value: "None"
-    },
-    color: "#4a90e2",
-    icon: "fa fa-play",
-    id: 2,
-    order: 1,
-    title: "New"
-  },
-  {
-    action: {
-      label: "None (nothing happens when status is selected)",
-      value: "None"
-    },
-    color: "#7ed321",
-    icon: "fa fa-play",
-    id: 3,
-    order: 2,
-    title: "Open"
-  },
-  {
-    action: {
-      label: "None (nothing happens when status is selected)",
-      value: "None"
-    },
-    color: "#f6a525",
-    icon: "fa fa-play",
-    id: 4,
-    order: 3,
-    title: "Pending"
-  },
-  {
-    action: {
-      label: "None (nothing happens when status is selected)",
-      value: "None"
-    },
-    color: "#9b9b9b",
-    icon: "fa fa-play",
-    id: 5,
-    order: 4,
-    title: "Closed"
-  },
-];
 
 export default function ProjectAdd( props ) {
   //data & queries
@@ -173,9 +98,22 @@ export default function ProjectAdd( props ) {
 
   const [ saving, setSaving ] = React.useState( false );
 
-  const [ statuses, setStatuses ] = React.useState( defaultStatuses );
-  const [ groups, setGroups ] = React.useState( defaultGroups );
   //events
+  React.useEffect( () => {
+    if ( !myDataLoading && !usersLoading ) {
+      const CurrentUser = toSelArr( usersData.basicUsers, 'email' )
+        .find( ( user ) => user.id === currentUser.id );
+      setProjectRights( [ {
+        user: CurrentUser,
+        read: true,
+        write: true,
+        delete: true,
+        internal: true,
+        admin: true
+      } ] );
+    }
+  }, [ myDataLoading, usersLoading ] );
+
 
   //functions
   const addProjectFunc = () => {
@@ -323,22 +261,40 @@ export default function ProjectAdd( props ) {
         <Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription( e.target.value )}/>
       </FormGroup>
 
-      <Statuses
-        statuses={statuses}
-        addStatus={(newStatus) => {
-          setStatuses([ ...statuses, {...newStatus, id: fakeID -- } ])
+      <Permissions
+        addUser={(user)=>{
+          let newProjectRights = [...projectRights, {user, read: true, write: false, delete: false, internal: false, admin: false}];
+          setProjectRights(newProjectRights);
         }}
-        deleteStatus={(id) => {
-          setStatuses( statuses.filter((tag) => tag.id !== id ) )
-        }}
-        updateStatus={(newStatus) => {
-          let newStatuses = [...statuses];
-          let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-          newStatuses[index] = { ...newStatuses[index], ...newStatus }
-          setStatuses(newStatuses);
-        }}
-        />
+        givePermission={(user, right)=>{
+          let newProjectRights=[...projectRights];
+          let index = projectRights.findIndex((r)=>r.user.id === user.id);
+          let item = newProjectRights[index];
+          item.read = right.read;
+          item.write = right.write;
+          item.delete = right.delete;
+          item.internal= right.internal;
+          item.admin = right.admin;
 
+          if(!item.read){
+            newProjectRights.splice(index,1);
+            setProjectRights(newProjectRights);
+            if (lockedRequester){
+              let newAssignedTo = {...assignedTo};
+              newAssignedTo.value = newAssignedTo.value.filter(u => u.id !== item.user.id);
+              setAssignedTo(newAssignedTo);
+            }
+          }else{
+            setProjectRights(newProjectRights);
+          }
+        }}
+        users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+        permissions={projectRights}
+        userID={currentUser.id}
+        isAdmin={currentUser.role.accessRights.projects || currentUser.role.accessRights.addProjects}
+        lockedRequester={lockedRequester}
+        lockRequester={() => setLockedRequester( !lockedRequester) }
+        />
 
       <Tags
         tags={tags}
@@ -353,55 +309,6 @@ export default function ProjectAdd( props ) {
           let index = newTags.findIndex((tag) => tag.id === newTag.id );
           newTags[index] = { ...newTags[index], ...newTag }
           setTags(newTags);
-        }}
-        />
-
-      <h4 className="m-t-20 m-b-20"> ACL </h4>
-      <div className="row">
-        <Checkbox
-          className = "m-l-5 m-r-5"
-          centerHor
-          disabled={false}
-          value = { lockedRequester}
-          onChange={() => setLockedRequester( !lockedRequester) }
-          />
-        A requester can be only a user with rights to this project.
-      </div>
-
-      <Permissions
-        addRight={ (newRight) => {
-          setProjectRights([...projectRights, newRight]);
-        }}
-        deleteRight={ (right) => {
-          setProjectRights(projectRights.filter((oldRight) => oldRight.user.id !== right.user.id ));
-        }}
-        updateRight={ (newRight) => {
-          let newProjectRights = [...projectRights];
-          let index = newProjectRights.findIndex((right) => right.user.id === newRight.user.id );
-          newProjectRights[index] = { ...newProjectRights[index], ...newRight }
-          setProjectRights(newProjectRights);
-        }}
-        users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-        permissions={ projectRights }
-        isAdmin={ true }
-        groups={ toSelArr(groups) }
-        />
-
-      <Groups
-        addGroup={(newGroup) => {
-          console.log(newGroup);
-          setGroups([...groups, newGroup])
-        }}
-        />
-
-      <ProjectAcl
-        groups={ groups }
-        updateGroupRight={ (groupID, acl, newVal) => {
-          let newGroups = [...groups];
-          let index = newGroups.findIndex((group) => group.id === groupID );
-          newGroups[index]['rights'][acl] = newVal;
-          setGroups(newGroups);
-
         }}
         />
 
@@ -461,7 +368,7 @@ export default function ProjectAdd( props ) {
         }
 
         <Button className="btn ml-auto"
-          disabled={cannotSave || true}
+          disabled={cannotSave}
           onClick={addProjectFunc}
           >
           {saving?'Adding...':'Add project'}

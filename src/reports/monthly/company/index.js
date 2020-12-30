@@ -63,7 +63,7 @@ import {
 
 import {
   GET_STATUSES
-} from 'helpdesk/settings/statuses/querries';
+} from 'helpdesk/settings/templateStatuses/querries';
 
 import {
   columnsToShowPausalSubtasks,
