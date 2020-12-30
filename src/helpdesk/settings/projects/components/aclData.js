@@ -23,8 +23,8 @@ export const allACLs = [ {
     both: true
   },
   {
-    id: 'project',
-    title: 'Project',
+    id: 'projectAcl',
+    title: 'Project ACL',
     dependancy: null,
     both: true
   },
