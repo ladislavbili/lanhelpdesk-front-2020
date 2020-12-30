@@ -11,14 +11,16 @@ import {
   Input
 } from 'reactstrap';
 import RightRow from './rightRow';
+import {
+  generalRightsTemplate,
+  settingsTemplate
+} from 'configs/constants/roles';
 
 import {
   GET_ROLES,
   ADD_ROLE,
   GET_MY_DATA
 } from './querries';
-
-
 
 export default function RoleAdd( props ) {
   //data
@@ -36,135 +38,14 @@ export default function RoleAdd( props ) {
   const [ order, setOrder ] = React.useState( 0 );
   const [ level, setLevel ] = React.useState( 0 );
 
-  const generalRights = [
-    {
-      state: React.useState( false ),
-      key: 'login',
-      label: "Login to system"
-    },
-    {
-      state: React.useState( false ),
-      key: 'testSections',
-      label: "Test sections - Navody, CMDB, Hesla, Naklady, Projekty, Monitoring"
-    },
-    {
-      state: React.useState( false ),
-      key: 'mailViaComment',
-      label: "Send mail via comments"
-    },
-    {
-      state: React.useState( false ),
-      key: 'vykazy',
-      label: "Výkazy"
-    },
-    {
-      state: React.useState( false ),
-      key: 'publicFilters',
-      label: "Public Filters"
-    },
-    {
-      state: React.useState( false ),
-      key: 'addProjects',
-      label: "Add projects"
-    },
-    {
-      state: React.useState( false ),
-      key: 'viewVykaz',
-      label: "View vykaz"
-    },
-    {
-      state: React.useState( false ),
-      key: 'viewRozpocet',
-      label: "View rozpocet"
-    },
-    {
-      state: React.useState( false ),
-      key: 'viewErrors',
-      label: "View errors"
-    },
-    {
-      state: React.useState( false ),
-      key: 'viewInternal',
-      label: "Internal messages"
-    }
-  ];
-  const settings = [
-    {
-      state: React.useState( false ),
-      key: 'users',
-      label: "Users"
-    },
-    {
-      state: React.useState( false ),
-      key: 'companies',
-      label: "Companies"
-    },
-    {
-      state: React.useState( false ),
-      key: 'pausals',
-      label: "Pausals"
-    },
-    {
-      state: React.useState( false ),
-      key: 'projects',
-      label: "Projects"
-    },
-    {
-      state: React.useState( false ),
-      key: 'statuses',
-      label: "Statuses"
-    },
-    {
-      state: React.useState( false ),
-      key: 'units',
-      label: "Units"
-    },
-    {
-      state: React.useState( false ),
-      key: 'prices',
-      label: "Prices"
-    },
-    {
-      state: React.useState( false ),
-      key: 'suppliers',
-      label: "Suppliers"
-    },
-    {
-      state: React.useState( false ),
-      key: 'tags',
-      label: "Tags"
-    },
-    {
-      state: React.useState( false ),
-      key: 'invoices',
-      label: "Invoices"
-    },
-    {
-      state: React.useState( false ),
-      key: 'roles',
-      label: "Roles"
-    },
-    {
-      state: React.useState( false ),
-      key: 'taskTypes',
-      label: "Task types"
-    },
-    {
-      state: React.useState( false ),
-      key: 'tripTypes',
-      label: "Trip types"
-    },
-    {
-      state: React.useState( false ),
-      key: 'imaps',
-      label: "IMAPs"
-    },
-    {
-      state: React.useState( false ),
-      key: 'smtps',
-      label: "SMTPs"
-    },
-  ];
+  const generalRights = generalRightsTemplate.map( ( template ) => ( {
+    ...template,
+    state: React.useState( false ),
+  } ) );
+  const settings = settingsTemplate.map( ( template ) => ( {
+    ...template,
+    state: React.useState( false ),
+  } ) );
 
   const [ saving, setSaving ] = React.useState( false );
 
@@ -297,7 +178,7 @@ export default function RoleAdd( props ) {
         </Button>
       }
 
-      <Button className="btn ml-auto" disabled={currentUserLevel === null || currentUserLevel >= level} onClick={addRoleFunc}>
+      <Button className="btn ml-auto" disabled={currentUserLevel === null || currentUserLevel >= level || true} onClick={addRoleFunc}>
         {
           saving
           ? 'Adding...'

@@ -13,9 +13,8 @@ import {
   setProject,
 } from 'apollo/localSchema/actions';
 import {
-  projectACLS,
-  projectDoubleACLS
-} from './acl';
+  createRandomRights
+} from './aclData';
 
 let fakeID = -1;
 
@@ -59,14 +58,7 @@ export default function ProjectGroups( props ) {
           <Button
             disabled={ title.length === 0 || isNaN(parseInt(order)) }
             onClick={ () => {
-              let rights = {};
-              projectACLS.forEach((acl) => {
-                rights[acl.id] = Math.random() > 0.5;
-              })
-              projectDoubleACLS.forEach((acl) => {
-                rights[acl.id] = { read: Math.random() > 0.5, write: false };
-              })
-              addGroup({ title, id: fakeID--, order, rights })
+              addGroup({ title, id: fakeID--, order, rights: createRandomRights() })
               setTitle('');
               setOrder(0);
               setOpen(false);

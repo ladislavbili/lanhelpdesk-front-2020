@@ -49,29 +49,17 @@ import {
   GET_MY_DATA
 } from './querries';
 import {
-  projectACLS,
-  projectDoubleACLS
-} from './components/acl';
+  createRandomRights
+} from './components/aclData';
 
 let fakeID = -1;
 let defaultGroups = [];
 [ 'Admin', 'Manager', 'Agent', 'Customer' ].map( ( name, index ) => {
-  let rights = {};
-  projectACLS.forEach( ( acl ) => {
-    rights[ acl.id ] = Math.random() > 0.5;
-  } )
-  projectDoubleACLS.forEach( ( acl ) => {
-    rights[ acl.id ] = {
-      read: Math.random() > 0.5,
-      write: false
-    };
-  } )
-
   defaultGroups.push( {
     title: name,
     id: fakeID--,
     order: index,
-    rights
+    rights: createRandomRights()
   } )
 } )
 
