@@ -43,7 +43,7 @@ import {
 } from 'configs/constants/projects';
 import {
   ADD_TASK
-} from '../querries';
+} from '../queries';
 
 import {
   REST_URL
@@ -76,7 +76,6 @@ export default function TaskAdd( props ) {
     tripTypes,
     milestones,
     companies,
-    statuses,
     defaultUnit,
     closeModal,
     setTaskTypeCreationError,
@@ -119,7 +118,7 @@ export default function TaskAdd( props ) {
     null
   );
   const [ saving, setSaving ] = React.useState( false );
-  const [ status, setStatus ] = React.useState( statuses ? statuses.find( ( status ) => status.action === 'IsNew' ) : null );
+  const [ status, setStatus ] = React.useState( null );
   const [ subtasks, setSubtasks ] = React.useState( [] );
   const [ tags, setTags ] = React.useState( [] );
   const [ materials, setMaterials ] = React.useState( [] );
@@ -195,7 +194,13 @@ export default function TaskAdd( props ) {
     setCompany( newCompany );
     setCompanyCreationError( newCompany );
 
-    let newStatus = def.status && ( def.status.fixed || def.status.def ) ? statuses.find( ( item ) => item.id === def.status.value.is ) : statuses[ 0 ];
+    let potentialStatus = toSelArr( project.statuses )
+      .find( ( status ) => status.action.toLowerCase() === 'isnew' );
+    if ( ![ potentialStatus ] ) {
+      potentialStatus = toSelArr( project.statuses )[ 0 ];
+    }
+    let newStatus = def.status && ( def.status.fixed || def.status.def ) ? toSelArr( project.statuses )
+      .find( ( item ) => item.id === def.status.value.id ) : potentialStatus;
     setStatus( newStatus );
 
     let mappedTags = def.tag.value.map( t => t.id );
@@ -392,9 +397,10 @@ export default function TaskAdd( props ) {
         placeholder={viewOnly ? "None" : "Select required" }
         value={project}
         onChange={(project)=>{
+          setTags([]);
+          setStatus(null);
           setProject(project);
           setMilestone(noMilestone);
-          setTags([]);
 
           if(!viewOnly){
             let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
@@ -458,7 +464,7 @@ export default function TaskAdd( props ) {
             setStatus(status);
           }
         }}
-        options={statuses}
+        options={project ? toSelArr(project.statuses.filter((status) => status.action.toLowerCase() !== 'invoiced' )) : []}
         />
     ),
     Type: (

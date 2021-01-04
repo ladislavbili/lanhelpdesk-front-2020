@@ -53,17 +53,13 @@ import {
   GET_REPORTS_CHOSEN_STATUSES,
   GET_REPORTS_FROM_DATE,
   GET_REPORTS_TO_DATE,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 import {
   GET_INVOICE_COMPANIES,
   GET_COMPANY_INVOICE_DATA,
   CREATE_TASK_INVOICE
-} from './querries';
-
-import {
-  GET_STATUSES
-} from 'helpdesk/settings/statuses/querries';
+} from './queries';
 
 import {
   columnsToShowPausalSubtasks,
@@ -89,10 +85,6 @@ export default function MothlyReportsCompany( props ) {
   } = useQuery( GET_REPORTS_TO_DATE );
 
   //network
-  const {
-    data: statusesData,
-    loading: statusesLoading
-  } = useQuery( GET_STATUSES );
 
   const [ createTaskInvoice ] = useMutation( CREATE_TASK_INVOICE );
 
@@ -131,15 +123,6 @@ export default function MothlyReportsCompany( props ) {
   }
 
   const [ showCompany, setShowCompany ] = React.useState( null );
-
-  React.useEffect( () => {
-    if ( !statusesLoading ) {
-      const statuses = statusesData && statusesData.statuses ?
-        toSelArr( orderArr( statusesData.statuses.filter( ( status ) => status.action.toLowerCase()
-          .includes( 'close' ) ) ) ) : [];
-      setReportsChosenStatuses( statuses );
-    }
-  }, [ statusesLoading ] );
 
   React.useEffect( () => {
     if ( chosenStatuses.length > 0 ) {
@@ -204,14 +187,14 @@ export default function MothlyReportsCompany( props ) {
       } );
   }
 
-  const loading = statusesLoading || invoiceCompaniesLoading;
+  const loading = invoiceCompaniesLoading;
 
   const chosenStatuses = chosenStatusesData ? chosenStatusesData.reportsChosenStatuses : [];
 
   const fromDate = fromDateData ? fromDateData.reportsFromDate : null;
   const toDate = toDateData ? toDateData.reportsToDate : null;
 
-  const statuses = statusesData && statusesData.statuses ? toSelArr( orderArr( statusesData.statuses ) ) : [];
+  const statuses = [];
   const INVOICE_COMPANIES = invoiceCompaniesData && invoiceCompaniesData.getInvoiceCompanies ? invoiceCompaniesData.getInvoiceCompanies : [];
 
   const statusIDs = chosenStatuses.map( status => status.id );

@@ -13,7 +13,7 @@ import classnames from 'classnames';
 
 import {
   GET_PRICELISTS
-} from './querries';
+} from './queries';
 
 export default function PricelistsList( props ) {
   // state

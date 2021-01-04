@@ -20,18 +20,18 @@ import {
 } from 'configs/constants/statuses';
 
 import {
-  GET_STATUSES,
-  ADD_STATUS
-} from './querries';
+  GET_STATUS_TEMPLATES,
+  ADD_STATUS_TEMPLATE
+} from './queries';
 
 export default function StatusAdd( props ) {
   //data & queries
   const {
     history
   } = props;
-  const [ addStatus, {
+  const [ addStatusTemplate, {
     client
-  } ] = useMutation( ADD_STATUS );
+  } ] = useMutation( ADD_STATUS_TEMPLATE );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -44,7 +44,7 @@ export default function StatusAdd( props ) {
   //functions
   const addStatusFunc = () => {
     setSaving( true );
-    addStatus( {
+    addStatusTemplate( {
         variables: {
           title,
           order: ( order !== '' ? parseInt( order ) : 0 ),
@@ -55,17 +55,17 @@ export default function StatusAdd( props ) {
       } )
       .then( ( response ) => {
         const allStatuses = client.readQuery( {
-            query: GET_STATUSES
+            query: GET_STATUS_TEMPLATES
           } )
-          .statuses;
+          .statusTemplates;
         const newStatus = {
-          ...response.data.addStatus,
+          ...response.data.addStatusTemplate,
           __typename: "Status"
         };
         client.writeQuery( {
-          query: GET_STATUSES,
+          query: GET_STATUS_TEMPLATES,
           data: {
-            statuses: [ ...allStatuses, newStatus ]
+            statusTemplates: [ ...allStatuses, newStatus ]
           }
         } );
         history.push( '/helpdesk/settings/statuses/' + newStatus.id )

@@ -18,28 +18,24 @@ import {
 } from 'helperFunctions';
 
 import {
-  GET_STATUSES
-} from 'helpdesk/settings/statuses/querries';
-
-import {
   GET_TASK_TYPES
-} from 'helpdesk/settings/taskTypes/querries';
+} from 'helpdesk/settings/taskTypes/queries';
 
 import {
   GET_TRIP_TYPES
-} from 'helpdesk/settings/tripTypes/querries';
+} from 'helpdesk/settings/tripTypes/queries';
 
 import {
   GET_MY_PROJECTS
-} from 'helpdesk/settings/projects/querries';
+} from 'helpdesk/settings/projects/queries';
 
 import {
   GET_BASIC_COMPANIES
-} from 'helpdesk/settings/companies/querries';
+} from 'helpdesk/settings/companies/queries';
 
 import {
   GET_BASIC_USERS
-} from 'helpdesk/settings/users/querries';
+} from 'helpdesk/settings/users/queries';
 
 import {
   GET_MY_DATA,
@@ -66,12 +62,12 @@ import {
   UPDATE_CUSTOM_ITEM,
   DELETE_CUSTOM_ITEM,
   DELETE_TASK_ATTACHMENT,
-} from '../querries';
+} from '../queries';
 
 import {
   GET_FILTER,
   GET_PROJECT,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 import {
   REST_URL,
@@ -94,10 +90,6 @@ export default function TaskEditContainer( props ) {
     data: myData,
     loading: myDataLoading,
   } = useQuery( GET_MY_DATA );
-  const {
-    data: statusesData,
-    loading: statusesLoading,
-  } = useQuery( GET_STATUSES );
   const {
     data: basicCompaniesData,
     loading: basicCompaniesLoading,
@@ -819,7 +811,6 @@ export default function TaskEditContainer( props ) {
 
   const dataLoading = (
     myDataLoading ||
-    statusesLoading ||
     basicCompaniesLoading ||
     basicUsersLoading ||
     taskTypesLoading ||
@@ -840,7 +831,6 @@ export default function TaskEditContainer( props ) {
       closeModal={closeModal}
       currentUser={myData.getMyData}
       accessRights={myData.getMyData.role.accessRights}
-      statuses={toSelArr(statusesData.statuses)}
       companies={toSelArr(basicCompaniesData.basicCompanies)}
       users={toSelArr(basicUsersData.basicUsers, 'fullName')}
       taskTypes={toSelArr(taskTypesData.taskTypes)}

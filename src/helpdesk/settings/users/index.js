@@ -17,11 +17,11 @@ import Loading from 'components/loading';
 import classnames from 'classnames';
 import {
   GET_USERS,
-} from './querries';
+} from './queries';
 
 import {
   GET_ROLES,
-} from '../roles/querries';
+} from '../roles/queries';
 
 export default function UserListContainer( props ) {
   //data

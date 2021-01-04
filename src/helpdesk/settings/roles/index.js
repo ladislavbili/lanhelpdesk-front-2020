@@ -16,7 +16,7 @@ import classnames from 'classnames';
 
 import {
   GET_ROLES
-} from './querries';
+} from './queries';
 
 export default function RolesList( props ) {
   // state

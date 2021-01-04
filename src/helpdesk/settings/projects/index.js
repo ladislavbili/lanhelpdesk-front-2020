@@ -13,7 +13,7 @@ import classnames from 'classnames';
 import {
   GET_PROJECTS,
   GET_MY_DATA
-} from './querries';
+} from './queries';
 
 export default function ProjectsList( props ) {
   // state

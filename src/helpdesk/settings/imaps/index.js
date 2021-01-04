@@ -10,7 +10,7 @@ import {
 import {
   GET_IMAPS,
   TEST_IMAPS
-} from './querries';
+} from './queries';
 import ImapAdd from './imapAdd';
 import ImapEdit from './imapEdit';
 import Loading from 'components/loading';

@@ -18,11 +18,11 @@ import classnames from 'classnames';
 
 import {
   GET_BASIC_ROLES
-} from 'helpdesk/settings/roles/querries';
+} from 'helpdesk/settings/roles/queries';
 
 import {
   GET_PUBLIC_FILTERS
-} from './querries';
+} from './queries';
 
 export default function PublicFilterList( props ) {
   // state

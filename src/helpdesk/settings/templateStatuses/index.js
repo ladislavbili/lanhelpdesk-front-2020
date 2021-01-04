@@ -14,8 +14,8 @@ import {
 import classnames from 'classnames';
 
 import {
-  GET_STATUSES
-} from './querries';
+  GET_STATUS_TEMPLATES
+} from './queries';
 
 export default function StatusesList( props ) {
   // state
@@ -29,8 +29,8 @@ export default function StatusesList( props ) {
   const {
     data,
     loading
-  } = useQuery( GET_STATUSES );
-  const statuses = ( loading || !data ? [] : orderArr( data.statuses ) );
+  } = useQuery( GET_STATUS_TEMPLATES );
+  const statuses = ( loading || !data ? [] : orderArr( data.statusTemplates ) );
 
   return (
     <div className="content">

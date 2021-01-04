@@ -44,11 +44,11 @@ import {
 import {
   ADD_TASK,
   GET_TASKS,
-} from '../../querries';
+} from '../../queries';
 import {
   GET_FILTER,
   GET_PROJECT,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 export default function RowTaskAdd( props ) {
   const {
@@ -59,12 +59,10 @@ export default function RowTaskAdd( props ) {
     currentUser,
     projects,
     users,
-    allTags,
     taskTypes,
     tripTypes,
     milestones,
     companies,
-    statuses,
     defaultUnit,
     closeModal
   } = props;
@@ -117,7 +115,7 @@ export default function RowTaskAdd( props ) {
     null
   );
   const [ saving, setSaving ] = React.useState( false );
-  const [ status, setStatus ] = React.useState( statuses ? statuses.find( ( status ) => status.action === 'IsNew' ) : null );
+  const [ status, setStatus ] = React.useState( null );
   const [ subtasks, setSubtasks ] = React.useState( [] );
   const [ tags, setTags ] = React.useState( [] );
   const [ materials, setMaterials ] = React.useState( [] );
@@ -191,11 +189,17 @@ export default function RowTaskAdd( props ) {
     setCompany( newCompany );
 
 
-    let newStatus = def.status && ( def.status.fixed || def.status.def ) ? statuses.find( ( item ) => item.id === def.status.value.is ) : statuses[ 0 ];
+    let potentialStatus = toSelArr( project.statuses )
+      .find( ( status ) => status.action.toLowerCase() === 'isnew' );
+    if ( ![ potentialStatus ] ) {
+      potentialStatus = toSelArr( project.statuses )[ 0 ];
+    }
+    let newStatus = def.status && ( def.status.fixed || def.status.def ) ? toSelArr( project.statuses )
+      .find( ( item ) => item.id === def.status.value.id ) : potentialStatus;
     setStatus( newStatus );
 
     let mappedTags = def.tag.value.map( t => t.id );
-    let newTags = def.tag && ( def.tag.fixed || def.tag.def ) ? allTags.filter( ( item ) => mappedTags.includes( item.id ) ) : allTags;
+    let newTags = def.tag && ( def.tag.fixed || def.tag.def ) ? project.tags.filter( ( item ) => mappedTags.includes( item.id ) ) : [];
     setTags( newTags );
 
     let newTaskType = def.taskType && ( def.taskType.fixed || def.taskType.def ) ? taskTypes.find( ( item ) => item.id === def.taskType.value ) : taskType;
@@ -312,7 +316,7 @@ export default function RowTaskAdd( props ) {
               setStatus(status);
             }
           }}
-          options={statuses}
+          options={project ? toSelArr(project.statuses) : []}
           />
       </div>
 

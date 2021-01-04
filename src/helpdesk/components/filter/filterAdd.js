@@ -34,21 +34,21 @@ import {
 
 import {
   GET_BASIC_ROLES
-} from 'helpdesk/settings/roles/querries';
+} from 'helpdesk/settings/roles/queries';
 import {
   GET_FILTER
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 import {
   GET_MY_FILTERS,
   ADD_FILTER,
   UPDATE_FILTER,
   GET_MY_DATA
-} from './querries';
+} from './queries';
 
 import {
   GET_MY_PROJECTS,
-} from 'helpdesk/settings/projects/querries';
+} from 'helpdesk/settings/projects/queries';
 
 export default function FilterAdd( props ) {
   //data & queries

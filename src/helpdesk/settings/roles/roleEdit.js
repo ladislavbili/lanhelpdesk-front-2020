@@ -23,7 +23,7 @@ import {
   UPDATE_ROLE,
   DELETE_ROLE,
   GET_MY_DATA
-} from './querries';
+} from './queries';
 
 export default function RoleEdit( props ) {
   //data

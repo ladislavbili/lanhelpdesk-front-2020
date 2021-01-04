@@ -32,19 +32,19 @@ import {
   ADD_CALENDAR_EVENT,
   UPDATE_CALENDAR_EVENT,
   DELETE_CALENDAR_EVENT
-} from './querries';
+} from './queries';
 
 import {
   GET_TASK,
   GET_TASKS,
   UPDATE_TASK,
   GET_CALENDAR_EVENTS,
-} from 'helpdesk/task/querries';
+} from 'helpdesk/task/queries';
 
 import {
   GET_FILTER,
   GET_PROJECT,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 const localizer = momentLocalizer( moment );
 const formats = {

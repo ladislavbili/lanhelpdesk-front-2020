@@ -8,7 +8,7 @@ import {
 } from 'reactstrap';
 import {
   GET_PROJECT,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 import {
   useQuery
 } from "@apollo/client";

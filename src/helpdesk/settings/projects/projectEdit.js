@@ -22,28 +22,25 @@ import {
   defItem
 } from 'configs/constants/projects';
 import classnames from 'classnames';
-import Permissions from "./projectPermissions";
-import ProjectDefaultValues from "./defaultValues";
-import Tags from './tags';
+import Permissions from "./components/projectPermissions";
+import ProjectDefaultValues from "./components/defaultValues";
+import Tags from './components/tags';
+import Statuses from './components/statuses';
 import DeleteReplacement from 'components/deleteReplacement';
-import CustomAttributes from "./customAttributes";
+import CustomAttributes from "./components/customAttributes";
 import Loading from 'components/loading';
 import {
   setProject,
 } from 'apollo/localSchema/actions';
-
 import {
   GET_BASIC_COMPANIES,
-} from '../companies/querries';
+} from '../companies/queries';
 import {
   GET_BASIC_USERS,
-} from '../users/querries';
-import {
-  GET_STATUSES,
-} from '../statuses/querries';
+} from '../users/queries';
 import {
   GET_TASK_TYPES,
-} from '../taskTypes/querries';
+} from '../taskTypes/queries';
 import {
   GET_PROJECTS,
   GET_MY_PROJECTS,
@@ -51,7 +48,7 @@ import {
   UPDATE_PROJECT,
   DELETE_PROJECT,
   GET_MY_DATA
-} from './querries';
+} from './queries';
 let fakeID = -1;
 
 export default function ProjectEdit( props ) {
@@ -85,10 +82,6 @@ export default function ProjectEdit( props ) {
   const [ deleteProject, {
     client
   } ] = useMutation( DELETE_PROJECT );
-  const {
-    data: statusesData,
-    loading: statusesLoading
-  } = useQuery( GET_STATUSES, fetchNetOptions );
   const {
     data: companiesData,
     loading: companiesLoading
@@ -136,6 +129,10 @@ export default function ProjectEdit( props ) {
   const [ requester, setRequester ] = React.useState( defItem );
   const [ status, setStatus ] = React.useState( defItem );
   const [ defTag, setDefTag ] = React.useState( defList );
+
+  const [ addStatuses, setAddStatuses ] = React.useState( [] );
+  const [ updateStatuses, setUpdateStatuses ] = React.useState( [] );
+  const [ deleteStatuses, setDeleteStatuses ] = React.useState( [] );
 
   const [ taskType, setTaskType ] = React.useState( defItem );
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
@@ -213,17 +210,16 @@ export default function ProjectEdit( props ) {
   }, [ projectLoading, companiesLoading ] );
 
   React.useEffect( () => {
-    if ( !projectLoading && !statusesLoading ) {
-      let statuses = toSelArr( statusesData.statuses );
+    if ( !projectLoading ) {
       let newStatus = {
         def: projectData.project.def.status.def,
         fixed: projectData.project.def.status.fixed,
         show: projectData.project.def.status.show,
-        value: ( projectData.project.def.status.value ? statuses.find( c => c.id === projectData.project.def.status.value.id ) : null )
+        value: ( projectData.project.def.status.value ? projectData.project.statuses.find( c => c.id === projectData.project.def.status.value.id ) : null )
       };
       setStatus( newStatus );
     }
-  }, [ projectLoading, statusesLoading ] );
+  }, [ projectLoading ] );
 
   React.useEffect( () => {
     if ( !projectLoading ) {
@@ -277,6 +273,20 @@ export default function ProjectEdit( props ) {
       }
     } );
     return allTags.concat( addTags );
+  }
+
+  const getAllStatuses = () => {
+    let allStatuses = projectData.project.statuses.filter( ( status ) => !deleteStatuses.includes( status.id ) );
+    updateStatuses.map( ( statusChange ) => {
+      let index = allStatuses.findIndex( ( status ) => status.id === statusChange.id );
+      if ( index !== -1 ) {
+        allStatuses[ index ] = {
+          ...allStatuses[ index ],
+          ...statusChange
+        };
+      }
+    } );
+    return allStatuses.concat( addStatuses );
   }
 
   const updateProjectFunc = () => {
@@ -336,7 +346,10 @@ export default function ProjectEdit( props ) {
           def: newDef,
           addTags,
           updateTags,
-          deleteTags
+          deleteTags,
+          deleteStatuses,
+          updateStatuses,
+          addStatuses,
         }
       } )
       .then( ( response ) => {
@@ -431,7 +444,6 @@ export default function ProjectEdit( props ) {
 
   if (
     projectLoading ||
-    statusesLoading ||
     companiesLoading ||
     usersLoading ||
     taskTypesLoading ||
@@ -456,13 +468,17 @@ export default function ProjectEdit( props ) {
     updateTags.some( ( tag ) => (
       ( tag.title !== undefined && tag.title.length === 0 ) ||
       ( tag.color !== undefined && !tag.color.includes( '#' ) ) ||
-      ( tag.order !== undefined && isNaN( parseInt( tag.order ) ) )
+      ( tag.order !== undefined && isNaN( parseInt( tag.order ) ) ) ||
+      !statuses.some( ( status ) => status.action === 'IsNew' ) ||
+      !statuses.some( ( status ) => status.action === 'CloseDate' ) ||
+      !statuses.some( ( status ) => status.action === 'Invoiced' )
     ) )
   )
 
   const myProjectRights = projectRights.find( p => p.user.id === currentUser.id );
   const isAdmin = myProjectRights !== undefined && myProjectRights.admin;
   const allTags = getAllTags();
+  const allStatuses = getAllStatuses();
 
   let canReadUserIDs = projectRights.map( ( permission ) => permission.user.id );
   let canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
@@ -541,12 +557,44 @@ export default function ProjectEdit( props ) {
         setTag={setDefTag}
         taskType={taskType}
         setTaskType={setTaskType}
-        statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
+        statuses={allStatuses}
         companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
         canBeAssigned={canBeAssigned}
         users={lockedRequester ? (toSelArr(projectRights.map(r => r.user), 'email')) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
         allTags={toSelArr(allTags)}
         taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
+        />
+
+      <Statuses
+        statuses={allStatuses}
+        addStatus={(newStatus) => {
+          setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ])
+        }}
+        deleteStatus={(id) => {
+          if(id > -1){
+            setUpdateStatuses(updateStatuses.filter((status) => status.id !== id ));
+            setDeleteStatuses([ ...deleteStatuses, id ]);
+          }else{
+            setAddStatuses(addStatuses.filter((status) => status.id !== id ));
+          }
+        }}
+        updateStatus={(newStatus) => {
+          if(newStatus.id > -1){
+            let newStatuses = [...updateStatuses];
+            let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+            if(index === -1){
+              newStatuses = newStatuses.concat(newStatus);
+            }else{
+              newStatuses[index] = { ...newStatuses[index], ...newStatus }
+            }
+            setUpdateStatuses(newStatuses);
+          }else{
+            let newStatuses = [...addStatuses];
+            let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+            newStatuses[index] = { ...newStatuses[index], ...newStatus }
+            setAddStatuses(newStatuses);
+          }
+        }}
         />
 
       <Tags

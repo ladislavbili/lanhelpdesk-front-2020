@@ -30,7 +30,7 @@ import {
   GET_MY_DATA,
   GET_BASIC_USERS,
   GET_USERS
-} from './querries';
+} from './queries';
 
 import PasswordChange from './passChange';
 

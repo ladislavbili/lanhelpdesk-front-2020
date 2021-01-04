@@ -6,7 +6,7 @@ import {
 
 import {
   GET_TASK_SEARCH,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 import TaskCol from './taskCol';
 import TaskList from './taskList';
@@ -20,7 +20,7 @@ import moment from 'moment';
 import {
   GET_FILTER,
   GET_PROJECT,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 const GET_MY_DATA = gql `
 query {

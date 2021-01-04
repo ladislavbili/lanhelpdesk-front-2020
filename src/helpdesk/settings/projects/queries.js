@@ -20,6 +20,14 @@ query {
         order
         color
       }
+      statuses {
+        id
+        title
+        order
+        color
+        icon
+        action
+      }
       def {
   			assignedTo {
   				def
@@ -113,14 +121,15 @@ query {
 `;
 
 export const ADD_PROJECT = gql `
-mutation addProject($title: String!, $description: String!, $lockedRequester: Boolean!, $projectRights: [ProjectRightInput]!, $def: ProjectDefaultsInput!, $tags: [NewTagInput]!) {
+mutation addProject($title: String!, $description: String!, $lockedRequester: Boolean!, $projectRights: [ProjectRightInput]!, $def: ProjectDefaultsInput!, $tags: [NewTagInput]!, $statuses: [NewStatusInput]!) {
   addProject(
     title: $title,
     description: $description,
     lockedRequester: $lockedRequester,
     projectRights: $projectRights,
     def: $def,
-    tags: $tags
+    tags: $tags,
+    statuses: $statuses,
   ){
     id
     title
@@ -223,6 +232,14 @@ query project($id: Int!) {
     title
     description
     lockedRequester
+    statuses{
+      id
+      title
+      order
+      color
+      icon
+      action
+    }
     tags {
       id
       title
@@ -307,7 +324,20 @@ query project($id: Int!) {
 `;
 
 export const UPDATE_PROJECT = gql `
-mutation updateProject($id: Int!, $title: String, $description: String, $lockedRequester: Boolean, $projectRights: [ProjectRightInput], $def: ProjectDefaultsInput, $deleteTags: [Int]!, $updateTags: [TagUpdateInput]!, $addTags: [NewTagInput]!) {
+mutation updateProject(
+  $id: Int!,
+  $title: String,
+  $description: String,
+  $lockedRequester: Boolean,
+  $projectRights: [ProjectRightInput],
+  $def: ProjectDefaultsInput,
+  $deleteTags: [Int]!,
+  $updateTags: [TagUpdateInput]!,
+  $addTags: [NewTagInput]!,
+  $deleteStatuses: [Int]!,
+  $updateStatuses: [UpdateStatusInput]!,
+  $addStatuses: [NewStatusInput]!,
+) {
   updateProject(
 		id: $id
     title: $title
@@ -318,6 +348,9 @@ mutation updateProject($id: Int!, $title: String, $description: String, $lockedR
     deleteTags: $deleteTags
     updateTags: $updateTags
     addTags: $addTags
+    deleteStatuses: $deleteStatuses
+    updateStatuses: $updateStatuses
+    addStatuses: $addStatuses
   ){
     id
     title

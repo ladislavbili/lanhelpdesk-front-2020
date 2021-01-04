@@ -13,7 +13,7 @@ import {
 import {
   ADD_TASK_TYPE,
   GET_TASK_TYPES,
-} from './querries';
+} from './queries';
 
 export default function TaskTypeAdd( props ) {
   //data & queries

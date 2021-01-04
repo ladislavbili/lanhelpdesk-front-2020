@@ -3,7 +3,7 @@ import CompanyList from 'helpdesk/settings/companies';
 import PublicFiltersList from 'helpdesk/settings/publicFilters';
 import SLAList from 'helpdesk/settings/pausals';
 import ProjectList from 'helpdesk/settings/projects';
-import StatusList from 'helpdesk/settings/statuses';
+import StatusList from 'helpdesk/settings/templateStatuses';
 import PriceList from 'helpdesk/settings/prices';
 import RoleList from 'helpdesk/settings/roles';
 import TripTypeList from 'helpdesk/settings/tripTypes';

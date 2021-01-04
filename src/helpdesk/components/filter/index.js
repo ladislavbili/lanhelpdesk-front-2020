@@ -34,19 +34,19 @@ import {
   GET_MY_DATA,
   GET_MY_FILTERS,
   DELETE_FILTER,
-} from './querries';
+} from './queries';
 import {
   GET_FILTER
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 import {
   GET_BASIC_USERS
-} from 'helpdesk/settings/users/querries';
+} from 'helpdesk/settings/users/queries';
 import {
   GET_BASIC_COMPANIES
-} from 'helpdesk/settings/companies/querries';
+} from 'helpdesk/settings/companies/queries';
 import {
   GET_TASK_TYPES
-} from 'helpdesk/settings/taskTypes/querries';
+} from 'helpdesk/settings/taskTypes/queries';
 import moment from 'moment';
 
 export default function FilterForm( props ) {

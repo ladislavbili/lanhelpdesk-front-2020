@@ -13,7 +13,7 @@ import {
 import {
   GET_TRIP_TYPES,
   ADD_TRIP_TYPE,
-} from './querries';
+} from './queries';
 
 export default function TripTypeAdd( props ) {
   //data & queries

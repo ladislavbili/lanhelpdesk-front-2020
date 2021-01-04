@@ -29,7 +29,7 @@ import Loading from 'components/loading';
 import {
   SET_TASKLIST_LAYOUT,
   GET_MY_DATA,
-} from 'helpdesk/settings/users/querries';
+} from 'helpdesk/settings/users/queries';
 
 export default function Navigation( props ) {
   //data & queries

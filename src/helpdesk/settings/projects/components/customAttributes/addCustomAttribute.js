@@ -24,7 +24,7 @@ import {
 
 import {
   GET_ROLES,
-} from '../../roles/querries';
+} from '../../../roles/queries';
 
 import Checkbox from 'components/checkbox';
 

@@ -9,7 +9,7 @@ import classnames from "classnames";
 
 import {
   GET_PROJECT,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 export default function ListHeader( props ) {
   const {
@@ -39,7 +39,7 @@ export default function ListHeader( props ) {
       }
 
       <Search {...props}/>
-      { !multiselect && statuses &&
+      { !multiselect && statuses && allStatuses.length > 0 &&
         <div className="center-hor flex-row">
           <Checkbox
             className="m-l-5  m-r-10"

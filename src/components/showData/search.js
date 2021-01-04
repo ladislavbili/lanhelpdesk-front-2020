@@ -10,7 +10,7 @@ import {
 } from "@apollo/client";
 import {
   GET_TASK_SEARCH,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 import {
   dashboard,
   allMilestones,

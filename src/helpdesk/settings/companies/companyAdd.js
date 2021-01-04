@@ -26,13 +26,13 @@ import classnames from "classnames";
 import {
   GET_PRICELISTS,
   ADD_PRICELIST
-} from '../prices/querries';
+} from '../prices/queries';
 
 import {
   GET_COMPANIES,
   ADD_COMPANY,
   GET_BASIC_COMPANIES,
-} from './querries';
+} from './queries';
 
 export default function CompanyAdd( props ) {
   //data

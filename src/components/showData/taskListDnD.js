@@ -29,7 +29,7 @@ import {
   UPDATE_TASK,
   GET_TASK,
   GET_TASKS,
-} from 'helpdesk/task/querries';
+} from 'helpdesk/task/queries';
 
 export default function TaskListDnD( props ) {
   const {

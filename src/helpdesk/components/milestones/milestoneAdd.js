@@ -18,15 +18,15 @@ import {
 
 import {
   GET_MY_PROJECTS
-} from 'helpdesk/settings/projects/querries';
+} from 'helpdesk/settings/projects/queries';
 
 import {
   ADD_MILESTONE
-} from './querries';
+} from './queries';
 
 import {
   GET_PROJECT,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 export default function MilestoneAdd( props ) {
   //data & queries

@@ -21,29 +21,30 @@ import {
   defItem
 } from 'configs/constants/projects';
 import classnames from 'classnames';
-import Permissions from "./projectPermissions";
-import CustomAttributes from "./customAttributes";
-import Tags from './tags';
-import ProjectDefaultValues from "./defaultValues";
+import Permissions from "./components/projectPermissions";
+import CustomAttributes from "./components/customAttributes";
+import Tags from './components/tags';
+import Statuses from './components/statuses';
+import ProjectDefaultValues from "./components/defaultValues";
 import Loading from 'components/loading';
 import {
   GET_BASIC_COMPANIES,
-} from '../companies/querries';
+} from '../companies/queries';
 import {
   GET_BASIC_USERS,
-} from '../users/querries';
+} from '../users/queries';
 import {
-  GET_STATUSES,
-} from '../statuses/querries';
+  GET_STATUS_TEMPLATES,
+} from '../templateStatuses/queries';
 import {
   GET_TASK_TYPES,
-} from '../taskTypes/querries';
+} from '../taskTypes/queries';
 import {
   GET_PROJECTS,
   GET_MY_PROJECTS,
   ADD_PROJECT,
   GET_MY_DATA
-} from './querries';
+} from './queries';
 
 let fakeID = -1;
 
@@ -63,7 +64,7 @@ export default function ProjectAdd( props ) {
   const {
     data: statusesData,
     loading: statusesLoading
-  } = useQuery( GET_STATUSES, fetchNetOptions );
+  } = useQuery( GET_STATUS_TEMPLATES, fetchNetOptions );
   const {
     data: companiesData,
     loading: companiesLoading
@@ -97,7 +98,7 @@ export default function ProjectAdd( props ) {
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
-
+  const [ statuses, setStatuses ] = React.useState( [] );
   //events
   React.useEffect( () => {
     if ( !myDataLoading && !usersLoading ) {
@@ -114,6 +115,18 @@ export default function ProjectAdd( props ) {
     }
   }, [ myDataLoading, usersLoading ] );
 
+  React.useEffect( () => {
+    if ( !statusesLoading ) {
+      setStatuses( statusesData.statusTemplates.map( ( statusTemplate ) => ( {
+        id: fakeID--,
+        title: statusTemplate.title,
+        color: statusTemplate.color,
+        icon: statusTemplate.icon,
+        action: statusTemplate.action,
+        order: statusTemplate.order,
+      } ) ) )
+    }
+  }, [ statusesLoading ] );
 
   //functions
   const addProjectFunc = () => {
@@ -169,7 +182,8 @@ export default function ProjectAdd( props ) {
           lockedRequester,
           projectRights: newProjectRights,
           def: newDef,
-          tags
+          tags,
+          statuses
         }
       } )
       .then( ( response ) => {
@@ -225,7 +239,11 @@ export default function ProjectAdd( props ) {
       tag.title.length === 0 ||
       !tag.color.includes( '#' ) ||
       isNaN( parseInt( tag.order ) )
-    ) )
+    ) ) ||
+    !statuses.some( ( status ) => status.action === 'IsNew' ) ||
+    !statuses.some( ( status ) => status.action === 'CloseDate' ) ||
+    !statuses.some( ( status ) => status.action === 'Invoiced' )
+
   )
   if (
     statusesLoading ||
@@ -296,6 +314,22 @@ export default function ProjectAdd( props ) {
         lockRequester={() => setLockedRequester( !lockedRequester) }
         />
 
+      <Statuses
+        statuses={statuses}
+        addStatus={(newStatus) => {
+          setStatuses([ ...statuses, {...newStatus, id: fakeID -- } ])
+        }}
+        deleteStatus={(id) => {
+          setStatuses( statuses.filter((tag) => tag.id !== id ) )
+        }}
+        updateStatus={(newStatus) => {
+          let newStatuses = [...statuses];
+          let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+          newStatuses[index] = { ...newStatuses[index], ...newStatus }
+          setStatuses(newStatuses);
+        }}
+        />
+
       <Tags
         tags={tags}
         addTag={(newTag) => {
@@ -329,7 +363,7 @@ export default function ProjectAdd( props ) {
         setTag={setDefTag}
         taskType={taskType}
         setTaskType={setTaskType}
-        statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
+        statuses={toSelArr(statuses)}
         companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
         canBeAssigned={canBeAssigned}
         users={lockedRequester ? (projectRights.map(r => r.user)) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}

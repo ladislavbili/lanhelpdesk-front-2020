@@ -16,7 +16,7 @@ import classnames from 'classnames';
 
 import {
   GET_TASK_TYPES,
-} from './querries';
+} from './queries';
 
 
 export default function TaskTypeList( props ) {

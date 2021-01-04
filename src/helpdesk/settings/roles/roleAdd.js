@@ -16,7 +16,7 @@ import {
   GET_ROLES,
   ADD_ROLE,
   GET_MY_DATA
-} from './querries';
+} from './queries';
 
 
 

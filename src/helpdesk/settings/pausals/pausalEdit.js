@@ -22,11 +22,11 @@ import Loading from 'components/loading';
 import {
   GET_PRICELISTS,
   ADD_PRICELIST
-} from '../prices/querries';
+} from '../prices/queries';
 import {
   GET_COMPANY,
   UPDATE_COMPANY
-} from '../companies/querries';
+} from '../companies/queries';
 
 export default function PausalEdit( props ) {
   //data

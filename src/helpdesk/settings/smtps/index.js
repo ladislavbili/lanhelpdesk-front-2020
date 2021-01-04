@@ -14,7 +14,7 @@ import classnames from 'classnames';
 import {
   GET_SMTPS,
   TEST_SMTPS
-} from './querries';
+} from './queries';
 
 export default function SMTPsList( props ) {
   // state

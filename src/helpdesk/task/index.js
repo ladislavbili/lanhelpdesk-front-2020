@@ -30,23 +30,22 @@ import {
 import RowTaskAdd from './add/row';
 
 import {
-  GET_STATUSES,
   SET_USER_STATUSES
-} from 'helpdesk/settings/statuses/querries';
+} from 'helpdesk/settings/templateStatuses/queries';
 
 import {
   GET_TASKS,
   DELETE_TASK,
   GET_MY_DATA,
   GET_CALENDAR_EVENTS,
-} from './querries';
+} from './queries';
 
 import {
   GET_FILTER,
   GET_PROJECT,
   GET_MILESTONE,
   GET_TASK_SEARCH,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 import {
   setFilter,
@@ -92,11 +91,6 @@ export default function TasksIndex( props ) {
     loading: taskSearchLoading
   } = useQuery( GET_TASK_SEARCH );
 
-  const {
-    data: statusesData,
-    loading: statusesLoading
-  } = useQuery( GET_STATUSES );
-
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
@@ -136,7 +130,6 @@ export default function TasksIndex( props ) {
     projectLoading ||
     milestoneLoading ||
     tasksLoading ||
-    statusesLoading ||
     calendarEventsLoading
   );
 
@@ -173,7 +166,7 @@ export default function TasksIndex( props ) {
   }
 
   const tasks = tasksData.tasks.tasks;
-  const statuses = orderArr( statusesData.statuses );
+  const statuses = localProject.project.statuses ? localProject.project.statuses : [];
   const currentUser = currentUserData.getMyData;
 
   const getBreadcrumsData = () => {
@@ -347,13 +340,14 @@ export default function TasksIndex( props ) {
   const setUserStatusesFunc = ( ids ) => {
     setUserStatuses( {
         variables: {
-          ids
+          ids: [
+            ...currentUser.statuses.map( ( status ) => status.id )
+            .filter( ( statusID ) => !statuses.some( ( status ) => status.id === statusID ) ),
+            ...ids
+          ]
         }
       } )
-      .then( ( response ) => {
-        console.log( 'got response' );
-        console.log( response );
-      } )
+      .then( ( response ) => {} )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -438,8 +432,9 @@ export default function TasksIndex( props ) {
   }
 
   const filterTasks = ( tasks ) => {
+    let currentStatuses = currentUser.statuses.filter( ( status1 ) => statuses.some( ( status2 ) => status1.id === status2.id ) )
     return tasks.filter( ( task ) => (
-      ( currentUser.statuses.length === 0 || currentUser.statuses.some( ( status ) => status.id === task.status.id ) )
+      ( currentStatuses.length === 0 || currentStatuses.some( ( status ) => status.id === task.status.id ) )
     ) )
   }
 
@@ -512,7 +507,7 @@ export default function TasksIndex( props ) {
         setStatuses={setUserStatusesFunc}
         underSearch={RowTaskAdd}
         underSearchLabel={'Task'}
-        statuses={currentUser.statuses.map((status) => status.id )}
+        statuses={currentUser.statuses.map((status) => status.id ).filter((statusID) => statuses.some((status) => status.id === statusID ) )}
         allStatuses={statuses}
         checkTask={checkTask}
         deleteTask={deleteTaskFunc}

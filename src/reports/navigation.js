@@ -23,7 +23,7 @@ import settings from 'configs/constants/settings';
 
 import {
   GET_MY_DATA
-} from './querries';
+} from './queries';
 
 export default function Navigation( props ) {
   const {

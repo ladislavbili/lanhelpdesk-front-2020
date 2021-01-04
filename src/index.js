@@ -20,7 +20,7 @@ import {
 import createClient from 'apollo/createClient';
 import {
   GET_IS_LOGGED_IN,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 export const database = {};
 export const rebase = {};

@@ -28,15 +28,15 @@ import {
   GET_USERS,
   GET_BASIC_USERS,
   ADD_USER
-} from './querries';
+} from './queries';
 
 import {
   GET_ROLES,
-} from '../roles/querries';
+} from '../roles/queries';
 
 import {
   GET_BASIC_COMPANIES,
-} from '../companies/querries';
+} from '../companies/queries';
 
 
 export default function UserAddContainer( props ) {

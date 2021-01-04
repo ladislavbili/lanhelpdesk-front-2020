@@ -27,11 +27,11 @@ import {
 } from 'helperFunctions';
 
 import {
-  GET_STATUSES,
-  GET_STATUS,
-  UPDATE_STATUS,
-  DELETE_STATUS
-} from './querries';
+  GET_STATUS_TEMPLATES,
+  GET_STATUS_TEMPLATE,
+  UPDATE_STATUS_TEMPLATE,
+  DELETE_STATUS_TEMPLATE
+} from './queries';
 
 export default function StatusEdit( props ) {
   //data
@@ -43,20 +43,20 @@ export default function StatusEdit( props ) {
     data,
     loading,
     refetch
-  } = useQuery( GET_STATUS, {
+  } = useQuery( GET_STATUS_TEMPLATE, {
     variables: {
       id: parseInt( props.match.params.id )
     },
     notifyOnNetworkStatusChange: true,
   } );
-  const [ updateStatus ] = useMutation( UPDATE_STATUS );
+  const [ updateStatus ] = useMutation( UPDATE_STATUS_TEMPLATE );
   const [ deleteStatus, {
     client
-  } ] = useMutation( DELETE_STATUS );
+  } ] = useMutation( DELETE_STATUS_TEMPLATE );
   const allStatuses = toSelArr( client.readQuery( {
-      query: GET_STATUSES
+      query: GET_STATUS_TEMPLATES
     } )
-    .statuses );
+    .statusTemplates );
   const filteredStatuses = allStatuses.filter( status => status.id !== parseInt( match.params.id ) );
   const theOnlyOneLeft = allStatuses.length === 0;
 
@@ -72,11 +72,11 @@ export default function StatusEdit( props ) {
   // sync
   React.useEffect( () => {
     if ( !loading ) {
-      setTitle( data.status.title );
-      setColor( data.status.color );
-      setOrder( data.status.order );
-      setIcon( data.status.icon );
-      setAction( actions.find( a => a.value === data.status.action ) );
+      setTitle( data.statusTemplate.title );
+      setColor( data.statusTemplate.color );
+      setOrder( data.statusTemplate.order );
+      setIcon( data.statusTemplate.icon );
+      setAction( actions.find( a => a.value === data.statusTemplate.action ) );
     }
   }, [ loading ] );
 
@@ -109,21 +109,20 @@ export default function StatusEdit( props ) {
     setSaving( false );
   };
 
-  const deleteStatusFunc = ( replacement ) => {
+  const deleteStatusFunc = () => {
     setDeleteOpen( false );
 
     if ( window.confirm( "Are you sure?" ) ) {
       deleteStatus( {
           variables: {
             id: parseInt( match.params.id ),
-            newId: replacement.id,
           }
         } )
         .then( ( response ) => {
           client.writeQuery( {
-            query: GET_STATUSES,
+            query: GET_STATUS_TEMPLATES,
             data: {
-              statuses: filteredStatuses
+              statusTemplates: filteredStatuses
             }
           } );
           history.goBack();
@@ -172,16 +171,17 @@ export default function StatusEdit( props ) {
         />
 
       <div className="row">
-        {action.value!=='Invoiced' && <Button className="btn-red m-l-5 m-t-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</Button>}
+        {action.value!=='Invoiced' &&
+          <Button
+            className="btn-red m-l-5 m-t-5"
+            disabled={saving || theOnlyOneLeft}
+            onClick={ deleteStatusFunc }
+            >
+        Delete
+      </Button>
+    }
         <Button className="btn m-t-5 ml-auto" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</Button>
       </div>
-      <DeleteReplacement
-        isOpen={deleteOpen}
-        label="status"
-        options={filteredStatuses}
-        close={()=>setDeleteOpen(false)}
-        finishDelete={deleteStatusFunc}
-        />
     </div>
   );
 }

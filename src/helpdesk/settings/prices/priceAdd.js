@@ -14,14 +14,14 @@ import Switch from "react-switch";
 import Loading from 'components/loading';
 import {
   GET_TASK_TYPES,
-} from '../taskTypes/querries';
+} from '../taskTypes/queries';
 import {
   GET_TRIP_TYPES,
-} from '../tripTypes/querries';
+} from '../tripTypes/queries';
 import {
   GET_PRICELISTS,
   ADD_PRICELIST,
-} from './querries';
+} from './queries';
 
 
 

@@ -26,22 +26,22 @@ import {
   GET_PUBLIC_FILTERS,
   GET_FILTER,
   UPDATE_PUBLIC_FILTER
-} from './querries';
+} from './queries';
 import {
   GET_TASK_TYPES,
-} from '../taskTypes/querries';
+} from '../taskTypes/queries';
 import {
   GET_BASIC_USERS,
-} from '../users/querries';
+} from '../users/queries';
 import {
   GET_BASIC_COMPANIES,
-} from '../companies/querries';
+} from '../companies/queries';
 import {
   GET_PROJECTS,
-} from '../projects/querries';
+} from '../projects/queries';
 import {
   GET_ROLES,
-} from '../roles/querries';
+} from '../roles/queries';
 
 import {
   oneOfOptions,

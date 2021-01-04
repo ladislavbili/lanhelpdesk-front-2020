@@ -8,7 +8,7 @@ import classnames from 'classnames';
 
 import {
   GET_COMPANIES
-} from '../companies/querries';
+} from '../companies/queries';
 
 export default function CompaniesList( props ) {
   // state

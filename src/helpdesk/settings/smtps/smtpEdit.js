@@ -36,7 +36,7 @@ import {
   UPDATE_SMTP,
   DELETE_SMTP,
   TEST_SMTP
-} from './querries';
+} from './queries';
 
 
 

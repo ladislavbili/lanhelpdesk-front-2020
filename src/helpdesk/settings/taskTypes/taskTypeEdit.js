@@ -19,7 +19,7 @@ import {
   UPDATE_TASK_TYPE,
   DELETE_TASK_TYPE,
   GET_TASK_TYPES,
-} from './querries';
+} from './queries';
 
 export default function TaskTypeEdit( props ) {
   //data

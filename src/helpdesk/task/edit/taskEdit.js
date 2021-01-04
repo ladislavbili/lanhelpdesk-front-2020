@@ -79,7 +79,7 @@ import {
   UPDATE_INVOICED_TASK,
   GET_TASK,
   GET_TASKS,
-} from '../querries';
+} from '../queries';
 let fakeID = -1;
 
 import {
@@ -101,7 +101,6 @@ export default function TaskEdit( props ) {
     task,
     currentUser,
     accessRights,
-    statuses,
     companies,
     users,
     taskTypes,
@@ -748,9 +747,11 @@ export default function TaskEdit( props ) {
     setAssignedTo( newAssignedTo );
     setMilestone( noMilestone );
     setTags( [] );
+    setStatus( null );
     autoUpdateTask( {
       project: project.id,
       tags: [],
+      status: null,
       assignedTo: newAssignedTo.map( ( user ) => user.id ),
       milestone: null
     } )
@@ -857,11 +858,11 @@ export default function TaskEdit( props ) {
               </button>
             }
             {
-              statuses.filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
+              (project ? toSelArr(project.project.statuses) : []).filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
                 <button
                   type="button"
                   className="btn btn-link waves-effect"
-                  onClick={changeStatus}
+                  onClick={() => changeStatus(status)}
                   >
                   { status.icon.length > 3 &&
                     <i
@@ -1097,7 +1098,7 @@ export default function TaskEdit( props ) {
         isDisabled={defaultFields.status.fixed || viewOnly}
         styles={layout === 2 ? invisibleSelectStyleNoArrowColoredRequiredNoPadding : invisibleSelectStyleNoArrowColoredRequired}
         onChange={ changeStatus }
-        options={statuses.filter((status)=>status.action!=='Invoiced')}
+        options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action!=='Invoiced')}
         />
     ),
     Type: (

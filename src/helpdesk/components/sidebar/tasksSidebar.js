@@ -47,19 +47,19 @@ import moment from 'moment';
 
 import {
   GET_MY_DATA,
-} from './querries';
+} from './queries';
 import {
   GET_MY_PROJECTS,
-} from 'helpdesk/settings/projects/querries';
+} from 'helpdesk/settings/projects/queries';
 import {
   GET_MY_FILTERS,
-} from '../filter/querries';
+} from '../filter/queries';
 
 import {
   GET_FILTER,
   GET_PROJECT,
   GET_MILESTONE,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 import {
   setFilter,

@@ -30,7 +30,7 @@ import {
   GET_PRICELIST,
   UPDATE_PRICELIST,
   DELETE_PRICELIST,
-} from './querries';
+} from './queries';
 
 
 

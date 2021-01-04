@@ -28,7 +28,7 @@ import ExcelExport from './excelExport';
 
 export default function CompanyReports( props ) {
 
-  //querries and mutations
+  //queries and mutations
   const {
     data: companiesData,
     loading: companiesLoading

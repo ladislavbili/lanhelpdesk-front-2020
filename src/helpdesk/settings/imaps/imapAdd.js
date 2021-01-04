@@ -29,17 +29,17 @@ import {
 import {
   GET_IMAPS,
   ADD_IMAP,
-} from './querries';
+} from './queries';
 
 import {
   GET_ROLES,
-} from '../roles/querries';
+} from '../roles/queries';
 import {
   GET_BASIC_COMPANIES,
-} from '../companies/querries';
+} from '../companies/queries';
 import {
   GET_PROJECTS,
-} from '../projects/querries';
+} from '../projects/queries';
 
 
 

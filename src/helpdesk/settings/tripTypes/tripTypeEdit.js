@@ -20,7 +20,7 @@ import {
   GET_TRIP_TYPE,
   UPDATE_TRIP_TYPE,
   DELETE_TRIP_TYPE,
-} from './querries';
+} from './queries';
 
 export default function TripTypeEdit( props ) {
   // data & queries

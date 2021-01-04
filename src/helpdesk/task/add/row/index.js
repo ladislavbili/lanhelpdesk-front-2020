@@ -19,45 +19,33 @@ import {
 
 import {
   GET_TASK_TYPES
-} from 'helpdesk/settings/taskTypes/querries';
+} from 'helpdesk/settings/taskTypes/queries';
 import {
   GET_TRIP_TYPES
-} from 'helpdesk/settings/tripTypes/querries';
+} from 'helpdesk/settings/tripTypes/queries';
 
 import {
   GET_BASIC_USERS
-} from 'helpdesk/settings/users/querries';
+} from 'helpdesk/settings/users/queries';
 
 import {
   GET_BASIC_COMPANIES
-} from 'helpdesk/settings/companies/querries';
+} from 'helpdesk/settings/companies/queries';
 
 import {
   GET_MY_PROJECTS
-} from 'helpdesk/settings/projects/querries';
-
-import {
-  GET_STATUSES
-} from 'helpdesk/settings/statuses/querries';
+} from 'helpdesk/settings/projects/queries';
 
 import {
   GET_MY_DATA
-} from '../../querries';
+} from '../../queries';
 
 import {
   GET_PROJECT,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 export default function RowTaskAddContainer( props ) {
   //data & queries
-  const {
-    data: statusesData,
-    loading: statusesLoading
-  } = useQuery( GET_STATUSES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
   const {
     data: companiesData,
     loading: companiesLoading
@@ -116,7 +104,6 @@ export default function RowTaskAddContainer( props ) {
   //state
 
   const loading = (
-    statusesLoading ||
     companiesLoading ||
     usersLoading ||
     taskTypesLoading ||
@@ -133,7 +120,6 @@ export default function RowTaskAddContainer( props ) {
     <RowTaskAdd
       {...props}
       loading={loading}
-      statuses={ toSelArr(statusesData.statuses.filter((status) => !status.action.toLowerCase().includes('invoiced') )) }
       projects={
         toSelArr(projectsData.myProjects.map((myProject) => ({
           ...myProject.project,
@@ -146,7 +132,6 @@ export default function RowTaskAddContainer( props ) {
       users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }
       companies={ toSelArr(companiesData.basicCompanies) }
       taskTypes={ toSelArr(taskTypesData.taskTypes) }
-      allTags={ [] }
       tripTypes={ toSelArr(tripTypesData.tripTypes) }
       currentUser={ currentUserData.getMyData }
       milestones={[noMilestone]}

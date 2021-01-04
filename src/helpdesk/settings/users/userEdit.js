@@ -30,15 +30,15 @@ import {
   DELETE_USER,
   GET_MY_DATA,
   SET_USER_ACTIVE
-} from './querries';
+} from './queries';
 
 import {
   GET_ROLES,
-} from '../roles/querries';
+} from '../roles/queries';
 
 import {
   GET_BASIC_COMPANIES,
-} from '../companies/querries';
+} from '../companies/queries';
 import PasswordChange from './passChange';
 
 export default function UserEdit( props ) {

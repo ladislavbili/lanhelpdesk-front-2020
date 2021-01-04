@@ -22,7 +22,7 @@ import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
 
 import {
   GET_TASKS_ATTRIBUTES_FILTER,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 import {
   setTasksAttributeFilter,

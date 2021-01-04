@@ -12,7 +12,7 @@ import Loading from 'components/loading';
 import classnames from 'classnames';
 import {
   GET_COMPANIES
-} from './querries';
+} from './queries';
 
 export default function CompanysList( props ) {
   // state

@@ -23,17 +23,17 @@ import moment from 'moment';
 
 import {
   GET_MY_PROJECTS
-} from 'helpdesk/settings/projects/querries';
+} from 'helpdesk/settings/projects/queries';
 import {
   GET_MILESTONE as GET_LOCAL_MILESTONE,
   GET_PROJECT
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 import {
   UPDATE_MILESTONE,
   GET_MILESTONE,
   DELETE_MILESTONE,
-} from './querries';
+} from './queries';
 
 export default function MilestoneEdit( props ) {
 

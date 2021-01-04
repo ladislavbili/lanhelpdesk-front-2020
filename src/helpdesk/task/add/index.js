@@ -25,41 +25,29 @@ import {
 
 import {
   GET_TASK_TYPES
-} from 'helpdesk/settings/taskTypes/querries';
+} from 'helpdesk/settings/taskTypes/queries';
 import {
   GET_TRIP_TYPES
-} from 'helpdesk/settings/tripTypes/querries';
+} from 'helpdesk/settings/tripTypes/queries';
 
 import {
   GET_BASIC_USERS
-} from 'helpdesk/settings/users/querries';
+} from 'helpdesk/settings/users/queries';
 
 import {
   GET_BASIC_COMPANIES
-} from 'helpdesk/settings/companies/querries';
+} from 'helpdesk/settings/companies/queries';
 
 import {
   GET_MY_PROJECTS
-} from 'helpdesk/settings/projects/querries';
-
-import {
-  GET_STATUSES
-} from 'helpdesk/settings/statuses/querries';
+} from 'helpdesk/settings/projects/queries';
 
 import {
   GET_MY_DATA
-} from '../querries';
+} from '../queries';
 
 export default function TaskAddContainer( props ) {
   //data & queries
-  const {
-    data: statusesData,
-    loading: statusesLoading
-  } = useQuery( GET_STATUSES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
   const {
     data: companiesData,
     loading: companiesLoading
@@ -117,7 +105,6 @@ export default function TaskAddContainer( props ) {
   const [ company, setCompany ] = React.useState( null );
 
   const loading = (
-    statusesLoading ||
     companiesLoading ||
     usersLoading ||
     taskTypesLoading ||
@@ -175,7 +162,6 @@ export default function TaskAddContainer( props ) {
           {  openAddTaskModal && !loading &&
             <TaskAdd {...props}
               loading={loading}
-              statuses={ toSelArr(statusesData.statuses.filter((status) => !status.action.toLowerCase().includes('invoiced') )) }
               projects={
                 toSelArr(projectsData.myProjects.map((myProject) => ({
                   ...myProject.project,

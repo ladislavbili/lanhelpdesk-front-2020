@@ -28,7 +28,7 @@ import {
   GET_REPORTS_AGENT_STATUSES,
   GET_REPORTS_FROM_DATE,
   GET_REPORTS_TO_DATE,
-} from 'apollo/localSchema/querries';
+} from 'apollo/localSchema/queries';
 
 import {
   GET_INVOICE_USERS,

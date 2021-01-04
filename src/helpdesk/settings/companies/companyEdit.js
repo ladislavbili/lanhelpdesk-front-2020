@@ -27,14 +27,14 @@ import classnames from 'classnames';
 import {
   GET_PRICELISTS,
   ADD_PRICELIST
-} from '../prices/querries';
+} from '../prices/queries';
 
 import {
   GET_COMPANY,
   UPDATE_COMPANY,
   DELETE_COMPANY,
   GET_COMPANIES,
-} from './querries';
+} from './queries';
 
 export default function CompanyEdit( props ) {
   //data

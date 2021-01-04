@@ -15,7 +15,7 @@ import {
 import classnames from 'classnames';
 import {
   GET_TRIP_TYPES
-} from './querries';
+} from './queries';
 
 export default function TripTypeListContainer( props ) {
   // state

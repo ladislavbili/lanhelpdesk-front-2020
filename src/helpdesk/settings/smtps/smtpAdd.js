@@ -23,7 +23,7 @@ import wellKnownOptions from 'configs/constants/wellKnown';
 import {
   GET_SMTPS,
   ADD_SMTP
-} from './querries';
+} from './queries';
 
 
 
