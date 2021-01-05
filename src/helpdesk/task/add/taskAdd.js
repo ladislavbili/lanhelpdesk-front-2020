@@ -36,6 +36,9 @@ import booleanSelects from 'configs/constants/boolSelect'
 import CheckboxList from 'helpdesk/components/checkboxList';
 import Scheduled from 'helpdesk/components/scheduled';
 import {
+  getCreationError as getVykazyError
+} from 'helpdesk/components/vykazyTable';
+import {
   noMilestone
 } from 'configs/constants/sidebar';
 import {
@@ -78,9 +81,6 @@ export default function TaskAdd( props ) {
     companies,
     defaultUnit,
     closeModal,
-    setTaskTypeCreationError,
-    setAssignedToCreationError,
-    setCompanyCreationError,
   } = props;
 
   const userIfInProject = ( project ) => {
@@ -1116,6 +1116,17 @@ export default function TaskAdd( props ) {
     )
   }
 
+  const canCreateVykazyError = () => {
+    if ( getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company ) === '' ) {
+      return null;
+    }
+    return (
+      <span className="center-hor m-l-10" style={{color: "#FF4500", height: "20px", fontSize: "14px"}}>
+        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
+      </span>
+    );
+  }
+
   return (
     <div>
       <div
@@ -1132,6 +1143,8 @@ export default function TaskAdd( props ) {
               "task-edit-left": layout === 2
             }
           )}>
+
+          {canCreateVykazyError()}
 
           { renderTitle() }
 

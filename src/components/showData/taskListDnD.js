@@ -49,6 +49,7 @@ export default function TaskListDnD( props ) {
     filterId,
     filterValues,
     originalProjectId,
+    layout,
   } = props;
 
   const [ updateTask ] = useMutation( UPDATE_TASK );
@@ -190,6 +191,8 @@ export default function TaskListDnD( props ) {
     .filter( item => statuses.includes( item.groupItem.id ) )
   );
 
+  console.log( groupRest() );
+
   return (
     <div>
       <CommandBar {...commandBar} listName={listName} />
@@ -202,8 +205,9 @@ export default function TaskListDnD( props ) {
           statuses={statuses}
           setStatuses={setStatuses}
           allStatuses={allStatuses}
+          layout={layout}
           />
-        <div className="flex-row">
+        <div className="flex-row m-l-20">
           <DragDropContext onDragEnd={onDragEnd}>
             {
               GROUP_DATA
@@ -297,13 +301,14 @@ export default function TaskListDnD( props ) {
           {
             groupRest().length>0 &&
             <Card className="dnd-column" key="Undefined group">
-              <CardHeader style={{backgroundColor:'#b8d9db'}}>Undefined group</CardHeader>
+              <CardHeader>Undefined group</CardHeader>
               <CardBody>
                 {
                   groupRest().map(
                     (item)=>
                     <ul
-                      className={classnames("taskCol", "clickable", "list-unstyled")}
+                      className={classnames("dnd-item", "clickable", "list-unstyled")}
+                      style={{borderLeft: `4px solid ${item.status.color}`}}
                       onClick={(e)=>{
                         history.push(link+'/'+item.id);
                       }}

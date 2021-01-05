@@ -185,6 +185,7 @@ export default function ShowDataContainer( props ) {
 					{tasklistLayout === 0 && (
 						<div className='col-xl-12'>
 							<TaskCol
+                layout={tasklistLayout}
 								commandBar={props}
 								useBreadcrums={useBreadcrums}
 								breadcrumsData={breadcrumsData}
@@ -213,6 +214,7 @@ export default function ShowDataContainer( props ) {
 							{itemID && <props.Edit match={match} columns={false} history={history} />}
 							{!itemID &&
 								<TaskList
+                  layout={tasklistLayout}
 									commandBar={props}
 									useBreadcrums={useBreadcrums}
 									breadcrumsData={breadcrumsData}
@@ -240,6 +242,7 @@ export default function ShowDataContainer( props ) {
 							{itemID && <props.Edit match={match} columns={false} history={history} />}
 							{!itemID &&
 								<TaskListDnD
+                  layout={tasklistLayout}
 									commandBar={props}
 									useBreadcrums={useBreadcrums}
 									breadcrumsData={breadcrumsData}
@@ -265,6 +268,7 @@ export default function ShowDataContainer( props ) {
 					{tasklistLayout === 3 && (
 						<div className='col-xl-12'>
 							<props.calendar
+                layout={tasklistLayout}
 								commandBar={props}
 								useBreadcrums={useBreadcrums}
 								breadcrumsData={breadcrumsData}

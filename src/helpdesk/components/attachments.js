@@ -50,7 +50,7 @@ export default class Attachments extends Component {
       removeAttachment,
     } = this.props;
     return (
-      <div className="full-width attachments">
+      <div className="full-width task-edit-popis">
         <input
           type="file"
           id={"uploadAttachment" + taskID}

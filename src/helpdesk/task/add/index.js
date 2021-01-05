@@ -15,9 +15,6 @@ import {
   Button
 } from 'reactstrap';
 import TaskAdd from './taskAdd';
-import {
-  getCreationError as getVykazyError
-} from 'helpdesk/components/vykazyTable';
 
 import {
   noMilestone
@@ -100,9 +97,6 @@ export default function TaskAddContainer( props ) {
 
   //state
   const [ openAddTaskModal, setOpenAddTaskModal ] = React.useState( false );
-  const [ taskType, setTaskType ] = React.useState( null );
-  const [ assignedTo, setAssignedTo ] = React.useState( [] );
-  const [ company, setCompany ] = React.useState( null );
 
   const loading = (
     companiesLoading ||
@@ -112,16 +106,6 @@ export default function TaskAddContainer( props ) {
     projectsLoading ||
     currentUserLoading
   );
-  const canCreateVykazyError = () => {
-    if ( getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company ) === '' ) {
-      return null;
-    }
-    return (
-      <span className="center-hor m-l-10" style={{color: "#FF4500", height: "20px", fontSize: "14px"}}>
-        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
-      </span>
-    );
-  }
 
   const renderCopyButton = () => {
     return (
@@ -154,10 +138,6 @@ export default function TaskAddContainer( props ) {
   const renderModal = () => {
     return (
       <Modal isOpen={openAddTaskModal} className="task-add-container" >
-        <ModalHeader>
-          Create new task
-          {canCreateVykazyError()}
-        </ModalHeader>
         <ModalBody className="scrollable" >
           {  openAddTaskModal && !loading &&
             <TaskAdd {...props}
@@ -178,13 +158,7 @@ export default function TaskAddContainer( props ) {
               defaultUnit={null}
               closeModal={ () => {
                 setOpenAddTaskModal(false);
-                setTaskType(null);
-                setAssignedTo([]);
-                setCompany(null);
               }}
-              setTaskTypeCreationError={setTaskType}
-              setAssignedToCreationError={setAssignedTo}
-              setCompanyCreationError={setCompany}
               />
           }
         </ModalBody>

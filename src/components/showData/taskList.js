@@ -47,6 +47,7 @@ export default function List( props ) {
     data,
     deleteTask,
     checkTask,
+    layout,
     underSearch: UnderSearch,
     underSearchLabel
   } = props;
@@ -65,6 +66,7 @@ export default function List( props ) {
     }
   }
   const filter = tasksFilterData.tasksAttributesFilter;
+
   return (
     <div>
 				<CommandBar {...commandBar} listName={listName}/>
@@ -77,6 +79,7 @@ export default function List( props ) {
             allStatuses={allStatuses}
             underSearchButtonEvent={() => setUnderSearchOpen(!underSearchOpen)}
             underSearchButtonLabel={underSearchLabel}
+            layout={layout}
             />
           {
             UnderSearch !== undefined &&

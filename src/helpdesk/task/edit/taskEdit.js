@@ -857,22 +857,6 @@ export default function TaskEdit( props ) {
                 Back
               </button>
             }
-            {
-              (project ? toSelArr(project.project.statuses) : []).filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
-                <button
-                  type="button"
-                  className="btn btn-link waves-effect"
-                  onClick={() => changeStatus(status)}
-                  >
-                  { status.icon.length > 3 &&
-                    <i
-                      className={`${status.icon} commandbar-command-icon`}
-                      />
-                  }
-                  {status.title}
-                </button>
-              ))
-            }
             { project &&
               <TaskAdd
                 project={project.id}
@@ -942,6 +926,22 @@ export default function TaskEdit( props ) {
               <i className="fas fa-retweet "/>
               Layout
             </button>
+            {
+              (project ? toSelArr(project.project.statuses) : []).filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
+                <button
+                  type="button"
+                  className="btn btn-link waves-effect"
+                  onClick={() => changeStatus(status)}
+                  >
+                  { status.icon.length > 3 &&
+                    <i
+                      className={`${status.icon} commandbar-command-icon`}
+                      />
+                  }
+                  {status.title}
+                </button>
+              ))
+            }
           </div>
         </div>
       </div>
@@ -1330,7 +1330,12 @@ export default function TaskEdit( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className={"task-edit-right" + (columns ? " w-250px" : "")} >
+      <div className={classnames(
+        {
+          "task-edit-right": !columns,
+          "task-edit-right-columns": columns
+        },
+      )}>
         <div className="col-form-label-2" >
           <Label className="col-form-value-2">Status</Label>
           { layoutComponents.Status }
@@ -1880,10 +1885,8 @@ export default function TaskEdit( props ) {
   return (
     <div
       className={classnames(
-        {
-          'task-edit-width': !inModal
-        },
-        "flex"
+        "flex",
+        "no-wrap-content"
       )}
       >
 
@@ -1892,16 +1895,16 @@ export default function TaskEdit( props ) {
           {"fit-with-header": !columns},
           {"fit-with-header-and-commandbar": columns},
           "scroll-visible",
-          { "row": layout === 2}
+          { "row": layout === 2},
         )}
         >
         <div
           className={classnames(
-            "card-box-lanwiki",
+            "bkg-white",
             {
               "task-edit-left": layout === 2 && !columns,
               "task-edit-left-columns": layout === 2 && columns
-            }
+            },
           )}
           >
           { renderCommandbar() }
@@ -1917,9 +1920,10 @@ export default function TaskEdit( props ) {
 
             { renderDescription() }
 
-              { renderSimpleSubtasks() }
+            { renderSimpleSubtasks() }
 
             { renderAttachments(false) }
+
             { renderCompanyPausalInfo() }
 
             { renderModalUserAdd() }
