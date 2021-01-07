@@ -464,6 +464,7 @@ export default function TasksIndex( props ) {
         displayValues={[
           {value:'checked', label: '', type:'checkbox'},
           {value:'important',label:'',type:'important'},
+          {value:'invoiced',label:'',type:'invoiced'},
           {value:'title',label:'Title',type:'text'},
           {value:'id',label:'ID',type:'int'},
           {value:'status',label:'Status',type:'object'},

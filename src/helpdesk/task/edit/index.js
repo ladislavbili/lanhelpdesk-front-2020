@@ -866,6 +866,7 @@ export default function TaskEditContainer( props ) {
       deleteShortSubtask={deleteShortSubtaskFunc}
       saving={saving}
       setSaving={setSaving}
+      canEditInvoiced={props.canEditInvoiced === true}
       />
   );
 

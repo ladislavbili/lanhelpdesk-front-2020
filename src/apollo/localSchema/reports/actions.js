@@ -1,13 +1,13 @@
 import {
-  reportsChosenStatusesVar,
+  reportsTypeVar,
   reportsFromDateVar,
   reportsToDateVar,
   reportsAgentStatusesVar
 } from './variables';
 
 
-export function setReportsChosenStatuses( newValue ) {
-  reportsChosenStatusesVar( newValue );
+export function setReportsType( newValue ) {
+  reportsTypeVar( newValue );
 }
 
 export function setReportsFromDate( newValue ) {

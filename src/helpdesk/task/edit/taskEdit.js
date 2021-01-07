@@ -136,6 +136,7 @@ export default function TaskEdit( props ) {
     addShortSubtask,
     updateShortSubtask,
     deleteShortSubtask,
+    canEditInvoiced,
   } = props;
 
   //state
@@ -177,15 +178,13 @@ export default function TaskEdit( props ) {
   const [ updateTask ] = useMutation( UPDATE_TASK );
   const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
 
-  const isInvoiced = task.status.action === 'Invoiced';
-  const canEditInvoiced = accessRights.vykazy;
-  const invoicedTask = isInvoiced ? task.invoicedTasks[ 0 ] : null;
+  const invoicedTask = task.invoiced ? task.invoicedTasks[ 0 ] : null;
 
   // sync
   React.useEffect( () => {
     setChanges( {} );
     setVykazyChanges( defaultVykazyChanges );
-    if ( isInvoiced ) {
+    if ( task.invoiced ) {
       setAssignedTo( toSelArr( invoicedTask.assignedTo ) );
     } else {
       setAssignedTo( toSelArr( task.assignedTo, 'email' ) );
@@ -213,7 +212,7 @@ export default function TaskEdit( props ) {
     }
     const status = ( task.status ? toSelItem( task.status ) : null )
     setStatus( status );
-    if ( isInvoiced ) {
+    if ( task.invoiced ) {
       setTags( toSelArr( invoicedTask.tags ) );
       setTaskType( createSelectInvoicedItem( task.taskType, invoicedTask.taskType ) );
       setCompany( createSelectInvoicedItem( task.company, invoicedTask.company ) );
@@ -248,7 +247,7 @@ export default function TaskEdit( props ) {
     setUsedTripPausal( task.company ? task.company.usedTripPausal : 0 );
 
     if ( project ) {
-      const viewOnly = !project.right.write || ( status.action === 'Invoiced' && !canEditInvoiced );
+      const viewOnly = !project.right.write || ( task.invoiced && !canEditInvoiced );
       setViewOnly( viewOnly );
     }
   }, [ id ] );
@@ -262,7 +261,6 @@ export default function TaskEdit( props ) {
       assignedTo,
       saving,
       viewOnly,
-      isInvoiced,
       ...change,
     }
     return (
@@ -285,7 +283,7 @@ export default function TaskEdit( props ) {
     }
   )
   const autoUpdateTask = ( change ) => {
-    if ( getCantSave( change ) || isInvoiced ) {
+    if ( getCantSave( change ) || task.invoiced ) {
       setChanges( {
         ...changes,
         ...change
@@ -378,7 +376,7 @@ export default function TaskEdit( props ) {
     setSaving( false );
   }
 
-  const submitInvoicedTask = () => {
+  const submitInvoicedTask = ( cancelInvoiced ) => {
     const stmcChanges = {
       subtasks: {
         ADD: vykazyChanges.subtask.ADD.map( ( newSubtask ) => ( {
@@ -528,6 +526,7 @@ export default function TaskEdit( props ) {
     updateInvoicedTask( {
         variables: {
           id,
+          cancelInvoiced,
           taskChanges: changes,
           stmcChanges,
         }
@@ -624,7 +623,7 @@ export default function TaskEdit( props ) {
   }
 
   const modifyInvoicedVykazy = ( data, type ) => {
-    if ( !isInvoiced ) {
+    if ( !task.invoiced ) {
       return data;
     }
     //vykazyChanges, setVykazyChanges
@@ -632,6 +631,7 @@ export default function TaskEdit( props ) {
     newData = newData.map( ( item ) => {
       switch ( type ) {
         case 'subtask': {
+          console.log( item );
           return ( {
             ...item,
             invoicedData: {
@@ -857,7 +857,7 @@ export default function TaskEdit( props ) {
                 Back
               </button>
             }
-            {
+            { !task.invoiced &&
               (project ? toSelArr(project.project.statuses) : []).filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
                 <button
                   type="button"
@@ -872,6 +872,28 @@ export default function TaskEdit( props ) {
                   {status.title}
                 </button>
               ))
+            }
+            { task.invoiced && !viewOnly &&
+              <button
+                type="button"
+                disabled={getCantSave()}
+                className="btn btn-danger waves-effect"
+                onClick={() => submitInvoicedTask(true)}
+                >
+                Re-open
+              </button>
+            }
+            { task.invoiced && !viewOnly &&
+              <button
+                type="button"
+                style={{color: important ? '#ffc107' : '#0078D4'}}
+                disabled={getCantSave()}
+                className="btn btn-link waves-effect"
+                onClick={() => submitInvoicedTask(false)}
+                >
+                <i className="far fa-save" />
+                Save invoiced task
+              </button>
             }
             { project &&
               <TaskAdd
@@ -922,18 +944,6 @@ export default function TaskEdit( props ) {
               <i className="far fa-star" />
               Important
             </button>
-            { isInvoiced &&
-              <button
-                type="button"
-                style={{color: important ? '#ffc107' : '#0078D4'}}
-                disabled={getCantSave()}
-                className="btn btn-link waves-effect"
-                onClick={submitInvoicedTask}
-                >
-                <i className="far fa-save" />
-                Save invoiced task
-              </button>
-            }
             <button
               type="button"
               className="btn btn-link waves-effect"
@@ -999,7 +1009,7 @@ export default function TaskEdit( props ) {
             {task.createdAt?(timestampToString(task.createdAt)):''}
           </span>
         </div>
-      { renderStatusDate() }
+        { renderStatusDate() }
       </div>
     )
   }
@@ -1008,22 +1018,22 @@ export default function TaskEdit( props ) {
     if ( status && status.action === 'PendingDate' ) {
       return (
         <div className="task-info">
-            <span className="center-hor">
-              Pending date:
-            </span>
-            <DatePicker
-              className="form-control hidden-input bolder"
-              selected={pendingDate}
-              disabled={!status || status.action!=='PendingDate'||viewOnly||!pendingChangable}
-              onChange={ (date) => {
-                setPendingDate(date);
-                if(date.valueOf() !== null){
-                  autoUpdateTask({pendingDate: date.valueOf().toString()});
-                }
-              }}
-              placeholderText="No pending date"
-              {...datePickerConfig}
-              />
+          <span className="center-hor">
+            Pending date:
+          </span>
+          <DatePicker
+            className="form-control hidden-input bolder"
+            selected={pendingDate}
+            disabled={!status || status.action!=='PendingDate'||viewOnly||!pendingChangable}
+            onChange={ (date) => {
+              setPendingDate(date);
+              if(date.valueOf() !== null){
+                autoUpdateTask({pendingDate: date.valueOf().toString()});
+              }
+            }}
+            placeholderText="No pending date"
+            {...datePickerConfig}
+            />
         </div>
       )
     }
@@ -1031,22 +1041,22 @@ export default function TaskEdit( props ) {
     if ( status && ( status.action === 'CloseDate' || status.action === 'Invoiced' || status.action === 'CloseInvalid' ) ) {
       return (
         <div className="task-info">
-            <span className="center-hor">
-              Closed at:
-            </span>
-            <DatePicker
-              className="form-control hidden-input bolder"
-              selected={closeDate}
-              disabled={!status || (status.action!=='CloseDate' && status.action!=='CloseInvalid')||viewOnly}
-              onChange={date => {
-                setCloseDate(date);
-                if(date.valueOf() !== null){
-                  autoUpdateTask({closeDate: date.valueOf().toString()});
-                }
-              }}
-              placeholderText="No pending date"
-              {...datePickerConfig}
-              />
+          <span className="center-hor">
+            Closed at:
+          </span>
+          <DatePicker
+            className="form-control hidden-input bolder"
+            selected={closeDate}
+            disabled={!status || (status.action!=='CloseDate' && status.action!=='CloseInvalid')||viewOnly}
+            onChange={date => {
+              setCloseDate(date);
+              if(date.valueOf() !== null){
+                autoUpdateTask({closeDate: date.valueOf().toString()});
+              }
+            }}
+            placeholderText="No pending date"
+            {...datePickerConfig}
+            />
         </div>
       )
     }
@@ -1063,7 +1073,7 @@ export default function TaskEdit( props ) {
     Project: (
       <Select
         placeholder="Zadajte projekt"
-        isDisabled={ viewOnly }
+        isDisabled={ viewOnly || task.invoiced }
         value={ project }
         onChange={ changeProject }
         options={ availableProjects }
@@ -1095,7 +1105,7 @@ export default function TaskEdit( props ) {
       <Select
         placeholder="Status required"
         value={status}
-        isDisabled={defaultFields.status.fixed || viewOnly}
+        isDisabled={defaultFields.status.fixed || viewOnly || task.invoiced}
         styles={layout === 2 ? invisibleSelectStyleNoArrowColoredRequiredNoPadding : invisibleSelectStyleNoArrowColoredRequired}
         onChange={ changeStatus }
         options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action!=='Invoiced')}
@@ -1137,7 +1147,7 @@ export default function TaskEdit( props ) {
       <Select
         placeholder="Zadajte firmu"
         value={company}
-        isDisabled={defaultFields.company.fixed || viewOnly}
+        isDisabled={defaultFields.company.fixed || viewOnly || task.invoiced}
         onChange={changeCompany}
         options={(canAddCompany ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
         styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
@@ -1439,9 +1449,20 @@ export default function TaskEdit( props ) {
 
   const renderTags = () => {
     if ( !defaultFields.tag.show ) {
+      if ( task.invoiced ) {
+        return (
+          <span className="bolder">
+            {timestampToString(task.invoicedDate)}
+          </span>
+        )
+      }
       return null;
     }
     return (
+      <div className="flex">
+      <div className="bolder">
+        Invoiced: {timestampToString(task.invoicedDate)}
+      </div>
       <div className="row f-1">
         <div className="center-hor">
           <Label className="center-hor">Tagy: </Label>
@@ -1461,15 +1482,16 @@ export default function TaskEdit( props ) {
             />
         </div>
       </div>
+    </div>
     )
   }
 
   const renderTagsAndInfo = () => {
     return (
       <div className="row">
-      {renderTags()}
-      {renderTaskInfoAndDates()}
-    </div>
+        {renderTags()}
+        {renderTaskInfoAndDates()}
+      </div>
     )
   }
 
@@ -1516,18 +1538,20 @@ export default function TaskEdit( props ) {
         <div>
           <Label className="col-form-label-description">
             Popis úlohy
-            <button
-              className="btn btn-link waves-effect m-l-5"
-              onClick={()=>{
-                if(showDescription){
-                  autoUpdateTask({ description  })
-                }
-                setShowDescription(!showDescription);
-              }}
-              >
-              <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
-              { !showDescription ? 'edit' : 'save' }
-            </button>
+            {!viewOnly &&
+              <button
+                className="btn btn-link waves-effect m-l-5"
+                onClick={()=>{
+                  if(showDescription){
+                    autoUpdateTask({ description  })
+                  }
+                  setShowDescription(!showDescription);
+                }}
+                >
+                <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
+                { !showDescription ? 'edit' : 'save' }
+              </button>
+            }
           </Label>
         </div>
         {RenderDescription}
@@ -1676,7 +1700,7 @@ export default function TaskEdit( props ) {
         showColumns={ (viewOnly ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
         showTotals={false}
         disabled={(viewOnly || getCantSave()) && !canEditInvoiced }
-        isInvoiced={isInvoiced}
+        isInvoiced={task.invoiced}
         canEditInvoiced={canEditInvoiced}
         company={company}
         match={match}
@@ -1686,24 +1710,24 @@ export default function TaskEdit( props ) {
         showSubtasks={project ? project.showSubtasks : false}
 
         submitService={(newService, price) => {
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges({...newService, price}, 'subtask', 'ADD' );
           }else{
             addSubtaskFunc(newService);
           }
         }}
-        subtasks={ isInvoiced ? modifyInvoicedVykazy(subtasks, 'subtask') : subtasks }
+        subtasks={ task.invoiced ? modifyInvoicedVykazy(subtasks, 'subtask') : subtasks }
         defaultType={taskType}
         taskTypes={taskTypes}
         updateSubtask={(id,newData)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
           }else{
             updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
           }
         }}
         updateSubtasks={(multipleSubtasks)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             multipleSubtasks.forEach(({id, newData}) => {
               saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
             })
@@ -1714,30 +1738,30 @@ export default function TaskEdit( props ) {
           }
         }}
         removeSubtask={(id)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( id, 'subtask', 'DELETE' );
           }else{
             deleteSubtaskFunc(id);
           }
         }}
-        workTrips={ isInvoiced ? modifyInvoicedVykazy(workTrips, 'trip') : workTrips }
+        workTrips={ task.invoiced ? modifyInvoicedVykazy(workTrips, 'trip') : workTrips }
         tripTypes={tripTypes}
         submitTrip={(newTrip, price)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( { ...newTrip, price }, 'trip', 'ADD' );
           }else{
             addWorkTripFunc(newTrip);
           }
         }}
         updateTrip={(id,newData)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( {id, newData}, 'trip', 'EDIT' );
           }else{
             updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
           }
         }}
         updateTrips={(multipleTrips)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             multipleTrips.forEach(({id, newData}) => {
               saveVykazyChanges({id,newData}, 'trip', 'EDIT' );
             })
@@ -1748,30 +1772,30 @@ export default function TaskEdit( props ) {
           }
         }}
         removeTrip={(id)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( id, 'trip', 'DELETE' );
           }else{
             deleteWorkTripFunc(id);
           }
         }}
 
-        materials={ isInvoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
+        materials={ task.invoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
         submitMaterial={(newMaterial)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( newMaterial, 'material', 'ADD' );
           }else{
             addMaterialFunc(newMaterial);
           }
         }}
         updateMaterial={(id,newData)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( {id,newData}, 'material', 'EDIT' );
           }else{
             updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
           }
         }}
         updateMaterials={(multipleMaterials)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             multipleMaterials.forEach(({id, newData}) => {
               saveVykazyChanges({id,newData}, 'material', 'EDIT' );
             })
@@ -1782,29 +1806,29 @@ export default function TaskEdit( props ) {
           }
         }}
         removeMaterial={(id)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( id, 'material', 'DELETE' );
           }else{
             deleteMaterialFunc(id);
           }
         }}
-        customItems={ isInvoiced ? modifyInvoicedVykazy(customItems, 'customItem') : customItems }
+        customItems={ task.invoiced ? modifyInvoicedVykazy(customItems, 'customItem') : customItems }
         submitCustomItem={(customItem)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( customItem, 'customItem', 'ADD' );
           }else{
             addCustomItemFunc(customItem);
           }
         }}
         updateCustomItem={(id,newData)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( {id,newData}, 'customItem', 'EDIT' );
           }else{
             updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id ),...newData});
           }
         }}
         updateCustomItems={(multipleCustomItems)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             multipleCustomItems.forEach(({id, newData}) => {
               saveVykazyChanges({id,newData}, 'customItem', 'EDIT' );
             })
@@ -1815,7 +1839,7 @@ export default function TaskEdit( props ) {
           }
         }}
         removeCustomItem={(id)=>{
-          if(isInvoiced){
+          if(task.invoiced){
             saveVykazyChanges( id, 'customItem', 'DELETE' );
           }else{
             deleteCustomItemFunc(id);
@@ -1917,7 +1941,7 @@ export default function TaskEdit( props ) {
 
             { renderDescription() }
 
-              { renderSimpleSubtasks() }
+            { renderSimpleSubtasks() }
 
             { renderAttachments(false) }
             { renderCompanyPausalInfo() }

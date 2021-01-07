@@ -33,24 +33,25 @@ import MonthSelector from 'reports/components/monthSelector';
 import Loading from 'components/loading';
 
 import {
-  selectStyleColored
+  selectStyle
 } from 'configs/components/select';
 
 import {
-  months
+  months,
+  reportTypes
 } from 'configs/constants/reports';
 
 import ReportsTable from './reportsTable';
 
 import {
-  setReportsChosenStatuses,
+  setReportsType,
   setReportsFromDate,
   setReportsToDate
 } from 'apollo/localSchema/actions';
 
 
 import {
-  GET_REPORTS_CHOSEN_STATUSES,
+  GET_REPORTS_TYPE,
   GET_REPORTS_FROM_DATE,
   GET_REPORTS_TO_DATE,
 } from 'apollo/localSchema/queries';
@@ -72,9 +73,9 @@ import {
 export default function MothlyReportsCompany( props ) {
   //local
   const {
-    data: chosenStatusesData,
-    loading: chosenStatusesLoading
-  } = useQuery( GET_REPORTS_CHOSEN_STATUSES );
+    data: reportsTypeData,
+    loading: reportsTypeLoading
+  } = useQuery( GET_REPORTS_TYPE );
   const {
     data: fromDateData,
     loading: fromDateLoading
@@ -90,12 +91,22 @@ export default function MothlyReportsCompany( props ) {
 
   const [ newInvoice, setNewInvoice ] = React.useState( false );
   const [ newInvoiceTitle, setNewInvoiceTitle ] = React.useState( "" );
+  const [ creatingInvoice, setCreatingInvoice ] = React.useState( false );
   const [ editedTask, setEditedTask ] = React.useState( null );
 
-  const [ fetchInvoiceCompanies, {
+  const {
+    refetch: invoiceCompaniesRefetch,
     loading: invoiceCompaniesLoading,
-    data: invoiceCompaniesData
-		} ] = useLazyQuery( GET_INVOICE_COMPANIES );
+    data: invoiceCompaniesData,
+  } = useQuery( GET_INVOICE_COMPANIES, {
+    variables: {
+      fromDate: fromDateData.reportsFromDate.valueOf()
+        .toString(),
+      toDate: toDateData.reportsToDate.valueOf()
+        .toString(),
+      type: reportsTypeData.reportsType.value,
+    }
+  } );
 
   const [ fetchCompanyInvoice, {
     loading: companyInvoiceLoading,
@@ -103,7 +114,7 @@ export default function MothlyReportsCompany( props ) {
 		} ] = useLazyQuery( GET_COMPANY_INVOICE_DATA );
 
   const onTrigger = ( newFrom, newTo ) => {
-    fetchInvoiceCompanies( {
+    invoiceCompaniesRefetch( {
       variables: {
         fromDate: newFrom ?
           newFrom.valueOf()
@@ -113,7 +124,7 @@ export default function MothlyReportsCompany( props ) {
           newTo.valueOf()
           .toString() : toDate.valueOf()
           .toString(),
-        statuses: chosenStatuses.map( status => status.id ),
+        type: reportsTypeData.reportsType.value,
       },
     } );
   }
@@ -125,12 +136,6 @@ export default function MothlyReportsCompany( props ) {
   const [ showCompany, setShowCompany ] = React.useState( null );
 
   React.useEffect( () => {
-    if ( chosenStatuses.length > 0 ) {
-      onTrigger();
-    }
-  }, [ chosenStatuses ] );
-
-  React.useEffect( () => {
     if ( showCompany !== null ) {
       fetchCompanyInvoice( {
         variables: {
@@ -138,7 +143,7 @@ export default function MothlyReportsCompany( props ) {
             .toString(),
           toDate: toDate.valueOf()
             .toString(),
-          statuses: chosenStatuses.map( status => status.id ),
+          type: reportsTypeData.reportsType.value,
           companyId: showCompany.id
         },
         options: {
@@ -148,33 +153,28 @@ export default function MothlyReportsCompany( props ) {
     }
   }, [ showCompany ] );
 
-  React.useEffect( () => {
-    if ( chosenStatuses.length > 0 ) {
-      onTrigger();
-    }
-  }, [ chosenStatuses ] );
-
   const invoiceTasks = () => {
+    setCreatingInvoice( true );
     createTaskInvoice( {
         variables: {
           fromDate: fromDate.valueOf()
             .toString(),
           toDate: toDate.valueOf()
             .toString(),
-          statuses: chosenStatuses.map( status => status.id ),
           companyId: showCompany.id,
           title: newInvoiceTitle,
         }
       } )
       .then( ( response ) => {
         setNewInvoice( !newInvoice );
+        setCreatingInvoice( false );
         fetchCompanyInvoice( {
           variables: {
             fromDate: fromDate.valueOf()
               .toString(),
             toDate: toDate.valueOf()
               .toString(),
-            statuses: chosenStatuses.map( status => status.id ),
+            type: reportsTypeData.reportsType.value,
             companyId: showCompany.id
           },
           options: {
@@ -183,21 +183,18 @@ export default function MothlyReportsCompany( props ) {
         } );
       } )
       .catch( ( err ) => {
+        setCreatingInvoice( false );
         console.log( err.message );
       } );
   }
 
   const loading = invoiceCompaniesLoading;
 
-  const chosenStatuses = chosenStatusesData ? chosenStatusesData.reportsChosenStatuses : [];
 
   const fromDate = fromDateData ? fromDateData.reportsFromDate : null;
   const toDate = toDateData ? toDateData.reportsToDate : null;
 
-  const statuses = [];
   const INVOICE_COMPANIES = invoiceCompaniesData && invoiceCompaniesData.getInvoiceCompanies ? invoiceCompaniesData.getInvoiceCompanies : [];
-
-  const statusIDs = chosenStatuses.map( status => status.id );
 
   const currentInvoiceData = companyInvoiceData ? companyInvoiceData.getCompanyInvoiceData : {};
 
@@ -217,7 +214,7 @@ export default function MothlyReportsCompany( props ) {
       <h2 className="m-l-20 m-t-20">Firmy</h2>
       <div style={{maxWidth:500}}>
         <MonthSelector
-          blockedShow={chosenStatuses.length === 0}
+          blockedShow={false}
           fromDate={fromDate}
           onChangeFromDate={(date) => {
             setReportsFromDate( date );
@@ -229,15 +226,16 @@ export default function MothlyReportsCompany( props ) {
           onTrigger={onTrigger}
           />
         <div className="p-20">
+          <Label>Task status:</Label>
           <Select
-            value={chosenStatuses}
-            placeholder="Vyberte statusy"
-            isMulti
-            onChange={(newChosenStatuses)=> {
-              setReportsChosenStatuses( newChosenStatuses );
+            value={reportsTypeData.reportsType}
+            placeholder="Vyberte typ"
+            onChange={(newType)=> {
+              setShowCompany(null);
+              setReportsType( newType );
             }}
-            options={statuses}
-            styles={selectStyleColored}
+            options={reportTypes}
+            styles={selectStyle}
             />
         </div>
       </div>
@@ -291,6 +289,7 @@ export default function MothlyReportsCompany( props ) {
           <div className="commandbar">
             <Button
               className="btn-danger m-l-5 center-hor"
+              disabled={ reportsTypeData.reportsType.value !== 'Closed' }
               onClick={() => {
                 const title = 'Fakturačný výkaz firmy ' +
                 showCompany.title +
@@ -306,9 +305,12 @@ export default function MothlyReportsCompany( props ) {
               >
               Faktúrovať
             </Button>
+            {
+              reportsTypeData.reportsType.value !== 'Closed' &&
+              <Label className="warning-text center-hor" >To invoice tasks you have to select only closed tasks status!</Label>
+            }
           </div>
         }
-
         {
           showCompany !== null && !invoiceLoaded &&
           <Loading />
@@ -770,6 +772,7 @@ export default function MothlyReportsCompany( props ) {
             </FormGroup>
             <Button
               className="btn-primary center-hor"
+              disabled={creatingInvoice}
               onClick={() => invoiceTasks()}
               >
               Add
@@ -777,11 +780,11 @@ export default function MothlyReportsCompany( props ) {
           </ModalBody>
         </Modal>
 
-        <Modal isOpen={editedTask !== null} toggle={()=>{}}>
+        <Modal isOpen={editedTask !== null} toggle={()=>{}}  className="task-add-container">
           <ModalHeader toggle={()=>setEditedTask(null)}>{editedTask !== null && `Editing task: ${editedTask.id}: ${editedTask.title}`}</ModalHeader>
           <ModalBody>
             { editedTask !== null &&
-              <TaskEdit inModal={true} taskID={editedTask.id} closeModal={()=>setEditedTask(null)}/>
+              <TaskEdit inModal={true} taskID={editedTask.id} canEditInvoiced={true} closeModal={()=>setEditedTask(null)}/>
             }
           </ModalBody>
         </Modal>

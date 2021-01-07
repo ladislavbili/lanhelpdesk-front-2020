@@ -22,8 +22,4 @@ export const actions = [ {
     label: 'Set pending date (sets pending date as 1 day from now)',
     value: 'PendingDate'
   },
-  {
-    label: `Set task as invoiced (can't be edited again, used only while invoicing tasks)`,
-    value: 'Invoiced'
-  },
 ]

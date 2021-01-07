@@ -960,6 +960,11 @@ tr:last-child{
   color: red;
 }
 
+.warning-text{
+  @extend .text-muted;
+  color: #ffc107 !important;
+}
+
 .backupList textarea{
   resize: none;
 }

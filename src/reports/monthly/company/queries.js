@@ -6,12 +6,12 @@ export const GET_INVOICE_COMPANIES = gql `
 query getInvoiceCompanies(
   $fromDate: String!,
   $toDate: String!,
-  $statuses: [Int]!
+  $type: ReportTypeAllowed!
 ){
   getInvoiceCompanies(
     fromDate: $fromDate
     toDate: $toDate
-    statuses: $statuses
+    type: $type
   ) {
     company {
       id
@@ -31,13 +31,13 @@ query getCompanyInvoiceData(
   $fromDate: String!,
   $toDate: String!,
   $companyId: Int!,
-  $statuses: [Int]!
+  $type: ReportTypeAllowed!
 ){
   getCompanyInvoiceData(
     fromDate: $fromDate
     toDate: $toDate
     companyId: $companyId
-    statuses: $statuses
+    type: $type
   ) {
     company{
       companyRents {
@@ -268,14 +268,12 @@ export const CREATE_TASK_INVOICE = gql `
 mutation createTaskInvoice(
   $fromDate: String!,
   $toDate: String!,
-  $statuses: [Int]!,
   $companyId: Int!,
   $title: String!
 ){
   createTaskInvoice(
     fromDate: $fromDate,
     toDate: $toDate,
-    statuses: $statuses,
     companyId: $companyId,
     title: $title
   ){

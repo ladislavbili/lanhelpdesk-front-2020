@@ -5,6 +5,8 @@ import {
 const responseTask = `
   id
   important
+  invoiced
+  invoicedDate
   title
   updatedAt
   createdAt
@@ -403,6 +405,7 @@ query tasks($filter: FilterInput, $projectId: Int){
 		tasks {
 			id
 			title
+      invoiced
 			updatedAt
 			createdAt
 			important
@@ -1006,9 +1009,10 @@ mutation deleteTaskAttachment($id: Int!) {
 
 
 export const UPDATE_INVOICED_TASK = gql `
-mutation updateInvoicedTask($id: Int!, $taskChanges: TaskChangeInput, $stmcChanges: SMTCChangesInput) {
+mutation updateInvoicedTask($id: Int!, $taskChanges: TaskChangeInput, $stmcChanges: SMTCChangesInput, $cancelInvoiced: Boolean!) {
   updateInvoicedTask(
 		id: $id,
+    cancelInvoiced: $cancelInvoiced,
     taskChanges: $taskChanges,
 		stmcChanges: $stmcChanges,
   ){

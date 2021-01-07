@@ -158,8 +158,7 @@ export default function StatusEdit( props ) {
           id="actionIfSelected"
           name="Action"
           styles={selectStyle}
-          isDisabled={action.value==='Invoiced'}
-          options={action.value==='Invoiced'?actions.concat([{label:'Invoiced (only one needed, but necessary)',value:'invoiced'}]):actions}
+          options={actions}
           value={action}
           onChange={ e => setAction(e) }
             />
@@ -171,7 +170,6 @@ export default function StatusEdit( props ) {
         />
 
       <div className="row">
-        {action.value!=='Invoiced' &&
           <Button
             className="btn-red m-l-5 m-t-5"
             disabled={saving || theOnlyOneLeft}
@@ -179,7 +177,6 @@ export default function StatusEdit( props ) {
             >
         Delete
       </Button>
-    }
         <Button className="btn m-t-5 ml-auto" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</Button>
       </div>
     </div>
