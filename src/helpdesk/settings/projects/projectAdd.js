@@ -410,7 +410,7 @@ export default function ProjectAdd( props ) {
         setTag={setDefTag}
         taskType={taskType}
         setTaskType={setTaskType}
-        statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
+        statuses={[]}
         companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
         canBeAssigned={canBeAssigned}
         users={lockedRequester ? (projectRights.map(r => r.user)) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}

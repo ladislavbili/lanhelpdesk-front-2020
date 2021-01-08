@@ -1,32 +1,24 @@
 export const allACLs = [ {
-    id: 'projectTitle',
-    title: 'Project name',
+    id: 'sep1',
+    title: 'PROJECT ACL',
+    separator: true
+  },
+  {
+    id: 'projectPrimary',
+    title: 'Project name & description',
+    dependancy: null,
+    both: true
+  },
+  {
+    id: 'projectSecondary',
+    title: 'Project settings & ACL - write and edit',
     dependancy: null,
     both: false
   },
   {
-    id: 'projectDescription',
-    title: 'Project description',
-    dependancy: null,
-    both: true
-  },
-  {
-    id: 'statuses',
-    title: 'Project statuses',
-    dependancy: null,
-    both: true
-  },
-  {
-    id: 'tags',
-    title: 'Project tags',
-    dependancy: null,
-    both: true
-  },
-  {
-    id: 'projectAcl',
-    title: 'Project ACL',
-    dependancy: null,
-    both: true
+    id: 'sep2',
+    title: 'TASK ACL',
+    separator: true,
   },
   {
     id: 'taskTitleEdit',
@@ -59,6 +51,18 @@ export const allACLs = [ {
     both: false
   },
   {
+    id: 'vykaz',
+    title: 'Vykaz',
+    dependancy: null,
+    both: true
+  },
+  {
+    id: 'rozpocet',
+    title: 'Rozpočet',
+    dependancy: null,
+    both: true
+  },
+  {
     id: 'viewComments',
     title: 'View comments',
     dependancy: null,
@@ -83,16 +87,9 @@ export const allACLs = [ {
     both: false
   },
   {
-    id: 'vykaz',
-    title: 'Vykaz',
-    dependancy: null,
-    both: true
-  },
-  {
-    id: 'rozpocet',
-    title: 'Rozpočet',
-    dependancy: null,
-    both: true
+    id: 'sep3',
+    title: 'TASK ACL DEFAULT ATTRIBUTES',
+    separator: true
   },
   {
     id: 'status',

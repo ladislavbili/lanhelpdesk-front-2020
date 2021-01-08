@@ -61,48 +61,52 @@ export default function ProjectACL( props ) {
           {
             allACLs.map((acl) => (
               <tr key={acl.id}>
-                <td>{ acl.title }</td>
-                {
-                  groups.map( (group) => (
-                    <td key={group.id}>
+                <td colSpan={acl.separator ? groups.length + 1 : '1' } >{ acl.title }</td>
+                { groups.map( (group) => {
+                  if(acl.separator){
+                    return null;
+                  }
+                    return (
+                      <td key={group.id}>
                         <span className='center-hor row' style={{width: 'fit-content'}}>
-                      <Checkbox
-                        className = "m-l-5 m-r-5"
-                        value = { acl.both ? group.rights[acl.id].read : group.rights[acl.id] }
-                        onChange={() =>{
-                          let newVal = !( acl.both ? group.rights[acl.id].read : group.rights[acl.id] );
-                          if( acl.both ){
-                            updateGroupRight(group.id, acl.id, { read: newVal, write: group.rights[acl.id].write } )
-                          }else{
-                            if( acl.dependancy !== null && newVal){
-                              updateGroupRight(group.id, acl.dependancy, newVal )
-                            }
-                            updateGroupRight(group.id, acl.id, newVal )
-                          }
-                        }}
-                        />
-                      { acl.both && '/' }
-                      { acl.both && <Checkbox
-                        className = "m-l-5 m-r-5"
-                        value = { group.rights[acl.id].write }
-                        onChange={() =>{
-                          let newVal = !group.rights[acl.id].write;
-                          if( newVal ){
-                            updateGroupRight(group.id, acl.id, { read: true, write: true } )
-                          }
-                          updateGroupRight(group.id, acl.id, { read: group.rights[acl.id].read, write: newVal } )
-                        }}
-                        />
-                      }
-                    </span>
+                          <Checkbox
+                            className = "m-l-5 m-r-5"
+                            value = { acl.both ? group.rights[acl.id].read : group.rights[acl.id] }
+                            onChange={() =>{
+                              let newVal = !( acl.both ? group.rights[acl.id].read : group.rights[acl.id] );
+                              if( acl.both ){
+                                updateGroupRight(group.id, acl.id, { read: newVal, write: group.rights[acl.id].write } )
+                              }else{
+                                if( acl.dependancy !== null && newVal){
+                                  updateGroupRight(group.id, acl.dependancy, newVal )
+                                }
+                                updateGroupRight(group.id, acl.id, newVal )
+                              }
+                            }}
+                            />
+                          { acl.both && '/' }
+                          { acl.both && <Checkbox
+                            className = "m-l-5 m-r-5"
+                            value = { group.rights[acl.id].write }
+                            onChange={() =>{
+                              let newVal = !group.rights[acl.id].write;
+                              if( newVal ){
+                                updateGroupRight(group.id, acl.id, { read: true, write: true } )
+                              }
+                              updateGroupRight(group.id, acl.id, { read: group.rights[acl.id].read, write: newVal } )
+                            }}
+                            />
+                        }
+                      </span>
                     </td>
-                  ) )
+                  )
                 }
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
+              )}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
   );
 }

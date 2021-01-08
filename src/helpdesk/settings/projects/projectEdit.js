@@ -221,7 +221,7 @@ export default function ProjectEdit( props ) {
 
   React.useEffect( () => {
     if ( !projectLoading && !statusesLoading ) {
-      let statuses = toSelArr( statusesData.statuses );
+      let statuses = [];
       let newStatus = {
         def: projectData.project.def.status.def,
         fixed: projectData.project.def.status.fixed,
@@ -608,7 +608,7 @@ export default function ProjectEdit( props ) {
         setTag={setDefTag}
         taskType={taskType}
         setTaskType={setTaskType}
-        statuses={(statusesLoading ? [] : toSelArr(statusesData.statuses))}
+        statuses={[]}
         companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
         canBeAssigned={canBeAssigned}
         users={lockedRequester ? (toSelArr(projectRights.map(r => r.user), 'email')) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}

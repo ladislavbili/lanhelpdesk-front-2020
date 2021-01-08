@@ -173,7 +173,7 @@ export default function TasksIndex( props ) {
   }
 
   const tasks = tasksData.tasks.tasks;
-  const statuses = orderArr( statusesData.statuses );
+  const statuses = orderArr( [] );
   const currentUser = currentUserData.getMyData;
 
   const getBreadcrumsData = () => {
