@@ -59,13 +59,13 @@
   margin-top: 20px;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 801px) {
   .modal-dialog {
     width: 1000px !important;
   }
 }
 
-@media (max-width: 768px){
+@media (max-width: 800px){
 .modal-dialog {
     width: 600px;
     margin: 30px auto;
@@ -284,6 +284,14 @@ html{
 }
 .position-inherit{
   position: inherit;
+}
+
+.position-absolute{
+  position: absolute;
+}
+
+.bottom-20{
+  bottom: 20px;
 }
 
 .make-space-30-r{
@@ -1490,7 +1498,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   width: 1200px !important;
   .modal-content{
     background-color: $form-background-color;
-    padding: 20px;
+    padding: 0px;
+    .modal-body{
+      padding: 0px;
+    }
   }
 }
 
@@ -1819,7 +1830,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   flex: auto;
   min-width: 200px;
   max-width: 300px;
-  margin: 0px 0px 0px 10px;
+  margin: 0px 0px 0px 0px;
   padding: 20px 20px 20px 13px;
   background-color: $task-right-background-color;
 }
@@ -1834,7 +1845,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .task-edit-left{
   max-width: 1620px;
   min-width: 400px;
-  width: calc(100% - 310px) !important;
+  width: calc(100% - 300px) !important;
 }
 
 .task-edit-left-columns{
