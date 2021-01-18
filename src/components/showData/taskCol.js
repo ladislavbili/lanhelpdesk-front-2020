@@ -18,12 +18,13 @@ export default function ColumnDisplay( props ) {
     setStatuses,
     statuses,
     allStatuses,
-    Edit
+    Edit,
+    layout
   } = props;
   return (
     <div>
 			<CommandBar {...commandBar} listName={listName} />
-			<ListHeader multiselect={false} greyBackground={true} {...commandBar} listName={listName} statuses={statuses} setStatuses={setStatuses} allStatuses={allStatuses} />
+			<ListHeader multiselect={false} layout={layout} {...commandBar} listName={listName} statuses={statuses} setStatuses={setStatuses} allStatuses={allStatuses} />
 
 		<div className="row p-0 task-container">
 

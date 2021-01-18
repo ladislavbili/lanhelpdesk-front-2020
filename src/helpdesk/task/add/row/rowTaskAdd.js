@@ -30,7 +30,8 @@ import {
   selectStyleNoArrow
 } from 'configs/components/select';
 import {
-  localFilterToValues
+  localFilterToValues,
+  toSelArr
 } from 'helperFunctions';
 import booleanSelects from 'configs/constants/boolSelect'
 import CheckboxList from 'helpdesk/components/checkboxList';

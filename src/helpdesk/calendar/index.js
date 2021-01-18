@@ -98,6 +98,7 @@ export default function TaskCalendar( props ) {
     filterId,
     filterValues,
     originalProjectId,
+    layout,
   } = props;
 
   const {
@@ -535,6 +536,7 @@ export default function TaskCalendar( props ) {
           statuses={currentUserData.getMyData.statuses}
           setStatuses={setUserFilterStatuses}
           allStatuses={allStatuses}
+          layout={layout}
           />
         <DnDCalendar
           events = { events }

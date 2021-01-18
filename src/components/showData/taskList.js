@@ -47,6 +47,7 @@ export default function List( props ) {
     data,
     deleteTask,
     checkTask,
+    layout,
     underSearch: UnderSearch,
     underSearchLabel
   } = props;
@@ -65,6 +66,7 @@ export default function List( props ) {
     }
   }
   const filter = tasksFilterData.tasksAttributesFilter;
+
   return (
     <div>
       <CommandBar {...commandBar} listName={listName}/>
@@ -77,6 +79,7 @@ export default function List( props ) {
           allStatuses={allStatuses}
           underSearchButtonEvent={() => setUnderSearchOpen(!underSearchOpen)}
           underSearchButtonLabel={underSearchLabel}
+          layout={layout}
           />
         {
           UnderSearch !== undefined &&
@@ -120,6 +123,7 @@ export default function List( props ) {
                   return (
                     <th
                       style={(display.value === "createdAt" || display.value === "deadline" ? {textAlign: "right"} : {})}
+                      colSpan={((index===0 || index ===1 || displayValues[index-1].type!=='important') && display.value !== "deadline")?'1':'2'}
                       key={display.value}
                       width={display.value === 'title' ? "30%" : ((display.value === "id") ? "50px" : '')}>
                       {display.label}

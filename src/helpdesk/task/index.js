@@ -247,12 +247,13 @@ export default function TasksIndex( props ) {
           </p>
         </div>
 
-        <div className="taskCol-tags">
-          {task.tags.map((tag)=>
-            <span key={tag.id} className="label-info m-r-5" style={{backgroundColor: tag.color, color: "white"}}>{tag.title}</span>
-          )}
-        </div>
-
+        { task.tags.length > 0 &&
+          <div className="taskCol-tags">
+            {task.tags.map((tag)=>
+              <span key={tag.id} className="label-info m-r-5" style={{backgroundColor: tag.color, color: "white"}}>{tag.title}</span>
+            )}
+          </div>
+        }
       </li> )
   }
 

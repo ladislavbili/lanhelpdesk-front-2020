@@ -59,13 +59,13 @@
   margin-top: 20px;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 801px) {
   .modal-dialog {
     width: 1000px !important;
   }
 }
 
-@media (max-width: 768px){
+@media (max-width: 800px){
 .modal-dialog {
     width: 600px;
     margin: 30px auto;
@@ -284,6 +284,14 @@ html{
 }
 .position-inherit{
   position: inherit;
+}
+
+.position-absolute{
+  position: absolute;
+}
+
+.bottom-20{
+  bottom: 20px;
 }
 
 .make-space-30-r{
@@ -1339,6 +1347,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   background-color: $secondary-form-background-color;
   padding: 0px 1px 0px 1px;
   height: 70px;
+  white-space: pre-wrap;
 }
 
 .commandbar-small{
@@ -1346,7 +1355,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   width: 100%;
   background-color: $main-background-color;
   padding: 0px 1px 0px 1px;
-  height: 40px;
+  height: 60px;
+  white-space: pre-wrap;
 }
 
 .commandbar-icon{
@@ -1493,6 +1503,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   width: 1200px !important;
   .modal-content{
     background-color: $form-background-color;
+    padding: 0px;
+    .modal-body{
+      padding: 0px;
+    }
   }
 }
 
@@ -1508,7 +1522,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-container>.table>thead{
-  background-color: #F6F6F6;
+  background-color: #F9F9F9;
   font-family: $main-font;
   font-style: normal;
   font-weight: normal;
@@ -1518,7 +1532,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-container>.table>thead>tr>th{
-  border-color: #F6F6F6 !important;
+  border-color: #F9F9F9 !important;
 }
 
 .task-container>.table>tbody>tr>th{
@@ -1530,8 +1544,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   font-size: 12px;
   line-height: 19px;
   color: #989898;
-  border-bottom: 5px solid #f4f4f4 !important;
-  border-right: 5px solid #f4f4f4;
+  border-bottom: 5px solid #F9F9F9 !important;
+  border-right: 5px solid #F9F9F9;
 //  border-bottom: 1px solid #bdbdbd !important;
 }
 
@@ -1550,7 +1564,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   font-family: $main-font;
   font-size: 12px;
   color: #767676 !important;
-  border-bottom: 1px solid #f4f4f4;
+  border-bottom: 1px solid #F9F9F9;
 }
 
 .task-container>.table>tbody>tr>td.title{
@@ -1560,8 +1574,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   color: #333 !important;
 }
 
+.card-header{
+  font: 20px Segoe UI;
+  background-color: #F9F9F9;
+}
+
 .dnd-column{
-  background-color: #F6F6F6;
+  background-color: #F9F9F9;
   min-width: 400px;
   max-width: 401px;
   border-radius: 0px;
@@ -1573,7 +1592,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .dnd-header{
-  background-color: #F6F6F6;
+  background-color: #F9F9F9;
   border-bottom: 1px solid #EAEAEA;
 
   font-family: $main-font;
@@ -1587,15 +1606,15 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .dnd-body{
-  background-color: #F6F6F6;
+  background-color: #F9F9F9;
   border-right: 1px solid #EAEAEA;
-  padding: 20px 10px 10px 20px ;
 }
 
 .dnd-item{
   background: #FFFFFF;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.16);
-  margin: 0px 10px 10px 0px !important;
+  margin-bottom: 20px !important;
+  padding: 15px;
 }
 
 .dnd-item-icon{
@@ -1632,11 +1651,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .taskCol-title{
-  font-size: 15px;
+  font: $font-task-description;
 }
 
 .taskCol-body{
-  margin-top: 0px;
+  margin-top: 10px;
   font-size: 12px;
 }
 
@@ -1785,6 +1804,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding: 10px 0px 10px 0px;
 }
 
+.no-wrap-content{
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
 .task-add-right-half{
   width: 220px;
   padding-left: 20px;
@@ -1808,7 +1832,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-edit-right{
-  width: 300px;
+  flex: auto;
+  min-width: 200px;
+  max-width: 300px;
+  margin: 0px 0px 0px 0px;
+  padding: 20px 20px 20px 13px;
+  background-color: $task-right-background-color;
+}
+.task-edit-right-columns{
+  flex: auto;
+  max-width: 200px;
   margin: 0px 0px 0px 10px;
   padding: 20px 20px 20px 13px;
   background-color: $task-right-background-color;
@@ -1816,12 +1849,14 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .task-edit-left{
   max-width: 1620px;
-  width: calc(100% - 310px) !important;
+  min-width: 400px;
+  width: calc(100% - 300px) !important;
 }
 
 .task-edit-left-columns{
   max-width: 1670px;
-  width: calc(100% - 250px) !important;
+  min-width: 400px;
+   width: auto;
 }
 
 .task-edit-popis{

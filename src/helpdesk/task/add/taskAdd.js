@@ -36,6 +36,9 @@ import booleanSelects from 'configs/constants/boolSelect'
 import CheckboxList from 'helpdesk/components/checkboxList';
 import Scheduled from 'helpdesk/components/scheduled';
 import {
+  getCreationError as getVykazyError
+} from 'helpdesk/components/vykazyTable';
+import {
   noMilestone
 } from 'configs/constants/sidebar';
 import {
@@ -78,9 +81,6 @@ export default function TaskAdd( props ) {
     companies,
     defaultUnit,
     closeModal,
-    setTaskTypeCreationError,
-    setAssignedToCreationError,
-    setCompanyCreationError,
   } = props;
 
   const userIfInProject = ( project ) => {
@@ -727,7 +727,7 @@ export default function TaskAdd( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className="task-edit-right  m-t-0 p-t-0">
+      <div className="task-edit-right  m-t-0 ">
         <div className="col-form-label-2" >
           <Label className="col-form-value-2">Status</Label>
           { layoutComponents.Status }
@@ -886,6 +886,9 @@ export default function TaskAdd( props ) {
                 />
             </div>
           </div>
+        }
+        {
+          renderCreateButton()
         }
       </div>
     )
@@ -1101,19 +1104,62 @@ export default function TaskAdd( props ) {
 
   const renderButtons = () => {
     return (
-      <div>
-        {closeModal &&
-          <Button className="btn btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
-        }
-        <button
-          className="btn pull-right"
+      <div className="p-l-30 p-r-30 p-b-30">
+        {renderCancelButton()}
+        {renderCreateButton()}
+      </div>
+    )
+  }
+
+  const renderCancelButton = () => {
+    if ( closeModal ) {
+      return (
+        <Button
+          className={classnames(
+            "btn",
+            "btn-link-cancel",
+            {
+              "position-absolute bottom-20": layout === 2
+            }
+          )}
+           onClick={() => closeModal()}>Cancel</Button>
+      )
+    } else {
+      return;
+    }
+  }
+
+  const renderCreateButton = () => {
+    return (
+      <button
+          className={classnames(
+            "btn",
+            {
+              "pull-right": layout === 1
+            },
+            {
+              "m-t-20": layout === 2
+            },
+            {
+              "m-l-5": layout === 2
+            }
+          )}
           disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
           onClick={addTaskFunc}
           > Create task
         </button>
-      </div>
-
     )
+  }
+
+  const canCreateVykazyError = () => {
+    if ( getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company ) === '' ) {
+      return null;
+    }
+    return (
+      <span className="center-hor" style={{color: "#FF4500", height: "20px", fontSize: "14px"}}>
+        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
+      </span>
+    );
   }
 
   return (
@@ -1121,17 +1167,20 @@ export default function TaskAdd( props ) {
       <div
         className={classnames(
           "scrollable",
-          { "p-20": layout === 1},
+          { "p-0": layout === 1},
           { "row": layout === 2}
         )}
         >
 
         <div
           className={classnames(
+            "p-30",
             {
               "task-edit-left": layout === 2
             }
           )}>
+
+          {canCreateVykazyError()}
 
           { renderTitle() }
 
@@ -1148,13 +1197,14 @@ export default function TaskAdd( props ) {
           { renderAttachments(false) }
           { !viewOnly && renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
+          { layout === 2 && renderCancelButton() }
 
         </div>
 
         { layout === 2 && renderSelectsLayout2Side() }
 
       </div>
-      { renderButtons() }
+      { layout ===1 && renderButtons() }
     </div>
   );
 }

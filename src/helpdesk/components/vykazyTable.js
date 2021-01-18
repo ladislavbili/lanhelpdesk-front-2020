@@ -1122,7 +1122,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn btn-secondary m-r-5"
+                  <button className="btn btn-link m-r-5"
                     disabled={!newSubtaskType || newSubtaskType.id === null || disabled || newSubtaskAssigned===null}
                     onClick={()=>{
                       let body={
@@ -1144,9 +1144,9 @@ export default function Rozpocet( props ) {
                       submitService(body, getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity }));
                     }}
                     >
-                    ADD
+                    <i className="fa fa-plus" />
                   </button>
-                  <button className="btn waves-effect"
+                  <button className="btn btn-link waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddSubtask(false)
@@ -1239,7 +1239,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn btn-secondary m-r-5"
+                  <button className="btn btn-link m-r-5"
                     disabled={newTripType===null||isNaN(parseInt(newTripQuantity))||disabled|| newTripAssigned===null}
                     onClick={()=>{
                       let body={
@@ -1259,9 +1259,9 @@ export default function Rozpocet( props ) {
                       submitTrip(body, getTotalDiscountedPrice({discount:newTripDiscount,quantity:newTripQuantity,type:newTripType}));
                     }}
                     >
-                    ADD
+                    <i className="fa fa-plus" />
                   </button>
-                  <button className="btn waves-effect"
+                  <button className="btn btn-link waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddTrip(false);
@@ -1437,7 +1437,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn btn-secondary m-r-5"
+                  <button className="btn btn-link m-r-5"
                     disabled={disabled}
                     onClick={()=>{
                       let body={
@@ -1458,9 +1458,9 @@ export default function Rozpocet( props ) {
                       submitMaterial(body);
                     }}
                     >
-                    ADD
+                    <i className="fa fa-plus" />
                   </button>
-                  <button className="btn waves-effect"
+                  <button className="btn btn-link waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddMaterial(false)
@@ -1543,7 +1543,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn btn-secondary m-r-5"
+                  <button className="btn btn-link m-r-5"
                     disabled={disabled}
                     onClick={()=>{
                       let body={
@@ -1560,9 +1560,9 @@ export default function Rozpocet( props ) {
                       submitCustomItem(body);
                     }}
                     >
-                    ADD
+                    <i className="fa fa-plus" />
                   </button>
-                  <button className="btn waves-effect"
+                  <button className="btn btn-link waves-effect"
                     disabled={disabled}
                     onClick={()=>{
                       setShowAddCustomItem(false)

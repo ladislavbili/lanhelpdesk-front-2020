@@ -36,11 +36,13 @@ export default function Search( props ) {
     loading: taskSearchLoading
   } = useQuery( GET_TASK_SEARCH );
 
+  console.log( layout );
+
   return (
     <div
       className={classnames(
-        { "m-l-0": (link.includes("settings") || layout === 0 )},
-        {"m-l-20": layout !== 0},
+        { "m-l-0": (link.includes("settings") || layout === 0 || layout === 3 )},
+        {"m-l-20": layout !== 0 && layout !== 3},
         "search-row"
       )}
       >
@@ -59,7 +61,7 @@ export default function Search( props ) {
 
       { isTask &&
         <Button
-          className="btn-link-reversed center-hor"
+          className="btn-link-reversed center-hor m-l-10"
           onClick={()=>{
             setMilestone(allMilestones);
             setProject(dashboard);
