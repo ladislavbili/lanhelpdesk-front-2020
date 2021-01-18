@@ -857,22 +857,6 @@ export default function TaskEdit( props ) {
                 Back
               </button>
             }
-            { !task.invoiced &&
-              (project ? toSelArr(project.project.statuses) : []).filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
-                <button
-                  type="button"
-                  className="btn btn-link waves-effect"
-                  onClick={() => changeStatus(status)}
-                  >
-                  { status.icon.length > 3 &&
-                    <i
-                      className={`${status.icon} commandbar-command-icon`}
-                      />
-                  }
-                  {status.title}
-                </button>
-              ))
-            }
             { task.invoiced && !viewOnly &&
               <button
                 type="button"
@@ -952,7 +936,7 @@ export default function TaskEdit( props ) {
               <i className="fas fa-retweet "/>
               Layout
             </button>
-            {
+            { !task.invoiced &&
               (project ? toSelArr(project.project.statuses) : []).filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
                 <button
                   type="button"

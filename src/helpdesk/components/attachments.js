@@ -2,6 +2,9 @@ import React, {
   Component
 } from 'react';
 import downloadjs from 'downloadjs';
+import {
+  Label
+} from 'reactstrap';
 import axios from 'axios';
 import {
   REST_URL,
@@ -50,7 +53,9 @@ export default class Attachments extends Component {
       removeAttachment,
     } = this.props;
     return (
-      <div className="full-width task-edit-popis">
+      <div className="form-section">
+        <Label>Attachments</Label>
+        <div></div>
         <input
           type="file"
           id={"uploadAttachment" + taskID}
@@ -77,7 +82,7 @@ export default class Attachments extends Component {
               {`${attachment.filename} (${attachment.size/1000}kb)`}
             </span>
             {!disabled &&
-              <button className="btn-link-remove"
+              <button className="btn-link"
                 disabled={disabled}
                 onClick={()=>{
                   removeAttachment(attachment);
@@ -88,12 +93,10 @@ export default class Attachments extends Component {
           </div>
         )}
         { !disabled && top &&
-          <div className="attachment-label">
-            <label htmlFor={"uploadAttachment"+taskID} className="btn-link clickable" >
-              <i className="fa fa-plus p-r-5" />
-              Add attachment
-            </label>
-          </div>
+          <button className="btn btn-link" htmlFor={"uploadAttachment"+taskID}>
+              <i className="fa fa-plus" />
+              Attachment
+        </button>
         }
       </div>
 

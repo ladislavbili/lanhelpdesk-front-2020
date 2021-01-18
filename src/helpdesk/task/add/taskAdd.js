@@ -186,13 +186,13 @@ export default function TaskAdd( props ) {
     }
     let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.includes( item.id ) ) : filteredAssignedTo;
     setAssignedTo( newAssignedTo );
-    setAssignedToCreationError( newAssignedTo );
+    //  setAssignedToCreationError( newAssignedTo );
     let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
     setRequester( newRequester );
 
     let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value ) : ( companies && newRequester ? companies.find( ( company ) => company.id === newRequester.company.id ) : null );
     setCompany( newCompany );
-    setCompanyCreationError( newCompany );
+    //setCompanyCreationError( newCompany );
 
     let potentialStatus = toSelArr( project.statuses )
       .find( ( status ) => status.action.toLowerCase() === 'isnew' );
@@ -209,7 +209,7 @@ export default function TaskAdd( props ) {
 
     let newTaskType = def.taskType && ( def.taskType.fixed || def.taskType.def ) ? taskTypes.find( ( item ) => item.id === def.taskType.value ) : taskType;
     setTaskType( newTaskType );
-    setTaskTypeCreationError( newTaskType );
+    //setTaskTypeCreationError( newTaskType );
 
     let newOvertime = def.overtime && ( def.overtime.fixed || def.overtime.def ) ? booleanSelects.find( ( item ) => def.overtime.value === item.value ) : overtime;
     setOvertime( newOvertime );
@@ -345,13 +345,28 @@ export default function TaskAdd( props ) {
       } );
   }
 
+  const renderLayoutButton = () => {
+    return (
+      <div className="task-add-layout">
+        <button
+          type="button"
+          className="btn btn-link waves-effect task-add-layout-button"
+          onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
+          <i className="fas fa-retweet "/>
+          Layout
+        </button>
+      </div>
+    )
+  }
+
   const renderTitle = () => {
     return (
-      <div className="row m-b-15">
-        <span className="center-hor flex m-r-15">
+      <div className="form-section">
+        <Label>Task name </Label>
+        <span>
           <input type="text"
             value={title}
-            className="task-title-input text-extra-slim full-width form-control"
+            className="task-title-input full-width form-control"
             onChange={ (e) => setTitle(e.target.value) }
             placeholder="ENTER NEW TASK NAME" />
         </span>
@@ -378,13 +393,6 @@ export default function TaskAdd( props ) {
             />
         </div>
       }
-        <button
-          type="button"
-          className="btn btn-link waves-effect ml-auto asc"
-          onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
-          <i className="fas fa-retweet "/>
-          Layout
-        </button>
       </div>
     );
   }
@@ -405,7 +413,7 @@ export default function TaskAdd( props ) {
           if(!viewOnly){
             let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
             setAssignedTo(newAssignedTo);
-            setAssignedToCreationError(newAssignedTo);
+          //  setAssignedToCreationError(newAssignedTo);
           }else{
             setPausal(booleanSelects[0]);
           }
@@ -440,7 +448,7 @@ export default function TaskAdd( props ) {
         isMulti
         onChange={(users)=> {
           setAssignedTo(users);
-          setAssignedToCreationError(users);
+          //setAssignedToCreationError(users);
         }}
         options={USERS_WITH_PERMISSIONS}
         styles={invisibleSelectStyleNoArrowRequired}
@@ -475,7 +483,7 @@ export default function TaskAdd( props ) {
         styles={invisibleSelectStyleNoArrowRequired}
         onChange={(taskType)=> {
           setTaskType(taskType);
-          setTaskTypeCreationError(taskType);
+          //setTaskTypeCreationError(taskType);
         }}
         options={taskTypes}
         />
@@ -512,7 +520,7 @@ export default function TaskAdd( props ) {
           setRequester(requester);
           const newCompany = companies.find((company) => company.id === requester.id );
           setCompany(newCompany);
-          setCompanyCreationError(newCompany);
+      //    setCompanyCreationError(newCompany);
         }}
         options={REQUESTERS}
         styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
@@ -525,7 +533,7 @@ export default function TaskAdd( props ) {
         isDisabled={defaultFields.company.fixed || viewOnly}
         onChange={(company)=> {
           setCompany(company);
-          setCompanyCreationError(company);
+          //setCompanyCreationError(company);
           setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
         }}
         options={companies}
@@ -766,7 +774,7 @@ export default function TaskAdd( props ) {
                 isMulti
                 onChange={(users)=> {
                   setAssignedTo(users);
-                  setAssignedToCreationError(users);
+                //  setAssignedToCreationError(users);
                 }}
                 options={USERS_WITH_PERMISSIONS}
                 styles={invisibleSelectStyleNoArrowRequired}
@@ -846,7 +854,7 @@ export default function TaskAdd( props ) {
                 styles={invisibleSelectStyleNoArrowRequired}
                 onChange={(taskType)=> {
                   setTaskType(taskType);
-                  setTaskTypeCreationError(taskType);
+                //  setTaskTypeCreationError(taskType);
                 }}
                 options={taskTypes}
                 />
@@ -887,16 +895,13 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        {
-          renderCreateButton()
-        }
       </div>
     )
   }
 
   const renderPopis = () => {
     return (
-      <div>
+      <div className="form-section">
         <Label className="col-form-label-description">Popis úlohy</Label>
         <CKEditor5
           editor={ ClassicEditor }
@@ -944,11 +949,9 @@ export default function TaskAdd( props ) {
 
   const renderTags = () => {
     return (
-      <div className = "row m-t-10" >
-        <div className="center-hor">
-          <Label className="center-hor">Tagy: </Label>
-        </div>
-        <div className="f-1 ">
+      <div className="form-section">
+        <Label >Tagy </Label>
+        <div className="f-1" style={{marginLeft: "-5px"}}>
           <Select
             value={tags}
             placeholder="None"
@@ -1104,50 +1107,18 @@ export default function TaskAdd( props ) {
 
   const renderButtons = () => {
     return (
-      <div className="p-l-30 p-r-30 p-b-30">
-        {renderCancelButton()}
-        {renderCreateButton()}
-      </div>
-    )
-  }
-
-  const renderCancelButton = () => {
-    if ( closeModal ) {
-      return (
+      <div className="row">
         <Button
-          className={classnames(
-            "btn",
-            "btn-link-cancel",
-            {
-              "position-absolute bottom-20": layout === 2
-            }
-          )}
-           onClick={() => closeModal()}>Cancel</Button>
-      )
-    } else {
-      return;
-    }
-  }
-
-  const renderCreateButton = () => {
-    return (
-      <button
-          className={classnames(
-            "btn",
-            {
-              "pull-right": layout === 1
-            },
-            {
-              "m-t-20": layout === 2
-            },
-            {
-              "m-l-5": layout === 2
-            }
-          )}
+          className="btn btn-link-cancel"
+          onClick={() => closeModal()}>Cancel</Button>
+        {canCreateVykazyError()}
+        <button
+          className="btn"
           disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
           onClick={addTaskFunc}
           > Create task
         </button>
+      </div>
     )
   }
 
@@ -1156,7 +1127,7 @@ export default function TaskAdd( props ) {
       return null;
     }
     return (
-      <span className="center-hor" style={{color: "#FF4500", height: "20px", fontSize: "14px"}}>
+      <span className="center-hor ml-auto m-r-5" style={{color: "#FF4500", height: "20px", fontSize: "14px"}}>
         {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
       </span>
     );
@@ -1164,6 +1135,8 @@ export default function TaskAdd( props ) {
 
   return (
     <div>
+      {renderLayoutButton()}
+
       <div
         className={classnames(
           "scrollable",
@@ -1174,17 +1147,16 @@ export default function TaskAdd( props ) {
 
         <div
           className={classnames(
-            "p-30",
             {
               "task-edit-left": layout === 2
+            },
+            {
+              "task-edit-left-columns": layout === 1
             }
           )}>
 
-          {canCreateVykazyError()}
 
           { renderTitle() }
-
-          <hr className="m-t-15 m-b-10"/>
 
           { layout === 1 ? renderSelectsLayout1() : renderTags() }
 
@@ -1195,16 +1167,17 @@ export default function TaskAdd( props ) {
             { renderSimpleSubtasks() }
 
           { renderAttachments(false) }
+
           { !viewOnly && renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
-          { layout === 2 && renderCancelButton() }
+          { renderButtons() }
 
         </div>
 
         { layout === 2 && renderSelectsLayout2Side() }
 
       </div>
-      { layout ===1 && renderButtons() }
+
     </div>
   );
 }

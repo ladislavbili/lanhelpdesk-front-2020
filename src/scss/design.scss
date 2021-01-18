@@ -549,7 +549,7 @@ h4{
 
 .btn-link{
   background-color: inherit;
-  padding-left: 0px;
+  padding: 0px;
   color: $color-link;
 }
 
@@ -739,11 +739,6 @@ h4{
 .col-form-label-description{
   font: $font-task-description;
   color: $color-task-description;
-  line-height: 16px;
-  padding-top: 8px;
-  padding-bottom: none;
-   margin-top: 10px;
-   margin-right: 20px;
 }
 
 Label{
@@ -1510,6 +1505,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
 }
 
+.task-add-layout{
+  height: 40px;
+  padding-left: $odsadenie-form;
+  background-color: #f4f8fb;
+  margin: 0px;
+}
+.task-add-layout-button{
+  margin-top: calc((40px - 30px)/2);
+}
+
 .task-container-col{
   background-color: #FFF;
 }
@@ -1685,9 +1690,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 //-------------------END-tasklist-------------------------
 
 //----------------------taskEdit--------------------------
-.task-title-input::placeholder{
-  color:#FF4500
-}
 .task-title-input{
   font-size: 2.5rem;
   line-height: 1.5;
@@ -1848,12 +1850,14 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-edit-left{
+  padding: 15px $odsadenie-form $odsadenie-form $odsadenie-form;
   max-width: 1620px;
   min-width: 400px;
   width: calc(100% - 300px) !important;
 }
 
 .task-edit-left-columns{
+  padding: 15px $odsadenie-form $odsadenie-form $odsadenie-form;
   max-width: 1670px;
   min-width: 400px;
    width: auto;
@@ -1888,11 +1892,17 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   color: black;
   font-size:12px;
   padding-left:3px;
-  margin-left:5px;
 }
 
 .attachment-label{
   display: inline-block;
+}
+
+.form-section{
+  margin-bottom: 15px;
+  label{
+      margin-bottom: 5px;
+  }
 }
 //-------------------END-taskEdit-------------------------
 //-----------NEW CHECKBOX -------------

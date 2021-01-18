@@ -197,7 +197,7 @@ export default function Rozpocet( props ) {
   let sortedMaterials = materials.sort( ( material1, material2 ) => material1.order - material2.order );
   let sortedCustomItems = customItems.sort( ( customItem1, customItem2 ) => customItem1.order - customItem2.order );
   return (
-    <div className="vykazyTable">
+    <div className="form-section vykazyTable">
       <table className="table">
         <thead>
           <tr>
