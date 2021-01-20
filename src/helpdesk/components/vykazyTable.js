@@ -198,7 +198,7 @@ export default function Rozpocet( props ) {
   let sortedCustomItems = customItems.sort( ( customItem1, customItem2 ) => customItem1.order - customItem2.order );
   return (
     <div className="form-section vykazyTable">
-      <table className="table">
+      <table className="table  form-section-rest">
         <thead>
           <tr>
             <th colSpan={showColumns.includes(0) ? 2 : 1}>

@@ -25,6 +25,7 @@ export default function CheckboxList( props ) {
     <div className="form-section">
       <Label>Subtasks</Label>
       <div></div>
+      <div className="form-section-rest">
       { items.map((item) =>
         <div className="row" id={item.id}>
           <Checkbox
@@ -112,6 +113,7 @@ export default function CheckboxList( props ) {
           {` ${label}`}
         </button>
       }
+    </div>
     </div>
   )
 }

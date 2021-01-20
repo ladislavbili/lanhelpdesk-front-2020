@@ -78,6 +78,7 @@ export default function TasksSidebar( props ) {
   } = props;
 
   //network
+  /*
   const {
     data: myData,
     loading: myDataLoading
@@ -89,10 +90,10 @@ export default function TasksSidebar( props ) {
     refetch: refetchMyProjects,
   } = useQuery( GET_MY_PROJECTS );
 
-  const {
-    data: myFiltersData,
-    loading: myFiltersLoading
-  } = useQuery( GET_MY_FILTERS );
+    const {
+      data: myFiltersData,
+      loading: myFiltersLoading
+    } = useQuery( GET_MY_FILTERS );*/
 
   //local
   const {
@@ -117,7 +118,7 @@ export default function TasksSidebar( props ) {
   const [ activeTab, setActiveTab ] = React.useState( 0 );
 
   // sync
-  React.useEffect( () => {
+  /*React.useEffect( () => {
     if ( !myFiltersLoading ) {
       if ( location.pathname.length > 12 ) {
         const newFilter = myFiltersData.myFilters.find( item => item.id === parseInt( match.params.filterID ) );
@@ -128,11 +129,11 @@ export default function TasksSidebar( props ) {
         }
       }
     }
-  }, [ myFiltersLoading, match.params.filterID ] );
+  }, [ myFiltersLoading, match.params.filterID ] );*/
   const dataLoading = (
-    myDataLoading ||
-    myProjectsLoading ||
-    myFiltersLoading ||
+    //  myDataLoading ||
+    //  myProjectsLoading ||
+    //  myFiltersLoading ||
     filterLoading ||
     projectLoading ||
     milestoneLoading
@@ -142,22 +143,23 @@ export default function TasksSidebar( props ) {
     return ( <Loading /> )
   }
 
-  const canEditProject = projectData.localProject.id !== null && (
-    myData.getMyData.role.accessRights.projects ||
-    (
-      projectData.localProject.right !== undefined &&
-      projectData.localProject.right.admin
-    )
-  )
+  const canEditProject = true;
+  /*projectData.localProject.id !== null && (
+      myData.getMyData.role.accessRights.projects ||
+      (
+        projectData.localProject.right !== undefined &&
+        projectData.localProject.right.admin
+      )
+    )*/
 
-  /*
+  /*NECHAJ
   const projects = [
   ...( myData.getMyData.role.accessRights.addProjects ? [ dashboard, addProject ] : [ dashboard ] ),
   ...myProjectsData.myProjects,
   ]
   */
-  const projects = [ dashboard, ...myProjectsData.myProjects ];
-  /*
+  const projects = [ dashboard ]; //, ...myProjectsData.myProjects ];
+  /* NECHAJ
   let milestones = [];
   if ( projectData.localProject.project.id === null ) {
   milestones = [ allMilestones ];
@@ -169,8 +171,8 @@ export default function TasksSidebar( props ) {
   }
   }
   */
-  const milestones = [ allMilestones, ...( projectData.localProject.project.id !== null ? projectData.localProject.project.milestones : [] ) ]
-
+  const milestones = [ allMilestones ]; //, ...( projectData.localProject.project.id !== null ? projectData.localProject.project.milestones : [] ) ]
+  setFilter( getEmptyGeneralFilter() );
   const DropdownIndicator = ( {
     innerProps,
     isDisabled
@@ -272,7 +274,7 @@ export default function TasksSidebar( props ) {
                 All tasks
               </span>
             </NavItem>
-            { myFiltersData.myFilters.map((filter) => (
+            { /* myFiltersData.myFilters*/[{id: 1, title: "Dummy FIlter"}, {id: 2, title: "Dummy FIlter"}, {id: 3, title: "Dummy FIlter"}, {id: 4, title: "Dummy FIlter"}].map((filter) => (
               <NavItem key={filter.id} className="row full-width">
                 <span
                   className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === filterData.localFilter.id }) }
@@ -305,18 +307,18 @@ export default function TasksSidebar( props ) {
       </TabContent>
       <div className='p-l-15 p-r-15'>
         <hr className='m-t-10 m-b-10'/>
-        { myData.getMyData.role.accessRights.addProjects &&
+        {// myData.getMyData.role.accessRights.addProjects &&
           <NavItem className="row full-width">
           <Button
             className='btn-link p-0'
             onClick={() => setOpenProjectAdd(true)}
             >
             <i className="fa fa-plus" />
-            { addProject.project.title }
+          {  addProject.project.title }
           </Button>
         </NavItem>
         }
-        { projectData.localProject.project.id !== null && canEditProject &&
+        {// projectData.localProject.project.id !== null && canEditProject &&
           <NavItem className="row full-width">
           <Button
             className='btn-link p-0'
@@ -328,7 +330,7 @@ export default function TasksSidebar( props ) {
         </NavItem>
         }
       </div>
-      { openProjectAdd &&
+      {/* openProjectAdd &&
         <ProjectAdd
           open={openProjectAdd}
           closeModal={(newProject, rights) => {
@@ -346,8 +348,18 @@ export default function TasksSidebar( props ) {
             }
           }}
           />
-      }
-      { canEditProject &&
+        */}
+
+    {    /*miesto edit project*/}
+      <div className='p-l-15 p-r-15'>
+        <Button
+          className='btn-link p-0'
+          onClick={() => {} /*setOpened(true)*/}
+          >
+          <i className="fa fa-cog"/> Project
+        </Button>
+      </div>
+      { /*canEditProject &&
         <ProjectEdit
           closeModal={(editedProject, rights) => {
             if(editedProject !== null){
@@ -368,9 +380,9 @@ export default function TasksSidebar( props ) {
             refetchMyProjects();
           }}
           />
-      }
+    */  }
 
-      { canEditProject && openMilestoneAdd &&
+      { /*canEditProject && openMilestoneAdd &&
         <MilestoneAdd
           open={openMilestoneAdd}
           closeModal={(newMilestone) => {
@@ -381,9 +393,19 @@ export default function TasksSidebar( props ) {
             setOpenMilestoneAdd(false);
           }}
           />
-      }
+        */}
 
-      { canEditProject && milestoneData.localMilestone.id !== null &&
+  {    /*miesto edit milestone*/}
+      <div className='p-l-15 p-r-15'>
+        <Button
+          className='btn-link p-0'
+          onClick={ () => {}/*toggle*/}
+          >
+          Milestone settings
+        </Button>
+      </div>
+
+      { /*canEditProject && milestoneData.localMilestone.id !== null &&
         <MilestoneEdit
           closeModal={(editedMilestone) => {
             if(editedMilestone !== null){
@@ -416,7 +438,7 @@ export default function TasksSidebar( props ) {
             setMilestone(allMilestones);
           }}
           />
-      }
+        */  }
 
     </div>
   );

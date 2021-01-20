@@ -139,21 +139,21 @@ export default function TaskAddContainer( props ) {
     return (
       <Modal isOpen={openAddTaskModal} className="task-add-container" >
         <ModalBody className="scrollable" >
-          {  openAddTaskModal && !loading &&
+          {  openAddTaskModal && /*!loading &&*/
             <TaskAdd {...props}
               loading={loading}
-              projects={
+              projects={[]/*
                 toSelArr(projectsData.myProjects.map((myProject) => ({
                   ...myProject.project,
                   right: myProject.right,
                   users: myProject.usersWithRights.map((user) => user.id)
                 }) ))
-              }
+              */}
               users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }
-              companies={ toSelArr(companiesData.basicCompanies) }
-              taskTypes={ toSelArr(taskTypesData.taskTypes) }
-              tripTypes={ toSelArr(tripTypesData.tripTypes) }
-              currentUser={ currentUserData.getMyData }
+              companies={[]/* toSelArr(companiesData.basicCompanies) */}
+              taskTypes={[]/* toSelArr(taskTypesData.taskTypes) */}
+              tripTypes={[] /*toSelArr(tripTypesData.tripTypes) */}
+              currentUser={[]/* currentUserData.getMyData */}
               milestones={[noMilestone]}
               defaultUnit={null}
               closeModal={ () => {

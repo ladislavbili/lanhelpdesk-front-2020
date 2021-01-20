@@ -33,9 +33,9 @@ export default function Scheduled( props ) {
   const [ newTo, setNewTo ] = React.useState( null );
 
   return (
-    <div>
-      <Label className="col-form-label-2">Scheduled</Label>
-      <div className="p-l-7">
+    <div className="form-selects-entry-column">
+      <Label>Scheduled</Label>
+      <div className="form-selects-entry-column-rest">
         { items.map((item) =>
           <div className="row" id={item.id}>
             <span className="make-space-30-r">
@@ -65,7 +65,7 @@ export default function Scheduled( props ) {
           </div>
         ) }
         <button
-          className="btn btn-link waves-effect p-l-0"
+          className="btn btn-link waves-effect m-l-7"
           disabled={disabled}
           onClick={()=>{
             setAddItem(true);
