@@ -1,11 +1,10 @@
 import React from 'react';
 import {
   useQuery,
-  useMutation
-} from "@apollo/client";
-import {
+  useMutation,
+  useApolloClient,
   gql
-} from '@apollo/client';;
+} from "@apollo/client";
 import {
   Dropdown,
   DropdownItem,
@@ -34,6 +33,7 @@ import UserProfile from 'helpdesk/settings/users/userProfile';
 import {
   GET_MY_DATA,
   GET_ERROR_MESSAGES_COUNT,
+  LOGOUT_USER
 } from './queries';
 
 export default function PageHeader( props ) {
@@ -54,6 +54,9 @@ export default function PageHeader( props ) {
     data: errorMessageCountData
   } = useQuery( GET_ERROR_MESSAGES_COUNT );
 
+  const [ logoutUser ] = useMutation( LOGOUT_USER );
+
+  const client = useApolloClient();
   //state
   const [ notificationsOpen, setNotificationsOpen ] = React.useState( false );
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
@@ -271,8 +274,10 @@ export default function PageHeader( props ) {
           className="header-icon clickable fa fa-sign-out-alt center-hor"
           onClick={() => {
             if (window.confirm('Are you sure you want to log out?')) {
+              logoutUser();
               localStorage.removeItem("acctok");
               setIsLoggedIn(false);
+              client.cache.reset()
             }
           }}
           />

@@ -17,7 +17,7 @@ import Checkbox from 'components/checkbox';
 export default function Rozpocet( props ) {
   //data & queries
   const {
-    disabled,
+    userRights,
     isInvoiced,
     company,
     defaultType,
@@ -48,8 +48,18 @@ export default function Rozpocet( props ) {
     submitCustomItem
   } = props;
 
+  let defaultTab = '6';
+
+  if ( showSubtasks ) {
+    defaultTab = '0';
+  } else if ( userRights.vykazRead ) {
+    defaultTab = '1';
+  } else if ( userRights.rozpocetRead ) {
+    defaultTab = '2';
+  }
+
   //state
-  const [ toggleTab, setToggleTab ] = React.useState( "1" );
+  const [ toggleTab, setToggleTab ] = React.useState( defaultTab );
 
   //subtasks
   const [ showAddSubtask, setShowAddSubtask ] = React.useState( false );
@@ -196,6 +206,12 @@ export default function Rozpocet( props ) {
   let sortedTrips = workTrips.sort( ( trip1, trip2 ) => trip1.order - trip2.order );
   let sortedMaterials = materials.sort( ( material1, material2 ) => material1.order - material2.order );
   let sortedCustomItems = customItems.sort( ( customItem1, customItem2 ) => customItem1.order - customItem2.order );
+  let disabled = !(
+    ( userRights.taskShortSubtasksWrite && toggleTab === '0' ) ||
+    ( userRights.vykazWrite && toggleTab === '1' ) ||
+    ( userRights.rozpocetWrite && toggleTab === '2' )
+  )
+
   return (
     <div className="vykazyTable">
       <table className="table">
@@ -203,7 +219,7 @@ export default function Rozpocet( props ) {
           <tr>
             <th colSpan={showColumns.includes(0) ? 2 : 1}>
               <Nav tabs className="b-0 m-0">
-                { showSubtasks &&
+                { showSubtasks && userRights.taskShortSubtasksRead &&
                   <NavItem>
                     <NavLink
                       className={classnames({ active: toggleTab === '0'}, "clickable", "")}
@@ -213,7 +229,7 @@ export default function Rozpocet( props ) {
                     </NavLink>
                   </NavItem>
                 }
-                { !showSubtasks &&
+                { !showSubtasks && userRights.vykazRead &&
                   <NavItem>
                     <NavLink
                       className={classnames({ active: toggleTab === '1'}, "clickable", "")}
@@ -230,7 +246,7 @@ export default function Rozpocet( props ) {
                     </NavLink>
                   </NavItem>
                 }
-                { !showSubtasks &&
+                { !showSubtasks && userRights.rozpocetRead &&
                   <NavItem>
                     <NavLink
                       className={classnames({ active: toggleTab === '2' }, "clickable", "")}

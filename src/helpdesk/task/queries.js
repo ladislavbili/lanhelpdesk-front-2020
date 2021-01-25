@@ -2,6 +2,10 @@ import {
   gql
 } from '@apollo/client';
 
+import {
+  groupRights
+} from 'helpdesk/settings/projects/queries';
+
 const responseTask = `
   id
   important
@@ -362,8 +366,7 @@ mutation addUserToProject(
       id
       title
       right{
-        write
-        delete
+        ${groupRights}
       }
     }
     requester{
@@ -439,8 +442,7 @@ query tasks($filter: FilterInput, $projectId: Int){
 				id
 				title
         right{
-          write
-          delete
+          ${groupRights}
         }
 			}
 			requester{
@@ -1039,8 +1041,7 @@ query calendarEvents($filter: FilterInput, $projectId: Int){
 				id
 				title
         right{
-          write
-          delete
+          ${groupRights}
         }
 			}
 			status {

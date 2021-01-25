@@ -65,6 +65,11 @@ export {
 from './showData';
 
 export {
+  deleteAttributes
+}
+from './objectManipulations';
+
+export {
   fromObjectToState,
   setDefaultFromObject
 }

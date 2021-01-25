@@ -2,6 +2,112 @@ import {
   gql
 } from '@apollo/client';
 
+export const groupRights = `
+  assignedRead
+  assignedWrite
+  companyRead
+  companyWrite
+  deadlineRead
+  deadlineWrite
+  milestoneRead
+  milestoneWrite
+  overtimeRead
+  overtimeWrite
+  pausalRead
+  pausalWrite
+  projectRead
+  projectWrite
+  projectPrimaryRead
+  projectPrimaryWrite
+  repeatRead
+  repeatWrite
+  requesterRead
+  requesterWrite
+  rozpocetRead
+  rozpocetWrite
+  scheduledRead
+  scheduledWrite
+  statusRead
+  statusWrite
+  tagsRead
+  tagsWrite
+  taskAttachmentsRead
+  taskAttachmentsWrite
+  taskDescriptionRead
+  taskDescriptionWrite
+  taskShortSubtasksRead
+  taskShortSubtasksWrite
+  typeRead
+  typeWrite
+  vykazRead
+  vykazWrite
+  deleteTasks
+  important
+  addComments
+  emails
+  history
+  internal
+  projectSecondary
+  pausalInfo
+  taskTitleEdit
+  viewComments
+`;
+
+const def = `
+assignedTo {
+  def
+  fixed
+  required
+  value {
+    id
+  }
+}
+company {
+  def
+  fixed
+  required
+  value {
+    id
+  }
+}
+overtime {
+  def
+  fixed
+  required
+  value
+}
+pausal {
+  def
+  fixed
+  required
+  value
+}
+requester {
+  def
+  fixed
+  required
+  value {
+    id
+  }
+}
+status {
+  def
+  fixed
+  required
+  value {
+    id
+  }
+}
+tag {
+  def
+  fixed
+  required
+  value {
+    id
+  }
+}
+`;
+
 export const GET_MY_PROJECTS = gql `
 query {
   myProjects {
@@ -29,74 +135,11 @@ query {
         action
       }
       def {
-  			assignedTo {
-  				def
-  				fixed
-  				show
-  				value {
-  					id
-  				}
-  			}
-  			company {
-  				def
-  				fixed
-  				show
-  				value {
-  					id
-  				}
-  			}
-  			overtime {
-  				def
-  				fixed
-  				show
-  				value
-  			}
-  			pausal {
-  				def
-  				fixed
-  				show
-  				value
-  			}
-  			requester {
-  				def
-  				fixed
-  				show
-  				value {
-  					id
-  				}
-  			}
-  			status {
-  				def
-  				fixed
-  				show
-  				value {
-  					id
-  				}
-  			}
-  			tag {
-  				def
-  				fixed
-  				show
-  				value {
-  					id
-  				}
-  			}
-  			taskType {
-  				def
-  				fixed
-  				show
-  				value {
-  					id
-  				}
-  			}
+        ${def}
       }
     }
     right {
-      read
-			write
-			delete
-			internal
-			admin
+      ${groupRights}
     }
     usersWithRights {
       id
@@ -109,116 +152,74 @@ query {
 export const GET_PROJECTS = gql `
 query {
   projects {
-      title
-      id
-      projectRights{
-        user{
-          id
-        }
-      }
+    title
+    id
+    right{
+      assignedRead
+    }
   }
 }
 `;
 
+const responseProject = `
+id
+title
+description
+lockedRequester
+statuses{
+  id
+  title
+  order
+  color
+  icon
+  action
+}
+groups{
+  id
+  title
+  order
+  rights{
+    ${groupRights}
+  }
+  users{
+    id
+    email
+  }
+}
+tags {
+  id
+  title
+  order
+  color
+}
+
+def {
+  ${def}
+}
+`
+
 export const ADD_PROJECT = gql `
-mutation addProject($title: String!, $description: String!, $lockedRequester: Boolean!, $projectRights: [ProjectRightInput]!, $def: ProjectDefaultsInput!, $tags: [NewTagInput]!, $statuses: [NewStatusInput]!) {
+mutation addProject(
+  $title: String!,
+  $description: String!,
+  $lockedRequester: Boolean!,
+  $def: ProjectDefaultsInput!,
+  $tags: [NewTagInput]!,
+  $statuses: [NewStatusInput]!
+  $groups: [ProjectGroupInput]!
+  $userGroups: [UserGroupInput]!
+) {
   addProject(
     title: $title,
     description: $description,
     lockedRequester: $lockedRequester,
-    projectRights: $projectRights,
     def: $def,
     tags: $tags,
     statuses: $statuses,
+    groups: $groups,
+    userGroups: $userGroups
   ){
-    id
-    title
-    description
-    lockedRequester
-    milestones {
-      id
-      title
-    }
-    tags {
-      id
-      title
-      order
-      color
-    }
-    projectRights {
-			read
-			write
-			delete
-			internal
-			admin
-			user {
-				id
-        email
-			}
-		}
-    def {
-			assignedTo {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			company {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			overtime {
-				def
-				fixed
-				show
-				value
-			}
-			pausal {
-				def
-				fixed
-				show
-				value
-			}
-			requester {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			status {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			tag {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			taskType {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-		}
-
+    ${responseProject}
   }
 }
 `;
@@ -226,99 +227,9 @@ mutation addProject($title: String!, $description: String!, $lockedRequester: Bo
 export const GET_PROJECT = gql `
 query project($id: Int!) {
   project(
-		id: $id,
+    id: $id,
   ){
-    id
-    title
-    description
-    lockedRequester
-    statuses{
-      id
-      title
-      order
-      color
-      icon
-      action
-    }
-    tags {
-      id
-      title
-      order
-      color
-    }
-    projectRights {
-			read
-			write
-			delete
-			internal
-			admin
-			user {
-				id
-        email
-			}
-		}
-    def {
-			assignedTo {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			company {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			overtime {
-				def
-				fixed
-				show
-				value
-			}
-			pausal {
-				def
-				fixed
-				show
-				value
-			}
-			requester {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			status {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			tag {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			taskType {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-		}
+    ${responseProject}
   }
 }
 `;
@@ -329,7 +240,6 @@ mutation updateProject(
   $title: String,
   $description: String,
   $lockedRequester: Boolean,
-  $projectRights: [ProjectRightInput],
   $def: ProjectDefaultsInput,
   $deleteTags: [Int]!,
   $updateTags: [TagUpdateInput]!,
@@ -337,13 +247,16 @@ mutation updateProject(
   $deleteStatuses: [Int]!,
   $updateStatuses: [UpdateStatusInput]!,
   $addStatuses: [NewStatusInput]!,
+  $userGroups: [UserGroupUpdateInput]!,
+  $addGroups: [ProjectGroupInput]!,
+  $updateGroups: [ProjectGroupInput]!,
+  $deleteGroups: [Int]!,
 ) {
   updateProject(
-		id: $id
+    id: $id
     title: $title
     description: $description
     lockedRequester: $lockedRequester
-    projectRights: $projectRights
     def: $def
     deleteTags: $deleteTags
     updateTags: $updateTags
@@ -351,90 +264,12 @@ mutation updateProject(
     deleteStatuses: $deleteStatuses
     updateStatuses: $updateStatuses
     addStatuses: $addStatuses
+    userGroups: $userGroups
+    addGroups: $addGroups
+    updateGroups: $updateGroups
+    deleteGroups: $deleteGroups
   ){
-    id
-    title
-    description
-    lockedRequester
-    tags {
-      id
-      title
-      order
-      color
-    }
-    projectRights {
-			read
-			write
-			delete
-			internal
-			admin
-			user {
-				id
-        email
-			}
-		}
-    def {
-			assignedTo {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			company {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			overtime {
-				def
-				fixed
-				show
-				value
-			}
-			pausal {
-				def
-				fixed
-				show
-				value
-			}
-			requester {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			status {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			tag {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-			taskType {
-				def
-				fixed
-				show
-				value {
-					id
-				}
-			}
-		}
+    ${responseProject}
   }
 }
 `;

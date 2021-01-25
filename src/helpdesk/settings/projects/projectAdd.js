@@ -18,15 +18,22 @@ import {
 import {
   defList,
   defBool,
-  defItem
+  defItem,
+  defaultGroups,
+  noDef
 } from 'configs/constants/projects';
 import classnames from 'classnames';
-import Permissions from "./components/projectPermissions";
+import UserGroups from "./components/userGroups";
 import CustomAttributes from "./components/customAttributes";
 import Tags from './components/tags';
 import Statuses from './components/statuses';
+import Groups from './components/group/groupAdd';
 import ProjectDefaultValues from "./components/defaultValues";
+import ProjectAcl from "./components/acl";
 import Loading from 'components/loading';
+import {
+  remapRightsToBackend
+} from './helpers';
 import {
   GET_BASIC_COMPANIES,
 } from '../companies/queries';
@@ -77,6 +84,9 @@ export default function ProjectAdd( props ) {
     data: taskTypesData,
     loading: taskTypesLoading
   } = useQuery( GET_TASK_TYPES, fetchNetOptions );
+  const {
+    refetch: refetchMyProjects,
+  } = useQuery( GET_MY_PROJECTS );
 
   const currentUser = myData ? myData.getMyData : {};
 
@@ -84,7 +94,8 @@ export default function ProjectAdd( props ) {
   const [ title, setTitle ] = React.useState( "" );
   const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
-  const [ projectRights, setProjectRights ] = React.useState( [] );
+  const [ groups, setGroups ] = React.useState( defaultGroups );
+  const [ userGroups, setUserGroups ] = React.useState( [] );
 
   const [ assignedTo, setAssignedTo ] = React.useState( defList );
   const [ company, setCompany ] = React.useState( defItem );
@@ -92,29 +103,18 @@ export default function ProjectAdd( props ) {
   const [ pausal, setPausal ] = React.useState( defBool );
   const [ requester, setRequester ] = React.useState( defItem );
   const [ status, setStatus ] = React.useState( defItem );
-  const [ defTag, setDefTag ] = React.useState( defList );
+  const [ defTag, setDefTag ] = React.useState( {
+    ...defList,
+    required: noDef.tag.required
+  } );
   const [ taskType, setTaskType ] = React.useState( defItem );
   const [ tags, setTags ] = React.useState( [] );
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
   const [ statuses, setStatuses ] = React.useState( [] );
-  //events
-  React.useEffect( () => {
-    if ( !myDataLoading && !usersLoading ) {
-      const CurrentUser = toSelArr( usersData.basicUsers, 'email' )
-        .find( ( user ) => user.id === currentUser.id );
-      setProjectRights( [ {
-        user: CurrentUser,
-        read: true,
-        write: true,
-        delete: true,
-        internal: true,
-        admin: true
-      } ] );
-    }
-  }, [ myDataLoading, usersLoading ] );
 
+  //events
   React.useEffect( () => {
     if ( !statusesLoading ) {
       setStatuses( statusesData.statusTemplates.map( ( statusTemplate ) => ( {
@@ -132,14 +132,6 @@ export default function ProjectAdd( props ) {
   const addProjectFunc = () => {
     setSaving( true );
 
-    let newProjectRights = projectRights.map( r => ( {
-      read: r.read,
-      write: r.write,
-      delete: r.delete,
-      internal: r.internal,
-      admin: r.admin,
-      UserId: r.user.id
-    } ) );
     let newDef = {
       assignedTo: {
         ...assignedTo,
@@ -169,19 +161,21 @@ export default function ProjectAdd( props ) {
         ...defTag,
         value: defTag.value.map( u => u.id )
       },
-      taskType: {
-        ...taskType,
-        value: ( taskType.value ? taskType.value.id : null )
-      },
     }
+    let newGroups = groups.map( ( group ) => remapRightsToBackend( group ) )
+    let newUserGroups = userGroups.map( ( userGroup ) => ( {
+      userId: userGroup.user.id,
+      groupId: userGroup.group.id
+    } ) );
 
     addProject( {
         variables: {
           title,
           description,
           lockedRequester,
-          projectRights: newProjectRights,
           def: newDef,
+          groups: newGroups,
+          userGroups: newUserGroups,
           tags,
           statuses
         }
@@ -192,8 +186,10 @@ export default function ProjectAdd( props ) {
           __typename: "Project"
         };
         if ( closeModal ) {
-          const myRights = newProjectRights.find( ( projectRight ) => projectRight.UserId === currentUser.id );
-          if ( myRights ) {
+          const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
+          const myRights = myUserGroup === undefined ? createCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
+            .rights;
+          if ( myUserGroup ) {
             const allProjects = client.readQuery( {
                 query: GET_MY_PROJECTS
               } )
@@ -209,6 +205,7 @@ export default function ProjectAdd( props ) {
             closeModal( null, null );
           }
         } else {
+          refetchMyProjects();
           const allProjects = client.readQuery( {
               query: GET_PROJECTS
             } )
@@ -227,22 +224,27 @@ export default function ProjectAdd( props ) {
       } );
     setSaving( false );
   }
+
   const cannotSave = (
     saving ||
     title === "" ||
+    currentUser &&
     ( company.value === null && company.fixed ) ||
     ( status.value === null && status.fixed ) ||
     ( assignedTo.value.length === 0 && assignedTo.fixed ) ||
-    ( taskType.value === null && taskType.fixed ) ||
-    !projectRights.some( ( projectRight ) => projectRight.admin ) ||
+    !groups.some( ( group ) => (
+      group.rights.projectPrimary.read &&
+      group.rights.projectPrimary.write &&
+      group.rights.projectSecondary &&
+      userGroups.some( ( userGroup ) => userGroup.group.id === group.id )
+    ) ) ||
     tags.some( ( tag ) => (
       tag.title.length === 0 ||
       !tag.color.includes( '#' ) ||
       isNaN( parseInt( tag.order ) )
     ) ) ||
     !statuses.some( ( status ) => status.action === 'IsNew' ) ||
-    !statuses.some( ( status ) => status.action === 'CloseDate' ) ||
-    !statuses.some( ( status ) => status.action === 'Invoiced' )
+    !statuses.some( ( status ) => status.action === 'CloseDate' )
 
   )
   if (
@@ -255,9 +257,8 @@ export default function ProjectAdd( props ) {
     return <Loading />
   }
 
-  let canReadUserIDs = projectRights.map( ( permission ) => permission.user.id );
-  let canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
-    .filter( ( user ) => canReadUserIDs.includes( user.id ) );
+  const canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
+    .filter( ( user ) => userGroups.some( ( userGroup ) => userGroup.user.id ) );
 
   return (
     <div
@@ -278,41 +279,6 @@ export default function ProjectAdd( props ) {
         <Label htmlFor="description">Popis</Label>
         <Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription( e.target.value )}/>
       </FormGroup>
-
-      <Permissions
-        addUser={(user)=>{
-          let newProjectRights = [...projectRights, {user, read: true, write: false, delete: false, internal: false, admin: false}];
-          setProjectRights(newProjectRights);
-        }}
-        givePermission={(user, right)=>{
-          let newProjectRights=[...projectRights];
-          let index = projectRights.findIndex((r)=>r.user.id === user.id);
-          let item = newProjectRights[index];
-          item.read = right.read;
-          item.write = right.write;
-          item.delete = right.delete;
-          item.internal= right.internal;
-          item.admin = right.admin;
-
-          if(!item.read){
-            newProjectRights.splice(index,1);
-            setProjectRights(newProjectRights);
-            if (lockedRequester){
-              let newAssignedTo = {...assignedTo};
-              newAssignedTo.value = newAssignedTo.value.filter(u => u.id !== item.user.id);
-              setAssignedTo(newAssignedTo);
-            }
-          }else{
-            setProjectRights(newProjectRights);
-          }
-        }}
-        users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-        permissions={projectRights}
-        userID={currentUser.id}
-        isAdmin={currentUser.role.accessRights.projects || currentUser.role.accessRights.addProjects}
-        lockedRequester={lockedRequester}
-        lockRequester={() => setLockedRequester( !lockedRequester) }
-        />
 
       <Statuses
         statuses={statuses}
@@ -346,6 +312,56 @@ export default function ProjectAdd( props ) {
         }}
         />
 
+      <Groups
+        addGroup={(newGroup) => {
+          setGroups([...groups, newGroup])
+        }}
+        />
+
+      <UserGroups
+        addRight={ (userGroup) => {
+          setUserGroups([...userGroups, userGroup]);
+        }}
+        deleteRight={ (userGroup) => {
+          setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+        }}
+        updateRight={ (userGroup) => {
+          let newUserGroups = [...userGroups];
+          let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+          newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+          setUserGroups(newUserGroups);
+        }}
+        users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+        permissions={ userGroups }
+        isAdmin={ true }
+        groups={ toSelArr(groups) }
+        />
+
+      <ProjectAcl
+        groups={ groups }
+        updateGroupRight={ (groupID, acl, newVal) => {
+          let newGroups = [...groups];
+          let index = newGroups.findIndex((group) => group.id === groupID );
+          newGroups[index]['rights'][acl] = newVal;
+          setGroups(newGroups);
+        }}
+        updateGroup={(newGroup) => {
+          let newGroups = [...groups];
+          let index = newGroups.findIndex((group) => group.id === newGroup.id );
+          newGroups[index] = { ...newGroups[index], ...newGroup }
+          setGroups(newGroups);
+          setUserGroups(userGroups.map((userGroup) => (
+            (userGroup.group.id !== newGroup.id) ?
+            userGroup :
+            ({...userGroup, group: {...userGroup.group,...newGroup}})
+          ) ))
+        }}
+        deleteGroup={(id) => {
+          setGroups( groups.filter((group) => group.id !== id ) );
+          setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
+        }}
+        />
+
       <ProjectDefaultValues
         assignedTo={assignedTo}
         setAssignedTo={setAssignedTo}
@@ -366,14 +382,18 @@ export default function ProjectAdd( props ) {
         statuses={toSelArr(statuses)}
         companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
         canBeAssigned={canBeAssigned}
-        users={lockedRequester ? (projectRights.map(r => r.user)) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+        users={
+          lockedRequester ?
+          userGroups.map( (userGroup) => userGroup.user ) :
+          (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
+        }
         allTags={toSelArr(tags)}
         taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
         />
 
-      { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) || ( taskType.value === null && taskType.fixed)) &&
+      { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) ) &&
         <div className="red" style={{color:'red'}}>
-          Status, assigned to, task type and company can't be empty if they are fixed!
+          Status, assigned to and company can't be empty if they are fixed!
         </div>
       }
 

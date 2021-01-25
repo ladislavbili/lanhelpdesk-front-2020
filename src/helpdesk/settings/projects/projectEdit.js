@@ -11,7 +11,8 @@ import {
   Input
 } from 'reactstrap';
 import {
-  toSelArr
+  toSelArr,
+  deleteAttributes
 } from 'helperFunctions';
 import {
   fetchNetOptions
@@ -19,13 +20,19 @@ import {
 import {
   defList,
   defBool,
-  defItem
+  defItem,
+  allACLs,
+  backendCleanRights,
+  noDef,
 } from 'configs/constants/projects';
 import classnames from 'classnames';
-import Permissions from "./components/projectPermissions";
+
 import ProjectDefaultValues from "./components/defaultValues";
 import Tags from './components/tags';
 import Statuses from './components/statuses';
+import UserGroups from "./components/userGroups";
+import Groups from './components/group/groupAdd';
+import ProjectAcl from "./components/acl";
 import DeleteReplacement from 'components/deleteReplacement';
 import CustomAttributes from "./components/customAttributes";
 import Loading from 'components/loading';
@@ -33,14 +40,16 @@ import {
   setProject,
 } from 'apollo/localSchema/actions';
 import {
+  remapRightsToBackend,
+  remapRightsFromBackend
+} from './helpers';
+
+import {
   GET_BASIC_COMPANIES,
 } from '../companies/queries';
 import {
   GET_BASIC_USERS,
 } from '../users/queries';
-import {
-  GET_TASK_TYPES,
-} from '../taskTypes/queries';
 import {
   GET_PROJECTS,
   GET_MY_PROJECTS,
@@ -90,11 +99,6 @@ export default function ProjectEdit( props ) {
     data: usersData,
     loading: usersLoading
   } = useQuery( GET_BASIC_USERS, fetchNetOptions );
-  const {
-    data: taskTypesData,
-    loading: taskTypesLoading
-  } = useQuery( GET_TASK_TYPES, fetchNetOptions );
-
   let allProjects = [];
   if ( closeModal ) {
     allProjects = toSelArr( client.readQuery( {
@@ -117,7 +121,8 @@ export default function ProjectEdit( props ) {
   const [ title, setTitle ] = React.useState( "" );
   const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
-  const [ projectRights, setProjectRights ] = React.useState( [] );
+  const [ groups, setGroups ] = React.useState( [] );
+  const [ userGroups, setUserGroups ] = React.useState( [] );
   const [ addTags, setAddTags ] = React.useState( [] );
   const [ updateTags, setUpdateTags ] = React.useState( [] );
   const [ deleteTags, setDeleteTags ] = React.useState( [] );
@@ -128,13 +133,15 @@ export default function ProjectEdit( props ) {
   const [ pausal, setPausal ] = React.useState( defBool );
   const [ requester, setRequester ] = React.useState( defItem );
   const [ status, setStatus ] = React.useState( defItem );
-  const [ defTag, setDefTag ] = React.useState( defList );
+  const [ defTag, setDefTag ] = React.useState( {
+    ...defList,
+    required: noDef.tag.required
+  } );
 
   const [ addStatuses, setAddStatuses ] = React.useState( [] );
   const [ updateStatuses, setUpdateStatuses ] = React.useState( [] );
   const [ deleteStatuses, setDeleteStatuses ] = React.useState( [] );
 
-  const [ taskType, setTaskType ] = React.useState( defItem );
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
@@ -146,11 +153,10 @@ export default function ProjectEdit( props ) {
       setTitle( projectData.project.title );
       setDescription( projectData.project.description );
       setLockedRequester( projectData.project.lockedRequester );
-      setProjectRights( projectData.project.projectRights );
       let newOvertime = {
         def: projectData.project.def.overtime.def,
         fixed: projectData.project.def.overtime.fixed,
-        show: projectData.project.def.overtime.show,
+        required: projectData.project.def.overtime.required,
         value: ( projectData.project.def.overtime.value ? {
           value: true,
           label: 'Yes'
@@ -163,7 +169,7 @@ export default function ProjectEdit( props ) {
       let newPausal = {
         def: projectData.project.def.pausal.def,
         fixed: projectData.project.def.pausal.fixed,
-        show: projectData.project.def.pausal.show,
+        required: projectData.project.def.pausal.required,
         value: ( projectData.project.def.pausal.value ? {
           value: true,
           label: 'Yes'
@@ -178,21 +184,28 @@ export default function ProjectEdit( props ) {
 
   React.useEffect( () => {
     if ( !projectLoading && !usersLoading ) {
+      const project = projectData.project;
       let users = toSelArr( usersData.basicUsers, 'email' );
       let newAssignedTo = {
-        def: projectData.project.def.assignedTo.def,
-        fixed: projectData.project.def.assignedTo.fixed,
-        show: projectData.project.def.assignedTo.show,
-        value: projectData.project.def.assignedTo.value.map( user => users.find( u => u.id === user.id ) )
+        def: project.def.assignedTo.def,
+        fixed: project.def.assignedTo.fixed,
+        required: project.def.assignedTo.required,
+        value: project.def.assignedTo.value.map( user => users.find( u => u.id === user.id ) )
       };
       setAssignedTo( newAssignedTo );
       let newRequester = {
-        def: projectData.project.def.requester.def,
-        fixed: projectData.project.def.requester.fixed,
-        show: projectData.project.def.requester.show,
-        value: ( projectData.project.def.requester.value ? users.find( u => u.id === projectData.project.def.requester.value.id ) : null )
+        def: project.def.requester.def,
+        fixed: project.def.requester.fixed,
+        required: project.def.requester.required,
+        value: ( project.def.requester.value ? users.find( u => u.id === project.def.requester.value.id ) : null )
       };
       setRequester( newRequester );
+      const {
+        groups,
+        userGroups
+      } = getDefaultGroupData();
+      setGroups( groups );
+      setUserGroups( userGroups );
     }
   }, [ projectLoading, usersLoading ] );
 
@@ -202,7 +215,7 @@ export default function ProjectEdit( props ) {
       let newCompany = {
         def: projectData.project.def.company.def,
         fixed: projectData.project.def.company.fixed,
-        show: projectData.project.def.company.show,
+        required: projectData.project.def.company.required,
         value: ( projectData.project.def.company.value ? companies.find( c => c.id === projectData.project.def.company.value.id ) : null )
       };
       setCompany( newCompany );
@@ -214,7 +227,7 @@ export default function ProjectEdit( props ) {
       let newStatus = {
         def: projectData.project.def.status.def,
         fixed: projectData.project.def.status.fixed,
-        show: projectData.project.def.status.show,
+        required: projectData.project.def.status.required,
         value: ( projectData.project.def.status.value ? projectData.project.statuses.find( c => c.id === projectData.project.def.status.value.id ) : null )
       };
       setStatus( newStatus );
@@ -223,31 +236,19 @@ export default function ProjectEdit( props ) {
 
   React.useEffect( () => {
     if ( !projectLoading ) {
+      const project = projectData.project;
       let tags = toSelArr( getAllTags() );
-      let ids = projectData.project.def.tag.value.map( v => v.id );
+      let ids = project.def.tag.value.map( v => v.id );
       let newValue = tags.filter( t => ids.includes( t.id ) );
       let newDefTag = {
-        def: projectData.project.def.tag.def,
-        fixed: projectData.project.def.tag.fixed,
-        show: projectData.project.def.tag.show,
+        def: project.def.tag.def,
+        fixed: project.def.tag.fixed,
+        required: project.def.tag.required,
         value: newValue
       };
       setDefTag( newDefTag );
     }
   }, [ projectLoading ] );
-
-  React.useEffect( () => {
-    if ( !projectLoading && !taskTypesLoading ) {
-      let taskTypes = toSelArr( taskTypesData.taskTypes );
-      let newTaskType = {
-        def: projectData.project.def.taskType.def,
-        fixed: projectData.project.def.taskType.fixed,
-        show: projectData.project.def.taskType.show,
-        value: ( projectData.project.def.taskType.value ? taskTypes.find( c => c.id === projectData.project.def.taskType.value.id ) : null )
-      };
-      setTaskType( newTaskType );
-    }
-  }, [ projectLoading, taskTypesLoading ] );
 
   React.useEffect( () => {
     setAddTags( [] );
@@ -289,17 +290,88 @@ export default function ProjectEdit( props ) {
     return allStatuses.concat( addStatuses );
   }
 
+  const getDefaultGroupData = () => {
+    const project = projectData.project;
+    const users = toSelArr( usersData.basicUsers, 'email' );
+    const groups = toSelArr( project.groups.map( ( group ) => remapRightsFromBackend( group ) ) );
+    const userGroups = project.groups.reduce( ( acc, cur ) => {
+      let group = groups.find( ( group ) => group.id === cur.id );
+      let userGroups = cur.users.map( ( user1 ) => ( {
+        user: users.find( ( user2 ) => user2.id === user1.id ),
+        group,
+      } ) )
+      return [ ...acc, ...userGroups ]
+    }, [] )
+    return {
+      groups,
+      userGroups
+    }
+  }
+
+  const filterGroupChanges = () => {
+    const {
+      groups: originalGroups,
+      userGroups: originalUserGroups
+    } = getDefaultGroupData();
+    const addGroups = groups.filter( ( group ) => group.id < 0 )
+      .map( ( group ) => remapRightsToBackend( group ) );
+    const updateGroups = groups.filter( ( group ) => group.id > -1 )
+      .filter( ( group ) => {
+        const originalGroup = originalGroups.find( ( orGroup ) => orGroup.id === group.id );
+        const rights = group.rights;
+        const originalRights = originalGroup.rights;
+        return (
+          group.title !== originalGroup.title ||
+          group.order !== originalGroup.order ||
+          (
+            allACLs.filter( ( acl ) => !acl.separator )
+            .some( ( acl ) => {
+              if ( acl.both ) {
+                return ( rights[ acl.id ].read !== originalRights[ acl.id ].read || rights[ acl.id ].write !== originalRights[ acl.id ].write )
+              } else {
+                return rights[ acl.id ] !== originalRights[ acl.id ];
+              }
+            } )
+          )
+        )
+      } )
+      .map( ( group ) => remapRightsToBackend( group ) );
+    const deleteGroups = originalGroups.filter( ( orGroup ) => !groups.some( ( group ) => group.id === orGroup.id ) )
+      .map( ( group ) => group.id );
+    return {
+      addGroups,
+      updateGroups,
+      deleteGroups
+    }
+  }
+
+  const compactUserGroups = () => {
+    let compactUserGroups = [];
+    userGroups.forEach( ( userGroup ) => {
+      const index = compactUserGroups.findIndex( ( compactUserGroup ) => compactUserGroup.groupId === userGroup.group.id );
+      if ( index === -1 ) {
+        compactUserGroups.push( {
+          groupId: userGroup.group.id,
+          userIds: [ userGroup.user.id ]
+        } );
+      } else {
+        compactUserGroups[ index ].userIds.push( userGroup.user.id );
+      }
+    } )
+    groups.filter( ( group ) => group.id > -1 )
+      .forEach( ( group ) => {
+        if ( !compactUserGroups.some( ( userGroup ) => userGroup.groupId === group.id ) ) {
+          compactUserGroups.push( {
+            groupId: group.id,
+            userIds: []
+          } );
+        }
+      } )
+    return compactUserGroups;
+  }
+
   const updateProjectFunc = () => {
     setSaving( true );
-
-    let newProjectRights = projectRights.map( r => ( {
-      read: r.read,
-      write: r.write,
-      delete: r.delete,
-      internal: r.internal,
-      admin: r.admin,
-      UserId: r.user.id
-    } ) );
 
     let newDef = {
       assignedTo: {
@@ -330,19 +402,13 @@ export default function ProjectEdit( props ) {
         ...defTag,
         value: defTag.value.map( u => u.id )
       },
-      taskType: {
-        ...taskType,
-        value: ( taskType.value ? taskType.value.id : null )
-      },
     }
-
     updateProject( {
         variables: {
           id,
           title,
           description,
           lockedRequester,
-          projectRights: newProjectRights,
           def: newDef,
           addTags,
           updateTags,
@@ -350,6 +416,8 @@ export default function ProjectEdit( props ) {
           deleteStatuses,
           updateStatuses,
           addStatuses,
+          ...filterGroupChanges(),
+          userGroups: compactUserGroups(),
         }
       } )
       .then( ( response ) => {
@@ -369,8 +437,10 @@ export default function ProjectEdit( props ) {
           },
         } );
         if ( closeModal ) {
-          const myRights = newProjectRights.find( ( projectRight ) => projectRight.UserId === currentUser.id );
-          if ( myRights ) {
+          const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
+          const myRights = myUserGroup === undefined ? backendCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
+            .rights;
+          if ( myUserGroup ) {
             client.writeQuery( {
               query: GET_MY_PROJECTS,
               data: {
@@ -446,7 +516,6 @@ export default function ProjectEdit( props ) {
     projectLoading ||
     companiesLoading ||
     usersLoading ||
-    taskTypesLoading ||
     myDataLoading
   ) {
     return <Loading />
@@ -458,8 +527,6 @@ export default function ProjectEdit( props ) {
     ( company && company.value === null && company.fixed ) ||
     ( status && status.value === null && status.fixed ) ||
     ( assignedTo && assignedTo.value.length === 0 && assignedTo.fixed ) ||
-    ( taskType && taskType.value === null && taskType.fixed ) ||
-    !projectRights.some( ( projectRight ) => projectRight.admin ) ||
     addTags.some( ( tag ) => (
       tag.title.length === 0 ||
       !tag.color.includes( '#' ) ||
@@ -468,21 +535,28 @@ export default function ProjectEdit( props ) {
     updateTags.some( ( tag ) => (
       ( tag.title !== undefined && tag.title.length === 0 ) ||
       ( tag.color !== undefined && !tag.color.includes( '#' ) ) ||
-      ( tag.order !== undefined && isNaN( parseInt( tag.order ) ) ) ||
-      !statuses.some( ( status ) => status.action === 'IsNew' ) ||
-      !statuses.some( ( status ) => status.action === 'CloseDate' ) ||
-      !statuses.some( ( status ) => status.action === 'Invoiced' )
+      ( tag.order !== undefined && isNaN( parseInt( tag.order ) ) )
+    ) ) ||
+    !getAllStatuses()
+    .some( ( status ) => status.action === 'IsNew' ) ||
+    !getAllStatuses()
+    .some( ( status ) => status.action === 'CloseDate' ) ||
+    !groups.some( ( group ) => (
+      group.rights.projectPrimary.read &&
+      group.rights.projectPrimary.write &&
+      group.rights.projectSecondary &&
+      userGroups.some( ( userGroup ) => userGroup.group.id === group.id )
     ) )
   )
 
-  const myProjectRights = projectRights.find( p => p.user.id === currentUser.id );
-  const isAdmin = myProjectRights !== undefined && myProjectRights.admin;
+  const myRights = currentUser.role.accessRights.projects ?
+    backendCleanRights( true ) :
+    projectData.project.groups.find( ( group ) => group.users.some( ( user ) => user.id === currentUser.id ) )
+    .rights;
   const allTags = getAllTags();
   const allStatuses = getAllStatuses();
-
-  let canReadUserIDs = projectRights.map( ( permission ) => permission.user.id );
-  let canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
-    .filter( ( user ) => canReadUserIDs.includes( user.id ) );
+  const canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
+    .filter( ( user ) => userGroups.some( ( userGroup ) => userGroup.user.id ) );
   return (
     <div
       className={ classnames(
@@ -493,164 +567,186 @@ export default function ProjectEdit( props ) {
         "p-20"
       )}
       >
-      <FormGroup>
-        <Label for="name">Project name</Label>
-        <Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
-      </FormGroup>
+      { myRights.projectPrimaryRead &&
+        <div>
+          <FormGroup>
+            <Label for="name">Project name</Label>
+            <Input disabled={!myRights.projectPrimaryWrite} type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
+          </FormGroup>
 
-      <FormGroup>
-        <Label htmlFor="description">Popis</Label>
-        <Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription( e.target.value )}/>
-      </FormGroup>
-
-      <Permissions
-        addUser={(user)=>{
-          let newProjectRights = [...projectRights, {user, read: true, write: false, delete: false, internal: false, admin: false}];
-          setProjectRights(newProjectRights);
-        }}
-        givePermission={(user, right)=>{
-          let newProjectRights=[...projectRights];
-          let index = projectRights.findIndex((r)=>r.user.id === user.id);
-          let item = {...newProjectRights[index]};
-          item.read = right.read;
-          item.write = right.write;
-          item.delete = right.delete;
-          item.internal= right.internal;
-          item.admin = right.admin;
-
-
-          if(!item.read){
-            newProjectRights.splice(index,1);
-            setProjectRights(newProjectRights);
-            if (lockedRequester){
-              let newAssignedTo = {...assignedTo};
-              newAssignedTo.value = newAssignedTo.value.filter(u => u.id !== item.user.id);
-              setAssignedTo(newAssignedTo);
-            }
-          }else{
-            newProjectRights[index] = item;
-            setProjectRights(newProjectRights);
-          }
-        }}
-        users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-        permissions={projectRights}
-        userID={currentUser.id}
-        isAdmin={currentUser.role.accessRights.projects || currentUser.role.accessRights.addProjects || isAdmin}
-        lockedRequester={lockedRequester}
-        lockRequester={() => setLockedRequester( !lockedRequester) }
-        />
-
-      <ProjectDefaultValues
-        assignedTo={assignedTo}
-        setAssignedTo={setAssignedTo}
-        company={company}
-        setCompany={setCompany}
-        overtime={overtime}
-        setOvertime={setOvertime}
-        pausal={pausal}
-        setPausal={setPausal}
-        requester={requester}
-        setRequester={setRequester}
-        status={status}
-        setStatus={setStatus}
-        tag={defTag}
-        setTag={setDefTag}
-        taskType={taskType}
-        setTaskType={setTaskType}
-        statuses={allStatuses}
-        companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
-        canBeAssigned={canBeAssigned}
-        users={lockedRequester ? (toSelArr(projectRights.map(r => r.user), 'email')) : (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-        allTags={toSelArr(allTags)}
-        taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
-        />
-
-      <Statuses
-        statuses={allStatuses}
-        addStatus={(newStatus) => {
-          setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ])
-        }}
-        deleteStatus={(id) => {
-          if(id > -1){
-            setUpdateStatuses(updateStatuses.filter((status) => status.id !== id ));
-            setDeleteStatuses([ ...deleteStatuses, id ]);
-          }else{
-            setAddStatuses(addStatuses.filter((status) => status.id !== id ));
-          }
-        }}
-        updateStatus={(newStatus) => {
-          if(newStatus.id > -1){
-            let newStatuses = [...updateStatuses];
-            let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-            if(index === -1){
-              newStatuses = newStatuses.concat(newStatus);
-            }else{
-              newStatuses[index] = { ...newStatuses[index], ...newStatus }
-            }
-            setUpdateStatuses(newStatuses);
-          }else{
-            let newStatuses = [...addStatuses];
-            let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-            newStatuses[index] = { ...newStatuses[index], ...newStatus }
-            setAddStatuses(newStatuses);
-          }
-        }}
-        />
-
-      <Tags
-        tags={allTags}
-        addTag={(newTag) => {
-          setAddTags([ ...addTags, {...newTag, id: fakeID -- } ])
-        }}
-        deleteTag={(id) => {
-          if(id > -1){
-            setUpdateTags(updateTags.filter((tag) => tag.id !== id ));
-            setDeleteTags([ ...deleteTags, id ]);
-          }else{
-            setAddTags(addTags.filter((tag) => tag.id !== id ));
-          }
-        }}
-        updateTag={(newTag) => {
-          if(newTag.id > -1){
-            let newTags = [...updateTags];
-            let index = newTags.findIndex((tag) => tag.id === newTag.id );
-            if(index === -1){
-              newTags = newTags.concat(newTag);
-            }else{
-              newTags[index] = { ...newTags[index], ...newTag }
-            }
-            setUpdateTags(newTags);
-          }else{
-            let newTags = [...addTags];
-            let index = newTags.findIndex((tag) => tag.id === newTag.id );
-            newTags[index] = { ...newTags[index], ...newTag }
-            setAddTags(newTags);
-          }
-        }}
-        />
-
-      { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) || ( taskType.value === null && taskType.fixed)) &&
-        <div className="red" style={{color:'red'}}>
-          Status, assigned to, task type and company can't be empty if they are fixed!
+          <FormGroup>
+            <Label htmlFor="description">Popis</Label>
+            <Input disabled={!myRights.projectPrimaryWrite} type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription( e.target.value )}/>
+          </FormGroup>
         </div>
       }
+      { myRights.projectSecondary &&
+        <div>
+          <Statuses
+            statuses={allStatuses}
+            addStatus={(newStatus) => {
+              setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ])
+            }}
+            deleteStatus={(id) => {
+              if(id > -1){
+                setUpdateStatuses(updateStatuses.filter((status) => status.id !== id ));
+                setDeleteStatuses([ ...deleteStatuses, id ]);
+              }else{
+                setAddStatuses(addStatuses.filter((status) => status.id !== id ));
+              }
+            }}
+            updateStatus={(newStatus) => {
+              if(newStatus.id > -1){
+                let newStatuses = [...updateStatuses];
+                let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+                if(index === -1){
+                  newStatuses = newStatuses.concat(newStatus);
+                }else{
+                  newStatuses[index] = { ...newStatuses[index], ...newStatus }
+                }
+                setUpdateStatuses(newStatuses);
+              }else{
+                let newStatuses = [...addStatuses];
+                let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+                newStatuses[index] = { ...newStatuses[index], ...newStatus }
+                setAddStatuses(newStatuses);
+              }
+            }}
+            />
 
-      <CustomAttributes
-        disabled={false}
-        customAttributes={customAttributes}
-        addCustomAttribute={(newCustomAttribute) => {
-          setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
-        }}
-        updateCustomAttribute={(changedCustomAttribute) => {
-          let newCustomAttributes = [...customAttributes];
-          let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
-          newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
-          setCustomAttributes(newCustomAttributes);
-        }}
-        deleteCustomAttribute={(id) => {
-          setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
-        }}
-        />
+          <Tags
+            tags={allTags}
+            addTag={(newTag) => {
+              setAddTags([ ...addTags, {...newTag, id: fakeID -- } ])
+            }}
+            deleteTag={(id) => {
+              if(id > -1){
+                setUpdateTags(updateTags.filter((tag) => tag.id !== id ));
+                setDeleteTags([ ...deleteTags, id ]);
+              }else{
+                setAddTags(addTags.filter((tag) => tag.id !== id ));
+              }
+            }}
+            updateTag={(newTag) => {
+              if(newTag.id > -1){
+                let newTags = [...updateTags];
+                let index = newTags.findIndex((tag) => tag.id === newTag.id );
+                if(index === -1){
+                  newTags = newTags.concat(newTag);
+                }else{
+                  newTags[index] = { ...newTags[index], ...newTag }
+                }
+                setUpdateTags(newTags);
+              }else{
+                let newTags = [...addTags];
+                let index = newTags.findIndex((tag) => tag.id === newTag.id );
+                newTags[index] = { ...newTags[index], ...newTag }
+                setAddTags(newTags);
+              }
+            }}
+            />
+
+          <Groups
+            addGroup={(newGroup) => {
+              setGroups([...groups, newGroup])
+            }}
+            />
+
+          <UserGroups
+            addRight={ (userGroup) => {
+              setUserGroups([...userGroups, userGroup]);
+            }}
+            deleteRight={ (userGroup) => {
+              setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+            }}
+            updateRight={ (userGroup) => {
+              let newUserGroups = [...userGroups];
+              let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+              newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+              setUserGroups(newUserGroups);
+            }}
+            users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+            permissions={ userGroups }
+            isAdmin={ true }
+            groups={ toSelArr(groups) }
+            />
+
+          <ProjectAcl
+            groups={ groups }
+            updateGroupRight={ (groupID, acl, newVal) => {
+              let newGroups = [...groups];
+              let index = newGroups.findIndex((group) => group.id === groupID );
+              newGroups[index]['rights'][acl] = newVal;
+              setGroups(newGroups);
+            }}
+            updateGroup={(newGroup) => {
+              let newGroups = [...groups];
+              let index = newGroups.findIndex((group) => group.id === newGroup.id );
+              newGroups[index] = { ...newGroups[index], ...newGroup }
+              setGroups(newGroups);
+              setUserGroups(userGroups.map((userGroup) => (
+                (userGroup.group.id !== newGroup.id) ?
+                userGroup :
+                ({...userGroup, group: {...userGroup.group,...newGroup}})
+              ) ))
+            }}
+            deleteGroup={(id) => {
+              setGroups( groups.filter((group) => group.id !== id ) );
+              setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
+            }}
+            />
+
+
+          <ProjectDefaultValues
+            assignedTo={assignedTo}
+            setAssignedTo={setAssignedTo}
+            company={company}
+            setCompany={setCompany}
+            overtime={overtime}
+            setOvertime={setOvertime}
+            pausal={pausal}
+            setPausal={setPausal}
+            requester={requester}
+            setRequester={setRequester}
+            status={status}
+            setStatus={setStatus}
+            tag={defTag}
+            setTag={setDefTag}
+            statuses={toSelArr(allStatuses)}
+            companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
+            canBeAssigned={canBeAssigned}
+            users={
+              lockedRequester ?
+              userGroups.map( (userGroup) => userGroup.user ) :
+              (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
+            }
+            allTags={toSelArr(allTags)}
+            />
+
+          { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
+            <div className="red" style={{color:'red'}}>
+              Status, assigned to and company can't be empty if they are fixed!
+            </div>
+          }
+
+          <CustomAttributes
+            disabled={false}
+            customAttributes={customAttributes}
+            addCustomAttribute={(newCustomAttribute) => {
+              setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
+            }}
+            updateCustomAttribute={(changedCustomAttribute) => {
+              let newCustomAttributes = [...customAttributes];
+              let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
+              newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
+              setCustomAttributes(newCustomAttributes);
+            }}
+            deleteCustomAttribute={(id) => {
+              setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
+            }}
+            />
+        </div>
+      }
 
       <div className="row">
         {
@@ -659,23 +755,28 @@ export default function ProjectEdit( props ) {
             Close
           </Button>
         }
-        <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
-          Delete
-        </Button>
-        <Button
-          className="btn ml-auto"
-          disabled={cannotSave}
-          onClick={updateProjectFunc}>
-          {(saving?'Saving...':'Save project')}
-        </Button>
-        </div>
-        <DeleteReplacement
-          isOpen={deleteOpen}
-          label="project"
-          options={filteredProjects}
-          close={()=>setDeleteOpen(false)}
-          finishDelete={deleteProjectFunc}
-          />
+        { myRights.projectPrimaryWrite &&
+          <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
+            Delete
+          </Button>
+        }
+
+        { (myRights.projectPrimaryWrite || myRights.projectSecondary) &&
+          <Button
+            className="btn ml-auto"
+            disabled={cannotSave}
+            onClick={updateProjectFunc}>
+            {(saving?'Saving...':'Save project')}
+          </Button>
+        }
       </div>
+      <DeleteReplacement
+        isOpen={deleteOpen}
+        label="project"
+        options={filteredProjects}
+        close={()=>setDeleteOpen(false)}
+        finishDelete={deleteProjectFunc}
+        />
+    </div>
   );
 }

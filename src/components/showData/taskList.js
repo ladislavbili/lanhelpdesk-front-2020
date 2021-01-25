@@ -250,7 +250,6 @@ export default function List( props ) {
                                   ((displayValues[index-1].type === 'invoiced' || displayValues[index-2].type === 'invoiced') && !item.invoiced) ? 15.5 : 0
                                 )
                               }}>
-                              {console.log((displayValues[index-1].type === 'invoiced' || displayValues[index-2].type === 'invoiced' && !item.invoiced))}
                               {getItemDisplayValue(item,display)}
                             </span>
                           </span>

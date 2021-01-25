@@ -20,8 +20,6 @@ export default function ProjectDefaultValues( props ) {
     setRequester,
     tag,
     setTag,
-    taskType,
-    setTaskType,
     pausal,
     setPausal,
     overtime,
@@ -31,7 +29,6 @@ export default function ProjectDefaultValues( props ) {
     users,
     allTags,
     companies,
-    taskTypes
   } = props;
 
   return (
@@ -41,9 +38,9 @@ export default function ProjectDefaultValues( props ) {
         <thead>
           <tr>
             <th ></th>
-            <th width="10">Def.</th>
-            <th width="10">Fixed</th>
-            <th width="10">Show</th>
+            <th width="15">Defined</th>
+            <th width="15">Fixed</th>
+            <th width="15">Required</th>
           </tr>
         </thead>
         <tbody>
@@ -67,7 +64,7 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { status.def }
                 onChange={(e)=>setStatus({...status,def:!status.def})}
-                disabled={status.fixed || !status.show}
+                disabled={status.fixed}
                 />
             </td>
             <td>
@@ -76,15 +73,15 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { status.fixed }
                 onChange={(e)=>setStatus({...status,fixed:!status.fixed, def: !status.fixed ? true : status.def })}
-                disabled={!status.show}
                 />
             </td>
             <td>
               <Checkbox
                 centerHor
                 centerVer
-                value = { status.show }
-                onChange={(e)=>setStatus({...status, show:!status.show, def: true, fixed: true })}
+                disabled={ true }
+                value = { true }
+                onChange={(e)=>setStatus({...status, required:!status.required })}
                 />
             </td>
           </tr>
@@ -125,8 +122,8 @@ export default function ProjectDefaultValues( props ) {
               <Checkbox
                 centerHor
                 centerVer
-                value = { tag.show }
-                onChange={(e)=>setTag({...tag, show:!tag.show })}
+                value = { tag.required }
+                onChange={(e)=>setTag({...tag, required:!tag.required })}
                 />
             </td>
           </tr>
@@ -152,7 +149,7 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { assignedTo.def }
                 onChange={(e)=>setAssignedTo({...assignedTo,def:!assignedTo.def})}
-                disabled={assignedTo.fixed || !assignedTo.show}
+                disabled={assignedTo.fixed }
                 />
             </td>
             <td>
@@ -161,57 +158,15 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { assignedTo.fixed }
                 onChange={(e)=>setAssignedTo({...assignedTo,fixed:!assignedTo.fixed, def: !assignedTo.fixed ? true : assignedTo.def })}
-                disabled={!assignedTo.show}
                 />
             </td>
             <td>
               <Checkbox
                 centerHor
                 centerVer
-                value = { assignedTo.show }
-                onChange={(e)=>setAssignedTo({...assignedTo, show:!assignedTo.show, def:true, fixed:true })}
-                />
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              <div className="row">
-                <label className="col-3 col-form-label">Task type</label>
-                <div className="col-9">
-                  <Select
-                    value={taskType.value}
-                    onChange={(e)=>setTaskType({...taskType,value:e})}
-                    options={taskTypes}
-                    styles={invisibleSelectStyle}
-                    />
-                </div>
-              </div>
-            </td>
-            <td>
-              <Checkbox
-                centerHor
-                centerVer
-                value = { taskType.def }
-                onChange={(e)=>setTaskType({...taskType,def:!taskType.def})}
-                disabled={taskType.fixed || !taskType.show }
-                />
-            </td>
-            <td>
-              <Checkbox
-                centerHor
-                centerVer
-                value = { taskType.fixed }
-                onChange={(e)=>setTaskType({...taskType,fixed:!taskType.fixed, def: !taskType.fixed ? true : taskType.def })}
-                disabled={ !taskType.show }
-                />
-            </td>
-            <td>
-              <Checkbox
-                centerHor
-                centerVer
-                value = { taskType.show }
-                onChange={(e)=>setTaskType({...taskType, show:!taskType.show, def:true, fixed:true })}
+                disabled={ true }
+                value = { true }
+                onChange={(e)=>setAssignedTo({...assignedTo, required:!assignedTo.required })}
                 />
             </td>
           </tr>
@@ -251,8 +206,8 @@ export default function ProjectDefaultValues( props ) {
               <Checkbox
                 centerHor
                 centerVer
-                value = { requester.show }
-                onChange={(e)=>setRequester({...requester, show:!requester.show })}
+                value = { requester.required }
+                onChange={(e)=>setRequester({...requester, required: !requester.required })}
                 />
             </td>
           </tr>
@@ -277,7 +232,7 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { company.def }
                 onChange={(e)=>setCompany({...company,def:!company.def})}
-                disabled={company.fixed || !company.show }
+                disabled={company.fixed }
                 />
             </td>
             <td>
@@ -286,15 +241,15 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { company.fixed }
                 onChange={(e)=>setCompany({...company,fixed:!company.fixed, def: !company.fixed ? true : company.def })}
-                disabled={ !company.show }
                 />
             </td>
             <td>
               <Checkbox
                 centerHor
                 centerVer
-                value = { company.show }
-                onChange={(e)=>setCompany({...company, show:!company.show, def:true, fixed:true })}
+                disabled={ true }
+                value = { true }
+                onChange={(e)=>setCompany({...company, required: !company.required })}
                 />
             </td>
           </tr>
@@ -319,7 +274,7 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { pausal.def }
                 onChange={(e)=>setPausal({...pausal,def:!pausal.def})}
-                disabled={pausal.fixed || !pausal.show}
+                disabled={pausal.fixed }
                 />
             </td>
             <td>
@@ -328,15 +283,15 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { pausal.fixed }
                 onChange={(e)=>setPausal({...pausal,fixed:!pausal.fixed, def: !pausal.fixed ? true : pausal.def })}
-                disabled={!pausal.show}
                 />
             </td>
             <td>
               <Checkbox
                 centerHor
                 centerVer
-                value = { pausal.show }
-                onChange={(e)=>setPausal({...pausal, show:!pausal.show, def:true, fixed:true })}
+                disabled={ true }
+                value = { true }
+                onChange={(e)=>setPausal({...pausal, required:!pausal.required })}
                 />
             </td>
           </tr>
@@ -361,7 +316,7 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { overtime.def }
                 onChange={(e)=>setOvertime({...overtime,def:!overtime.def})}
-                disabled={overtime.fixed || !overtime.show}
+                disabled={overtime.fixed }
                 />
             </td>
             <td>
@@ -370,15 +325,15 @@ export default function ProjectDefaultValues( props ) {
                 centerVer
                 value = { overtime.fixed }
                 onChange={(e)=>setOvertime({...overtime,fixed:!overtime.fixed, def: !overtime.fixed ? true : overtime.def })}
-                disabled={!overtime.show}
                 />
             </td>
             <td>
               <Checkbox
                 centerHor
                 centerVer
-                value = { overtime.show }
-                onChange={(e)=>setOvertime({...overtime, show:!overtime.show, def:true, fixed:true })}
+                disabled={ true }
+                value = { true }
+                onChange={(e)=>setOvertime({...overtime, required:!overtime.required })}
                 />
             </td>
           </tr>
@@ -389,11 +344,10 @@ export default function ProjectDefaultValues( props ) {
         (
           (company.value===null && company.fixed) ||
           (status.value===null && status.fixed) ||
-          (assignedTo.value && assignedTo.value.length===0 && assignedTo.fixed) ||
-          (taskType.value===null && taskType.fixed)
+          (assignedTo.value && assignedTo.value.length===0 && assignedTo.fixed)
         ) &&
         <div className="red" style={{color:'red'}}>
-          Status, assigned to, task taskType and company can't be empty if they are fixed!
+          Status, assigned to and company can't be empty if they are fixed!
         </div>
       }
     </div>

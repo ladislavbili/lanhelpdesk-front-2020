@@ -146,29 +146,12 @@ export default function TasksSidebar( props ) {
     myData.getMyData.role.accessRights.projects ||
     (
       projectData.localProject.right !== undefined &&
-      projectData.localProject.right.admin
+      projectData.localProject.right.projectPrimaryRead
     )
   )
 
-  /*
-  const projects = [
-  ...( myData.getMyData.role.accessRights.addProjects ? [ dashboard, addProject ] : [ dashboard ] ),
-  ...myProjectsData.myProjects,
-  ]
-  */
   const projects = [ dashboard, ...myProjectsData.myProjects ];
-  /*
-  let milestones = [];
-  if ( projectData.localProject.project.id === null ) {
-  milestones = [ allMilestones ];
-  } else {
-  if ( canEditProject ) {
-  milestones = [ allMilestones, addMilestone, ...projectData.localProject.project.milestones ];
-  } else {
-  milestones = [ allMilestones, ...projectData.localProject.project.milestones ];
-  }
-  }
-  */
+
   const milestones = [ allMilestones, ...( projectData.localProject.project.id !== null ? projectData.localProject.project.milestones : [] ) ]
 
   const DropdownIndicator = ( {
