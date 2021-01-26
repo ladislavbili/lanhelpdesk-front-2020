@@ -11,6 +11,10 @@ import {
 } from 'reactstrap';
 import Checkbox from 'components/checkbox';
 
+import {
+  setFilter,
+} from 'apollo/localSchema/actions';
+
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
 import Loading from 'components/loading';
 import Select from 'react-select';
@@ -25,7 +29,8 @@ import moment from 'moment';
 import {
   GET_PUBLIC_FILTERS,
   GET_FILTER,
-  UPDATE_PUBLIC_FILTER
+  UPDATE_PUBLIC_FILTER,
+  DELETE_FILTER,
 } from './queries';
 import {
   GET_TASK_TYPES,
@@ -45,10 +50,10 @@ import {
 
 import {
   oneOfOptions,
+  getEmptyGeneralFilter,
   emptyFilter,
-  ofCurrentUser
+  ofCurrentUser,
 } from 'configs/constants/filter';
-
 export default function PublicFilterEdit( props ) {
   const {
     match
@@ -109,6 +114,7 @@ export default function PublicFilterEdit( props ) {
   } = fromObjectToState( emptyFilter );
 
   //get data
+
   const {
     data: taskTypesData,
     loading: taskTypesLoading
@@ -147,6 +153,8 @@ export default function PublicFilterEdit( props ) {
   const [ updatePublicFilter, {
     client
   } ] = useMutation( UPDATE_PUBLIC_FILTER );
+
+  const [ deleteFilter ] = useMutation( DELETE_FILTER );
 
   const dataLoading = (
     taskTypesLoading ||
@@ -238,6 +246,70 @@ export default function PublicFilterEdit( props ) {
         setSaving( false );
       } )
     setDataChanged( false );
+  }
+
+  const deletePublicFilter = () => {
+    if ( window.confirm( "Are you sure?" ) ) {
+      deleteFilter( {
+          variables: {
+            id,
+          }
+        } )
+        .then( ( response ) => {
+          try {
+            const allFilters = client.readQuery( {
+                query: GET_MY_FILTERS
+              } )
+              .myFilters;
+            const newFilters = [ ...allFilters ].filter( item => item.id !== id );
+            client.writeQuery( {
+              query: GET_MY_FILTERS,
+              data: {
+                myFilters: [ ...newFilters ]
+              }
+            } );
+          } catch ( err ) {
+
+          }
+          try {
+            const allFilters = client.readQuery( {
+                query: GET_MY_FILTERS
+              } )
+              .myFilters;
+            const newFilters = [ ...allFilters ].filter( item => item.id !== id );
+            client.writeQuery( {
+              query: GET_MY_FILTERS,
+              data: {
+                myFilters: [ ...newFilters ]
+              }
+            } );
+          } catch ( err ) {
+
+          }
+          try {
+            const allFilters = client.readQuery( {
+                query: GET_PUBLIC_FILTERS
+              } )
+              .publicFilters;
+            const newFilters = [ ...allFilters ].filter( item => item.id !== id );
+            client.writeQuery( {
+              query: GET_PUBLIC_FILTERS,
+              data: {
+                publicFilters: [ ...newFilters ]
+              }
+            } );
+          } catch ( err ) {
+
+          }
+          history.back();
+          setFilter( getEmptyGeneralFilter() );
+          close();
+        } )
+        .catch( ( err ) => {
+          console.log( err.message );
+          console.log( err );
+        } );
+    }
   }
 
   React.useEffect( () => {
@@ -606,6 +678,11 @@ export default function PublicFilterEdit( props ) {
 
 
         <div className="row">
+          <Button
+            className="btn-red m-l-5"
+            onClick={ deletePublicFilter }>
+            Delete
+          </Button>
           <Button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>{saving?'Saving...':'Save filter'}</Button>
         </div>
       </div>

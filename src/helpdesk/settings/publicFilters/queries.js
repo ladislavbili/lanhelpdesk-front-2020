@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 
 export const GET_PUBLIC_FILTERS = gql `
 query {
@@ -134,3 +136,13 @@ mutation updatePublicFilter(
     }
   }
 `
+
+export const DELETE_FILTER = gql `
+mutation deleteFilter($id: Int!) {
+  deleteFilter(
+    id: $id,
+  ){
+    id
+  }
+}
+`;

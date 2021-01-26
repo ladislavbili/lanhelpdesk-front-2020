@@ -26,6 +26,7 @@ import {
 } from 'configs/components/select';
 import {
   oneOfOptions,
+  getEmptyGeneralFilter,
   emptyFilter,
   ofCurrentUser
 } from 'configs/constants/filter';
