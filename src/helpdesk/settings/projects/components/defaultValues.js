@@ -6,6 +6,11 @@ import {
 } from 'configs/components/select';
 import Checkbox from 'components/checkbox';
 import booleanSelects from 'configs/constants/boolSelect'
+import {
+  emptyUserValue,
+  emptyCompanyValue,
+  emptyStatus
+} from 'configs/constants/projects';
 
 export default function ProjectDefaultValues( props ) {
   //data
@@ -50,9 +55,15 @@ export default function ProjectDefaultValues( props ) {
                 <label className="col-3 col-form-label">Status</label>
                 <div className="col-9">
                   <Select
-                    value={status.value}
-                    onChange={(e)=>setStatus({...status, value:e})}
-                    options={statuses}
+                    value={status.value === null ? emptyStatus : status.value }
+                    onChange={(e)=>{
+                      if(e.id === null){
+                        setStatus({...status, value:null })
+                      }else{
+                        setStatus({...status, value:e})
+                      }
+                    }}
+                    options={statuses.concat(emptyStatus)}
                     styles={invisibleSelectStyleNoArrowColored}
                     />
                 </div>
@@ -135,8 +146,10 @@ export default function ProjectDefaultValues( props ) {
                 <div className="col-9">
                   <Select
                     isMulti
-                    value={assignedTo.value}
-                    onChange={(e)=>setAssignedTo({...assignedTo,value:e})}
+                    value={assignedTo.value.length === 0 ? [emptyUserValue] : assignedTo.value }
+                    onChange={(e)=>
+                      setAssignedTo({...assignedTo, value:e.filter((user) => user.id !== null)})
+                    }
                     options={canBeAssigned}
                     styles={invisibleSelectStyle}
                     />
@@ -177,9 +190,15 @@ export default function ProjectDefaultValues( props ) {
                 <label className="col-3 col-form-label">Requester</label>
                 <div className="col-9">
                   <Select
-                    value={requester.value}
-                    onChange={(e)=>setRequester({...requester,value:e})}
-                    options={users}
+                    value={requester.value === null ? emptyUserValue : requester.value }
+                    onChange={ (e) => {
+                      if(e.key === null){
+                        setRequester({ ...requester, value:null })
+                      }else{
+                        setRequester({...requester,value:e})
+                      }
+                    }}
+                    options={users.concat(emptyUserValue)}
                     styles={invisibleSelectStyle}
                     />
                 </div>
@@ -218,9 +237,15 @@ export default function ProjectDefaultValues( props ) {
                 <label className="col-3 col-form-label">Company</label>
                 <div className="col-9">
                   <Select
-                    value={company.value}
-                    onChange={(e)=>setCompany({...company,value:e})}
-                    options={companies}
+                    value={ company.value === null ? emptyCompanyValue : company.value }
+                    onChange={(e)=>{
+                      if( e.id === null){
+                        setCompany({...company,value:null})
+                      }else{
+                        setCompany({...company,value:e})
+                      }
+                    }}
+                    options={companies.concat(emptyCompanyValue)}
                     styles={invisibleSelectStyle}
                     />
                 </div>

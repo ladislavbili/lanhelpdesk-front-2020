@@ -188,13 +188,10 @@ export default function TaskAdd( props ) {
     }
     let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.includes( item.id ) ) : filteredAssignedTo;
     setAssignedTo( newAssignedTo );
-    setAssignedToCreationError( newAssignedTo );
     let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
     setRequester( newRequester );
-
-    let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value ) : ( companies && newRequester ? companies.find( ( company ) => company.id === newRequester.company.id ) : null );
+    let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value.id ) : ( companies && newRequester ? companies.find( ( company ) => company.id === newRequester.company.id ) : null );
     setCompany( newCompany );
-    setCompanyCreationError( newCompany );
 
     let potentialStatus = toSelArr( project.statuses )
       .find( ( status ) => status.action.toLowerCase() === 'isnew' );
@@ -348,7 +345,7 @@ export default function TaskAdd( props ) {
     status === null ||
     project === null ||
     assignedTo === [] ||
-    company === null ||
+    !company ||
     ( project.def.tag.required && tags.length === 0 )
   )
 
@@ -409,7 +406,6 @@ export default function TaskAdd( props ) {
           setMilestone(noMilestone);
           let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
           setAssignedTo(newAssignedTo);
-          setAssignedToCreationError(newAssignedTo);
         }}
         options={projects}
         styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrowRequired}
@@ -423,7 +419,6 @@ export default function TaskAdd( props ) {
         isMulti
         onChange={(users)=> {
           setAssignedTo(users);
-          setAssignedToCreationError(users);
         }}
         options={USERS_WITH_PERMISSIONS}
         styles={invisibleSelectStyleNoArrowRequired}
@@ -458,7 +453,6 @@ export default function TaskAdd( props ) {
         styles={invisibleSelectStyleNoArrow}
         onChange={(taskType)=> {
           setTaskType(taskType);
-          setTaskTypeCreationError(taskType);
         }}
         options={taskTypes}
         />
@@ -495,7 +489,6 @@ export default function TaskAdd( props ) {
           setRequester(requester);
           const newCompany = companies.find((company) => company.id === requester.id );
           setCompany(newCompany);
-          setCompanyCreationError(newCompany);
         }}
         options={REQUESTERS}
         styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
@@ -508,7 +501,6 @@ export default function TaskAdd( props ) {
         isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
         onChange={(company)=> {
           setCompany(company);
-          setCompanyCreationError(company);
           setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
         }}
         options={companies}
@@ -1048,6 +1040,47 @@ export default function TaskAdd( props ) {
         units={[]}
         defaultUnit={defaultUnit}
         />
+    )
+  }
+
+  const renderCancelButton = () => {
+    if ( closeModal ) {
+      return (
+        <Button
+          className={classnames(
+            "btn",
+            "btn-link-cancel",
+            {
+              "position-absolute bottom-20": layout === 2
+            }
+          )}
+           onClick={() => closeModal()}>Cancel</Button>
+      )
+    } else {
+      return;
+    }
+  }
+
+  const renderCreateButton = () => {
+    return (
+      <button
+        className={classnames(
+          "btn",
+          {
+            "pull-right": layout === 1
+          },
+          {
+            "m-t-20": layout === 2
+          },
+          {
+            "m-l-5": layout === 2
+          }
+        )}
+        onClick={addTaskFunc}
+        disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
+        >
+        Create task
+      </button>
     )
   }
 

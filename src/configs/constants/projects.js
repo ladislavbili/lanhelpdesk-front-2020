@@ -288,3 +288,25 @@ export const defItem = {
   required: true,
   value: null,
 }
+
+export const emptyUserValue = {
+  id: null,
+  value: null,
+  label: 'Task Creator',
+  title: 'Task Creator'
+}
+
+export const emptyCompanyValue = {
+  id: null,
+  value: null,
+  label: "Task Creator's company",
+  title: "Task Creator's company"
+}
+
+export const emptyStatus = {
+  title: 'New (first with new action)',
+  id: null,
+  label: 'New (first with new action)',
+  value: null,
+  color: 'green'
+};
