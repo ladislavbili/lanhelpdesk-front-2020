@@ -25,10 +25,13 @@ import axios from 'axios';
 import datePickerConfig from 'configs/components/datepicker';
 import {
   invisibleSelectStyleNoArrow,
+  selectStyleNoArrowNoPadding,
   invisibleSelectStyleNoArrowNoPadding,
   invisibleSelectStyleNoArrowColored,
+  selectStyleNoArrowColoredRequired,
   invisibleSelectStyleNoArrowColoredRequired,
   invisibleSelectStyleNoArrowColoredRequiredNoPadding,
+  selectStyleNoArrowRequired,
   invisibleSelectStyleNoArrowRequired,
   invisibleSelectStyleNoArrowRequiredNoPadding,
 } from 'configs/components/select';
@@ -350,14 +353,29 @@ export default function TaskAdd( props ) {
   )
 
   //RENDERS
+  const renderLayoutButton = () => {
+    return (
+      <div className="task-add-layout">
+        <button
+          type="button"
+          className="btn btn-link waves-effect task-add-layout-button"
+          onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
+          <i className="fas fa-retweet "/>
+          Layout
+        </button>
+      </div>
+    )
+  }
+
   const renderTitle = () => {
     return (
-      <div className="row m-b-15">
-        <span className="center-hor flex m-r-15">
+      <div className="form-section">
+        <Label>Task name </Label>
+        <span className="form-section-rest">
           <input type="text"
             value={title}
             disabled={ !userRights.taskTitleEdit }
-            className="task-title-input text-extra-slim full-width form-control"
+            className="task-title-input full-width form-control"
             onChange={ (e) => setTitle(e.target.value) }
             placeholder="ENTER NEW TASK NAME" />
         </span>
@@ -383,13 +401,6 @@ export default function TaskAdd( props ) {
               />
           </div>
         }
-        <button
-          type="button"
-          className="btn btn-link waves-effect ml-auto asc"
-          onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
-          <i className="fas fa-retweet "/>
-          Layout
-        </button>
       </div>
     );
   }
@@ -408,7 +419,7 @@ export default function TaskAdd( props ) {
           setAssignedTo(newAssignedTo);
         }}
         options={projects}
-        styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Assigned: (
@@ -421,7 +432,7 @@ export default function TaskAdd( props ) {
           setAssignedTo(users);
         }}
         options={USERS_WITH_PERMISSIONS}
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={selectStyleNoArrowRequired}
         />
     ),
     Status: (
@@ -429,7 +440,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={status}
         isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
-        styles={layout === 2 ? invisibleSelectStyleNoArrowColoredRequiredNoPadding : invisibleSelectStyleNoArrowColoredRequired}
+        styles={layout === 2 ? selectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowColoredRequired}
         onChange={(status)=>{
           if(status.action==='PendingDate'){
             setStatus(status);
@@ -450,7 +461,7 @@ export default function TaskAdd( props ) {
         placeholder="Select task type"
         value={taskType}
         isDisabled={ !userRights.typeWrite }
-        styles={invisibleSelectStyleNoArrow}
+        styles={selectStyleNoArrowRequired}
         onChange={(taskType)=> {
           setTaskType(taskType);
         }}
@@ -477,7 +488,7 @@ export default function TaskAdd( props ) {
           }
         }}
         options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrow}
+        styles={layout === 2 ? selectStyleNoArrowNoPadding : invisibleSelectStyleNoArrow}
         />
     ),
     Requester: (
@@ -491,7 +502,7 @@ export default function TaskAdd( props ) {
           setCompany(newCompany);
         }}
         options={REQUESTERS}
-        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Company: (
@@ -504,7 +515,7 @@ export default function TaskAdd( props ) {
           setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
         }}
         options={companies}
-        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Pausal: (
@@ -512,7 +523,7 @@ export default function TaskAdd( props ) {
         value={pausal}
         placeholder="Select required"
         isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={selectStyleNoArrowRequired}
         onChange={(pausal)=> setPausal(pausal)}
         options={booleanSelects}
         />
@@ -532,7 +543,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={overtime}
         isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={selectStyleNoArrowRequired}
         onChange={(overtime) => setOvertime(overtime)}
         options={booleanSelects}
         />
@@ -541,8 +552,9 @@ export default function TaskAdd( props ) {
 
   const renderSelectsLayout1 = () => {
     return (
-      <div className = "row" >
-        <div className="col-12 row">
+      <div className = "form-section form-selects-entries" >
+        <div className="form-section-rest">
+
           <div className="col-12 row">
             <div className="col-4">
               <div className="row p-r-10">
@@ -563,6 +575,8 @@ export default function TaskAdd( props ) {
               </div>
             }
           </div>
+
+          <div className="row">
 
           <div className="col-4">
             {userRights.statusRead &&
@@ -655,6 +669,7 @@ export default function TaskAdd( props ) {
               </div>
             }
           </div>
+          </div>
         </div>
       </div>
     )
@@ -697,47 +712,57 @@ export default function TaskAdd( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className="task-edit-right  m-t-0 p-t-0">
+      <div className="task-edit-right">
         { userRights.statusRead &&
-          <div className="col-form-label-2" >
-            <Label className="col-form-value-2">Status</Label>
-            { layoutComponents.Status }
+          <div className="form-selects-entry-column" >
+            <Label>Status</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Status }
+            </div>
           </div>
         }
-        <div className="col-form-label-2">
-          <Label className="col-form-value-2">Projekt</Label>
-          { layoutComponents.Project(true) }
+        <div className="form-selects-entry-column" >
+          <Label>Projekt</Label>
+          <div className="form-selects-entry-column-rest" >
+            { layoutComponents.Project(true) }
+          </div>
         </div>
         { userRights.milestoneRead &&
-          <div className="col-form-label-2">
-            <Label className="col-form-value-2">Milestone</Label>
-            { layoutComponents.Milestone }
+          <div className="form-selects-entry-column" >
+            <Label>Milestone</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Milestone }
+            </div>
           </div>
         }
         { userRights.requesterRead &&
-          <div className="col-form-label-2">
-            <Label className="col-form-value-2">Zadal</Label>
-            { layoutComponents.Requester }
+          <div className="form-selects-entry-column" >
+            <Label>Zadal</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Requester }
+            </div>
           </div>
         }
         { userRights.companyRead &&
-          <div className="col-form-label-2">
-            <Label className="col-form-value-2">Firma</Label>
-            { layoutComponents.Company }
+          <div className="form-selects-entry-column" >
+            <Label>Firma</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Company }
+            </div>
           </div>
         }
         { userRights.assignedRead &&
-          <div className="">
-            <Label className="col-form-label-2">Assigned</Label>
-            <div className="col-form-value-2">
+          <div className="form-selects-entry-column" >
+            <Label>Assigned</Label>
+            <div className="form-selects-entry-column-rest" >
               { layoutComponents.Assigned }
             </div>
           </div>
         }
         { userRights.deadlineRead &&
-          <div className="">
-            <Label className="col-form-label-2">Deadline</Label>
-            <div className="col-form-value-2">
+          <div className="form-selects-entry-column" >
+            <Label>Deadline</Label>
+            <div className="form-selects-entry-column-rest" >
               { layoutComponents.Deadline }
             </div>
           </div>
@@ -786,31 +811,28 @@ export default function TaskAdd( props ) {
             />
         }
         { userRights.typeRead &&
-          <div className="">
-            <Label className="col-form-label-2">Task Type</Label>
-            <div className="col-form-value-2">
+          <div className="form-selects-entry-column" >
+            <Label>Task Type</Label>
+            <div className="form-selects-entry-column-rest" >
               { layoutComponents.Type }
             </div>
           </div>
         }
         { userRights.pausalRead &&
-          <div className="">
-            <Label className="col-form-label-2">Paušál</Label>
-            <div className="col-form-value-2">
+          <div className="form-selects-entry-column" >
+            <Label>Paušál</Label>
+            <div className="form-selects-entry-column-rest" >
               { layoutComponents.Pausal }
             </div>
           </div>
         }
         { userRights.overtimeRead &&
-          <div className="">
-            <Label className="col-form-label-2">Mimo PH</Label>
-            <div className="col-form-value-2">
+          <div className="form-selects-entry-column" >
+            <Label>Mimo PH</Label>
+            <div className="form-selects-entry-column-rest" >
               { layoutComponents.Overtime }
             </div>
           </div>
-        }
-        {
-          renderCreateButton()
         }
       </div>
     )
@@ -821,11 +843,9 @@ export default function TaskAdd( props ) {
       return null;
     }
     return (
-      <div className = "row m-t-10" >
-        <div className="center-hor">
-          <Label className="center-hor">Tagy: </Label>
-        </div>
-        <div className="f-1 ">
+      <div className = "form-section" >
+        <Label>Tagy</Label>
+        <div className="f-1 form-section-rest" style={{marginLeft: "5px"}}>
           <Select
             value={tags}
             placeholder="None"
@@ -845,19 +865,21 @@ export default function TaskAdd( props ) {
       return null;
     }
     return (
-      <div>
-        <Label className="col-form-label-description">Popis úlohy</Label>
-        <CKEditor5
-          editor={ ClassicEditor }
-          data={description}
-          onInit={(editor)=>{
-          }}
-          onChange={(e, editor)=>{
-            setDescription(editor.getData());
-          }}
-          readOnly={!userRights.taskDescriptionWrite}
-          config={ck5config}
-          />
+      <div className="form-section">
+        <Label>Popis úlohy</Label>
+        <div  className="form-section-rest">
+          <CKEditor5
+            editor={ ClassicEditor }
+            data={description}
+            onInit={(editor)=>{
+            }}
+            onChange={(e, editor)=>{
+              setDescription(editor.getData());
+            }}
+            readOnly={!userRights.taskDescriptionWrite}
+            config={ck5config}
+            />
+        </div>
       </div>
     )
   }
@@ -1043,53 +1065,14 @@ export default function TaskAdd( props ) {
     )
   }
 
-  const renderCancelButton = () => {
-    if ( closeModal ) {
-      return (
-        <Button
-          className={classnames(
-            "btn",
-            "btn-link-cancel",
-            {
-              "position-absolute bottom-20": layout === 2
-            }
-          )}
-           onClick={() => closeModal()}>Cancel</Button>
-      )
-    } else {
-      return;
-    }
-  }
-
-  const renderCreateButton = () => {
-    return (
-      <button
-        className={classnames(
-          "btn",
-          {
-            "pull-right": layout === 1
-          },
-          {
-            "m-t-20": layout === 2
-          },
-          {
-            "m-l-5": layout === 2
-          }
-        )}
-        onClick={addTaskFunc}
-        disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
-        >
-        Create task
-      </button>
-    )
-  }
-
   const renderButtons = () => {
     return (
-      <div>
+      <div className="form-section task-edit-buttons">
+      <div className="row form-section-rest">
         {closeModal &&
           <Button className="btn btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
         }
+        {canCreateVykazyError()}
         <button
           className="btn pull-right"
           disabled={ cantSave }
@@ -1097,6 +1080,7 @@ export default function TaskAdd( props ) {
           > Create task
         </button>
       </div>
+    </div>
     )
   }
 
@@ -1105,7 +1089,7 @@ export default function TaskAdd( props ) {
       return null;
     }
     return (
-      <span className="center-hor" style={{color: "#FF4500", height: "20px", fontSize: "14px"}}>
+      <span className="message error-message center-hor ml-auto">
         {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
       </span>
     );
@@ -1113,48 +1097,48 @@ export default function TaskAdd( props ) {
 
   return (
     <div>
+      {renderLayoutButton()}
       <div
         className={classnames(
           "scrollable",
           "min-height-400",
-          { "p-20": layout === 1},
           { "row": layout === 2}
         )}
         >
 
         <div
           className={classnames(
-            "p-30",
             {
               "task-edit-left": layout === 2
+            },
+            {
+              "task-edit-left-columns": layout !== 2
             }
           )}>
-
-          {canCreateVykazyError()}
 
           { renderTitle() }
 
           <hr className="m-t-15 m-b-10"/>
 
-          { layout === 1 ? renderSelectsLayout1() : renderTags() }
+          { renderTags() }
+
+          { layout === 1 && renderSelectsLayout1()  }
 
           { renderDescription() }
 
-          { layout === 1 && renderTags() }
 
           { renderSimpleSubtasks() }
 
           { renderAttachments(false) }
           { renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
-          { layout === 2 && renderCancelButton() }
+          { renderButtons() }
 
         </div>
 
         { layout === 2 && renderSelectsLayout2Side() }
 
       </div>
-      { layout ===1 && renderButtons() }
     </div>
   );
 }

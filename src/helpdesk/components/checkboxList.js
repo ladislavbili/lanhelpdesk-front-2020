@@ -1,5 +1,8 @@
 import React from 'react';
 import Checkbox from 'components/checkbox';
+import {
+  Label
+} from 'reactstrap';
 
 export default function CheckboxList( props ) {
   const {
@@ -19,10 +22,10 @@ export default function CheckboxList( props ) {
   const [ editedItem, setEditedItem ] = React.useState( null );
 
   return (
-    <div className="task-edit-popis">
-      <div>
-        Subtasks
-      </div>
+    <div className="form-section">
+          <Label>Subtasks</Label>
+          <div></div>
+          <div className="form-section-rest">
       { items.map((item) =>
         <div className="row" key={item.id}>
           <Checkbox
@@ -111,5 +114,6 @@ export default function CheckboxList( props ) {
         </button>
       }
     </div>
+  </div>
   )
 }

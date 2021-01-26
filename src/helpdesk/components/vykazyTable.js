@@ -213,8 +213,8 @@ export default function Rozpocet( props ) {
   )
 
   return (
-    <div className="vykazyTable">
-      <table className="table">
+    <div className="vykazyTable form-section">
+      <table className="table form-section-rest">
         <thead>
           <tr>
             <th colSpan={showColumns.includes(0) ? 2 : 1}>

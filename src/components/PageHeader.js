@@ -135,7 +135,8 @@ export default function PageHeader( props ) {
           }
         </div>
         <div className="ml-auto center-hor row">
-          <i className="fas fa-user header-icon center-hor clickable w-25px" onClick={() => setModalUserProfileOpen(true)}></i>
+          <div className=" header-icon center-hor clickable" onClick={() => setModalUserProfileOpen(true)}>{`${currentUser.name} ${currentUser.surname}`} <i className="fas fa-user m-l-5"/></div>
+
           { accessRights.viewErrors &&
             <ErrorIcon history={history} location={URL} />
           }

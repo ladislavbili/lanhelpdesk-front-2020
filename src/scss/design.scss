@@ -294,6 +294,10 @@ html{
   position: absolute;
 }
 
+.bottom-15{
+  bottom: 15px;
+}
+
 .bottom-20{
   bottom: 20px;
 }
@@ -557,7 +561,7 @@ h4{
 
 .btn-link{
   background-color: inherit;
-  padding-left: 0px;
+  padding: 0px;
   color: $color-link;
 }
 
@@ -606,6 +610,19 @@ h4{
   background-color: inherit;
   color: $main-font-color;
   text-decoration: none;
+}
+
+.btn-repeat{
+  background-color: white !important;
+  font: $font-no-value;
+  color: $color-no-value;
+  width: 100%;
+  text-align: left;
+}
+.btn-repeat:hover{
+  cursor: pointer;
+  background-color: white !important;
+  color: black;
 }
 
 .btn-outline-blue:not(:disabled):not(.disabled).active, .btn-outline-blue:not(:disabled):not(.disabled):active, .show>.btn-outline-blue.dropdown-toggle {
@@ -667,17 +684,6 @@ h4{
   color: $basic-button-color;
 }
 
-.repeat-btn{
-  background-color: inherit;
-  font: $font-no-value;
-  color: $color-no-value;
-}
-.repeat-btn:hover{
-  cursor: pointer;
-  background-color: inherit;
-  color: $main-font-color;
-}
-
 .fa, .fas, .far{
   padding-right: 5px;
 }
@@ -725,15 +731,6 @@ h4{
   line-height: 16px;
   padding-top: 8px;
   padding-bottom: none;
-}
-
-.col-form-label-2{
-  font: $font-label;
-  color: $color-label;
-  line-height: 16px;
-  padding-top: 8px;
-  padding-bottom: none;
-  padding-left: 7px;
 }
 
 .col-form-label-3{
@@ -1034,8 +1031,10 @@ tr:last-child{
 }
 
 .message{
+  padding: 4px 4px;
   height: $button-height;
-  padding: 3px 6px;
+  font-size: 14px;
+  margin-right: 5px;
 }
 
 .success-message{
@@ -1550,6 +1549,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
 }
 
+.task-add-layout{
+  height: 40px;
+  padding-left: $odsadenie-form;
+  background-color: #f4f8fb;
+  margin: 0px;
+}
+.task-add-layout-button{
+  margin-top: calc((40px - 30px)/2);
+}
+
 .task-container-col{
   background-color: #FFF;
 }
@@ -1725,9 +1734,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 //-------------------END-tasklist-------------------------
 
 //----------------------taskEdit--------------------------
-.task-title-input::placeholder{
-  color:#FF4500
-}
 .task-title-input{
   font-size: 2.5rem;
   line-height: 1.5;
@@ -1793,6 +1799,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .vykazyTable>.table{
   font-size: 12px;
+  width: calc(100% - #{$difference-form}) !important;
 }
 
 .vykazyTable>.table>thead{
@@ -1888,15 +1895,30 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-edit-left{
+  position: relative;
+  padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$difference-form});
   max-width: 1620px;
   min-width: 400px;
   width: calc(100% - 300px) !important;
 }
 
 .task-edit-left-columns{
+  padding: 15px $odsadenie-form $odsadenie-form $odsadenie-form;
   max-width: 1670px;
   min-width: 400px;
    width: auto;
+}
+
+.task-edit-buttons{
+  position: absolute;
+  bottom: 10px;
+  width: calc(100% - ( 2 *  #{$odsadenie-form} ) + #{$difference-form} )  !important;
+}
+
+.task-edit-buttons-columns{
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
 }
 
 .task-edit-popis{
@@ -1934,6 +1956,77 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .attachment-label{
   display: inline-block;
 }
+
+.form-section{
+  margin-bottom: 15px;
+  label:not(.col-form-label){
+      margin-bottom: 5px;
+      margin-left: $difference-form;
+  }
+  .form-section-rest{
+      margin-left: $difference-form;
+  }
+  .form-section-rest.task-title-input{
+      margin-left: 0;
+  }
+}
+
+.form-section:nth-last-child(2){
+  margin-bottom: 40px;
+}
+
+.form-selects-entry-column{
+  font: $font-label;
+  color: $color-label;
+  line-height: 16px;
+  margin-top: 0px;
+  margin-bottom: 8px;
+
+  label{
+    margin-left: 7px;
+    margin-bottom: 5px;
+  }
+
+  .form-selects-entry-column-rest{
+    margin-left: 0px;
+  }
+  .react-datepicker-wrapper{
+    width: 100%;
+    .react-datepicker__input-container{
+      width: 100%;
+      input{
+        border: none;
+        color: #E81123;
+      }
+    }
+  }
+  .react-datepicker-popper{
+    z-index: 9999;
+  }
+}
+
+.col-9{
+  .react-datepicker-wrapper{
+    width: 100%;
+    .react-datepicker__input-container{
+      width: 100%;
+      input{
+        border: none;
+        color: #E81123;
+      }
+    }
+  }
+  .react-datepicker-popper{
+    z-index: 9999;
+  }
+}
+
+.form-selects-entries{
+  background-color:  #F4F4F4;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
 //-------------------END-taskEdit-------------------------
 //-----------NEW CHECKBOX -------------
 .checkbox-mark {

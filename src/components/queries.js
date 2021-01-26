@@ -7,6 +7,8 @@ query {
   getMyData{
     id
     tasklistLayout
+    name
+    surname
     role {
       accessRights {
         viewVykaz

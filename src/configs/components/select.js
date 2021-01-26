@@ -10,7 +10,6 @@ const noValue = {
 }
 const noValueMandatory = {
   font: '14px Segoe UI',
-  color: '#E81123',
 }
 
 export const invisibleSelectStyleNoArrow = {
@@ -76,6 +75,77 @@ export const invisibleSelectStyleNoArrow = {
   placeholder: base => ( {
     ...base,
     ...noValue
+  } ),
+  menu: base => ( {
+    ...base,
+    zIndex: 50,
+  } ),
+
+};
+
+export const selectStyleNoArrowNoPadding = {
+  control: ( base, state ) => ( {
+    ...base,
+    minHeight: 30,
+    backgroundColor: 'white',
+    border: "none",
+    borderRadius: 0,
+  } ),
+  dropdownIndicator: base => ( {
+    ...base,
+    color: "transparent",
+    padding: 4,
+  } ),
+  clearIndicator: base => ( {
+    ...base,
+    padding: 4,
+  } ),
+  multiValue: ( base, {
+    data
+  } ) => {
+    return {
+      ...base,
+      backgroundColor: data.color ? data.color : "#F2F1F1",
+      borderRadius: 0,
+    };
+  },
+  multiValueLabel: ( base, {
+    data
+  } ) => ( {
+    ...base,
+    color: data.color ? "white" : "black",
+  } ),
+  multiValueRemove: ( styles, {
+    data
+  } ) => ( {
+    ...styles,
+    color: data.color ? "white" : "black",
+    backgroundColor: data.color ? data.color : "#F2F1F1",
+    ':hover': {
+      backgroundColor: "rgba(0,0,0,0.5)",
+      color: 'white',
+    },
+  } ),
+  valueContainer: base => ( {
+    ...base,
+    padding: '0px 5px',
+    borderRadius: 0,
+    ...value,
+  } ),
+  input: base => ( {
+    ...base,
+    margin: 0,
+    padding: 0,
+    backgroundColor: "white",
+    borderRadius: 0
+  } ),
+  indicatorSeparator: base => ( {
+    ...base,
+    width: 0,
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValueMandatory
   } ),
   menu: base => ( {
     ...base,
@@ -268,7 +338,8 @@ export const invisibleSelectStyleNoArrowRequired = {
     ...base,
     minHeight: 30,
     backgroundColor: state.isFocused ? 'white' : 'inherit',
-    borderWidth: 0,
+    border: "none",
+    borderBottom: "1px solid  #E81123",
     borderRadius: 0
   } ),
   dropdownIndicator: base => ( {
@@ -335,12 +406,86 @@ export const invisibleSelectStyleNoArrowRequired = {
 
 };
 
+export const selectStyleNoArrowRequired = {
+  control: ( base, state ) => ( {
+    ...base,
+    minHeight: 30,
+    backgroundColor: 'white',
+    border: "none",
+    borderBottom: "1px solid  #E81123",
+    borderRadius: 0
+  } ),
+  dropdownIndicator: base => ( {
+    ...base,
+    color: "transparent",
+    padding: 4,
+  } ),
+  clearIndicator: base => ( {
+    ...base,
+    padding: 4,
+  } ),
+  multiValue: ( base, {
+    data
+  } ) => {
+    return {
+      ...base,
+      backgroundColor: data.color ? data.color : "#F2F1F1",
+      borderRadius: 0,
+    };
+  },
+  multiValueLabel: ( base, {
+    data
+  } ) => ( {
+    ...base,
+    color: data.color ? "white" : "black",
+  } ),
+  multiValueRemove: ( styles, {
+    data
+  } ) => ( {
+    ...styles,
+    color: data.color ? "white" : "black",
+    backgroundColor: data.color ? data.color : "#F2F1F1",
+    ':hover': {
+      backgroundColor: "rgba(0,0,0,0.5)",
+      color: 'white',
+    },
+  } ),
+  valueContainer: base => ( {
+    ...base,
+    padding: '0px 6px',
+    borderRadius: 0,
+    ...value,
+  } ),
+  input: base => ( {
+    ...base,
+    margin: 0,
+    padding: 0,
+    backgroundColor: "white",
+    borderRadius: 0
+  } ),
+  indicatorSeparator: base => ( {
+    ...base,
+    width: 0,
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValueMandatory
+  } ),
+  menu: base => ( {
+    ...base,
+    zIndex: 50,
+    ...value
+  } ),
+
+};
+
 export const invisibleSelectStyleNoArrowRequiredNoPadding = {
   control: ( base, state ) => ( {
     ...base,
     minHeight: 30,
-    backgroundColor: state.isFocused ? 'white' : 'inherit',
-    borderWidth: 0,
+    backgroundColor: 'white',
+    border: "none",
+    borderBottom: "1px solid  #E81123",
     borderRadius: 0
   } ),
   dropdownIndicator: base => ( {
@@ -408,12 +553,127 @@ export const invisibleSelectStyleNoArrowRequiredNoPadding = {
 
 };
 
+export const selectStyleNoArrowColoredRequired = {
+  control: ( base, state ) => ( {
+    ...base,
+    minHeight: 30,
+    backgroundColor: 'white',
+    border: "none",
+    borderBottom: "1px solid  #E81123",
+    borderRadius: 0
+  } ),
+  option: ( styles, {
+    data,
+    isDisabled,
+    isFocused,
+    isSelected
+  } ) => {
+    const color = chroma( data.color );
+    return {
+      ...styles,
+      backgroundColor: isDisabled ?
+        null : isSelected ?
+        data.color : isFocused ?
+        color.alpha( 0.1 ).css() : null,
+      color: isDisabled ?
+        '#ccc' : isSelected ?
+        chroma.contrast( color, 'white' ) > 2 ?
+        'white' :
+        'black' : data.color,
+      cursor: isDisabled ? 'not-allowed' : 'default',
+
+      ':active': {
+        ...styles[ ':active' ],
+        backgroundColor: !isDisabled && ( isSelected ? data.color : color.alpha( 0.3 ).css() ),
+      },
+    };
+  },
+  dropdownIndicator: base => ( {
+    ...base,
+    color: "transparent",
+    padding: 4,
+  } ),
+  clearIndicator: base => ( {
+    ...base,
+    padding: 4,
+  } ),
+  multiValue: ( base, {
+    data
+  } ) => {
+    const color = chroma( data.color );
+    return {
+      ...base,
+      color: '#FFF',
+      padding: '0px 5px',
+      backgroundColor: color.alpha( 0.1 ).css(),
+      borderRadius: 0,
+    };
+  },
+  multiValueLabel: ( base, {
+    data
+  } ) => ( {
+    ...base,
+    color: data.color,
+  } ),
+  multiValueRemove: ( styles, {
+    data
+  } ) => ( {
+    ...styles,
+    color: data.color,
+    ':hover': {
+      backgroundColor: data.color,
+      color: 'white',
+    },
+  } ),
+  valueContainer: base => ( {
+    ...base,
+    padding: '0px 5px',
+    borderRadius: 0,
+    ...value
+
+  } ),
+  input: base => ( {
+    ...base,
+    margin: 0,
+    padding: '0px 5px',
+    backgroundColor: "white",
+    borderRadius: 0
+  } ),
+  indicatorSeparator: base => ( {
+    ...base,
+    width: 0,
+  } ),
+  placeholder: base => ( {
+    ...base,
+    ...noValueMandatory
+  } ),
+  singleValue: ( styles, {
+    data
+  } ) => {
+    return ( {
+      ...styles,
+      color: '#FFF',
+      padding: '0px 5px',
+      backgroundColor: data.color
+    } );
+  },
+  placeholder: base => ( {
+    ...base,
+    ...noValueMandatory,
+  } ),
+  menu: base => ( {
+    ...base,
+    zIndex: 50,
+  } ),
+};
+
 export const invisibleSelectStyleNoArrowColoredRequired = {
   control: ( base, state ) => ( {
     ...base,
     minHeight: 30,
     backgroundColor: state.isFocused ? 'white' : 'inherit',
-    borderWidth: 0,
+    border: "none",
+    borderBottom: "1px solid  #E81123",
     borderRadius: 0
   } ),
   option: ( styles, {
@@ -513,8 +773,7 @@ export const invisibleSelectStyleNoArrowColoredRequired = {
   },
   placeholder: base => ( {
     ...base,
-    font: '14px Segoe UI',
-    color: '#E81123',
+    ...noValueMandatory
   } ),
   menu: base => ( {
     ...base,

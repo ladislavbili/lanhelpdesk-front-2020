@@ -2,6 +2,9 @@ import React, {
   Component
 } from 'react';
 import downloadjs from 'downloadjs';
+import {
+  Label
+} from 'reactstrap';
 import axios from 'axios';
 import {
   REST_URL,
@@ -50,53 +53,53 @@ export default class Attachments extends Component {
       removeAttachment,
     } = this.props;
     return (
-      <div className="full-width task-edit-popis">
-        <input
-          type="file"
-          id={"uploadAttachment" + taskID}
-          multiple={true}
-          style={{display:'none'}}
-          onChange={(e)=>{
-            if(e.target.files.length>0){
-              let files = [...e.target.files];
-              addAttachments(files);
-            }
-          }}
-          />
-        { !disabled && !top &&
-          <div className="attachment-label">
-            <label htmlFor={"uploadAttachment"+taskID} className="btn-link" >
+      <div className="form-section">
+        <Label>Attachments</Label>
+        <div></div>
+        <div className="form-section-rest">
+          <input
+            type="file"
+            id={"uploadAttachment" + taskID}
+            multiple={true}
+            style={{display:'none'}}
+            onChange={(e)=>{
+              if(e.target.files.length>0){
+                let files = [...e.target.files];
+                addAttachments(files);
+              }
+            }}
+            />
+          { !disabled && !top &&
+            <div className="attachment-label">
+              <label htmlFor={"uploadAttachment"+taskID} className="btn btn-link" >
+                <i className="fa fa-plus" />
+                Add attachment
+              </label>
+            </div>
+          }
+          { attachments.map((attachment,index)=>
+            <div key={index}  className="attachment">
+              <span key={attachment.id} className="comment-attachment link m-r-5" onClick={ () => this.getAttachment(attachment) }>
+                {`${attachment.filename} (${attachment.size/1000}kb)`}
+              </span>
+              {!disabled &&
+                <button className="btn-link"
+                  disabled={disabled}
+                  onClick={()=>{
+                    removeAttachment(attachment);
+                  }}>
+                  <i className="fa fa-times"  />
+                </button>
+              }
+            </div>
+          )}
+          { !disabled && top &&
+            <button className="btn btn-link" htmlFor={"uploadAttachment"+taskID}>
               <i className="fa fa-plus" />
-              Add attachment
-            </label>
-          </div>
-        }
-        { attachments.map((attachment,index)=>
-          <div key={index}  className="attachment">
-            <span key={attachment.id} className="comment-attachment link m-r-5" onClick={ () => this.getAttachment(attachment) }>
-              {`${attachment.filename} (${attachment.size/1000}kb)`}
-            </span>
-            {!disabled &&
-              <button className="btn-link-remove"
-                disabled={disabled}
-                onClick={()=>{
-                  removeAttachment(attachment);
-                }}>
-                <i className="fa fa-times"  />
-              </button>
-            }
-          </div>
-        )}
-        { !disabled && top &&
-          <div className="attachment-label">
-            <label htmlFor={"uploadAttachment"+taskID} className="btn-link clickable" >
-              <i className="fa fa-plus p-r-5" />
-              Add attachment
-            </label>
-          </div>
-        }
+              Attachment</button>
+          }
+        </div>
       </div>
-
     );
   }
 }
