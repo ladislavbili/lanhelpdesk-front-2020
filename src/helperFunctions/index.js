@@ -9,6 +9,7 @@ export {
   sameStringForms,
   textIncluded,
   inputError,
+  compareObjectAttributes,
 }
 from './dataChecks';
 

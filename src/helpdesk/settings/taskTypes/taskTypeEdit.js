@@ -54,11 +54,14 @@ export default function TaskTypeEdit( props ) {
   const [ saving, setSaving ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
+  const [ dataChanged, setDataChanged ] = React.useState( false );
+
   // sync
   React.useEffect( () => {
     if ( !loading ) {
       setTitle( data.taskType.title );
       setOrder( data.taskType.order );
+      setDataChanged( false );
     }
   }, [ loading ] );
 
@@ -87,6 +90,7 @@ export default function TaskTypeEdit( props ) {
       } );
 
     setSaving( false );
+    setDataChanged( false );
   };
 
   const deleteTaskTypeFunc = ( replacement ) => {
@@ -115,39 +119,77 @@ export default function TaskTypeEdit( props ) {
     }
   };
 
+  if ( loading ) {
+    return <Loading />
+  }
+
   return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-      {
-        loading &&
-        <Loading />
-      }
-      <FormGroup>
-        <Label for="name">Task type name</Label>
-        <Input type="text" name="name" id="name" placeholder="Enter task type name" value={title} onChange={(e)=>setTitle(e.target.value)} />
-      </FormGroup>
-
-      <FormGroup>
-        <Label for="order">Order</Label>
-        <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
-      </FormGroup>
-
-      <div className="row">
-        <Button
-          className="btn-red m-l-5"
-          disabled={saving || theOnlyOneLeft}
-          onClick={() => setDeleteOpen(true)}
-          >
-          Delete
-        </Button>
-        <Button className="btn ml-auto" disabled={saving} onClick={updateTaskTypeFunc}>{saving?'Saving task type...':'Save task type'}</Button>
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { dataChanged &&
+          <div className="message error-message">
+            Save changes before leaving!
+          </div>
+        }
+        { !dataChanged &&
+          <div className="message success-message">
+            Saved
+          </div>
+        }
       </div>
-      <DeleteReplacement
-        isOpen={deleteOpen}
-        label="task type"
-        options={filteredTaskTypes}
-        close={()=>setDeleteOpen(false)}
-        finishDelete={deleteTaskTypeFunc}
-        />
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+        <FormGroup>
+          <Label for="name">Task type name</Label>
+          <Input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Enter task type name"
+            value={title}
+            onChange={(e)=>{
+              setTitle(e.target.value);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+
+        <FormGroup>
+          <Label for="order">Order</Label>
+          <Input
+            type="number"
+            name="order"
+            id="order"
+            placeholder="Lower means first"
+            value={order}
+            onChange={(e)=>{
+              setOrder(e.target.value);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+
+        <div className="row">
+          <Button
+            className="btn-red m-l-5"
+            disabled={saving || theOnlyOneLeft}
+            onClick={() => {
+              setDeleteOpen(true);
+              setDataChanged( true );
+            }}
+            >
+            Delete
+          </Button>
+          <Button className="btn ml-auto" disabled={saving} onClick={updateTaskTypeFunc}>{saving?'Saving task type...':'Save task type'}</Button>
+        </div>
+        <DeleteReplacement
+          isOpen={deleteOpen}
+          label="task type"
+          options={filteredTaskTypes}
+          close={()=>setDeleteOpen(false)}
+          finishDelete={deleteTaskTypeFunc}
+          />
+      </div>
     </div>
+
   )
 }

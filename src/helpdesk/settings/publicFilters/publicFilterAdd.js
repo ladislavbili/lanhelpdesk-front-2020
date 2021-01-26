@@ -226,187 +226,197 @@ export default function PublicFilterAdd( props ) {
     return <Loading />
   }
   return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-      <FormGroup> {/* Title */}
-        <Label htmlFor="title">Filter name</Label>
-        <Input
-          id="title"
-          type="text"
-          placeholder="Enter role name"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          />
-      </FormGroup>
-
-      <FormGroup>{/* Order */}
-        <Label for="order">Filter order</Label>
-        <Input
-          id="order"
-          type="number"
-          placeholder="Enter filter order"
-          value={order}
-          onChange={(e) => setOrder(e.target.value)}
-          />
-      </FormGroup>
-
-      {/* Global */}
-      <Checkbox
-        className = "m-l-5 m-r-5"
-        label = "Global (shown in all projects)"
-        value = { global }
-        onChange={(e) => setGlobal(!global)}
-        />
-
-      <div className="m-b-10">{/* Project */}
-        <Label className="form-label">Projekt</Label>
-        <Select
-          placeholder="Vyberte projekt"
-          value={project}
-          isDisabled={global}
-          onChange={(project) => setProject(project)}
-          options={toSelArr(projectsData.projects)}
-          styles={selectStyle}
-          />
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { cantSave &&
+          <div className="message error-message">
+            Fill in all the required information!
+          </div>
+        }
       </div>
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+        <FormGroup> {/* Title */}
+          <Label htmlFor="title">Filter name <span className="warning-big">*</span></Label>
+          <Input
+            id="title"
+            type="text"
+            placeholder="Enter role name"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            />
+        </FormGroup>
 
-      {/* Dashboard */}
-      <Checkbox
-        className = "m-l-5 m-r-5"
-        label = "Dashboard (shown in dashboard)"
-        value = { dashboard }
-        onChange={(e) => setDashboard(!dashboard)}
-        />
+        <FormGroup>{/* Order */}
+          <Label for="order">Filter order <span className="warning-big">*</span></Label>
+          <Input
+            id="order"
+            type="number"
+            placeholder="Enter filter order"
+            value={order}
+            onChange={(e) => setOrder(e.target.value)}
+            />
+        </FormGroup>
 
-      <FormGroup>{/* Roles */}
-        <Label className="">Roles</Label>
-        <Select
-          placeholder="Choose roles"
-          value={roles}
-          isMulti
-          onChange={(newRoles)=>{
-            if(newRoles.some((role) => role.id === 'all' )){
-              if( roles.length === rolesData.roles.length ){
-                setRoles([]);
+        {/* Global */}
+        <Checkbox
+          className = "m-l-5 m-r-5"
+          label = "Global (shown in all projects)"
+          value = { global }
+          onChange={(e) => setGlobal(!global)}
+          addition={ <span className="one-of-big">*</span>}
+          />
+
+        <div className="m-b-10">{/* Project */}
+          <Label className="form-label">Projekt <span className="one-of-big">*</span></Label>
+          <Select
+            placeholder="Vyberte projekt"
+            value={project}
+            isDisabled={global}
+            onChange={(project) => setProject(project)}
+            options={toSelArr(projectsData.projects)}
+            styles={selectStyle}
+            />
+        </div>
+
+        {/* Dashboard */}
+        <Checkbox
+          className = "m-l-5 m-r-5"
+          label = "Dashboard (shown in dashboard)"
+          value = { dashboard }
+          onChange={(e) => setDashboard(!dashboard)}
+          />
+
+        <FormGroup>{/* Roles */}
+          <Label className="">Roles</Label>
+          <Select
+            placeholder="Choose roles"
+            value={roles}
+            isMulti
+            onChange={(newRoles)=>{
+              if(newRoles.some((role) => role.id === 'all' )){
+                if( roles.length === rolesData.roles.length ){
+                  setRoles([]);
+                }else{
+                  setRoles(toSelArr(rolesData.roles));
+                }
               }else{
-                setRoles(toSelArr(rolesData.roles));
+                setRoles(newRoles);
               }
-            }else{
-              setRoles(newRoles);
-            }
-          }}
-          options={toSelArr([{id: 'all', title: roles.length === rolesData.roles.length ? 'Clear' : 'All' }, ...rolesData.roles])}
-          styles={selectStyle}
+            }}
+            options={toSelArr([{id: 'all', title: roles.length === rolesData.roles.length ? 'Clear' : 'All' }, ...rolesData.roles])}
+            styles={selectStyle}
+            />
+        </FormGroup>
+
+
+        <Label className="m-t-15">Filter attributes</Label>
+        <hr className="m-t-5 m-b-10"/>
+
+        <FormGroup>{/* Requester */}
+          <label>Zadal</label>
+          <Select
+            id="select-requester"
+            options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+            onChange={ (requester) => setRequester(requester) }
+            value={requester}
+            styles={selectStyle} />
+        </FormGroup>
+
+        <FormGroup>{/* Company */}
+          <label>Firma</label>
+          <Select
+            options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
+            onChange={ (company) => setCompany(company) }
+            value={company}
+            styles={selectStyle} />
+        </FormGroup>
+
+        <FormGroup>{/* Assigned */}
+          <label>Riesi</label>
+          <Select
+            options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+            onChange={(newValue)=>setAssigned(newValue)}
+            value={assigned}
+            styles={selectStyle}
+            />
+        </FormGroup>
+
+        {/* Status Date */}
+        <FilterDatePickerInCalendar
+          label="Status date"
+          showNowFrom={statusDateFromNow}
+          dateFrom={statusDateFrom}
+          setShowNowFrom={setStatusDateFromNow}
+          setDateFrom={setStatusDateFrom}
+          showNowTo={statusDateToNow}
+          dateTo={statusDateTo}
+          setShowNowTo={setStatusDateToNow}
+          setDateTo={setStatusDateTo}
           />
-      </FormGroup>
 
-
-      <Label className="m-t-15">Filter attributes</Label>
-      <hr className="m-t-5 m-b-10"/>
-
-      <FormGroup>{/* Requester */}
-        <label>Zadal</label>
-        <Select
-          id="select-requester"
-          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
-          onChange={ (requester) => setRequester(requester) }
-          value={requester}
-          styles={selectStyle} />
-      </FormGroup>
-
-      <FormGroup>{/* Company */}
-        <label>Firma</label>
-        <Select
-          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
-          onChange={ (company) => setCompany(company) }
-          value={company}
-          styles={selectStyle} />
-      </FormGroup>
-
-      <FormGroup>{/* Assigned */}
-        <label>Riesi</label>
-        <Select
-          options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
-          onChange={(newValue)=>setAssigned(newValue)}
-          value={assigned}
-          styles={selectStyle}
+        {/* Pending Date */}
+        <FilterDatePickerInCalendar
+          label="Pending date"
+          showNowFrom={pendingDateFromNow}
+          dateFrom={pendingDateFrom}
+          setShowNowFrom={setPendingDateFromNow}
+          setDateFrom={setPendingDateFrom}
+          showNowTo={pendingDateToNow}
+          dateTo={pendingDateTo}
+          setShowNowTo={setPendingDateToNow}
+          setDateTo={setPendingDateTo}
           />
-      </FormGroup>
 
-      {/* Status Date */}
-      <FilterDatePickerInCalendar
-        label="Status date"
-        showNowFrom={statusDateFromNow}
-        dateFrom={statusDateFrom}
-        setShowNowFrom={setStatusDateFromNow}
-        setDateFrom={setStatusDateFrom}
-        showNowTo={statusDateToNow}
-        dateTo={statusDateTo}
-        setShowNowTo={setStatusDateToNow}
-        setDateTo={setStatusDateTo}
-        />
+        {/* Close Date */}
+        <FilterDatePickerInCalendar
+          label="Close date"
+          showNowFrom={closeDateFromNow}
+          dateFrom={closeDateFrom}
+          showNowTo={closeDateToNow}
+          dateTo={closeDateTo}
+          setShowNowFrom={setCloseDateFromNow}
+          setDateFrom={setCloseDateFrom}
+          setShowNowTo={setCloseDateToNow}
+          setDateTo={setCloseDateTo}
+          />
 
-      {/* Pending Date */}
-      <FilterDatePickerInCalendar
-        label="Pending date"
-        showNowFrom={pendingDateFromNow}
-        dateFrom={pendingDateFrom}
-        setShowNowFrom={setPendingDateFromNow}
-        setDateFrom={setPendingDateFrom}
-        showNowTo={pendingDateToNow}
-        dateTo={pendingDateTo}
-        setShowNowTo={setPendingDateToNow}
-        setDateTo={setPendingDateTo}
-        />
+        {/* Deadline */}
+        <FilterDatePickerInCalendar
+          label="Deadline"
+          showNowFrom={deadlineFromNow}
+          dateFrom={deadlineFrom}
+          showNowTo={deadlineToNow}
+          dateTo={deadlineTo}
+          setShowNowFrom={setDeadlineFromNow}
+          setDateFrom={setDeadlineFrom}
+          setShowNowTo={setDeadlineToNow}
+          setDateTo={setDeadlineTo}
+          />
 
-      {/* Close Date */}
-      <FilterDatePickerInCalendar
-        label="Close date"
-        showNowFrom={closeDateFromNow}
-        dateFrom={closeDateFrom}
-        showNowTo={closeDateToNow}
-        dateTo={closeDateTo}
-        setShowNowFrom={setCloseDateFromNow}
-        setDateFrom={setCloseDateFrom}
-        setShowNowTo={setCloseDateToNow}
-        setDateTo={setCloseDateTo}
-        />
+        <FormGroup>{/* Work Type */}
+          <label htmlFor="example-input-small">Typ práce</label>
+          <Select
+            options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypesData.taskTypes))}
+            onChange={(taskType)=>setTaskType(taskType)}
+            value={taskType}
+            styles={selectStyle} />
+        </FormGroup>
 
-      {/* Deadline */}
-      <FilterDatePickerInCalendar
-        label="Deadline"
-        showNowFrom={deadlineFromNow}
-        dateFrom={deadlineFrom}
-        showNowTo={deadlineToNow}
-        dateTo={deadlineTo}
-        setShowNowFrom={setDeadlineFromNow}
-        setDateFrom={setDeadlineFrom}
-        setShowNowTo={setDeadlineToNow}
-        setDateTo={setDeadlineTo}
-        />
+        <FormGroup>{/* One Of */}
+          <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
+          <Select
+            options={oneOfOptions}
+            onChange={(oneOf)=>setOneOf(oneOf)}
+            value={oneOf}
+            isMulti
+            styles={selectStyle} />
+        </FormGroup>
 
-      <FormGroup>{/* Work Type */}
-        <label htmlFor="example-input-small">Typ práce</label>
-        <Select
-          options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypesData.taskTypes))}
-          onChange={(taskType)=>setTaskType(taskType)}
-          value={taskType}
-          styles={selectStyle} />
-      </FormGroup>
-
-      <FormGroup>{/* One Of */}
-        <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
-        <Select
-          options={oneOfOptions}
-          onChange={(oneOf)=>setOneOf(oneOf)}
-          value={oneOf}
-          isMulti
-          styles={selectStyle} />
-      </FormGroup>
-
-      <div className="row">
-        <Button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>
-          {saving?'Adding...':'Add filter'}
-        </Button>
+        <div className="row">
+          <Button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>
+            {saving?'Adding...':'Add filter'}
+          </Button>
+        </div>
       </div>
     </div>
   );

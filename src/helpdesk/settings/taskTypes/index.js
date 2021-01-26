@@ -95,7 +95,6 @@ export default function TaskTypeList( props ) {
           </div>
         </div>
         <div className="col-lg-8">
-          <div className="commandbar"></div>
           {
             match.params.id && match.params.id==='add' && <TaskTypeAdd {...props}  />
           }

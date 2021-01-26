@@ -93,9 +93,6 @@ export default function PricelistsList( props ) {
               </div>
             </div>
             <div className="col-lg-8">
-              <div className="commandbar">
-              </div>
-              <div className="p-20 scroll-visible fit-with-header-and-commandbar">
                 {
                   match.params.id && match.params.id==='add' && <PriceAdd {...props} />
                 }
@@ -105,7 +102,6 @@ export default function PricelistsList( props ) {
                 {
                   match.params.id && match.params.id!=='add' && PRICELISTS.some((item)=>item.id===parseInt(match.params.id)) && <PriceEdit {...{history, match}} />
                 }
-              </div>
             </div>
           </div>
         </div>

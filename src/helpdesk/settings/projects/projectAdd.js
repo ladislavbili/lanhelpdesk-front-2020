@@ -265,6 +265,14 @@ export default function ProjectAdd( props ) {
     .filter( ( user ) => userGroups.some( ( userGroup ) => userGroup.user.id ) );
 
   return (
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { cannotSave &&
+          <div className="message error-message">
+            Fill in all the required information!
+          </div>
+        }
+      </div>
     <div
       className={ classnames(
         {
@@ -275,7 +283,7 @@ export default function ProjectAdd( props ) {
       )}
       >
       <FormGroup>
-        <Label for="name">Project name</Label>
+        <Label for="name">Project name <span className="warning-big">*</span></Label>
         <Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
       </FormGroup>
 
@@ -446,5 +454,6 @@ export default function ProjectAdd( props ) {
         </Button>
       </div>
     </div>
+  </div>
   );
 }

@@ -82,6 +82,8 @@ export default function SMTPEdit( props ) {
   const [ showPass, setShowPass ] = React.useState( false );
 
   const [ saving, setSaving ] = React.useState( false );
+  const [ dataChanged, setDataChanged ] = React.useState( false );
+
   const [ tested, setTested ] = React.useState( false );
   const [ newSMTP, setNewSMTP ] = React.useState( null );
   const [ choosingNewSMTP, setChoosingNewSMTP ] = React.useState( false );
@@ -103,6 +105,7 @@ export default function SMTPEdit( props ) {
       setSecure( data.smtp.secure );
       setWellKnown( wellKnownOptions.find( ( option ) => option.id === data.smtp.wellKnown ) );
       setTested( false );
+      setDataChanged( false );
     }
   }, [ loading ] );
 
@@ -169,6 +172,7 @@ export default function SMTPEdit( props ) {
       } );
 
     setSaving( false );
+    setDataChanged( false );
   };
   const startTest = () => {
     let newSmtps = [ ...allSMTPs ];
@@ -240,17 +244,43 @@ export default function SMTPEdit( props ) {
   }
 
   return (
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { dataChanged &&
+          <div className="message error-message">
+            Save changes before leaving!
+          </div>
+        }
+        { !dataChanged &&
+          <div className="message success-message">
+            Saved
+          </div>
+        }
+      </div>
     <div className="p-20 scroll-visible fit-with-header-and-commandbar">
       <Checkbox
         className = "m-b-5 p-l-0"
         value = { def }
-        onChange={ () => setDef(!def) }
+        onChange={ () => {
+          setDef(!def);
+          setDataChanged( true );
+        } }
         label = "Default"
         />
 
       <FormGroup>
-        <Label for="name">Title</Label>
-        <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
+        <Label for="name">Title { !wellKnownBlock && <span className="warning-big">*</span>}</Label>
+        <Input
+          type="text"
+          name="name"
+          id="name"
+          placeholder="Enter title"
+          value={title}
+          onChange={ (e) => {
+            setTitle(e.target.value);
+            setDataChanged( true );
+          } }
+          />
       </FormGroup>
 
       <FormGroup>
@@ -259,36 +289,81 @@ export default function SMTPEdit( props ) {
           styles={selectStyle}
           options={wellKnownOptions}
           value={wellKnown}
-          onChange={wellKnown => setWellKnown(wellKnown)}
+          onChange={wellKnown => {
+            setWellKnown(wellKnown);
+            setDataChanged( true );
+          }}
           />
       </FormGroup>
 
       <FormGroup>
-        <Label for="name">Host</Label>
-        <Input type="text" name="name" id="host" placeholder="Enter host" value={host} onChange={ (e) => setHost(e.target.value) } />
+        <Label for="name">Host { !wellKnownBlock && <span className="warning-big">*</span>}</Label>
+        <Input
+          type="text"
+          name="name"
+          id="host"
+          placeholder="Enter host"
+          value={host}
+          onChange={ (e) => {
+            setHost(e.target.value);
+            setDataChanged( true );
+          } }
+          />
       </FormGroup>
 
       <FormGroup>
-        <Label for="name">Port</Label>
-        <Input type="number" name="name" id="port" placeholder="Enter port" value={port} onChange={ (e) => setPort(e.target.value) } />
+        <Label for="name">Port { !wellKnownBlock && <span className="warning-big">*</span>}</Label>
+        <Input
+          type="number"
+          name="name"
+          id="port"
+          placeholder="Enter port"
+          value={port}
+          onChange={ (e) => {
+            setPort(e.target.value);
+            setDataChanged( true );
+          } }
+          />
       </FormGroup>
 
       <Checkbox
         className = "m-b-5 p-l-0"
         value = { secure }
-        onChange={ () => setSecure(!secure) }
+        onChange={ () => {
+          setSecure(!secure);
+          setDataChanged( true );
+        } }
         label = "Secure"
         />
 
       <FormGroup>
-        <Label for="name">Username</Label>
-        <Input type="text" name="name" id="user" placeholder="Enter user" value={username} onChange={ (e) => setUsername(e.target.value) } />
+        <Label for="name">Username <span className="warning-big">*</span></Label>
+        <Input
+          type="text"
+          name="name"
+          id="user"
+          placeholder="Enter user"
+          value={username}
+          onChange={ (e) => {
+            setUsername(e.target.value);
+            setDataChanged( true );
+          }  }
+          />
       </FormGroup>
 
       <FormGroup>
-        <Label>Password</Label>
+        <Label>Password <span className="warning-big">*</span></Label>
         <InputGroup>
-          <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={password} onChange={ (e) => setPassword(e.target.value) } />
+          <Input
+            type={showPass?'text':"password"}
+            className="from-control"
+            placeholder="Enter password"
+            value={password}
+            onChange={ (e) => {
+              setPassword(e.target.value);
+              setDataChanged( true );
+            } }
+            />
           <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
             <InputGroupText>
               <i className={"mt-auto mb-auto "+ ( !showPass ?' fa fa-eye':'fa fa-eye-slash') }/>
@@ -300,7 +375,10 @@ export default function SMTPEdit( props ) {
       <Checkbox
         className = "m-b-5 p-l-0"
         value = { rejectUnauthorized }
-        onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
+        onChange={ () => {
+          setRejectUnauthorized(!rejectUnauthorized);
+          setDataChanged( true );
+        }}
         label = "Reject unauthorized"
         />
 
@@ -315,7 +393,10 @@ export default function SMTPEdit( props ) {
               styles={selectStyle}
               options={filteredSMTPs}
               value={newSMTP}
-              onChange={s => setNewSMTP(s)}
+              onChange={s => {
+                setNewSMTP(s);
+                setDataChanged( true );
+              }}
               />
           </FormGroup>
 
@@ -326,7 +407,10 @@ export default function SMTPEdit( props ) {
                 styles={selectStyle}
                 options={filteredSMTPs}
                 value={newDefSMTP}
-                onChange={s => setNewDefSMTP(s)}
+                onChange={s => {
+                  setNewDefSMTP(s);
+                  setDataChanged( true );
+                }}
                 />
             </FormGroup>
           }
@@ -348,5 +432,6 @@ export default function SMTPEdit( props ) {
         <Button className="btn m-l-5" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</Button>
       </div>
     </div>
+  </div>
   );
 }

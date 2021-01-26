@@ -144,13 +144,13 @@ html{
 	height: $height-without-header;
 }
 .fit-with-header-and-commandbar{
-	height: calc(  #{$height-without-header} - 70px );
+	height: calc(  #{$height-without-header} - #{$commandbar-height} );
 }
 .fit-with-header-and-commandbar-2{
 	height: calc(  #{$height-without-header} - 82px );
 }
 .fit-with-header-and-commandbar-3{
-	height: calc(  #{$height-without-header} - 70px - 40px - 40px );
+	height: calc(  #{$height-without-header} - #{$commandbar-height}  - 40px - 40px );
 }
 
 .overflow-x{
@@ -484,6 +484,10 @@ h4{
     text-align: left;
 }
 
+.a-i-c{
+  align-items: center;
+}
+
 .col-1-5{
   flex: 0 0 12.5%;
   max-width: 12.5%;
@@ -504,7 +508,7 @@ h4{
 
 .form-body-highlighted{
   position: relative;
-  height: calc(  100vh - 40px - 70px - 40px - 60px); //header, commandbar, nadpis, buttons
+  height: calc(  100vh - 40px - #{$commandbar-height} - 40px - 60px); //header, commandbar, nadpis, buttons
 }
 
 .bring-to-front{
@@ -972,6 +976,16 @@ tr:last-child{
   color: red;
 }
 
+.warning-big{
+  color: red;
+  font-size: 15px;
+}
+
+ .one-of-big{
+   color: orange;
+   font-size: 15px;
+ }
+
 .warning-text{
   @extend .text-muted;
   color: #ffc107 !important;
@@ -1017,6 +1031,21 @@ tr:last-child{
 .input-error{
   border-color: #f19a9aed;
   border-width: 1px;
+}
+
+.message{
+  height: $button-height;
+  padding: 3px 6px;
+}
+
+.success-message{
+  background-color: #e6f3e6;
+  color: #365836;
+}
+
+.error-message{
+  background-color: #fcece6;
+  color: #da460f;
 }
 
 //----------------END-všeobecné-elementy----------------
@@ -1357,7 +1386,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   width: 100%;
   background-color: $secondary-form-background-color;
   padding: 0px 1px 0px 1px;
-  height: 70px;
+  height: $commandbar-height;
   white-space: pre-wrap;
 }
 

@@ -29,3 +29,30 @@ export const inputError = ( input, type ) => {
   }
   return testFailed ? 'input-error' : '';
 }
+
+const compareObjectAttribute = ( newObject, oldObject, attribute ) => {
+  switch ( attribute.type ) {
+    case "string": {
+      return newObject[ attribute.key ] === oldObject[ attribute.key ];
+      break;
+    }
+    case "integer": {
+      return parseInt( newObject[ attribute.key ] ) === parseInt( oldObject[ attribute.key ] );
+      break;
+    }
+    case "float": {
+      return parseFloat( newObject[ attribute.key ] ) === parseFloat( oldObject[ attribute.key ] );
+      break;
+    }
+    case "object": {
+      return parseInt( newObject[ attribute.key ].id ) === parseInt( oldObject[ attribute.key ].id );
+      break;
+    }
+    default:
+      return false;
+  }
+}
+
+export const compareObjectAttributes = ( newObject, oldObject, attributes ) => {
+  return attributes.every( attribute => compareObjectAttribute( newObject, oldObject, attribute ) );
+}

@@ -30,7 +30,7 @@ export default function Tags( props ) {
 
   return (
     <div>
-      <h3 className="m-t-20 m-b-20"> Tags </h3>
+      <h3 className="m-t-20 m-b-20"> Tags  <span className="warning-big">*</span></h3>
       <table className="table m-t-10 vykazyTable">
         <thead>
           <tr>

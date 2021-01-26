@@ -98,68 +98,77 @@ export default function SMTPAdd( props ) {
   )
 
   return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-      <Checkbox
-        className = "m-b-5 p-l-0"
-        value = { def }
-        onChange={ () => setDef(!def) }
-        label = "Default"
-        />
-
-      <FormGroup>
-        <Label for="name">Title</Label>
-        <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
-      </FormGroup>
-      <FormGroup>
-        <Label>Well known providers - requires only user and password</Label>
-        <Select
-          styles={selectStyle}
-          options={wellKnownOptions}
-          value={wellKnown}
-          onChange={wellKnown => setWellKnown(wellKnown)}
-          />
-      </FormGroup>
-      <FormGroup>
-        <Label for="name">Host</Label>
-        <Input type="text" name="name" id="host" placeholder="Enter host" value={host} onChange={ (e) => setHost(e.target.value) } />
-      </FormGroup>
-      <FormGroup>
-        <Label for="name">Port</Label>
-        <Input type="number" name="name" id="port" placeholder="Enter port" value={port} onChange={ (e) => setPort(e.target.value) } />
-      </FormGroup>
-      <Checkbox
-        className = "m-b-5 p-l-0"
-        value = { secure }
-        onChange={ () => setSecure(!secure) }
-        label = "Secure"
-        />
-      <FormGroup>
-        <Label for="name">Username</Label>
-        <Input type="text" name="name" id="user" placeholder="Enter user" value={username} onChange={ (e) => setUsername(e.target.value) } />
-      </FormGroup>
-      <FormGroup>
-        <Label>Password</Label>
-        <InputGroup>
-          <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={password} onChange={ (e) => setPassword(e.target.value) } />
-          <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
-            <InputGroupText>
-              <i className={"mt-auto mb-auto "+ (!showPass ?'fa fa-eye':'fa fa-eye-slash')}/>
-            </InputGroupText>
-          </InputGroupAddon>
-        </InputGroup>
-      </FormGroup>
-      <Checkbox
-        className = "m-b-5 p-l-0"
-        value = { rejectUnauthorized }
-        onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
-        label = "Reject unauthorized"
-        />
-
-      <div className="row">
-        <Button className="btn ml-auto" disabled={cannotSave} onClick={addSMTPFunc}>
-          {saving?'Adding...':'Add SMTP'}
-        </Button>
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { cannotSave &&
+          <div className="message error-message">
+            Fill in all the required information!
+          </div>
+        }
       </div>
-  </div>
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+        <Checkbox
+          className = "m-b-5 p-l-0"
+          value = { def }
+          onChange={ () => setDef(!def) }
+          label = "Default"
+          />
+
+        <FormGroup>
+          <Label for="name">Title { !wellKnownBlock && <span className="warning-big">*</span>}</Label>
+          <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
+        </FormGroup>
+        <FormGroup>
+          <Label>Well known providers - requires only user and password</Label>
+          <Select
+            styles={selectStyle}
+            options={wellKnownOptions}
+            value={wellKnown}
+            onChange={wellKnown => setWellKnown(wellKnown)}
+            />
+        </FormGroup>
+        <FormGroup>
+          <Label for="name">Host { !wellKnownBlock && <span className="warning-big">*</span>}</Label>
+          <Input type="text" name="name" id="host" placeholder="Enter host" value={host} onChange={ (e) => setHost(e.target.value) } />
+        </FormGroup>
+        <FormGroup>
+          <Label for="name">Port { !wellKnownBlock && <span className="warning-big">*</span>}</Label>
+          <Input type="number" name="name" id="port" placeholder="Enter port" value={port} onChange={ (e) => setPort(e.target.value) } />
+        </FormGroup>
+        <Checkbox
+          className = "m-b-5 p-l-0"
+          value = { secure }
+          onChange={ () => setSecure(!secure) }
+          label = "Secure"
+          />
+        <FormGroup>
+          <Label for="name">Username <span className="warning-big">*</span></Label>
+          <Input type="text" name="name" id="user" placeholder="Enter user" value={username} onChange={ (e) => setUsername(e.target.value) } />
+        </FormGroup>
+        <FormGroup>
+          <Label>Password <span className="warning-big">*</span></Label>
+          <InputGroup>
+            <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={password} onChange={ (e) => setPassword(e.target.value) } />
+            <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
+              <InputGroupText>
+                <i className={"mt-auto mb-auto "+ (!showPass ?'fa fa-eye':'fa fa-eye-slash')}/>
+              </InputGroupText>
+            </InputGroupAddon>
+          </InputGroup>
+        </FormGroup>
+        <Checkbox
+          className = "m-b-5 p-l-0"
+          value = { rejectUnauthorized }
+          onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
+          label = "Reject unauthorized"
+          />
+
+        <div className="row">
+          <Button className="btn ml-auto" disabled={cannotSave} onClick={addSMTPFunc}>
+            {saving?'Adding...':'Add SMTP'}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -61,6 +61,8 @@ export default function RoleEdit( props ) {
   const [ order, setOrder ] = React.useState( 0 );
   const [ level, setLevel ] = React.useState( 0 );
 
+  const [ dataChanged, setDataChanged ] = React.useState( false );
+
   const generalRights = [
     {
       state: React.useState( false ),
@@ -201,6 +203,7 @@ export default function RoleEdit( props ) {
       setOrder( data.role.order );
       setLevel( data.role.level );
       [ ...generalRights, ...settings ].forEach( ( right ) => right.state[ 1 ]( data.role.accessRights[ right.key ] ) );
+      setDataChanged( false );
     }
   }, [ loading ] );
 
@@ -243,6 +246,7 @@ export default function RoleEdit( props ) {
       } );
 
     setSaving( false );
+    setDataChanged( false );
   };
 
   const deleteRoleFunc = ( replacement ) => {
@@ -277,97 +281,149 @@ export default function RoleEdit( props ) {
   const disabled = currentUserLevel === null || currentUserLevel >= data.role.level;
 
   return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-      <FormGroup>
-        <Label for="role">Role</Label>
-        <Input name="name" id="name" type="text" placeholder="Enter role name" disabled={disabled} value={title} onChange={ (e) => setTitle(e.target.value) }
-          />
-      </FormGroup>
-
-      <FormGroup>
-        <Label for="role">Order</Label>
-        <Input name="name" id="name" type="number" placeholder="Enter role name" disabled={disabled} value={order} onChange={ (e) => setOrder(e.target.value) }
-          />
-      </FormGroup>
-
-      <FormGroup>
-          <Label for="role" className="row">
-            Level
-            <ErrorMessage show={ currentUserLevel === null || level <= currentUserLevel } message={`Targets role can't be lower or same as yours(${currentUserLevel})!`} />
-          </Label>
-        <Input name="name" id="name" type="number" placeholder="Enter role name" disabled={disabled} value={level} onChange={ (e) => setLevel(e.target.value) }
-          />
-      </FormGroup>
-
-      <div className="">
-        <h2>General rights</h2>
-        <table className="table">
-          <thead>
-            <tr>
-              <th  width={"90%"} key={1}>
-                Name
-              </th>
-              <th className="t-a-c" key={2}>
-                Granted
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            { generalRights.map( (right) =>
-              <RightRow
-                key={[right.key,right.state[0]].toString()}
-                onChange={right.state[1]}
-                label={right.label}
-                disabled={disabled}
-                value={right.state[0]}
-                />
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="">
-        <h2>Specific rules</h2>
-        <table className="table">
-          <thead>
-            <tr>
-              <th width={"90%"} key={1}>
-                Access
-              </th>
-              <th className="t-a-c" key={2}>
-                View & Edit
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            { settings.map( (right) =>
-              <RightRow
-                key={[right.key,right.state[0]].toString()}
-                onChange={right.state[1]}
-                label={right.label}
-                disabled={disabled}
-                value={right.state[0]}
-                />
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="row">
-        {props.close &&
-          <Button className="btn-link"
-            onClick={()=>{props.close()}}>Cancel</Button>
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { !disabled &&
+          dataChanged &&
+          <div className="message error-message">
+            Save changes before leaving!
+          </div>
         }
-        <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft || currentUserLevel === null || currentUserLevel >= level } onClick={ () => setDeleteOpen(true) }>Delete</Button>
-        <Button className="btn ml-auto" disabled={saving || currentUserLevel === null || currentUserLevel >= level} onClick={updateRoleFunc}>{saving?'Saving...':'Save'}</Button>
+        { !disabled && !dataChanged &&
+          <div className="message success-message">
+            Saved
+          </div>
+        }
+        <ErrorMessage show={ currentUserLevel === null || level <= currentUserLevel } message={`You don't have the right to edit this role. Targets role can't be lower or same as yours(${currentUserLevel})!`} />
       </div>
-      <DeleteReplacement
-        isOpen={deleteOpen}
-        label="role"
-        options={filteredRoles}
-        close={()=>setDeleteOpen(false)}
-        finishDelete={deleteRoleFunc}
-        />
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+        <FormGroup>
+          <Label for="role">Role <span className="warning-big">*</span></Label>
+          <Input
+            name="name"
+            id="name"
+            type="text"
+            placeholder="Enter role name"
+            disabled={disabled}
+            value={title}
+            onChange={ (e) => {
+              setTitle(e.target.value);
+              setDataChanged( true );
+            } }
+            />
+        </FormGroup>
+
+        <FormGroup>
+          <Label for="role">Order</Label>
+          <Input
+            name="name"
+            id="name"
+            type="number"
+            placeholder="Enter role name"
+            disabled={disabled}
+            value={order}
+            onChange={ (e) => {
+              setOrder(e.target.value);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+
+        <FormGroup>
+          <div className="row">
+            <Label for="role">Level <span className="warning-big">*</span></Label>
+          </div>
+          <Input
+            name="name"
+            id="name"
+            type="number"
+            placeholder="Enter role name"
+            disabled={disabled}
+            value={level}
+            onChange={ (e) => {
+              setLevel(e.target.value);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+
+        <div className="">
+          <h2>General rights</h2>
+          <table className="table">
+            <thead>
+              <tr>
+                <th  width={"90%"} key={1}>
+                  Name
+                </th>
+                <th className="t-a-c" key={2}>
+                  Granted
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              { generalRights.map( (right) =>
+                <RightRow
+                  key={[right.key,right.state[0]].toString()}
+                  onChange={(e) => {
+                    right.state[1](e);
+                    setDataChanged( true );
+                  }}
+                  label={right.label}
+                  disabled={disabled}
+                  value={right.state[0]}
+                  />
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="">
+          <h2>Specific rules</h2>
+          <table className="table">
+            <thead>
+              <tr>
+                <th width={"90%"} key={1}>
+                  Access
+                </th>
+                <th className="t-a-c" key={2}>
+                  View & Edit
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              { settings.map( (right) =>
+                <RightRow
+                  key={[right.key,right.state[0]].toString()}
+                  onChange={(e) => {
+                    right.state[1](e);
+                    setDataChanged( true );
+                  }}
+                  label={right.label}
+                  disabled={disabled}
+                  value={right.state[0]}
+                  />
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="row">
+          {props.close &&
+            <Button className="btn-link"
+              onClick={()=>{props.close()}}>Cancel</Button>
+          }
+          <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft || currentUserLevel === null || currentUserLevel >= level } onClick={ () => setDeleteOpen(true) }>Delete</Button>
+          <Button className="btn ml-auto" disabled={saving || currentUserLevel === null || currentUserLevel >= level} onClick={updateRoleFunc}>{saving?'Saving...':'Save'}</Button>
+        </div>
+        <DeleteReplacement
+          isOpen={deleteOpen}
+          label="role"
+          options={filteredRoles}
+          close={()=>setDeleteOpen(false)}
+          finishDelete={deleteRoleFunc}
+          />
+      </div>
     </div>
+
   );
 }

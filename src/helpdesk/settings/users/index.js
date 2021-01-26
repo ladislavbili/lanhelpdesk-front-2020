@@ -147,7 +147,6 @@ export default function UserListContainer( props ) {
             </div>
           </div>
           <div className="col-lg-8">
-            <div className="commandbar"></div>
             {
               !dataLoading && match.params.id && match.params.id==='add' && <UserAdd  history={history}/>
           }

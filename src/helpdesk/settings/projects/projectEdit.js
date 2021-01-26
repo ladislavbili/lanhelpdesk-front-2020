@@ -148,6 +148,8 @@ export default function ProjectEdit( props ) {
   const [ saving, setSaving ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
+  const [ dataChanged, setDataChanged ] = React.useState( false );
+
   // sync
   React.useEffect( () => {
     if ( !projectLoading ) {
@@ -180,6 +182,7 @@ export default function ProjectEdit( props ) {
         } )
       };
       setPausal( newPausal );
+      setDataChanged( false );
     }
   }, [ projectLoading ] );
 
@@ -207,6 +210,7 @@ export default function ProjectEdit( props ) {
       } = getDefaultGroupData();
       setGroups( groups );
       setUserGroups( userGroups );
+      setDataChanged( false );
     }
   }, [ projectLoading, usersLoading ] );
 
@@ -232,6 +236,7 @@ export default function ProjectEdit( props ) {
         value: ( projectData.project.def.status.value ? projectData.project.statuses.find( c => c.id === projectData.project.def.status.value.id ) : null )
       };
       setStatus( newStatus );
+      setDataChanged( false );
     }
   }, [ projectLoading ] );
 
@@ -248,6 +253,7 @@ export default function ProjectEdit( props ) {
         value: newValue
       };
       setDefTag( newDefTag );
+      setDataChanged( false );
     }
   }, [ projectLoading ] );
 
@@ -260,6 +266,7 @@ export default function ProjectEdit( props ) {
         id
       }
     } );
+    setDataChanged( false );
   }, [ id ] );
 
   // functions
@@ -475,6 +482,7 @@ export default function ProjectEdit( props ) {
       } );
 
     setSaving( false );
+    setDataChanged( false );
   };
 
   const deleteProjectFunc = ( replacement ) => {
@@ -557,6 +565,19 @@ export default function ProjectEdit( props ) {
   const canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
     .filter( ( user ) => userGroups.some( ( userGroup ) => userGroup.user.id ) );
   return (
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { dataChanged &&
+          <div className="message error-message">
+            Save changes before leaving!
+          </div>
+        }
+        { !dataChanged &&
+          <div className="message success-message">
+            Saved
+          </div>
+        }
+      </div>
     <div
       className={ classnames(
         {
@@ -571,13 +592,35 @@ export default function ProjectEdit( props ) {
       { myRights.projectPrimaryRead &&
         <div>
           <FormGroup>
-            <Label for="name">Project name</Label>
-            <Input disabled={!myRights.projectPrimaryWrite} type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
+            <Label for="name">Project name<span className="warning-big">*</span></Label>
+            <Input
+              disabled={!myRights.projectPrimaryWrite}
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Enter project name"
+              value={title}
+              onChange={(e)=>{
+                setTitle(e.target.value);
+                setDataChanged( true );
+              }}
+              />
           </FormGroup>
 
           <FormGroup>
             <Label htmlFor="description">Popis</Label>
-            <Input disabled={!myRights.projectPrimaryWrite} type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription( e.target.value )}/>
+            <Input
+              disabled={!myRights.projectPrimaryWrite}
+              type="textarea"
+              className="form-control"
+              id="description"
+              placeholder="Zadajte text"
+              value={description}
+              onChange={(e) => {
+                setDescription( e.target.value );
+                setDataChanged( true );
+              }}
+              />
           </FormGroup>
         </div>
       }
@@ -586,7 +629,8 @@ export default function ProjectEdit( props ) {
           <Statuses
             statuses={allStatuses}
             addStatus={(newStatus) => {
-              setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ])
+              setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ]);
+              setDataChanged( true );
             }}
             deleteStatus={(id) => {
               if(id > -1){
@@ -595,6 +639,7 @@ export default function ProjectEdit( props ) {
               }else{
                 setAddStatuses(addStatuses.filter((status) => status.id !== id ));
               }
+              setDataChanged( true );
             }}
             updateStatus={(newStatus) => {
               if(newStatus.id > -1){
@@ -612,13 +657,15 @@ export default function ProjectEdit( props ) {
                 newStatuses[index] = { ...newStatuses[index], ...newStatus }
                 setAddStatuses(newStatuses);
               }
+              setDataChanged( true );
             }}
             />
 
           <Tags
             tags={allTags}
             addTag={(newTag) => {
-              setAddTags([ ...addTags, {...newTag, id: fakeID -- } ])
+              setAddTags([ ...addTags, {...newTag, id: fakeID -- } ]);
+              setDataChanged( true );
             }}
             deleteTag={(id) => {
               if(id > -1){
@@ -627,6 +674,7 @@ export default function ProjectEdit( props ) {
               }else{
                 setAddTags(addTags.filter((tag) => tag.id !== id ));
               }
+              setDataChanged( true );
             }}
             updateTag={(newTag) => {
               if(newTag.id > -1){
@@ -644,6 +692,7 @@ export default function ProjectEdit( props ) {
                 newTags[index] = { ...newTags[index], ...newTag }
                 setAddTags(newTags);
               }
+              setDataChanged( true );
             }}
             />
 
@@ -653,31 +702,41 @@ export default function ProjectEdit( props ) {
               centerHor
               disabled={false}
               value = { lockedRequester}
-              onChange={() => setLockedRequester( !lockedRequester) }
+              onChange={() => {
+                setLockedRequester( !lockedRequester);
+                setDataChanged( true );
+              }}
               />
-            <span className="clickable" onClick = { () => setLockedRequester( !lockedRequester) }>
+            <span className="clickable" onClick = { () => {
+              setLockedRequester( !lockedRequester);
+              setDataChanged( true );
+            } }>
               A requester can be only a user with rights to this project.
             </span>
           </div>
 
           <Groups
             addGroup={(newGroup) => {
-              setGroups([...groups, newGroup])
+              setGroups([...groups, newGroup]);
+              setDataChanged( true );
             }}
             />
 
           <UserGroups
             addRight={ (userGroup) => {
               setUserGroups([...userGroups, userGroup]);
+              setDataChanged( true );
             }}
             deleteRight={ (userGroup) => {
               setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+              setDataChanged( true );
             }}
             updateRight={ (userGroup) => {
               let newUserGroups = [...userGroups];
               let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
               newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
               setUserGroups(newUserGroups);
+              setDataChanged( true );
             }}
             users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
             permissions={ userGroups }
@@ -692,6 +751,7 @@ export default function ProjectEdit( props ) {
               let index = newGroups.findIndex((group) => group.id === groupID );
               newGroups[index]['rights'][acl] = newVal;
               setGroups(newGroups);
+              setDataChanged( true );
             }}
             updateGroup={(newGroup) => {
               let newGroups = [...groups];
@@ -702,11 +762,13 @@ export default function ProjectEdit( props ) {
                 (userGroup.group.id !== newGroup.id) ?
                 userGroup :
                 ({...userGroup, group: {...userGroup.group,...newGroup}})
-              ) ))
+              ) ));
+              setDataChanged( true );
             }}
             deleteGroup={(id) => {
               setGroups( groups.filter((group) => group.id !== id ) );
               setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
+              setDataChanged( true );
             }}
             />
 
@@ -748,15 +810,18 @@ export default function ProjectEdit( props ) {
             customAttributes={customAttributes}
             addCustomAttribute={(newCustomAttribute) => {
               setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
+              setDataChanged( true );
             }}
             updateCustomAttribute={(changedCustomAttribute) => {
               let newCustomAttributes = [...customAttributes];
               let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
               newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
               setCustomAttributes(newCustomAttributes);
+              setDataChanged( true );
             }}
             deleteCustomAttribute={(id) => {
               setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
+              setDataChanged( true );
             }}
             />
         </div>
@@ -792,5 +857,7 @@ export default function ProjectEdit( props ) {
         finishDelete={deleteProjectFunc}
         />
     </div>
+</div>
+
   );
 }

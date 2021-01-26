@@ -143,9 +143,17 @@ export default function UserAddContainer( props ) {
   }
 
   return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { cannotAddUser() &&
+          <div className="message error-message">
+            Fill in all the required information!
+          </div>
+        }
+      </div>
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
         <FormGroup>
-          <Label for="role">Role</Label>
+          <Label for="role">Role <span className="warning-big">*</span></Label>
           <Select
             styles={ selectStyle }
             options={ ROLES }
@@ -154,11 +162,11 @@ export default function UserAddContainer( props ) {
             />
         </FormGroup>
         <FormGroup>
-          <Label for="username">Username</Label>
+          <Label for="username">Username <span className="warning-big">*</span></Label>
           <Input type="text" name="username" id="username" placeholder="Enter username" value={ username } onChange={ (e) => setUsername(e.target.value) } />
         </FormGroup>
         <FormGroup>
-          <Label for="name">Name</Label>
+          <Label for="name">Name <span className="warning-big">*</span></Label>
           <Input type="text" name="name" id="name" placeholder="Enter name" value={ name } onChange={ (e)=>{
               if (signatureChanged){
                 setName(e.target.value);
@@ -168,10 +176,10 @@ export default function UserAddContainer( props ) {
                 setSignatureChanged(false);
               }
             }}
-          />
+            />
         </FormGroup>
         <FormGroup>
-          <Label for="surname">Surname</Label>
+          <Label for="surname">Surname <span className="warning-big">*</span></Label>
           <Input type="text" name="surname" id="surname" placeholder="Enter surname" value={ surname } onChange={ (e) => {
               if (signatureChanged) {
                 setSurname(e.target.value);
@@ -181,14 +189,14 @@ export default function UserAddContainer( props ) {
                 setSignatureChanged(false);
               }
             }}
-          />
+            />
         </FormGroup>
         <FormGroup>
-          <Label for="email">E-mail</Label>
+          <Label for="email">E-mail <span className="warning-big">*</span></Label>
           <Input type="email" name="email" id="email" placeholder="Enter email" value={ email } onChange={ (e) => setEmail(e.target.value) } />
         </FormGroup>
         <FormGroup>
-          <Label for="password">Password</Label>
+          <Label for="password">Password <span className="warning-big">*</span></Label>
           <Input type="password" name="password" id="password" placeholder="Enter password" value={ password } onChange={ (e) => setPassword(e.target.value) } />
         </FormGroup>
 
@@ -210,7 +218,7 @@ export default function UserAddContainer( props ) {
           />
 
         <FormGroup>
-          <Label for="company">Company*</Label>
+          <Label for="company">Company <span className="warning-big">*</span></Label>
           <Select
             styles={ selectStyle }
             options={ COMPANIES }
@@ -223,8 +231,8 @@ export default function UserAddContainer( props ) {
                 setSignature(`${name} ${surname}, ${company.title}`);
                 setSignatureChanged(false);
               }
-              }}
-           />
+            }}
+            />
         </FormGroup>
         <FormGroup>
           <Label for="signature">Signature</Label>
@@ -258,6 +266,7 @@ export default function UserAddContainer( props ) {
             { saving ? 'Adding...' : 'Add user' }
           </Button>
         </div>
+      </div>
     </div>
   )
 }

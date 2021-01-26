@@ -76,41 +76,54 @@ export default function StatusAdd( props ) {
     setSaving( false );
   }
 
+  const cannotSave = () => {
+    return saving || title.length === 0;
+  }
+
   return (
-    <div className="scroll-visible p-20 fit-with-header-and-commandbar">
-          <FormGroup>
-            <Label for="name">Status name</Label>
-            <Input type="text" name="name" id="name" placeholder="Enter status name" value={title} onChange={(e)=>setTitle(e.target.value)} />
-          </FormGroup>
-          <FormGroup>
-            <Label for="icon">Icon</Label>
-            <Input type="text" name="icon" id="icon" placeholder="fas fa-arrow-left" value={icon} onChange={(e)=>setIcon(e.target.value)} />
-          </FormGroup>
-          <FormGroup>
-            <Label for="order">Order</Label>
-            <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
-          </FormGroup>
-          <FormGroup>
-            <Label for="actionIfSelected">Action if selected</Label>
-            <Select
-              id="actionIfSelected"
-              name="Action"
-              styles={selectStyle}
-              options={actions}
-              value={action}
-              onChange={e => setAction(e) }
-                />
-          </FormGroup>
-          <SketchPicker
-            id="color"
-            color={color}
-            onChangeComplete={value => setColor( value.hex )}
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { cannotSave() &&
+          <div className="message error-message">
+            Fill in all the required information!
+          </div>
+        }
+      </div>
+      <div className="scroll-visible p-20 fit-with-header-and-commandbar">
+        <FormGroup>
+          <Label for="name">Status name <span className="warning-big">*</span></Label>
+          <Input type="text" name="name" id="name" placeholder="Enter status name" value={title} onChange={(e)=>setTitle(e.target.value)} />
+        </FormGroup>
+        <FormGroup>
+          <Label for="icon">Icon</Label>
+          <Input type="text" name="icon" id="icon" placeholder="fas fa-arrow-left" value={icon} onChange={(e)=>setIcon(e.target.value)} />
+        </FormGroup>
+        <FormGroup>
+          <Label for="order">Order</Label>
+          <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
+        </FormGroup>
+        <FormGroup>
+          <Label for="actionIfSelected">Action if selected</Label>
+          <Select
+            id="actionIfSelected"
+            name="Action"
+            styles={selectStyle}
+            options={actions}
+            value={action}
+            onChange={e => setAction(e) }
+            />
+        </FormGroup>
+        <SketchPicker
+          id="color"
+          color={color}
+          onChangeComplete={value => setColor( value.hex )}
           />
         <div className="row">
-          <Button className="btn m-t-5 ml-auto" disabled={saving} onClick={addStatusFunc}>
+          <Button className="btn m-t-5 ml-auto" disabled={cannotSave()} onClick={addStatusFunc}>
             {saving?'Adding...':'Add status'}
           </Button>
         </div>
       </div>
+    </div>
   );
 }

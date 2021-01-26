@@ -54,12 +54,14 @@ export default function TripTypeEdit( props ) {
   const [ order, setOrder ] = React.useState( 0 );
   const [ saving, setSaving ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
+  const [ dataChanged, setDataChanged ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
     if ( !loading ) {
       setTitle( data.tripType.title );
       setOrder( data.tripType.order );
+      setDataChanged( false );
     }
   }, [ loading ] );
 
@@ -88,6 +90,7 @@ export default function TripTypeEdit( props ) {
       } );
 
     setSaving( false );
+    setDataChanged( false );
   };
   const deleteTripTypeFunc = ( replacement ) => {
     if ( window.confirm( "Are you sure?" ) ) {
@@ -117,32 +120,67 @@ export default function TripTypeEdit( props ) {
   }
 
   return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-      <FormGroup>
-        <Label for="name">Task type name</Label>
-        <Input type="text" name="name" id="name" placeholder="Enter trip type" value={title} onChange={(e)=>setTitle(e.target.value)} />
-      </FormGroup>
-      <FormGroup>
-        <Label for="order">Order</Label>
-        <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
-      </FormGroup>
-      <div className="row">
-        <Button
-          className="btn-red m-l-5"
-          disabled={saving || theOnlyOneLeft}
-          onClick={() => setDeleteOpen(true)}
-          >
-          Delete
-        </Button>
-        <Button className="btn ml-auto" disabled={saving} onClick={updateTripTypeFunc}>{saving ? 'Saving trip type...' : 'Save trip type'}</Button>
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { dataChanged &&
+          <div className="message error-message">
+            Save changes before leaving!
+          </div>
+        }
+        { !dataChanged &&
+          <div className="message success-message">
+            Saved
+          </div>
+        }
       </div>
-      <DeleteReplacement
-        isOpen={deleteOpen}
-        label="trip type"
-        options={filteredTripTypes}
-        close={()=>setDeleteOpen(false)}
-        finishDelete={deleteTripTypeFunc}
-        />
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+        <FormGroup>
+          <Label for="name">Task type name <span className="warning-big">*</span></Label>
+          <Input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Enter trip type"
+            value={title}
+            onChange={(e)=> {
+              setTitle(e.target.value);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+        <FormGroup>
+          <Label for="order">Order</Label>
+          <Input
+            type="number"
+            name="order"
+            id="order"
+            placeholder="Lower means first"
+            value={order}
+            onChange={(e)=> {
+              setOrder(e.target.value);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+        <div className="row">
+          <Button
+            className="btn-red m-l-5"
+            disabled={saving || theOnlyOneLeft}
+            onClick={() => setDeleteOpen(true)}
+            >
+            Delete
+          </Button>
+          <Button className="btn ml-auto" disabled={saving} onClick={updateTripTypeFunc}>{saving ? 'Saving trip type...' : 'Save trip type'}</Button>
+        </div>
+        <DeleteReplacement
+          isOpen={deleteOpen}
+          label="trip type"
+          options={filteredTripTypes}
+          close={()=>setDeleteOpen(false)}
+          finishDelete={deleteTripTypeFunc}
+          />
+      </div>
     </div>
+
   )
 }

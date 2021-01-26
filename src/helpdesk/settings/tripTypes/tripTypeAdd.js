@@ -61,22 +61,35 @@ export default function TripTypeAdd( props ) {
     setSaving( false );
   }
 
-  return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+  const cannotSave = () => {
+    return saving || title.length === 0;
+  }
 
-      <FormGroup>
-        <Label for="name">Trip type</Label>
-        <Input type="text" name="name" id="name" placeholder="Enter trip type" value={title} onChange={(e)=>setTitle(e.target.value)} />
-      </FormGroup>
-      <FormGroup>
-        <Label for="order">Order</Label>
-        <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
-      </FormGroup>
-      <div className="row">
-        <Button className="btn ml-auto" disabled={saving} onClick={addTripTypeFunc}>
-          {saving?'Adding...':'Add trip type'}
-        </Button>
+  return (
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { cannotSave() &&
+          <div className="message error-message">
+            Fill in all the required information!
+          </div>
+        }
       </div>
-  </div>
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+
+        <FormGroup>
+          <Label for="name">Trip type <span className="warning-big">*</span></Label>
+          <Input type="text" name="name" id="name" placeholder="Enter trip type" value={title} onChange={(e)=>setTitle(e.target.value)} />
+        </FormGroup>
+        <FormGroup>
+          <Label for="order">Order</Label>
+          <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
+        </FormGroup>
+        <div className="row">
+          <Button className="btn ml-auto" disabled={cannotSave()} onClick={addTripTypeFunc}>
+            {saving?'Adding...':'Add trip type'}
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }

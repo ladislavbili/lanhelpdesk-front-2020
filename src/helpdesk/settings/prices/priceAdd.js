@@ -110,8 +110,21 @@ export default function PricelistAdd( props ) {
   if ( taskTypesLoading || tripTypesLoading ) {
     return <Loading />
   }
+
+  const cannotSave = () => {
+    return saving || title.length === 0;
+  }
+
   return (
     <div>
+      <div className="commandbar a-i-c p-l-20">
+        { cannotSave() &&
+          <div className="message error-message">
+            Fill in all the required information!
+          </div>
+        }
+      </div>
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
         <label>
           <Switch
             checked={def}
@@ -125,7 +138,7 @@ export default function PricelistAdd( props ) {
 
           <FormGroup className="row m-b-10">
             <div className="m-r-10 w-20">
-              <Label for="name">Pricelist name</Label>
+              <Label for="name">Pricelist name <span className="warning-big">*</span></Label>
             </div>
             <div className="flex">
               <Input type="text" name="name" id="name" placeholder="Enter pricelist name" value={title} onChange={ (e) => setTitle(e.target.value) } />
@@ -223,10 +236,11 @@ export default function PricelistAdd( props ) {
           </div>
 
           <div className="row">
-            <Button className="btn ml-auto" disabled={saving} onClick={addPricelistFunc}>
+            <Button className="btn ml-auto" disabled={cannotSave()} onClick={addPricelistFunc}>
               {saving?'Saving prices...':'Save prices'}
             </Button>
           </div>
       </div>
+  </div>
   );
 }

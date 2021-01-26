@@ -74,6 +74,7 @@ export default function PricelistEdit( props ) {
   const [ choosingNewPricelist, setChoosingNewPricelist ] = React.useState( false );
 
   const [ saving, setSaving ] = React.useState( false );
+  const [ dataChanged, setDataChanged ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
@@ -85,6 +86,7 @@ export default function PricelistEdit( props ) {
       setMaterialMargin( data.pricelist.materialMargin );
       setMaterialMarginExtra( data.pricelist.materialMarginExtra );
       setPrices( data.pricelist.prices );
+      setDataChanged( false );
     }
   }, [ loading ] );
 
@@ -142,6 +144,7 @@ export default function PricelistEdit( props ) {
       } );
 
     setSaving( false );
+    setDataChanged( false );
   }
 
   const deletePricelistFunc = () => {
@@ -191,10 +194,26 @@ export default function PricelistEdit( props ) {
 
   return (
     <div>
+      <div className="commandbar a-i-c p-l-20">
+        { dataChanged &&
+          <div className="message error-message">
+            Save changes before leaving!
+          </div>
+        }
+        { !dataChanged &&
+          <div className="message success-message">
+            Saved
+          </div>
+        }
+      </div>
+      <div className="scroll-visible p-20 fit-with-header-and-commandbar">
         <label>
           <Switch
             checked={def}
-            onChange={ () => setDef(!def) }
+            onChange={ () => {
+              setDef(!def);
+              setDataChanged( true );
+            } }
             height={22}
             checkedIcon={<span className="switchLabel">YES</span>}
             uncheckedIcon={<span className="switchLabel">NO</span>}
@@ -204,16 +223,27 @@ export default function PricelistEdit( props ) {
 
         <FormGroup className="row m-b-10">
           <div className="m-r-10 w-20">
-            <Label for="name">Pricelist name</Label>
+            <Label for="name">Pricelist name <span className="warning-big">*</span></Label>
           </div>
           <div className="flex">
-            <Input type="text" name="name" id="name" placeholder="Enter pricelist name" value={title} onChange={ (e) => setTitle(e.target.value) }/>
+            <Input
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Enter pricelist name"
+              value={title}
+              onChange={ (e) => {
+                setTitle(e.target.value);
+                setDataChanged( true );
+              } }
+              />
           </div>
         </FormGroup>
 
         <h3>Ceny úloh</h3>
         <div className="p-t-10 p-b-10">
-          {prices.filter(item => item.type === "TaskType" )
+          {
+            prices.filter(item => item.type === "TaskType" )
             .map((item, i) =>
             <FormGroup key={i} className="row m-b-10">
               <div className="m-r-10 w-20">
@@ -235,7 +265,9 @@ export default function PricelistEdit( props ) {
                       }
                     });
                     setPrices(newPrices);
-                  }} />
+                    setDataChanged( true );
+                  }}
+                  />
               </div>
             </FormGroup>
           )}
@@ -243,23 +275,32 @@ export default function PricelistEdit( props ) {
 
         <h3>Ceny Výjazdov</h3>
         <div className="p-t-10 p-b-10">
-          {prices.filter(item => item.type === "TripType" )
+          {
+            prices.filter(item => item.type === "TripType" )
             .map((item, i) =>
             <FormGroup key={i} className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for={item.type}>{item.tripType ? item.tripType.title : "Unnamed"}</Label>
               </div>
               <div className="flex">
-                <Input type="text" name={item.type} id={item.type} placeholder="Enter price" value={item.price} onChange={(e)=>{
-                  let newPrices = prices.map(p => {
-                    if (p.id === item.id){
-                      return {...p, price: e.target.value.replace(",", ".")}
-                    } else {
-                      return {...p};
-                    }
-                  });
-                  setPrices(newPrices);
-                  }} />
+                <Input
+                  type="text"
+                  name={item.type}
+                  id={item.type}
+                  placeholder="Enter price"
+                  value={item.price}
+                  onChange={(e)=>{
+                    let newPrices = prices.map(p => {
+                      if (p.id === item.id){
+                        return {...p, price: e.target.value.replace(",", ".")}
+                      } else {
+                        return {...p};
+                      }
+                    });
+                    setPrices(newPrices);
+                    setDataChanged( true );
+                  }}
+                  />
               </div>
             </FormGroup>
           )}
@@ -272,7 +313,17 @@ export default function PricelistEdit( props ) {
               <Label for="afterPer">After hours percentage</Label>
             </div>
             <div className="flex">
-              <Input type="text" name="afterPer" id="afterPer" placeholder="Enter after hours percentage" value={afterHours} onChange={(e)=>setAfterHours(e.target.value.replace(",", "."))} />
+              <Input
+                type="text"
+                name="afterPer"
+                id="afterPer"
+                placeholder="Enter after hours percentage"
+                value={afterHours}
+                onChange={(e)=>{
+                  setAfterHours(e.target.value.replace(",", "."));
+                  setDataChanged( true );
+                }}
+                />
             </div>
           </FormGroup>
           <FormGroup className="row m-b-10">
@@ -280,7 +331,17 @@ export default function PricelistEdit( props ) {
               <Label for="materMarg">Materials margin percentage 50-</Label>
             </div>
             <div className="flex">
-              <Input type="text" name="materMarg" id="materMarg" placeholder="Enter materials margin percentage" value={materialMargin} onChange={(e)=>setMaterialMargin(e.target.value.replace(",", "."))} />
+              <Input
+                type="text"
+                name="materMarg"
+                id="materMarg"
+                placeholder="Enter materials margin percentage"
+                value={materialMargin}
+                onChange={(e)=>{
+                  setMaterialMargin(e.target.value.replace(",", "."));
+                  setDataChanged( true );
+                }}
+                />
             </div>
           </FormGroup>
           <FormGroup className="row m-b-10">
@@ -288,7 +349,17 @@ export default function PricelistEdit( props ) {
               <Label for="materMarg+">Materials margin percentage 50+</Label>
             </div>
             <div className="flex">
-              <Input type="text" name="materMarg+" id="materMarg+" placeholder="Enter materials margin percentage" value={materialMarginExtra} onChange={(e)=>setMaterialMarginExtra(e.target.value.replace(",", "."))}/>
+              <Input
+                type="text"
+                name="materMarg+"
+                id="materMarg+"
+                placeholder="Enter materials margin percentage"
+                value={materialMarginExtra}
+                onChange={(e)=>{
+                  setMaterialMarginExtra(e.target.value.replace(",", "."));
+                  setDataChanged( true );
+                }}
+                />
             </div>
           </FormGroup>
         </div>
@@ -304,7 +375,10 @@ export default function PricelistEdit( props ) {
                 styles={selectStyle}
                 options={filteredPricelists}
                 value={newPricelist}
-                onChange={s => setNewPricelist(s)}
+                onChange={s => {
+                  setNewPricelist(s);
+                  setDataChanged( true );
+                }}
                 />
             </FormGroup>
 
@@ -315,7 +389,10 @@ export default function PricelistEdit( props ) {
                   styles={selectStyle}
                   options={filteredPricelists}
                   value={newDefPricelist}
-                  onChange={s => setNewDefPricelist(s)}
+                  onChange={s => {
+                    setNewDefPricelist(s);
+                    setDataChanged( true );
+                  }}
                   />
               </FormGroup>
             }
@@ -332,13 +409,13 @@ export default function PricelistEdit( props ) {
 
         <div className="row">
           <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewPricelist(true)}>Delete price list</Button>
-            <Button
-              className="btn ml-auto"
-              disabled={saving}
-              onClick={updatePricelistFunc}>{saving?'Saving prices...':'Save prices'}</Button>
+          <Button
+            className="btn ml-auto"
+            disabled={saving}
+            onClick={updatePricelistFunc}>{saving?'Saving prices...':'Save prices'}</Button>
 
         </div>
-
+      </div>
     </div>
   );
 }

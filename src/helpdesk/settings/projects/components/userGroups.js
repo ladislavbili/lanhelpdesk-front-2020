@@ -24,7 +24,7 @@ export default function ProjectPermissions( props ) {
   const [ group, setGroup ] = React.useState( null );
   return (
     <div >
-				<h3 className="m-t-20 m-b-20"> Prístupové práva </h3>
+				<h3 className="m-t-20 m-b-20"> Prístupové práva  <span className="warning-big">*</span></h3>
 				<div className="row">
 					<div className="m-r-10 center-hor">
 						<label className="">

@@ -93,7 +93,6 @@ export default function TripTypeListContainer( props ) {
           </div>
         </div>
         <div className="col-lg-8">
-          <div className="commandbar"></div>
           {
             match.params.id && match.params.id==='add' &&
             <TripTypeAdd history={history} />

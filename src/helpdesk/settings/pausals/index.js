@@ -89,7 +89,6 @@ export default function CompaniesList( props ) {
           </div>
         </div>
         <div className="col-lg-8">
-          <div className="commandbar"></div>
           {
           match.params.id && COMPANIES.some((item)=>item.id===parseInt(match.params.id)) && <PausalEdit match={match} history = {history} />
           }

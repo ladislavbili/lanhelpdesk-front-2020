@@ -44,7 +44,7 @@ export default class Checkbox extends Component {
             htmlFor={ "checkbox-" + this.ID }
             className={classnames(
               {
-                'm-l-5': !this.props.right, 
+                'm-l-5': !this.props.right,
                 'm-r-5': this.props.right,
                 'center-hor': this.props.centerHor,
                 'center-ver': this.props.centerVer
@@ -55,6 +55,7 @@ export default class Checkbox extends Component {
             )}
             >
             { this.props.label ? this.props.label : '' }
+            {this.props.addition ? this.props.addition : ""}
           </Label>
         }
         {

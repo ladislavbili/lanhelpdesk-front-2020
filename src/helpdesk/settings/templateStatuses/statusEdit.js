@@ -69,6 +69,8 @@ export default function StatusEdit( props ) {
   const [ saving, setSaving ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
+  const [ dataChanged, setDataChanged ] = React.useState( false );
+
   // sync
   React.useEffect( () => {
     if ( !loading ) {
@@ -77,6 +79,8 @@ export default function StatusEdit( props ) {
       setOrder( data.statusTemplate.order );
       setIcon( data.statusTemplate.icon );
       setAction( actions.find( a => a.value === data.statusTemplate.action ) );
+
+      setDataChanged( false );
     }
   }, [ loading ] );
 
@@ -107,6 +111,7 @@ export default function StatusEdit( props ) {
       } );
 
     setSaving( false );
+    setDataChanged( false );
   };
 
   const deleteStatusFunc = () => {
@@ -139,45 +144,95 @@ export default function StatusEdit( props ) {
   }
 
   return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-      <FormGroup>
-        <Label for="name">Status name</Label>
-        <Input type="text" name="name" id="name" placeholder="Enter status name" value={title} onChange={ (e) => setTitle(e.target.value) } />
-      </FormGroup>
-      <FormGroup>
-        <Label for="name">Icon</Label>
-        <Input type="text" name="name" id="name" placeholder="fas fa-arrow-left" value={icon} onChange={ (e) => setIcon(e.target.value) } />
-      </FormGroup>
-      <FormGroup>
-        <Label for="order">Order</Label>
-        <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={ (e) => setOrder(e.target.value) } />
-      </FormGroup>
-      <FormGroup>
-        <Label for="actionIfSelected">Action if selected</Label>
-        <Select
-          id="actionIfSelected"
-          name="Action"
-          styles={selectStyle}
-          options={actions}
-          value={action}
-          onChange={ e => setAction(e) }
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { dataChanged &&
+          <div className="message error-message">
+            Save changes before leaving!
+          </div>
+        }
+        { !dataChanged &&
+          <div className="message success-message">
+            Saved
+          </div>
+        }
+      </div>
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+        <FormGroup>
+          <Label for="name">Status name <span className="warning-big">*</span></Label>
+          <Input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Enter status name"
+            value={title}
+            onChange={ (e) =>  {
+              setTitle(e.target.value);
+              setDataChanged( true );
+            } }
             />
-      </FormGroup>
-      <SketchPicker
-        id="color"
-        color={color}
-        onChangeComplete={ value => setColor( value.hex ) }
-        />
+        </FormGroup>
+        <FormGroup>
+          <Label for="name">Icon</Label>
+          <Input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="fas fa-arrow-left"
+            value={icon}
+            onChange={ (e) =>  {
+              setIcon(e.target.value);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+        <FormGroup>
+          <Label for="order">Order</Label>
+          <Input
+            type="number"
+            name="order"
+            id="order"
+            placeholder="Lower means first"
+            value={order}
+            onChange={ (e) =>  {
+              setOrder(e.target.value);
+              setDataChanged( true );
+            } }
+            />
+        </FormGroup>
+        <FormGroup>
+          <Label for="actionIfSelected">Action if selected</Label>
+          <Select
+            id="actionIfSelected"
+            name="Action"
+            styles={selectStyle}
+            options={actions}
+            value={action}
+            onChange={ e =>  {
+              setAction(e) ;
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+        <SketchPicker
+          id="color"
+          color={color}
+          onChangeComplete={ value =>  {
+            setColor( value.hex );
+            setDataChanged( true );
+          }}
+          />
 
-      <div className="row">
+        <div className="row">
           <Button
             className="btn-red m-l-5 m-t-5"
             disabled={saving || theOnlyOneLeft}
             onClick={ deleteStatusFunc }
             >
-        Delete
-      </Button>
-        <Button className="btn m-t-5 ml-auto" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</Button>
+            Delete
+          </Button>
+          <Button className="btn m-t-5 ml-auto" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</Button>
+        </div>
       </div>
     </div>
   );

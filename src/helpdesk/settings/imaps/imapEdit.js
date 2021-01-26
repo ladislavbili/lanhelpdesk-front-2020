@@ -108,6 +108,7 @@ export default function IMAPEdit( props ) {
   const [ showPass, setShowPass ] = React.useState( false );
 
   const [ saving, setSaving ] = React.useState( false );
+  const [ dataChanged, setDataChanged ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
@@ -141,6 +142,7 @@ export default function IMAPEdit( props ) {
       setProject( toSelArr( projectData.projects )
         .find( ( project ) => project.id === data.imap.project.id ) );
       setTested( false );
+      setDataChanged( false );
     }
   }, [ loading, rolesLoading, companiesLoading, projectsLoading ] );
 
@@ -214,6 +216,7 @@ export default function IMAPEdit( props ) {
       } );
 
     setSaving( false );
+    setDataChanged( false );
   };
 
   const deleteIMAPFunc = () => {
@@ -277,41 +280,109 @@ export default function IMAPEdit( props ) {
   }
 
   return (
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { dataChanged &&
+          <div className="message error-message">
+            Save changes before leaving!
+          </div>
+        }
+        { !dataChanged &&
+          <div className="message success-message">
+            Saved
+          </div>
+        }
+      </div>
+      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
 
         <Checkbox
           className = "m-b-5 p-l-0"
           value = { def }
-          onChange={ () => setDef(!def) }
+          onChange={ () => {
+            setDef(!def);
+            setDataChanged( true );
+          } }
           label = "Default"
           />
         <Checkbox
           className = "m-b-5 p-l-0"
           value = { active }
-          onChange={ () => setActive(!active) }
+          onChange={ () => {
+            setActive(!active);
+            setDataChanged( true );
+          } }
           label = "Active"
           />
 
         <FormGroup>
-          <Label for="name">Title</Label>
-          <Input type="text" name="name" id="name" placeholder="Enter title" value={title} onChange={ (e) => setTitle(e.target.value) } />
+          <Label for="name">Title <span className="warning-big">*</span></Label>
+          <Input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Enter title"
+            value={title}
+            onChange={ (e) =>{
+              setTitle(e.target.value);
+              setDataChanged( true );
+            } }
+            />
         </FormGroup>
         <FormGroup>
-          <Label for="name">Host</Label>
-          <Input type="text" name="name" id="host" placeholder="Enter host" value={host} onChange={ (e) => setHost(e.target.value) }/>
+          <Label for="name">Host <span className="warning-big">*</span></Label>
+          <Input
+            type="text"
+            name="name"
+            id="host"
+            placeholder="Enter host"
+            value={host}
+            onChange={ (e) =>{
+              setHost(e.target.value);
+              setDataChanged( true );
+            } }
+            />
         </FormGroup>
         <FormGroup>
-          <Label for="name">Port</Label>
-          <Input type="number" name="name" id="port" placeholder="Enter port"  value={port} onChange={ (e) => setPort(e.target.value) } />
+          <Label for="name">Port <span className="warning-big">*</span></Label>
+          <Input
+            type="number"
+            name="name"
+            id="port"
+            placeholder="Enter port"
+            value={port}
+            onChange={ (e) =>{
+              setPort(e.target.value);
+              setDataChanged( true );
+            } }
+            />
         </FormGroup>
         <FormGroup>
-          <Label for="name">Username</Label>
-          <Input type="text" name="name" id="user" placeholder="Enter user" value={username} onChange={ (e) => setUsername(e.target.value) } />
+          <Label for="name">Username <span className="warning-big">*</span></Label>
+          <Input
+            type="text"
+            name="name"
+            id="user"
+            placeholder="Enter user"
+            value={username}
+            onChange={ (e) =>{
+              setUsername(e.target.value) ;
+              setDataChanged( true );
+            }}
+            />
         </FormGroup>
         <FormGroup>
-          <Label>Password</Label>
+          <Label>Password <span className="warning-big">*</span></Label>
           <InputGroup>
-            <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={password} onChange={ (e) => setPassword(e.target.value) } />
+            <Input
+              type={showPass?'text':"password"}
+              className="from-control"
+              placeholder="Enter password"
+              value={password}
+              onChange={ (e) => {
+                setPassword(e.target.value);
+                setDataChanged( true );
+              } }
+              />
             <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
               <InputGroupText>
                 <i className={"mt-auto mb-auto "+ (!showPass ?'fa fa-eye':'fa fa-eye-slash')}/>
@@ -323,71 +394,108 @@ export default function IMAPEdit( props ) {
         <Checkbox
           className = "m-b-5 p-l-0"
           value = { tls }
-          onChange={ () => setTls(!tls) }
+          onChange={ () => {
+            setTls(!tls);
+            setDataChanged( true );
+          } }
           label = "TLS"
           />
-          <FormGroup>
-            <Label for="destination">Destination</Label>
-            <Input type="text" name="destination" id="destination" placeholder="Enter destination" value={destination} onChange={ (e) => setDestination(e.target.value) } />
-          </FormGroup>
+        <FormGroup>
+          <Label for="destination">Destination <span className="warning-big">*</span></Label>
+          <Input
+            type="text"
+            name="destination"
+            id="destination"
+            placeholder="Enter destination"
+            value={destination}
+            onChange={ (e) => {
+              setDestination(e.target.value);
+              setDataChanged( true );
+            } }
+            />
+        </FormGroup>
 
-          <FormGroup>
-            <Label for="ignoredRecievers">Ignored recievers</Label>
-            <Creatable
-              isMulti
-              value={ignoredRecievers}
-              onChange={(ignoredRecievers) => {
-                setIgnoredRecievers(ignoredRecievers);
-                setPreviousIgnoredRecievers(filterUnique([...ignoredRecievers, ...previousIgnoredRecievers]));
-              }}
-              options={previousIgnoredRecievers}
-              styles={selectStyle}
-              />
-          </FormGroup>
+        <FormGroup>
+          <Label for="ignoredRecievers">Ignored recievers</Label>
+          <Creatable
+            isMulti
+            value={ignoredRecievers}
+            onChange={(ignoredRecievers) => {
+              setIgnoredRecievers(ignoredRecievers);
+              setPreviousIgnoredRecievers(filterUnique([...ignoredRecievers, ...previousIgnoredRecievers]));
+              setDataChanged( true );
+            }}
+            options={previousIgnoredRecievers}
+            styles={selectStyle}
+            />
+        </FormGroup>
 
-          <FormGroup>
-            <Label for="ignoredDestination">Ignored recievers destination</Label>
-            <Input type="text" name="ignoredDestination" id="ignoredDestination" placeholder="Enter ignored e-mails destination" value={ignoredRecieversDestination} onChange={ (e) => setIgnoredRecieversDestination(e.target.value) } />
-          </FormGroup>
+        <FormGroup>
+          <Label for="ignoredDestination">Ignored recievers destination <span className="warning-big">*</span></Label>
+          <Input
+            type="text"
+            name="ignoredDestination"
+            id="ignoredDestination"
+            placeholder="Enter ignored e-mails destination"
+            value={ignoredRecieversDestination}
+            onChange={ (e) => {
+              setIgnoredRecieversDestination(e.target.value);
+              setDataChanged( true );
+            } }
+            />
+        </FormGroup>
         <Checkbox
           className = "m-b-5 p-l-0"
           value = { rejectUnauthorized }
-          onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
+          onChange={ () => {
+            setRejectUnauthorized(!rejectUnauthorized);
+            setDataChanged( true );
+          } }
           label = "Reject unauthorized"
           />
-          <FormGroup>
-            <Label for="role">Users Role</Label>
-            <Select
-              styles={selectStyle}
-              options={toSelArr(roleData.roles)}
-              value={role}
-              onChange={role => setRole(role)}
-              />
-          </FormGroup>
-          <FormGroup>
-            <Label for="project">Users Company</Label>
-            <Select
-              styles={selectStyle}
-              options={toSelArr(companyData.basicCompanies)}
-              value={company}
-              onChange={company => setCompany(company)}
-              />
-          </FormGroup>
-          <FormGroup>
-            <Label for="project">Tasks Project</Label>
-            <Select
-              styles={selectStyle}
-              options={toSelArr(projectData.projects)}
-              value={project}
-              onChange={project => setProject(project)}
-              />
-          </FormGroup>
+        <FormGroup>
+          <Label for="role">Users Role <span className="warning-big">*</span></Label>
+          <Select
+            styles={selectStyle}
+            options={toSelArr(roleData.roles)}
+            value={role}
+            onChange={role => {
+              setRole(role);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+        <FormGroup>
+          <Label for="project">Users Company <span className="warning-big">*</span></Label>
+          <Select
+            styles={selectStyle}
+            options={toSelArr(companyData.basicCompanies)}
+            value={company}
+            onChange={company =>{
+              setCompany(company);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
+        <FormGroup>
+          <Label for="project">Tasks Project <span className="warning-big">*</span></Label>
+          <Select
+            styles={selectStyle}
+            options={toSelArr(projectData.projects)}
+            value={project}
+            onChange={project => {
+              setProject(project);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
 
         <div className="row">
           <Button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={ deleteIMAPFunc }>Delete</Button>
           <Button className="btn ml-auto" disabled={saving || tested} onClick={ startTest }>Test IMAP</Button>
-            <Button className="btn m-l-5" disabled={cannotSave} onClick={updateIMAPFunc}>{ saving ? 'Saving IMAP...' : 'Save IMAP' }</Button>
+          <Button className="btn m-l-5" disabled={cannotSave} onClick={updateIMAPFunc}>{ saving ? 'Saving IMAP...' : 'Save IMAP' }</Button>
         </div>
       </div>
+    </div>
   );
 }

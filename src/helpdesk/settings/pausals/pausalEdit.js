@@ -73,6 +73,8 @@ export default function PausalEdit( props ) {
 
   const [ saving, setSaving ] = React.useState( false );
 
+  const [ dataChanged, setDataChanged ] = React.useState( false );
+
   const getFakeID = () => {
     let fake = fakeID;
     setFakeID( fakeID + 1 );
@@ -114,6 +116,8 @@ export default function PausalEdit( props ) {
         }
       } )
       setRents( r );
+
+      setDataChanged( false );
     }
   }, [ loading ] );
 
@@ -161,6 +165,7 @@ export default function PausalEdit( props ) {
       } );
 
     setSaving( false );
+    setDataChanged( false );
   };
 
 
@@ -190,6 +195,7 @@ export default function PausalEdit( props ) {
         console.log( err.message );
       } );
     setSaving( false );
+    setDataChanged( false );
   }
 
   /*
@@ -227,6 +233,19 @@ export default function PausalEdit( props ) {
   }
 
   return (
+    <div>
+      <div className="commandbar a-i-c p-l-20">
+        { dataChanged &&
+          <div className="message error-message">
+            Save changes before leaving!
+          </div>
+        }
+        { !dataChanged &&
+          <div className="message success-message">
+            Saved
+          </div>
+        }
+      </div>
     <div className="fit-with-header-and-commandbar-2 scroll-visible">
 
       <h2 className="p-t-10 p-l-20 p-b-5">{title}</h2>
@@ -244,6 +263,7 @@ export default function PausalEdit( props ) {
               value={taskWorkPausal}
               onChange={(e) => {
                 setTaskWorkPausal(e.target.value);
+                setDataChanged( true );
               }}
               />
         </FormGroup>
@@ -257,28 +277,35 @@ export default function PausalEdit( props ) {
               value={taskTripPausal}
               onChange={(e)=> {
                 setTaskTripPausal(e.target.value);
+                setDataChanged( true );
               }}
               />
         </FormGroup>
 
         <CompanyRents
           clearForm={clearCompanyRents}
-          setClearForm={()=>setClearCompanyRents(false)}
+          setClearForm={()=>{
+            setClearCompanyRents(false);
+            setDataChanged( true );
+          }}
           data={rents}
           updateRent={(rent)=>{
             let newRents=[...rents];
             newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
             setRents( newRents );
+            setDataChanged( true );
           }}
           addRent={(rent)=>{
             let newRents=[...rents];
             newRents.push({...rent, id: getFakeID()})
             setRents( newRents );
+            setDataChanged( true );
           }}
           removeRent={(rent)=>{
             let newRents=[...rents];
             newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
             setRents( newRents );
+            setDataChanged( true );
           }}
           />
 
@@ -288,11 +315,23 @@ export default function PausalEdit( props ) {
         oldPricelist={oldPricelist}
         pricelistName={pricelistName}
         newData={false}
-        cancel={() => cancel()}
-        setPricelist={(pl) => setPricelist(pl)}
-        setOldPricelist={(pl) => setOldPricelist(pl)}
+        cancel={() => {
+          cancel();
+          setDataChanged( true );
+        }}
+        setPricelist={(pl) => {
+          setPricelist(pl);
+          setDataChanged( true );
+        }}
+        setOldPricelist={(pl) => {
+          setOldPricelist(pl);
+          setDataChanged( true );
+        }}
         setNewData={(e) => {}}
-        setPricelistName={(n) => setPricelistName(n)}
+        setPricelistName={(n) => {
+          setPricelistName(n);
+          setDataChanged( true );
+        }}
         match={match}
          />
 
@@ -311,5 +350,6 @@ export default function PausalEdit( props ) {
 
       </div>
     </div>
+  </div>
   );
 }
