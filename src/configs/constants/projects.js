@@ -12,7 +12,7 @@ export const allACLs = [
   },
   {
     id: 'projectPrimary',
-    title: 'Project name & description',
+    title: 'Project name & description VIEW/EDIT',
     disabled: [ {
       key: 'projectSecondary',
       values: 'read'
@@ -21,7 +21,7 @@ export const allACLs = [
   },
   {
     id: 'projectSecondary',
-    title: 'Project settings & ACL - write and edit',
+    title: 'Project settings & ACL - write and edit  VIEW + EDIT',
     dependancy: [ {
       key: 'projectPrimary',
       affect: 'read'
@@ -55,27 +55,27 @@ export const allACLs = [
   },
   {
     id: 'taskShortSubtasks',
-    title: 'Task subtasks',
+    title: 'Task subtasks VIEW/EDIT',
     both: true
   },
   {
     id: 'taskAttachments',
-    title: 'Task attachments',
+    title: 'Task attachments VIEW/EDIT',
     both: true
   },
   {
     id: 'pausalInfo',
-    title: 'Task pausal info',
+    title: 'Task pausal info VIEW/EDIT',
     both: false
   },
   {
     id: 'vykaz',
-    title: 'Vykaz',
+    title: 'Vykaz VIEW/EDIT',
     both: true
   },
   {
     id: 'rozpocet',
-    title: 'Rozpočet',
+    title: 'Rozpočet VIEW/EDIT',
     both: true
   },
   {
@@ -121,32 +121,32 @@ export const allACLs = [
   },
   {
     id: 'project',
-    title: 'Project',
+    title: 'Project VIEW/EDIT',
     both: true
   },
   {
     id: 'milestone',
-    title: 'Milestone',
+    title: 'Milestone VIEW/EDIT',
     both: true
   },
   {
     id: 'deadline',
-    title: 'Deadline',
+    title: 'Deadline VIEW/EDIT',
     both: true
   },
   {
     id: 'scheduled',
-    title: 'Scheduled',
+    title: 'Scheduled VIEW/EDIT',
     both: true
   },
   {
     id: 'repeat',
-    title: 'Repeat',
+    title: 'Repeat VIEW/EDIT',
     both: true
   },
   {
     id: 'type',
-    title: 'Type',
+    title: 'Type VIEW/EDIT',
     both: true
   },
   {
@@ -156,37 +156,37 @@ export const allACLs = [
   },
   {
     id: 'status',
-    title: 'Status',
+    title: 'Status VIEW/EDIT',
     both: true
   },
   {
     id: 'tags',
-    title: 'Tags',
+    title: 'Tags VIEW/EDIT',
     both: true
   },
   {
     id: 'assigned',
-    title: 'Assigned to',
+    title: 'Assigned to VIEW/EDIT',
     both: true
   },
   {
     id: 'requester',
-    title: 'Requester',
+    title: 'Requester VIEW/EDIT',
     both: true
   },
   {
     id: 'company',
-    title: 'Company',
+    title: 'Company VIEW/EDIT',
     both: true
   },
   {
     id: 'pausal',
-    title: 'Pausal',
+    title: 'Pausal VIEW/EDIT',
     both: true
   },
   {
     id: 'overtime',
-    title: 'Mimo pracovných hodín',
+    title: 'Mimo pracovných hodín VIEW/EDIT',
     both: true
   },
 ];

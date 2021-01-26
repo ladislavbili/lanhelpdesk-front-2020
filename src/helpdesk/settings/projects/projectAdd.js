@@ -23,6 +23,9 @@ import {
   noDef
 } from 'configs/constants/projects';
 import classnames from 'classnames';
+import Loading from 'components/loading';
+import Checkbox from 'components/checkbox';
+
 import UserGroups from "./components/userGroups";
 import CustomAttributes from "./components/customAttributes";
 import Tags from './components/tags';
@@ -30,10 +33,11 @@ import Statuses from './components/statuses';
 import Groups from './components/group/groupAdd';
 import ProjectDefaultValues from "./components/defaultValues";
 import ProjectAcl from "./components/acl";
-import Loading from 'components/loading';
+
 import {
   remapRightsToBackend
 } from './helpers';
+
 import {
   GET_BASIC_COMPANIES,
 } from '../companies/queries';
@@ -311,6 +315,19 @@ export default function ProjectAdd( props ) {
           setTags(newTags);
         }}
         />
+
+        <div className="row">
+          <Checkbox
+            className = "m-l-5 m-r-5"
+            centerHor
+            disabled={false}
+            value = { lockedRequester}
+            onChange={() => setLockedRequester( !lockedRequester) }
+            />
+            <span className="clickable" onClick = { () => setLockedRequester( !lockedRequester) }>
+              A requester can be only a user with rights to this project.
+            </span>
+        </div>
 
       <Groups
         addGroup={(newGroup) => {

@@ -7,7 +7,7 @@ import {
   getLocation,
 } from 'helperFunctions';
 
-export default function Attachments( props ) {
+export default function ErrorInfo( props ) {
   const {
     history,
     errorMessage

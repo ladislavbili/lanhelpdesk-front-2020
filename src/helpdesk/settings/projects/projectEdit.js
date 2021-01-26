@@ -26,6 +26,7 @@ import {
   noDef,
 } from 'configs/constants/projects';
 import classnames from 'classnames';
+import Checkbox from 'components/checkbox';
 
 import ProjectDefaultValues from "./components/defaultValues";
 import Tags from './components/tags';
@@ -520,7 +521,6 @@ export default function ProjectEdit( props ) {
   ) {
     return <Loading />
   }
-
   const cannotSave = (
     saving ||
     title === "" ||
@@ -548,7 +548,6 @@ export default function ProjectEdit( props ) {
       userGroups.some( ( userGroup ) => userGroup.group.id === group.id )
     ) )
   )
-
   const myRights = currentUser.role.accessRights.projects ?
     backendCleanRights( true ) :
     projectData.project.groups.find( ( group ) => group.users.some( ( user ) => user.id === currentUser.id ) )
@@ -561,10 +560,12 @@ export default function ProjectEdit( props ) {
     <div
       className={ classnames(
         {
-          "scroll-visible": !closeModal,
-          "fit-with-header-and-commandbar": !closeModal
+          "scroll-visible": true,
+          "fit-with-header-and-commandbar": !closeModal,
+          "fit-with-header": closeModal,
+          "p-20": !closeModal,
+          "p-40": closeModal,
         },
-        "p-20"
       )}
       >
       { myRights.projectPrimaryRead &&
@@ -645,6 +646,19 @@ export default function ProjectEdit( props ) {
               }
             }}
             />
+
+          <div className="row">
+            <Checkbox
+              className = "m-l-5 m-r-5"
+              centerHor
+              disabled={false}
+              value = { lockedRequester}
+              onChange={() => setLockedRequester( !lockedRequester) }
+              />
+            <span className="clickable" onClick = { () => setLockedRequester( !lockedRequester) }>
+              A requester can be only a user with rights to this project.
+            </span>
+          </div>
 
           <Groups
             addGroup={(newGroup) => {
