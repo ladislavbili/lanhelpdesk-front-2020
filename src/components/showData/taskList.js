@@ -125,7 +125,7 @@ export default function List( props ) {
                       style={(display.value === "createdAt" || display.value === "deadline" ? {textAlign: "right"} : {})}
                       colSpan={((index===0 || index ===1 || displayValues[index-1].type!=='important') && display.value !== "deadline")?'1':'2'}
                       key={display.value}
-                      width={display.value === 'title' ? "30%" : ((display.value === "id") ? "50px" : '')}>
+                      width={display.value === 'title' ? "30%" : ((display.value === "id" || display.value === "status") ? "50px" : '')}>
                       {display.label}
                     </th>
                   )
@@ -155,7 +155,7 @@ export default function List( props ) {
                     return <th key={display.value} >
                       <div className={(display.value === "deadline" ? "row" : "")}>
 
-                        <div style={{width: "80%"}}>
+                        <div style={display.value === "deadline" ? {flex: "1"} : {}}>
                           <input
                             type="text"
                             value={ value }
@@ -167,7 +167,7 @@ export default function List( props ) {
                             />
                         </div>
                         {display.value === "deadline" &&
-                          <div>
+                          <div className="ml-auto">
                             <button type="button" className="btn btn-link waves-effect" onClick={clearFilter}>
                               <i
                                 className="fas fa-times commandbar-command-icon m-l-8 text-highlight"
