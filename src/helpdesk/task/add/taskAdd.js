@@ -1052,8 +1052,8 @@ export default function TaskAdd( props ) {
   }
 
   const renderButtons = () => {
-      return (
-          <div>
+    return (
+      <div>
         {closeModal &&
           <Button className="btn btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
         }
@@ -1063,6 +1063,7 @@ export default function TaskAdd( props ) {
           onClick={addTaskFunc}
           > Create task
         </button>
+      </div>
     )
   }
 
