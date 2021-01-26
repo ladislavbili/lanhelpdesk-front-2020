@@ -1,11 +1,9 @@
 import React from 'react';
 import {
   useQuery,
-  useMutation
+  useMutation,
+  useApolloClient,
 } from "@apollo/client";
-import {
-  gql
-} from '@apollo/client';;
 import {
   Dropdown,
   DropdownItem,
@@ -22,6 +20,7 @@ import {
 import {
   setIsLoggedIn
 } from 'apollo/localSchema/actions';
+import ErrorIcon from 'components/errorMessages/errorIcon'
 import classnames from 'classnames';
 
 import {
@@ -33,7 +32,7 @@ import UserProfile from 'helpdesk/settings/users/userProfile';
 
 import {
   GET_MY_DATA,
-  GET_ERROR_MESSAGES_COUNT,
+  LOGOUT_USER
 } from './queries';
 
 export default function PageHeader( props ) {
@@ -50,10 +49,10 @@ export default function PageHeader( props ) {
   const {
     data: myData
   } = useQuery( GET_MY_DATA );
-  const {
-    data: errorMessageCountData
-  } = useQuery( GET_ERROR_MESSAGES_COUNT );
 
+  const [ logoutUser ] = useMutation( LOGOUT_USER );
+
+  const client = useApolloClient();
   //state
   const [ notificationsOpen, setNotificationsOpen ] = React.useState( false );
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
@@ -99,7 +98,6 @@ export default function PageHeader( props ) {
     })*/
   }
 
-  const errorMessages = errorMessageCountData ? errorMessageCountData.errorMessageCount : 0;
   const URL = getLocation( history );
 
   return (
@@ -138,19 +136,8 @@ export default function PageHeader( props ) {
         </div>
         <div className="ml-auto center-hor row">
           <i className="fas fa-user header-icon center-hor clickable w-25px" onClick={() => setModalUserProfileOpen(true)}></i>
-          {
-            accessRights.viewErrors &&
-            <i
-              className={classnames({ "danger-color": errorMessages > 0 }, "header-icon fas fa-exclamation-triangle center-hor clickable")}
-              style={{marginRight: 6}}
-              onClick={() => history.push(`${getLocation(history)}/errorMessages/`)}
-              />
-          }
-          {
-            accessRights.viewErrors &&
-            <span className={classnames({ "danger-color": errorMessages > 0 },"header-icon-text clickable")}>
-              {errorMessages}
-            </span>
+          { accessRights.viewErrors &&
+            <ErrorIcon history={history} location={URL} />
           }
 
           {
@@ -271,8 +258,10 @@ export default function PageHeader( props ) {
           className="header-icon clickable fa fa-sign-out-alt center-hor"
           onClick={() => {
             if (window.confirm('Are you sure you want to log out?')) {
+              logoutUser();
               localStorage.removeItem("acctok");
               setIsLoggedIn(false);
+              client.cache.reset()
             }
           }}
           />

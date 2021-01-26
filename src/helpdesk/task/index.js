@@ -56,7 +56,6 @@ import {
 import TaskEdit from './edit';
 import TaskEmpty from './taskEmpty';
 import TaskCalendar from '../calendar';
-//TODO remove and make work
 
 export default function TasksIndex( props ) {
   const {

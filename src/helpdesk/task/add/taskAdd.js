@@ -59,6 +59,10 @@ import {
 } from '../constants';
 
 import {
+  backendCleanRights
+} from 'configs/constants/projects';
+
+import {
   toSelArr
 } from 'helperFunctions';
 
@@ -137,17 +141,15 @@ export default function TaskAdd( props ) {
   }
 
   const userRights = (
-    project ?
-    project.right : {
-      admin: false,
-      delete: false,
-      internal: false,
-      read: false,
-      write: false
-    }
+    currentUser.role.level === 0 ?
+    backendCleanRights( true ) :
+    (
+      project ?
+      project.right :
+      backendCleanRights()
+    )
   );
-
-  const [ viewOnly, setViewOnly ] = React.useState( currentUser.role.level !== 0 && !userRights.write );
+  const REQUESTERS = ( project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users );
 
   const setDefaults = ( project, forced ) => {
     if ( project === null ) {
@@ -207,17 +209,11 @@ export default function TaskAdd( props ) {
     let newTags = def.tag && ( def.tag.fixed || def.tag.def ) ? project.tags.filter( ( item ) => mappedTags.includes( item.id ) ) : [];
     setTags( newTags );
 
-    let newTaskType = def.taskType && ( def.taskType.fixed || def.taskType.def ) ? taskTypes.find( ( item ) => item.id === def.taskType.value ) : taskType;
-    setTaskType( newTaskType );
-    setTaskTypeCreationError( newTaskType );
-
     let newOvertime = def.overtime && ( def.overtime.fixed || def.overtime.def ) ? booleanSelects.find( ( item ) => def.overtime.value === item.value ) : overtime;
     setOvertime( newOvertime );
 
     let newPausal = def.pausal && ( def.pausal.fixed || def.pausal.def ) ? booleanSelects.find( ( item ) => def.pausal.value === item.value ) : pausal;
     setPausal( newPausal );
-
-    setViewOnly( currentUser.role.level !== 0 && !project.right.write );
 
     setDefaultFields( def );
   }
@@ -345,39 +341,51 @@ export default function TaskAdd( props ) {
       } );
   }
 
+  const cantSave = (
+    saving ||
+    loading ||
+    title === "" ||
+    status === null ||
+    project === null ||
+    assignedTo === [] ||
+    company === null ||
+    ( project.def.tag.required && tags.length === 0 )
+  )
+
+  //RENDERS
   const renderTitle = () => {
     return (
       <div className="row m-b-15">
         <span className="center-hor flex m-r-15">
           <input type="text"
             value={title}
+            disabled={ !userRights.taskTitleEdit }
             className="task-title-input text-extra-slim full-width form-control"
             onChange={ (e) => setTitle(e.target.value) }
             placeholder="ENTER NEW TASK NAME" />
         </span>
-        {
-          status &&
+        { status && userRights.statusRead &&
           (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) &&
           <div className="task-info-add ml-auto center-hor">
-          <span className="">
-            {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Close date: " : "PendingDate: "}
-          </span>
-          <DatePicker
-            className="form-control hidden-input bolder"
-            selected={(status.action==='CloseDate' || status.action==='CloseInvalid') ? closeDate : pendingDate }
-            disabled={viewOnly}
-            onChange={date => {
-              if (status.action==='CloseDate' || status.action==='CloseInvalid'){
-                setCloseDate(date);
-              } else {
-                setPendingDate(date);
-              }
-            }}
-            placeholderText="No close date"
-            {...datePickerConfig}
-            />
-        </div>
-      }
+            <span className="">
+              {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Close date: " : "PendingDate: "}
+            </span>
+            <DatePicker
+              className="form-control hidden-input bolder"
+              selected={(status.action==='CloseDate' || status.action==='CloseInvalid') ? closeDate : pendingDate }
+              disabled={userRights.statusWrite}
+              onChange={date => {
+                if (status.action==='CloseDate' || status.action==='CloseInvalid'){
+                  setCloseDate(date);
+                } else {
+                  setPendingDate(date);
+                }
+              }}
+              placeholderText="No close date"
+              {...datePickerConfig}
+              />
+          </div>
+        }
         <button
           type="button"
           className="btn btn-link waves-effect ml-auto asc"
@@ -389,44 +397,19 @@ export default function TaskAdd( props ) {
     );
   }
 
-  const REQUESTERS = ( project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users );
-
   const layoutComponents = {
-    Project: ( viewOnly ) => (
+    Project: () => (
       <Select
-        placeholder={viewOnly ? "None" : "Select required" }
+        placeholder="Zadajte projekt"
         value={project}
         onChange={(project)=>{
           setTags([]);
           setStatus(null);
           setProject(project);
           setMilestone(noMilestone);
-
-          if(!viewOnly){
-            let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
-            setAssignedTo(newAssignedTo);
-            setAssignedToCreationError(newAssignedTo);
-          }else{
-            setPausal(booleanSelects[0]);
-          }
-
-          const newViewOnly = currentUser.role.level !== 0 && !project.right.write;
-          setViewOnly(newViewOnly);
-
-          if(newViewOnly){
-            setRepeat(null);
-            setSimpleSubtasks([]);
-            setScheduled([]);
-            setSubtasks([]);
-            setMaterials([]);
-            setCustomItems([]);
-            setWorkTrips([]);
-            setDeadline(null);
-            setCloseDate(null);
-            setPendingDate(null);
-            //		setReminder(null);
-          }
-
+          let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
+          setAssignedTo(newAssignedTo);
+          setAssignedToCreationError(newAssignedTo);
         }}
         options={projects}
         styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrowRequired}
@@ -436,7 +419,7 @@ export default function TaskAdd( props ) {
       <Select
         placeholder="Select required"
         value={assignedTo}
-        isDisabled={defaultFields.assignedTo.fixed || viewOnly}
+        isDisabled={ defaultFields.assignedTo.fixed || !userRights.assignedWrite }
         isMulti
         onChange={(users)=> {
           setAssignedTo(users);
@@ -450,7 +433,7 @@ export default function TaskAdd( props ) {
       <Select
         placeholder="Select required"
         value={status}
-        isDisabled={defaultFields.status.fixed || viewOnly}
+        isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
         styles={layout === 2 ? invisibleSelectStyleNoArrowColoredRequiredNoPadding : invisibleSelectStyleNoArrowColoredRequired}
         onChange={(status)=>{
           if(status.action==='PendingDate'){
@@ -469,10 +452,10 @@ export default function TaskAdd( props ) {
     ),
     Type: (
       <Select
-        placeholder="Select required"
+        placeholder="Select task type"
         value={taskType}
-        isDisabled={defaultFields.taskType.fixed || viewOnly}
-        styles={invisibleSelectStyleNoArrowRequired}
+        isDisabled={ !userRights.typeWrite }
+        styles={invisibleSelectStyleNoArrow}
         onChange={(taskType)=> {
           setTaskType(taskType);
           setTaskTypeCreationError(taskType);
@@ -482,7 +465,7 @@ export default function TaskAdd( props ) {
     ),
     Milestone: (
       <Select
-        isDisabled={viewOnly}
+        isDisabled={!userRights.milestoneWrite}
         placeholder="None"
         value={milestone}
         onChange={(milestone)=> {
@@ -507,7 +490,7 @@ export default function TaskAdd( props ) {
       <Select
         value={requester}
         placeholder="Select required"
-        isDisabled={defaultFields.requester.fixed || viewOnly}
+        isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
         onChange={(requester)=>{
           setRequester(requester);
           const newCompany = companies.find((company) => company.id === requester.id );
@@ -522,7 +505,7 @@ export default function TaskAdd( props ) {
       <Select
         value={company}
         placeholder="Select required"
-        isDisabled={defaultFields.company.fixed || viewOnly}
+        isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
         onChange={(company)=> {
           setCompany(company);
           setCompanyCreationError(company);
@@ -536,7 +519,7 @@ export default function TaskAdd( props ) {
       <Select
         value={pausal}
         placeholder="Select required"
-        isDisabled={viewOnly || !company || company.monthly || defaultFields.pausal.fixed}
+        isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
         styles={invisibleSelectStyleNoArrowRequired}
         onChange={(pausal)=> setPausal(pausal)}
         options={booleanSelects}
@@ -546,7 +529,7 @@ export default function TaskAdd( props ) {
       <DatePicker
         className="form-control hidden-input"
         selected={deadline}
-        disabled={viewOnly}
+        disabled={!userRights.deadlineWrite}
         onChange={date => setDeadline(date)}
         placeholderText="No deadline"
         {...datePickerConfig}
@@ -556,7 +539,7 @@ export default function TaskAdd( props ) {
       <Select
         placeholder="Select required"
         value={overtime}
-        isDisabled={viewOnly || defaultFields.overtime.fixed}
+        isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
         styles={invisibleSelectStyleNoArrowRequired}
         onChange={(overtime) => setOvertime(overtime)}
         options={booleanSelects}
@@ -567,127 +550,120 @@ export default function TaskAdd( props ) {
   const renderSelectsLayout1 = () => {
     return (
       <div className = "row" >
-        {!viewOnly &&
+        <div className="col-12 row">
           <div className="col-12 row">
-            <div className="col-12 row">
-              <div className="col-4">
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Projekt</Label>
-                  <div className="col-9">
-                    { layoutComponents.Project(viewOnly) }
-                  </div>
-                </div>
-              </div>
-              {!viewOnly &&
-                defaultFields.assignedTo.show &&
-                <div className="col-8">
-                  <div className="row p-r-10">
-                    <Label className="col-1-5 col-form-label">Assigned</Label>
-                    <div className="col-10-5">
-                      { layoutComponents.Assigned }
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
-
-            <div className="col-4">
-              {!viewOnly &&
-                defaultFields.status.show &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Status</Label>
-                  <div className="col-9">
-                    { layoutComponents.Status }
-                  </div>
-                </div>
-              }
-              {!viewOnly &&
-                defaultFields.taskType.show &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Typ</Label>
-                  <div className="col-9">
-                    { layoutComponents.Type }
-                  </div>
-                </div>
-              }
-              {!viewOnly &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Milestone</Label>
-                  <div className="col-9">
-                    { layoutComponents.Milestone }
-                  </div>
-                </div>
-              }
-            </div>
-
-            <div className="col-4">
-              {!viewOnly &&
-                defaultFields.requester.show &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Zadal</Label>
-                  <div className="col-9">
-                    { layoutComponents.Requester }
-                  </div>
-                </div>
-              }
-              {!viewOnly &&
-                defaultFields.company.show &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Firma</Label>
-                  <div className="col-9">
-                    { layoutComponents.Company }
-                  </div>
-                </div>
-              }
-              {!viewOnly &&
-                defaultFields.pausal.show &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Paušál</Label>
-                  <div className="col-9">
-                    { layoutComponents.Pausal }
-                  </div>
-                </div>
-              }
-            </div>
-
             <div className="col-4">
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Deadline</Label>
+                <Label className="col-3 col-form-label">Projekt</Label>
                 <div className="col-9">
-                  { layoutComponents.Deadline }
+                  { layoutComponents.Project() }
                 </div>
               </div>
-              {!viewOnly &&
-                <Repeat
-                  taskID={null}
-                  repeat={repeat}
-                  disabled={viewOnly}
-                  submitRepeat={(repeat)=>{
-                    if(viewOnly){
-                      return;
-                    }
-                    setRepeat(repeat);
-                  }}
-                  deleteRepeat={()=>{
-                    setRepeat(null);
-                  }}
-                  columns={true}
-                  vertical={false}
-                  addTask={true}
-                  />
-              }
-              {!viewOnly &&
-                defaultFields.overtime.show &&
+            </div>
+            { userRights.assignedRead &&
+              <div className="col-8">
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Mimo PH</Label>
-                  <div className="col-9">
-                    {layoutComponents.Overtime}
+                  <Label className="col-1-5 col-form-label">Assigned</Label>
+                  <div className="col-10-5">
+                    { layoutComponents.Assigned }
                   </div>
                 </div>
-              }
-            </div>
+              </div>
+            }
           </div>
-        }
+
+          <div className="col-4">
+            {userRights.statusRead &&
+              <div className="row p-r-10">
+                <Label className="col-3 col-form-label">Status</Label>
+                <div className="col-9">
+                  { layoutComponents.Status }
+                </div>
+              </div>
+            }
+            { userRights.typeRead &&
+              <div className="row p-r-10">
+                <Label className="col-3 col-form-label">Typ</Label>
+                <div className="col-9">
+                  { layoutComponents.Type }
+                </div>
+              </div>
+            }
+            { userRights.milestoneRead &&
+              <div className="row p-r-10">
+                <Label className="col-3 col-form-label">Milestone</Label>
+                <div className="col-9">
+                  { layoutComponents.Milestone }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div className="col-4">
+            {userRights.requesterRead &&
+              <div className="row p-r-10">
+                <Label className="col-3 col-form-label">Zadal</Label>
+                <div className="col-9">
+                  { layoutComponents.Requester }
+                </div>
+              </div>
+            }
+            {userRights.companyRead &&
+              <div className="row p-r-10">
+                <Label className="col-3 col-form-label">Firma</Label>
+                <div className="col-9">
+                  { layoutComponents.Company }
+                </div>
+              </div>
+            }
+            {userRights.pausalRead &&
+              <div className="row p-r-10">
+                <Label className="col-3 col-form-label">Paušál</Label>
+                <div className="col-9">
+                  { layoutComponents.Pausal }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div className="col-4">
+            { userRights.deadlineRead &&
+            <div className="row p-r-10">
+              <Label className="col-3 col-form-label">Deadline</Label>
+              <div className="col-9">
+                { layoutComponents.Deadline }
+              </div>
+            </div>
+            }
+            { userRights.repeatRead &&
+              <Repeat
+                taskID={null}
+                repeat={repeat}
+                disabled={true}
+                submitRepeat={(repeat)=>{
+                  if(viewOnly){
+                    return;
+                  }
+                  setRepeat(repeat);
+                }}
+                deleteRepeat={()=>{
+                  setRepeat(null);
+                }}
+                columns={true}
+                vertical={false}
+                addTask={true}
+                />
+            }
+            { userRights.overtimeRead &&
+              <div className="row p-r-10">
+                <Label className="col-3 col-form-label">Mimo PH</Label>
+                <div className="col-9">
+                  {layoutComponents.Overtime}
+                </div>
+              </div>
+            }
+          </div>
+        </div>
       </div>
     )
   }
@@ -695,27 +671,29 @@ export default function TaskAdd( props ) {
   const renderSelectsLayout2Form = () => {
     return (
       <div className="col-12 row task-edit-align-select-labels">
-        <div className="col-2" >
-          <Label className="col-form-label">Status</Label>
-          { layoutComponents.Status }
-        </div>
-
+        { userRights.statusRead &&
+          <div className="col-2" >
+            <Label className="col-form-label">Status</Label>
+            { layoutComponents.Status }
+          </div>
+        }
         <div className="col-2">
           <Label className="col-form-label">Projekt</Label>
-          { layoutComponents.Project(viewOnly) }
+          { layoutComponents.Project() }
         </div>
-
-        <div className="col-2">
-          <Label className="col-form-label">Milestone</Label>
-          { layoutComponents.Milestone }
-        </div>
-        { defaultFields.requester.show &&
+        { userRights.milestoneRead &&
+          <div className="col-2">
+            <Label className="col-form-label">Milestone</Label>
+            { layoutComponents.Milestone }
+          </div>
+        }
+        { userRights.requesterRead &&
           <div className="col-2">
             <Label className="col-form-label">Zadal</Label>
             { layoutComponents.Requester }
           </div>
         }
-        { defaultFields.company.show &&
+        { userRights.companyRead &&
           <div className="col-2">
             <Label className="col-form-label">Firma</Label>
             { layoutComponents.Company }
@@ -727,77 +705,58 @@ export default function TaskAdd( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className="task-edit-right  m-t-0 ">
-        <div className="col-form-label-2" >
-          <Label className="col-form-value-2">Status</Label>
-          { layoutComponents.Status }
-        </div>
-
+      <div className="task-edit-right  m-t-0 p-t-0">
+        { userRights.statusRead &&
+          <div className="col-form-label-2" >
+            <Label className="col-form-value-2">Status</Label>
+            { layoutComponents.Status }
+          </div>
+        }
         <div className="col-form-label-2">
           <Label className="col-form-value-2">Projekt</Label>
-          { layoutComponents.Project(viewOnly) }
+          { layoutComponents.Project(true) }
         </div>
-
-        <div className="col-form-label-2">
-          <Label className="col-form-value-2">Milestone</Label>
-          { layoutComponents.Milestone }
-        </div>
-        { defaultFields.requester.show &&
+        { userRights.milestoneRead &&
+          <div className="col-form-label-2">
+            <Label className="col-form-value-2">Milestone</Label>
+            { layoutComponents.Milestone }
+          </div>
+        }
+        { userRights.requesterRead &&
           <div className="col-form-label-2">
             <Label className="col-form-value-2">Zadal</Label>
             { layoutComponents.Requester }
           </div>
         }
-        { defaultFields.company.show &&
+        { userRights.companyRead &&
           <div className="col-form-label-2">
             <Label className="col-form-value-2">Firma</Label>
             { layoutComponents.Company }
           </div>
         }
-        {!viewOnly &&
-          defaultFields.assignedTo.show &&
+        { userRights.assignedRead &&
           <div className="">
             <Label className="col-form-label-2">Assigned</Label>
             <div className="col-form-value-2">
-              <Select
-                placeholder="Select required"
-                value={assignedTo}
-                isDisabled={defaultFields.assignedTo.fixed || viewOnly}
-                isMulti
-                onChange={(users)=> {
-                  setAssignedTo(users);
-                  setAssignedToCreationError(users);
-                }}
-                options={USERS_WITH_PERMISSIONS}
-                styles={invisibleSelectStyleNoArrowRequired}
-                />
+              { layoutComponents.Assigned }
             </div>
           </div>
         }
-
-        {!viewOnly &&
+        { userRights.deadlineRead &&
           <div className="">
             <Label className="col-form-label-2">Deadline</Label>
             <div className="col-form-value-2">
-              <DatePicker
-                className="form-control hidden-input"
-                selected={deadline}
-                disabled={viewOnly}
-                onChange={date => setDeadline(date)}
-                placeholderText="No deadline"
-                {...datePickerConfig}
-                />
+              { layoutComponents.Deadline }
             </div>
           </div>
         }
-
-        {!viewOnly &&
+        { userRights.repeatRead &&
           <Repeat
             taskID={null}
             repeat={repeat}
-            disabled={viewOnly}
+            disabled={true}
             submitRepeat={(repeat)=>{
-              if(viewOnly){
+              if(true){
                 return;
               }
               setRepeat(repeat);
@@ -810,80 +769,51 @@ export default function TaskAdd( props ) {
             vertical={true}
             />
         }
-
-        <Scheduled
-          items={scheduled}
-          users={assignedTo}
-          disabled={false}
-          onChange={(item) => {
-            let newScheduled = [...scheduled];
-            newScheduled[newScheduled.findIndex((item2) => item2.id === item.id )] = item;
-            setScheduled(newScheduled);
-          }}
-          submitItem = { (newScheduled) => {
-            setScheduled([
-              ...scheduled,
-              {
-                ...newScheduled,
-                id: fakeID--,
-              }
-            ])
-          }}
-          deleteItem = { (newScheduled) => {
-            setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
-          } }
-          />
-
-        {!viewOnly &&
-          defaultFields.taskType.show &&
+        { userRights.scheduledRead &&
+          <Scheduled
+            items={scheduled}
+            users={assignedTo}
+            disabled={false}
+            onChange={(item) => {
+              let newScheduled = [...scheduled];
+              newScheduled[newScheduled.findIndex((item2) => item2.id === item.id )] = item;
+              setScheduled(newScheduled);
+            }}
+            submitItem = { (newScheduled) => {
+              setScheduled([
+                ...scheduled,
+                {
+                  ...newScheduled,
+                  id: fakeID--,
+                }
+              ])
+            }}
+            deleteItem = { (newScheduled) => {
+              setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
+            } }
+            />
+        }
+        { userRights.typeRead &&
           <div className="">
             <Label className="col-form-label-2">Task Type</Label>
             <div className="col-form-value-2">
-              <Select
-                placeholder="Select required"
-                value={taskType}
-                isDisabled={defaultFields.taskType.fixed || viewOnly}
-                styles={invisibleSelectStyleNoArrowRequired}
-                onChange={(taskType)=> {
-                  setTaskType(taskType);
-                  setTaskTypeCreationError(taskType);
-                }}
-                options={taskTypes}
-                />
+              { layoutComponents.Type }
             </div>
           </div>
         }
-
-        {!viewOnly &&
-          defaultFields.pausal.show &&
+        { userRights.pausalRead &&
           <div className="">
             <Label className="col-form-label-2">Paušál</Label>
             <div className="col-form-value-2">
-              <Select
-                value={pausal}
-                placeholder="Select required"
-                isDisabled={viewOnly || !company || company.monthly || defaultFields.pausal.fixed}
-                styles={invisibleSelectStyleNoArrowRequired}
-                onChange={(pausal)=> setPausal(pausal)}
-                options={booleanSelects}
-                />
+              { layoutComponents.Pausal }
             </div>
           </div>
         }
-
-        {!viewOnly &&
-          defaultFields.overtime.show &&
+        { userRights.overtimeRead &&
           <div className="">
             <Label className="col-form-label-2">Mimo PH</Label>
             <div className="col-form-value-2">
-              <Select
-                placeholder="Select required"
-                value={overtime}
-                isDisabled={viewOnly || defaultFields.overtime.fixed}
-                styles={invisibleSelectStyleNoArrowRequired}
-                onChange={(overtime) => setOvertime(overtime)}
-                options={booleanSelects}
-                />
+              { layoutComponents.Overtime }
             </div>
           </div>
         }
@@ -894,7 +824,34 @@ export default function TaskAdd( props ) {
     )
   }
 
-  const renderPopis = () => {
+  const renderTags = () => {
+    if ( !userRights.tagsRead ) {
+      return null;
+    }
+    return (
+      <div className = "row m-t-10" >
+        <div className="center-hor">
+          <Label className="center-hor">Tagy: </Label>
+        </div>
+        <div className="f-1 ">
+          <Select
+            value={tags}
+            placeholder="None"
+            isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
+            isMulti
+            onChange={(t)=>setTags(t)}
+            options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
+            styles={ project && project.def.tag.required ? invisibleSelectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowColored }
+            />
+        </div>
+      </div>
+    )
+  }
+
+  const renderDescription = () => {
+    if ( !userRights.taskDescriptionRead ) {
+      return null;
+    }
     return (
       <div>
         <Label className="col-form-label-description">Popis úlohy</Label>
@@ -906,7 +863,7 @@ export default function TaskAdd( props ) {
           onChange={(e, editor)=>{
             setDescription(editor.getData());
           }}
-          readOnly={viewOnly}
+          readOnly={!userRights.taskDescriptionWrite}
           config={ck5config}
           />
       </div>
@@ -914,9 +871,12 @@ export default function TaskAdd( props ) {
   }
 
   const renderSimpleSubtasks = () => {
+    if ( !userRights.taskShortSubtasksRead ) {
+      return null;
+    }
     return (
       <CheckboxList
-        disabled={false}
+        disabled={!userRights.taskShortSubtasksWrite}
         items={simpleSubtasks}
         onChange={(simpleSubtask) => {
           let newSimpleSubtasks = [...simpleSubtasks];
@@ -942,31 +902,13 @@ export default function TaskAdd( props ) {
     )
   }
 
-  const renderTags = () => {
-    return (
-      <div className = "row m-t-10" >
-        <div className="center-hor">
-          <Label className="center-hor">Tagy: </Label>
-        </div>
-        <div className="f-1 ">
-          <Select
-            value={tags}
-            placeholder="None"
-            isDisabled={defaultFields.tag.fixed || viewOnly}
-            isMulti
-            onChange={(t)=>setTags(t)}
-            options={viewOnly || project === null ? [] : toSelArr(project.tags)}
-            styles={invisibleSelectStyleNoArrowColored}
-            />
-        </div>
-      </div>
-    )
-  }
-
   const renderAttachments = ( top ) => {
+    if ( !userRights.taskAttachmentsRead ) {
+      return null;
+    }
     return (
       <Attachments
-        disabled={viewOnly}
+        disabled={!userRights.taskAttachmentsWrite}
         taskID={null}
         top={top}
         attachments={attachments}
@@ -992,13 +934,20 @@ export default function TaskAdd( props ) {
   }
 
   const renderVykazyTable = ( subtasks, workTrips, materials, customItems ) => {
+    if (
+      !userRights.rozpocetRead &&
+      !userRights.vykazRead
+    ) {
+      return null
+    }
     return (
       <VykazyTable
         id={company ? company.id : 0}
         showColumns={ [0,1,2,3,4,5,6,7,8] }
-
         showTotals={false}
-        disabled={viewOnly}
+        userRights={userRights}
+        isInvoiced={false}
+        canEditInvoiced={false}
         company={company}
         match={match}
         taskID={null}
@@ -1103,48 +1052,14 @@ export default function TaskAdd( props ) {
   }
 
   const renderButtons = () => {
-    return (
-      <div className="p-l-30 p-r-30 p-b-30">
-        {renderCancelButton()}
-        {renderCreateButton()}
-      </div>
-    )
-  }
-
-  const renderCancelButton = () => {
-    if ( closeModal ) {
       return (
-        <Button
-          className={classnames(
-            "btn",
-            "btn-link-cancel",
-            {
-              "position-absolute bottom-20": layout === 2
-            }
-          )}
-           onClick={() => closeModal()}>Cancel</Button>
-      )
-    } else {
-      return;
-    }
-  }
-
-  const renderCreateButton = () => {
-    return (
-      <button
-          className={classnames(
-            "btn",
-            {
-              "pull-right": layout === 1
-            },
-            {
-              "m-t-20": layout === 2
-            },
-            {
-              "m-l-5": layout === 2
-            }
-          )}
-          disabled={title==="" || status===null || project === null || assignedTo === [] || company === null || saving || loading}
+          <div>
+        {closeModal &&
+          <Button className="btn btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
+        }
+        <button
+          className="btn pull-right"
+          disabled={ cantSave }
           onClick={addTaskFunc}
           > Create task
         </button>
@@ -1167,7 +1082,8 @@ export default function TaskAdd( props ) {
       <div
         className={classnames(
           "scrollable",
-          { "p-0": layout === 1},
+          "min-height-400",
+          { "p-20": layout === 1},
           { "row": layout === 2}
         )}
         >
@@ -1188,14 +1104,14 @@ export default function TaskAdd( props ) {
 
           { layout === 1 ? renderSelectsLayout1() : renderTags() }
 
-          { renderPopis() }
+          { renderDescription() }
 
-          { layout === 1 && defaultFields.tag.show && renderTags() }
+          { layout === 1 && renderTags() }
 
-            { renderSimpleSubtasks() }
+          { renderSimpleSubtasks() }
 
           { renderAttachments(false) }
-          { !viewOnly && renderVykazyTable(subtasks, workTrips, materials, customItems) }
+          { renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
           { layout === 2 && renderCancelButton() }
 

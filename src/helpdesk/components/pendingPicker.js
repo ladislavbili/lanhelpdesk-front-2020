@@ -40,7 +40,8 @@ export default class PendingPicker extends Component {
   render() {
     const {
       prefferedMilestone,
-      milestones
+      milestones,
+      milestonesBlocked
     } = this.props;
     const milestoneActive = milestones.some( ( milestone ) => prefferedMilestone && milestone.id === prefferedMilestone.id );
     return (
@@ -73,7 +74,7 @@ export default class PendingPicker extends Component {
                 <Select
                   placeholder="Vyberte milestone"
                   value={ this.state.milestone }
-                  isDisabled={ this.state.pendingDate !== null }
+                  isDisabled={ this.state.pendingDate !== null || milestonesBlocked }
                   onChange={(milestone)=> {
                     this.setState( { milestone } );
                   }}

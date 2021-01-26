@@ -43,6 +43,10 @@ const unreadTypeFilter = {
 
 export default function ErrorList( props ) {
   const {
+    history
+  } = props;
+
+  const {
     data: errorMessagesData,
     loading: errorMessagesLoading,
   } = useQuery( GET_ERROR_MESSAGES );
@@ -52,9 +56,6 @@ export default function ErrorList( props ) {
   const [ deleteAllErrorMessages ] = useMutation( DELETE_ALL_ERROR_MESSAGES );
   const [ deleteSelectedErrorMessages ] = useMutation( DELETE_SELECTED_ERROR_MESSAGES );
 
-  const {
-    history
-  } = props;
 
   const [ searchFilter, setSearchFilter ] = React.useState( '' );
   const [ selectedErrorID, setSelectedErrorID ] = React.useState( null );

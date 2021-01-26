@@ -24,7 +24,7 @@ export default function CheckboxList( props ) {
         Subtasks
       </div>
       { items.map((item) =>
-        <div className="row" id={item.id}>
+        <div className="row" key={item.id}>
           <Checkbox
             className = "m-r-5"
             centerVer

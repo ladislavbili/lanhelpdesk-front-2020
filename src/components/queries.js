@@ -38,3 +38,9 @@ query {
   errorMessageCount
 }
 `;
+
+export const LOGOUT_USER = gql `
+mutation logoutUser {
+  logoutUser
+}
+`;

@@ -65,13 +65,13 @@ export default function TaskHistory( props ) {
 
   const renderMultipleMessages = ( event ) => {
     return (
-      <div style={{ marginBottom: '1rem' }} className="row">
+      <div style={{ marginBottom: '1rem' }} className="row" key={event.createdAt}>
         <p className="text-muted m-b-0">
           {timestampToString(event.createdAt)}
         </p>
         <div className="m-l-5">
-        {event.messages.map((message) => (
-          <p className="m-b-0">
+        {event.messages.map((message,index) => (
+          <p className="m-b-0" key={index}>
             {message}
           </p>
         ))}

@@ -37,7 +37,7 @@ export default function Scheduled( props ) {
       <Label className="col-form-label-2">Scheduled</Label>
       <div className="p-l-7">
         { items.map((item) =>
-          <div className="row" id={item.id}>
+          <div className="row" key={item.id}>
             <span className="make-space-30-r">
               {
                 `

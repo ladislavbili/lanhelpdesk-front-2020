@@ -42,7 +42,7 @@ export default function ProjectsList( props ) {
     let color = 'red';
     let text = 'No';
     let iconName = 'far fa-times-circle';
-    if ( project.projectRights.some( ( right ) => right.user.id === currentUser.id ) ) {
+    if ( project.right !== null ) {
       color = 'green';
       text = 'Yes';
       iconName = 'far fa-check-circle';

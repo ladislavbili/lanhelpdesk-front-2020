@@ -18,6 +18,8 @@ import ErrorMessages from 'components/errorMessages';
 import PageHeader from '../components/PageHeader';
 import SelectPage from '../components/SelectPage';
 
+import ProjectEdit from 'helpdesk/components/projects/projectEdit';
+
 import AccessDenied from 'components/accessDenied';
 
 import TaskList from './task';
@@ -85,6 +87,7 @@ export default function Navigation( props ) {
           <Route exact path="/helpdesk/taskList/i/:listID/:taskID" component={TaskList} />
           <Route exact path="/helpdesk/notifications" component={NotificationList} />
           <Route exact path="/helpdesk/notifications/:notificationID/:taskID" component={NotificationList} />
+            <Route exact path="/helpdesk/project/:projectID" component={ProjectEdit} />
 
           { /* SETTINGS */ }
           { settings.map( (item) => {
