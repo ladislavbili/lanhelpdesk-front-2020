@@ -1,5 +1,4 @@
 export const remapRightsToBackend = ( group ) => {
-  console.log( group );
   return {
     id: group.id,
     title: group.title,

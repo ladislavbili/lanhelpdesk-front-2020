@@ -301,7 +301,6 @@ export default function FilterForm( props ) {
     } else if ( filter.assignedTo === null ) {
       setAssigned( emptyFilter.assigned );
     } else {
-      console.log( filter );
       setAssigned( toSelArr( usersData.basicUsers )
         .find( ( user ) => user.id === filter.assignedTo.id ) );
     }

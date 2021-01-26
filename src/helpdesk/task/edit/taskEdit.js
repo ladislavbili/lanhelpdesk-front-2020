@@ -268,7 +268,7 @@ export default function TaskEdit( props ) {
   const canAddUser = accessRights.users;
   const canAddCompany = accessRights.companies;
   const canCopy = userRights.write || title === "" || status === null || project === null || saving;
-  const availableProjects = projects.filter( ( project ) => project.right.write );
+  const availableProjects = projects.filter( ( project ) => project.right.projectWrite || currentUser.role.level === 0 );
   const assignedTos = project ? toSelArr( project.usersWithRights, 'fullName' ) : [];
 
   const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights, 'fullName' ) : users );
@@ -1927,7 +1927,7 @@ export default function TaskEdit( props ) {
         />
     )
   }
-  //todo nastavit defaultne hodnoty tabov
+
   const renderComments = () => {
     if ( !userRights.history && !userRights.viewComments ) {
       return null;

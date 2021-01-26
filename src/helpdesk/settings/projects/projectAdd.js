@@ -132,6 +132,17 @@ export default function ProjectAdd( props ) {
     }
   }, [ statusesLoading ] );
 
+  React.useEffect( () => {
+    if ( !myDataLoading && !usersLoading ) {
+      setUserGroups( [ {
+        group: toSelArr( groups )
+          .find( ( group ) => group.order === 0 ),
+        user: toSelArr( usersData.basicUsers, 'email' )
+          .find( ( user ) => user.id === myData.getMyData.id )
+      } ] )
+    }
+  }, [ myDataLoading, usersLoading ] );
+
   //functions
   const addProjectFunc = () => {
     setSaving( true );
