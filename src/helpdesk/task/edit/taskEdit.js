@@ -35,10 +35,13 @@ import {
 import datePickerConfig from 'configs/components/datepicker';
 import {
   invisibleSelectStyleNoArrow,
+  selectStyleNoArrowNoPadding,
   invisibleSelectStyleNoArrowNoPadding,
   invisibleSelectStyleNoArrowColored,
+  selectStyleNoArrowColoredRequired,
   invisibleSelectStyleNoArrowColoredRequired,
   invisibleSelectStyleNoArrowColoredRequiredNoPadding,
+  selectStyleNoArrowRequired,
   invisibleSelectStyleNoArrowRequired,
   invisibleSelectStyleNoArrowRequiredNoPadding,
 } from 'configs/components/select';
@@ -842,13 +845,13 @@ export default function TaskEdit( props ) {
   //render
   const renderCommandbar = () => {
     return (
-      <div className={classnames( "bkg-white", "p-l-30", {"commandbar-small": columns}, {"commandbar": !columns})}> {/*Commandbar*/}
+      <div className="task-add-layout"> {/*Commandbar*/}
         <div className={classnames("d-flex", "flex-row", "center-hor", {"m-b-10": columns})}>
           <div className="display-inline center-hor">
             {!columns &&
               <button
                 type="button"
-                className="btn btn-link waves-effect"
+                className="btn btn-link waves-effect task-add-layout-button"
                 onClick={() => {
                   if(inModal){
                     closeModal()
@@ -863,28 +866,11 @@ export default function TaskEdit( props ) {
                 Back
               </button>
             }
-            { !task.invoiced && userRights.statusWrite &&
-              (project ? toSelArr(project.project.statuses) : []).map((status) => (
-                <button
-                  type="button"
-                  key={status.id}
-                  className="btn btn-link waves-effect"
-                  onClick={() => changeStatus(status)}
-                  >
-                  { status.icon.length > 3 &&
-                    <i
-                      className={`${status.icon} commandbar-command-icon`}
-                      />
-                  }
-                  {status.title}
-                </button>
-              ))
-            }
             { task.invoiced && accessRights.vykazy && canEditInvoiced &&
               <button
                 type="button"
                 disabled={getCantSave()}
-                className="btn btn-danger waves-effect"
+                className="btn btn-danger waves-effect task-add-layout-button"
                 onClick={() => submitInvoicedTask(true)}
                 >
                 Re-open
@@ -895,7 +881,7 @@ export default function TaskEdit( props ) {
                 type="button"
                 style={{color: important ? '#ffc107' : '#0078D4'}}
                 disabled={getCantSave()}
-                className="btn btn-link waves-effect"
+                className="btn btn-link waves-effect task-add-layout-button"
                 onClick={() => submitInvoicedTask(false)}
                 >
                 <i className="far fa-save" />
@@ -930,7 +916,7 @@ export default function TaskEdit( props ) {
             { userRights.deleteTasks &&
               <button
                 type="button"
-                className="btn btn-link waves-effect"
+                className="btn btn-link waves-effect task-add-layout-button"
                 onClick={deleteTaskFunc}
                 >
                 <i className="far fa-trash-alt" />
@@ -941,7 +927,7 @@ export default function TaskEdit( props ) {
                 type="button"
                 style={{color: important ? '#ffc107' : '#0078D4'}}
                 disabled={userRights.important || false}
-                className="btn btn-link waves-effect"
+                className="btn btn-link waves-effect task-add-layout-button"
                 onClick={()=>{
                   autoUpdateTask({ important: !important })
                   setImportant(!important);
@@ -952,17 +938,21 @@ export default function TaskEdit( props ) {
               </button>
             <button
               type="button"
-              className="btn btn-link waves-effect"
+              className="btn btn-link waves-effect task-add-layout-button"
               onClick={() => setLayout(layout === 1 ? 2 : 1)}
               >
               <i className="fas fa-retweet "/>
               Layout
             </button>
-            {
-              (project ? toSelArr(project.project.statuses) : []).filter((status) => !['Invoiced'].includes(status.action) ).map((status) => (
+
+            { !task.invoiced && userRights.statusWrite &&
+              (project ? toSelArr(project.project.statuses) : [])
+              .filter((status) => !['Invoiced'].includes(status.action) )
+              .map((status) => (
                 <button
                   type="button"
-                  className="btn btn-link waves-effect"
+                  key={status.id}
+                  className="btn btn-link waves-effect task-add-layout-button"
                   onClick={() => changeStatus(status)}
                   >
                   { status.icon.length > 3 &&
@@ -996,9 +986,9 @@ export default function TaskEdit( props ) {
 
   const renderTitle = () => {
     return (
-      <div className="d-flex p-2">
+      <div className="d-flex">
         <div className="row flex">
-          <h2 className="center-hor text-extra-slim">{id}: </h2>
+          <h2 className="center-hor m-l-10">{id}: </h2>
           <span className="center-hor flex m-r-15">
             <input type="text"
               disabled={ !userRights.taskTitleEdit }
@@ -1012,6 +1002,7 @@ export default function TaskEdit( props ) {
               }}
               placeholder="Enter task name" />
           </span>
+          {renderTaskInfoAndDates()}
         </div>
       </div>
     );
@@ -1110,7 +1101,7 @@ export default function TaskEdit( props ) {
         value={ project }
         onChange={ changeProject }
         options={ availableProjects }
-        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired }
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Assigned: (
@@ -1131,7 +1122,7 @@ export default function TaskEdit( props ) {
           ( canAddUser ? [{id:-1, title:'+ Add user',body:'add', label:'+ Add user',value:null}] : [])
           .concat(assignedTos)
         }
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={selectStyleNoArrowRequired}
         />
     ),
     Status: (
@@ -1139,7 +1130,7 @@ export default function TaskEdit( props ) {
         placeholder="Status required"
         value={status}
         isDisabled={defaultFields.status.fixed || !userRights.statusWrite || task.invoiced}
-        styles={layout === 2 ? invisibleSelectStyleNoArrowColoredRequiredNoPadding : invisibleSelectStyleNoArrowColoredRequired}
+        styles={layout === 2 ? selectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowColoredRequired}
         onChange={ changeStatus }
         options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action!=='Invoiced')}
         />
@@ -1149,7 +1140,7 @@ export default function TaskEdit( props ) {
         placeholder="Zadajte typ"
         value={taskType}
         isDisabled={ !userRights.typeWrite }
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={selectStyleNoArrowRequired}
         onChange={(type)=> {
           setTaskType(type);
           autoUpdateTask({ taskType: type.id })
@@ -1163,7 +1154,7 @@ export default function TaskEdit( props ) {
         value={milestone}
         onChange={changeMilestone}
         options={milestones}
-        styles={layout === 2 ? invisibleSelectStyleNoArrowNoPadding : invisibleSelectStyleNoArrow}
+        styles={layout === 2 ? selectStyleNoArrowNoPadding : invisibleSelectStyleNoArrow}
         />
     ),
     Requester: (
@@ -1173,7 +1164,7 @@ export default function TaskEdit( props ) {
         isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
         onChange={changeRequester}
         options={(canAddUser?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(requesters)}
-        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Company: (
@@ -1183,14 +1174,14 @@ export default function TaskEdit( props ) {
         isDisabled={defaultFields.company.fixed || !userRights.companyWrite || task.invoiced}
         onChange={changeCompany}
         options={(canAddCompany ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
-        styles={layout === 2 ? invisibleSelectStyleNoArrowRequiredNoPadding : invisibleSelectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Pausal: (
       <Select
         value={company && parseInt(company.taskWorkPausal) === 0 && pausal.value === false ? {...pausal, label: pausal.label + " (nezmluvný)"} : pausal }
         isDisabled={!userRights.pausalWrite || !company || !company.monthly || parseInt(company.taskWorkPausal) < 0 || defaultFields.pausal.fixed}
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={selectStyleNoArrowRequired}
         onChange={(pausal)=> {
           autoUpdateTask({ pausal: pausal.value })
           setPausal(pausal);
@@ -1200,7 +1191,7 @@ export default function TaskEdit( props ) {
     ),
     Deadline: (
       <DatePicker
-        className="form-control hidden-input"
+        className="form-control"
         selected={deadline}
         disabled={!userRights.deadlineWrite}
         onChange={date => {
@@ -1217,7 +1208,7 @@ export default function TaskEdit( props ) {
       <Select
         value={overtime}
         isDisabled={!userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={invisibleSelectStyleNoArrowRequired}
+        styles={selectStyleNoArrowRequired}
         onChange={(overtime)=> {
           setOvertime(overtime);
           autoUpdateTask({ overtime: overtime.value })
@@ -1229,118 +1220,129 @@ export default function TaskEdit( props ) {
 
   const renderSelectsLayout1 = () => {
     return (
-      <div>
-        <div className="col-12 row">
-          { userRights.projectRead &&
-            <div className="col-4">
-              <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Projekt</Label>
-                <div className="col-9">
-                  { layoutComponents.Project }
+      <div className = "form-section form-selects-entries" >
+        <div className="form-section-rest">
+          <div className="col-12 row">
+            { userRights.projectRead &&
+              <div className="col-4">
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Project }
+                  </div>
                 </div>
               </div>
-            </div>
-          }
-          { userRights.assignedRead &&
-            <div className="col-8" style={{ marginLeft: -5 }}>
-              <div className="row p-r-10">
-                <Label className="col-1-5 col-form-label">Assigned</Label>
-                <div className="col-10-5">
-                  { layoutComponents.Assigned }
+            }
+            { userRights.assignedRead &&
+              <div className="col-8" style={{ marginLeft: -5 }}>
+                <div className="row p-r-10">
+                  <Label className="col-1-5 col-form-label">Assigned <span className="warning-big">*</span></Label>
+                  <div className="col-10-5">
+                    { layoutComponents.Assigned }
+                  </div>
                 </div>
               </div>
-            </div>
-          }
-        </div>
+            }
+          </div>
 
-        <div className="hello">
-          {userRights.statusRead &&
-            <div className="display-inline">
-              <Label className="col-form-label w-8">Status</Label>
-              <div className="display-inline-block w-25 p-r-10">
-                { layoutComponents.Status }
+          { userRights.tagsRead &&
+            <div className="row p-r-10">
+              <Label className="col-1 col-form-label">Tags {  defaultFields.tag.required ? <span className="warning-big">*</span> : ""}</Label>
+              <div className="col-11">
+                { renderTags() }
               </div>
             </div>
           }
-          { userRights.typeRead &&
-            <div className="display-inline">
-              <Label className="col-form-label w-8">Typ</Label>
-              <div className="display-inline-block w-25 p-r-10">
-                { layoutComponents.Type }
+
+          <div className="hello">
+            {userRights.statusRead &&
+              <div className="display-inline">
+                <Label className="col-form-label w-8">Status <span className="warning-big">*</span></Label>
+                <div className="display-inline-block w-25 p-r-10">
+                  { layoutComponents.Status }
+                </div>
               </div>
-            </div>
-          }
-          { userRights.milestoneRead &&
-            <div className="display-inline">
-              <Label className="col-form-label w-8">Milestone</Label>
-              <div className="display-inline-block w-25 p-r-10">
-                { layoutComponents.Milestone }
+            }
+            { userRights.typeRead &&
+              <div className="display-inline">
+                <Label className="col-form-label w-8">Typ <span className="warning-big">*</span></Label>
+                <div className="display-inline-block w-25 p-r-10">
+                  { layoutComponents.Type }
+                </div>
               </div>
-            </div>
-          }
-          {userRights.requesterRead &&
-            <div className="display-inline">
-              <Label className="col-form-label w-8">Zadal</Label>
-              <div className="display-inline-block w-25 p-r-10">
-                { layoutComponents.Requester }
+            }
+            { userRights.milestoneRead &&
+              <div className="display-inline">
+                <Label className="col-form-label w-8">Milestone</Label>
+                <div className="display-inline-block w-25 p-r-10">
+                  { layoutComponents.Milestone }
+                </div>
               </div>
-            </div>
-          }
-          {userRights.companyRead &&
-            <div className="display-inline">
-              <Label className="col-form-label w-8">Firma</Label>
-              <div className="display-inline-block w-25 p-r-10">
-                { layoutComponents.Company }
+            }
+            {userRights.requesterRead &&
+              <div className="display-inline">
+                <Label className="col-form-label w-8">Zadal <span className="warning-big">*</span></Label>
+                <div className="display-inline-block w-25 p-r-10">
+                  { layoutComponents.Requester }
+                </div>
               </div>
-            </div>
-          }
-          {userRights.pausalRead &&
-            <div className="display-inline">
-              <Label className="col-form-label w-8">Paušál</Label>
-              <div className="display-inline-block w-25 p-r-10">
-                { layoutComponents.Pausal }
+            }
+            {userRights.companyRead &&
+              <div className="display-inline">
+                <Label className="col-form-label w-8">Firma <span className="warning-big">*</span></Label>
+                <div className="display-inline-block w-25 p-r-10">
+                  { layoutComponents.Company }
+                </div>
               </div>
-            </div>
-          }
-          { userRights.deadlineRead &&
-            <div className="display-inline">
-              <Label className="col-form-label w-8">Deadline</Label>
-              <div className="display-inline-block w-25 p-r-10">
-                { layoutComponents.Deadline }
+            }
+            {userRights.pausalRead &&
+              <div className="display-inline">
+                <Label className="col-form-label w-8">Paušál <span className="warning-big">*</span></Label>
+                <div className="display-inline-block w-25 p-r-10">
+                  { layoutComponents.Pausal }
+                </div>
               </div>
-            </div>
-          }
-          { userRights.repeatRead &&
-            <div className="display-inline">
-              <Repeat
-                disabled={!userRights.repeatWrite}
-                taskID={id}
-                repeat={repeat}
-                submitRepeat={(repeat) => {
-                  setRepeat(repeat);
-                  autoUpdateTask({
-                    repeat: {
-                      repeatEvery: repeat.repeatEvery,
-                      repeatInterval: repeat.repeatInterval.value,
-                      startsAt: repeat.startsAt.valueOf().toString(),
-                    }
-                  })
-                }}
-                deleteRepeat={()=> {
-                  setRepeat(null);
-                  autoUpdateTask({ repeat: null })
-                }}
-                />
-            </div>
-          }
-          { userRights.overtimeRead &&
-            <div className="display-inline">
-              <Label className="col-form-label w-8">Mimo PH</Label>
-              <div className="display-inline-block w-25 p-r-10">
-                {layoutComponents.Overtime}
+            }
+            { userRights.deadlineRead &&
+              <div className="display-inline">
+                <Label className="col-form-label w-8">Deadline</Label>
+                <div className="display-inline-block w-25 p-r-10">
+                  { layoutComponents.Deadline }
+                </div>
               </div>
-            </div>
-          }
+            }
+            { userRights.repeatRead &&
+              <div className="display-inline">
+                <Repeat
+                  disabled={!userRights.repeatWrite}
+                  taskID={id}
+                  repeat={repeat}
+                  submitRepeat={(repeat) => {
+                    setRepeat(repeat);
+                    autoUpdateTask({
+                      repeat: {
+                        repeatEvery: repeat.repeatEvery,
+                        repeatInterval: repeat.repeatInterval.value,
+                        startsAt: repeat.startsAt.valueOf().toString(),
+                      }
+                    })
+                  }}
+                  deleteRepeat={()=> {
+                    setRepeat(null);
+                    autoUpdateTask({ repeat: null })
+                  }}
+                  />
+              </div>
+            }
+            { userRights.overtimeRead &&
+              <div className="display-inline">
+                <Label className="col-form-label w-8">Mimo PH <span className="warning-big">*</span></Label>
+                <div className="display-inline-block w-25 p-r-10">
+                  {layoutComponents.Overtime}
+                </div>
+              </div>
+            }
+          </div>
         </div>
       </div>
     )
@@ -1385,48 +1387,58 @@ export default function TaskEdit( props ) {
     return (
       <div className={"task-edit-right" + (columns ? " w-250px" : "")} >
         { userRights.statusRead &&
-          <div className="col-form-label-2" >
-            <Label className="col-form-value-2">Status</Label>
-            { layoutComponents.Status }
+          <div className="form-selects-entry-column" >
+            <Label>Status <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Status }
+            </div>
           </div>
         }
         { userRights.projectRead &&
-          <div className="col-form-label-2">
-            <Label className="col-form-value-2">Projekt</Label>
-            { layoutComponents.Project }
+          <div className="form-selects-entry-column" >
+            <Label>Projekt <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Project }
+            </div>
           </div>
         }
         { userRights.milestoneRead &&
-          <div className="col-form-label-2">
-            <Label className="col-form-value-2">Milestone</Label>
-            { layoutComponents.Milestone }
+          <div className="form-selects-entry-column" >
+            <Label>Milestone</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Milestone }
+            </div>
           </div>
         }
         { userRights.requesterRead &&
-          <div className="col-form-label-2">
-            <Label className="col-form-value-2">Zadal</Label>
-            { layoutComponents.Requester }
+          <div className="form-selects-entry-column" >
+            <Label>Zadal <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Requester }
+            </div>
           </div>
         }
         { userRights.companyRead &&
-          <div className="col-form-label-2">
-            <Label className="col-form-value-2">Firma</Label>
-            { layoutComponents.Company }
+          <div className="form-selects-entry-column" >
+            <Label>Firma <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Company }
+            </div>
           </div>
         }
         { userRights.assignedRead &&
-          <div>
-            <Label className="col-form-label-2">Assigned</Label>
-            <div className="col-form-value-2" style={{marginLeft: "-5px"}}>
-              {layoutComponents.Assigned}
+          <div className="form-selects-entry-column" >
+            <Label>Assigned <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Assigned }
             </div>
           </div>
         }
         { userRights.deadlineRead &&
-          <div>
-            <Label className="col-form-label m-l-7">Deadline</Label>
-            <div className="col-form-value-2" style={{marginLeft: "-1px"}}>
-              {layoutComponents.Deadline}
+          <div className="form-selects-entry-column" >
+            <Label>Deadline</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Deadline }
             </div>
           </div>
         }
@@ -1469,27 +1481,37 @@ export default function TaskEdit( props ) {
             } }
             />
         }
+
+        { userRights.tagsRead &&
+          <div className="form-selects-entry-column" >
+            <Label>Tags { defaultFields.tag.required ? <span className="warning-big">*</span> : ""}</Label>
+            <div className="form-selects-entry-column-rest" >
+              { renderTags() }
+            </div>
+          </div>
+        }
+
         { userRights.typeRead &&
-          <div>
-            <label className="col-form-label m-l-7">Task Type</label>
-            <div className="col-form-value-2">
+          <div className="form-selects-entry-column" >
+            <Label>Task Type <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
               { layoutComponents.Type }
             </div>
           </div>
         }
         { userRights.pausalRead &&
-          <div>
-            <label className="col-form-label m-l-7">Paušál</label>
-            <div className="col-form-value-2">
-              {layoutComponents.Pausal}
+          <div className="form-selects-entry-column" >
+            <Label>Paušál <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Pausal }
             </div>
           </div>
         }
         { userRights.overtimeRead &&
-          <div>
-            <label className="col-form-label-2">Mimo PH</label>
-            <div className="col-form-value-2">
-              {layoutComponents.Overtime}
+          <div className="form-selects-entry-column" >
+            <Label>Mimo PH <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Overtime }
             </div>
           </div>
         }
@@ -1522,9 +1544,6 @@ export default function TaskEdit( props ) {
           </div>
         }
         <div className="row f-1">
-          <div className="center-hor">
-            <Label className="center-hor">Tagy: </Label>
-          </div>
           <div className="f-1 center-hor">
             <Select
               placeholder="Zvoľte tagy"
@@ -1536,7 +1555,7 @@ export default function TaskEdit( props ) {
               }}
               options={toSelArr(project === null ? [] : project.project.tags)}
               isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-              styles={ defaultFields.tag.required ? invisibleSelectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowColored}
+              styles={ defaultFields.tag.required ? selectStyleNoArrowColoredRequired : selectStyleNoArrowNoPadding}
               />
           </div>
         </div>
@@ -1590,32 +1609,32 @@ export default function TaskEdit( props ) {
         if ( description.length !== 0 ) {
           RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
         } else {
-          RenderDescription = <div className=""></div>
+          RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
         }
       }
     }
     return (
-      <div>
-        <div>
-          <Label className="col-form-label-description">
-            Popis úlohy
-            { userRights.taskDescriptionWrite &&
-              <button
-                className="btn btn-link waves-effect m-l-5"
-                onClick={()=>{
-                  if(showDescription){
-                    autoUpdateTask({ description  })
-                  }
-                  setShowDescription(!showDescription);
-                }}
-                >
-                <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
-                { !showDescription ? 'edit' : 'save' }
-              </button>
-            }
-          </Label>
+      <div className="form-section">
+        <Label className="col-form-label-description">
+          Popis úlohy
+          { userRights.taskDescriptionWrite &&
+            <button
+              className="btn btn-link waves-effect m-l-5"
+              onClick={()=>{
+                if(showDescription){
+                  autoUpdateTask({ description  })
+                }
+                setShowDescription(!showDescription);
+              }}
+              >
+              <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
+              { !showDescription ? 'edit' : 'save' }
+            </button>
+          }
+        </Label>
+        <div className="form-section-rest">
+          {RenderDescription}
         </div>
-        {RenderDescription}
       </div>
     )
   }
@@ -1625,19 +1644,23 @@ export default function TaskEdit( props ) {
       return null;
     }
     return (
-      <div>
-        { `Pausal ${company.title}  ` }
-        <span>
-          {`Pausal subtasks:`}
-          <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
-            {` ${usedSubtaskPausal}`}
+      <div className="form-section">
+        <div className="form-section-rest">
+          <span className=" message success-message center-hor ml-auto">
+            { `Pausal ${company.title}  ` }
+            <span>
+              {`Pausal subtasks:`}
+              <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
+                {` ${usedSubtaskPausal}`}
+              </span>
+              {` / ${taskWorkPausal} Pausal trips:`}
+              <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
+                {` ${usedTripPausal}`}
+              </span>
+              {` / ${taskTripPausal}`}
+            </span>
           </span>
-          {` / ${taskWorkPausal} Pausal trips:`}
-          <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
-            {` ${usedTripPausal}`}
-          </span>
-          {` / ${taskTripPausal}`}
-        </span>
+        </div>
       </div>
     )
   }
@@ -1684,7 +1707,7 @@ export default function TaskEdit( props ) {
 
   const renderModalUserAdd = () => {
     return (
-      <Modal isOpen={openUserAdd} >
+      <Modal isOpen={openUserAdd} className="modal-without-borders" >
         <ModalHeader>
           Add user
         </ModalHeader>
@@ -1712,7 +1735,7 @@ export default function TaskEdit( props ) {
 
   const renderModalCompanyAdd = () => {
     return (
-      <Modal isOpen={openCompanyAdd}>
+      <Modal isOpen={openCompanyAdd} className="modal-without-borders">
         <ModalBody>
           <CompanyAdd
             closeModal={() => setOpenCompanyAdd(false)}
@@ -1933,8 +1956,9 @@ export default function TaskEdit( props ) {
       return null;
     }
     return (
-      <div className="comments">
-        <Nav tabs className="b-0 m-b-22 m-l--10 m-t-15">
+      <div className="form-section">
+        <div className="form-section-rest">
+        <Nav tabs className="b-0 m-b-10">
           { userRights.viewComments &&
             <NavItem>
               <NavLink
@@ -1963,7 +1987,6 @@ export default function TaskEdit( props ) {
             </NavItem>
           }
         </Nav>
-
         <TabContent activeTab={toggleTab}>
           <TabPane tabId={1}>
             <Comments
@@ -1981,6 +2004,7 @@ export default function TaskEdit( props ) {
             </TabPane>
           }
         </TabContent>
+      </div>
       </div>
     )
   }
@@ -2004,21 +2028,20 @@ export default function TaskEdit( props ) {
           { "row": layout === 2},
         )}
         >
+        { renderCommandbar() }
         <div
           className={classnames(
             "bkg-white",
             {
               "task-edit-left": layout === 2 && !columns,
-              "task-edit-left-columns": layout === 2 && columns
+              "task-edit-left-columns": (layout === 2 && columns) || layout === 1,
             },
           )}
           >
-          { renderCommandbar() }
 
-          <div className="p-l-30 p-r-30">
+          <div>
             { renderTitle() }
-            <hr className="m-t-5 m-b-5"/>
-            { renderTagsAndInfo() }
+            { layout === 2 && <hr className="m-t-5 m-b-5"/> }
 
             {canCreateVykazyError()}
 
@@ -2030,8 +2053,6 @@ export default function TaskEdit( props ) {
 
             { renderAttachments(false) }
 
-            { renderCompanyPausalInfo() }
-
             { renderModalUserAdd() }
 
             { renderModalCompanyAdd() }
@@ -2039,8 +2060,12 @@ export default function TaskEdit( props ) {
             { renderPendingPicker() }
 
             { renderVykazyTable() }
+            
+            { renderCompanyPausalInfo() }
 
             { renderComments() }
+
+            <div className="form-section"></div>
 
           </div>
 

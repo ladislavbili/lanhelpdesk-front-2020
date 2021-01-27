@@ -545,7 +545,7 @@ h4{
   height: $button-height;
   border-radius: 0px;
   color: #FFFFFF;
-  font: $font-link;
+  font: $font-value;
   margin-left: 0px;
   margin-right: 10px;
 }
@@ -566,6 +566,21 @@ h4{
 }
 
 .btn-link:hover{
+  background-color: inherit;
+  color: $main-font-color;
+  text-decoration: none;
+}
+
+.btn-link-reversed{
+  background-color: inherit;
+  border: 0px;
+  border-radius: 0px;
+  color: $main-font-color;
+  padding-left: 0px;
+  margin-left: 0px;
+}
+
+.btn-link-reversed:hover{
   background-color: inherit;
   color: $main-font-color;
   text-decoration: none;
@@ -594,23 +609,6 @@ h4{
   background-color: #dc3545;
 }
 
-.btn-link-reversed{
-  background-color: inherit;
-  border: 0px;
-  border-radius: 0px;
-  color: $basic-button-color;
-  height: $button-height;
-  font-weight: 400;
-  font-size: $main-font-size;
-  padding-left: 0px;
-  margin-left: 0px;
-}
-
-.btn-link-reversed:hover{
-  background-color: inherit;
-  color: $main-font-color;
-  text-decoration: none;
-}
 
 .btn-repeat{
   background-color: white !important;
@@ -1252,10 +1250,32 @@ tr:last-child{
   background-color: rgb(238,238,238);
 }
 
+.sidebar-label{
+  padding-top: 15px;
+  padding-left: 15px;
+  label{
+    margin-left: 5px;
+    font: $font-value;
+  }
+  img{
+      color: #212121;
+      height: 14px;
+      margin-bottom: 3px;
+  }
+}
+
 .sidebar-plus{
   margin-right: 10px;
   margin-left: 8px;
   margin-top: 5px;
+}
+
+.sidebar-item{
+  background-color: inherit;
+}
+
+.sidebar-item.active{
+  background-color: #deeaf3;
 }
 
 .sidebar-menu-item{
@@ -1268,7 +1288,6 @@ tr:last-child{
 }
 
 .sidebar-menu-item.active{
-  font-weight: 900;
   color: #0078D4 !important;
 }
 
@@ -1554,6 +1573,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding-left: $odsadenie-form;
   background-color: #f4f8fb;
   margin: 0px;
+  width: 100% !important;
 }
 .task-add-layout-button{
   margin-top: calc((40px - 30px)/2);
@@ -1846,11 +1866,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   -moz-appearance:textfield;
 }
 
-.comments{
-  background-color: $form-background-color;
-  padding: 10px 0px 10px 0px;
-}
-
 .no-wrap-content{
   white-space: nowrap;
   overflow-x: auto;
@@ -1903,7 +1918,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-edit-left-columns{
-  padding: 15px $odsadenie-form $odsadenie-form $odsadenie-form;
+padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$difference-form});
   max-width: 1670px;
   min-width: 400px;
    width: auto;
@@ -1922,6 +1937,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-edit-popis{
+  min-height: 30px;
   font: $font-value;
   color: $color-value;
   background-color: #f4f8fb !important;
@@ -1969,6 +1985,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   .form-section-rest.task-title-input{
       margin-left: 0;
   }
+  /*.nav-tabs>.nav-item>.nav-link{
+    @extend label:not(.col-form-label);
+  }*/
 }
 
 .form-section:nth-last-child(2){

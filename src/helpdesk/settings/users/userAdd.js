@@ -109,7 +109,7 @@ export default function UserAddContainer( props ) {
               basicUsers: [ ...allUsers, newUser ]
             }
           } );
-          addUserToList();
+          addUserToList( newUser );
           closeModal();
         } else {
           let newUser = {
@@ -252,7 +252,7 @@ export default function UserAddContainer( props ) {
         <div className="row">
           {closeModal &&
             <Button
-              className="btn-link"
+              className="btn btn-link"
               onClick={ closeModal }
               >
               Cancel

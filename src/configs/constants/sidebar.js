@@ -39,3 +39,15 @@ export const noMilestone = {
   label: 'None',
   startsAt: null
 };
+export const addUser = {
+  id: -1,
+  title: 'User',
+  label: 'User',
+  value: -1
+};
+export const addCompany = {
+  id: -1,
+  title: 'Company',
+  label: 'Company',
+  value: -1
+};

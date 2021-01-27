@@ -111,7 +111,7 @@ export default function TaskAddContainer( props ) {
     return (
       <button
         type="button"
-        className="btn btn-link waves-effect"
+        className="btn btn-link waves-effect task-add-layout-button"
         disabled={props.disabled}
         onClick={()=> {
           setOpenAddTaskModal(true);
@@ -130,7 +130,7 @@ export default function TaskAddContainer( props ) {
         onClick={() => {
           setOpenAddTaskModal(true);
         }}
-        >  Add task
+        > <i className="fa fa-plus"/> Task
       </Button>
     )
   }

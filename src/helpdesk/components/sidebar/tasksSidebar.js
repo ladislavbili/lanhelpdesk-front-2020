@@ -1,14 +1,18 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
 } from "@apollo/client";
 
 import {
+  Label,
   Nav,
   NavItem,
   TabPane,
   TabContent,
-  Button
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
 } from 'reactstrap';
 import {
   NavLink as Link
@@ -16,7 +20,7 @@ import {
 import Loading from 'components/loading';
 import Select from "react-select";
 import {
-  sidebarSelectStyle
+  sidebarSelectStyleNoIcon
 } from 'configs/components/select';
 
 import classnames from 'classnames';
@@ -26,6 +30,8 @@ import TaskAdd from '../../task/add';
 import ProjectAdd from '../projects/projectAddContainer';
 import MilestoneEdit from '../milestones/milestoneEdit';
 import MilestoneAdd from '../milestones/milestoneAdd';
+import UserAdd from 'helpdesk/settings/users/userAdd';
+import CompanyAdd from 'helpdesk/settings/companies/companyAdd';
 
 import {
   getEmptyGeneralFilter
@@ -40,7 +46,9 @@ import {
   dashboard,
   addProject,
   allMilestones,
-  addMilestone
+  addMilestone,
+  addUser,
+  addCompany,
 } from 'configs/constants/sidebar';
 import moment from 'moment';
 
@@ -113,6 +121,8 @@ export default function TasksSidebar( props ) {
   //state
   const [ openProjectAdd, setOpenProjectAdd ] = React.useState( false );
   const [ openMilestoneAdd, setOpenMilestoneAdd ] = React.useState( false );
+  const [ openCompanyAdd, setOpenCompanyAdd ] = React.useState( false );
+  const [ openUserAdd, setOpenUserAdd ] = React.useState( false );
   const [ activeTab, setActiveTab ] = React.useState( 0 );
 
   // sync
@@ -180,32 +190,51 @@ export default function TasksSidebar( props ) {
     </div>
   )
 
+  console.log( projectData );
+
   return (
     <div>
+      <div className="sidebar-label">
+        <img
+          className=""
+          src={folderIcon}
+          alt="Folder icon not found"
+          />
+        <Label>
+        Project
+      </Label>
+    </div>
       <Select
         options={toSelArr(projects.map((project) => ({...project, id: project.project.id, title: project.project.title}) ))}
         value={projectData.localProject}
-        styles={sidebarSelectStyle}
+        styles={sidebarSelectStyleNoIcon}
         onChange={pro => {
           setProject(pro)
         }}
-        components={{ DropdownIndicator }}
         />
-      <hr className = "m-l-15 m-r-15" />
       { projectData.localProject.id !== null &&
         <div className="">
+          <div className="sidebar-label">
+            <img
+              className=""
+              src={folderIcon}
+              alt="Folder icon not found"
+              />
+            <Label>
+            Milestone
+          </Label>
+        </div>
           <Select
             options={toSelArr(milestones)}
             value={milestoneData.localMilestone}
-            styles={sidebarSelectStyle}
+            styles={sidebarSelectStyleNoIcon}
             onChange={mile => {
               setOpenMilestoneAdd(true);
             }}
-            components={{ DropdownIndicator }}
             />
-          <hr className = "m-l-15 m-r-15" />
         </div>
       }
+      <hr className = "m-l-15 m-r-15" />
 
       <TaskAdd
         history={history}
@@ -243,7 +272,7 @@ export default function TasksSidebar( props ) {
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0}>
           <Nav vertical>
-            <NavItem key='all' className="row full-width">
+            <NavItem key='all' className={classnames("row full-width sidebar-item", { "active": 'all' === match.params.filterID }) }>
               <span
                 className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
                 onClick={() => {
@@ -255,18 +284,18 @@ export default function TasksSidebar( props ) {
               </span>
             </NavItem>
             { myFiltersData.myFilters.map((filter) => (
-              <NavItem key={filter.id} className="row full-width">
+              <NavItem key={filter.id} className={classnames("row full-width sidebar-item", { "active": filter.id === parseInt(match.params.filterID) }) }>
                 <span
-                  className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === filterData.localFilter.id }) }
+                  className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === parseInt(match.params.filterID) }) }
                   onClick={() => {
                     history.push(`/helpdesk/taskList/i/${filter.id}`)
                   }}>
                   {filter.title}
                 </span>
 
-                <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === filterData.localFilter.id })}
+                <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === parseInt(match.params.filterID) })}
                   onClick={() => {
-                    if (filter.id === filterData.localFilter.id) {
+                    if (filter.id === parseInt(match.params.filterID)) {
                       setActiveTab(1);
                     }
                   }}>
@@ -287,10 +316,44 @@ export default function TasksSidebar( props ) {
       </TabContent>
       <div className='p-l-15 p-r-15'>
         <hr className='m-t-10 m-b-10'/>
+
+          { canEditProject && projectData.localProject.id &&
+              <Button
+                className='btn btn-link-reversed'
+                onClick={() => history.push( `/helpdesk/project/${projectData.localProject.id}` )}
+                >
+                <i className="fa fa-cog"/>
+                Project
+              </Button>
+            }
+              {/*
+
+            <ProjectEdit
+              closeModal={(editedProject, rights) => {
+                if(editedProject !== null){
+                  const project = {
+                    project: { ...projectData.localProject.project, ...editedProject },
+                    right: rights,
+                    id: editedProject.id,
+                    value: editedProject.id,
+                    title: editedProject.title,
+                    label: editedProject.title,
+                  }
+                  setProject(project);
+                  refetchMyProjects();
+                }
+              }}
+              projectDeleted={()=>{
+                setProject(dashboard);
+                refetchMyProjects();
+              }}
+              />
+            */}
+
         { myData.getMyData.role.accessRights.addProjects &&
           <NavItem className="row full-width">
           <Button
-            className='btn-link p-0'
+            className='btn btn-link-reversed'
             onClick={() => setOpenProjectAdd(true)}
             >
             <i className="fa fa-plus" />
@@ -301,7 +364,7 @@ export default function TasksSidebar( props ) {
         { projectData.localProject.project.id !== null && canEditProject &&
           <NavItem className="row full-width">
           <Button
-            className='btn-link p-0'
+            className='btn btn-link-reversed'
             onClick={() => setOpenMilestoneAdd(true)}
             >
             <i className="fa fa-plus" />
@@ -309,7 +372,31 @@ export default function TasksSidebar( props ) {
           </Button>
         </NavItem>
         }
+        { myData.getMyData.role.accessRights.companies &&
+          <NavItem className="row full-width">
+          <Button
+            className='btn btn-link-reversed'
+            onClick={() => setOpenCompanyAdd(true)}
+            >
+            <i className="fa fa-plus" />
+            { addCompany.title }
+          </Button>
+        </NavItem>
+        }
+
+        { myData.getMyData.role.accessRights.users &&
+          <NavItem className="row full-width">
+          <Button
+            className='btn btn-link-reversed'
+            onClick={() => setOpenUserAdd(true)}
+            >
+            <i className="fa fa-plus" />
+            { addUser.title }
+          </Button>
+        </NavItem>
+        }
       </div>
+
       { openProjectAdd &&
         <ProjectAdd
           open={openProjectAdd}
@@ -329,38 +416,8 @@ export default function TasksSidebar( props ) {
           }}
           />
       }
-      { canEditProject && projectData.localProject.id &&
-          <Button
-            className='btn-link m-l-15 m-r-15 p-0'
-            onClick={() => history.push( `/helpdesk/project/${projectData.localProject.id}` )}
-            >
-            <i className="fa fa-cog"/>
-            Project
-          </Button>
-        }
-          {/*
 
-        <ProjectEdit
-          closeModal={(editedProject, rights) => {
-            if(editedProject !== null){
-              const project = {
-                project: { ...projectData.localProject.project, ...editedProject },
-                right: rights,
-                id: editedProject.id,
-                value: editedProject.id,
-                title: editedProject.title,
-                label: editedProject.title,
-              }
-              setProject(project);
-              refetchMyProjects();
-            }
-          }}
-          projectDeleted={()=>{
-            setProject(dashboard);
-            refetchMyProjects();
-          }}
-          />
-        */}
+
 
       { canEditProject && openMilestoneAdd &&
         <MilestoneAdd
@@ -408,6 +465,31 @@ export default function TasksSidebar( props ) {
             setMilestone(allMilestones);
           }}
           />
+      }
+
+      { openUserAdd &&
+        <Modal isOpen={openUserAdd} className="modal-without-borders">
+          <ModalHeader>
+            Add user
+          </ModalHeader>
+          <ModalBody>
+            <UserAdd
+              closeModal={() => setOpenUserAdd(false)}
+              addUserToList={() => {}}
+              />
+          </ModalBody>
+        </Modal>
+      }
+
+      { openCompanyAdd &&
+        <Modal isOpen={openCompanyAdd} className="modal-without-borders">
+          <ModalBody>
+            <CompanyAdd
+              closeModal={() => setOpenCompanyAdd(false)}
+              addCompanyToList={() => {}}
+              />
+          </ModalBody>
+        </Modal>
       }
 
     </div>

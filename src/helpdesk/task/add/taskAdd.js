@@ -530,7 +530,7 @@ export default function TaskAdd( props ) {
     ),
     Deadline: (
       <DatePicker
-        className="form-control hidden-input"
+        className="form-control"
         selected={deadline}
         disabled={!userRights.deadlineWrite}
         onChange={date => setDeadline(date)}
@@ -548,6 +548,19 @@ export default function TaskAdd( props ) {
         options={booleanSelects}
         />
     ),
+    Tags: (
+      <div className="f-1">
+        <Select
+          value={tags}
+          placeholder="None"
+          isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
+          isMulti
+          onChange={(t)=>setTags(t)}
+          options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
+          styles={ project && project.def.tag.required ? selectStyleNoArrowColoredRequired : selectStyleNoArrowNoPadding }
+          />
+      </div>
+    )
   }
 
   const renderSelectsLayout1 = () => {
@@ -558,7 +571,7 @@ export default function TaskAdd( props ) {
           <div className="col-12 row">
             <div className="col-4">
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Projekt</Label>
+                <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
                 <div className="col-9">
                   { layoutComponents.Project() }
                 </div>
@@ -567,7 +580,7 @@ export default function TaskAdd( props ) {
             { userRights.assignedRead &&
               <div className="col-8">
                 <div className="row p-r-10">
-                  <Label className="col-1-5 col-form-label">Assigned</Label>
+                  <Label className="col-1-5 col-form-label">Assigned <span className="warning-big">*</span></Label>
                   <div className="col-10-5">
                     { layoutComponents.Assigned }
                   </div>
@@ -576,20 +589,29 @@ export default function TaskAdd( props ) {
             }
           </div>
 
-          <div className="row">
+          { userRights.tagsRead &&
+            <div className="row p-r-10">
+              <Label className="col-1 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
+              <div className="col-11">
+                { layoutComponents.Tags }
+              </div>
+            </div>
+          }
 
+          <div className="row">
           <div className="col-4">
             {userRights.statusRead &&
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Status</Label>
+                <Label className="col-3 col-form-label">Status <span className="warning-big">*</span></Label>
                 <div className="col-9">
                   { layoutComponents.Status }
                 </div>
               </div>
             }
+
             { userRights.typeRead &&
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Typ</Label>
+                <Label className="col-3 col-form-label">Typ <span className="warning-big">*</span></Label>
                 <div className="col-9">
                   { layoutComponents.Type }
                 </div>
@@ -608,7 +630,7 @@ export default function TaskAdd( props ) {
           <div className="col-4">
             {userRights.requesterRead &&
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Zadal</Label>
+                <Label className="col-3 col-form-label">Zadal <span className="warning-big">*</span></Label>
                 <div className="col-9">
                   { layoutComponents.Requester }
                 </div>
@@ -616,7 +638,7 @@ export default function TaskAdd( props ) {
             }
             {userRights.companyRead &&
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Firma</Label>
+                <Label className="col-3 col-form-label">Firma <span className="warning-big">*</span></Label>
                 <div className="col-9">
                   { layoutComponents.Company }
                 </div>
@@ -624,7 +646,7 @@ export default function TaskAdd( props ) {
             }
             {userRights.pausalRead &&
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Paušál</Label>
+                <Label className="col-3 col-form-label">Paušál <span className="warning-big">*</span></Label>
                 <div className="col-9">
                   { layoutComponents.Pausal }
                 </div>
@@ -662,7 +684,7 @@ export default function TaskAdd( props ) {
             }
             { userRights.overtimeRead &&
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Mimo PH</Label>
+                <Label className="col-3 col-form-label">Mimo PH <span className="warning-big">*</span></Label>
                 <div className="col-9">
                   {layoutComponents.Overtime}
                 </div>
@@ -715,14 +737,14 @@ export default function TaskAdd( props ) {
       <div className="task-edit-right">
         { userRights.statusRead &&
           <div className="form-selects-entry-column" >
-            <Label>Status</Label>
+            <Label>Status <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Status }
             </div>
           </div>
         }
         <div className="form-selects-entry-column" >
-          <Label>Projekt</Label>
+          <Label>Projekt <span className="warning-big">*</span></Label>
           <div className="form-selects-entry-column-rest" >
             { layoutComponents.Project(true) }
           </div>
@@ -737,7 +759,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.requesterRead &&
           <div className="form-selects-entry-column" >
-            <Label>Zadal</Label>
+            <Label>Zadal <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Requester }
             </div>
@@ -745,7 +767,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.companyRead &&
           <div className="form-selects-entry-column" >
-            <Label>Firma</Label>
+            <Label>Firma <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Company }
             </div>
@@ -753,7 +775,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.assignedRead &&
           <div className="form-selects-entry-column" >
-            <Label>Assigned</Label>
+            <Label>Assigned <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Assigned }
             </div>
@@ -810,9 +832,17 @@ export default function TaskAdd( props ) {
             } }
             />
         }
+        { userRights.tagsRead &&
+          <div className="form-selects-entry-column" >
+            <Label>Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Tags }
+            </div>
+          </div>
+        }
         { userRights.typeRead &&
           <div className="form-selects-entry-column" >
-            <Label>Task Type</Label>
+            <Label>Task Type <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Type }
             </div>
@@ -820,7 +850,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.pausalRead &&
           <div className="form-selects-entry-column" >
-            <Label>Paušál</Label>
+            <Label>Paušál <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Pausal }
             </div>
@@ -828,7 +858,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.overtimeRead &&
           <div className="form-selects-entry-column" >
-            <Label>Mimo PH</Label>
+            <Label>Mimo PH <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Overtime }
             </div>
@@ -1117,10 +1147,6 @@ export default function TaskAdd( props ) {
           )}>
 
           { renderTitle() }
-
-          <hr className="m-t-15 m-b-10"/>
-
-          { renderTags() }
 
           { layout === 1 && renderSelectsLayout1()  }
 

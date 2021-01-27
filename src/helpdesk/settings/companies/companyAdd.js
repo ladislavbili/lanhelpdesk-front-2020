@@ -625,6 +625,7 @@ export default function CompanyAdd( props ) {
         <div
           className={ classnames(
             "row",
+            "form-footer",
             {
               "form-footer": newData || props.addCompany,
               "bring-to-front": newData

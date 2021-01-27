@@ -339,7 +339,6 @@ export const invisibleSelectStyleNoArrowRequired = {
     minHeight: 30,
     backgroundColor: state.isFocused ? 'white' : 'inherit',
     border: "none",
-    borderBottom: "1px solid  #E81123",
     borderRadius: 0
   } ),
   dropdownIndicator: base => ( {
@@ -412,7 +411,6 @@ export const selectStyleNoArrowRequired = {
     minHeight: 30,
     backgroundColor: 'white',
     border: "none",
-    borderBottom: "1px solid  #E81123",
     borderRadius: 0
   } ),
   dropdownIndicator: base => ( {
@@ -485,7 +483,6 @@ export const invisibleSelectStyleNoArrowRequiredNoPadding = {
     minHeight: 30,
     backgroundColor: 'white',
     border: "none",
-    borderBottom: "1px solid  #E81123",
     borderRadius: 0
   } ),
   dropdownIndicator: base => ( {
@@ -559,7 +556,6 @@ export const selectStyleNoArrowColoredRequired = {
     minHeight: 30,
     backgroundColor: 'white',
     border: "none",
-    borderBottom: "1px solid  #E81123",
     borderRadius: 0
   } ),
   option: ( styles, {
@@ -673,7 +669,6 @@ export const invisibleSelectStyleNoArrowColoredRequired = {
     minHeight: 30,
     backgroundColor: state.isFocused ? 'white' : 'inherit',
     border: "none",
-    borderBottom: "1px solid  #E81123",
     borderRadius: 0
   } ),
   option: ( styles, {
@@ -923,6 +918,44 @@ export const sidebarSelectStyle = {
     return {
       ...provided,
       marginLeft: 30
+    };
+  },
+};
+
+export const sidebarSelectStyleNoIcon = {
+  singleValue: ( provided, state ) => {
+    return {
+      ...provided,
+      marginLeft: 7,
+      color: "#212121"
+    };
+  },
+  indicatorSeparator: ( provided, state ) => {
+    return {
+      ...provided,
+      width: 0,
+    };
+  },
+  control: ( provided, state ) => {
+    return {
+      ...provided,
+      background: "#F9F9F9",
+      borderRadius: 0,
+      borderWidth: "0",
+      height: 40,
+      padding: 0
+    };
+  },
+  input: ( provided, state ) => {
+    return {
+      ...provided,
+      marginLeft: 7
+    };
+  },
+  placeholder: ( provided, state ) => {
+    return {
+      ...provided,
+      marginLeft: 7
     };
   },
 };
