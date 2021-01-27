@@ -126,7 +126,8 @@ export default function Comments( props ) {
 
         <div className="row m-b-30">
 
-          <Button className="btn waves-effect m-t-5 p-l-20 p-r-20 center-hor"
+          <Button
+            className="btn waves-effect center-hor m-t-0"
             disabled={(!isEmail && newComment==='')||
               (isEmail&&(tos.length < 1 ||subject===''||emailBody===''))||saving}
               onClick={() => {
@@ -164,7 +165,7 @@ export default function Comments( props ) {
             </Button>
             { !userRights.emails || !userRights.addComments &&
               <Checkbox
-                className = "m-l-10 center-hor"
+                className = "m-r-15 center-hor "
                 centerHor
                 disabled={ !userRights.emails || !userRights.addComments }
                 label = "E-mail"
@@ -174,7 +175,7 @@ export default function Comments( props ) {
             }
             {userRights.internal && !isEmail &&
               <Checkbox
-                className = "m-l-10 center-hor"
+                className = "m-r-15 center-hor"
                 centerHor
                 label = "Internal"
                 value = { isInternal }
@@ -184,8 +185,7 @@ export default function Comments( props ) {
 
             <div className='center-hor'>
               <label
-                className="btn btn-table-add-item m-l-5"
-                style={{fontFamily:"Segoe UI"}}
+                className="btn"
                 htmlFor="uploadCommentAttachments">
                 Add Attachement
               </label>

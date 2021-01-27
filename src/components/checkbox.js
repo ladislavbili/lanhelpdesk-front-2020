@@ -50,7 +50,6 @@ export default class Checkbox extends Component {
                 'center-ver': this.props.centerVer
               },
               "clickable",
-              "m-l-5",
               "noselect"
             )}
             >

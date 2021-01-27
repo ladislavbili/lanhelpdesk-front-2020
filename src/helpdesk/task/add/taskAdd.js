@@ -432,7 +432,7 @@ export default function TaskAdd( props ) {
           setAssignedTo(users);
         }}
         options={USERS_WITH_PERMISSIONS}
-        styles={selectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Status: (
@@ -461,7 +461,7 @@ export default function TaskAdd( props ) {
         placeholder="Select task type"
         value={taskType}
         isDisabled={ !userRights.typeWrite }
-        styles={selectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         onChange={(taskType)=> {
           setTaskType(taskType);
         }}
@@ -523,14 +523,14 @@ export default function TaskAdd( props ) {
         value={pausal}
         placeholder="Select required"
         isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-        styles={selectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         onChange={(pausal)=> setPausal(pausal)}
         options={booleanSelects}
         />
     ),
     Deadline: (
       <DatePicker
-        className="form-control"
+        className={classnames("form-control", {"hidden-input": layout !== 2})}
         selected={deadline}
         disabled={!userRights.deadlineWrite}
         onChange={date => setDeadline(date)}
@@ -543,7 +543,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={overtime}
         isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={selectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         onChange={(overtime) => setOvertime(overtime)}
         options={booleanSelects}
         />
@@ -557,7 +557,7 @@ export default function TaskAdd( props ) {
           isMulti
           onChange={(t)=>setTags(t)}
           options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
-          styles={ project && project.def.tag.required ? selectStyleNoArrowColoredRequired : selectStyleNoArrowNoPadding }
+          styles={ layout === 2 ? selectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowRequired}
           />
       </div>
     )
@@ -588,15 +588,6 @@ export default function TaskAdd( props ) {
               </div>
             }
           </div>
-
-          { userRights.tagsRead &&
-            <div className="row p-r-10">
-              <Label className="col-1 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-              <div className="col-11">
-                { layoutComponents.Tags }
-              </div>
-            </div>
-          }
 
           <div className="row">
           <div className="col-4">
@@ -692,6 +683,16 @@ export default function TaskAdd( props ) {
             }
           </div>
           </div>
+
+          { userRights.tagsRead &&
+            <div className="row p-r-10">
+              <Label className="col-1 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
+              <div className="col-11">
+                { layoutComponents.Tags }
+              </div>
+            </div>
+          }
+
         </div>
       </div>
     )

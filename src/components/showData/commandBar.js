@@ -5,7 +5,7 @@ export default function CommandBar( props ) {
 
   const FILTERED_BREADCRUMBS = ( props.breadcrumsData ? props.breadcrumsData.filter( ( breadcrum ) => breadcrum.show ) : [] );
   return (
-    <div className={"commandbar " + (props.layout !== 0 ? "p-l-20" : "p-l-0")}>
+    <div className={"task-list-commandbar " + (props.layout !== 0 ? "p-l-30" : "p-l-0")}>
 
 			<div className="breadcrum-bar center-hor">
 				{

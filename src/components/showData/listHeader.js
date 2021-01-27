@@ -35,7 +35,7 @@ export default function ListHeader( props ) {
         localProjectData.localProject.id &&
         underSearchButtonEvent !== undefined &&
         underSearchButtonLabel !== undefined &&
-        <button className="btn btn-link" onClick={underSearchButtonEvent}><i className="fa fa-plus"/> {underSearchButtonLabel}</button>
+        <button className="btn btn-link m-l-20" onClick={underSearchButtonEvent}><i className="fa fa-plus"/> {underSearchButtonLabel}</button>
       }
 
       <Search {...props}/>

@@ -70,7 +70,7 @@ export default function List( props ) {
   return (
     <div>
       <CommandBar {...commandBar} listName={listName}/>
-      <div className="full-width scroll-visible fit-with-header-and-commandbar task-container">
+      <div className="full-width scroll-visible fit-with-header-and-commandbar task-container   p-l-10">
         <ListHeader
           {...commandBar}
           listName={listName}

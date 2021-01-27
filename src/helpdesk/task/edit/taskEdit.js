@@ -1122,7 +1122,7 @@ export default function TaskEdit( props ) {
           ( canAddUser ? [{id:-1, title:'+ Add user',body:'add', label:'+ Add user',value:null}] : [])
           .concat(assignedTos)
         }
-        styles={selectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         />
     ),
     Status: (
@@ -1140,7 +1140,7 @@ export default function TaskEdit( props ) {
         placeholder="Zadajte typ"
         value={taskType}
         isDisabled={ !userRights.typeWrite }
-        styles={selectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         onChange={(type)=> {
           setTaskType(type);
           autoUpdateTask({ taskType: type.id })
@@ -1181,7 +1181,7 @@ export default function TaskEdit( props ) {
       <Select
         value={company && parseInt(company.taskWorkPausal) === 0 && pausal.value === false ? {...pausal, label: pausal.label + " (nezmluvný)"} : pausal }
         isDisabled={!userRights.pausalWrite || !company || !company.monthly || parseInt(company.taskWorkPausal) < 0 || defaultFields.pausal.fixed}
-        styles={selectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         onChange={(pausal)=> {
           autoUpdateTask({ pausal: pausal.value })
           setPausal(pausal);
@@ -1191,7 +1191,7 @@ export default function TaskEdit( props ) {
     ),
     Deadline: (
       <DatePicker
-        className="form-control"
+        className={classnames("form-control", {"hidden-input": layout !== 2})}
         selected={deadline}
         disabled={!userRights.deadlineWrite}
         onChange={date => {
@@ -1208,7 +1208,7 @@ export default function TaskEdit( props ) {
       <Select
         value={overtime}
         isDisabled={!userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={selectStyleNoArrowRequired}
+        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         onChange={(overtime)=> {
           setOvertime(overtime);
           autoUpdateTask({ overtime: overtime.value })
@@ -1244,15 +1244,6 @@ export default function TaskEdit( props ) {
               </div>
             }
           </div>
-
-          { userRights.tagsRead &&
-            <div className="row p-r-10">
-              <Label className="col-1 col-form-label">Tags {  defaultFields.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-              <div className="col-11">
-                { renderTags() }
-              </div>
-            </div>
-          }
 
           <div className="hello">
             {userRights.statusRead &&
@@ -1331,6 +1322,7 @@ export default function TaskEdit( props ) {
                     setRepeat(null);
                     autoUpdateTask({ repeat: null })
                   }}
+                  layout={layout}
                   />
               </div>
             }
@@ -1343,6 +1335,16 @@ export default function TaskEdit( props ) {
               </div>
             }
           </div>
+
+          { userRights.tagsRead &&
+            <div className="row p-r-10">
+              <Label className="col-1 col-form-label">Tags {  defaultFields.tag.required ? <span className="warning-big">*</span> : ""}</Label>
+              <div className="col-11">
+                { renderTags() }
+              </div>
+            </div>
+          }
+
         </div>
       </div>
     )
@@ -1462,6 +1464,7 @@ export default function TaskEdit( props ) {
               autoUpdateTask({ repeat: null })
             }}
             vertical={true}
+            layout={layout}
             />
         }
         { userRights.scheduledRead &&
@@ -1555,7 +1558,7 @@ export default function TaskEdit( props ) {
               }}
               options={toSelArr(project === null ? [] : project.project.tags)}
               isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-              styles={ defaultFields.tag.required ? selectStyleNoArrowColoredRequired : selectStyleNoArrowNoPadding}
+              styles={ layout === 2 ? selectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowRequired}
               />
           </div>
         </div>
@@ -2060,7 +2063,7 @@ export default function TaskEdit( props ) {
             { renderPendingPicker() }
 
             { renderVykazyTable() }
-            
+
             { renderCompanyPausalInfo() }
 
             { renderComments() }

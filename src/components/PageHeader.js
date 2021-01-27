@@ -38,6 +38,7 @@ import {
 export default function PageHeader( props ) {
   //data & queries
   const {
+    match,
     history,
     setLayout,
     settings,
@@ -100,9 +101,11 @@ export default function PageHeader( props ) {
 
   const URL = getLocation( history );
 
+  console.log( match );
+
   return (
-    <div className="page-header flex">
-      <div className="d-flex full-height p-l-10">
+    <div className={classnames("page-header flex m-l-30")}>
+      <div className="d-flex full-height">
         <div className="center-hor">
           <Link
             to={{ pathname: `/helpdesk/taskList/i/all` }}
