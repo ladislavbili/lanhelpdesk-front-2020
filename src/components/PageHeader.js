@@ -101,8 +101,6 @@ export default function PageHeader( props ) {
 
   const URL = getLocation( history );
 
-  console.log( match );
-
   return (
     <div className={classnames("page-header flex m-l-30")}>
       <div className="d-flex full-height">

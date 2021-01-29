@@ -196,8 +196,6 @@ export default function TasksSidebar( props ) {
     </div>
   )
 
-  console.log( projectData );
-
   return (
     <div>
       <div className="sidebar-label">
@@ -236,8 +234,8 @@ export default function TasksSidebar( props ) {
             value={milestoneData.localMilestone}
             styles={sidebarSelectStyleNoIcon}
             onChange={mile => {
-              setOpenMilestoneAdd(true);
-              history.push(`${match.url}`)
+                setMilestone(mile);
+                history.push(`${match.url}`);
             }}
             />
         </div>
@@ -413,7 +411,10 @@ export default function TasksSidebar( props ) {
             setOpenProjectAdd(false);
             if(newProject!==null){
               const project = {
-                project: newProject,
+                project: {
+                  ...newProject,
+                  milestones: [],
+                },
                 right: rights,
                 id: newProject.id,
                 value: newProject.id,
@@ -440,7 +441,6 @@ export default function TasksSidebar( props ) {
           }}
           />
       }
-
       { canEditProject && milestoneData.localMilestone.id !== null &&
         <MilestoneEdit
           closeModal={(editedMilestone) => {
@@ -475,7 +475,6 @@ export default function TasksSidebar( props ) {
           }}
           />
       }
-
       { openUserAdd &&
         <Modal isOpen={openUserAdd} className="modal-without-borders">
           <ModalHeader>

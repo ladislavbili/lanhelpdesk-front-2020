@@ -1,46 +1,11 @@
 import React from 'react';
 import {
-  useMutation
+  useMutation,
 } from "@apollo/client";
 import Login from './login';
 import {
-  gql
-} from '@apollo/client';;
-
-const LOGIN_USER = gql `
-mutation loginUser($email: String!, $password: String!) {
-  loginUser(
-    email: $email,
-    password: $password
-  ){
-    user{
-      fullName
-      email
-      name
-      surname
-      id
-      role {
-        id
-        accessRights {
-          users
-          companies
-          pausals
-          projects
-          statuses
-          prices
-          invoices
-          roles
-          taskTypes
-          tripTypes
-          imaps
-          smtps
-        }
-      }
-    },
-    accessToken
-  }
-}
-`;
+  LOGIN_USER
+} from '../queries';
 
 export default function LoginContainer() {
   const [ login ] = useMutation( LOGIN_USER );

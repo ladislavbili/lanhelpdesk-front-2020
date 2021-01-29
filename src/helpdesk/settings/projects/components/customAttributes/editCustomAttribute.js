@@ -23,8 +23,8 @@ import {
 } from 'helperFunctions';
 
 import {
-  GET_ROLES,
-} from '../../../roles/queries';
+  GET_BASIC_ROLES,
+} from 'helpdesk/settings/roles/queries';
 
 import Checkbox from 'components/checkbox';
 
@@ -48,7 +48,7 @@ export default function CustomAttributes( props ) {
   const {
     data: rolesData,
     loading: rolesLoading
-  } = useQuery( GET_ROLES );
+  } = useQuery( GET_BASIC_ROLES );
 
   // sync
   React.useEffect( () => {
@@ -148,7 +148,7 @@ export default function CustomAttributes( props ) {
         <Label>Right to read</Label>
         <Select
           styles={selectStyle}
-          options={toSelArr(rolesData.roles)}
+          options={toSelArr(rolesData.basicRoles)}
           value={read}
           isMulti
           onChange={ (readRights) => {

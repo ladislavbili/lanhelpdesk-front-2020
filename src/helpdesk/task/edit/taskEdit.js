@@ -269,7 +269,6 @@ export default function TaskEdit( props ) {
   );
   const canAddUser = accessRights.users;
   const canAddCompany = accessRights.companies;
-  const canCopy = userRights.write || title === "" || status === null || project === null || saving;
   const availableProjects = projects.filter( ( project ) => project.right.projectWrite || currentUser.role.level === 0 );
   const assignedTos = project ? toSelArr( project.usersWithRights, 'fullName' ) : [];
 
@@ -748,6 +747,9 @@ export default function TaskEdit( props ) {
     invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
   } ) );
 
+  const canCopy = userRights.addTasks && !getCantSave();
+
+
   //Value Change
   const changeProject = ( project ) => {
     let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.id === user.id ) );
@@ -878,7 +880,6 @@ export default function TaskEdit( props ) {
             { task.invoiced && accessRights.vykazy && canEditInvoiced &&
               <button
                 type="button"
-                style={{color: important ? '#ffc107' : '#0078D4'}}
                 disabled={getCantSave()}
                 className="btn btn-link waves-effect task-add-layout-button"
                 onClick={() => submitInvoicedTask(false)}
@@ -887,11 +888,11 @@ export default function TaskEdit( props ) {
                 Save invoiced task
               </button>
             }
-            { project &&
+            { project && canCopy &&
               <TaskAdd
                 project={project.id}
                 task={task}
-                disabled={canCopy}
+                disabled={!canCopy}
                 />
             }
             { false &&
@@ -922,10 +923,11 @@ export default function TaskEdit( props ) {
                 Delete
               </button>
             }
+            { userRights.important &&
               <button
                 type="button"
                 style={{color: important ? '#ffc107' : '#0078D4'}}
-                disabled={userRights.important || false}
+                disabled={userRights.important }
                 className="btn btn-link waves-effect task-add-layout-button"
                 onClick={()=>{
                   autoUpdateTask({ important: !important })
@@ -935,6 +937,7 @@ export default function TaskEdit( props ) {
                 <i className="far fa-star" />
                 Important
               </button>
+            }
             <button
               type="button"
               className="btn btn-link waves-effect task-add-layout-button"
