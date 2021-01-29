@@ -1,6 +1,15 @@
 import React from 'react';
+import {
+  timestampToString
+} from 'helperFunctions';
+import {
+  Label,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+} from 'reactstrap';
 
-export default function CheckboxList( props ) {
+export default function EmailRender( props ) {
   const {
     getAttachment,
     comment,

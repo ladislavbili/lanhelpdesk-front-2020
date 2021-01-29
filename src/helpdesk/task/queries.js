@@ -509,8 +509,6 @@ query {
 			level
       accessRights {
         projects
-        mailViaComment
-        viewInternal
         publicFilters
         users
         companies

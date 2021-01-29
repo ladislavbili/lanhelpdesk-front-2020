@@ -41,6 +41,9 @@ export const groupRights = `
   typeWrite
   vykazRead
   vykazWrite
+  companyTasks
+  allTasks
+  addTasks
   deleteTasks
   important
   addComments

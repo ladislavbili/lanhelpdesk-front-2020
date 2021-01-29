@@ -11,7 +11,6 @@ query {
     surname
     role {
       accessRights {
-        viewVykaz
         viewErrors
         publicFilters
         users
@@ -19,11 +18,7 @@ query {
         pausals
         projects
         statuses
-        units
         prices
-        suppliers
-        tags
-        invoices
         roles
         taskTypes
         tripTypes

@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';;
 
 export const GET_ROLES = gql `
 query {
@@ -50,24 +52,16 @@ query role($id: Int!) {
     accessRights {
       login
       testSections
-      mailViaComment
       vykazy
       publicFilters
       addProjects
-      viewVykaz
-      viewRozpocet
       viewErrors
-      viewInternal
       users
       companies
       pausals
       projects
       statuses
-      units
       prices
-      suppliers
-      tags
-      invoices
       roles
       taskTypes
       tripTypes

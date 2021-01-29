@@ -36,8 +36,6 @@ export default function Search( props ) {
     loading: taskSearchLoading
   } = useQuery( GET_TASK_SEARCH );
 
-  console.log( layout );
-
   return (
     <div
       className={classnames(

@@ -44,6 +44,9 @@ import {
 } from '../queries';
 
 export default function TaskAddContainer( props ) {
+  const {
+    disabled
+  } = props;
   //data & queries
   const {
     data: companiesData,
@@ -112,7 +115,7 @@ export default function TaskAddContainer( props ) {
       <button
         type="button"
         className="btn btn-link waves-effect"
-        disabled={props.disabled}
+        disabled={disabled}
         onClick={()=> {
           setOpenAddTaskModal(true);
         }}
@@ -127,6 +130,7 @@ export default function TaskAddContainer( props ) {
     return (
       <Button
         className="btn sidebar-btn"
+        disabled={disabled}
         onClick={() => {
           setOpenAddTaskModal(true);
         }}
