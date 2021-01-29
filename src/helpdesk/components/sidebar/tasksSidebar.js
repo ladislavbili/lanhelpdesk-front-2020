@@ -159,10 +159,16 @@ export default function TasksSidebar( props ) {
     )
   )
 
+  const canAddTask = (
+    projectData.localProject.id === null ||
+    (
+      projectData.localProject.right !== undefined &&
+      projectData.localProject.right.addTasks
+    )
+  )
   const projects = [ dashboard, ...myProjectsData.myProjects ];
 
   const milestones = [ allMilestones, ...( projectData.localProject.project.id !== null ? projectData.localProject.project.milestones : [] ) ]
-
   const DropdownIndicator = ( {
     innerProps,
     isDisabled
@@ -209,7 +215,8 @@ export default function TasksSidebar( props ) {
         value={projectData.localProject}
         styles={sidebarSelectStyleNoIcon}
         onChange={pro => {
-          setProject(pro)
+          setProject(pro);
+          history.push(`${match.url}`)
         }}
         />
       { projectData.localProject.id !== null &&
@@ -230,6 +237,7 @@ export default function TasksSidebar( props ) {
             styles={sidebarSelectStyleNoIcon}
             onChange={mile => {
               setOpenMilestoneAdd(true);
+              history.push(`${match.url}`)
             }}
             />
         </div>
@@ -239,6 +247,7 @@ export default function TasksSidebar( props ) {
       <TaskAdd
         history={history}
         match={match}
+        disabled={ !canAddTask }
         projectID={ projectData.localProject.id}
         />
       { activeTab !== 1 &&

@@ -186,7 +186,6 @@ export default function TaskEdit( props ) {
   const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
 
   const invoicedTask = task.invoiced ? task.invoicedTasks[ 0 ] : null;
-
   // sync
   React.useEffect( () => {
     setChanges( {} );

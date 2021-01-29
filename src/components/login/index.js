@@ -27,10 +27,7 @@ mutation loginUser($email: String!, $password: String!) {
           pausals
           projects
           statuses
-          units
           prices
-          suppliers
-          tags
           invoices
           roles
           taskTypes

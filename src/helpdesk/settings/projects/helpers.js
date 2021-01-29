@@ -42,6 +42,9 @@ export const remapRightsToBackend = ( group ) => {
       typeWrite: group.rights.type.write,
       vykazRead: group.rights.vykaz.write,
       vykazWrite: group.rights.vykaz.write,
+      companyTasks: group.rights.companyTasks,
+      allTasks: group.rights.allTasks,
+      addTasks: group.rights.addTasks,
       deleteTasks: group.rights.deleteTasks,
       important: group.rights.important,
       addComments: group.rights.addComments,
@@ -52,8 +55,6 @@ export const remapRightsToBackend = ( group ) => {
       pausalInfo: group.rights.pausalInfo,
       taskTitleEdit: group.rights.taskTitleEdit,
       viewComments: group.rights.viewComments,
-
-
     }
   }
 }
@@ -139,6 +140,9 @@ export const remapRightsFromBackend = ( group ) => ( {
       read: group.rights.vykazRead,
       write: group.rights.vykazWrite,
     },
+    companyTasks: group.rights.companyTasks,
+    allTasks: group.rights.allTasks,
+    addTasks: group.rights.addTasks,
     deleteTasks: group.rights.deleteTasks,
     important: group.rights.important,
     addComments: group.rights.addComments,

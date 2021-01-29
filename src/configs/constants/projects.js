@@ -34,6 +34,31 @@ export const allACLs = [
     separator: true,
   },
   {
+    id: 'companyTasks',
+    title: 'View my company tasks',
+    both: false,
+    disabled: [
+      {
+        key: 'allTasks'
+    }
+  ]
+  },
+  {
+    id: 'allTasks',
+    title: 'View all tasks',
+    dependancy: [
+      {
+        key: 'companyTasks',
+    }
+  ],
+    both: false
+  },
+  {
+    id: 'addTasks',
+    title: 'Add Tasks',
+    both: false
+  },
+  {
     id: 'deleteTasks',
     title: 'Delete Tasks',
     both: false

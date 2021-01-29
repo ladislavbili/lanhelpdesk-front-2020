@@ -76,11 +76,6 @@ export default function RoleEdit( props ) {
     },
     {
       state: React.useState( false ),
-      key: 'mailViaComment',
-      label: "Send mail via comments"
-    },
-    {
-      state: React.useState( false ),
       key: 'vykazy',
       label: "Výkazy"
     },
@@ -96,24 +91,9 @@ export default function RoleEdit( props ) {
     },
     {
       state: React.useState( false ),
-      key: 'viewVykaz',
-      label: "View vykaz"
-    },
-    {
-      state: React.useState( false ),
-      key: 'viewRozpocet',
-      label: "View rozpocet"
-    },
-    {
-      state: React.useState( false ),
       key: 'viewErrors',
       label: "View errors"
     },
-    {
-      state: React.useState( false ),
-      key: 'viewInternal',
-      label: "Internal messages"
-    }
   ];
   const settings = [
     {
@@ -143,28 +123,8 @@ export default function RoleEdit( props ) {
     },
     {
       state: React.useState( false ),
-      key: 'units',
-      label: "Units"
-    },
-    {
-      state: React.useState( false ),
       key: 'prices',
       label: "Prices"
-    },
-    {
-      state: React.useState( false ),
-      key: 'suppliers',
-      label: "Suppliers"
-    },
-    {
-      state: React.useState( false ),
-      key: 'tags',
-      label: "Tags"
-    },
-    {
-      state: React.useState( false ),
-      key: 'invoices',
-      label: "Invoices"
     },
     {
       state: React.useState( false ),

@@ -418,7 +418,7 @@ export default function TaskAdd( props ) {
           let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
           setAssignedTo(newAssignedTo);
         }}
-        options={projects}
+        options={projects.filter((project) => currentUser.role.level === 0 || project.right.addTasks )}
         styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
         />
     ),

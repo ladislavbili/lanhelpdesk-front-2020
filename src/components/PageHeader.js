@@ -121,7 +121,7 @@ export default function PageHeader( props ) {
             Úlohy
           </Link>
           {
-            accessRights.viewVykaz &&
+            accessRights.vykazy &&
             <Link
               to={{ pathname: `/reports` }}
               className={

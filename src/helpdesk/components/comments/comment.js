@@ -1,13 +1,19 @@
 import React from 'react';
+import {
+  timestampToString
+} from 'helperFunctions';
+import {
+  Label,
+} from 'reactstrap';
 
-export default function CheckboxList( props ) {
+export default function CommentRender( props ) {
   const {
     getAttachment,
     comment
   } = props;
   return (
     <div>
-        <div className="media m-b-30 m-t-30">
+      <div className="media m-b-30 m-t-30">
         <img
           className="d-flex mr-3 rounded-circle thumb-sm"
           src="https://i.pinimg.com/originals/08/a9/0a/08a90a48a9386c314f97a07ba1f0db56.jpg"

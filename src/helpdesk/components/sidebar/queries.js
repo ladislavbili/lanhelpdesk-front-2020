@@ -24,11 +24,7 @@ query {
         pausals
         projects
         statuses
-        units
         prices
-        suppliers
-        tags
-        invoices
         roles
         taskTypes
         tripTypes

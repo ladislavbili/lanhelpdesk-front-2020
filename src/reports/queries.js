@@ -7,9 +7,7 @@ query {
   getMyData{
     role {
       accessRights {
-        viewVykaz
         viewErrors
-        viewRozpocet
         publicFilters
         users
         companies
@@ -18,9 +16,6 @@ query {
         statuses
         units
         prices
-        suppliers
-        tags
-        invoices
         roles
         taskTypes
         tripTypes

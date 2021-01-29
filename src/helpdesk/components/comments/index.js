@@ -27,6 +27,8 @@ import axios from 'axios';
 import {
   REST_URL,
 } from 'configs/restAPI';
+import Comment from './comment';
+import Email from './email';
 
 import downloadjs from 'downloadjs';
 
