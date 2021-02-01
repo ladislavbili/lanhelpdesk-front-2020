@@ -387,7 +387,7 @@ export const invisibleSelectStyleNoArrowRequired = {
     margin: 0,
     padding: 0,
     backgroundColor: "inherit",
-    borderRadius: 0
+    borderRadius: 0,
   } ),
   indicatorSeparator: base => ( {
     ...base,
@@ -429,6 +429,8 @@ export const selectStyleNoArrowRequired = {
       ...base,
       backgroundColor: data.color ? data.color : "#F2F1F1",
       borderRadius: 0,
+      marginLeft: 0,
+      marginRight: 4,
     };
   },
   multiValueLabel: ( base, {
@@ -446,12 +448,14 @@ export const selectStyleNoArrowRequired = {
     ':hover': {
       backgroundColor: "rgba(0,0,0,0.5)",
       color: 'white',
+      margin: 0,
     },
   } ),
   valueContainer: base => ( {
     ...base,
     padding: '0px 6px',
     borderRadius: 0,
+    margin: 0,
     ...value,
   } ),
   input: base => ( {
@@ -650,7 +654,8 @@ export const selectStyleNoArrowColoredRequired = {
       ...styles,
       color: '#FFF',
       padding: '0px 5px',
-      backgroundColor: data.color
+      backgroundColor: data.color,
+      height: 22
     } );
   },
   placeholder: base => ( {

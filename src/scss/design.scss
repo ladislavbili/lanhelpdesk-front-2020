@@ -500,9 +500,19 @@ h4{
   max-width: 12.5%;
 }
 
+.col-1-45{
+  flex: 0 0 12%;
+  max-width: 12%;
+}
+
 .col-10-5{
   flex: 0 0 87.5%;
   max-width: 87.5%;
+}
+
+.col-10-45{
+  flex: 0 0 88%;
+  max-width: 88%;
 }
 
 .modal.fade.show{
@@ -1249,6 +1259,14 @@ tr:last-child{
 }
 
 .sidebar-btn{
+  width: calc(100% - 10px);
+  margin: 10px 5px 0px 5px;
+  padding-left: 10px;
+  height: $button-height;
+  text-align: left;
+}
+
+.sidebar-filter{
   width: calc(100% - 30px);
   margin: 10px 15px 0px 15px;
   height: $button-height;
@@ -1969,6 +1987,10 @@ padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$diffe
   padding: 15px;
 }
 
+.task-edit-popis:last-child{
+  padding-top: 0px;
+}
+
 .task-edit-popis>div>p{
   margin-bottom: 0px;
 }
@@ -1990,8 +2012,8 @@ padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$diffe
   height: 21px;
   color: black;
   font-size:12px;
-  padding-left:3px;
-  margin-left:5px;
+  padding-right:3px;
+  margin-right:5px;
 }
 
 .attachment-label{

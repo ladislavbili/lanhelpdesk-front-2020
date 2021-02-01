@@ -249,7 +249,7 @@ export default function TasksSidebar( props ) {
         projectID={ projectData.localProject.id}
         />
       { activeTab !== 1 &&
-        <div className="sidebar-btn">
+        <div className="sidebar-filter">
           <div onClick={() => {
               history.push(`/helpdesk/taskList/i/all`);
               setActiveTab((

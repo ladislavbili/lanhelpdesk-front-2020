@@ -1238,8 +1238,8 @@ export default function TaskEdit( props ) {
             { userRights.assignedRead &&
               <div className="col-8" style={{ marginLeft: -5 }}>
                 <div className="row p-r-10">
-                  <Label className="col-1-5 col-form-label">Assigned <span className="warning-big">*</span></Label>
-                  <div className="col-10-5">
+                  <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
+                  <div className="col-10-45">
                     { layoutComponents.Assigned }
                   </div>
                 </div>
@@ -1620,25 +1620,35 @@ export default function TaskEdit( props ) {
     }
     return (
       <div className="form-section">
-        <Label className="col-form-label-description">
-          Popis úlohy
-          { userRights.taskDescriptionWrite &&
-            <button
-              className="btn btn-link waves-effect m-l-5"
-              onClick={()=>{
-                if(showDescription){
-                  autoUpdateTask({ description  })
-                }
-                setShowDescription(!showDescription);
-              }}
-              >
-              <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
-              { !showDescription ? 'edit' : 'save' }
-            </button>
+        <div className="row" style={{alignItems: "baseline"}}>
+          <Label className="m-r-10">
+            Popis úlohy
+          </Label>
+            { userRights.taskDescriptionWrite &&
+              <button
+                className="btn btn-link waves-effect m-r-10"
+                style={{height: "20px"}}
+                onClick={()=>{
+                  if(showDescription){
+                    autoUpdateTask({ description  })
+                  }
+                  setShowDescription(!showDescription);
+                }}
+                >
+                <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
+                { !showDescription ? 'edit' : 'save' }
+              </button>
+            }
+            { userRights.taskAttachmentsRead && userRights.taskAttachmentsWrite &&
+              <label htmlFor={`uploadAttachment-${id}`} className="btn btn-link" >
+                <i className="fa fa-plus" />
+                Attachment
+              </label>
           }
-        </Label>
+          </div>
         <div className="form-section-rest">
           {RenderDescription}
+          {renderAttachments(false)}
         </div>
       </div>
     )
@@ -2046,7 +2056,7 @@ export default function TaskEdit( props ) {
 
           <div>
             { renderTitle() }
-            { layout === 2 && <hr className="m-t-5 m-b-5"/> }
+            { layout === 2 && <hr className="m-t-5 m-b-15"/> }
 
             {canCreateVykazyError()}
 
@@ -2055,8 +2065,6 @@ export default function TaskEdit( props ) {
             { renderDescription() }
 
             { renderSimpleSubtasks() }
-
-            { renderAttachments(false) }
 
             { renderModalUserAdd() }
 

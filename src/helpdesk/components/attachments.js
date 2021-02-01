@@ -7,6 +7,7 @@ import axios from 'axios';
 import {
   REST_URL,
 } from 'configs/restAPI';
+import classnames from 'classnames';
 
 export default function TaskAttachments( props ) {
   //data & queries
@@ -45,10 +46,8 @@ export default function TaskAttachments( props ) {
   }
 
   return (
-    <div className="form-section">
-      <Label>Attachments</Label>
-      <div></div>
-      <div className="form-section-rest">
+    <div className={classnames("task-edit-popis", {"p-t-15": taskID === null})}>
+      <div className="">
         <input
           type="file"
           id={`uploadAttachment-${taskID}`}
@@ -61,11 +60,11 @@ export default function TaskAttachments( props ) {
             }
           }}
           />
-        { !disabled && !top &&
+        { false && !disabled && !top &&
           <div className="attachment-label">
             <label htmlFor={`uploadAttachment-${taskID}`} className="btn btn-link" >
               <i className="fa fa-plus" />
-              Add attachment
+              Attachment
             </label>
           </div>
         }
@@ -85,10 +84,10 @@ export default function TaskAttachments( props ) {
             }
           </div>
         )}
-        { !disabled && top &&
+        { false && !disabled && top &&
           <label htmlFor={`uploadAttachment-${taskID}`} className="btn btn-link" >
             <i className="fa fa-plus" />
-            Add attachment
+            Attachment
           </label>
         }
       </div>
