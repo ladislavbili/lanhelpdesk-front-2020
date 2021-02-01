@@ -1,7 +1,40 @@
 import React from 'react';
 import {
+  Tooltip
+} from 'reactstrap';
+import {
   timestampToString
 } from './moment';
+
+const ImportantIcon = function ImportantIcon( props ) {
+  const {
+    item
+  } = props;
+  const [ tooltipOpen, setTooltipOpen ] = React.useState( false );
+  return (
+    <span>
+    <i className="far fa-star" style={{ color: '#ffc107' }} id={`important-${item.id}`} />
+      <Tooltip placement="top" target={`important-${item.id}`} isOpen={tooltipOpen} toggle={() => setTooltipOpen(!tooltipOpen) } >
+        Task is important!
+      </Tooltip>
+  </span>
+  )
+}
+
+const InvoicedIcon = function InvoicedIcon( props ) {
+  const {
+    item
+  } = props;
+  const [ tooltipOpen, setTooltipOpen ] = React.useState( false );
+  return (
+    <span>
+      <i className="far fa-file-alt" id={`invoiced-${item.id}`}/>
+      <Tooltip placement="top" target={`invoiced-${item.id}`} isOpen={tooltipOpen} toggle={() => setTooltipOpen(!tooltipOpen) } >
+        Task is invoiced!
+      </Tooltip>
+  </span>
+  )
+}
 
 export const getItemDisplayValue = ( item, value ) => {
   if ( !item[ value.value ] && ( value.type === 'important' || value.type === 'invoiced' || value.type === 'checkbox' ) ) {
@@ -42,15 +75,11 @@ export const getItemDisplayValue = ( item, value ) => {
   } else if ( value.type === 'user' ) {
     return item[ value.value ].name + ' ' + item[ value.value ].surname;
   } else if ( value.type === "important" ) {
-    return <i className="far fa-star" style={{
-        color: '#ffc107'
-      }}/>;
+    return <ImportantIcon item={item} />;
   } else if ( value.type === "invoiced" ) {
-    return <i className="far fa-file-alt"/>;
+    return <InvoicedIcon item={item} />;
   } else if ( value.type === "checkbox" ) {
-    return <i className="far fa-star" style={{
-        color: '#ffc107'
-      }}/>;
+    return null;
   } else {
     return 'Error'
   }

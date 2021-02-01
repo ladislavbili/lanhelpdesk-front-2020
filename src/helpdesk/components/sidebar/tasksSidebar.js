@@ -283,8 +283,6 @@ export default function TasksSidebar( props ) {
               <span
                 className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
                 onClick={() => {
-                  setMilestone(allMilestones);
-                  setProject(dashboard);
                   history.push(`/helpdesk/taskList/i/all`)
                 }}>
                 All tasks

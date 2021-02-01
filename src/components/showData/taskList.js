@@ -67,6 +67,29 @@ export default function List( props ) {
   }
   const filter = tasksFilterData.tasksAttributesFilter;
 
+  const renderWithIcons = ( displayValues, item, index, Component ) => {
+    if ( ![ 'important', 'invoiced' ].includes( displayValues[ index - 1 ].type ) ) {
+      return Component;
+    }
+    return (
+      <span>
+        {(displayValues[index-1].type === 'important' || displayValues[index-2].type === 'important') && getItemDisplayValue(item,displayValues.find((item) => item.type === 'important' )) }
+        {(displayValues[index-1].type === 'invoiced' || displayValues[index-2].type === 'invoiced') && getItemDisplayValue(item,displayValues.find((item) => item.type === 'invoiced' )) }
+        <span style={{
+            paddingLeft:
+            (
+              ((displayValues[index-1].type === 'important' || displayValues[index-2].type === 'important') && !item.important) ? 20.75 : 0
+            ) +
+            (
+              ((displayValues[index-1].type === 'invoiced' || displayValues[index-2].type === 'invoiced') && !item.invoiced) ? 15.5 : 0
+            )
+          }}>
+          { Component }
+        </span>
+      </span>
+    )
+  }
+
   return (
     <div>
       <CommandBar {...commandBar} listName={listName}/>
@@ -229,9 +252,9 @@ export default function List( props ) {
                     }
                     return (
                       <td
-                        colSpan={(index===displayValues.length-1)?"2":"1"}
+                        colSpan={ (index === displayValues.length-1) ? "2" : "1" }
                         style={{
-                          ...(display.value === "createdAt" || display.value === "deadline" ? {textAlign: "right"} : {}),
+                          ...(["createdAt", "deadline"].includes(display.value) ? {textAlign: "right"} : {}),
                         }}
                         key={display.value}
                         className={display.value}
@@ -241,25 +264,8 @@ export default function List( props ) {
                           }
                         }}
                         >
-                        {	display.type !== 'checkbox' && display.value === 'title' &&
-                          <span>
-                            {(displayValues[index-1].type === 'important' || displayValues[index-2].type === 'important') && getItemDisplayValue(item,displayValues.find((item) => item.type === 'important' )) }
-                            {(displayValues[index-1].type === 'invoiced' || displayValues[index-2].type === 'invoiced') && getItemDisplayValue(item,displayValues.find((item) => item.type === 'invoiced' )) }
-                            <span style={{
-                                paddingLeft:
-                                (
-                                  ((displayValues[index-1].type === 'important' || displayValues[index-2].type === 'important') && !item.important) ? 20.75 : 0
-                                ) +
-                                (
-                                  ((displayValues[index-1].type === 'invoiced' || displayValues[index-2].type === 'invoiced') && !item.invoiced) ? 15.5 : 0
-                                )
-                              }}>
-                              {getItemDisplayValue(item,display)}
-                            </span>
-                          </span>
-                        }
-                        {	display.type !== 'checkbox' && display.value !== 'title' &&
-                          getItemDisplayValue(item,display)
+                        {	display.type !== 'checkbox' &&
+                          renderWithIcons( displayValues, item, index, getItemDisplayValue(item,display) )
                         }
                         { display.type === 'checkbox' &&
                           <Checkbox

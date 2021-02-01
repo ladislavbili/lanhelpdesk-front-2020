@@ -52,7 +52,7 @@ export default function CommandBar( props ) {
 								value={props.orderBy}
 								className="invisible-select text-bold text-highlight"
 								onChange={(e)=>props.setOrderBy(e.target.value)}>
-								{ props.orderByValues.map((item,index)=>
+								{ props.orderByValues.map((item,index) =>
 									<option value={item.value} key={index}>{item.label}</option>
 								) }
 							</select>

@@ -927,7 +927,7 @@ export default function TaskEdit( props ) {
               <button
                 type="button"
                 style={{color: important ? '#ffc107' : '#0078D4'}}
-                disabled={userRights.important }
+                disabled={ !userRights.important }
                 className="btn btn-link waves-effect task-add-layout-button"
                 onClick={()=>{
                   autoUpdateTask({ important: !important })
@@ -1355,16 +1355,16 @@ export default function TaskEdit( props ) {
   const renderSelectsLayout2Form = () => {
     return (
       <div className="col-12 row task-edit-align-select-labels">
+        <div className="col-2">
+          <Label className="col-form-label">Projekt</Label>
+          { layoutComponents.Project }
+        </div>
         { userRights.statusRead &&
           <div className="col-2" >
             <Label className="col-form-label">Status</Label>
             { layoutComponents.Status }
           </div>
         }
-        <div className="col-2">
-          <Label className="col-form-label">Projekt</Label>
-          { layoutComponents.Project }
-        </div>
         { userRights.milestoneRead &&
           <div className="col-2">
             <Label className="col-form-label">Milestone</Label>
@@ -1390,19 +1390,19 @@ export default function TaskEdit( props ) {
   const renderSelectsLayout2Side = () => {
     return (
       <div className={"task-edit-right" + (columns ? " w-250px" : "")} >
-        { userRights.statusRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Status <span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Status }
-            </div>
-          </div>
-        }
         { userRights.projectRead &&
           <div className="form-selects-entry-column" >
             <Label>Projekt <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Project }
+            </div>
+          </div>
+        }
+        { userRights.statusRead &&
+          <div className="form-selects-entry-column" >
+            <Label>Status <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Status }
             </div>
           </div>
         }
@@ -1963,53 +1963,53 @@ export default function TaskEdit( props ) {
     return (
       <div className="form-section">
         <div className="form-section-rest">
-        <Nav tabs className="b-0 m-b-10">
-          { userRights.viewComments &&
-            <NavItem>
-              <NavLink
-                className={classnames({ active: toggleTab === 1}, "clickable", "")}
-                onClick={() => setToggleTab(1) }
-                >
-                Komentáre
-              </NavLink>
-            </NavItem>
-          }
-          { userRights.history && userRights.viewComments &&
-            <NavItem>
-              <NavLink>
-                |
-              </NavLink>
-            </NavItem>
-          }
-          { userRights.history &&
-            <NavItem>
-              <NavLink
-                className={classnames({ active: toggleTab === 2 }, "clickable", "")}
-                onClick={() => setToggleTab(2) }
-                >
-                História
-              </NavLink>
-            </NavItem>
-          }
-        </Nav>
-        <TabContent activeTab={toggleTab}>
-          <TabPane tabId={1}>
-            <Comments
-              id={id}
-              comments={task ? task.comments : []}
-              submitComment={ submitComment }
-              submitEmail={ submitEmail }
-              userRights={ userRights }
-              users={users}
-              />
-          </TabPane>
-          {	userRights.history &&
-            <TabPane tabId={2}>
-              <TaskHistory task={task} />
+          <Nav tabs className="b-0 m-b-10">
+            { userRights.viewComments &&
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: toggleTab === 1}, "clickable", "")}
+                  onClick={() => setToggleTab(1) }
+                  >
+                  Komentáre
+                </NavLink>
+              </NavItem>
+            }
+            { userRights.history && userRights.viewComments &&
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
+            }
+            { userRights.history &&
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: toggleTab === 2 }, "clickable", "")}
+                  onClick={() => setToggleTab(2) }
+                  >
+                  História
+                </NavLink>
+              </NavItem>
+            }
+          </Nav>
+          <TabContent activeTab={toggleTab}>
+            <TabPane tabId={1}>
+              <Comments
+                id={id}
+                comments={task ? task.comments : []}
+                submitComment={ submitComment }
+                submitEmail={ submitEmail }
+                userRights={ userRights }
+                users={users}
+                />
             </TabPane>
-          }
-        </TabContent>
-      </div>
+            {	userRights.history &&
+              <TabPane tabId={2}>
+                <TaskHistory task={task} />
+              </TabPane>
+            }
+          </TabContent>
+        </div>
       </div>
     )
   }
@@ -2030,55 +2030,61 @@ export default function TaskEdit( props ) {
           {"fit-with-header": !columns},
           {"fit-with-header-and-commandbar": columns},
           "scroll-visible",
-          { "row": layout === 2},
         )}
         >
         { renderCommandbar() }
         <div
           className={classnames(
-            "bkg-white",
             {
-              "task-edit-left": layout === 2 && !columns,
-              "task-edit-left-columns": (layout === 2 && columns) || layout === 1,
+              "row": layout === 2,
             },
           )}
           >
+          <div
+            className={classnames(
+              "bkg-white",
+              {
+                "task-edit-left": layout === 2 && !columns,
+                "task-edit-left-columns": (layout === 2 && columns) || layout === 1,
+              },
+            )}
+            >
 
-          <div>
-            { renderTitle() }
-            { layout === 2 && <hr className="m-t-5 m-b-5"/> }
+            <div>
+              { renderTitle() }
+              { layout === 2 && <hr className="m-t-5 m-b-5"/> }
 
-            {canCreateVykazyError()}
+              {canCreateVykazyError()}
 
-            { layout === 1 ? renderSelectsLayout1() : null }
+              { layout === 1 ? renderSelectsLayout1() : null }
 
-            { renderDescription() }
+              { renderDescription() }
 
-            { renderSimpleSubtasks() }
+              { renderSimpleSubtasks() }
 
-            { renderAttachments(false) }
+              { renderAttachments(false) }
 
-            { renderModalUserAdd() }
+              { renderModalUserAdd() }
 
-            { renderModalCompanyAdd() }
+              { renderModalCompanyAdd() }
 
-            { renderPendingPicker() }
+              { renderPendingPicker() }
 
-            { renderVykazyTable() }
+              { renderVykazyTable() }
 
-            { renderCompanyPausalInfo() }
+              { renderCompanyPausalInfo() }
 
-            { renderComments() }
+              { renderComments() }
 
-            <div className="form-section"></div>
+              <div className="form-section"></div>
+
+            </div>
+
 
           </div>
 
-
+          { layout === 2 && renderSelectsLayout2Side() }
         </div>
-
-        { layout === 2 && renderSelectsLayout2Side() }
-
       </div>
     </div>
   );

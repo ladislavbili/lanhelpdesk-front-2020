@@ -52,3 +52,10 @@ query {
   }
 }
 `;
+
+
+export const GET_ERROR_MESSAGES_COUNT = gql `
+query {
+  errorMessageCount
+}
+`;

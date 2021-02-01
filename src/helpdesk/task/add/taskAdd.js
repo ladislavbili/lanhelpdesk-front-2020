@@ -374,7 +374,6 @@ export default function TaskAdd( props ) {
         <span className="form-section-rest">
           <input type="text"
             value={title}
-            disabled={ !userRights.taskTitleEdit }
             className="task-title-input full-width form-control"
             onChange={ (e) => setTitle(e.target.value) }
             placeholder="ENTER NEW TASK NAME" />
@@ -701,16 +700,16 @@ export default function TaskAdd( props ) {
   const renderSelectsLayout2Form = () => {
     return (
       <div className="col-12 row task-edit-align-select-labels">
+        <div className="col-2">
+          <Label className="col-form-label">Projekt</Label>
+          { layoutComponents.Project() }
+        </div>
         { userRights.statusRead &&
           <div className="col-2" >
             <Label className="col-form-label">Status</Label>
             { layoutComponents.Status }
           </div>
         }
-        <div className="col-2">
-          <Label className="col-form-label">Projekt</Label>
-          { layoutComponents.Project() }
-        </div>
         { userRights.milestoneRead &&
           <div className="col-2">
             <Label className="col-form-label">Milestone</Label>
@@ -736,6 +735,12 @@ export default function TaskAdd( props ) {
   const renderSelectsLayout2Side = () => {
     return (
       <div className="task-edit-right">
+        <div className="form-selects-entry-column" >
+          <Label>Projekt <span className="warning-big">*</span></Label>
+          <div className="form-selects-entry-column-rest" >
+            { layoutComponents.Project(true) }
+          </div>
+        </div>
         { userRights.statusRead &&
           <div className="form-selects-entry-column" >
             <Label>Status <span className="warning-big">*</span></Label>
@@ -744,12 +749,6 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        <div className="form-selects-entry-column" >
-          <Label>Projekt <span className="warning-big">*</span></Label>
-          <div className="form-selects-entry-column-rest" >
-            { layoutComponents.Project(true) }
-          </div>
-        </div>
         { userRights.milestoneRead &&
           <div className="form-selects-entry-column" >
             <Label>Milestone</Label>

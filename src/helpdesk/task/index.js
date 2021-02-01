@@ -45,12 +45,14 @@ import {
   GET_PROJECT,
   GET_MILESTONE,
   GET_TASK_SEARCH,
+  GET_TASKS_SORT,
 } from 'apollo/localSchema/queries';
 
 import {
   setFilter,
   setProject,
   setMilestone,
+  setTasksSort,
 } from 'apollo/localSchema/actions';
 
 import TaskEdit from './edit';
@@ -84,11 +86,15 @@ export default function TasksIndex( props ) {
     loading: milestoneLoading
   } = useQuery( GET_MILESTONE );
 
-
   const {
     data: taskSearchData,
     loading: taskSearchLoading
   } = useQuery( GET_TASK_SEARCH );
+
+  const {
+    data: tasksSortData,
+    loading: tasksSortLoading
+  } = useQuery( GET_TASKS_SORT );
 
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
@@ -113,7 +119,8 @@ export default function TasksIndex( props ) {
     variables: {
       filterId: localFilter.id,
       filter: localFilterToValues( localFilter ),
-      projectId: localProject.id
+      projectId: localProject.id,
+      sort: null
     },
     notifyOnNetworkStatusChange: true,
   } );
@@ -129,9 +136,9 @@ export default function TasksIndex( props ) {
     projectLoading ||
     milestoneLoading ||
     tasksLoading ||
+    tasksSortLoading ||
     calendarEventsLoading
   );
-
   //sync
   React.useEffect( () => {
     tasksRefetch( {
@@ -167,6 +174,7 @@ export default function TasksIndex( props ) {
   const tasks = tasksData.tasks.tasks;
   const statuses = localProject.project.statuses ? localProject.project.statuses : [];
   const currentUser = currentUserData.getMyData;
+  const tasksSort = tasksSortData.tasksSort;
 
   const getBreadcrumsData = () => {
     return [
@@ -444,7 +452,6 @@ export default function TasksIndex( props ) {
       checked: markedTasks.includes( task.id )
     } ) )
   }
-
   return (
       <ShowData
         data={processTasks(filterTasks(tasks))}
@@ -463,10 +470,10 @@ export default function TasksIndex( props ) {
         filterName="help-tasks"
         displayValues={[
           {value:'checked', label: '', type:'checkbox'},
-          {value:'important',label:'',type:'important'},
-          {value:'invoiced',label:'',type:'invoiced'},
           {value:'id',label:'ID',type:'int'},
           {value:'status',label:'Status',type:'object'},
+          {value:'important',label:'',type:'important'},
+          {value:'invoiced',label:'',type:'invoiced'},
           {value:'title',label:'Title',type:'text'},
           {value:'requester',label:'Requester',type:'user'},
           {value:'company',label:'Company',type:'object'},
@@ -489,6 +496,14 @@ export default function TasksIndex( props ) {
           {value:'createdAt',label:'Created at',type:'date'},
           {value:'deadline',label:'Deadline',type:'date'}
         ]}
+        setOrderBy={(value) => {
+          setTasksSort({ ...tasksSort, key: value })
+        }}
+        orderBy={ tasksSort.key }
+        setAscending={(ascending) => {
+          setTasksSort({ ...tasksSort, asc: ascending })
+        }}
+        ascending={ tasksSort.asc }
         dndGroupAttribute="status"
         dndGroupData={statuses}
         calendar={TaskCalendar}

@@ -39,6 +39,8 @@ export default function ShowDataContainer( props ) {
     filterBy,
     displayValues,
     orderByValues,
+    orderBy,
+    ascending,
     useBreadcrums,
     breadcrumsData,
     Empty,
@@ -80,26 +82,6 @@ export default function ShowDataContainer( props ) {
 
   const tasklistLayout = myData ? myData.getMyData.tasklistLayout : 1;
 
-  //	const client = useApolloClient();
-
-  /*	const addShowDataFilter = () => {
-  		if(localCache && localCache.showDataFilter.name !== listName){
-  			let newShowDataFilter={
-  				name: listName,
-  			};
-  			displayValues.forEach((display)=>{
-  				if (display.value === "checked" || display.value === "important"){
-  					newShowDataFilter[display.value] = false;
-  				} else {
-  					newShowDataFilter[display.value] = '';
-  				}
-  			})
-  			client.writeData({ data: {
-  				showDataFilter: newShowDataFilter,
-  			} });
-  		}
-  	}*/
-
   const filterDataFunc = () => {
     return data.filter( ( item ) => {
         if ( taskSearchData.taskSearch === "" ) {
@@ -132,18 +114,16 @@ export default function ShowDataContainer( props ) {
           .includes( taskSearchData.taskSearch.toLowerCase() );
       } )
       .sort( ( item1, item2 ) => {
-        let val1 = getSortValue( item1 );
-        let val2 = getSortValue( item2 );
-        if ( false ) {
-          if ( val1 === null ) {
-            return 1;
-          }
-          return val1 > val2 ? 1 : -1;
+        const val1 = getSortValue( item1 );
+        const val2 = getSortValue( item2 );
+        const returnVal = ascending ? -1 : 1;
+
+        if ( val1 === null ) {
+          return returnVal * -1;
+        } else if ( val2 === null ) {
+          return returnVal;
         } else {
-          if ( val2 === null ) {
-            return 1;
-          }
-          return val1 < val2 ? 1 : -1;
+          return val1 > val2 ? returnVal : returnVal * -1;
         }
       } )
       .sort( ( val1, val2 ) => {
@@ -157,7 +137,7 @@ export default function ShowDataContainer( props ) {
   }
 
   const getSortValue = ( item ) => {
-    let value = orderByValues.find( ( val ) => val.value === ( false ? 'no' : "id" ) );
+    let value = orderByValues.find( ( val ) => val.value === orderBy );
     if ( value.type === 'object' ) {
       if ( value.value === "status" ) {
         return item[ value.value ] ? ( ( 100 - item[ value.value ].order ) + " " + item.statusChange ) : null;

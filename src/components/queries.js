@@ -66,12 +66,6 @@ mutation loginUser($email: String!, $password: String!) {
 }
 `;
 
-export const GET_ERROR_MESSAGES_COUNT = gql `
-query {
-  errorMessageCount
-}
-`;
-
 export const LOGOUT_USER = gql `
 mutation logoutUser {
   logoutUser

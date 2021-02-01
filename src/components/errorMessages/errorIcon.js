@@ -5,8 +5,10 @@ import {
 import classnames from 'classnames';
 import {
   GET_MY_DATA,
-  GET_ERROR_MESSAGES_COUNT,
 } from '../queries';
+import {
+  GET_ERROR_MESSAGES_COUNT
+} from './queries';
 
 export default function ErrorIcon( props ) {
 

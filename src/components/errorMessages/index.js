@@ -26,6 +26,7 @@ import {
   SET_ALL_ERROR_MESSAGES_READ,
   DELETE_ALL_ERROR_MESSAGES,
   DELETE_SELECTED_ERROR_MESSAGES,
+  GET_ERROR_MESSAGES_COUNT,
 } from './queries';
 
 const noTypeFilter = {
@@ -50,6 +51,11 @@ export default function ErrorList( props ) {
     data: errorMessagesData,
     loading: errorMessagesLoading,
   } = useQuery( GET_ERROR_MESSAGES );
+
+  const {
+    data: errorMessageCountData,
+    loading: errorMessageCountLoading
+  } = useQuery( GET_ERROR_MESSAGES_COUNT );
 
   const [ setErrorMessageRead ] = useMutation( SET_ERROR_MESSAGE_READ );
   const [ setAllErrorMessagesRead ] = useMutation( SET_ALL_ERROR_MESSAGES_READ );
@@ -94,6 +100,12 @@ export default function ErrorList( props ) {
             read: true
           } ) );
           writeDataToCache( newData );
+          client.writeQuery( {
+            query: GET_ERROR_MESSAGES_COUNT,
+            data: {
+              errorMessageCount: errorMessageCountData.errorMessageCount - 1,
+            }
+          } );
         } )
         .catch( ( err ) => {
           console.log( err.message );
@@ -118,6 +130,12 @@ export default function ErrorList( props ) {
             read: true
           } ) );
           writeDataToCache( newData );
+          client.writeQuery( {
+            query: GET_ERROR_MESSAGES_COUNT,
+            data: {
+              errorMessageCount: 0,
+            }
+          } );
         } )
         .catch( ( err ) => {
           console.log( err.message );
@@ -131,6 +149,12 @@ export default function ErrorList( props ) {
         .then( ( response ) => {
           writeDataToCache( [] );
           setSelectedErrorID( null );
+          client.writeQuery( {
+            query: GET_ERROR_MESSAGES_COUNT,
+            data: {
+              errorMessageCount: 0,
+            }
+          } );
         } )
         .catch( ( err ) => {
           console.log( err.message );
