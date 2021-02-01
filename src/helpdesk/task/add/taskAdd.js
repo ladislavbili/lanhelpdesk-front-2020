@@ -579,8 +579,8 @@ export default function TaskAdd( props ) {
             { userRights.assignedRead &&
               <div className="col-8">
                 <div className="row p-r-10">
-                  <Label className="col-1-5 col-form-label">Assigned <span className="warning-big">*</span></Label>
-                  <div className="col-10-5">
+                  <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
+                  <div className="col-10-45">
                     { layoutComponents.Assigned }
                   </div>
                 </div>
@@ -896,7 +896,15 @@ export default function TaskAdd( props ) {
     }
     return (
       <div className="form-section">
-        <Label>Popis úlohy</Label>
+        <div className="row" style={{alignItems: "baseline"}}>
+          <Label className="m-r-10">Popis úlohy</Label>
+            { userRights.taskAttachmentsRead && userRights.taskAttachmentsWrite &&
+              <label htmlFor={`uploadAttachment-${null}`} className="btn btn-link" >
+                <i className="fa fa-plus" />
+                Attachment
+              </label>
+          }
+        </div>
         <div  className="form-section-rest">
           <CKEditor5
             editor={ ClassicEditor }
@@ -909,6 +917,10 @@ export default function TaskAdd( props ) {
             readOnly={!userRights.taskDescriptionWrite}
             config={ck5config}
             />
+
+          {
+              renderAttachments(false)
+          }
         </div>
       </div>
     )
@@ -1155,7 +1167,6 @@ export default function TaskAdd( props ) {
 
           { renderSimpleSubtasks() }
 
-          { renderAttachments(false) }
           { renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
           { renderButtons() }
