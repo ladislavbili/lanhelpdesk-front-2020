@@ -260,10 +260,9 @@ export default function PageHeader( props ) {
           className="header-icon clickable fa fa-sign-out-alt center-hor"
           onClick={() => {
             if (window.confirm('Are you sure you want to log out?')) {
-              logoutUser();
-              localStorage.removeItem("acctok");
-              setIsLoggedIn(false);
-              client.cache.reset()
+              logoutUser().then(() => {
+                location.reload(false);
+              } );
             }
           }}
           />

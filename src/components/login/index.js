@@ -8,8 +8,8 @@ import {
 } from '../queries';
 
 export default function LoginContainer() {
-  const [ login ] = useMutation( LOGIN_USER );
+  const [ loginUser ] = useMutation( LOGIN_USER );
   return (
-    <Login login={login} />
+    <Login loginUser={loginUser} />
   )
 }

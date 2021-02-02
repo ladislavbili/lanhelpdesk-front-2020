@@ -1,5 +1,5 @@
 export * from './filter/queries';
-export * from './isLoggedIn/queries';
+export * from './login/queries';
 export * from './milestone/queries';
 export * from './project/queries';
 export * from './reports/queries';

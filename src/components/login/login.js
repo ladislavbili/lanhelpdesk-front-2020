@@ -1,6 +1,4 @@
-import React, {
-  Component
-} from 'react';
+import React from 'react';
 import {
   Button,
   FormGroup,
@@ -8,80 +6,125 @@ import {
   Input
 } from 'reactstrap';
 import {
-  setIsLoggedIn
+  setIsLoggedIn,
+  setTestedToken,
 } from 'apollo/localSchema/actions';
+import {
+  useQuery,
+} from "@apollo/client";
+import {
+  refreshToken,
+} from 'apollo/createClient';
+import {
+  GET_TESTED_TOKEN,
+} from 'apollo/localSchema/queries';
 
-export default class Login extends Component {
-  constructor( props ) {
-    super( props );
-    this.state = {
-      email: '',
-      password: '',
-      signingIn: false,
-      error: null,
-    };
-    this.login.bind( this );
-  }
 
-  login() {
-    this.setState( {
-      error: null,
-      signingIn: true
-    } );
+export default function Login( props ) {
+  const {
+    loginUser
+  } = props;
 
-    this.props.login( {
+  const [ email, setEmail ] = React.useState( '' );
+  const [ password, setPassword ] = React.useState( '' );
+  const [ signingIn, setSigningIn ] = React.useState( false );
+  const [ error, setError ] = React.useState( null );
+
+  const {
+    data: testedTokenData,
+    loading: testedTokenLoading
+  } = useQuery( GET_TESTED_TOKEN );
+
+  const login = () => {
+    setSigningIn( true );
+    setError( null );
+
+    loginUser( {
         variables: {
-          email: this.state.email,
-          password: this.state.password
+          email,
+          password
         }
       } )
       .then( ( response ) => {
-        this.setState( {
-          signingIn: false
-        } );
-        localStorage.setItem( "acctok", response.data.loginUser.accessToken );
+        setSigningIn( false );
+        sessionStorage.setItem( "acctok", response.data.loginUser.accessToken );
         setIsLoggedIn( true );
       } )
       .catch( ( err ) => {
-        this.setState( {
-          error: err.message,
-          signingIn: false
-        } );
+        setSigningIn( false );
+        setError( err.message );
       } );
   }
-  render() {
-    return (
-      <div style={{height:'100vh',display: 'flex'}}>
-			<div className="card" style={{backgroundColor:'white', borderRadius:6, padding:'10px 20px', width:'350px',margin:'auto'}}>
 
-				<FormGroup>
-					<Label for="email">E-mail</Label>
-					<Input type="email" name="email" id="email" placeholder="Enter e-mail" value={this.state.email} onChange={(e)=>this.setState({email:e.target.value})}
-						onKeyPress={(e)=>{
-							if(e.charCode===13 && !this.state.signingIn && this.state.email.length>0 && this.state.password.length>0){
-								this.login();
-							}
-						}}
-						/>
-				</FormGroup>
-				<FormGroup>
-					<Label for="pass">Password</Label>
-					<Input type="password" name="pass" id="pass" placeholder="Enter password" value={this.state.password} onChange={(e)=>this.setState({password:e.target.value})}
-						onKeyPress={(e)=>{
-							if(e.charCode===13 && !this.state.signingIn && this.state.email.length>0 && this.state.password.length>0){
-								this.login();
-							}
-						}}
-						/>
-				</FormGroup>
-			<Button color="primary" disabled={this.state.signingIn||this.state.email.length===0||this.state.password.length===0} onClick={this.login.bind(this)}>Login</Button>
-			{this.state.error !== null &&
-				<div style={{color:'red'}}>
-        {this.state.error}
-	      </div>
-				}
-			</div>
-		</div>
-    );
+  React.useEffect( () => {
+    if ( !testedTokenLoading && !testedTokenData.testedToken ) {
+      setTestedToken( true )
+      tryLogin();
+    }
+  }, [ testedTokenLoading, testedTokenData.testedToken ] );
+
+  const tryLogin = () => {
+    setSigningIn( true );
+    refreshToken()
+      .then( ( response ) => {
+        const {
+          ok,
+          accessToken
+        } = response.data;
+        if ( ok ) {
+          sessionStorage.setItem( "acctok", accessToken );
+          setIsLoggedIn( true )
+          setSigningIn( false );
+        } else {
+          sessionStorage.removeItem( "acctok" );
+          setIsLoggedIn( false );
+          setSigningIn( false );
+        }
+      } )
+      .catch( ( error ) => {
+        setIsLoggedIn( false );
+        signingIn( false );
+      } )
   }
+
+
+  return (
+    <div style={{height:'100vh',display: 'flex'}}>
+      <div className="card" style={{backgroundColor:'white', borderRadius:6, padding:'10px 20px', width:'350px',margin:'auto'}}>
+
+        <FormGroup>
+          <Label for="email">E-mail</Label>
+          <Input type="email" name="email" id="email" placeholder="Enter e-mail" value={email}
+            onChange={(e) => setEmail(e.target.value) }
+            onKeyPress={(e)=>{
+              if( e.charCode===13 && signingIn && email.length > 0 && password.length > 0 ){
+                login();
+              }
+            }}
+            />
+        </FormGroup>
+        <FormGroup>
+          <Label for="pass">Password</Label>
+          <Input type="password" name="pass" id="pass" placeholder="Enter password" value={password} onChange={(e)=>setPassword(e.target.value)}
+            onKeyPress={(e)=>{
+              if(e.charCode===13 && !signingIn && email.length>0 && password.length>0){
+                login();
+              }
+            }}
+            />
+        </FormGroup>
+        <Button color="primary"
+          disabled={ signingIn || email.length === 0 || password.length === 0 }
+          onClick={ login }
+          >
+          Login
+        </Button>
+        {error !== null &&
+          <div style={{color:'red'}}>
+            {error}
+          </div>
+        }
+      </div>
+    </div>
+  )
 }

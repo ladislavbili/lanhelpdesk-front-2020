@@ -40,7 +40,7 @@ const link = new HttpLink( {
   credentials: "include"
 } );
 
-async function refreshToken() {
+export async function refreshToken() {
   return axios.request( {
     url: `${REST_URL}/refresh_token`,
     method: 'post',
@@ -57,9 +57,9 @@ const promiseToObservable = promise => (
           accessToken
         } = response.data;
         if ( ok ) {
-          localStorage.setItem( "acctok", accessToken );
+          sessionStorage.setItem( "acctok", accessToken );
         } else {
-          localStorage.removeItem( "acctok" )
+          sessionStorage.removeItem( "acctok" )
           setIsLoggedIn( false );
         }
         if ( subscriber.closed ) return;
@@ -71,10 +71,11 @@ const promiseToObservable = promise => (
     return subscriber;
   } )
 )
+
 const authLink = setContext( async ( _, {
   headers
 } ) => {
-  let token = localStorage.getItem( 'acctok' );
+  let token = sessionStorage.getItem( 'acctok' );
   if ( !token ) {
     return headers;
   }
@@ -85,9 +86,9 @@ const authLink = setContext( async ( _, {
     } = ( await refreshToken() ).data;
     if ( ok ) {
       token = accessToken;
-      localStorage.setItem( "acctok", accessToken );
+      sessionStorage.setItem( "acctok", accessToken );
     } else {
-      localStorage.removeItem( "acctok" )
+      sessionStorage.removeItem( "acctok" )
       setIsLoggedIn( false );
     }
   }
@@ -113,7 +114,7 @@ function processErrors( {
     return promiseToObservable( refreshToken() ).flatMap( () => forward( operation ) );
   }
   if ( error.extensions.code === "NO_ACC_TOKEN" ) {
-    localStorage.removeItem( "acctok" )
+    sessionStorage.removeItem( "acctok" )
     setIsLoggedIn( false );
   }
 }
@@ -123,21 +124,5 @@ export default function createClient() {
     cache,
     link: ApolloFrom( [ onError( processErrors ), authLink, link ] ),
   } );
-
-  if ( localStorage.getItem( "acctok" ) ) {
-    refreshToken().then( ( response ) => {
-      const {
-        ok,
-        accessToken
-      } = response.data;
-      if ( ok ) {
-        localStorage.setItem( "acctok", accessToken );
-        setIsLoggedIn( true )
-      } else {
-        localStorage.removeItem( "acctok" );
-        setIsLoggedIn( false );
-      }
-    } )
-  }
   return client;
 }
