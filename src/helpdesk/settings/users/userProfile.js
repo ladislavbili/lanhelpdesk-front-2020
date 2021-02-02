@@ -98,7 +98,7 @@ export default function UserProfile( props ) {
       } )
       .then( ( response ) => {
         if ( password !== null && password.length >= 6 ) {
-          localStorage.setItem( "acctok", response.data.updateProfile.accessToken );
+          sessionStorage.setItem( "acctok", response.data.updateProfile.accessToken );
         }
         try {
           const allUsers = client.readQuery( {

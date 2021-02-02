@@ -25,7 +25,7 @@ export default function TaskAttachments( props ) {
           path: attachment.path
         },
         headers: {
-          'authorization': `Bearer ${localStorage.getItem('acctok')}`
+          'authorization': `Bearer ${sessionStorage.getItem('acctok')}`
         },
         responseType: 'arraybuffer',
       } )

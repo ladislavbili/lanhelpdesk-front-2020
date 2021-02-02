@@ -1,4 +1,4 @@
-export * from './isLoggedIn/resolvers';
+export * from './login/resolvers';
 
 export * from './filter/resolvers';
 export * from './milestone/resolvers';

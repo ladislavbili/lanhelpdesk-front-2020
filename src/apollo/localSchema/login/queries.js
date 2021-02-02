@@ -7,3 +7,9 @@ export const GET_IS_LOGGED_IN = gql `
     isLoggedIn @client
   }
 `;
+
+export const GET_TESTED_TOKEN = gql `
+  query testedToken {
+    testedToken @client
+  }
+`;

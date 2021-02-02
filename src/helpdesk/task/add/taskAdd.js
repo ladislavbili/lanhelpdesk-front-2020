@@ -308,7 +308,7 @@ export default function TaskAdd( props ) {
           const formData = new FormData();
           attachments.map( ( attachment ) => attachment.data )
             .forEach( ( file ) => formData.append( `file`, file ) );
-          formData.append( "token", `Bearer ${localStorage.getItem( "acctok" )}` );
+          formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
           formData.append( "taskId", response.data.addTask.id );
           axios.post( `${REST_URL}/upload-attachments`, formData, {
               headers: {

@@ -624,7 +624,7 @@ export default function TaskEditContainer( props ) {
     const formData = new FormData();
     attachments.forEach( ( file ) => formData.append( `file`, file ) );
     //FORM DATA
-    formData.append( "token", `Bearer ${localStorage.getItem('acctok')}` );
+    formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
     formData.append( "taskId", id );
     formData.append( "message", message );
     formData.append( "parentCommentId", parentCommentId );
@@ -689,7 +689,7 @@ export default function TaskEditContainer( props ) {
     const formData = new FormData();
     attachments.forEach( ( file ) => formData.append( `file`, file ) );
     //FORM DATA
-    formData.append( "token", `Bearer ${localStorage.getItem('acctok')}` );
+    formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
     formData.append( "taskId", id );
     formData.append( "message", emailBody );
     formData.append( "subject", subject );
@@ -741,7 +741,7 @@ export default function TaskEditContainer( props ) {
   const addAttachments = ( attachments ) => {
     const formData = new FormData();
     attachments.forEach( ( file ) => formData.append( `file`, file ) );
-    formData.append( "token", `Bearer ${localStorage.getItem('acctok')}` );
+    formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
     formData.append( "taskId", id );
     axios.post( `${REST_URL}/upload-attachments`, formData, {
         headers: {
