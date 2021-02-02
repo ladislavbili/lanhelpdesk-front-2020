@@ -152,6 +152,9 @@ html{
 .fit-with-header-and-commandbar-3{
 	height: calc(  #{$height-without-header} - #{$commandbar-height}  - 40px - 40px );
 }
+.fit-with-header-and-commandbar-4{
+	height: calc(  #{$height-without-header} - #{$task-list-commandbar-height}  );
+}
 
 .overflow-x{
   overflow-x: auto;
@@ -605,8 +608,8 @@ h4{
   background-color: $basic-button-color;
 }
 
- .btn-link:active{
-  background-color: transparent;
+ .btn-link:active, .btn-link:focus{
+  background-color: transparent !important;
 }
 
 .btn-link-reversed{
@@ -870,7 +873,6 @@ hr{
 }
 
 th {
-  border-bottom: 2px solid $table-lines !important;
   font-size: 12px;
   font-weight: 500;
 }
@@ -889,7 +891,7 @@ td {
 tr{
   border-bottom: 1px solid $table-lines !important;
 }
-tr:last-child{
+tr:last-child, tr:first-child{
   border-bottom: 0px solid $table-lines !important;
 }
 .tr-no-lines>th {
@@ -937,6 +939,7 @@ tr:last-child{
   border-radius: 0px;
   box-shadow: none;
   height: calc(1.5em + .75rem + 4px);
+  border: $main-border;
 }
 
 .form-control:disabled{
@@ -1271,6 +1274,7 @@ tr:last-child{
 .sidebar{
   width: $sidebar-width;
   border: none;
+  border-right: $main-border;
   list-style-type: none;
   background: $sidebar-background-color;
   position: relative;
@@ -1289,6 +1293,7 @@ tr:last-child{
   padding-left: 10px;
   height: $button-height;
   text-align: left;
+  border-radius: 4px;
 }
 
 .sidebar-filter{
@@ -1461,19 +1466,21 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .commandbar{
   display: flex;
   width: 100%;
-  background-color: $secondary-form-background-color;
+  background-color: #f4f8fb;
   padding: 0px 1px 0px 1px;
   height: $commandbar-height;
   white-space: pre-wrap;
+  border-bottom: $main-border;
 }
 
 .task-list-commandbar{
   display: flex;
   width: 100%;
-  background-color: $secondary-form-background-color;
   padding: 0px 1px 0px 1px;
   height: $task-list-commandbar-height;
   white-space: pre-wrap;
+  background-color: #f4f8fb;
+  border-bottom: $main-border;
 }
 
 .commandbar-small{
@@ -1483,6 +1490,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding: 0px 1px 0px 1px;
   height: 60px;
   white-space: pre-wrap;
+  border-bottom: $main-border;
 }
 
 .commandbar-icon{
@@ -1497,9 +1505,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .search-text{
-  border-radius: 0px;
-  border: none;
   height: $button-height;
+  border-left: none;
 }
 
 .search{
@@ -1511,12 +1518,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .search-btn{
 	background-color: white;
-  border-width: 0px;
-/*	border-left: 1px solid #ced4da;
-  border-bottom: 1px solid #ced4da;
-  border-top: 1px solid #ced4da;*/
-  border: none;
-	border-radius: 0px;
+  border: $main-border;
+  border-right: none;
   margin: 0;
   height: $button-height;
 	font-size: 14px;
@@ -1618,7 +1621,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 //---------------------TaskList----------------------
 .task-container{
-  background-color: $secondary-form-background-color;
   .modal-content{
     background-color: $form-background-color;
     width: 1200px;
@@ -1637,14 +1639,15 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-add-layout{
-  height: 40px;
+  height: 70px;
   padding-left: $odsadenie-form;
   background-color: #f4f8fb;
   margin: 0px;
   width: 100% !important;
+  border-bottom: $main-border;
 }
 .task-add-layout-button{
-  margin-top: calc((40px - 30px)/2);
+  margin-top: calc((70px - 30px)/2);
 }
 
 .task-container-col{
@@ -1659,21 +1662,22 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-container>.table>thead{
-  background-color: #F9F9F9;
   font-family: $main-font;
   font-style: normal;
   font-weight: normal;
   font-size: 12px;
   line-height: 16px;
   color: #333;
+  border: none;
 }
 
 .task-container>.table>thead>tr>th{
-  border-color: #F9F9F9 !important;
+  border: none;
+  //border-color: #F9F9F9 !important;
 }
 
 .task-container>.table>tbody>tr>th{
-  padding: 4px 0px 1px 0px !important;
+  padding: 4px 10px 10px 0px !important;
   background-color: #FFF;
   font-family: $main-font;
   font-style: normal;
@@ -1681,8 +1685,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   font-size: 12px;
   line-height: 19px;
   color: #989898;
-  border-bottom: 5px solid #F9F9F9 !important;
-  border-right: 5px solid #F9F9F9;
+  border: none;
+  /*border-bottom: 5px solid #F9F9F9 !important;
+  border-right: 5px solid #F9F9F9;*/
 //  border-bottom: 1px solid #bdbdbd !important;
 }
 
@@ -1701,7 +1706,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   font-family: $main-font;
   font-size: 12px;
   color: #767676 !important;
-//  border-bottom: 1px solid #c4c4c4;
+  border: none;
 }
 
 .task-container>.table>tbody>tr>td.title{
@@ -2122,6 +2127,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     .react-datepicker__input-container{
       width: 100%;
       input{
+        height: 30px;
         border: none;
         color: #E81123;
       }
@@ -2136,7 +2142,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   background-color:  #f9f9f9;
   padding-top: 5px;
   padding-bottom: 5px;
-  .col-9, .col-10-45, .col-11, .col-11-5{
+  .col-9, .col-10-45, .col-11, .col-11-5, .display-inline-block {
     border: 1px solid #c4c4c4;
   }
 }

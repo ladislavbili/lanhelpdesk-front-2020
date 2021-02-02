@@ -93,7 +93,7 @@ export default function List( props ) {
   return (
     <div>
       <CommandBar {...commandBar} listName={listName}/>
-      <div className="full-width scroll-visible fit-with-header-and-commandbar task-container   p-l-10">
+      <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container   p-l-10">
         <ListHeader
           {...commandBar}
           listName={listName}
@@ -182,7 +182,7 @@ export default function List( props ) {
                           <input
                             type="text"
                             value={ value }
-                            className="form-control hidden-input"
+                            className="form-control"
                             style={{fontSize: "12px", marginRight: "10px"}}
                             onChange={(e) => {
                               setTasksAttributeFilter(display.value, e.target.value);

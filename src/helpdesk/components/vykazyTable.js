@@ -45,7 +45,8 @@ export default function Rozpocet( props ) {
     submitService,
     submitTrip,
     submitMaterial,
-    submitCustomItem
+    submitCustomItem,
+    message
   } = props;
 
   let defaultTab = '6';
@@ -1643,8 +1644,10 @@ export default function Rozpocet( props ) {
         </tbody>
       </table>
       {/* Statistics */}
+      <div className="row">
+        {message}
       {(workTrips.length + subtasks.length + materials.length + customItems.length > 0) &&
-        <div className="row m-r-10">
+        <div className="ml-auto row m-r-10">
           <div className="text-right ml-auto m-r-5">
             <b>Cena bez DPH: </b>
             {
@@ -1674,6 +1677,7 @@ export default function Rozpocet( props ) {
         </div>
       }
     </div>
+  </div>
   );
 }
 

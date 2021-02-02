@@ -220,11 +220,7 @@ export default function TasksSidebar( props ) {
       { projectData.localProject.id !== null &&
         <div className="">
           <div className="sidebar-label">
-            <img
-              className=""
-              src={folderIcon}
-              alt="Folder icon not found"
-              />
+            <i className="fas fa-retweet "/>
             <Label>
             Milestone
           </Label>
@@ -242,12 +238,6 @@ export default function TasksSidebar( props ) {
       }
       <hr className = "m-l-15 m-r-15" />
 
-      <TaskAdd
-        history={history}
-        match={match}
-        disabled={ !canAddTask }
-        projectID={ projectData.localProject.id}
-        />
       { activeTab !== 1 &&
         <div className="sidebar-filter">
           <div onClick={() => {
@@ -319,88 +309,95 @@ export default function TasksSidebar( props ) {
             />
         </TabPane>
       </TabContent>
-      <div className='p-l-15 p-r-15'>
         <hr className='m-t-10 m-b-10'/>
 
-          { canEditProject && projectData.localProject.id &&
+        <TaskAdd
+          history={history}
+          match={match}
+          disabled={ !canAddTask }
+          projectID={ projectData.localProject.id}
+          />
+
+        <div className='p-l-15 p-r-15'>
+        { canEditProject && projectData.localProject.id &&
+          <Button
+            className='btn btn-link'
+            onClick={() => history.push( `/helpdesk/project/${projectData.localProject.id}` )}
+            >
+            <i className="fa fa-cog"/>
+            Project
+          </Button>
+        }
+        {/*
+
+          <ProjectEdit
+          closeModal={(editedProject, rights) => {
+          if(editedProject !== null){
+          const project = {
+          project: { ...projectData.localProject.project, ...editedProject },
+          right: rights,
+          id: editedProject.id,
+          value: editedProject.id,
+          title: editedProject.title,
+          label: editedProject.title,
+          }
+          setProject(project);
+          refetchMyProjects();
+          }
+          }}
+          projectDeleted={()=>{
+          setProject(dashboard);
+          refetchMyProjects();
+          }}
+          />
+          */}
+
+          { myData.getMyData.role.accessRights.addProjects &&
+            <NavItem className="row full-width">
               <Button
-                className='btn btn-link-reversed'
-                onClick={() => history.push( `/helpdesk/project/${projectData.localProject.id}` )}
+                className='btn btn-link'
+                onClick={() => setOpenProjectAdd(true)}
                 >
-                <i className="fa fa-cog"/>
-                Project
+                <i className="fa fa-plus" />
+                { addProject.project.title }
               </Button>
-            }
-              {/*
+            </NavItem>
+          }
+          { projectData.localProject.project.id !== null && canEditProject &&
+            <NavItem className="row full-width">
+              <Button
+                className='btn btn-link'
+                onClick={() => setOpenMilestoneAdd(true)}
+                >
+                <i className="fa fa-plus" />
+                { addMilestone.title }
+              </Button>
+            </NavItem>
+          }
+          { myData.getMyData.role.accessRights.companies &&
+            <NavItem className="row full-width">
+              <Button
+                className='btn btn-link'
+                onClick={() => setOpenCompanyAdd(true)}
+                >
+                <i className="fa fa-plus" />
+                { addCompany.title }
+              </Button>
+            </NavItem>
+          }
 
-            <ProjectEdit
-              closeModal={(editedProject, rights) => {
-                if(editedProject !== null){
-                  const project = {
-                    project: { ...projectData.localProject.project, ...editedProject },
-                    right: rights,
-                    id: editedProject.id,
-                    value: editedProject.id,
-                    title: editedProject.title,
-                    label: editedProject.title,
-                  }
-                  setProject(project);
-                  refetchMyProjects();
-                }
-              }}
-              projectDeleted={()=>{
-                setProject(dashboard);
-                refetchMyProjects();
-              }}
-              />
-            */}
-
-        { myData.getMyData.role.accessRights.addProjects &&
-          <NavItem className="row full-width">
-          <Button
-            className='btn btn-link-reversed'
-            onClick={() => setOpenProjectAdd(true)}
-            >
-            <i className="fa fa-plus" />
-            { addProject.project.title }
-          </Button>
-        </NavItem>
-        }
-        { projectData.localProject.project.id !== null && canEditProject &&
-          <NavItem className="row full-width">
-          <Button
-            className='btn btn-link-reversed'
-            onClick={() => setOpenMilestoneAdd(true)}
-            >
-            <i className="fa fa-plus" />
-            { addMilestone.title }
-          </Button>
-        </NavItem>
-        }
-        { myData.getMyData.role.accessRights.companies &&
-          <NavItem className="row full-width">
-          <Button
-            className='btn btn-link-reversed'
-            onClick={() => setOpenCompanyAdd(true)}
-            >
-            <i className="fa fa-plus" />
-            { addCompany.title }
-          </Button>
-        </NavItem>
-        }
-
-        { myData.getMyData.role.accessRights.users &&
-          <NavItem className="row full-width">
-          <Button
-            className='btn btn-link-reversed'
-            onClick={() => setOpenUserAdd(true)}
-            >
-            <i className="fa fa-plus" />
-            { addUser.title }
-          </Button>
-        </NavItem>
-        }
-      </div>
+          { myData.getMyData.role.accessRights.users &&
+            <NavItem className="row full-width">
+              <Button
+                className='btn btn-link'
+                onClick={() => setOpenUserAdd(true)}
+                >
+                <i className="fa fa-plus" />
+                { addUser.title }
+              </Button>
+            </NavItem>
+          }
+        </div>
 
       { openProjectAdd &&
         <ProjectAdd

@@ -29,7 +29,7 @@ export default function ListHeader( props ) {
   } = useQuery( GET_PROJECT );
 
   return (
-    <div className={classnames("d-flex", "p-b-10", "flex-row", 'bkg-F9F9F9')}>
+    <div className={classnames("d-flex", "p-b-10", "flex-row", "m-t-20")}>
       {
         !localProjectLoading &&
         localProjectData.localProject.id &&

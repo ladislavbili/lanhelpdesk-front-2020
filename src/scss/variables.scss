@@ -2,7 +2,10 @@ $header-height: 40px;
 $height-without-header: calc( 100vh - calc(#{$header-height})  );
 $sidebar-width: 270px;
 $sidebar-item-height: 40px;
+
 $inputs-border: 6px solid red;
+$main-border: 1px solid #c4c4c4;
+
 $main-font: Segoe UI;
 $main-font-bold: Segoe UI Semibold;
 $main-font-size: 14px;

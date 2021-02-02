@@ -76,10 +76,11 @@ export default function Repeat( props ) {
           </div>
         </div>
       }
-      {!vertical &&
+      {false &&
+        !vertical &&
         !addTask &&
         <div className="display-inline">
-          <Label className="col-form-label w-8">Repeat</Label>
+          <Label className="col-form-label col">Repeat</Label>
           <div className="display-inline-block w-25 p-r-10">
             <Button type="button" className="btn btn-repeat flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
               {
@@ -92,7 +93,7 @@ export default function Repeat( props ) {
         </div>
       }
       {!vertical &&
-        addTask &&
+    //    addTask &&
         <div className="row p-r-10">
           <Label className="col-3 col-form-label">Repeat</Label>
           <div className="col-9">
