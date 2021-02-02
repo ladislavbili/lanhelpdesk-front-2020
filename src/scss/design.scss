@@ -387,6 +387,10 @@ p-auto{
   }
 }
 
+.display-none{
+  display: none;
+}
+
 .clickable{
 	cursor:pointer;
 }
@@ -501,8 +505,13 @@ h4{
 }
 
 .col-1-45{
-  flex: 0 0 12%;
-  max-width: 12%;
+  flex: 0 0 12.35%;
+  max-width: 12.35%;
+}
+
+.col-0-5{
+  flex: 0 0 8.2%;
+  max-width: 8.2%;
 }
 
 .col-10-5{
@@ -511,8 +520,13 @@ h4{
 }
 
 .col-10-45{
-  flex: 0 0 88%;
-  max-width: 88%;
+  flex: 0 0 87.65%;
+  max-width: 87.65%;
+}
+
+.col-11-5{
+  flex: 0 0 91.8%;
+  max-width: 91.8%;
 }
 
 .modal.fade.show{
@@ -582,6 +596,17 @@ h4{
   background-color: inherit;
   color: $main-font-color;
   text-decoration: none;
+}
+
+.btn:focus, .btn:focus:active, .btn:active{
+  outline: 0;
+  box-shadow: none;
+  border: none;
+  background-color: $basic-button-color;
+}
+
+ .btn-link:active{
+  background-color: transparent;
 }
 
 .btn-link-reversed{
@@ -1601,7 +1626,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-add-container{
-  width: 1200px !important;
+  width: 1300px !important;
   .modal-content{
     background-color: $form-background-color;
     padding: 0px;
@@ -1676,7 +1701,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   font-family: $main-font;
   font-size: 12px;
   color: #767676 !important;
-  border-bottom: 1px solid #F9F9F9;
+//  border-bottom: 1px solid #c4c4c4;
 }
 
 .task-container>.table>tbody>tr>td.title{
@@ -1857,7 +1882,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .vykazyTable{
-  background-color: white;
+  background-color: inherit;
+  input:not(.hidden-input){
+    border: 1px solid #c4c4c4;
+  }
 }
 
 .vykazyTable>.table{
@@ -1881,6 +1909,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .vykazyTable>.table>tbody>tr>td{
   padding-left: 0px;
   padding-right: 0px;
+  border-top: 1px solid #c4c4c4;
 }
 
 .vykazyTable>.table>tbody>tr>td:first-child{
@@ -1953,37 +1982,41 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-edit-left{
+  background-color: #F9F9F9;
   position: relative;
-  padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$difference-form});
+  padding: calc(#{$odsadenie-form} - #{$difference-form}) calc(#{$odsadenie-form} - #{$difference-form}) calc(#{$odsadenie-form} - #{$difference-form}) calc(#{$odsadenie-form} - #{$difference-form});
   max-width: 1620px;
   min-width: 400px;
   width: calc(100% - 300px) !important;
 }
 
 .task-edit-left-columns{
-padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$difference-form});
+  background-color: #F9F9F9;
+  padding: 15px calc(#{$odsadenie-form} - #{$difference-form}) $odsadenie-form calc(#{$odsadenie-form} - #{$difference-form});
   max-width: 1670px;
   min-width: 400px;
-   width: auto;
+  width: auto;
 }
 
 .task-edit-buttons{
-  position: absolute;
+  background-color: #f9f9f9;
+  padding: $odsadenie-form;
+  /*position: absolute;
   bottom: 10px;
-  width: calc(100% - ( 2 *  #{$odsadenie-form} ) + #{$difference-form} )  !important;
+  width: calc(100% - ( 2 *  #{$odsadenie-form} ) + #{$difference-form} )  !important;*/
 }
 
 .task-edit-buttons-columns{
-  position: absolute;
+  /*position: absolute;
   bottom: 10px;
-  width: 100%;
+  width: 100%;*/
 }
 
 .task-edit-popis{
   min-height: 30px;
   font: $font-value;
   color: $color-value;
-  background-color: #F4F4F4 !important;
+  background-color: #F9F9F9 !important;
   padding: 15px;
 }
 
@@ -2026,19 +2059,28 @@ padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$diffe
       margin-bottom: 5px;
       margin-left: $difference-form;
   }
+  .table{
+    width: calc(100% - 20px) !important;
+  }
   .form-section-rest{
       margin-left: $difference-form;
+      .row.p-r-10{
+        margin-bottom: 10px;
+      }
   }
-  .form-section-rest.task-title-input{
+  .form-section-rest{
+    .task-title-input{
+      border: 1px solid #c4c4c4 !important;
       margin-left: 0;
+    }
   }
   /*.nav-tabs>.nav-item>.nav-link{
     @extend label:not(.col-form-label);
   }*/
 }
 
-.form-section:nth-last-child(2){
-  margin-bottom: 40px;
+.form-section:last-child{
+  margin-bottom: 0px;
 }
 
 .form-selects-entry-column{
@@ -2055,12 +2097,14 @@ padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$diffe
 
   .form-selects-entry-column-rest{
     margin-left: 0px;
+    border: 1px solid #c4c4c4;
   }
   .react-datepicker-wrapper{
     width: 100%;
     .react-datepicker__input-container{
       width: 100%;
       input{
+        height: 30px;
         border: none;
         color: #E81123;
       }
@@ -2073,6 +2117,7 @@ padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$diffe
 
 .col-9{
   .react-datepicker-wrapper{
+    height: 30px;
     width: 100%;
     .react-datepicker__input-container{
       width: 100%;
@@ -2088,9 +2133,12 @@ padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$diffe
 }
 
 .form-selects-entries{
-  background-color:  #F4F4F4;
+  background-color:  #f9f9f9;
   padding-top: 5px;
   padding-bottom: 5px;
+  .col-9, .col-10-45, .col-11, .col-11-5{
+    border: 1px solid #c4c4c4;
+  }
 }
 
 //-------------------END-taskEdit-------------------------
@@ -2099,7 +2147,7 @@ padding: 15px $odsadenie-form $odsadenie-form calc(#{$odsadenie-form} - #{$diffe
   cursor: pointer;
   height: 20px;
   width: 20px;
-  border: 1px solid #eee;
+  border: 1px solid #c4c4c4;
   border-radius: 0px;
   background-color: white;
   margin-bottom: 0px;

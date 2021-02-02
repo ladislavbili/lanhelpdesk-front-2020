@@ -35,9 +35,9 @@ export default function Scheduled( props ) {
   return (
     <div className="form-selects-entry-column">
       <Label>Scheduled</Label>
-      <div className="form-selects-entry-column-rest">
+      <div className="form-selects-entry-column-rest" style={{border: "none"}}>
         { items.map((item) =>
-          <div className="row" key={item.id}>
+          <div className="row m-l-7" key={item.id}>
             <span className="make-space-30-r">
               {
                 `
@@ -54,7 +54,7 @@ export default function Scheduled( props ) {
               }
             </span>
             <button
-              className="btn btn-link waves-effect"
+              className="btn btn-link waves-effect ml-auto"
               disabled={disabled}
               onClick={()=>{
                 deleteItem(item);
