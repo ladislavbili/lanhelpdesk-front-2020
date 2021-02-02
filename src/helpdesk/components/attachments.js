@@ -46,7 +46,7 @@ export default function TaskAttachments( props ) {
   }
 
   return (
-    <div className={classnames("task-edit-popis", {"p-t-15": taskID === null})}>
+    <div className={classnames("task-edit-popis", {"p-t-15": taskID === null}, {"p-l-0 ": taskID === null}, {"display-none": attachments.length === 0} )}>
       <div className="">
         <input
           type="file"

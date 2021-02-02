@@ -370,7 +370,7 @@ export default function TaskAdd( props ) {
   const renderTitle = () => {
     return (
       <div className="form-section">
-        <Label>Task name </Label>
+        <Label>Task name<span className="warning-big m-l-5">*</span> </Label>
         <span className="form-section-rest">
           <input type="text"
             value={title}
@@ -418,7 +418,7 @@ export default function TaskAdd( props ) {
           setAssignedTo(newAssignedTo);
         }}
         options={projects.filter((project) => currentUser.role.level === 0 || project.right.addTasks )}
-        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
+        styles={selectStyleNoArrowRequired}
         />
     ),
     Assigned: (
@@ -431,7 +431,7 @@ export default function TaskAdd( props ) {
           setAssignedTo(users);
         }}
         options={USERS_WITH_PERMISSIONS}
-        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
+        styles={selectStyleNoArrowRequired}
         />
     ),
     Status: (
@@ -439,7 +439,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={status}
         isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
-        styles={layout === 2 ? selectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowColoredRequired}
+        styles={selectStyleNoArrowColoredRequired}
         onChange={(status)=>{
           if(status.action==='PendingDate'){
             setStatus(status);
@@ -460,7 +460,7 @@ export default function TaskAdd( props ) {
         placeholder="Select task type"
         value={taskType}
         isDisabled={ !userRights.typeWrite }
-        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
+        styles={ selectStyleNoArrowRequired }
         onChange={(taskType)=> {
           setTaskType(taskType);
         }}
@@ -487,7 +487,7 @@ export default function TaskAdd( props ) {
           }
         }}
         options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={layout === 2 ? selectStyleNoArrowNoPadding : invisibleSelectStyleNoArrow}
+        styles={ selectStyleNoArrowNoPadding }
         />
     ),
     Requester: (
@@ -501,7 +501,7 @@ export default function TaskAdd( props ) {
           setCompany(newCompany);
         }}
         options={REQUESTERS}
-        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
+        styles={ selectStyleNoArrowRequired }
         />
     ),
     Company: (
@@ -514,7 +514,7 @@ export default function TaskAdd( props ) {
           setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
         }}
         options={companies}
-        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
+        styles={ selectStyleNoArrowRequired }
         />
     ),
     Pausal: (
@@ -522,14 +522,14 @@ export default function TaskAdd( props ) {
         value={pausal}
         placeholder="Select required"
         isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
+        styles={ selectStyleNoArrowRequired }
         onChange={(pausal)=> setPausal(pausal)}
         options={booleanSelects}
         />
     ),
     Deadline: (
       <DatePicker
-        className={classnames("form-control", {"hidden-input": layout !== 2})}
+        className={classnames("form-control")}
         selected={deadline}
         disabled={!userRights.deadlineWrite}
         onChange={date => setDeadline(date)}
@@ -542,7 +542,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={overtime}
         isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={layout === 2 ? selectStyleNoArrowRequired : invisibleSelectStyleNoArrowRequired}
+        styles={ selectStyleNoArrowRequired }
         onChange={(overtime) => setOvertime(overtime)}
         options={booleanSelects}
         />
@@ -556,7 +556,7 @@ export default function TaskAdd( props ) {
           isMulti
           onChange={(t)=>setTags(t)}
           options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
-          styles={ layout === 2 ? selectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowRequired}
+          styles={ selectStyleNoArrowColoredRequired }
           />
       </div>
     )
@@ -601,7 +601,7 @@ export default function TaskAdd( props ) {
 
             { userRights.typeRead &&
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Typ <span className="warning-big">*</span></Label>
+                <Label className="col-3 col-form-label">Typ</Label>
                 <div className="col-9">
                   { layoutComponents.Type }
                 </div>
@@ -685,8 +685,8 @@ export default function TaskAdd( props ) {
 
           { userRights.tagsRead &&
             <div className="row p-r-10">
-              <Label className="col-1 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-              <div className="col-11">
+              <Label className="col-0-5 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
+              <div className="col-11-5">
                 { layoutComponents.Tags }
               </div>
             </div>
@@ -736,7 +736,7 @@ export default function TaskAdd( props ) {
     return (
       <div className="task-edit-right">
         <div className="form-selects-entry-column" >
-          <Label>Projekt <span className="warning-big">*</span></Label>
+          <Label>Project <span className="warning-big">*</span></Label>
           <div className="form-selects-entry-column-rest" >
             { layoutComponents.Project(true) }
           </div>
@@ -759,7 +759,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.requesterRead &&
           <div className="form-selects-entry-column" >
-            <Label>Zadal <span className="warning-big">*</span></Label>
+            <Label>Requester <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Requester }
             </div>
@@ -767,7 +767,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.companyRead &&
           <div className="form-selects-entry-column" >
-            <Label>Firma <span className="warning-big">*</span></Label>
+            <Label>Company <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Company }
             </div>
@@ -842,7 +842,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.typeRead &&
           <div className="form-selects-entry-column" >
-            <Label>Task Type <span className="warning-big">*</span></Label>
+            <Label>Task Type</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Type }
             </div>
@@ -850,7 +850,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.pausalRead &&
           <div className="form-selects-entry-column" >
-            <Label>Paušál <span className="warning-big">*</span></Label>
+            <Label>Pausal <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Pausal }
             </div>
@@ -858,7 +858,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.overtimeRead &&
           <div className="form-selects-entry-column" >
-            <Label>Mimo PH <span className="warning-big">*</span></Label>
+            <Label>Outside PH <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Overtime }
             </div>
@@ -1128,7 +1128,10 @@ export default function TaskAdd( props ) {
 
   const canCreateVykazyError = () => {
     if ( getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company ) === '' ) {
-      return null;
+      return (
+        <span className="center-hor ml-auto">
+        </span>
+      );
     }
     return (
       <span className="message error-message center-hor ml-auto">
@@ -1138,7 +1141,7 @@ export default function TaskAdd( props ) {
   }
 
   return (
-    <div>
+    <div style={{backgroundColor: "#f9f9f9"}}>
       {renderLayoutButton()}
       <div
         className={classnames(
@@ -1169,13 +1172,14 @@ export default function TaskAdd( props ) {
 
           { renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
-          { renderButtons() }
-
         </div>
 
         { layout === 2 && renderSelectsLayout2Side() }
 
       </div>
+
+      { renderButtons() }
+
     </div>
   );
 }

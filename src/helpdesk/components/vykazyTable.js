@@ -258,13 +258,13 @@ export default function Rozpocet( props ) {
                 }
               </Nav>
             </th>
-            {showColumns.includes(1) && toggleTab !== "0" && <th width="190">Rieši</th> }
-            {showColumns.includes(2) && toggleTab !== "0" && <th width="100">Typ</th> }
-            {showColumns.includes(3) && <th width="50" className="t-a-r">Mn.</th> }
-            {showColumns.includes(4) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Cenník/Nákup</th> }
-            {showColumns.includes(5) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Zľava/Marža</th> }
-            {showColumns.includes(6) && toggleTab !== "0" && <th width="70" className="t-a-r">Cena</th> }
-            {showColumns.includes(7) && !isInvoiced && <th width="120" className="t-a-c">Akcie</th> }
+            {showColumns.includes(3) && toggleTab !== "0" && <th width="190">Typ</th> }
+            {showColumns.includes(2) && toggleTab !== "0" && <th width="190">Rieši</th> }
+            {showColumns.includes(4) && <th width="50" className="t-a-r">Mn.</th> }
+            {showColumns.includes(5) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Cenník/Nákup</th> }
+            {showColumns.includes(6) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Zľava/Marža</th> }
+            {showColumns.includes(7) && toggleTab !== "0" && <th width="70" className="t-a-r">Cena</th> }
+            {showColumns.includes(8) && !isInvoiced && <th width="120" className="t-a-c">Akcie</th> }
           </tr>
         </thead>
         <tbody>
@@ -304,20 +304,6 @@ export default function Rozpocet( props ) {
                     />
                 </td>
               }
-              {/*Riesi*/}
-              {showColumns.includes(2) && toggleTab !== "0" &&
-                <td>
-                  <Select
-                    isDisabled={disabled}
-                    value={ !isInvoiced ? subtask.assignedTo : subtask.invoicedData.assignedTo }
-                    onChange={(assignedTo)=>{
-                      updateSubtask(subtask.id,{assignedTo:assignedTo})
-                    }}
-                    options={taskAssigned}
-                    styles={invisibleSelectStyle}
-                    />
-                </td>
-              }
               {/*Type*/}
               {showColumns.includes(3) && toggleTab !== "0" &&
                 <td>
@@ -332,6 +318,20 @@ export default function Rozpocet( props ) {
                     />
                 </td>
               }
+              {/*Riesi*/}
+              {showColumns.includes(2) && toggleTab !== "0" &&
+                <td>
+                  <Select
+                    isDisabled={disabled}
+                    value={ !isInvoiced ? subtask.assignedTo : subtask.invoicedData.assignedTo }
+                    onChange={(assignedTo)=>{
+                      updateSubtask(subtask.id,{assignedTo:assignedTo})
+                    }}
+                    options={taskAssigned}
+                    styles={invisibleSelectStyle}
+                    />
+                </td>
+              }
               {/*Mnozstvo*/}
               {showColumns.includes(4) &&
                 <td>
@@ -339,7 +339,7 @@ export default function Rozpocet( props ) {
                     disabled={disabled}
                     type="text"
                     pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-                    className="form-control hidden-input h-30"
+                    className="form-control hidden-input h-30 t-a-r"
                     value={
                       subtask.id === focusedSubtask
                       ? editedSubtaskQuantity.toString()
@@ -421,7 +421,7 @@ export default function Rozpocet( props ) {
               {showColumns.includes(8) &&
                 <td className="t-a-r">	{/* //akcie*/}
                   <button
-                    className="btn waves-effect"
+                    className="btn btn-link waves-effect"
                     disabled={ disabled || index === 0 }
                     onClick={()=>{
                       updateSubtasks([
@@ -435,7 +435,7 @@ export default function Rozpocet( props ) {
                     <i className="fa fa-arrow-up"  />
                   </button>
                   <button
-                    className="btn waves-effect"
+                    className="btn btn-link waves-effect"
                     disabled={ disabled || index === sortedWorks.length - 1 }
                     onClick={()=>{
                       updateSubtasks([
@@ -448,7 +448,7 @@ export default function Rozpocet( props ) {
                     >
                     <i className="fa fa-arrow-down"  />
                   </button>
-                  <button className="btn waves-effect" disabled={disabled}
+                  <button className="btn btn-link waves-effect" disabled={disabled}
                     onClick={()=>{
                       if(window.confirm('Are you sure?')){
                         removeSubtask(subtask.id);
@@ -491,6 +491,10 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
+                {/*Type*/}
+                {showColumns.includes(3) &&
+                  <td className="p-t-15 p-l-8">Výjazd</td>
+                }
                 {/*Riesi*/}
                 {showColumns.includes(2) &&
                   <td>
@@ -505,10 +509,6 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
-                {/*Type*/}
-                {showColumns.includes(3) &&
-                  <td className="p-t-15 p-l-8">Výjazd</td>
-                }
                 {/*Mnozstvo*/}
                 {showColumns.includes(4) &&
                   <td>
@@ -516,7 +516,7 @@ export default function Rozpocet( props ) {
                       disabled={disabled}
                       type="text"
                       pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-                      className="form-control hidden-input h-30"
+                      className="form-control hidden-input h-30 t-a-r"
                       value={
                         trip.id === focusedTrip ?
                         editedTripQuantity.toString() :
@@ -600,7 +600,7 @@ export default function Rozpocet( props ) {
                 {showColumns.includes(8) &&
                   <td className="t-a-r">
                     <button
-                      className="btn waves-effect"
+                      className="btn btn-link waves-effect"
                       disabled={ disabled || index === 0 }
                       onClick={()=>{
                         updateTrips([
@@ -614,7 +614,7 @@ export default function Rozpocet( props ) {
                       <i className="fa fa-arrow-up"  />
                     </button>
                     <button
-                      className="btn waves-effect"
+                      className="btn btn-link waves-effect"
                       disabled={ disabled || index === sortedTrips.length - 1 }
                       onClick={()=>{
                         updateTrips([
@@ -628,7 +628,7 @@ export default function Rozpocet( props ) {
                       <i className="fa fa-arrow-down"  />
                     </button>
                     <button
-                      className="btn waves-effect"
+                      className="btn btn-link waves-effect"
                       disabled={disabled}
                       onClick={()=>{
                         if(window.confirm('Are you sure?')){
@@ -684,15 +684,15 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
-                {/*Riesi*/}
-                {showColumns.includes(2) &&
-                  <td></td>
-                }
                 {/*Type*/}
                 {showColumns.includes(3) &&
                   <td className="p-l-8 p-t-15">
                     Materiál
                   </td>
+                }
+                {/*Riesi*/}
+                {showColumns.includes(2) &&
+                  <td></td>
                 }
                 {/*Mnozstvo*/}
                 {showColumns.includes(4) &&
@@ -701,7 +701,7 @@ export default function Rozpocet( props ) {
                       disabled={disabled}
                       type="text"
                       pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-                      className="form-control hidden-input h-30"
+                      className="form-control hidden-input h-30 t-a-r"
                       value={
                         material.id === focusedMaterial ?
                         editedMaterialQuantity.toString() :
@@ -802,7 +802,7 @@ export default function Rozpocet( props ) {
                 {/*Toolbar*/}
                 {showColumns.includes(8) &&
                   <td className="t-a-r">
-                    <button className="btn waves-effect" disabled={disabled}>
+                    <button className="btn btn-link waves-effect" disabled={disabled}>
                       <i
                         className="fa fa-sync-alt"
                         onClick={()=>{
@@ -815,7 +815,7 @@ export default function Rozpocet( props ) {
                         />
                     </button>
                     <button
-                      className="btn waves-effect"
+                      className="btn btn-link waves-effect"
                       disabled={ disabled || index === 0 }
                       onClick={()=>{
                         updateMaterials([
@@ -829,7 +829,7 @@ export default function Rozpocet( props ) {
                       <i className="fa fa-arrow-up"  />
                     </button>
                     <button
-                      className="btn waves-effect"
+                      className="btn btn-link waves-effect"
                       disabled={ disabled || index === sortedMaterials.length - 1 }
                       onClick={()=>{
                         updateMaterials([
@@ -842,7 +842,7 @@ export default function Rozpocet( props ) {
                       >
                       <i className="fa fa-arrow-down"  />
                     </button>
-                    <button className="btn waves-effect"
+                    <button className="btn btn-link waves-effect"
                       disabled={disabled}
                       onClick={()=>{
                         if(window.confirm('Are you sure?')){
@@ -897,15 +897,15 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
-                {/*Riesi*/}
-                {showColumns.includes(2) &&
-                  <td></td>
-                }
                 {/*Type*/}
                 {showColumns.includes(3) &&
                   <td className="p-l-8 p-t-15">
                     Voľná položka
                   </td>
+                }
+                {/*Riesi*/}
+                {showColumns.includes(2) &&
+                  <td></td>
                 }
                 {/*Mnozstvo*/}
                 {showColumns.includes(4) &&
@@ -914,7 +914,7 @@ export default function Rozpocet( props ) {
                       disabled={disabled}
                       type="text"
                       pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-                      className="form-control hidden-input h-30"
+                      className="form-control hidden-input h-30 t-a-r"
                       value={
                         customItem.id === focusedCustomItem ?
                         editedCustomItemQuantity.toString() :
@@ -979,7 +979,7 @@ export default function Rozpocet( props ) {
                 {showColumns.includes(8) &&
                   <td className="t-a-r">
                     <button
-                      className="btn waves-effect"
+                      className="btn btn-link waves-effect"
                       disabled={ disabled || index === 0 }
                       onClick={()=>{
                         updateCustomItems([
@@ -993,7 +993,7 @@ export default function Rozpocet( props ) {
                       <i className="fa fa-arrow-up"  />
                     </button>
                     <button
-                      className="btn waves-effect"
+                      className="btn btn-link waves-effect"
                       disabled={ disabled || index === sortedCustomItems.length - 1 }
                       onClick={()=>{
                         updateCustomItems([
@@ -1006,7 +1006,7 @@ export default function Rozpocet( props ) {
                       >
                       <i className="fa fa-arrow-down"  />
                     </button>
-                    <button className="btn waves-effect"
+                    <button className="btn btn-link waves-effect"
                       disabled={disabled}
                       onClick={()=>{
                         if(window.confirm('Are you sure?')){
@@ -1064,20 +1064,6 @@ export default function Rozpocet( props ) {
                     />
                 </td>
               }
-              {/*Riesi*/}
-              {showColumns.includes(2) && toggleTab !== "0" &&
-                <td className="p-l-8">
-                  <Select
-                    isDisabled={disabled}
-                    value={newSubtaskAssigned}
-                    onChange={(newSubtaskAssigned)=>{
-                      setNewSubtaskAssigned(newSubtaskAssigned);
-                    }}
-                    options={taskAssigned}
-                    styles={invisibleSelectStyleNoArrow}
-                    />
-                </td>
-              }
               {/*Type*/}
               {showColumns.includes(3) && toggleTab !== "0" &&
                 <td className="p-l-8">{/*typ*/}
@@ -1092,6 +1078,20 @@ export default function Rozpocet( props ) {
                     />
                 </td>
               }
+              {/*Riesi*/}
+              {showColumns.includes(2) && toggleTab !== "0" &&
+                <td className="p-l-8">
+                  <Select
+                    isDisabled={disabled}
+                    value={newSubtaskAssigned}
+                    onChange={(newSubtaskAssigned)=>{
+                      setNewSubtaskAssigned(newSubtaskAssigned);
+                    }}
+                    options={taskAssigned}
+                    styles={invisibleSelectStyleNoArrow}
+                    />
+                </td>
+              }
               {/*Mnozstvo*/}
               {showColumns.includes(4) &&
                 <td className="p-l-8 p-r-8">
@@ -1101,7 +1101,7 @@ export default function Rozpocet( props ) {
                     pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                     value={newSubtaskQuantity.toString()}
                     onChange={(e)=>setNewSubtaskQuantity(e.target.value.replace(',', '.'))}
-                    className="form-control h-30"
+                    className="form-control h-30 t-a-r"
                     id="inlineFormInput"
                     placeholder=""
                     />
@@ -1138,7 +1138,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn btn-link m-r-5"
+                  <button className="btn btn-link"
                     disabled={!newSubtaskType || newSubtaskType.id === null || disabled || newSubtaskAssigned===null}
                     onClick={()=>{
                       let body={
@@ -1191,6 +1191,10 @@ export default function Rozpocet( props ) {
                     />
                 </td>
               }
+              {/*Type*/}
+              {showColumns.includes(3) &&
+                <td className="p-t-15 p-l-8">Výjazd</td>
+              }
               {/*Riesi*/}
               {showColumns.includes(2) &&
                 <td className="p-l-8">
@@ -1205,10 +1209,6 @@ export default function Rozpocet( props ) {
                     />
                 </td>
               }
-              {/*Type*/}
-              {showColumns.includes(3) &&
-                <td className="p-t-15 p-l-8">Výjazd</td>
-              }
               {/*Mnozstvo*/}
               {showColumns.includes(4) &&
                 <td className="p-l-8 p-r-8">
@@ -1218,7 +1218,7 @@ export default function Rozpocet( props ) {
                     pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                     value={newTripQuantity.toString()}
                     onChange={(e)=>setNewTripQuantity(e.target.value.replace(',', '.'))}
-                    className="form-control h-30"
+                    className="form-control h-30 t-a-r"
                     id="inlineFormInput"
                     placeholder="Quantity"
                     />
@@ -1255,7 +1255,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn btn-link m-r-5"
+                  <button className="btn btn-link"
                     disabled={newTripType===null||isNaN(parseInt(newTripQuantity))||disabled|| newTripAssigned===null}
                     onClick={()=>{
                       let body={
@@ -1306,6 +1306,12 @@ export default function Rozpocet( props ) {
                     />
                 </td>
               }
+              {/*Input Nakupna cena*/}
+              {showColumns.includes(3) &&
+                <td className="p-t-15 p-l-8">
+                  Materiál
+                </td>
+              }
               {/*Text Nakupna cena*/}
               {showColumns.includes(2) &&
                 <td className="p-r-8 p-l-8 table-highlight-background">
@@ -1348,12 +1354,6 @@ export default function Rozpocet( props ) {
                   }
                 </td>
               }
-              {/*Input Nakupna cena*/}
-              {showColumns.includes(3) &&
-                <td className="p-t-15 p-l-8">
-                  Materiál
-                </td>
-              }
               {/*Mnozstvo*/}
               {showColumns.includes(4) &&
                 <td className="p-r-8 p-l-8">
@@ -1363,7 +1363,7 @@ export default function Rozpocet( props ) {
                     pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                     value={newMaterialQuantity.toString()}
                     onChange={(e)=>setNewMaterialQuantity(e.target.value.replace(',', '.') )}
-                    className="form-control h-30"
+                    className="form-control h-30 t-a-r"
                     id="inlineFormInput"
                     placeholder=""
                     />
@@ -1453,7 +1453,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn btn-link m-r-5"
+                  <button className="btn btn-link"
                     disabled={disabled}
                     onClick={()=>{
                       let body={
@@ -1504,15 +1504,15 @@ export default function Rozpocet( props ) {
                     />
                 </td>
               }
-              {/*Riesi */}
-              {showColumns.includes(2) &&
-                <td></td>
-              }
               {/*Type*/}
               {showColumns.includes(3) &&
                 <td className="p-t-15 p-l-8">
                   Voľná položka
                 </td>
+              }
+              {/*Riesi */}
+              {showColumns.includes(2) &&
+                <td></td>
               }
               {/*Mnozstvo*/}
               {showColumns.includes(4) &&
@@ -1523,7 +1523,7 @@ export default function Rozpocet( props ) {
                     pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                     value={newCustomItemQuantity.toString()}
                     onChange={(e)=>setNewCustomItemQuantity(e.target.value.replace(',', '.'))}
-                    className="form-control h-30"
+                    className="form-control h-30 t-a-r"
                     id="inlineFormInput"
                     placeholder=""
                     />
@@ -1559,7 +1559,7 @@ export default function Rozpocet( props ) {
               {/*Toolbar*/}
               {showColumns.includes(8) &&
                 <td className="t-a-r">
-                  <button className="btn btn-link m-r-5"
+                  <button className="btn btn-link"
                     disabled={disabled}
                     onClick={()=>{
                       let body={
@@ -1644,7 +1644,7 @@ export default function Rozpocet( props ) {
       </table>
       {/* Statistics */}
       {(workTrips.length + subtasks.length + materials.length + customItems.length > 0) &&
-        <div className="row">
+        <div className="row m-r-10">
           <div className="text-right ml-auto m-r-5">
             <b>Cena bez DPH: </b>
             {
