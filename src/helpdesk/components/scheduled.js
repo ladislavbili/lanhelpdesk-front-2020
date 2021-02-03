@@ -10,7 +10,7 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
-
+import classnames from "classnames";
 import {
   selectStyle
 } from 'configs/components/select';
@@ -24,6 +24,7 @@ export default function Scheduled( props ) {
     onChange,
     submitItem,
     deleteItem,
+    layout,
   } = props;
 
   const [ addItem, setAddItem ] = React.useState( null );
@@ -34,11 +35,22 @@ export default function Scheduled( props ) {
 
   return (
     <div className="form-selects-entry-column">
-      <Label>Scheduled</Label>
-      <div className="form-selects-entry-column-rest" style={{border: "none"}}>
+      <div className="row">
+        <Label className={classnames({"m-l-0 m-t-5 m-r-10": layout === 1})} >Scheduled</Label>
+        <button
+          className={classnames("btn btn-link waves-effect", {"ml-auto": layout === 2})}
+          disabled={disabled}
+          onClick={()=>{
+            setAddItem(true);
+          }}
+          >
+          <i className="fa fa-plus" />
+        </button>
+      </div>
+      <div className={classnames("form-selects-entry-column-rest", {"row": layout === 1})} style={{border: "none"}}>
         { items.map((item) =>
-          <div className="row m-l-7" key={item.id}>
-            <span className="make-space-30-r">
+          <div className={classnames({"m-l-7": layout === 2}, "row", {"m-r-10": layout === 1})} key={item.id}>
+            <span className={classnames({"make-space-30-r": layout === 2, "m-r-10": layout === 1})}>
               {
                 `
                 ${item.from.format( 'HH:mm DD.MM.YYYY' )} - ${
@@ -64,16 +76,6 @@ export default function Scheduled( props ) {
             </button>
           </div>
         ) }
-        <button
-          className="btn btn-link waves-effect m-l-7"
-          disabled={disabled}
-          onClick={()=>{
-            setAddItem(true);
-          }}
-          >
-          <i className="fa fa-plus" />
-          {` Scheduled`}
-        </button>
         <Modal isOpen={addItem}  >
           <ModalHeader>Add scheduled</ModalHeader>
           <ModalBody>

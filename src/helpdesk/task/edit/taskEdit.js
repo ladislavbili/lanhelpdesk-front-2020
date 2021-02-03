@@ -1226,8 +1226,8 @@ export default function TaskEdit( props ) {
         <div className="form-section-rest">
           <div className="col-12 row">
             { userRights.projectRead &&
-              <div className="col-4">
-                <div className="row p-r-10">
+              <div className="col-3">
+                <div className="p-r-10">
                   <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Project }
@@ -1236,10 +1236,10 @@ export default function TaskEdit( props ) {
               </div>
             }
             { userRights.assignedRead &&
-              <div className="col-8">
-                <div className="row p-r-10">
+              <div className="col-9" style={{border: "none"}}>
+                <div className="p-r-10">
                   <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
-                  <div className="col-10-45">
+                  <div className="col-10-45" style={{maxWidth: "100%"}}>
                     { layoutComponents.Assigned }
                   </div>
                 </div>
@@ -1248,68 +1248,71 @@ export default function TaskEdit( props ) {
           </div>
 
           <div className="row">
-          <div className="col-4">
+          <div className="col-3">
             {userRights.statusRead &&
-              <div className="display-inline row p-r-10">
+              <div className="p-r-10">
                 <Label className="col-form-label col-3 ">Status <span className="warning-big">*</span></Label>
-                <div className="display-inline-block col-9">
+                <div className="col-9">
                   { layoutComponents.Status }
                 </div>
               </div>
             }
             { userRights.typeRead &&
-              <div className="display-inline row p-r-10">
+              <div className="p-r-10">
                 <Label className="col-form-label  col-3">Typ <span className="warning-big">*</span></Label>
-                <div className="display-inline-block col-9">
+                <div className="col-9">
                   { layoutComponents.Type }
                 </div>
               </div>
             }
             { userRights.milestoneRead &&
-              <div className="display-inline row p-r-10">
+              <div className="p-r-10">
                 <Label className="col-form-label  col-3">Milestone</Label>
-                <div className="display-inline-block col-9">
+                <div className="col-9">
                   { layoutComponents.Milestone }
                 </div>
               </div>
             }
           </div>
 
-          <div className="col-4">
+          <div className="col-3">
             {userRights.requesterRead &&
-              <div className="display-inline row p-r-10">
+              <div className="p-r-10">
                 <Label className="col-form-label col-3 ">Zadal <span className="warning-big">*</span></Label>
-                <div className="display-inline-block col-9">
+                <div className="col-9">
                   { layoutComponents.Requester }
                 </div>
               </div>
             }
             {userRights.companyRead &&
-              <div className="display-inline row p-r-10">
+              <div className="p-r-10">
                 <Label className="col-form-label col-3 ">Firma <span className="warning-big">*</span></Label>
-                <div className="display-inline-block col-9">
+                <div className="col-9">
                   { layoutComponents.Company }
                 </div>
               </div>
             }
+          </div>
+
+          <div className="col-3">
             {userRights.pausalRead &&
-              <div className="display-inline row p-r-10">
+              <div className="p-r-10">
                 <Label className="col-form-label col-3 ">Paušál <span className="warning-big">*</span></Label>
-                <div className="display-inline-block col-9">
+                <div className="col-9">
                   { layoutComponents.Pausal }
                 </div>
               </div>
             }
-          </div>
-          <div className="col-4">
             { userRights.deadlineRead &&
-              <div className="display-inline row p-r-10">
+              <div className="p-r-10">
                 <Label className="col-form-label col-3">Deadline</Label>
-                <div className="display-inline-block col-9">
+                <div className="col-9">
                   { layoutComponents.Deadline }
                 </div>
               </div>
             }
+          </div>
+          <div className="col-3">
             { userRights.repeatRead &&
                 <Repeat
                   disabled={!userRights.repeatWrite}
@@ -1333,9 +1336,9 @@ export default function TaskEdit( props ) {
                   />
             }
             { userRights.overtimeRead &&
-              <div className="display-inline row p-r-10">
+              <div className="p-r-10">
                 <Label className="col-form-label row col-3">Mimo PH <span className="warning-big">*</span></Label>
-                <div className="display-inline-block col-9">
+                <div className="col-9">
                   {layoutComponents.Overtime}
                 </div>
               </div>
@@ -1344,14 +1347,32 @@ export default function TaskEdit( props ) {
           </div>
 
           { userRights.tagsRead &&
-            <div className="row p-r-10">
+            <div className="p-r-10">
               <Label className="col-0-5 col-form-label">Tags {  defaultFields.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-              <div className="col-11-5">
+              <div className="col-11-5" style={{maxWidth: "100%"}}>
                 { renderTags() }
               </div>
             </div>
           }
 
+          { userRights.scheduledRead &&
+            <Scheduled
+              items={task.scheduled.map((item) => ({
+                ...item,
+                from: moment(parseInt(item.from)),
+                to: moment(parseInt(item.to)),
+              }))}
+              users={assignedTos}
+              disabled={false}
+              submitItem = { (newScheduled) => {
+                addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from , to: newScheduled.to });
+              }}
+              deleteItem = { (scheduled) => {
+                deleteScheduledTaskFunc(scheduled.id);
+              } }
+              layout={layout}
+              />
+          }
         </div>
       </div>
     )
@@ -1490,6 +1511,7 @@ export default function TaskEdit( props ) {
             deleteItem = { (scheduled) => {
               deleteScheduledTaskFunc(scheduled.id);
             } }
+            layout={layout}
             />
         }
 

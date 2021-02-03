@@ -142,7 +142,7 @@ export default function TaskAddContainer( props ) {
   const renderModal = () => {
     return (
       <Modal isOpen={openAddTaskModal} className="task-add-container" >
-        <ModalBody className="scrollable" >
+        <ModalBody>
           {  openAddTaskModal && !loading &&
             <TaskAdd {...props}
               loading={loading}

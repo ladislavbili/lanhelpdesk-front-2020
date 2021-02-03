@@ -234,7 +234,12 @@ export default function PublicFilterAdd( props ) {
           </div>
         }
       </div>
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+
+
+      <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
+        <h2 className="m-b-20" >
+          Add public filter
+        </h2>
         <FormGroup> {/* Title */}
           <Label htmlFor="title">Filter name <span className="warning-big">*</span></Label>
           <Input

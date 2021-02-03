@@ -284,15 +284,23 @@ export default function ProjectAdd( props ) {
           </div>
         }
       </div>
+
+
     <div
       className={ classnames(
         {
           "scroll-visible": !closeModal,
           "fit-with-header-and-commandbar": !closeModal
         },
-        "p-20"
+        {
+          "bkg-F9F9F9": closeModal
+        },
+        "p-t-10 p-l-20 p-r-20 p-b-20",
       )}
       >
+      <h2 className="m-b-20" >
+        Add project
+      </h2>
       <FormGroup>
         <Label for="name">Project name <span className="warning-big">*</span></Label>
         <Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />

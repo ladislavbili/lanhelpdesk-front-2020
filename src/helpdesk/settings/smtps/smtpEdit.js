@@ -257,6 +257,11 @@ export default function SMTPEdit( props ) {
           </div>
         }
       </div>
+
+      <h2 className="p-l-20 m-t-10" >
+        Edit SMTP
+      </h2>
+
     <div className="p-20 scroll-visible fit-with-header-and-commandbar">
       <Checkbox
         className = "m-b-5 p-l-0"

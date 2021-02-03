@@ -293,7 +293,11 @@ export default function IMAPEdit( props ) {
           </div>
         }
       </div>
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+
+      <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
+        <h2 className="m-b-20" >
+          Edit IMAP
+        </h2>
 
         <Checkbox
           className = "m-b-5 p-l-0"

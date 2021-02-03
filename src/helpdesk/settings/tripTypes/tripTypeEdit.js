@@ -133,6 +133,11 @@ export default function TripTypeEdit( props ) {
           </div>
         }
       </div>
+
+      <h2 className="p-l-20 m-t-10" >
+        Edit trip type
+      </h2>
+
       <div className="p-20 scroll-visible fit-with-header-and-commandbar">
         <FormGroup>
           <Label for="name">Task type name <span className="warning-big">*</span></Label>

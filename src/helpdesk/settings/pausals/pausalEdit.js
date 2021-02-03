@@ -248,7 +248,7 @@ export default function PausalEdit( props ) {
       </div>
     <div className="fit-with-header-and-commandbar-2 scroll-visible">
 
-      <h2 className="p-t-10 p-l-20 p-b-5">{title}</h2>
+      <h2 className="p-t-10 p-l-20 p-b-5">Edit service level agreement - {title}</h2>
 
       <div className="p-20">
 

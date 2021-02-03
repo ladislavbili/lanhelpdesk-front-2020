@@ -584,11 +584,16 @@ export default function ProjectEdit( props ) {
           "scroll-visible": true,
           "fit-with-header-and-commandbar": !closeModal,
           "fit-with-header": closeModal,
-          "p-20": !closeModal,
-          "p-40": closeModal,
+          "p-t-10 p-l-20 p-r-20 p-b-20": !closeModal,
+          "p-30": closeModal,
         },
       )}
       >
+
+      <h2 className="m-b-20" >
+        Edit project
+      </h2>
+
       { myRights.projectPrimaryRead &&
         <div>
           <FormGroup>

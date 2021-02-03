@@ -472,9 +472,6 @@ export default function TasksSidebar( props ) {
       }
       { openUserAdd &&
         <Modal isOpen={openUserAdd} className="modal-without-borders">
-          <ModalHeader>
-            Add user
-          </ModalHeader>
           <ModalBody>
             <UserAdd
               closeModal={() => setOpenUserAdd(false)}

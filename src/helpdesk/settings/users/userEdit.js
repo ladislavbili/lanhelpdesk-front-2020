@@ -258,6 +258,9 @@ export default function UserEdit( props ) {
           </div>
         }
       </div>
+      <h2 className="p-l-20 m-t-10" >
+        Edit user
+      </h2>
       <div className="scroll-visible p-20 fit-with-header-and-commandbar">
         <FormGroup>
           <Label for="role">Role <span className="warning-big">*</span></Label>

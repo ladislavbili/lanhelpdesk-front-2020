@@ -186,7 +186,12 @@ export default function RoleAdd( props ) {
           </div>
         }
       </div>
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+
+
+      <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
+        <h2 className="m-b-20" >
+          Add role
+        </h2>
         <FormGroup>
           <Label for="role">Role <span className="warning-big">*</span></Label>
           <Input name="name" id="name" type="text" placeholder="Enter role name" value={title} onChange={(e) => setTitle(e.target.value)}/>

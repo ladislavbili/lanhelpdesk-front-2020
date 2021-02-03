@@ -74,6 +74,11 @@ export default function TaskTypeAdd( props ) {
           </div>
         }
       </div>
+
+      <h2 className="p-l-20 m-t-10" >
+        Add task type
+      </h2>
+
       <div className="p-20 scroll-visible fit-with-header-and-commandbar">
 
         <FormGroup>

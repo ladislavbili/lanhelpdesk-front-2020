@@ -17,6 +17,7 @@ import {
 } from "configs/components/select";
 
 import languages from "configs/constants/languages";
+import classnames from 'classnames';
 
 import {
   isEmail,
@@ -151,7 +152,16 @@ export default function UserAddContainer( props ) {
           </div>
         }
       </div>
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+      <div
+        className={classnames(
+        "p-t-10 p-l-20 p-r-20 p-b-20",
+        {" scroll-visible fit-with-header-and-commandbar": !closeModal},
+        {"bkg-F9F9F9": closeModal}
+      )}
+        >
+        <h2 className="m-b-20" >
+          Add user
+        </h2>
         <FormGroup>
           <Label for="role">Role <span className="warning-big">*</span></Label>
           <Select

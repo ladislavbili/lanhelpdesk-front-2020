@@ -124,7 +124,10 @@ export default function PricelistAdd( props ) {
           </div>
         }
       </div>
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+      <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
+        <h2 className="m-b-20" >
+          Add price list
+        </h2>
         <label>
           <Switch
             checked={def}

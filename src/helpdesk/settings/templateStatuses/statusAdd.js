@@ -89,6 +89,11 @@ export default function StatusAdd( props ) {
           </div>
         }
       </div>
+
+      <h2 className="p-l-20 m-t-10" >
+        Add status
+      </h2>
+
       <div className="scroll-visible p-20 fit-with-header-and-commandbar">
         <FormGroup>
           <Label for="name">Status name <span className="warning-big">*</span></Label>

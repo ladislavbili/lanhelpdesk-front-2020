@@ -256,7 +256,12 @@ export default function RoleEdit( props ) {
         }
         <ErrorMessage show={ currentUserLevel === null || level <= currentUserLevel } message={`You don't have the right to edit this role. Targets role can't be lower or same as yours(${currentUserLevel})!`} />
       </div>
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+
+
+      <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
+        <h2 className="m-b-20" >
+          Edit role
+        </h2>
         <FormGroup>
           <Label for="role">Role <span className="warning-big">*</span></Label>
           <Input

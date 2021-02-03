@@ -137,6 +137,11 @@ export default function TaskTypeEdit( props ) {
           </div>
         }
       </div>
+
+      <h2 className="p-l-20 m-t-10" >
+        Edit task type
+      </h2>
+
       <div className="p-20 scroll-visible fit-with-header-and-commandbar">
         <FormGroup>
           <Label for="name">Task type name</Label>

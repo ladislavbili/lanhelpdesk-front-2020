@@ -206,7 +206,10 @@ export default function PricelistEdit( props ) {
           </div>
         }
       </div>
-      <div className="scroll-visible p-20 fit-with-header-and-commandbar">
+      <div className="scroll-visible p-t-10 p-l-20 p-r-20 p-b-20 fit-with-header-and-commandbar">
+        <h2 className="m-b-20" >
+          Edit price list
+        </h2>
         <label>
           <Switch
             checked={def}

@@ -38,7 +38,7 @@ export default function RolesList( props ) {
       <div className="row m-0 p-0 taskList-container">
         <div className="col-lg-4">
           <div className="commandbar">
-            <div className="search-row">
+            <div className="m-l-20 search-row">
               <div className="search">
                 <button className="search-btn" type="button">
                   <i className="fa fa-search" />
@@ -112,6 +112,9 @@ export default function RolesList( props ) {
           match.params.id!=='add' &&
           ROLES.some( (role) => role.id === parseInt(match.params.id) ) &&
           <RoleEdit {...{history, match}} />
+        }
+        {
+          !loading && !match.params.id && <div className="commandbar"></div>
         }
       </div>
     </div>

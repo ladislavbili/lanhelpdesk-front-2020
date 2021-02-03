@@ -60,7 +60,7 @@ export default function SMTPsList( props ) {
       <div className="row m-0 p-0 taskList-container">
         <div className="col-lg-4">
           <div className="commandbar">
-            <div className="search-row">
+            <div className="m-l-20 search-row">
               <div className="search">
                 <button className="search-btn" type="button">
                   <i className="fa fa-search" />
@@ -160,6 +160,9 @@ export default function SMTPsList( props ) {
           }
           {
             match.params.id && match.params.id!=='add' && SMTPS.some((item)=>item.id===parseInt(match.params.id)) && <SMTPEdit {...{history, match}} />
+          }
+          {
+            !loading && !match.params.id && <div className="commandbar"></div>
           }
         </div>
       </div>

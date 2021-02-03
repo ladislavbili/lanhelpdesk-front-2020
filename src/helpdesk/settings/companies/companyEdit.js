@@ -387,27 +387,9 @@ export default function CompanyEdit( props ) {
           <div style={{position: "fixed", zIndex: "999", backgroundColor: "rgba(255,255,255,0.5)", top: "0", left: "0", width: "100%", height: "100vh"}}></div>
         }
 
-        <h2 className={ classnames(
-            "p-t-10",
-            "p-l-20",
-            "p-b-5",
-            {
-              "bring-to-front": dataChanged
-            },
-          )}
-          >
-          Edit company
-        </h2>
-
-        <hr className={ classnames(
-            {
-              "bring-to-front": dataChanged
-            },
-          )}
-          />
-
         <div
           className={ classnames(
+            "p-t-10 p-l-20 p-r-20 p-b-20",
             "form-body-highlighted",
             "scroll-visible",
             {
@@ -415,7 +397,10 @@ export default function CompanyEdit( props ) {
             },
           )}
           >
-          <div className="p-20">
+
+          <h2 className="m-b-20" >
+            Edit company
+          </h2>
             <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="name">Company name<span className="warning-big">*</span></Label>
@@ -645,7 +630,6 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-          </div>
 
           <div className="p-20 table-highlight-background">
             <div className="row">

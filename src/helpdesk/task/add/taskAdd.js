@@ -577,6 +577,8 @@ export default function TaskAdd( props ) {
               </div>
             </div>
             { userRights.assignedRead &&
+               !defaultFields.assignedTo.fixed &&
+               userRights.assignedWrite &&
               <div className="col-8">
                 <div className="row p-r-10">
                   <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
@@ -591,6 +593,8 @@ export default function TaskAdd( props ) {
           <div className="row">
           <div className="col-4">
             {userRights.statusRead &&
+              !defaultFields.status.fixed &&
+              userRights.statusWrite &&
               <div className="row p-r-10">
                 <Label className="col-3 col-form-label">Status <span className="warning-big">*</span></Label>
                 <div className="col-9">
@@ -600,6 +604,7 @@ export default function TaskAdd( props ) {
             }
 
             { userRights.typeRead &&
+              userRights.typeWrite &&
               <div className="row p-r-10">
                 <Label className="col-3 col-form-label">Typ</Label>
                 <div className="col-9">
@@ -608,6 +613,7 @@ export default function TaskAdd( props ) {
               </div>
             }
             { userRights.milestoneRead &&
+                userRights.milestoneWrite &&
               <div className="row p-r-10">
                 <Label className="col-3 col-form-label">Milestone</Label>
                 <div className="col-9">
@@ -619,6 +625,8 @@ export default function TaskAdd( props ) {
 
           <div className="col-4">
             {userRights.requesterRead &&
+              !defaultFields.requester.fixed &&
+              userRights.requesterWrite &&
               <div className="row p-r-10">
                 <Label className="col-3 col-form-label">Zadal <span className="warning-big">*</span></Label>
                 <div className="col-9">
@@ -627,6 +635,8 @@ export default function TaskAdd( props ) {
               </div>
             }
             {userRights.companyRead &&
+              !defaultFields.company.fixed &&
+              userRights.companyWrite &&
               <div className="row p-r-10">
                 <Label className="col-3 col-form-label">Firma <span className="warning-big">*</span></Label>
                 <div className="col-9">
@@ -635,6 +645,10 @@ export default function TaskAdd( props ) {
               </div>
             }
             {userRights.pausalRead &&
+               userRights.pausalWrite &&
+               company &&
+               !company.monthly &&
+               !defaultFields.pausal.fixed &&
               <div className="row p-r-10">
                 <Label className="col-3 col-form-label">Paušál <span className="warning-big">*</span></Label>
                 <div className="col-9">
@@ -646,6 +660,7 @@ export default function TaskAdd( props ) {
 
           <div className="col-4">
             { userRights.deadlineRead &&
+              userRights.deadlineWrite &&
             <div className="row p-r-10">
               <Label className="col-3 col-form-label">Deadline</Label>
               <div className="col-9">
@@ -654,6 +669,7 @@ export default function TaskAdd( props ) {
             </div>
             }
             { userRights.repeatRead &&
+              userRights.repeatWrite &&
               <Repeat
                 taskID={null}
                 repeat={repeat}
@@ -673,6 +689,8 @@ export default function TaskAdd( props ) {
                 />
             }
             { userRights.overtimeRead &&
+              userRights.overtimeWrite &&
+              !defaultFields.overtime.fixed &&
               <div className="row p-r-10">
                 <Label className="col-3 col-form-label">Mimo PH <span className="warning-big">*</span></Label>
                 <div className="col-9">
@@ -684,6 +702,8 @@ export default function TaskAdd( props ) {
           </div>
 
           { userRights.tagsRead &&
+            !defaultFields.tag.fixed &&
+            userRights.tagsWrite &&
             <div className="row p-r-10">
               <Label className="col-0-5 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
               <div className="col-11-5">
@@ -742,6 +762,8 @@ export default function TaskAdd( props ) {
           </div>
         </div>
         { userRights.statusRead &&
+          !defaultFields.status.fixed &&
+          userRights.statusWrite &&
           <div className="form-selects-entry-column" >
             <Label>Status <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -750,6 +772,7 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.milestoneRead &&
+            userRights.milestoneWrite &&
           <div className="form-selects-entry-column" >
             <Label>Milestone</Label>
             <div className="form-selects-entry-column-rest" >
@@ -758,6 +781,8 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.requesterRead &&
+          !defaultFields.requester.fixed &&
+          userRights.requesterWrite &&
           <div className="form-selects-entry-column" >
             <Label>Requester <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -766,6 +791,8 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.companyRead &&
+          !defaultFields.company.fixed &&
+          userRights.companyWrite &&
           <div className="form-selects-entry-column" >
             <Label>Company <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -774,6 +801,8 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.assignedRead &&
+           !defaultFields.assignedTo.fixed &&
+           userRights.assignedWrite &&
           <div className="form-selects-entry-column" >
             <Label>Assigned <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -782,6 +811,7 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.deadlineRead &&
+          userRights.deadlineWrite &&
           <div className="form-selects-entry-column" >
             <Label>Deadline</Label>
             <div className="form-selects-entry-column-rest" >
@@ -790,6 +820,7 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.repeatRead &&
+          userRights.repeatWrite &&
           <Repeat
             taskID={null}
             repeat={repeat}
@@ -809,6 +840,7 @@ export default function TaskAdd( props ) {
             />
         }
         { userRights.scheduledRead &&
+          userRights.scheduledWrite &&
           <Scheduled
             items={scheduled}
             users={assignedTo}
@@ -833,6 +865,8 @@ export default function TaskAdd( props ) {
             />
         }
         { userRights.tagsRead &&
+          !defaultFields.tag.fixed &&
+          userRights.tagsWrite &&
           <div className="form-selects-entry-column" >
             <Label>Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
             <div className="form-selects-entry-column-rest" >
@@ -841,6 +875,7 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.typeRead &&
+          userRights.typeWrite &&
           <div className="form-selects-entry-column" >
             <Label>Task Type</Label>
             <div className="form-selects-entry-column-rest" >
@@ -849,6 +884,10 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.pausalRead &&
+           userRights.pausalWrite &&
+           company &&
+           !company.monthly &&
+           !defaultFields.pausal.fixed &&
           <div className="form-selects-entry-column" >
             <Label>Pausal <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -857,6 +896,8 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.overtimeRead &&
+          userRights.overtimeWrite &&
+          !defaultFields.overtime.fixed &&
           <div className="form-selects-entry-column" >
             <Label>Outside PH <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >

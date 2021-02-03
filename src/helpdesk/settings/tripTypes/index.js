@@ -36,7 +36,7 @@ export default function TripTypeListContainer( props ) {
       <div className="row m-0 p-0 taskList-container">
         <div className="col-lg-4">
           <div className="commandbar">
-            <div className="search-row">
+            <div className="m-l-20 search-row">
               <div className="search">
                 <button className="search-btn" type="button">
                   <i className="fa fa-search" />
@@ -104,6 +104,9 @@ export default function TripTypeListContainer( props ) {
           {
             !loading && match.params.id && match.params.id!=='add' && data.tripTypes.some((item)=> item.id.toString() === match.params.id) &&
             <TripTypeEdit {...{history, match}} />
+          }
+          {
+            !loading && !match.params.id && match.params.id!=='add' && <div className="commandbar"></div>
           }
         </div>
       </div>

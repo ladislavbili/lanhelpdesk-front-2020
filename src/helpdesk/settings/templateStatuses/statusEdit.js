@@ -157,6 +157,11 @@ export default function StatusEdit( props ) {
           </div>
         }
       </div>
+
+      <h2 className="p-l-20 m-t-10" >
+        Edit status
+      </h2>
+
       <div className="p-20 scroll-visible fit-with-header-and-commandbar">
         <FormGroup>
           <Label for="name">Status name <span className="warning-big">*</span></Label>
