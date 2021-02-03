@@ -862,6 +862,7 @@ export default function TaskAdd( props ) {
             deleteItem = { (newScheduled) => {
               setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
             } }
+            layout={layout}
             />
         }
         { userRights.tagsRead &&
