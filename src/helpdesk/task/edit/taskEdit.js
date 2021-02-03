@@ -1394,7 +1394,8 @@ export default function TaskEdit( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className={"task-edit-right" + (columns ? " w-250px" : "")} >
+      <div className={classnames("task-edit-right", {"w-250px": columns})}>
+        <div className="">
         { userRights.projectRead &&
           <div className="form-selects-entry-column" >
             <Label>Projekt <span className="warning-big">*</span></Label>
@@ -1525,6 +1526,7 @@ export default function TaskEdit( props ) {
             </div>
           </div>
         }
+        </div>
       </div>
     );
   }
@@ -2065,6 +2067,7 @@ export default function TaskEdit( props ) {
                 "task-edit-left-columns": (layout === 2 && columns) || layout === 1,
               },
             )}
+             style={ layout === 2 && !columns ? {height: '100vh'} : {}}
             >
 
             <div>

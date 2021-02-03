@@ -89,10 +89,14 @@ export default function Login( props ) {
 
 
   return (
-    <div style={{height:'100vh',display: 'flex'}}>
-      <div className="card" style={{backgroundColor:'white', borderRadius:6, padding:'10px 20px', width:'350px',margin:'auto'}}>
+    <div className="login-bkg">
+      <div className="login-card">
 
-        <FormGroup>
+        <h1 className="login-header">
+          LanHelpdesk
+        </h1>
+
+        <FormGroup className="login-item">
           <Label for="email">E-mail</Label>
           <Input type="email" name="email" id="email" placeholder="Enter e-mail" value={email}
             onChange={(e) => setEmail(e.target.value) }
@@ -103,7 +107,7 @@ export default function Login( props ) {
             }}
             />
         </FormGroup>
-        <FormGroup>
+        <FormGroup className="login-item">
           <Label for="pass">Password</Label>
           <Input type="password" name="pass" id="pass" placeholder="Enter password" value={password} onChange={(e)=>setPassword(e.target.value)}
             onKeyPress={(e)=>{
@@ -114,6 +118,7 @@ export default function Login( props ) {
             />
         </FormGroup>
         <Button color="primary"
+          className="btn login-item"
           disabled={ signingIn || email.length === 0 || password.length === 0 }
           onClick={ login }
           >

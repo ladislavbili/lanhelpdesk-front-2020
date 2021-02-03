@@ -128,14 +128,14 @@ export default function TaskAddContainer( props ) {
 
   const renderAddTaskButton = () => {
     return (
-      <Button
+      <button
         className="btn sidebar-btn"
         disabled={disabled}
         onClick={() => {
           setOpenAddTaskModal(true);
         }}
         > <i className="fa fa-plus"/> Task
-      </Button>
+      </button>
     )
   }
 
