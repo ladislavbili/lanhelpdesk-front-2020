@@ -1,6 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
-import DatePicker from 'react-datepicker';
+import DatePicker from 'components/DatePicker';
 import {
   FormGroup,
   Label,
@@ -8,7 +8,6 @@ import {
 } from 'reactstrap';
 import moment from 'moment';
 
-import datePickerConfig from 'configs/components/datepicker';
 import {
   selectStyle
 } from 'configs/components/select';
@@ -103,7 +102,6 @@ export default function MonthSelector( props ) {
               selected={fromDate}
               onChange={date => onChangeFromDate(date) }
               placeholderText="From"
-              {...datePickerConfig}
               showTimeSelect={false}
               dateFormat="DD.MM.YYYY"
               />
@@ -114,7 +112,6 @@ export default function MonthSelector( props ) {
               selected={toDate}
               onChange={date => onChangeToDate(date)}
               placeholderText="To"
-              {...datePickerConfig}
               showTimeSelect={false}
               dateFormat="DD.MM.YYYY"
               />

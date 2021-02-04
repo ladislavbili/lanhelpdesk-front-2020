@@ -1,24 +1,45 @@
-import React, { Component } from 'react';
-import { Button, FormGroup } from 'reactstrap';
+import React, {
+  Component,
+  forwardRef
+} from 'react';
+import {
+  Button,
+  FormGroup
+} from 'reactstrap';
 
-import DatePicker from 'react-datepicker';
-import datePickerConfig from 'configs/components/datepicker';
+import DatePicker from 'components/DatePicker';
 import classnames from 'classnames';
 
 
-export default class FilterDatePickerInCalendar extends Component{
-  render(){
-    const { label, showNowFrom, dateFrom, showNowTo, dateTo } = this.props;
-    const { setShowNowFrom, setDateFrom, setShowNowTo, setDateTo, minimal } = this.props;
-    const DateInputFrom = ({ value, onClick }) => {
-      let text = '';
-      if(minimal){
-        text = showNowFrom ? 'Current date' : ( value ? `${value}` : 'Select date from' )
-      }else{
-        text = showNowFrom ? 'From: Current date' : ( value ? `From: ${value}` : 'Select date from' );
-      }
-      return (
-        <div className="row form-control p-0" style={ minimal ? { backgroundColor:'inherit', color:'inherit' } : {}}>
+export default class FilterDatePickerInCalendar extends Component {
+  render() {
+    const {
+      label,
+      showNowFrom,
+      dateFrom,
+      showNowTo,
+      dateTo
+    } = this.props;
+    const {
+      setShowNowFrom,
+      setDateFrom,
+      setShowNowTo,
+      setDateTo,
+      minimal
+    } = this.props;
+    const DateInputFrom = forwardRef(
+      ( {
+        value,
+        onClick
+      }, ref ) => {
+        let text = '';
+        if ( minimal ) {
+          text = showNowFrom ? 'Current date' : ( value ? `${value}` : 'Select date from' )
+        } else {
+          text = showNowFrom ? 'From: Current date' : ( value ? `From: ${value}` : 'Select date from' );
+        }
+        return (
+          <div className="row form-control p-0" style={ minimal ? { backgroundColor:'inherit', color:'inherit' } : {}}>
           <button className={classnames({ "datepicker-input-button-minimal": minimal, "datepicker-input-button": !minimal })} onClick={onClick} style={{flex: 1}}>
             { text }
           </button>
@@ -33,17 +54,22 @@ export default class FilterDatePickerInCalendar extends Component{
             { minimal ? 'Now' : 'Set now' }
           </Button>
       </div>
-      )
-    };
-    const DateInputTo = ({ value, onClick }) => {
-      let text = '';
-      if(minimal){
-        text = showNowTo ? 'Current date' : ( value ? `${value}` : 'Select date to' )
-      }else{
-        text = showNowTo ? 'To: Current date' : ( value ? `To: ${value}` : 'Select date to' );
+        )
       }
-      return (
-        <div className="row form-control p-0" style={ minimal ? { backgroundColor:'inherit', color:'inherit' } : {}}>
+    )
+    const DateInputTo = forwardRef(
+      ( {
+        value,
+        onClick
+      }, ref ) => {
+        let text = '';
+        if ( minimal ) {
+          text = showNowTo ? 'Current date' : ( value ? `${value}` : 'Select date to' )
+        } else {
+          text = showNowTo ? 'To: Current date' : ( value ? `To: ${value}` : 'Select date to' );
+        }
+        return (
+          <div className="row form-control p-0" style={ minimal ? { backgroundColor:'inherit', color:'inherit' } : {}}>
           <button className={classnames({ "datepicker-input-button-minimal": minimal, "datepicker-input-button": !minimal })} onClick={onClick} style={{flex: 1}}>
             { text }
           </button>
@@ -58,8 +84,9 @@ export default class FilterDatePickerInCalendar extends Component{
             { minimal ? 'Now' : 'Set now' }
           </Button>
       </div>
-      )
-    };
+        )
+      }
+    )
 
     return (
       <FormGroup className={classnames({'sidebar-filter-row': minimal})}>
@@ -75,7 +102,6 @@ export default class FilterDatePickerInCalendar extends Component{
                   setDateFrom(e)
                 }}
                 placeholderText="No date"
-                {...datePickerConfig}
                 customInput={ <DateInputFrom /> }
                 />
             </FormGroup>
@@ -90,7 +116,6 @@ export default class FilterDatePickerInCalendar extends Component{
                   setDateTo(e)
                 }}
                 placeholderText="No date"
-                {...datePickerConfig}
                 customInput={ <DateInputTo /> }
                 />
             </FormGroup>

@@ -39,7 +39,6 @@ import {
 
 import {
   GET_MY_DATA,
-  GET_EMAILS,
   GET_TASK,
 
   ADD_USER_TO_PROJECT,
@@ -635,40 +634,6 @@ export default function TaskEditContainer( props ) {
         }
       } )
       .then( ( response ) => {
-        if ( response.data.ok ) {
-          const responseComment = response.data.comment;
-          const newComment = {
-            ...responseComment,
-            childComments: [],
-            createdAt: moment( responseComment.createdAt )
-              .valueOf(),
-            emailError: null,
-            html: null,
-            subject: null,
-            tos: [],
-            user: basicUsersData.basicUsers.find( ( user ) => user.id === responseComment.UserId ),
-            __typename: "Comment"
-          }
-          const oldTask = client.readQuery( {
-              query: GET_TASK,
-              variables: {
-                id
-              }
-            } )
-            .task;
-          client.writeQuery( {
-            query: GET_TASK,
-            variables: {
-              id
-            },
-            data: {
-              task: {
-                ...oldTask,
-                comments: [ newComment, ...oldTask.comments ]
-              }
-            }
-          } )
-        }
         setSaving( false );
       } )
       .catch( ( err ) => {
@@ -700,36 +665,6 @@ export default function TaskEditContainer( props ) {
         }
       } )
       .then( ( response ) => {
-        const responseComment = response.data.comment;
-        const newComment = {
-          ...responseComment,
-          childComments: [],
-          createdAt: moment( responseComment.createdAt )
-            .valueOf(),
-          html: responseComment.message,
-          tos: responseComment.EmailTargets.map( ( emailTarget ) => emailTarget.address ),
-          user: basicUsersData.basicUsers.find( ( user ) => user.id === responseComment.UserId ),
-          __typename: "Comment",
-        }
-        const oldTask = client.readQuery( {
-            query: GET_TASK,
-            variables: {
-              id
-            }
-          } )
-          .task;
-        client.writeQuery( {
-          query: GET_TASK,
-          variables: {
-            id
-          },
-          data: {
-            task: {
-              ...oldTask,
-              comments: [ newComment, ...oldTask.comments ]
-            }
-          }
-        } )
         setSaving( false );
       } )
       .catch( ( err ) => {

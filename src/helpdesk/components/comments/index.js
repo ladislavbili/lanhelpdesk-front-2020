@@ -11,6 +11,9 @@ import {
   DropdownMenu,
   DropdownToggle
 } from 'reactstrap';
+import {
+  useQuery,
+} from "@apollo/client";
 import Checkbox from 'components/checkbox';
 import {
   timestampToString
@@ -27,6 +30,11 @@ import axios from 'axios';
 import {
   REST_URL,
 } from 'configs/restAPI';
+import {
+  GET_COMMENTS
+} from './queries';
+import Loading from 'components/loading';
+
 import Comment from './comment';
 import Email from './email';
 
@@ -41,8 +49,18 @@ export default function Comments( props ) {
     userRights,
     submitComment,
     submitEmail,
-    comments
   } = props;
+
+  const {
+    data: commentsData,
+    loading: commentsLoading,
+    refetch: commentsRefetch,
+  } = useQuery( GET_COMMENTS, {
+    variables: {
+      task: id
+    },
+    notifyOnNetworkStatusChange: true,
+  } );
 
   const [ attachments, setAttachments ] = React.useState( [] );
   const [ emailBody, setEmailBody ] = React.useState( "" );
@@ -57,7 +75,12 @@ export default function Comments( props ) {
 
   React.useEffect( () => {
     setOpenedComments( [] )
-    setIsEmail( !userRights.addComments )
+    setIsEmail( !userRights.addComments );
+    commentsRefetch( {
+      variables: {
+        task: id
+      }
+    } );
   }, [ id ] );
 
   const getAttachment = ( attachment ) => {
@@ -85,6 +108,11 @@ export default function Comments( props ) {
         downloadjs( response.data, attachment.filename, attachment.mimetype );
       } )
   }
+
+  if ( commentsLoading ) {
+    return <Loading />
+  }
+  console.log( commentsData );
   return (
     <div>
       { (userRights.addComments || userRights.emails) &&
@@ -228,7 +256,7 @@ export default function Comments( props ) {
           </div>
         </div>
       }
-      { !isMulti && comments.filter((comment)=> userRights.internal || !comment.isInternal).sort((item1,item2)=>item2.createdAt-item1.createdAt).map((comment)=>
+      { !isMulti && commentsData.comments.filter((comment)=> userRights.internal || !comment.isInternal).sort((item1,item2)=>item2.createdAt-item1.createdAt).map((comment)=>
         <div key={comment.id} >
           { comment.isEmail &&
             <Email

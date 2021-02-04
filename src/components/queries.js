@@ -24,6 +24,7 @@ query {
         tripTypes
         imaps
         smtps
+        vykazy
       }
     }
   }

@@ -11,11 +11,10 @@ import {
   ModalFooter,
   ModalHeader
 } from 'reactstrap';
-import DatePicker from 'react-datepicker';
+import DatePicker from 'components/DatePicker';
 import {
   invisibleSelectStyleNoArrow
 } from 'configs/components/select';
-import datePickerConfig from 'configs/components/datepicker';
 import moment from 'moment';
 
 export default class PendingPicker extends Component {
@@ -59,7 +58,6 @@ export default class PendingPicker extends Component {
                     this.setState({ pendingDate: date });
                   }}
                   placeholderText="No pending date"
-                  {...datePickerConfig}
                 />
               { this.state.pendingDate !== null &&
                 <i className="fa fa-times center-hor m-l-10 m-r-10 clickable" onClick={ () => { this.setState({ pendingDate: null }) } } />

@@ -1,17 +1,32 @@
-import React, { Component } from 'react';
-import DatePicker from 'react-datepicker';
-import { connect } from "react-redux";
-import { Button, FormGroup, Label,Input, Modal, ModalHeader, ModalBody, ModalFooter  } from 'reactstrap';
-import {rebase} from '../../../index';
+import React, {
+  Component
+} from 'react';
+import DatePicker from 'components/DatePicker';
+import {
+  connect
+} from "react-redux";
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
+} from 'reactstrap';
+import {
+  rebase
+} from '../../../index';
 
-class MilestoneAdd extends Component{
-  constructor(props){
-    super(props);
-    this.state={
+class MilestoneAdd extends Component {
+  constructor( props ) {
+    super( props );
+    this.state = {
       title: '',
-			description: '',
-			startsAt:null,
-			endsAt:null,
+      description: '',
+      startsAt: null,
+      endsAt: null,
 
       saving: false,
       opened: true
@@ -19,19 +34,21 @@ class MilestoneAdd extends Component{
   }
 
 
-  toggle(){
-    if(!this.state.opened){
-			this.setState({
-				title: '',
-				description: '',
-				startsAt:null,
-				endsAt:null,
-			})
+  toggle() {
+    if ( !this.state.opened ) {
+      this.setState( {
+        title: '',
+        description: '',
+        startsAt: null,
+        endsAt: null,
+      } )
     }
-		this.props.close();
-    this.setState({opened:!this.state.opened});
+    this.props.close();
+    this.setState( {
+      opened: !this.state.opened
+    } );
   }
-  render(){
+  render() {
     return (
       <div>
           <Modal isOpen={this.state.opened}>
@@ -116,9 +133,15 @@ class MilestoneAdd extends Component{
   }
 }
 
-const mapStateToProps = ({ filterReducer }) => {
-	const { project } = filterReducer;
-	return { project };
+const mapStateToProps = ( {
+  filterReducer
+} ) => {
+  const {
+    project
+  } = filterReducer;
+  return {
+    project
+  };
 };
 
-export default connect(mapStateToProps, {})(MilestoneAdd);
+export default connect( mapStateToProps, {} )( MilestoneAdd );

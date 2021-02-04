@@ -1,24 +1,44 @@
-import React, { Component } from 'react';
-import { Button, FormGroup } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  Button,
+  FormGroup
+} from 'reactstrap';
 
-import DatePicker from 'react-datepicker';
-import datePickerConfig from 'configs/components/datepicker';
+import DatePicker from 'components/DatePicker';
 import Checkbox from 'components/checkbox';
-import {rebase} from 'index';
+import {
+  rebase
+} from 'index';
 
-export default class FilterDatePickerSeparated extends Component{
-  constructor(props){
-    super(props);
-    this.state={
+export default class FilterDatePickerSeparated extends Component {
+  constructor( props ) {
+    super( props );
+    this.state = {
       showCalendarFrom: false,
       showCalendarTo: false,
     }
   }
 
-  render(){
-    const { label, showNowFrom, dateFrom, showNowTo, dateTo } = this.props;
-    const { setShowNowFrom, setDateFrom, setShowNowTo, setDateTo } = this.props;
-    const { showCalendarFrom, showCalendarTo } = this.state;
+  render() {
+    const {
+      label,
+      showNowFrom,
+      dateFrom,
+      showNowTo,
+      dateTo
+    } = this.props;
+    const {
+      setShowNowFrom,
+      setDateFrom,
+      setShowNowTo,
+      setDateTo
+    } = this.props;
+    const {
+      showCalendarFrom,
+      showCalendarTo
+    } = this.state;
 
     return (
       <FormGroup>
@@ -53,7 +73,6 @@ export default class FilterDatePickerSeparated extends Component{
                   selected={dateFrom}
                   onChange={(e)=>{ setDateFrom(e) }}
                   placeholderText="No date"
-                  {...datePickerConfig}
                   />
                 <i className="fa fa-times center-hor m-l-10 m-r-10 clickable" onClick={ () => { setDateFrom(null); this.setState({showCalendarFrom: false}) } } />
               </FormGroup>
@@ -96,7 +115,6 @@ export default class FilterDatePickerSeparated extends Component{
                   selected={dateTo}
                   onChange={(e)=>{ setDateTo(e) }}
                   placeholderText="No date"
-                  {...datePickerConfig}
                   />
                 <i className="fa fa-times center-hor m-l-10 m-r-10 clickable" onClick={ () => { setDateTo(null); this.setState({showCalendarTo: false}) } } />
               </FormGroup>

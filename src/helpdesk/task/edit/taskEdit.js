@@ -21,7 +21,7 @@ import {
   ListGroup,
   ListGroupItem
 } from 'reactstrap';
-import DatePicker from 'react-datepicker';
+import DatePicker from 'components/DatePicker';
 import moment from 'moment';
 import classnames from "classnames";
 import CKEditor from '@ckeditor/ckeditor5-react';
@@ -32,7 +32,6 @@ import {
   intervals
 } from 'configs/constants/repeat';
 
-import datePickerConfig from 'configs/components/datepicker';
 import {
   invisibleSelectStyleNoArrow,
   selectStyleNoArrowNoPadding,
@@ -152,7 +151,6 @@ export default function TaskEdit( props ) {
 
   const [ assignedTo, setAssignedTo ] = React.useState( [] );
   const [ closeDate, setCloseDate ] = React.useState( null );
-  const [ comments, setComments ] = React.useState( [] );
   const [ company, setCompany ] = React.useState( null );
   const [ deadline, setDeadline ] = React.useState( null );
   const [ description, setDescription ] = React.useState( "" );
@@ -196,7 +194,6 @@ export default function TaskEdit( props ) {
       setAssignedTo( toSelArr( task.assignedTo, 'email' ) );
     }
     setCloseDate( moment( parseInt( task.closeDate ) ) );
-    setComments( task.comments );
     setDeadline( task.deadline ? moment( parseInt( task.deadline ) ) : null );
     setDescription( task.description );
     setImportant( task.important );
@@ -1054,7 +1051,6 @@ export default function TaskEdit( props ) {
               }
             }}
             placeholderText="No pending date"
-            {...datePickerConfig}
             />
         </div>
       )
@@ -1081,7 +1077,6 @@ export default function TaskEdit( props ) {
               }
             }}
             placeholderText="No pending date"
-            {...datePickerConfig}
             />
         </div>
       )
@@ -1203,7 +1198,6 @@ export default function TaskEdit( props ) {
           }
         }}
         placeholderText="No deadline"
-        {...datePickerConfig}
         />
     ),
     Overtime: (
@@ -2037,7 +2031,6 @@ export default function TaskEdit( props ) {
             <TabPane tabId={1}>
               <Comments
                 id={id}
-                comments={task ? task.comments : []}
                 submitComment={ submitComment }
                 submitEmail={ submitEmail }
                 userRights={ userRights }

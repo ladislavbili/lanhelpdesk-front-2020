@@ -17,7 +17,7 @@ import {
   Label,
   Input
 } from 'reactstrap';
-import DatePicker from 'react-datepicker';
+import DatePicker from 'components/DatePicker';
 
 import moment from 'moment';
 

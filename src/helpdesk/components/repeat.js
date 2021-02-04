@@ -9,12 +9,11 @@ import {
   Label,
   Input
 } from 'reactstrap';
-import DatePicker from 'react-datepicker';
+import DatePicker from 'components/DatePicker';
 
 import {
   selectStyle
 } from 'configs/components/select';
-import datePickerConfig from 'configs/components/datepicker';
 import {
   toMomentInput,
   fromMomentToUnix
@@ -119,7 +118,6 @@ export default function Repeat( props ) {
                 selected={startsAt}
                 onChange={setStartsAt}
                 placeholderText="No start date"
-                {...datePickerConfig}
                 />
             </FormGroup>
 

@@ -4,7 +4,7 @@ import {
   useQuery
 } from "@apollo/client";
 
-import DatePicker from 'react-datepicker';
+import DatePicker from 'components/DatePicker';
 import {
   Button,
   FormGroup,

@@ -7,6 +7,7 @@ query {
   getMyData{
     role {
       accessRights {
+        vykazy
         viewErrors
         publicFilters
         users
@@ -14,7 +15,6 @@ query {
         pausals
         projects
         statuses
-        units
         prices
         roles
         taskTypes

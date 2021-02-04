@@ -9,12 +9,11 @@ import {
   Label
 } from 'reactstrap';
 import Select from 'react-select';
-import DatePicker from 'react-datepicker';
+import DatePicker from 'components/DatePicker';
 import classnames from "classnames";
 import {
   selectStyle
 } from 'configs/components/select';
-import datePickerConfig from 'configs/components/datepicker';
 
 export default function Scheduled( props ) {
   const {
@@ -91,7 +90,6 @@ export default function Scheduled( props ) {
                   }
                 }}
                 placeholderText="No start"
-                {...datePickerConfig}
                 />
             </FormGroup>
             <FormGroup>
@@ -107,7 +105,6 @@ export default function Scheduled( props ) {
                   }
                 }}
                 placeholderText="No end"
-                {...datePickerConfig}
                 />
             </FormGroup>
             <FormGroup>

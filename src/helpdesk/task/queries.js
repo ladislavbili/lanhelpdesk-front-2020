@@ -188,54 +188,6 @@ const responseTask = `
     quantity
     price
   }
-  comments {
-    id
-    createdAt
-    internal
-    isEmail
-    message
-    html
-    subject
-    tos
-    emailSend
-    emailError
-    user{
-      id
-      fullName
-      email
-    }
-    commentAttachments{
-      id
-      path
-      filename
-      size
-      mimetype
-    }
-    childComments {
-      id
-      createdAt
-      internal
-      isEmail
-      message
-      html
-      subject
-      tos
-      emailSend
-      emailError
-      user{
-        id
-        fullName
-        email
-      }
-      commentAttachments{
-      id
-      path
-      filename
-      size
-      mimetype
-      }
-    }
-  }
   invoicedTasks {
     assignedTo {
       title
@@ -505,24 +457,6 @@ query {
         vykazy
       }
     }
-  }
-}
-`;
-
-export const GET_EMAILS = gql `
-query emails($task: Int!){
-	emails(
-		task: $task
-	)  {
-		id
-		createdAt
-    subject
-    message
-    user {
-      id
-      fullName
-    }
-    toEmails
   }
 }
 `;

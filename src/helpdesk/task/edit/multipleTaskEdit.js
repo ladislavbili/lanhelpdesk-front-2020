@@ -14,7 +14,7 @@ import {
   NavLink,
   Button
 } from 'reactstrap';
-import DatePicker from 'react-datepicker';
+import DatePicker from 'components/DatePicker';
 import moment from 'moment';
 import lodash from 'lodash';
 
@@ -23,7 +23,6 @@ import Comments from 'helpdesk/components/comments';
 import Repeat from 'helpdesk/components/repeat';
 
 import classnames from "classnames";
-import datePickerConfig from 'configs/components/datepicker';
 import {
   toSelArr,
   sameStringForms
@@ -619,7 +618,6 @@ export default class MultipleTaskEdit extends Component {
 										this.setState({ deadline: date });
 									}}
 									placeholderText="No deadline"
-									{...datePickerConfig}
 									/>
 							</div>
 					</div>
@@ -838,7 +836,6 @@ export default class MultipleTaskEdit extends Component {
 										this.setState({ deadline: date });
 									}}
 									placeholderText="No deadline"
-									{...datePickerConfig}
 									/>
 							</div>
 						</div>

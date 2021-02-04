@@ -32,7 +32,6 @@ export default function Navigation( props ) {
 
   const currentUser = data ? data.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
-
   return (
     <div>
       <div className="page-header">

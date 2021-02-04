@@ -8,7 +8,7 @@ import {
   Label,
   Button
 } from 'reactstrap';
-import DatePicker from 'react-datepicker';
+import DatePicker from 'components/DatePicker';
 import moment from 'moment';
 
 import Repeat from 'helpdesk/components/repeat';
@@ -22,7 +22,6 @@ import CKEditor5 from '@ckeditor/ckeditor5-react';
 import ck5config from 'configs/components/ck5config';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import axios from 'axios';
-import datePickerConfig from 'configs/components/datepicker';
 import {
   invisibleSelectStyleNoArrow,
   selectStyleNoArrowNoPadding,
@@ -396,7 +395,6 @@ export default function TaskAdd( props ) {
                 }
               }}
               placeholderText="No close date"
-              {...datePickerConfig}
               />
           </div>
         }
@@ -534,7 +532,6 @@ export default function TaskAdd( props ) {
         disabled={!userRights.deadlineWrite}
         onChange={date => setDeadline(date)}
         placeholderText="No deadline"
-        {...datePickerConfig}
         />
     ),
     Overtime: (
