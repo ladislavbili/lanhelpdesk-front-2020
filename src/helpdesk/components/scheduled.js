@@ -31,7 +31,6 @@ export default function Scheduled( props ) {
   const [ newUser, setNewUser ] = React.useState( null );
   const [ newFrom, setNewFrom ] = React.useState( null );
   const [ newTo, setNewTo ] = React.useState( null );
-
   return (
     <div className="form-selects-entry-column">
       <Label>Scheduled</Label>
@@ -85,7 +84,6 @@ export default function Scheduled( props ) {
                 disabled={disabled}
                 onChange={date => {
                   setNewFrom(date);
-                  console.log(newTo);
                   if(newTo === null){
                     setNewTo(date);
                   }
@@ -140,7 +138,7 @@ export default function Scheduled( props ) {
                 }
                 className="btn-primary center-hor ml-auto"
                 onClick={() => {
-                  submitItem({user: newUser, from: newFrom, to: newTo})
+                  submitItem({user: newUser, from: newFrom.valueOf().toString(), to: newTo.valueOf().toString()})
                   setNewUser(null);
                   setNewFrom(null);
                   setNewTo(null);

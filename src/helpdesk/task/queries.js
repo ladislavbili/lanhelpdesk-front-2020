@@ -54,17 +54,6 @@ const responseTask = `
       }
     }
   }
-  taskChanges{
-    createdAt
-    user{
-      id
-      fullName
-    }
-    taskChangeMessages{
-      type
-      message
-    }
-  }
   createdBy {
     id
     name

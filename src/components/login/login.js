@@ -83,7 +83,7 @@ export default function Login( props ) {
       } )
       .catch( ( error ) => {
         setIsLoggedIn( false );
-        signingIn( false );
+        setSigningIn( false );
       } )
   }
 
