@@ -5,3 +5,7 @@ export const deleteAttributes = ( object, attList ) => {
   attList.forEach( ( att ) => delete newObject[ att ] );
   return newObject;
 }
+
+export const objectToAtributeArray = ( object, attribute ) => {
+  return object.map( attr => attr[ attribute ] );
+}

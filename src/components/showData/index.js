@@ -22,13 +22,9 @@ import {
   GET_PROJECT,
 } from 'apollo/localSchema/queries';
 
-const GET_MY_DATA = gql `
-query {
-  getMyData{
-    tasklistLayout
-  }
-}
-`;
+import {
+  GET_MY_DATA
+} from './queries';
 
 export default function ShowDataContainer( props ) {
   const {

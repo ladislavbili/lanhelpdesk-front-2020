@@ -1,9 +1,75 @@
 import React from 'react';
+import {
+  useQuery,
+  useLazyQuery,
+} from "@apollo/client";
 import classnames from 'classnames';
+import {
+  Button,
+  Popover,
+  PopoverHeader,
+  PopoverBody,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from 'reactstrap';
+import Checkbox from 'components/checkbox';
+import CustomAttributes from "helpdesk/settings/projects/components/customAttributes";
+import {
+  objectToAtributeArray
+} from 'helperFunctions';
+
+import {
+  GET_PROJECT,
+} from 'apollo/localSchema/queries';
+
+import {
+  GET_MY_DATA,
+  GET_PROJECT_GROUPS
+} from './queries';
 
 export default function CommandBar( props ) {
 
+  const [ popoverOpen, setPopoverOpen ] = React.useState( false );
+  const [ openCustomAttributes, setOpenCustomAttributes ] = React.useState( false );
+
+  const {
+    data: myData,
+    loading: myDataLoading,
+  } = useQuery( GET_MY_DATA );
+
+  const {
+    data: projectData,
+    loading: projectLoading,
+  } = useQuery( GET_PROJECT );
+
+  const [ fetchProjectGroups, {
+    loading: projectGroupsLoading,
+    data: projectGroupsData
+	} ] = useLazyQuery( GET_PROJECT_GROUPS );
+
+  const currentUser = myData ? myData.getMyData : {};
+
+  React.useEffect( () => {
+    if ( !projectLoading ) {
+      if ( projectData.localProject.id !== null ) {
+        fetchProjectGroups( {
+          variables: {
+            id: projectData.localProject.id
+          }
+        } );
+      }
+    }
+  }, [ projectLoading ] );
+
+  const toggle = () => setPopoverOpen( !popoverOpen );
+
   const FILTERED_BREADCRUMBS = ( props.breadcrumsData ? props.breadcrumsData.filter( ( breadcrum ) => breadcrum.show ) : [] );
+
+  const canAddCustomAttributes = projectGroupsData ? projectGroupsData.project.groups.some( group => objectToAtributeArray( group.users, "id" )
+    .includes( currentUser.id ) && group.rights.projectSecondary ) : false;
+
   return (
     <div className={"task-list-commandbar " + (props.layout !== 0 ? "p-l-30" : "p-l-0")}>
 
@@ -44,6 +110,34 @@ export default function CommandBar( props ) {
 
 							"d-flex", "flex-row", "align-items-center", "ml-auto")}
 							>
+
+              { canAddCustomAttributes &&
+              <button type="button" className="btn waves-effect" onClick={() => setOpenCustomAttributes(true)}>
+                <i className="fa fa-plus"/> Custom Attribute
+              </button>
+            }
+
+              <Modal isOpen={openCustomAttributes} className="modal-without-borders">
+                <ModalBody style={{padding: "20px"}}>
+                    <CustomAttributes
+                      disabled={false}
+                      customAttributes={[]}
+                      addCustomAttribute={() => {
+                      }}
+                      updateCustomAttribute={() => {
+                      }}
+                      deleteCustomAttribute={() => {}}
+                      />
+                </ModalBody>
+                <ModalFooter className="p-l-20 p-r-20">
+                  <button type="button" className="btn btn-link-cancel mr-auto" onClick={() => setOpenCustomAttributes(false)}>
+                    Close
+                  </button>
+                </ModalFooter>
+              </Modal>
+
+
+
 							<div className="text-basic m-r-5 m-l-5">
 								Sort by
 							</div>
@@ -68,6 +162,26 @@ export default function CommandBar( props ) {
 									<i className="fas fa-arrow-down" />
 								</button>
 							}
+
+              <button type="button" id="checkboxPopover" className="btn btn-link waves-effect">
+                <i className="fa fa-cog"/>
+              </button>
+              <Popover  trigger="legacy" placement="bottom" isOpen={popoverOpen} target="checkboxPopover" toggle={toggle}>
+                <PopoverHeader>Show columns</PopoverHeader>
+                <PopoverBody>
+                  { props.orderByValues.map((item,index) =>
+                    <Checkbox
+      								key = {index}
+      								className = "m-r-5"
+      								label = {item.label}
+      								value = { item.value }
+      								onChange = {()=>{
+      									// show/hide respective elements
+      								}}
+      								/>
+                  ) }
+                </PopoverBody>
+              </Popover>
 						</div>
 					</div>
 				</div>

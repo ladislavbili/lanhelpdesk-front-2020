@@ -66,7 +66,8 @@ export {
 from './showData';
 
 export {
-  deleteAttributes
+  deleteAttributes,
+  objectToAtributeArray
 }
 from './objectManipulations';
 

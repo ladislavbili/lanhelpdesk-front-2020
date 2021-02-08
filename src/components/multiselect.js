@@ -1,41 +1,52 @@
-import React, { Component } from 'react';
-import { ButtonDropdown, DropdownToggle, DropdownMenu } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  ButtonDropdown,
+  DropdownToggle,
+  DropdownMenu
+} from 'reactstrap';
 import Checkbox from './checkbox';
 
-export default class Multiselect extends Component {
-	constructor(props){
-		super(props);
-		this.state = {
-			open:false,
-		}
-	}
+export default function Multiselect( props ) {
 
-	render() {
-		return (
-			<ButtonDropdown
-				className={this.props.className}
-				direction={ this.props.direction ? this.props.direction : "left" }
-				style={this.props.style?this.props.style:{}}
-				isOpen={ this.state.open && !this.props.disabled }
-				toggle={()=>this.setState({open:!this.state.open})}
+  const {
+    className,
+    direction,
+    style,
+    label,
+    options,
+    value,
+    onChange,
+    disabled,
+  } = props;
+
+  const [ open, setOpen ] = React.useSate( false );
+
+  return (
+    <ButtonDropdown
+				className={ className }
+				direction={ direction ? direction : "left" }
+				style={ style ? style : {} }
+				isOpen={ open && !disabled }
+				toggle={ () => setOpen(!open) }
 				>
 				<DropdownToggle caret className="btn btn-link-reversed">
-					{this.props.label}
+					{label}
 				</DropdownToggle>
 				<DropdownMenu style={{width:'max-content'}}>
-					{ this.props.options.map((option)=>
-						<Checkbox
-							key = {option.id}
-							className = "m-l-5 m-r-5"
-							label = {option.label}
-							value = { this.props.value.some((item)=> item.id === option.id ) }
-							onChange = {()=>{
-								this.props.onChange(option);
-							}}
-							/>
+					{ options.map((option)=>
+							<Checkbox
+								key = {option.id}
+								className = "m-l-5 m-r-5"
+								label = {option.label}
+								value = { value.some((item)=> item.id === option.id ) }
+								onChange = {()=>{
+									onChange(option);
+								}}
+								/>
 					)}
 				</DropdownMenu>
 			</ButtonDropdown>
-		);
-	}
+  );
 }

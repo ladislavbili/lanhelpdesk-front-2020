@@ -133,6 +133,19 @@ export default function PageHeader( props ) {
               Vykazy
             </Link>
           }
+          <Link
+            to={{ pathname: `/lanwiki` }}
+            className={
+              "header-link" +
+              (
+                URL.includes("lanwiki") ?
+                " header-link-active" :
+                ""
+              )
+            }
+            >
+            LanWiki
+          </Link>
         </div>
         <div className="ml-auto center-hor row">
           <div className=" header-icon center-hor clickable" onClick={() => setModalUserProfileOpen(true)}>{`${currentUser.name} ${currentUser.surname}`} <i className="fas fa-user m-l-5"/></div>

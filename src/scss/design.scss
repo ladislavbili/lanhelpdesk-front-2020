@@ -811,6 +811,10 @@ Label{
   text-align: end;
 }
 
+.popover>.arrow{
+  display: none;
+}
+
 .task-info>.react-datepicker-wrapper{
   width: 43% !important;
 }

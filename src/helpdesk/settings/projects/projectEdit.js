@@ -564,6 +564,9 @@ export default function ProjectEdit( props ) {
   const allStatuses = getAllStatuses();
   const canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
     .filter( ( user ) => userGroups.some( ( userGroup ) => userGroup.user.id ) );
+
+  console.log( projectData );
+  console.log( groups );
   return (
     <div>
       <div className="commandbar a-i-c p-l-20">
@@ -583,7 +586,7 @@ export default function ProjectEdit( props ) {
         {
           "scroll-visible": true,
           "fit-with-header-and-commandbar": !closeModal,
-          "fit-with-header": closeModal,
+          "fit-with-header-and-commandbar": closeModal,
           "p-t-10 p-l-20 p-r-20 p-b-20": !closeModal,
           "p-30": closeModal,
         },
