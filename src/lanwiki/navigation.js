@@ -15,10 +15,14 @@ import ErrorMessages from 'components/errorMessages';
 import PageHeader from '../components/PageHeader';
 import SelectPage from '../components/SelectPage';
 import ListNotes from './Notes';
+import TagAdd from './Tags/TagAdd';
+import TagEdit from './Tags/TagEdit';
+
+import {
+  layout
+} from './constants';
 
 export default function Navigation( props ) {
-
-  const layout = 2;
 
   return (
     <div>
@@ -43,11 +47,10 @@ export default function Navigation( props ) {
           <Route exact path="/lanwiki/errorMessages" component={ErrorMessages} />
           <Route exact path='/lanwiki/i/:listID' component={ListNotes} />
           <Route exact path='/lanwiki/i/:listID/:noteID' component={ListNotes} />
+          <Route exact path='/lanwiki/tag-add' component={TagAdd} />
+          <Route exact path='/lanwiki/tag-edit/:listID' component={TagEdit} />
 				</div>
 			</div>
 		</div>
   );
 }
-/*
-
-*/

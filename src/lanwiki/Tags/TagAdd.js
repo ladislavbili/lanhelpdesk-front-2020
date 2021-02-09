@@ -1,89 +1,57 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, Label, Input, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
-import { rebase } from '../../index';
+import React, {
+  Component
+} from 'react';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+} from 'reactstrap';
 
-export default class Sidebar extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			saving: false,
-			title: "",
-			body: "",
-			public: false,
-			active: false,
-			read: [],
-			write: [],
-			users: [],
-			search: "",
+import TagACL from './acl';
 
-			value: 100,
-		};
+import {
+  users,
+  usersWithRights
+} from '../constants';
 
-		this.submit.bind(this);
-	}
+export default function TagAdd( props ) {
 
-	submit(){
-    this.setState({value: 0, saving: true});
-    let newRead = this.state.read.map(user => user.id);
-    let newWrite = this.state.write.map(user => user.id);
-    rebase.addToCollection('/lanwiki-tags', {title:this.state.title, body:this.state.body, read: newRead, write: newWrite, public: this.state.public, active: this.state.active})
-    .then(() => {
-      this.setState({
-        saving:false,
-        title: "",
-        body: "",
-        users: "",
-        read: [],
-        write: [],
-        public: false,
-        active: false,
-        value: 100
-      }, () => this.props.close());
-    });
-  }
+  const [ saving, setSaving ] = React.useState( false );
+  const [ title, setTitle ] = React.useState( "Tag 2" );
+  const [ body, setBody ] = React.useState( "Hello" );
 
-	render() {
-		return (
-			<div>
-				{/*		<Progress value={this.state.value}>{this.state.value === 100 ? "Loaded" : "Loading"}</Progress>*/}
+  const submit = () => {}
 
-				<ModalBody>
-					<ModalHeader>
-						Add tag
-					</ModalHeader>
-					<FormGroup className="m-t-10 m-b-10">
-							<Input
-								type="checkbox"
-								checked={this.state.active}
-								onChange={(e) => this.setState({active: e.target.checked})}
-								/>
-							<Label className="m-l-15">
-								Active
-							</Label>
-					</FormGroup>
+  const cancel = () => {}
 
-						<FormGroup>
-							<Label htmlFor="name">Názov</Label>
-							<Input id="name" className="form-control" placeholder="Názov" value={this.state.title} onChange={(e) => this.setState({title: e.target.value})}/>
-						</FormGroup>
+  return (
+    <div className="lanwiki-tag-form">
+      <h1>Add tag</h1>
 
-						<FormGroup>
-							<Label htmlFor="body">Popis</Label>
-							<Input type="textarea" className="form-control" id="body" placeholder="Zadajte text" value={this.state.body} onChange={(e) => this.setState({body: e.target.value})}/>
-						</FormGroup>
+      <FormGroup >
+        <Label htmlFor="name">Title</Label>
+        <Input id="name" className="form-control" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)}/>
+      </FormGroup>
 
-					</ModalBody>
+      <FormGroup>
+        <Label htmlFor="body">Description</Label>
+        <Input type="textarea" className="form-control" id="body" placeholder="Enter text" value={body} onChange={(e) => setBody(e.target.value)}/>
+      </FormGroup>
 
-					<ModalFooter>
-						<Button className="mr-auto btn-link" disabled={this.state.saving} onClick={() => this.props.close()}>
-							Close
-						</Button>
-						<Button  className="btn" onClick={this.submit.bind(this)} >
-							{!this.state.saving ? "Save":"Saving..."}
-						</Button>
-					</ModalFooter>
+      <TagACL
+        users={users}
+        usersWithRights={usersWithRights}
+        />
 
-			</div>
-			);
-		}
-	}
+      <div className="row buttons">
+        <Button className="btn btn-link-cancel" disabled={saving} onClick={cancel}>
+          Close
+        </Button>
+        <Button  className="btn ml-auto" onClick={submit} >
+          {!saving ? "Save":"Saving..."}
+        </Button>
+      </div>
+    </div>
+  );
+}

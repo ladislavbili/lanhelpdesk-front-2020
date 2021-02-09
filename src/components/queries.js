@@ -11,6 +11,7 @@ query {
     surname
     role {
       accessRights {
+        testSections
         viewErrors
         publicFilters
         users

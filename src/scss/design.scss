@@ -1854,13 +1854,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding: 20px 30px;
 }
 
-.card-box-lanwiki{
-  border: none;
-  margin-bottom: 0px;
-  background-color: $form-background-color;
-  border-radius: 0px;
-}
-
 .form-tab{
   border-color: $main-font-color;
   border-width: 0px 1px 0px 0px;
@@ -2390,8 +2383,108 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .danger-color{
   color: #dc3545;
 }
-// /0078D4
-//background: $main-background-color;
-//background: #3C3C3C;
-//color: #212121;
-//color: #33332D;
+
+//---------------------------LanWiki----------------------
+
+.lanwiki-tag-form {
+  position: relative;
+  background-color: #faf9f8;
+  height: $height-without-header;
+  padding: $odsadenie-form;
+  h1{
+      margin-left: $input-padding;
+      margin-bottom: $odsadenie-form;
+  }
+  .form-group{
+    label{
+      margin-left: $input-padding;
+    }
+  }
+  .table{
+    margin-top: 30px;
+    background-color: #f4f6f8;
+    th{
+      @extend Label;
+    }
+  }
+  .buttons{
+    position: absolute;
+    bottom: $odsadenie-form;
+    width: calc(100% - 2*#{$odsadenie-form});
+  }
+}
+
+.commandbar{
+  padding-left: $odsadenie-form;
+}
+
+.lanwiki-content{
+  .col-lg-4{
+    .commandbar{
+      padding-left: $list-odsadenie;
+    }
+  }
+  li{
+    list-style-type: none;
+  }
+  .lanwiki-list{
+    li{
+      margin: 10px $list-odsadenie;
+      padding-bottom: 10px;
+      border-bottom: $main-border;
+      .pull-right{
+        font: $font-info-text;
+        color: #767676;
+      }
+      .lanwiki-tags{
+        font: $font-info-text;
+      }
+    }
+  }
+  hr{
+    border: none;
+    border-top: $main-border;
+  }
+
+  .lanwiki-note{
+    background-color: #F9F9F9;
+    padding: $odsadenie-form;
+    .note-tags{
+      margin-bottom: 15px;
+      label{
+        margin-top: 15px;
+      }
+    }
+    .note-tags.edit{
+      margin-bottom: 15px;
+      label{
+        margin-left: $input-padding;
+        margin-top: 15px;
+      }
+    }
+    .lanwiki-title{
+      background-color: white;
+      border: $main-border;
+      h1{
+        margin-left: $input-padding;
+      }
+    }
+  }
+  .nav-item{
+    border: none;
+    .nav-link{
+      font: $font-value;
+      color: #c4c4c4;
+    }
+    .nav-link:first-child{
+      padding-left: 0px;
+    }
+      .nav-link.active{
+            list-style-type: none;
+            text-decoration: none;
+            color: black;
+            border: none !important;
+              @extend Label;
+      }
+  }
+}
