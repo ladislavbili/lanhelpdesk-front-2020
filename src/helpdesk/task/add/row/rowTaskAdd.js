@@ -12,7 +12,6 @@ import {
 import DatePicker from 'components/DatePicker';
 import moment from 'moment';
 
-import Repeat from 'helpdesk/components/repeat';
 import Attachments from 'helpdesk/components/attachments';
 
 import VykazyTable, {
@@ -108,7 +107,6 @@ export default function RowTaskAdd( props ) {
   const [ pendingDate, setPendingDate ] = React.useState( null );
   const [ pendingChangable, setPendingChangable ] = React.useState( false );
   //  const [ reminder, setReminder ] = React.useState(null);
-  const [ repeat, setRepeat ] = React.useState( null );
   const [ requester, setRequester ] = React.useState(
     project !== null ?
     userIfInProject( project ) :

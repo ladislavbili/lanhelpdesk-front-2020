@@ -11,7 +11,7 @@ import {
 import DatePicker from 'components/DatePicker';
 import moment from 'moment';
 
-import Repeat from 'helpdesk/components/repeat';
+import Repeat from 'helpdesk/components/repeat/simpleRepeat';
 import Attachments from 'helpdesk/components/attachments';
 
 import VykazyTable from 'helpdesk/components/vykazyTable';
@@ -253,9 +253,11 @@ export default function TaskAdd( props ) {
           tags: tags.map( tag => tag.id ),
           taskType: taskType ? taskType.id : null,
           repeat: repeat ? {
+            active: repeat.active,
             repeatInterval: repeat.repeatInterval.value,
-            startsAt: repeat.startsAt.valueOf() + "",
-            repeatEvery: repeat.repeatEvery + ""
+            startsAt: repeat.startsAt.valueOf()
+              .toString(),
+            repeatEvery: repeat.repeatEvery.toString()
           } : null,
           subtasks: subtasks.map( item => ( {
             title: item.title,
@@ -314,8 +316,20 @@ export default function TaskAdd( props ) {
                 'Content-Type': 'multipart/form-data'
               }
             } )
-            .then( ( response2 ) => {
+            .then( async ( response2 ) => {
               if ( response2.data.ok ) {
+                if ( repeat ) {
+                  const formData = new FormData();
+                  attachments.map( ( attachment ) => attachment.data )
+                    .forEach( ( file ) => formData.append( `file`, file ) );
+                  formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
+                  formData.append( "repeatTemplateId", response.data.addTask.repeat.repeatTemplate.id );
+                  await axios.post( `${REST_URL}/upload-repeat-template-attachments`, formData, {
+                    headers: {
+                      'Content-Type': 'multipart/form-data'
+                    }
+                  } )
+                }
                 setSaving( false );
                 closeModal();
                 history.push( `${link}/${response.data.addTask.id}` )
@@ -346,7 +360,7 @@ export default function TaskAdd( props ) {
     title === "" ||
     status === null ||
     project === null ||
-    assignedTo === [] ||
+    assignedTo.length === 0 ||
     !company ||
     ( project.def.tag.required && tags.length === 0 )
   )
@@ -666,13 +680,12 @@ export default function TaskAdd( props ) {
             </div>
             }
             { userRights.repeatRead &&
-              userRights.repeatWrite &&
               <Repeat
                 taskID={null}
                 repeat={repeat}
-                disabled={true}
+                disabled={!userRights.repeatWrite}
                 submitRepeat={(repeat)=>{
-                  if(viewOnly){
+                  if(!userRights.repeatWrite){
                     return;
                   }
                   setRepeat(repeat);
@@ -751,7 +764,7 @@ export default function TaskAdd( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className="task-edit-right">
+      <div className="task-edit-right p-b-20">
         <div className="form-selects-entry-column" >
           <Label>Project <span className="warning-big">*</span></Label>
           <div className="form-selects-entry-column-rest" >
@@ -817,13 +830,12 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.repeatRead &&
-          userRights.repeatWrite &&
           <Repeat
             taskID={null}
             repeat={repeat}
-            disabled={true}
+            disabled={!userRights.repeatWrite}
             submitRepeat={(repeat)=>{
-              if(true){
+              if(!userRights.repeatWrite){
                 return;
               }
               setRepeat(repeat);
@@ -1044,14 +1056,12 @@ export default function TaskAdd( props ) {
         isInvoiced={false}
         canEditInvoiced={false}
         company={company}
-        match={match}
-        taskID={null}
         taskAssigned={assignedTo}
 
         showSubtasks={project ? project.showSubtasks : false}
 
-        submitService={(newService)=>{
-          setSubtasks([...subtasks,{id:getNewID(), ...newService}]);
+        submitSubtask={(newSubtask)=>{
+          setSubtasks([...subtasks,{id:getNewID(), ...newSubtask}]);
         }}
         subtasks={subtasks}
         defaultType={taskType}
@@ -1139,9 +1149,6 @@ export default function TaskAdd( props ) {
           newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
           setCustomItems(newCustomItems);
         }}
-
-        units={[]}
-        defaultUnit={defaultUnit}
         />
     )
   }

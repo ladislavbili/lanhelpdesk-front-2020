@@ -137,7 +137,7 @@ export default function Scheduled( props ) {
                 }
                 className="btn-primary center-hor ml-auto"
                 onClick={() => {
-                  submitItem({user: newUser, from: newFrom.valueOf().toString(), to: newTo.valueOf().toString()})
+                  submitItem({user: newUser, from: newFrom, to: newTo})
                   setNewUser(null);
                   setNewFrom(null);
                   setNewTo(null);

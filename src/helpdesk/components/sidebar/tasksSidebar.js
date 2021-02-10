@@ -298,6 +298,15 @@ export default function TasksSidebar( props ) {
                 </div>
               </NavItem>
             )) }
+            <NavItem key='repeats' className={classnames("row full-width sidebar-item", { "active": window.location.pathname === '/helpdesk/repeats' }) }>
+              <span
+                className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname === '/helpdesk/repeats' }) }
+                onClick={() => {
+                  history.push(`/helpdesk/repeats`)
+                }}>
+                Repeats
+              </span>
+            </NavItem>
           </Nav>
         </TabPane>
         <TabPane tabId={1}>

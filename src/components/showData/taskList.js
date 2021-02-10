@@ -210,7 +210,6 @@ export default function List( props ) {
               {
                 return displayValues
                 .every((display)=> {
-                  console.log(item, display);
                   let value = getItemDisplayValue(item,display);
                   if(display.value === "assignedTo"){
                     value = item["assignedTo"].map(item => `${item.name} ${item.surname} (${item.email})`).toString();
@@ -239,8 +238,6 @@ export default function List( props ) {
                   if(display.value === 'checked'){
                     return true;
                   }
-                  console.log("aaaaa", value.toString().toLowerCase());
-                  console.log("bbbb", filter[display.value].toLowerCase());
                   let result = value.toString().toLowerCase().includes(filter[display.value].toLowerCase());
                   return result;
                 });
