@@ -90,9 +90,11 @@ const responseTask = `
     title
   }
   repeat {
+    id
     repeatEvery
     repeatInterval
     startsAt
+    active
   }
   scheduled{
     id
@@ -224,7 +226,7 @@ mutation addTask(
   $status: Int!,
   $tags: [Int]!,
   $taskType: Int,
-  $repeat: RepeatInput,
+  $repeat: TaskRepeatInput,
   $subtasks: [SubtaskInput],
   $workTrips: [WorkTripInput],
   $materials: [MaterialInput],
@@ -259,6 +261,11 @@ mutation addTask(
   ){
     id
     title
+    repeat{
+      repeatTemplate{
+        id
+      }
+    }
   }
 }
 `;
@@ -268,74 +275,11 @@ mutation addUserToProject(
   $userId: Int!,
   $projectId: Int!,
 ){
-  addTask(
+  addUserToProject(
     userId: $userId
     projectId: $projectId,
   ){
     id
-    title
-    updatedAt
-    createdAt
-    important
-    closeDate
-    overtime
-    pausal
-    pendingChangable
-    statusChange
-    assignedTo {
-      id
-      fullName
-      email
-    }
-    company {
-      id
-      title
-    }
-    createdBy {
-      id
-      name
-      surname
-    }
-    deadline
-    description
-    milestone{
-      id
-      title
-    }
-    pendingDate
-    project{
-      id
-      title
-      right{
-        ${groupRights}
-      }
-    }
-    requester{
-      id
-      name
-      surname
-      fullName
-      email
-    }
-    status {
-      id
-      title
-      color
-      action
-    }
-    tags {
-      id
-      title
-    }
-    taskType {
-      id
-      title
-    }
-    repeat {
-      repeatEvery
-      repeatInterval
-      startsAt
-    }
   }
 }
 `;
@@ -407,11 +351,6 @@ query tasks($filter: FilterInput, $projectId: Int, $sort: SortTasksInput){
 			taskType {
 				id
 				title
-			}
-			repeat {
-				repeatEvery
-				repeatInterval
-				startsAt
 			}
 		}
     execTime
@@ -491,7 +430,6 @@ mutation updateTask(
   $status: Int,
   $tags: [Int],
   $taskType: Int,
-  $repeat: RepeatInput
 ) {
   updateTask(
 		id: $id,
@@ -512,88 +450,9 @@ mutation updateTask(
     status: $status,
     tags: $tags,
     taskType: $taskType,
-    repeat: $repeat,
   ){
-      id
-      important
-      title
-      updatedAt
-      createdAt
-      closeDate
-      assignedTo {
-        id
-        name
-        surname
-        email
-      }
-      company {
-        id
-        title
-        dph
-        usedTripPausal
-        usedSubtaskPausal
-        taskWorkPausal
-        taskTripPausal
-        monthly
-        monthlyPausal
-        pricelist {
-          id
-          title
-          materialMargin
-          prices {
-            type
-            price
-            taskType {
-              id
-            }
-            tripType {
-              id
-            }
-          }
-        }
-      }
-      createdBy {
-        id
-        name
-        surname
-      }
-      deadline
-      description
-      milestone{
-        id
-        title
-      }
-      pendingDate
-      project{
-        id
-        title
-      }
-      requester{
-        id
-        name
-        surname
-      }
-      status {
-        id
-        title
-        color
-        action
-      }
-      tags {
-        id
-        title
-        color
-      }
-      taskType {
-        id
-        title
-      }
-      repeat {
-        repeatEvery
-        repeatInterval
-        startsAt
-      }
-    }
+    ${responseTask}
+  }
 }
 `;
 
@@ -930,7 +789,6 @@ mutation deleteTaskAttachment($id: Int!) {
   }
 }
 `;
-
 
 export const UPDATE_INVOICED_TASK = gql `
 mutation updateInvoicedTask($id: Int!, $taskChanges: TaskChangeInput, $stmcChanges: SMTCChangesInput, $cancelInvoiced: Boolean!) {

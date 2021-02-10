@@ -42,7 +42,7 @@ export default function Rozpocet( props ) {
     updateCustomItem,
     updateCustomItems,
     removeCustomItem,
-    submitService,
+    submitSubtask,
     submitTrip,
     submitMaterial,
     submitCustomItem,
@@ -1058,7 +1058,7 @@ export default function Rozpocet( props ) {
                         setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
                         setShowAddSubtask( false);
 
-                        submitService(body);
+                        submitSubtask(body);
                       }
                     }}
                     onChange={(e)=>setNewSubtaskTitle(e.target.value)}
@@ -1158,7 +1158,7 @@ export default function Rozpocet( props ) {
                       setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
                       setShowAddSubtask( false);
 
-                      submitService(body, getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity }));
+                      submitSubtask(body, getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity }));
                     }}
                     >
                     <i className="fa fa-plus" />

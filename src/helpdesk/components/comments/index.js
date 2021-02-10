@@ -112,7 +112,7 @@ export default function Comments( props ) {
   if ( commentsLoading ) {
     return <Loading />
   }
-  console.log( commentsData );
+
   return (
     <div>
       { (userRights.addComments || userRights.emails) &&

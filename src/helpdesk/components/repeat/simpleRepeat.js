@@ -1,5 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
+import Checkbox from 'components/checkbox';
 import {
   Button,
   Popover,
@@ -22,19 +23,17 @@ import {
   intervals
 } from 'configs/constants/repeat';
 
-export default function Repeat( props ) {
+export default function SimpleRepeat( props ) {
   const {
-    disabled,
-    taskID,
     repeat,
     submitRepeat,
     deleteRepeat,
     vertical,
-    addTask,
-    layout,
+    disabled,
   } = props;
 
   const [ open, setOpen ] = React.useState( false );
+  const [ active, setActive ] = React.useState( true );
   const [ startsAt, setStartsAt ] = React.useState( repeat ? repeat.startsAt : null );
   const [ repeatEvery, setRepeatEvery ] = React.useState( repeat ? repeat.repeatEvery : "1" );
   const [ repeatInterval, setRepeatInterval ] = React.useState( repeat ? repeat.repeatInterval : intervals[ 0 ] );
@@ -42,15 +41,17 @@ export default function Repeat( props ) {
   React.useEffect( () => {
     setOpen( false )
     if ( repeat === null ) {
+      setActive( true );
       setStartsAt( null );
       setRepeatEvery( "1" );
       setRepeatInterval( intervals[ 0 ] );
     } else {
+      setActive( repeat.active );
       setStartsAt( repeat.startsAt );
       setRepeatEvery( repeat.repeatEvery );
       setRepeatInterval( repeat.repeatInterval );
     }
-  }, [ taskID, repeat ] );
+  }, [ repeat ] );
 
   const toggleRepeat = () => {
     if ( disabled ) {
@@ -65,23 +66,7 @@ export default function Repeat( props ) {
         <div className="form-selects-entry-column">
           <Label style={{display: "block"}}>Repeat</Label>
           <div className="form-selects-entry-column-rest">
-            <Button type="button"className="btn btn-repeat" id={"openPopover"+taskID} onClick={toggleRepeat}>
-              {
-                repeat ?
-                ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
-                "No repeat"
-              }
-            </Button>
-          </div>
-        </div>
-      }
-      {
-        !vertical &&
-        !addTask &&
-        <div className="p-r-10">
-          <Label className="col-3 col-form-label">Repeat</Label>
-          <div className="col-9">
-            <Button type="button" className="btn btn-repeat flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
+            <Button type="button"className="btn btn-repeat" id={"repeatPopover"} onClick={toggleRepeat}>
               {
                 repeat ?
                 ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
@@ -92,11 +77,10 @@ export default function Repeat( props ) {
         </div>
       }
       {!vertical &&
-        addTask &&
         <div className="row p-r-10">
           <Label className="col-3 col-form-label">Repeat</Label>
           <div className="col-9">
-            <Button type="button" className="btn btn-repeat flex" id={"openPopover"+taskID} onClick={toggleRepeat}>
+            <Button type="button" className="btn btn-repeat flex" id={"repeatPopover"} onClick={toggleRepeat}>
               {
                 repeat ?
                 ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
@@ -107,7 +91,7 @@ export default function Repeat( props ) {
         </div>
       }
 
-      <Popover placement="bottom" isOpen={open && !disabled} target={"openPopover"+taskID} toggle={toggleRepeat}>
+      <Popover placement="bottom" isOpen={open && !disabled} target={"repeatPopover"} toggle={toggleRepeat}>
         <PopoverHeader>Opakovanie</PopoverHeader>
         <PopoverBody>
           <div>
@@ -146,6 +130,13 @@ export default function Repeat( props ) {
                 }
               </div>
             </FormGroup>
+              <Checkbox
+                className = "m-r-5"
+                disabled = {disabled}
+                label="Active"
+                value = { active }
+                onChange={() => setActive(!active )}
+                />
             <div className="row">
               <Button
                 className="btn btn-link"
@@ -168,7 +159,8 @@ export default function Repeat( props ) {
                     submitRepeat({
                       startsAt,
                       repeatEvery,
-                      repeatInterval
+                      repeatInterval,
+                      active
                     });
                   }
                   setOpen(false);

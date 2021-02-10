@@ -28,9 +28,6 @@ import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 import ck5config from 'configs/components/ck5config';
-import {
-  intervals
-} from 'configs/constants/repeat';
 
 import {
   invisibleSelectStyleNoArrow,
@@ -54,7 +51,7 @@ import {
 
 import Attachments from 'helpdesk/components/attachments';
 import Comments from 'helpdesk/components/comments';
-import Repeat from 'helpdesk/components/repeat';
+import Repeat from 'helpdesk/components/repeat/repeatFormInput';
 import TaskHistory from 'helpdesk/components/taskHistory';
 import VykazyTable, {
   getCreationError as getVykazyError
@@ -165,7 +162,6 @@ export default function TaskEdit( props ) {
   const [ potentialPendingStatus, setPotentialPendingStatus ] = React.useState( null );
   const [ pendingOpen, setPendingOpen ] = React.useState( false );
   const [ project, setProject ] = React.useState( null );
-  const [ repeat, setRepeat ] = React.useState( null );
   const [ requester, setRequester ] = React.useState( null );
   const [ status, setStatus ] = React.useState( null );
   const [ showDescription, setShowDescription ] = React.useState( false );
@@ -193,7 +189,7 @@ export default function TaskEdit( props ) {
     } else {
       setAssignedTo( toSelArr( task.assignedTo, 'email' ) );
     }
-    setCloseDate( moment( parseInt( task.closeDate ) ) );
+    setCloseDate( task.closeDate ? moment( parseInt( task.closeDate ) ) : null );
     setDeadline( task.deadline ? moment( parseInt( task.deadline ) ) : null );
     setDescription( task.description );
     setImportant( task.important );
@@ -203,16 +199,7 @@ export default function TaskEdit( props ) {
     setOvertime( ( task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPausal( ( task.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPendingChangable( task.pendingChangable );
-    setPendingDate( moment( parseInt( task.pendingDate ) ) );
-    if ( task.repeat === null ) {
-      setRepeat( null );
-    } else {
-      setRepeat( {
-        repeatInterval: intervals.find( ( interval ) => interval.value === task.repeat.repeatInterval ),
-        repeatEvery: task.repeat.repeatEvery,
-        startsAt: moment( parseInt( task.repeat.startsAt ) )
-      } );
-    }
+    setPendingDate( task.pendingDate ? moment( parseInt( task.pendingDate ) ) : null );
     const status = ( task.status ? toSelItem( task.status ) : null )
     setStatus( status );
     if ( task.invoiced ) {
@@ -746,6 +733,41 @@ export default function TaskEdit( props ) {
 
   const canCopy = userRights.addTasks && !getCantSave();
 
+  const getTaskData = () => ( {
+    scheduled: task.scheduled,
+    shortSubtasks: task.shortSubtasks,
+    subtasks: task.subtasks.map( item => ( {
+      ...item,
+      assignedTo: toSelItem( item.assignedTo, 'email' ),
+      type: toSelItem( item.type )
+    } ) ),
+    workTrips: task.workTrips.map( item => ( {
+      ...item,
+      assignedTo: toSelItem( item.assignedTo, 'email' ),
+      type: toSelItem( item.type )
+    } ) ),
+    materials: task.materials,
+    customItems: task.customItems,
+    assignedTo,
+    closeDate,
+    company,
+    deadline,
+    description,
+    important,
+    milestone,
+    overtime,
+    pausal,
+    pendingChangable,
+    pendingDate,
+    potentialPendingStatus,
+    project,
+    requester,
+    status,
+    tags,
+    taskType,
+    title,
+
+  } )
 
   //Value Change
   const changeProject = ( project ) => {
@@ -1311,21 +1333,8 @@ export default function TaskEdit( props ) {
                 <Repeat
                   disabled={!userRights.repeatWrite}
                   taskID={id}
-                  repeat={repeat}
-                  submitRepeat={(repeat) => {
-                    setRepeat(repeat);
-                    autoUpdateTask({
-                      repeat: {
-                        repeatEvery: repeat.repeatEvery,
-                        repeatInterval: repeat.repeatInterval.value,
-                        startsAt: repeat.startsAt.valueOf().toString(),
-                      }
-                    })
-                  }}
-                  deleteRepeat={()=> {
-                    setRepeat(null);
-                    autoUpdateTask({ repeat: null })
-                  }}
+                  duplicateTask={ !task.repeat ? getTaskData() : null}
+                  repeat={task.repeat}
                   layout={layout}
                   />
             }
@@ -1469,24 +1478,11 @@ export default function TaskEdit( props ) {
         }
         { userRights.repeatRead &&
           <Repeat
-            disabled={userRights.repeatWrite}
+            vertical
+            disabled={!userRights.repeatWrite}
+            duplicateTask={ !task.repeat ? getTaskData() : null}
             taskID={id}
-            repeat={repeat}
-            submitRepeat={(repeat) => {
-              setRepeat(repeat);
-              autoUpdateTask({
-                repeat: {
-                  repeatEvery: repeat.repeatEvery,
-                  repeatInterval: repeat.repeatInterval.value,
-                  startsAt: repeat.startsAt.valueOf().toString(),
-                }
-              })
-            }}
-            deleteRepeat={()=> {
-              setRepeat(null);
-              autoUpdateTask({ repeat: null })
-            }}
-            vertical={true}
+            repeat={task.repeat}
             layout={layout}
             />
         }
@@ -1500,7 +1496,7 @@ export default function TaskEdit( props ) {
             users={assignedTos}
             disabled={false}
             submitItem = { (newScheduled) => {
-              addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from , to: newScheduled.to });
+              addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from.valueOf().toString() , to: newScheduled.to.valueOf().toString() });
             }}
             deleteItem = { (scheduled) => {
               deleteScheduledTaskFunc(scheduled.id);
@@ -1601,7 +1597,7 @@ export default function TaskEdit( props ) {
   }
 
   const renderDescription = () => {
-    if ( !userRights.taskDescriptionRead ) {
+    if ( !userRights.taskDescriptionRead && !userRights.taskAttachmentsRead ) {
       return null;
     }
     let RenderDescription = null;
@@ -1620,7 +1616,7 @@ export default function TaskEdit( props ) {
             onInit={(editor) => {
               editor.editing.view.document.on( 'keydown', ( evt, data ) => {
                 if ( data.keyCode === 27 ) {
-                  autoUpdateTask({ description  });
+                  saveChange({ description  });
                   setShowDescription(false);
                   data.preventDefault();
                   evt.stop();
@@ -1662,7 +1658,7 @@ export default function TaskEdit( props ) {
                 { !showDescription ? 'edit' : 'save' }
               </button>
             }
-            { userRights.taskAttachmentsRead && userRights.taskAttachmentsWrite &&
+            { userRights.taskAttachmentsWrite &&
               <label htmlFor={`uploadAttachment-${id}`} className="btn btn-link" >
                 <i className="fa fa-plus" />
                 Attachment
@@ -1841,24 +1837,22 @@ export default function TaskEdit( props ) {
         isInvoiced={task.invoiced}
         canEditInvoiced={canEditInvoiced}
         company={company}
-        match={match}
-        taskID={id}
         taskAssigned={assignedTo.filter((user) => user.id !== null )}
 
         showSubtasks={project ? project.showSubtasks : false}
 
         message={renderCompanyPausalInfo()}
 
-        submitService={(newService, price) => {
-          if(task.invoiced){
-            saveVykazyChanges({...newService, price}, 'subtask', 'ADD' );
-          }else{
-            addSubtaskFunc(newService);
-          }
-        }}
         subtasks={ task.invoiced ? modifyInvoicedVykazy(subtasks, 'subtask') : subtasks }
         defaultType={taskType}
         taskTypes={taskTypes}
+        submitSubtask={(newSubtask, price) => {
+          if(task.invoiced){
+            saveVykazyChanges({...newSubtask, price}, 'subtask', 'ADD' );
+          }else{
+            addSubtaskFunc(newSubtask);
+          }
+        }}
         updateSubtask={(id,newData)=>{
           if(task.invoiced){
             saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
@@ -1985,8 +1979,6 @@ export default function TaskEdit( props ) {
             deleteCustomItemFunc(id);
           }
         }}
-        units={[]}
-        defaultUnit={null}
         />
     )
   }

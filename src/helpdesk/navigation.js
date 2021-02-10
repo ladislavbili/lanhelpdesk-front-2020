@@ -27,6 +27,7 @@ import TaskList from './task';
 import NotificationList from './notifications';
 
 import Loading from 'components/loading';
+import RepeatsList from 'helpdesk/components/repeat/repeatsList';
 
 import {
   SET_TASKLIST_LAYOUT,
@@ -87,7 +88,9 @@ export default function Navigation( props ) {
           <Route exact path="/helpdesk/taskList/i/:listID/:taskID" component={TaskList} />
           <Route exact path="/helpdesk/notifications" component={NotificationList} />
           <Route exact path="/helpdesk/notifications/:notificationID/:taskID" component={NotificationList} />
-            <Route exact path="/helpdesk/project/:projectID" component={ProjectEdit} />
+          <Route exact path="/helpdesk/project/:projectID" component={ProjectEdit} />
+            <Route exact path="/helpdesk/repeats" component={RepeatsList} />
+
 
           { /* SETTINGS */ }
           { settings.map( (item) => {
