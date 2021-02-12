@@ -27,10 +27,16 @@ export default function Scheduled( props ) {
   } = props;
 
   const [ addItem, setAddItem ] = React.useState( null );
-
   const [ newUser, setNewUser ] = React.useState( null );
   const [ newFrom, setNewFrom ] = React.useState( null );
   const [ newTo, setNewTo ] = React.useState( null );
+
+  React.useEffect( () => {
+    if ( users.length > 0 && newUser === null ) {
+      setNewUser( users[ 0 ] );
+    }
+  }, [ users ] );
+
   return (
     <div className="form-selects-entry-column">
       <div className="row">

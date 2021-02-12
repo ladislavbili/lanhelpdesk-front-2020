@@ -804,7 +804,8 @@ export default function RepeatForm( props ) {
   const renderHeader = () => {
     return (
       <div className="task-add-layout row">
-        <h3 className="center-hor p-r-20">{`${ !editMode ? 'Add repeat' : 'Edit repeat' }`}</h3>
+        <h2 className="center-hor p-r-20">{`${ !editMode ? 'Add repeat' : 'Edit repeat' }`}</h2>
+        <div className="ml-auto m-r-20">
         <button
           type="button"
           className="btn btn-link waves-effect task-add-layout-button"
@@ -822,6 +823,7 @@ export default function RepeatForm( props ) {
             Delete Repeat
           </button>
         }
+      </div>
 
       </div>
     )

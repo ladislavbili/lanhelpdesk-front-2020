@@ -15,6 +15,9 @@ import {
 
 import Repeat from './repeatFormModal';
 
+import {
+  GET_PROJECT,
+} from 'apollo/localSchema/queries';
 
 import {
   GET_REPEATS
@@ -30,12 +33,20 @@ export default function RepeatList( props ) {
     history,
     match
   } = props;
+
+  const {
+    data: projectData,
+    loading: projectLoading
+  } = useQuery( GET_PROJECT );
+
   const {
     data: repeatsData,
     loading: repeatsLoading
   } = useQuery( GET_REPEATS, {
+    variables: {
+      projectId: projectData.localProject.id
+    },
     fetchPolicy: 'network-only',
-    notifyOnNetworkStatusChange: true,
   } );
 
   if ( repeatsLoading ) {
@@ -45,8 +56,8 @@ export default function RepeatList( props ) {
   return (
     <div className="content">
       <div className="row m-0 p-0 taskList-container">
-        <div className="commandbar">
-          <div className="m-l-20 search-row">
+        <div className="commandbar p-l-20">
+          <div className="search-row">
             <div className="search">
               <button className="search-btn" type="button">
                 <i className="fa fa-search" />

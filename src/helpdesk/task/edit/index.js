@@ -43,6 +43,10 @@ import {
 
   ADD_USER_TO_PROJECT,
   DELETE_TASK,
+  UPDATE_TASK,
+  UPDATE_INVOICED_TASK,
+  SET_TASK_LAYOUT,
+
   ADD_SCHEDULED_TASK,
   DELETE_SCHEDULED_TASK,
   ADD_SHORT_SUBTASK,
@@ -88,6 +92,7 @@ export default function TaskEditContainer( props ) {
   const {
     data: myData,
     loading: myDataLoading,
+    refetch: myDataRefetch,
   } = useQuery( GET_MY_DATA );
   const {
     data: basicCompaniesData,
@@ -130,6 +135,10 @@ export default function TaskEditContainer( props ) {
   const {
     data: projectData,
   } = useQuery( GET_PROJECT );
+
+  const [ updateTask ] = useMutation( UPDATE_TASK );
+  const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
+  const [ setTaskLayout ] = useMutation( SET_TASK_LAYOUT );
 
   const [ addScheduledTask ] = useMutation( ADD_SCHEDULED_TASK );
   const [ deleteScheduledTask ] = useMutation( DELETE_SCHEDULED_TASK );
@@ -744,6 +753,18 @@ export default function TaskEditContainer( props ) {
 
   }
 
+  const setTaskLayoutFunc = ( value ) => {
+    setTaskLayout( {
+        variables: {
+          taskLayout: value,
+        }
+      } )
+      .then( ( response ) => {
+        myDataRefetch();
+      } )
+      .catch( ( err ) => console.log( err ) );
+  }
+
   const dataLoading = (
     myDataLoading ||
     basicCompaniesLoading ||
@@ -799,6 +820,10 @@ export default function TaskEditContainer( props ) {
       addShortSubtask={addShortSubtaskFunc}
       updateShortSubtask={updateShortSubtaskFunc}
       deleteShortSubtask={deleteShortSubtaskFunc}
+      updateTask={updateTask}
+      updateInvoicedTask={updateInvoicedTask}
+      setTaskLayout={setTaskLayoutFunc}
+      client={client}
       saving={saving}
       setSaving={setSaving}
       canEditInvoiced={props.canEditInvoiced === true}

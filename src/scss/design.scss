@@ -1622,6 +1622,17 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
 }
 
+.small-modal{
+  width: 600px !important;
+  .modal-content{
+    background-color: $form-background-color;
+    padding: 0px;
+    .modal-body{
+      padding: 0px;
+    }
+  }
+}
+
 .task-add-container{
   width: 1300px !important;
   .modal-content{

@@ -1,6 +1,4 @@
-import React, {
-  Component
-} from 'react';
+import React from 'react';
 import {
   ButtonDropdown,
   DropdownToggle,
@@ -21,7 +19,7 @@ export default function Multiselect( props ) {
     disabled,
   } = props;
 
-  const [ open, setOpen ] = React.useSate( false );
+  const [ open, setOpen ] = React.useState( false );
 
   return (
     <ButtonDropdown

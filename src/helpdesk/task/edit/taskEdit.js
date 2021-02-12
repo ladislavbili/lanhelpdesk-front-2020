@@ -1,12 +1,4 @@
 import React from 'react';
-import {
-  gql,
-  useMutation,
-  useQuery,
-  useLazyQuery,
-  useApolloClient,
-} from "@apollo/client";
-
 import Select from 'react-select';
 import {
   Label,
@@ -74,8 +66,6 @@ import {
   toFloatOrZero
 } from 'helperFunctions';
 import {
-  UPDATE_TASK,
-  UPDATE_INVOICED_TASK,
   GET_TASK,
   GET_TASKS,
 } from '../queries';
@@ -93,7 +83,6 @@ import {
 let fakeID = -1;
 
 export default function TaskEdit( props ) {
-  const client = useApolloClient();
   //data & queries
   const {
     match,
@@ -141,10 +130,13 @@ export default function TaskEdit( props ) {
     updateShortSubtask,
     deleteShortSubtask,
     canEditInvoiced,
+    updateTask,
+    updateInvoicedTask,
+    client,
+    setTaskLayout,
   } = props;
 
   //state
-  const [ layout, setLayout ] = React.useState( 2 );
 
   const [ assignedTo, setAssignedTo ] = React.useState( [] );
   const [ closeDate, setCloseDate ] = React.useState( null );
@@ -176,8 +168,6 @@ export default function TaskEdit( props ) {
 
   const [ changes, setChanges ] = React.useState( {} );
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
-  const [ updateTask ] = useMutation( UPDATE_TASK );
-  const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
 
   const invoicedTask = task.invoiced ? task.invoicedTasks[ 0 ] : null;
   // sync
@@ -960,7 +950,7 @@ export default function TaskEdit( props ) {
             <button
               type="button"
               className="btn btn-link waves-effect task-add-layout-button"
-              onClick={() => setLayout(layout === 1 ? 2 : 1)}
+              onClick={() => setTaskLayout(currentUser.taskLayout === 1 ? 2 : 1)}
               >
               <i className="fas fa-retweet "/>
               Layout
@@ -1335,7 +1325,7 @@ export default function TaskEdit( props ) {
                   taskID={id}
                   duplicateTask={ !task.repeat ? getTaskData() : null}
                   repeat={task.repeat}
-                  layout={layout}
+                  layout={currentUser.taskLayout}
                   />
             }
             { userRights.overtimeRead &&
@@ -1365,15 +1355,15 @@ export default function TaskEdit( props ) {
                 from: moment(parseInt(item.from)),
                 to: moment(parseInt(item.to)),
               }))}
-              users={assignedTos}
-              disabled={false}
+              users={assignedTo}
+              disabled={ assignedTo.length === 0 }
               submitItem = { (newScheduled) => {
                 addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from , to: newScheduled.to });
               }}
               deleteItem = { (scheduled) => {
                 deleteScheduledTaskFunc(scheduled.id);
               } }
-              layout={layout}
+              layout={currentUser.taskLayout}
               />
           }
         </div>
@@ -1483,7 +1473,7 @@ export default function TaskEdit( props ) {
             duplicateTask={ !task.repeat ? getTaskData() : null}
             taskID={id}
             repeat={task.repeat}
-            layout={layout}
+            layout={currentUser.taskLayout}
             />
         }
         { userRights.scheduledRead &&
@@ -1493,15 +1483,15 @@ export default function TaskEdit( props ) {
               from: moment(parseInt(item.from)),
               to: moment(parseInt(item.to)),
             }))}
-            users={assignedTos}
-            disabled={false}
+            users={assignedTo}
+            disabled={ assignedTo.length === 0 }
             submitItem = { (newScheduled) => {
               addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from.valueOf().toString() , to: newScheduled.to.valueOf().toString() });
             }}
             deleteItem = { (scheduled) => {
               deleteScheduledTaskFunc(scheduled.id);
             } }
-            layout={layout}
+            layout={currentUser.taskLayout}
             />
         }
 
@@ -2062,7 +2052,7 @@ export default function TaskEdit( props ) {
         <div
           className={classnames(
             {
-              "row": layout === 2,
+              "row": currentUser.taskLayout === 2,
             },
           )}
           >
@@ -2070,20 +2060,20 @@ export default function TaskEdit( props ) {
             className={classnames(
               "bkg-white",
               {
-                "task-edit-left": layout === 2 && !columns,
-                "task-edit-left-columns": (layout === 2 && columns) || layout === 1,
+                "task-edit-left": currentUser.taskLayout === 2 && !columns,
+                "task-edit-left-columns": (currentUser.taskLayout === 2 && columns) || currentUser.taskLayout === 1,
               },
             )}
-             style={ layout === 2 && !columns ? {height: '100vh'} : {}}
+             style={ currentUser.taskLayout === 2 && !columns ? {height: '100vh'} : {}}
             >
 
             <div>
               { renderTitle() }
-              { layout === 2 && <hr className="m-t-5 m-b-15"/> }
+              { currentUser.taskLayout === 2 && <hr className="m-t-5 m-b-15"/> }
 
               {canCreateVykazyError()}
 
-              { layout === 1 ? renderSelectsLayout1() : null }
+              { currentUser.taskLayout === 1 ? renderSelectsLayout1() : null }
 
               { renderDescription() }
 
@@ -2107,7 +2097,7 @@ export default function TaskEdit( props ) {
 
           </div>
 
-          { layout === 2 && renderSelectsLayout2Side() }
+          { currentUser.taskLayout === 2 && renderSelectsLayout2Side() }
         </div>
       </div>
     </div>

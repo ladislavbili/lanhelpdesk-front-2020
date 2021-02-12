@@ -372,34 +372,6 @@ mutation deleteTask($id: Int!) {
 }
 `;
 
-export const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-		statuses {
-			id
-			title
-			color
-			action
-		}
-		company {
-			id
-			title
-		}
-    role {
-			level
-      accessRights {
-        projects
-        publicFilters
-        users
-        companies
-        vykazy
-      }
-    }
-  }
-}
-`;
-
 export const GET_TASK = gql `
 query task($id: Int!){
 	task(
@@ -452,6 +424,45 @@ mutation updateTask(
     taskType: $taskType,
   ){
     ${responseTask}
+  }
+}
+`;
+
+export const GET_MY_DATA = gql `
+query {
+  getMyData{
+    id
+    taskLayout
+		statuses {
+			id
+			title
+			color
+			action
+		}
+		company {
+			id
+			title
+		}
+    role {
+			level
+      accessRights {
+        projects
+        publicFilters
+        users
+        companies
+        vykazy
+      }
+    }
+  }
+}
+`;
+
+export const SET_TASK_LAYOUT = gql `
+mutation setTaskLayout($taskLayout: Int!) {
+  setTaskLayout(
+    taskLayout: $taskLayout
+  ){
+    taskLayout
   }
 }
 `;

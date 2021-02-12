@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useMutation,
 } from "@apollo/client";
 import {
   gql
@@ -15,6 +16,8 @@ import {
   Button
 } from 'reactstrap';
 import TaskAdd from './taskAdd';
+
+import ProjectSelectModal from './projectSelectModal';
 
 import {
   noMilestone
@@ -40,13 +43,20 @@ import {
 } from 'helpdesk/settings/projects/queries';
 
 import {
-  GET_MY_DATA
+  GET_MY_DATA,
+  SET_TASK_LAYOUT,
+  ADD_TASK,
 } from '../queries';
 
 export default function TaskAddContainer( props ) {
   const {
-    disabled
+    disabled,
+    projectID: sidebarProjectID,
   } = props;
+
+  const [ addTask ] = useMutation( ADD_TASK );
+  const [ setTaskLayout ] = useMutation( SET_TASK_LAYOUT );
+
   //data & queries
   const {
     data: companiesData,
@@ -91,7 +101,8 @@ export default function TaskAddContainer( props ) {
   } );
   const {
     data: currentUserData,
-    loading: currentUserLoading
+    loading: currentUserLoading,
+    refetch: currentUserRefetch,
   } = useQuery( GET_MY_DATA, {
     options: {
       fetchPolicy: 'network-only'
@@ -100,6 +111,23 @@ export default function TaskAddContainer( props ) {
 
   //state
   const [ openAddTaskModal, setOpenAddTaskModal ] = React.useState( false );
+  const [ projectID, setProjectID ] = React.useState( sidebarProjectID ? sidebarProjectID : null );
+
+  React.useEffect( () => {
+    setProjectID( sidebarProjectID ? sidebarProjectID : null );
+  }, [ sidebarProjectID ] );
+
+  const setTaskLayoutFunc = ( value ) => {
+    setTaskLayout( {
+        variables: {
+          taskLayout: value,
+        }
+      } )
+      .then( ( response ) => {
+        currentUserRefetch();
+      } )
+      .catch( ( err ) => console.log( err ) );
+  }
 
   const loading = (
     companiesLoading ||
@@ -140,11 +168,37 @@ export default function TaskAddContainer( props ) {
   }
 
   const renderModal = () => {
+    if ( !openAddTaskModal ) {
+      return null;
+    }
+    if ( projectID === null ) {
+      return (
+        <ProjectSelectModal
+          projects={
+            loading ? [] :
+            toSelArr(projectsData.myProjects.map((myProject) => ({
+              ...myProject.project,
+              right: myProject.right,
+              users: myProject.usersWithRights.map((user) => user.id)
+            }) ))
+          }
+          onSubmit= {(projectID) => {
+            setProjectID(projectID);
+          }}
+          closeModal={() => {
+            setOpenAddTaskModal(false);
+          }}
+          loading={loading}
+          />
+      )
+    }
     return (
       <Modal isOpen={openAddTaskModal} className="task-add-container" >
         <ModalBody>
           {  openAddTaskModal && !loading &&
-            <TaskAdd {...props}
+            <TaskAdd
+              {...props}
+              projectID={projectID}
               loading={loading}
               projects={
                 toSelArr(projectsData.myProjects.map((myProject) => ({
@@ -162,7 +216,10 @@ export default function TaskAddContainer( props ) {
               defaultUnit={null}
               closeModal={ () => {
                 setOpenAddTaskModal(false);
+                setProjectID(null);
               }}
+              addTask={addTask}
+              setTaskLayout={setTaskLayoutFunc}
               />
           }
         </ModalBody>
@@ -170,15 +227,12 @@ export default function TaskAddContainer( props ) {
     )
   }
 
-  if ( props.task && !openAddTaskModal ) {
+  if ( props.task ) {
     return (
-      renderCopyButton()
-    );
-  }
-
-  if ( props.task && openAddTaskModal ) {
-    return (
-      renderModal()
+      <>
+        {renderCopyButton()}
+      {renderModal()}
+    </>
     );
   }
   return (
@@ -191,5 +245,5 @@ export default function TaskAddContainer( props ) {
       { renderModal() }
 
     </div>
-  );
-}
+    );
+  }

@@ -180,7 +180,7 @@ export default function TasksIndex( props ) {
     return [
       {
         type: 'project',
-        show: localProject.id === null,
+        show: true,
         data: localProject,
         label: localProject.title,
         onClick: () => {
@@ -191,7 +191,7 @@ export default function TasksIndex( props ) {
       },
       {
         type: 'milestone',
-        show: localProject.id !== null,
+        show: localProject.id !== null && localMilestone.id !== null,
         data: localMilestone,
         label: localMilestone.title,
         onClick: () => {

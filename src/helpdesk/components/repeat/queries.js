@@ -177,8 +177,12 @@ query repeat($id: Int){
 `;
 
 export const GET_REPEATS = gql `
-query {
-  repeats {
+query (
+    $projectId: Int
+) {
+  repeats(
+      projectId: $projectId
+  ) {
     id
     repeatEvery
     repeatInterval

@@ -196,6 +196,8 @@ export default function TasksSidebar( props ) {
     </div>
   )
 
+  const repeatPage = window.location.pathname === '/helpdesk/repeats';
+
   return (
     <div>
       <div className="sidebar-label">
@@ -214,7 +216,11 @@ export default function TasksSidebar( props ) {
         styles={sidebarSelectStyleNoIcon}
         onChange={pro => {
           setProject(pro);
-          history.push(`${match.url}`)
+          if(!repeatPage){
+            history.push(`${match.url}`)
+          }else{
+            history.push(`/helpdesk/repeats`)            
+          }
         }}
         />
       { projectData.localProject.id !== null &&
@@ -298,9 +304,9 @@ export default function TasksSidebar( props ) {
                 </div>
               </NavItem>
             )) }
-            <NavItem key='repeats' className={classnames("row full-width sidebar-item", { "active": window.location.pathname === '/helpdesk/repeats' }) }>
+            <NavItem key='repeats' className={classnames("row full-width sidebar-item", { "active": repeatPage }) }>
               <span
-                className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname === '/helpdesk/repeats' }) }
+                className={ classnames("clickable sidebar-menu-item link", { "active": repeatPage }) }
                 onClick={() => {
                   history.push(`/helpdesk/repeats`)
                 }}>

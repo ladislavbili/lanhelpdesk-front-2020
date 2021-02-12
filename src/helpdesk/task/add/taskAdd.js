@@ -1,7 +1,4 @@
 import React from 'react';
-import {
-  useMutation
-} from "@apollo/client";
 
 import Select from 'react-select';
 import {
@@ -46,9 +43,6 @@ import {
 import {
   noDef
 } from 'configs/constants/projects';
-import {
-  ADD_TASK
-} from '../queries';
 
 import {
   REST_URL
@@ -87,6 +81,8 @@ export default function TaskAdd( props ) {
     companies,
     defaultUnit,
     closeModal,
+    addTask,
+    setTaskLayout
   } = props;
 
   const userIfInProject = ( project ) => {
@@ -95,9 +91,7 @@ export default function TaskAdd( props ) {
     return user ? user : null;
   }
 
-  const [ addTask ] = useMutation( ADD_TASK );
   //state
-  const [ layout, setLayout ] = React.useState( 2 );
 
   const [ project, setProject ] = React.useState( projectID ? projects.find( p => p.id === projectID ) : null );
   const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
@@ -364,18 +358,26 @@ export default function TaskAdd( props ) {
     !company ||
     ( project.def.tag.required && tags.length === 0 )
   )
+  console.log(
+    project ? project.def.tag : ''
+  );
 
   //RENDERS
-  const renderLayoutButton = () => {
+  const renderHeader = () => {
     return (
-      <div className="task-add-layout">
-        <button
-          type="button"
-          className="btn btn-link waves-effect task-add-layout-button"
-          onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
-          <i className="fas fa-retweet "/>
-          Layout
-        </button>
+      <div className="task-add-layout row">
+        <h2 className="center-hor p-r-20">Add task</h2>
+        <div className="ml-auto m-r-20">
+          <button
+            type="button"
+            className="btn btn-link waves-effect task-add-layout-button"
+            onClick={ () => {
+              setTaskLayout( currentUser.taskLayout === 1 ? 2 : 1 )
+              }}>
+            <i className="fas fa-retweet "/>
+            Layout
+          </button>
+        </div>
       </div>
     )
   }
@@ -588,8 +590,6 @@ export default function TaskAdd( props ) {
               </div>
             </div>
             { userRights.assignedRead &&
-               !defaultFields.assignedTo.fixed &&
-               userRights.assignedWrite &&
               <div className="col-8">
                 <div className="row p-r-10">
                   <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
@@ -602,118 +602,101 @@ export default function TaskAdd( props ) {
           </div>
 
           <div className="row">
-          <div className="col-4">
-            {userRights.statusRead &&
-              !defaultFields.status.fixed &&
-              userRights.statusWrite &&
-              <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Status <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Status }
+            <div className="col-4">
+              {userRights.statusRead &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Status <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Status }
+                  </div>
                 </div>
-              </div>
-            }
+              }
 
-            { userRights.typeRead &&
-              userRights.typeWrite &&
-              <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Typ</Label>
-                <div className="col-9">
-                  { layoutComponents.Type }
+              { userRights.typeRead &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Typ</Label>
+                  <div className="col-9">
+                    { layoutComponents.Type }
+                  </div>
                 </div>
-              </div>
-            }
-            { userRights.milestoneRead &&
-                userRights.milestoneWrite &&
-              <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Milestone</Label>
-                <div className="col-9">
-                  { layoutComponents.Milestone }
+              }
+              { userRights.milestoneRead &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Milestone</Label>
+                  <div className="col-9">
+                    { layoutComponents.Milestone }
+                  </div>
                 </div>
-              </div>
-            }
-          </div>
-
-          <div className="col-4">
-            {userRights.requesterRead &&
-              !defaultFields.requester.fixed &&
-              userRights.requesterWrite &&
-              <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Zadal <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Requester }
-                </div>
-              </div>
-            }
-            {userRights.companyRead &&
-              !defaultFields.company.fixed &&
-              userRights.companyWrite &&
-              <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Firma <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Company }
-                </div>
-              </div>
-            }
-            {userRights.pausalRead &&
-               userRights.pausalWrite &&
-               company &&
-               !company.monthly &&
-               !defaultFields.pausal.fixed &&
-              <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Paušál <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Pausal }
-                </div>
-              </div>
-            }
-          </div>
-
-          <div className="col-4">
-            { userRights.deadlineRead &&
-              userRights.deadlineWrite &&
-            <div className="row p-r-10">
-              <Label className="col-3 col-form-label">Deadline</Label>
-              <div className="col-9">
-                { layoutComponents.Deadline }
-              </div>
+              }
             </div>
-            }
-            { userRights.repeatRead &&
-              <Repeat
-                taskID={null}
-                repeat={repeat}
-                disabled={!userRights.repeatWrite}
-                submitRepeat={(repeat)=>{
-                  if(!userRights.repeatWrite){
-                    return;
-                  }
-                  setRepeat(repeat);
-                }}
-                deleteRepeat={()=>{
-                  setRepeat(null);
-                }}
-                columns={true}
-                vertical={false}
-                addTask={true}
-                />
-            }
-            { userRights.overtimeRead &&
-              userRights.overtimeWrite &&
-              !defaultFields.overtime.fixed &&
-              <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Mimo PH <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  {layoutComponents.Overtime}
+
+            <div className="col-4">
+              {userRights.requesterRead &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Zadal <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Requester }
+                  </div>
                 </div>
-              </div>
-            }
-          </div>
+              }
+              {userRights.companyRead &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Firma <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Company }
+                  </div>
+                </div>
+              }
+              {userRights.pausalRead &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Paušál <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Pausal }
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div className="col-4">
+              { userRights.deadlineRead &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Deadline</Label>
+                  <div className="col-9">
+                    { layoutComponents.Deadline }
+                  </div>
+                </div>
+              }
+              { userRights.repeatRead &&
+                <Repeat
+                  taskID={null}
+                  repeat={repeat}
+                  disabled={!userRights.repeatWrite}
+                  submitRepeat={(repeat)=>{
+                    if(!userRights.repeatWrite){
+                      return;
+                    }
+                    setRepeat(repeat);
+                  }}
+                  deleteRepeat={()=>{
+                    setRepeat(null);
+                  }}
+                  columns={true}
+                  vertical={false}
+                  addTask={true}
+                  />
+              }
+              { userRights.overtimeRead &&
+                <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Mimo PH <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    {layoutComponents.Overtime}
+                  </div>
+                </div>
+              }
+            </div>
           </div>
 
           { userRights.tagsRead &&
-            !defaultFields.tag.fixed &&
-            userRights.tagsWrite &&
             <div className="row p-r-10">
               <Label className="col-0-5 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
               <div className="col-11-5">
@@ -772,8 +755,6 @@ export default function TaskAdd( props ) {
           </div>
         </div>
         { userRights.statusRead &&
-          !defaultFields.status.fixed &&
-          userRights.statusWrite &&
           <div className="form-selects-entry-column" >
             <Label>Status <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -782,7 +763,6 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.milestoneRead &&
-            userRights.milestoneWrite &&
           <div className="form-selects-entry-column" >
             <Label>Milestone</Label>
             <div className="form-selects-entry-column-rest" >
@@ -791,8 +771,6 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.requesterRead &&
-          !defaultFields.requester.fixed &&
-          userRights.requesterWrite &&
           <div className="form-selects-entry-column" >
             <Label>Requester <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -801,8 +779,6 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.companyRead &&
-          !defaultFields.company.fixed &&
-          userRights.companyWrite &&
           <div className="form-selects-entry-column" >
             <Label>Company <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -811,8 +787,6 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.assignedRead &&
-           !defaultFields.assignedTo.fixed &&
-           userRights.assignedWrite &&
           <div className="form-selects-entry-column" >
             <Label>Assigned <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -821,7 +795,6 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.deadlineRead &&
-          userRights.deadlineWrite &&
           <div className="form-selects-entry-column" >
             <Label>Deadline</Label>
             <div className="form-selects-entry-column-rest" >
@@ -849,11 +822,10 @@ export default function TaskAdd( props ) {
             />
         }
         { userRights.scheduledRead &&
-          userRights.scheduledWrite &&
           <Scheduled
             items={scheduled}
             users={assignedTo}
-            disabled={false}
+            disabled={assignedTo.length === 0}
             onChange={(item) => {
               let newScheduled = [...scheduled];
               newScheduled[newScheduled.findIndex((item2) => item2.id === item.id )] = item;
@@ -871,12 +843,10 @@ export default function TaskAdd( props ) {
             deleteItem = { (newScheduled) => {
               setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
             } }
-            layout={layout}
+            layout={currentUser.taskLayout}
             />
         }
         { userRights.tagsRead &&
-          !defaultFields.tag.fixed &&
-          userRights.tagsWrite &&
           <div className="form-selects-entry-column" >
             <Label>Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
             <div className="form-selects-entry-column-rest" >
@@ -885,7 +855,6 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.typeRead &&
-          userRights.typeWrite &&
           <div className="form-selects-entry-column" >
             <Label>Task Type</Label>
             <div className="form-selects-entry-column-rest" >
@@ -894,10 +863,6 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.pausalRead &&
-           userRights.pausalWrite &&
-           company &&
-           !company.monthly &&
-           !defaultFields.pausal.fixed &&
           <div className="form-selects-entry-column" >
             <Label>Pausal <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -906,8 +871,6 @@ export default function TaskAdd( props ) {
           </div>
         }
         { userRights.overtimeRead &&
-          userRights.overtimeWrite &&
-          !defaultFields.overtime.fixed &&
           <div className="form-selects-entry-column" >
             <Label>Outside PH <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -949,11 +912,11 @@ export default function TaskAdd( props ) {
       <div className="form-section">
         <div className="row" style={{alignItems: "baseline"}}>
           <Label className="m-r-10">Popis úlohy</Label>
-            { userRights.taskAttachmentsRead && userRights.taskAttachmentsWrite &&
-              <label htmlFor={`uploadAttachment-${null}`} className="btn btn-link" >
-                <i className="fa fa-plus" />
-                Attachment
-              </label>
+          { userRights.taskAttachmentsRead && userRights.taskAttachmentsWrite &&
+            <label htmlFor={`uploadAttachment-${null}`} className="btn btn-link" >
+              <i className="fa fa-plus" />
+              Attachment
+            </label>
           }
         </div>
         <div  className="form-section-rest">
@@ -970,7 +933,7 @@ export default function TaskAdd( props ) {
             />
 
           {
-              renderAttachments(false)
+            renderAttachments(false)
           }
         </div>
       </div>
@@ -1156,19 +1119,19 @@ export default function TaskAdd( props ) {
   const renderButtons = () => {
     return (
       <div className="form-section task-edit-buttons">
-      <div className="row form-section-rest">
-        {closeModal &&
-          <Button className="btn btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
-        }
-        {canCreateVykazyError()}
-        <button
-          className="btn pull-right"
-          disabled={ cantSave }
-          onClick={addTaskFunc}
-          > Create task
-        </button>
+        <div className="row form-section-rest">
+          {closeModal &&
+            <Button className="btn btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
+          }
+          {canCreateVykazyError()}
+          <button
+            className="btn pull-right"
+            disabled={ cantSave }
+            onClick={addTaskFunc}
+            > Create task
+          </button>
+        </div>
       </div>
-    </div>
     )
   }
 
@@ -1188,28 +1151,28 @@ export default function TaskAdd( props ) {
 
   return (
     <div style={{backgroundColor: "#f9f9f9"}}>
-      {renderLayoutButton()}
+      {renderHeader()}
       <div
         className={classnames(
           "scrollable",
           "min-height-400",
-          { "row": layout === 2}
+          { "row": currentUser.taskLayout === 2}
         )}
         >
 
         <div
           className={classnames(
             {
-              "task-edit-left": layout === 2
+              "task-edit-left": currentUser.taskLayout === 2
             },
             {
-              "task-edit-left-columns": layout !== 2
+              "task-edit-left-columns": currentUser.taskLayout !== 2
             }
           )}>
 
           { renderTitle() }
 
-          { layout === 1 && renderSelectsLayout1()  }
+          { currentUser.taskLayout === 1 && renderSelectsLayout1()  }
 
           { renderDescription() }
 
@@ -1220,7 +1183,7 @@ export default function TaskAdd( props ) {
 
         </div>
 
-        { layout === 2 && renderSelectsLayout2Side() }
+        { currentUser.taskLayout === 2 && renderSelectsLayout2Side() }
 
       </div>
 

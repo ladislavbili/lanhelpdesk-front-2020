@@ -84,11 +84,11 @@ export default function CommandBar( props ) {
 				}
 				{props.useBreadcrums  &&
 					<div className="flex-row breadcrumbs">
-						{ FILTERED_BREADCRUMBS.map((breadcrum, index)=>
+						{ FILTERED_BREADCRUMBS.map((breadcrum, index) =>
 							<h2
 								className="clickable"
 								key={index}
-								onClick={breadcrum.onClick}>{breadcrum.label + ((FILTERED_BREADCRUMBS.length - 1 !== index) ? ` \\ ` : "")}</h2>
+								onClick={breadcrum.onClick}>{`${index !== 0 ? '\\' : ''}${breadcrum.label}`}</h2>
 						)}
 					</div>
 				}

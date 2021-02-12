@@ -18,6 +18,10 @@ import {
   noMilestone
 } from 'configs/constants/sidebar';
 import RepeatForm from './repeatForm';
+import axios from 'axios';
+import {
+  REST_URL,
+} from 'configs/restAPI';
 
 import {
   GET_TASK_TYPES
@@ -527,7 +531,7 @@ export default function RepeatFormLoader( props ) {
     const formData = new FormData();
     attachments.forEach( ( file ) => formData.append( `file`, file ) );
     formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
-    formData.append( "repeatTemplateId", repeat.id );
+    formData.append( "repeatTemplateId", repeat.repeatTemplate.id );
     axios.post(
         `${REST_URL}/upload-repeat-template-attachments`,
         formData, {
