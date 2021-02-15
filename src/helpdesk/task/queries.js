@@ -432,6 +432,7 @@ export const GET_MY_DATA = gql `
 query {
   getMyData{
     id
+    tasklistLayout
     taskLayout
 		statuses {
 			id

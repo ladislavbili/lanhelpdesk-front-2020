@@ -50,6 +50,7 @@ export default function List( props ) {
     layout,
     underSearch: UnderSearch,
     underSearchLabel,
+    tasklistLayoutData,
   } = props;
   const [ editOpen, setEditOpen ] = React.useState( false );
   const [ underSearchOpen, setUnderSearchOpen ] = React.useState( false );
@@ -75,7 +76,7 @@ export default function List( props ) {
       <span>
         {(displayValues[index-1].type === 'important' || displayValues[index-2].type === 'important') && getItemDisplayValue(item,displayValues.find((item) => item.type === 'important' )) }
         {(displayValues[index-1].type === 'invoiced' || displayValues[index-2].type === 'invoiced') && getItemDisplayValue(item,displayValues.find((item) => item.type === 'invoiced' )) }
-        <span style={{
+        <span className="task-list-title" style={{
             paddingLeft:
             (
               ((displayValues[index-1].type === 'important' || displayValues[index-2].type === 'important') && !item.important) ? 20.75 : 0
@@ -92,8 +93,12 @@ export default function List( props ) {
 
   return (
     <div>
-      <CommandBar {...commandBar} listName={listName}/>
-      <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container   p-l-10">
+      <CommandBar
+        {...commandBar}
+        listName={listName}
+        {...tasklistLayoutData}
+        />
+      <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
         <ListHeader
           {...commandBar}
           listName={listName}

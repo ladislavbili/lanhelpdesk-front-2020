@@ -34,6 +34,10 @@ import {
 } from 'helpdesk/settings/templateStatuses/queries';
 
 import {
+  SET_TASKLIST_LAYOUT,
+} from 'helpdesk/settings/users/queries';
+
+import {
   GET_TASKS,
   DELETE_TASK,
   GET_MY_DATA,
@@ -129,6 +133,7 @@ export default function TasksIndex( props ) {
     client
   } ] = useMutation( DELETE_TASK );
   const [ setUserStatuses ] = useMutation( SET_USER_STATUSES );
+  const [ setTasklistLayout ] = useMutation( SET_TASKLIST_LAYOUT );
 
   const dataLoading = (
     currentUserLoading ||
@@ -175,6 +180,18 @@ export default function TasksIndex( props ) {
   const statuses = localProject.project.statuses ? localProject.project.statuses : [];
   const currentUser = currentUserData.getMyData;
   const tasksSort = tasksSortData.tasksSort;
+
+  const setTasklistLayoutFunc = ( value ) => {
+    setTasklistLayout( {
+        variables: {
+          tasklistLayout: value,
+        }
+      } )
+      .then( ( response ) => {
+        userDataRefetch();
+      } )
+      .catch( ( err ) => console.log( err ) );
+  }
 
   const getBreadcrumsData = () => {
     return [
@@ -452,6 +469,8 @@ export default function TasksIndex( props ) {
       checked: markedTasks.includes( task.id )
     } ) )
   }
+
+  console.log( currentUser );
   return (
       <ShowData
         data={processTasks(filterTasks(tasks))}
@@ -527,6 +546,16 @@ export default function TasksIndex( props ) {
         allStatuses={statuses}
         checkTask={checkTask}
         deleteTask={deleteTaskFunc}
+
+        tasklistLayout={currentUser.tasklistLayout}
+        tasklistLayoutData={{
+            setLayout: function(value) {
+              setTasklistLayoutFunc(value);
+            },
+            showLayoutSwitch: true,
+            dndLayout: localProject.title !== "Any project",
+            calendarLayout: true,
+        }}
         />
     );
   }

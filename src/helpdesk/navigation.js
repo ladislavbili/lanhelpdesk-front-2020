@@ -30,7 +30,6 @@ import Loading from 'components/loading';
 import RepeatsList from 'helpdesk/components/repeat/repeatsList';
 
 import {
-  SET_TASKLIST_LAYOUT,
   GET_MY_DATA,
 } from 'helpdesk/settings/users/queries';
 
@@ -41,21 +40,7 @@ export default function Navigation( props ) {
     refetch: myDataRefetch
   } = useQuery( GET_MY_DATA );
 
-  const [ setTasklistLayout ] = useMutation( SET_TASKLIST_LAYOUT );
-
   const client = useApolloClient();
-
-  const setTasklistLayoutFunc = ( value ) => {
-    setTasklistLayout( {
-        variables: {
-          tasklistLayout: value,
-        }
-      } )
-      .then( ( response ) => {
-        myDataRefetch();
-      } )
-      .catch( ( err ) => console.log( err ) );
-  }
 
   const currentUser = myData ? myData.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
@@ -66,10 +51,6 @@ export default function Navigation( props ) {
         <div className="center-ver row center flex">
           <SelectPage />
           <PageHeader {...props}
-            showLayoutSwitch={true}
-            setLayout={setTasklistLayoutFunc}
-            dndLayout={true}
-            calendarLayout={true}
             settings={settings} />
         </div>
       </div>

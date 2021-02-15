@@ -29,11 +29,7 @@ export default function Navigation( props ) {
 			<div className="page-header">
 				<div className="center-ver row center flex">
 					<SelectPage />
-					<PageHeader {...props}
-						setLayout={() => {}}
-						layout={layout}
-						showLayoutSwitch={true}
-						/>
+					<PageHeader {...props} />
 				</div>
 			</div>
 

@@ -28,12 +28,12 @@ export default function ProjectSelectModal( props ) {
     <Modal isOpen={true} className="small-modal" >
       <ModalBody>
         <div>
-          <div className="task-add-layout row">
-            <h2 className="center-hor p-r-20">Add task</h2>
+          <div className="task-add-layout-2 m-l-20 row">
+            <h2 className="center-hor p-r-20">Create new task</h2>
           </div>
-          <div className="m-30">
+          <div className="m-30 m-t-15">
             <FormGroup>
-              <Label>Project</Label>
+              <Label>Project <span className="warning-big">*</span></Label>
               <Select
                 placeholder="Zadajte projekt"
                 value={project}

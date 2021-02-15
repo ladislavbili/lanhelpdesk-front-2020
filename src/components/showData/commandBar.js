@@ -13,6 +13,10 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
 } from 'reactstrap';
 import Checkbox from 'components/checkbox';
 import CustomAttributes from "helpdesk/settings/projects/components/customAttributes";
@@ -30,9 +34,16 @@ import {
 } from './queries';
 
 export default function CommandBar( props ) {
+  const {
+    setLayout,
+    showLayoutSwitch,
+    dndLayout,
+    calendarLayout
+  } = props;
 
   const [ popoverOpen, setPopoverOpen ] = React.useState( false );
   const [ openCustomAttributes, setOpenCustomAttributes ] = React.useState( false );
+  const [ layoutOpen, setLayoutOpen ] = React.useState( false );
 
   const {
     data: myData,
@@ -64,6 +75,21 @@ export default function CommandBar( props ) {
   }, [ projectLoading ] );
 
   const toggle = () => setPopoverOpen( !popoverOpen );
+
+  const getLayoutIcon = () => {
+    switch ( currentUser.tasklistLayout ) {
+      case 0:
+        return "fa-columns";
+      case 1:
+        return "fa-list";
+      case 2:
+        return "fa-map";
+      case 3:
+        return "fa-calendar-alt";
+      default:
+        return "fa-cog";
+    }
+  }
 
   const FILTERED_BREADCRUMBS = ( props.breadcrumsData ? props.breadcrumsData.filter( ( breadcrum ) => breadcrum.show ) : [] );
 
@@ -182,6 +208,46 @@ export default function CommandBar( props ) {
                   ) }
                 </PopoverBody>
               </Popover>
+
+              {
+                showLayoutSwitch &&
+                <Dropdown className="center-hor"
+                  isOpen={layoutOpen}
+                  toggle={() => setLayoutOpen(!layoutOpen)}
+                  >
+                  <DropdownToggle className="btn btn-link">
+                    <i className={"fa " + getLayoutIcon()}/>
+                  </DropdownToggle>
+                  <DropdownMenu right>
+                    <div className="btn-group-vertical" data-toggle="buttons">
+                      <label className={classnames({'active':currentUser.tasklistLayout === 0}, "btn btn-link")}>
+                        <input type="radio" name="options" onChange={() => setLayout(0)} checked={currentUser.tasklistLayout === 0}/>
+                        <i className="fa fa-columns"/>
+                      </label>
+                      <label className={classnames({'active':currentUser.tasklistLayout === 1}, "btn btn-link")}>
+                        <input type="radio" name="options" checked={currentUser.tasklistLayout === 1} onChange={() => setLayout(1)}/>
+                        <i className="fa fa-list"/>
+                      </label>
+                      {
+                        dndLayout &&
+                        <label className={classnames({'active':currentUser.tasklistLayout === 2}, "btn btn-link")}>
+                          <input type="radio" name="options" onChange={() => setLayout(2)} checked={currentUser.tasklistLayout === 2}/>
+                          <i className="fa fa-map"/>
+                        </label>
+                      }
+
+                      {
+                        calendarLayout &&
+                        <label className={classnames({'active':currentUser.tasklistLayout === 3}, "btn btn-link")}>
+                          <input type="radio" name="options" onChange={() => setLayout(3)} checked={currentUser.tasklistLayout === 3}/>
+                          <i className="fa fa-calendar-alt"/>
+                        </label>
+                      }
+                    </div>
+                  </DropdownMenu>
+                </Dropdown>
+              }
+
 						</div>
 					</div>
 				</div>

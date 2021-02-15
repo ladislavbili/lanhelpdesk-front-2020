@@ -1330,7 +1330,7 @@ export default function TaskEdit( props ) {
             }
             { userRights.overtimeRead &&
               <div className="p-r-10">
-                <Label className="col-form-label row col-3">Mimo PH <span className="warning-big">*</span></Label>
+                <Label className="col-form-label col-4">Mimo PH <span className="warning-big">*</span></Label>
                 <div className="col-9">
                   {layoutComponents.Overtime}
                 </div>
@@ -2038,6 +2038,9 @@ export default function TaskEdit( props ) {
         },
         "flex",
         "min-height-400",
+        {
+          "basic-border-top": currentUser.taskLayout === 1
+        }
       )}
       >
 

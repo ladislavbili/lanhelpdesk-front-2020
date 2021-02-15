@@ -894,7 +894,8 @@ export const sidebarSelectStyle = {
     return {
       ...provided,
       marginLeft: 30,
-      color: "#212121"
+      color: "#212121",
+      backgroundColor: "transparent",
     };
   },
   indicatorSeparator: ( provided, state ) => {
@@ -907,6 +908,7 @@ export const sidebarSelectStyle = {
     return {
       ...provided,
       background: "#F9F9F9",
+      backgroundColor: "transparent",
       borderRadius: 0,
       borderWidth: "0",
       height: 40,
@@ -932,7 +934,8 @@ export const sidebarSelectStyleNoIcon = {
     return {
       ...provided,
       marginLeft: 7,
-      color: "#212121"
+      color: "#212121",
+      backgroundColor: "transparent",
     };
   },
   indicatorSeparator: ( provided, state ) => {
@@ -944,7 +947,7 @@ export const sidebarSelectStyleNoIcon = {
   control: ( provided, state ) => {
     return {
       ...provided,
-      background: "#F9F9F9",
+      backgroundColor: "transparent",
       borderRadius: 0,
       borderWidth: "0",
       height: 40,
@@ -954,7 +957,8 @@ export const sidebarSelectStyleNoIcon = {
   input: ( provided, state ) => {
     return {
       ...provided,
-      marginLeft: 7
+      marginLeft: 7,
+      backgroundColor: "transparent",
     };
   },
   placeholder: ( provided, state ) => {

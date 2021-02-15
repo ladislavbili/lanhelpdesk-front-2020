@@ -122,7 +122,7 @@ body{
 }
 
 .main{
-  background-color: $main-background-color;
+  background-color: #eaeaea; //$main-background-color;
   width: calc( 100% - #{$sidebar-width} - 2px );
 }
 
@@ -271,6 +271,10 @@ html{
 }
 .h-100{
   height: 100%;
+}
+
+.h-60px{
+  height: 60px;
 }
 
 .h-100vh{
@@ -565,6 +569,19 @@ h4{
 .asc{
   align-self: center;
 }
+
+.basic-border{
+  border: $main-border;
+}
+
+.basic-border-top{
+  border-top: $main-border;
+}
+
+.h-f-c{
+  height: fit-content !important;
+}
+
 //---------------END-všeobecné-atribúty-----------------
 
 //---------------všeobecné-elementy---------------------
@@ -586,14 +603,15 @@ h4{
   margin-right: 0px;
 }
 
-.btn:hover, .btn:focus, .btn:focus:active, .btn:active{
+.btn:hover, .btn:focus, .btn:focus:active, .btn:active, .btn:disabled{
   background-color: $basic-button-color;
   color: #FFFFFF;
   box-shadow: none;
   outline: none;
+  opacity: 100;
 }
 
-.btn-link, .btn-link:hover, .btn-link:active, .btn-link:focus, .btn:focus:active, .btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn){
+.btn-link, .btn-link:hover, .btn-link:active, .btn-link:focus, .btn-link:disabled, .btn:focus:active, .btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn){
   background-color: inherit;
   padding: 0px;
   color: $color-link;
@@ -630,7 +648,7 @@ h4{
   padding-left: 10px;
   height: $button-height;
   text-align: left;
-  border-radius: 4px;
+  border-radius: 0px;
   background-color: $basic-button-color;
   border: none;
 }
@@ -854,7 +872,7 @@ Label{
 
 
 .modal-content{
-  background-color: white;
+  background-color: #eaeaea;//white;
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -1181,12 +1199,12 @@ tr:last-child, tr:first-child{
 
 //---------------------header---------------------
 .page-header{
-	background-color: $basic-button-color !important;
+	background-color: #004578 !important;
   height: $header-height;
   margin: 0px;
   padding: 0px;
   border: 0px;
-  border-right: 2px solid $basic-button-color;
+  border-right: 2px solid #004578;
   //margin-right: -2px;
 
   .lansystems-title{
@@ -1276,7 +1294,7 @@ tr:last-child, tr:first-child{
   border: none;
   border-right: $main-border;
   list-style-type: none;
-  background: $sidebar-background-color;
+  background: #f2f1f1; //$sidebar-background-color;
   position: relative;
   top: inherit;
   z-index: 999;
@@ -1470,7 +1488,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding: 0px 1px 0px 1px;
   height: $task-list-commandbar-height;
   white-space: pre-wrap;
-  background-color: #f4f8fb;
+  background-color:#eaeaea; //#f4f8fb;
   border-bottom: $main-border;
 }
 
@@ -1488,11 +1506,18 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   height: 19px;
 }
 
+.task-list-title{
+  display: inline;
+    -webkit-box-decoration-break: clone;
+}
+
 .search-row{
     display: flex !important;
     margin: 0px;
     width: 60%;
     max-width: 500px;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .search-text{
@@ -1625,7 +1650,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .small-modal{
   width: 600px !important;
   .modal-content{
-    background-color: $form-background-color;
+    background-color: #eaeaea;//$form-background-color;
     padding: 0px;
     .modal-body{
       padding: 0px;
@@ -1656,12 +1681,21 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   margin-top: calc((70px - 30px)/2);
 }
 
+.task-add-layout-2{
+  height: 70px;
+  padding-left: $difference-form;
+  background-color: transparent; //#f4f8fb;
+  margin: 0px;
+  width: 100% !important;
+  border-bottom: $main-border;
+}
+
 .task-container-col{
   background-color: #FFF;
 }
 
 .task-container>.table{
-  background-color: white;
+  background-color: transparent; //white;
   margin-left: 20px;
   margin-right: 20px;
   width: calc(100% - 40px) !important; //0
@@ -1680,6 +1714,21 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .task-container>.table>thead>tr>th{
   border: none;
   //border-color: #F9F9F9 !important;
+}
+
+.task-container>.table>tbody>tr:first-child>th{
+  padding: 4px 10px 10px 0px !important;
+  background-color: transparent;
+  font-family: $main-font;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 19px;
+  color: #989898;
+  border: none;
+  .checkbox-mark{
+    border: 0px;
+  }
 }
 
 .task-container>.table>tbody>tr>th{
@@ -1975,7 +2024,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   max-width: 300px;
   margin: 0px 0px 0px 0px;
   padding: 20px 20px 20px 13px;
-  background-color: $task-right-background-color;
+  background-color: #eaeaea; //$task-right-background-color;
   border-left: $main-border;
 }
 .task-edit-right-columns{
@@ -1983,11 +2032,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   max-width: 200px;
   margin: 0px 0px 0px 10px;
   padding: 20px 20px 20px 13px;
-  background-color: $task-right-background-color;
+  background-color: #eaeaea;//$task-right-background-color;
 }
 
 .task-edit-left{
-  background-color: #F9F9F9;
+  background-color: white; //#F9F9F9;
   position: relative;
   padding: calc(#{$odsadenie-form} - #{$difference-form}) calc(#{$odsadenie-form} - #{$difference-form}) calc(#{$odsadenie-form} - #{$difference-form}) calc(#{$odsadenie-form} - #{$difference-form});
   max-width: 1620px;
@@ -1996,7 +2045,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-edit-left-columns{
-  background-color: #F9F9F9;
+  background-color: white;
   padding: 15px calc(#{$odsadenie-form} - #{$difference-form}) $odsadenie-form calc(#{$odsadenie-form} - #{$difference-form});
   max-width: 1670px;
   min-width: 400px;
@@ -2004,8 +2053,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-edit-buttons{
-  background-color: #f9f9f9;
-  padding: $odsadenie-form;
+  background-color: transparent// #f9f9f9;
+//  padding: $odsadenie-form;
   /*position: absolute;
   bottom: 10px;
   width: calc(100% - ( 2 *  #{$odsadenie-form} ) + #{$difference-form} )  !important;*/
@@ -2075,7 +2124,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
   .form-section-rest{
     .task-title-input{
-      border: 1px solid #c4c4c4 !important;
+      border: $main-border !important;
       margin-left: 0;
     }
   }
@@ -2102,7 +2151,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
   .form-selects-entry-column-rest{
     margin-left: 0px;
-    border: 1px solid #c4c4c4;
+    border: $main-border;
+    .disabled-info{
+      padding-left: 8px;
+    }
   }
   .react-datepicker-wrapper{
     width: 100%;
@@ -2143,8 +2195,28 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding-top: 5px;
   padding-bottom: 5px;
   .col-9, .col-10-45, .col-11, .col-11-5, .display-inline-block {
-    border: 1px solid #c4c4c4;
+    border: $main-border;
   }
+}
+
+.scheduled-items-container{
+  border: $main-border;
+  background-color: white;
+  min-height: 30px;
+  padding: 2px $input-padding;
+  div{
+    background-color: #f2f1f1;
+    padding: 2px;
+    font: 85% Segoe UI;
+    margin-bottom: 2px;
+  }
+}
+
+.disabled-info{
+  height: 30px;
+  font: $font-info-text;
+  font-size: 14px;
+  line-height: 32px;
 }
 
 //-------------------END-taskEdit-------------------------

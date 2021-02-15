@@ -99,6 +99,7 @@ export default function TaskCalendar( props ) {
     filterValues,
     originalProjectId,
     layout,
+    tasklistLayoutData,
   } = props;
 
   const {
@@ -528,8 +529,11 @@ export default function TaskCalendar( props ) {
 
   return (
     <div>
-      <CommandBar { ...commandBar } />
-      <div className="full-width scroll-visible fit-with-header-and-commandbar task-container p-20">
+      <CommandBar
+        { ...commandBar }
+        {...tasklistLayoutData}
+        />
+      <div className="full-width scroll-visible fit-with-header-and-commandbar task-container">
         <ListHeader
           { ...commandBar }
           listName={ listName }
@@ -542,7 +546,7 @@ export default function TaskCalendar( props ) {
           events = { events }
           defaultDate = { new Date( moment().valueOf() ) }
           defaultView = { calendarLayout }
-          style = {{ height: "100vh" }}
+          style = {{ height: "100vh", padding: "20px" }}
           views={['month', 'week']}
           drilldownView="day"
           localizer = { localizer }

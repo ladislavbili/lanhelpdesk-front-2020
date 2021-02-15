@@ -40,11 +40,7 @@ export default function PageHeader( props ) {
   const {
     match,
     history,
-    setLayout,
     settings,
-    showLayoutSwitch,
-    dndLayout,
-    calendarLayout
   } = props;
 
   const {
@@ -63,24 +59,6 @@ export default function PageHeader( props ) {
 
   const currentUser = myData ? myData.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
-
-
-  const getLayoutIcon = () => {
-    switch ( currentUser.tasklistLayout ) {
-      case 0:
-        return "fa-columns";
-      case 1:
-        return "fa-list";
-      case 2:
-        return "fa-map";
-      case 3:
-        return "fa-calendar-alt";
-      default:
-        return "fa-cog";
-    }
-  }
-
-
 
   const processNotifications = () => {
     return [];
@@ -155,45 +133,6 @@ export default function PageHeader( props ) {
 
           { accessRights.viewErrors &&
             <ErrorIcon history={history} location={URL} />
-          }
-
-          {
-            showLayoutSwitch &&
-            <Dropdown className="center-hor"
-              isOpen={layoutOpen}
-              toggle={() => setLayoutOpen(!layoutOpen)}
-              >
-              <DropdownToggle className="header-dropdown">
-                <i className={"header-icon fa " + getLayoutIcon()}/>
-              </DropdownToggle>
-              <DropdownMenu right>
-                <div className="btn-group-vertical" data-toggle="buttons">
-                  <label className={classnames({'active':currentUser.tasklistLayout === 0}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" onChange={() => setLayout(0)} checked={currentUser.tasklistLayout === 0}/>
-                    <i className="fa fa-columns"/>
-                  </label>
-                  <label className={classnames({'active':currentUser.tasklistLayout === 1}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                    <input type="radio" name="options" checked={currentUser.tasklistLayout === 1} onChange={() => setLayout(1)}/>
-                    <i className="fa fa-list"/>
-                  </label>
-                  {
-                    dndLayout &&
-                    <label className={classnames({'active':currentUser.tasklistLayout === 2}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => setLayout(2)} checked={currentUser.tasklistLayout === 2}/>
-                      <i className="fa fa-map"/>
-                    </label>
-                  }
-
-                  {
-                    calendarLayout &&
-                    <label className={classnames({'active':currentUser.tasklistLayout === 3}, "btn btn-link btn-outline-blue waves-effect waves-light")}>
-                      <input type="radio" name="options" onChange={() => setLayout(3)} checked={currentUser.tasklistLayout === 3}/>
-                      <i className="fa fa-calendar-alt"/>
-                    </label>
-                  }
-                </div>
-              </DropdownMenu>
-            </Dropdown>
           }
 
           <Dropdown className="center-hor" isOpen={notificationsOpen} toggle={() => setNotificationsOpen(!notificationsOpen)}>

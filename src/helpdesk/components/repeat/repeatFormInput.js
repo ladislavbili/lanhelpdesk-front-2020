@@ -21,7 +21,7 @@ export default function RepeatFormInput( props ) {
   const [ openModal, setOpenModal ] = React.useState( false );
   return (
     <div>
-    <div className="display-inline">
+    <div>
       {vertical &&
         <div className="form-selects-entry-column">
           <Label style={{display: "block"}}>Repeat</Label>
@@ -41,7 +41,7 @@ export default function RepeatFormInput( props ) {
         </div>
       }
       {!vertical &&
-        <div className="row p-r-10">
+        <div className="p-r-10">
           <Label className="col-3 col-form-label">Repeat</Label>
           <div className="col-9">
             <Button type="button" className="btn btn-repeat flex" id={"repeatPopover"} onClick={() => {

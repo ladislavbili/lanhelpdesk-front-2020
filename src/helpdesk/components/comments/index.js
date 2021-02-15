@@ -217,7 +217,7 @@ export default function Comments( props ) {
               <label
                 className="btn"
                 htmlFor="uploadCommentAttachments">
-                Add Attachement
+                <i className="fa fa-plus" /> Attachement
               </label>
               <input type="file" id="uploadCommentAttachments" multiple={true} style={{display:'none'}}
                 onChange={(e)=>{

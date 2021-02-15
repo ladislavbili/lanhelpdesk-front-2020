@@ -50,6 +50,8 @@ export default function TaskListDnD( props ) {
     filterValues,
     originalProjectId,
     layout,
+    setLayout,
+    tasklistLayoutData,
   } = props;
 
   const [ updateTask ] = useMutation( UPDATE_TASK );
@@ -195,7 +197,11 @@ export default function TaskListDnD( props ) {
 
   return (
     <div>
-      <CommandBar {...commandBar} listName={listName} />
+      <CommandBar
+        {...commandBar}
+        listName={listName}
+       {...tasklistLayoutData}
+        />
       <div className="scroll-visible overflow-x fit-with-header-and-commandbar task-container">
         <ListHeader
           {...commandBar}

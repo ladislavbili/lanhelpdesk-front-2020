@@ -36,11 +36,11 @@ export default function Search( props ) {
     loading: taskSearchLoading
   } = useQuery( GET_TASK_SEARCH );
 
+
   return (
     <div
       className={classnames(
-        { "m-l-0": (link.includes("settings") || layout === 0 || layout === 3 )},
-        {"m-l-20": layout !== 0 && layout !== 3},
+        {"m-l-30": !link.includes("settings")},
         "search-row"
       )}
       >

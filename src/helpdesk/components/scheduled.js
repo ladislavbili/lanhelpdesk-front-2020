@@ -38,11 +38,11 @@ export default function Scheduled( props ) {
   }, [ users ] );
 
   return (
-    <div className="form-selects-entry-column">
+    <div className={classnames("form-selects-entry-column", {"m-r-10": layout === 1})}>
       <div className="row">
         <Label className={classnames({"m-l-0 m-t-5 m-r-10": layout === 1})} >Scheduled</Label>
         <button
-          className={classnames("btn btn-link waves-effect", {"ml-auto": layout === 2})}
+          className={classnames("btn btn-link waves-effect h-f-c", {"ml-auto": layout === 2})}
           disabled={disabled}
           onClick={()=>{
             setAddItem(true);
@@ -51,10 +51,10 @@ export default function Scheduled( props ) {
           <i className="fa fa-plus" />
         </button>
       </div>
-      <div className={classnames("form-selects-entry-column-rest", {"row": layout === 1})} style={{border: "none"}}>
+      <div className={classnames("form-selects-entry-column-rest", "scheduled-items-container", {"row": layout === 1})}>
         { items.map((item) =>
-          <div className={classnames({"m-l-7": layout === 2}, "row", {"m-r-10": layout === 1})} key={item.id}>
-            <span className={classnames({"make-space-30-r": layout === 2, "m-r-10": layout === 1})}>
+          <div className={classnames("row", {"m-r-10": layout === 1})} key={item.id}>
+            <span className={classnames({"m-r-10": layout === 1})}>
               {
                 `
                 ${item.from.format( 'HH:mm DD.MM.YYYY' )} - ${

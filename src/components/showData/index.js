@@ -55,8 +55,12 @@ export default function ShowDataContainer( props ) {
     calendarAllDayData,
     calendarEventsData,
     underSearch,
-    underSearchLabel
+    underSearchLabel,
+    tasklistLayout,
+    tasklistLayoutData,
   } = props;
+
+  console.log( tasklistLayout );
 
   const {
     data: taskSearchData,
@@ -75,8 +79,6 @@ export default function ShowDataContainer( props ) {
   const {
     data: projectData,
   } = useQuery( GET_PROJECT );
-
-  const tasklistLayout = myData ? myData.getMyData.tasklistLayout : 1;
 
   const filterDataFunc = () => {
     return data.filter( ( item ) => {
@@ -180,6 +182,7 @@ export default function ShowDataContainer( props ) {
 								Edit={Edit}
                 underSearch={underSearch}
                 underSearchLabel={underSearchLabel}
+                tasklistLayoutData={tasklistLayoutData}
 								/>
 						</div>
 					)}
@@ -209,6 +212,7 @@ export default function ShowDataContainer( props ) {
 									deleteTask={deleteTask}
                   underSearch={underSearch}
                   underSearchLabel={underSearchLabel}
+                  tasklistLayoutData={tasklistLayoutData}
 									/>}
 						</div>
 					)}
@@ -237,6 +241,7 @@ export default function ShowDataContainer( props ) {
 									allStatuses={allStatuses}
                   underSearch={underSearch}
                   underSearchLabel={underSearchLabel}
+                  tasklistLayoutData={tasklistLayoutData}
 									/>
 							}
 						</div>
@@ -266,6 +271,7 @@ export default function ShowDataContainer( props ) {
 								Edit={Edit}
                 underSearch={underSearch}
                 underSearchLabel={underSearchLabel}
+                tasklistLayoutData={tasklistLayoutData}
 								/>
 						</div>
 					)}

@@ -365,8 +365,8 @@ export default function TaskAdd( props ) {
   //RENDERS
   const renderHeader = () => {
     return (
-      <div className="task-add-layout row">
-        <h2 className="center-hor p-r-20">Add task</h2>
+      <div className="task-add-layout-2 row">
+        <h2 className="center-hor">Create new task</h2>
         <div className="ml-auto m-r-20">
           <button
             type="button"
@@ -389,7 +389,7 @@ export default function TaskAdd( props ) {
         <span className="form-section-rest">
           <input type="text"
             value={title}
-            className="task-title-input full-width form-control"
+            className="input basic-border full-width form-control"
             onChange={ (e) => setTitle(e.target.value) }
             placeholder="ENTER NEW TASK NAME" />
         </span>
@@ -436,141 +436,211 @@ export default function TaskAdd( props ) {
         />
     ),
     Assigned: (
-      <Select
-        placeholder="Select required"
-        value={assignedTo}
-        isDisabled={ defaultFields.assignedTo.fixed || !userRights.assignedWrite }
-        isMulti
-        onChange={(users)=> {
-          setAssignedTo(users);
-        }}
-        options={USERS_WITH_PERMISSIONS}
-        styles={selectStyleNoArrowRequired}
-        />
+      <div>
+        { (defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
+          <div className="disabled-info">{assignedTo.label}</div>
+        }
+        { !(defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
+          <Select
+            placeholder="Select required"
+            value={assignedTo}
+            isDisabled={ defaultFields.assignedTo.fixed || !userRights.assignedWrite }
+            isMulti
+            onChange={(users)=> {
+              setAssignedTo(users);
+            }}
+            options={USERS_WITH_PERMISSIONS}
+            styles={selectStyleNoArrowRequired}
+            />
+        }
+      </div>
     ),
     Status: (
-      <Select
-        placeholder="Select required"
-        value={status}
-        isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
-        styles={selectStyleNoArrowColoredRequired}
-        onChange={(status)=>{
-          if(status.action==='PendingDate'){
-            setStatus(status);
-            setPendingDate( moment().add(1,'d') );
-          }else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
-            setStatus(status);
-            setCloseDate( moment() );
-          }
-          else{
-            setStatus(status);
-          }
-        }}
-        options={project ? toSelArr(project.statuses.filter((status) => status.action.toLowerCase() !== 'invoiced' )) : []}
-        />
+      <div>
+        { (defaultFields.status.fixed || !userRights.statusWrite) &&
+          <div className="disabled-info">{status.label}</div>
+        }
+        { !(defaultFields.status.fixed || !userRights.statusWrite) &&
+          <Select
+            placeholder="Select required"
+            value={status}
+            isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
+            styles={selectStyleNoArrowColoredRequired}
+            onChange={(status)=>{
+              if(status.action==='PendingDate'){
+                setStatus(status);
+                setPendingDate( moment().add(1,'d') );
+              }else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
+                setStatus(status);
+                setCloseDate( moment() );
+              }
+              else{
+                setStatus(status);
+              }
+            }}
+            options={project ? toSelArr(project.statuses.filter((status) => status.action.toLowerCase() !== 'invoiced' )) : []}
+            />
+        }
+      </div>
     ),
     Type: (
-      <Select
-        placeholder="Select task type"
-        value={taskType}
-        isDisabled={ !userRights.typeWrite }
-        styles={ selectStyleNoArrowRequired }
-        onChange={(taskType)=> {
-          setTaskType(taskType);
-        }}
-        options={taskTypes}
-        />
+      <div>
+        { !userRights.typeWrite &&
+          <div className="disabled-info">{taskType.label}</div>
+        }
+        { userRights.typeWrite &&
+          <Select
+            placeholder="Select task type"
+            value={taskType}
+            isDisabled={ !userRights.typeWrite }
+            styles={ selectStyleNoArrowRequired }
+            onChange={(taskType)=> {
+              setTaskType(taskType);
+            }}
+            options={taskTypes}
+            />
+        }
+      </div>
     ),
     Milestone: (
-      <Select
-        isDisabled={!userRights.milestoneWrite}
-        placeholder="None"
-        value={milestone}
-        onChange={(milestone)=> {
-          if(status.action==='PendingDate'){
-            if(milestone.startsAt !== null){
-              setMilestone(milestone);
-              setPendingDate(moment(milestone.startsAt));
-              setPendingChangable(false);
-            }else{
-              setMilestone(milestone);
-              setPendingChangable(true);
-            }
-          }else{
-            setMilestone(milestone);
-          }
-        }}
-        options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={ selectStyleNoArrowNoPadding }
-        />
+      <div>
+        { !userRights.milestoneWrite &&
+          <div className="disabled-info">{milestone.label}</div>
+        }
+        { userRights.milestoneWrite &&
+          <Select
+            isDisabled={!userRights.milestoneWrite}
+            placeholder="None"
+            value={milestone}
+            onChange={(milestone)=> {
+              if(status.action==='PendingDate'){
+                if(milestone.startsAt !== null){
+                  setMilestone(milestone);
+                  setPendingDate(moment(milestone.startsAt));
+                  setPendingChangable(false);
+                }else{
+                  setMilestone(milestone);
+                  setPendingChangable(true);
+                }
+              }else{
+                setMilestone(milestone);
+              }
+            }}
+            options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
+            styles={ selectStyleNoArrowNoPadding }
+            />
+        }
+      </div>
     ),
     Requester: (
-      <Select
-        value={requester}
-        placeholder="Select required"
-        isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
-        onChange={(requester)=>{
-          setRequester(requester);
-          const newCompany = companies.find((company) => company.id === requester.id );
-          setCompany(newCompany);
-        }}
-        options={REQUESTERS}
-        styles={ selectStyleNoArrowRequired }
-        />
+      <div>
+        { (defaultFields.requester.fixed || !userRights.requesterWrite) &&
+          <div className="disabled-info">{requester.label}</div>
+        }
+        { !(defaultFields.requester.fixed || !userRights.requesterWrite) &&
+          <Select
+            value={requester}
+            placeholder="Select required"
+            isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
+            onChange={(requester)=>{
+              setRequester(requester);
+              const newCompany = companies.find((company) => company.id === requester.id );
+              setCompany(newCompany);
+            }}
+            options={REQUESTERS}
+            styles={ selectStyleNoArrowRequired }
+            />
+        }
+      </div>
     ),
     Company: (
-      <Select
-        value={company}
-        placeholder="Select required"
-        isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
-        onChange={(company)=> {
-          setCompany(company);
-          setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
-        }}
-        options={companies}
-        styles={ selectStyleNoArrowRequired }
-        />
+      <div>
+        { (defaultFields.company.fixed || !userRights.companyWrite) &&
+          <div className="disabled-info">{company.label}</div>
+        }
+        { !(defaultFields.company.fixed || !userRights.companyWrite) &&
+          <Select
+            value={company}
+            placeholder="Select required"
+            isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
+            onChange={(company)=> {
+              setCompany(company);
+              setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
+            }}
+            options={companies}
+            styles={ selectStyleNoArrowRequired }
+            />
+        }
+      </div>
     ),
     Pausal: (
-      <Select
-        value={pausal}
-        placeholder="Select required"
-        isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-        styles={ selectStyleNoArrowRequired }
-        onChange={(pausal)=> setPausal(pausal)}
-        options={booleanSelects}
-        />
+      <div>
+        { (!userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed) &&
+          <div className="disabled-info">{pausal.label}</div>
+        }
+        { !(!userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed) &&
+          <Select
+            value={pausal}
+            placeholder="Select required"
+            isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
+            styles={ selectStyleNoArrowRequired }
+            onChange={(pausal)=> setPausal(pausal)}
+            options={booleanSelects}
+            />
+        }
+      </div>
     ),
     Deadline: (
-      <DatePicker
-        className={classnames("form-control")}
-        selected={deadline}
-        disabled={!userRights.deadlineWrite}
-        onChange={date => setDeadline(date)}
-        placeholderText="No deadline"
-        />
+      <div>
+        { !userRights.deadlineWrite &&
+          <div className="disabled-info">{deadline}</div>
+        }
+        { userRights.deadlineWrite &&
+          <DatePicker
+            className={classnames("form-control")}
+            selected={deadline}
+            disabled={!userRights.deadlineWrite}
+            onChange={date => setDeadline(date)}
+            placeholderText="No deadline"
+            />
+        }
+      </div>
     ),
     Overtime: (
-      <Select
-        placeholder="Select required"
-        value={overtime}
-        isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={ selectStyleNoArrowRequired }
-        onChange={(overtime) => setOvertime(overtime)}
-        options={booleanSelects}
-        />
+      <div>
+        { (!userRights.overtimeWrite || defaultFields.overtime.fixed) &&
+          <div className="disabled-info">{overtime.label}</div>
+        }
+        { !(!userRights.overtimeWrite || defaultFields.overtime.fixed) &&
+          <Select
+            placeholder="Select required"
+            value={overtime}
+            isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
+            styles={ selectStyleNoArrowRequired }
+            onChange={(overtime) => setOvertime(overtime)}
+            options={booleanSelects}
+            />
+        }
+      </div>
     ),
     Tags: (
-      <div className="f-1">
-        <Select
-          value={tags}
-          placeholder="None"
-          isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-          isMulti
-          onChange={(t)=>setTags(t)}
-          options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
-          styles={ selectStyleNoArrowColoredRequired }
-          />
+      <div>
+        { (defaultFields.tag.fixed || !userRights.tagsWrite) &&
+          <div className="disabled-info">{tags.map(tag => tag.label).join(" ")}</div>
+        }
+        { !(defaultFields.tag.fixed || !userRights.tagsWrite) &&
+          <div className="f-1">
+            <Select
+              value={tags}
+              placeholder="None"
+              isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
+              isMulti
+              onChange={(t)=>setTags(t)}
+              options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
+              styles={ selectStyleNoArrowColoredRequired }
+              />
+          </div>
+        }
       </div>
     )
   }
@@ -747,7 +817,7 @@ export default function TaskAdd( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className="task-edit-right p-b-20">
+      <div className="task-edit-right p-b-20 p-t-90">
         <div className="form-selects-entry-column" >
           <Label>Project <span className="warning-big">*</span></Label>
           <div className="form-selects-entry-column-rest" >
@@ -1151,7 +1221,6 @@ export default function TaskAdd( props ) {
 
   return (
     <div style={{backgroundColor: "#f9f9f9"}}>
-      {renderHeader()}
       <div
         className={classnames(
           "scrollable",
@@ -1169,6 +1238,7 @@ export default function TaskAdd( props ) {
               "task-edit-left-columns": currentUser.taskLayout !== 2
             }
           )}>
+          {renderHeader()}
 
           { renderTitle() }
 
@@ -1181,13 +1251,13 @@ export default function TaskAdd( props ) {
 
           { renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
+          { renderButtons() }
         </div>
 
         { currentUser.taskLayout === 2 && renderSelectsLayout2Side() }
 
       </div>
 
-      { renderButtons() }
 
     </div>
   );
