@@ -30,8 +30,20 @@ export const allACLs = [
   },
   {
     id: 'sep2',
-    title: 'TASK ACL',
+    title: 'TASK LIST',
     separator: true,
+  },
+  {
+    id: 'myTasks',
+    title: 'View my tasks created/requested/assigned',
+    both: false,
+    fake: true,
+    value: true,
+    disabled: [
+      {
+        key: 'myTasks'
+    }
+  ]
   },
   {
     id: 'companyTasks',
@@ -54,9 +66,19 @@ export const allACLs = [
     both: false
   },
   {
+    id: 'sepAdd',
+    title: 'ADD TASK',
+    separator: true,
+  },
+  {
     id: 'addTasks',
     title: 'Add Tasks',
     both: false
+  },
+  {
+    id: 'sepEdit',
+    title: 'EDIT TASK',
+    separator: true,
   },
   {
     id: 'deleteTasks',
@@ -104,6 +126,71 @@ export const allACLs = [
     both: true
   },
   {
+    id: 'sep3',
+    title: 'TASK ACL DEFAULT ATTRIBUTES',
+    separator: true
+  },
+  {
+    id: 'status',
+    title: 'Status VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'tags',
+    title: 'Tags VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'assigned',
+    title: 'Assigned to VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'requester',
+    title: 'Requester VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'company',
+    title: 'Company VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'project',
+    title: 'Project VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'milestone',
+    title: 'Milestone VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'deadline',
+    title: 'Deadline VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'scheduled',
+    title: 'Scheduled VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'repeat',
+    title: 'Repeat VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'type',
+    title: 'Type VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'sepComments',
+    title: 'COMMENTS & HISTORY',
+    separator: true,
+  },
+  {
     id: 'viewComments',
     title: 'View comments',
     both: false,
@@ -145,64 +232,9 @@ export const allACLs = [
     both: false
   },
   {
-    id: 'project',
-    title: 'Project VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'milestone',
-    title: 'Milestone VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'deadline',
-    title: 'Deadline VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'scheduled',
-    title: 'Scheduled VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'repeat',
-    title: 'Repeat VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'type',
-    title: 'Type VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'sep3',
-    title: 'TASK ACL DEFAULT ATTRIBUTES',
-    separator: true
-  },
-  {
-    id: 'status',
-    title: 'Status VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'tags',
-    title: 'Tags VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'assigned',
-    title: 'Assigned to VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'requester',
-    title: 'Requester VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'company',
-    title: 'Company VIEW/EDIT',
-    both: true
+    id: 'sepSLA',
+    title: 'SERVICE LEVEL AGREMENTS',
+    separator: true,
   },
   {
     id: 'pausal',
@@ -214,11 +246,12 @@ export const allACLs = [
     title: 'Mimo pracovných hodín VIEW/EDIT',
     both: true
   },
+
 ];
 
 export const createCleanRights = ( access = false ) => {
   let rights = {};
-  allACLs.filter( ( acl ) => !acl.separator ).forEach( ( acl ) => {
+  allACLs.filter( ( acl ) => !acl.separator && !acl.fake ).forEach( ( acl ) => {
     if ( acl.both ) {
       rights[ acl.id ] = {
         read: access,

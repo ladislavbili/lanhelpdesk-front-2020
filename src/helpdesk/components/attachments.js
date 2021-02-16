@@ -17,11 +17,14 @@ export default function TaskAttachments( props ) {
     attachments,
     addAttachments,
     removeAttachment,
+    type
   } = props;
+
+
   const getAttachment = ( attachment ) => {
     axios.get( `${REST_URL}/get-attachments`, {
         params: {
-          type: "task",
+          type,
           path: attachment.path
         },
         headers: {
@@ -30,7 +33,7 @@ export default function TaskAttachments( props ) {
         responseType: 'arraybuffer',
       } )
       .then( ( response ) => {
-        console.log( response );
+        downloadjs( response.data, attachment.filename, attachment.mimetype );
         /*
         window.open(
         URL.createObjectURL(
@@ -41,7 +44,9 @@ export default function TaskAttachments( props ) {
         );
         */
         //download
-        downloadjs( response.data, attachment.filename, attachment.mimetype );
+      } )
+      .catch( ( err ) => {
+        console.log( err );
       } )
   }
 
@@ -68,7 +73,7 @@ export default function TaskAttachments( props ) {
             </label>
           </div>
         }
-        { attachments.map((attachment,index)=>
+        { attachments.map((attachment,index) =>
           <div key={index}  className="attachment">
             <span key={attachment.id} className="comment-attachment link m-r-5" onClick={ () => getAttachment(attachment) }>
               {`${attachment.filename} (${attachment.size/1000}kb)`}

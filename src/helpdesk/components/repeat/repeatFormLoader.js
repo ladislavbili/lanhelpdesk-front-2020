@@ -531,7 +531,7 @@ export default function RepeatFormLoader( props ) {
     const formData = new FormData();
     attachments.forEach( ( file ) => formData.append( `file`, file ) );
     formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
-    formData.append( "repeatTemplateId", repeat.repeatTemplate.id );
+    formData.append( "repeatTemplateId", repeatTemplateId );
     axios.post(
         `${REST_URL}/upload-repeat-template-attachments`,
         formData, {

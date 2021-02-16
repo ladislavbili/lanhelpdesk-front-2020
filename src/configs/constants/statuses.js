@@ -1,25 +1,25 @@
 export const actions = [ {
-    label: 'None (nothing happens when status is selected)',
+    label: 'None (nothing happens)',
     value: 'None'
   },
   {
-    label: 'None (is open)',
+    label: 'Open (none is open)',
     value: 'IsOpen'
   },
   {
-    label: 'None (is new)',
+    label: 'New (none is new)',
     value: 'IsNew'
   },
   {
-    label: 'Set close date (sets close date as current)',
+    label: 'Close (set close date as current, can be invoiced)',
     value: 'CloseDate'
   },
   {
-    label: 'Set close invalid (sets close date as current)',
+    label: `Close Invalid (set close date as current, can't be invoiced)`,
     value: 'CloseInvalid'
   },
   {
-    label: 'Set pending date (sets pending date as 1 day from now)',
+    label: 'Pending (set pending date to 24 hour)',
     value: 'PendingDate'
   },
 ]

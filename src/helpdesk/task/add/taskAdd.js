@@ -358,9 +358,6 @@ export default function TaskAdd( props ) {
     !company ||
     ( project.def.tag.required && tags.length === 0 )
   )
-  console.log(
-    project ? project.def.tag : ''
-  );
 
   //RENDERS
   const renderHeader = () => {
@@ -981,6 +978,7 @@ export default function TaskAdd( props ) {
         disabled={!userRights.taskAttachmentsWrite}
         taskID={null}
         top={top}
+        type="task"
         attachments={attachments}
         addAttachments={(newAttachments)=>{
           let time = moment().valueOf();
@@ -988,6 +986,7 @@ export default function TaskAdd( props ) {
             return {
               title:attachment.name,
               size:attachment.size,
+              filename: attachment.name,
               time,
               data:attachment
             }

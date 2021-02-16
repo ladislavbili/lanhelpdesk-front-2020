@@ -37,6 +37,7 @@ import ProjectAcl from "./components/acl";
 import DeleteReplacement from 'components/deleteReplacement';
 import CustomAttributes from "./components/customAttributes";
 import Loading from 'components/loading';
+import ACLErrors from './components/aclErrors';
 import {
   setProject,
 } from 'apollo/localSchema/actions';
@@ -146,6 +147,7 @@ export default function ProjectEdit( props ) {
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
+  const [ addTaskErrors, setAddTaskErrors ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
   const [ dataChanged, setDataChanged ] = React.useState( false );
@@ -529,6 +531,15 @@ export default function ProjectEdit( props ) {
   ) {
     return <Loading />
   }
+  const addTaskIssue = groups.filter( ( group ) => group.rights.addTasks )
+    .some( ( group ) => (
+      ( !group.rights.taskTitleEdit ) ||
+      ( !group.rights.status.write && !status.def ) ||
+      ( !group.rights.tags.write && !defTag.def && defTag.required ) ||
+      ( !group.rights.assigned.write && !assignedTo.def ) ||
+      ( !group.rights.requester.write && !requester.def && requester.required ) ||
+      ( !group.rights.company.write && !company.def )
+    ) )
   const cannotSave = (
     saving ||
     title === "" ||
@@ -554,7 +565,8 @@ export default function ProjectEdit( props ) {
       group.rights.projectPrimary.write &&
       group.rights.projectSecondary &&
       userGroups.some( ( userGroup ) => userGroup.group.id === group.id )
-    ) )
+    ) ) ||
+    addTaskIssue
   )
   const myRights = currentUser.role.accessRights.projects ?
     backendCleanRights( true ) :
@@ -565,18 +577,16 @@ export default function ProjectEdit( props ) {
   const canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
     .filter( ( user ) => userGroups.some( ( userGroup ) => userGroup.user.id ) );
 
-  console.log( projectData );
-  console.log( groups );
   return (
     <div>
-      <div className="commandbar a-i-c p-l-20">
+      <div className="dynamic-commandbar a-i-c p-l-20">
         { dataChanged &&
-          <div className="message error-message">
+          <div className="message error-message" style={{ minWidth: 220 }}>
             Save changes before leaving!
           </div>
         }
         { !dataChanged &&
-          <div className="message success-message">
+          <div className="message success-message" style={{ minWidth: 42 }}>
             Saved
           </div>
         }
@@ -779,8 +789,6 @@ export default function ProjectEdit( props ) {
               setDataChanged( true );
             }}
             />
-
-
           <ProjectDefaultValues
             assignedTo={assignedTo}
             setAssignedTo={setAssignedTo}
@@ -834,7 +842,20 @@ export default function ProjectEdit( props ) {
             />
         </div>
       }
-
+      { addTaskErrors && addTaskIssue &&
+        <ACLErrors
+          {
+            ...{
+              groups,
+              status,
+              defTag,
+              assignedTo,
+              requester,
+              company
+            }
+          }
+          />
+      }
       <div className="row">
         {
           closeModal &&
@@ -850,9 +871,22 @@ export default function ProjectEdit( props ) {
 
         { (myRights.projectPrimaryWrite || myRights.projectSecondary) &&
           <Button
-            className="btn ml-auto"
-            disabled={cannotSave}
-            onClick={updateProjectFunc}>
+            className={classnames(
+                "btn ml-auto",
+                {
+                  "disabled": cannotSave
+                },
+              )}
+            disabled={addTaskErrors && cannotSave}
+            onClick={() => {
+              if(cannotSave){
+                setAddTaskErrors(true);
+                return;
+              }else{
+                updateProjectFunc();
+              }
+            }}
+            >
             {(saving?'Saving...':'Save project')}
           </Button>
         }

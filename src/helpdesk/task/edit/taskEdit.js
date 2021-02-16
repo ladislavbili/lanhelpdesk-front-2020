@@ -1721,6 +1721,7 @@ export default function TaskEdit( props ) {
       <Attachments
         disabled={!userRights.taskAttachmentsWrite}
         taskID={id}
+        type="task"
         top={top}
         attachments={task.taskAttachments}
         addAttachments={addAttachments}
