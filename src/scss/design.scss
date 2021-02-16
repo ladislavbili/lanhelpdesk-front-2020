@@ -1095,6 +1095,8 @@ tr:last-child, tr:first-child{
   width: 100% !important;
 }
 
+
+
 .input-error{
   border-color: #f19a9aed;
   border-width: 1px;
@@ -1105,6 +1107,12 @@ tr:last-child, tr:first-child{
   height: $button-height;
   font-size: 14px;
   margin-right: 5px;
+}
+
+.project-message{
+  padding: 4px 4px;
+  font-size: 14px;
+  margin: 5px;
 }
 
 .success-message{
@@ -1480,6 +1488,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   height: $commandbar-height;
   white-space: pre-wrap;
   border-bottom: $main-border;
+}
+
+.dynamic-commandbar{
+  display: flex;
+  background-color: #f4f8fb;
+  width: 100%;
+  padding: 0px 1px 0px 1px;
+  white-space: pre-wrap;
+  border-bottom: $main-border;
+  min-height: $commandbar-height;
 }
 
 .task-list-commandbar{

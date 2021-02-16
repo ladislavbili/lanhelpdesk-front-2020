@@ -19,6 +19,7 @@ export default function RepeatFormInput( props ) {
 
   //state
   const [ openModal, setOpenModal ] = React.useState( false );
+  const interval = intervals.find( ( interval ) => interval.value === repeat.repeatInterval );
   return (
     <div>
     <div>
@@ -33,7 +34,7 @@ export default function RepeatFormInput( props ) {
               }}>
               {
                 repeat ?
-                ("Opakovať každý "+ repeat.repeatEvery + ' ' + intervals.find((interval) => interval.value === repeat.repeatInterval).title) :
+                `Opakovať každý ${repeat.repeatEvery} ${interval.label}` :
                 "No repeat"
               }
             </Button>
@@ -51,7 +52,7 @@ export default function RepeatFormInput( props ) {
               }}>
               {
                 repeat ?
-                ("Opakovať každý "+ repeat.repeatEvery + ' ' + repeat.repeatInterval.title) :
+                `Opakovať každý ${repeat.repeatEvery} ${interval.label}` :
                 "No repeat"
               }
             </Button>

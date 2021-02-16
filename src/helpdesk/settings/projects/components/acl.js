@@ -130,7 +130,7 @@ export default function ProjectACL( props ) {
             <td>Group Order</td>
             {
               groups.map((group) => (
-                <td>
+                <td key={group.id}>
                   {group.order}
                 </td>
               ))
@@ -149,9 +149,12 @@ export default function ProjectACL( props ) {
                         <span className='center-hor row' style={{width: 'fit-content'}}>
                           <Checkbox
                             className = "m-l-5 m-r-5"
-                            disabled = { rightDisabled(acl, group.rights) }
-                            value = { acl.both ? group.rights[acl.id].read : group.rights[acl.id] }
+                            disabled = { acl.fake || rightDisabled(acl, group.rights) }
+                            value = { acl.fake ? acl.value : (acl.both ? group.rights[acl.id].read : group.rights[acl.id]) }
                             onChange={() =>{
+                              if(acl.fake){
+                                return;
+                              }
                               let newVal = !( acl.both ? group.rights[acl.id].read : group.rights[acl.id] );
                               if( acl.both ){
                                 updateGroupRight(group.id, acl.id, { read: newVal, write: group.rights[acl.id].write } )

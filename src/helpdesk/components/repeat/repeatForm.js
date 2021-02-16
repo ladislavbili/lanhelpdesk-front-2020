@@ -296,6 +296,7 @@ export default function RepeatForm( props ) {
     );
     setProject( project );
     setTitle( data.title );
+    setAttachments( data.repeatTemplateAttachments );
     setScheduled( data.scheduled.map( ( item ) => ( {
       ...item,
       from: moment( parseInt( item.from ) ),
@@ -1514,11 +1515,13 @@ export default function RepeatForm( props ) {
     if ( !userRights.taskAttachmentsRead ) {
       return null;
     }
+
     return (
       <Attachments
         disabled={!userRights.taskAttachmentsWrite}
         taskID={null}
         top={top}
+        type="repeatTemplate"
         attachments={attachments}
         addAttachments={(newAttachments)=>{
           if(editMode){
@@ -1529,8 +1532,9 @@ export default function RepeatForm( props ) {
             return {
               title:attachment.name,
               size:attachment.size,
+              filename: attachment.name,
               time,
-              data:attachment
+              data: attachment
             }
           });
           setAttachments([...attachments, ...newAttachments]);

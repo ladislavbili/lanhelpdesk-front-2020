@@ -4,6 +4,9 @@ import {
   invisibleSelectStyle,
   invisibleSelectStyleNoArrowColored
 } from 'configs/components/select';
+import {
+  toSelItem
+} from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 import booleanSelects from 'configs/constants/boolSelect'
 import {
@@ -55,7 +58,7 @@ export default function ProjectDefaultValues( props ) {
                 <label className="col-3 col-form-label">Status</label>
                 <div className="col-9">
                   <Select
-                    value={status.value === null ? emptyStatus : status.value }
+                    value={status.value === null ? emptyStatus : toSelItem(status.value) }
                     onChange={(e)=>{
                       if(e.id === null){
                         setStatus({...status, value:null })

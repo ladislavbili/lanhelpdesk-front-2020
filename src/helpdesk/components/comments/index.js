@@ -193,7 +193,8 @@ export default function Comments( props ) {
               }}>
               Submit
             </Button>
-            { !userRights.emails || !userRights.addComments &&
+            {console.log(userRights)}
+            { userRights.emails && userRights.addComments &&
               <Checkbox
                 className = "m-r-15 center-hor "
                 centerHor
