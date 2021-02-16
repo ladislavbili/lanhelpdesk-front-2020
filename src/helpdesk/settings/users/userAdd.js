@@ -145,18 +145,19 @@ export default function UserAddContainer( props ) {
 
   return (
     <div>
-      <div className="commandbar a-i-c p-l-20">
-        { cannotAddUser() &&
-          <div className="message error-message">
-            Fill in all the required information!
-          </div>
-        }
-      </div>
+      { !closeModal &&
+        <div className="commandbar a-i-c p-l-20">
+          { cannotAddUser() &&
+            <div className="message error-message">
+              Fill in all the required information!
+            </div>
+          }
+        </div>
+      }
       <div
         className={classnames(
         "p-t-10 p-l-20 p-r-20 p-b-20",
         {" scroll-visible fit-with-header-and-commandbar": !closeModal},
-        {"bkg-F9F9F9": closeModal}
       )}
         >
         <h2 className="m-b-20" >
@@ -259,7 +260,7 @@ export default function UserAddContainer( props ) {
             />
         </FormGroup>
 
-        <div className="row">
+        <div className="form-buttons-row">
           {closeModal &&
             <Button
               className="btn btn-link"
@@ -268,13 +269,21 @@ export default function UserAddContainer( props ) {
               Cancel
             </Button>
           }
-          <Button
-            className="btn ml-auto"
+          { closeModal && cannotAddUser() &&
+            <div className=" ml-auto message error-message">
+              Fill in all the required information!
+            </div>
+          }
+          <button
+            className={classnames(
+                "btn",
+                {"ml-auto": !closeModal}
+              )}
             disabled={ cannotAddUser() }
             onClick={ addUserFunc }
             >
             { saving ? 'Adding...' : 'Add user' }
-          </Button>
+          </button>
         </div>
       </div>
     </div>

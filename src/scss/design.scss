@@ -95,7 +95,7 @@
 
 .modal-without-borders{
   .modal-content{
-    background-color: $main-background-color;
+    background-color: #eaeaea;//$main-background-color;
     padding: 0px;
     .modal-body{
       padding:0px;
@@ -603,7 +603,7 @@ h4{
   margin-right: 0px;
 }
 
-.btn:hover, .btn:focus, .btn:focus:active, .btn:active, .btn:disabled{
+.btn:hover, .btn:focus, .btn:focus:active, .btn:active, .btn:disabled, .btn:focus:active{
   background-color: $basic-button-color;
   color: #FFFFFF;
   box-shadow: none;
@@ -611,7 +611,7 @@ h4{
   opacity: 100;
 }
 
-.btn-link, .btn-link:hover, .btn-link:active, .btn-link:focus, .btn-link:disabled, .btn:focus:active, .btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn){
+.btn-link, .btn-link:hover, .btn-link:active, .btn-link:focus, .btn-link:disabled, .btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn){
   background-color: inherit;
   padding: 0px;
   color: $color-link;
@@ -704,15 +704,13 @@ h4{
 }
 
 .btn-red{
-  background-color: white;
-  color: red;
-  border: 1px solid red;
+  background-color: red;
+  color: white;
 }
 
 .btn-red:hover{
   background-color: red;
   color: white;
-  border: inherit;
 }
 
 .btn-danger{
@@ -729,6 +727,12 @@ h4{
 
 .btn-grey{
   background-color: lightGrey;
+}
+
+.form-buttons-row{
+    display: flex !important;
+    margin: 0px;
+    margin-top: 20px;
 }
 
 .hidden-button{
@@ -1795,34 +1799,36 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .dnd-column{
-  background-color: #F9F9F9;
+  background-color: #eaeaea;
   min-width: 400px;
   max-width: 401px;
   border-radius: 0px;
   border: none;
 }
 
-.dnd-column:first-child>.dnd-header{
-    margin-left: 20px;
+.dnd-column:last-child{
+  .dnd-body{
+    border-right: 0px;
+  }
 }
 
 .dnd-header{
-  background-color: #F9F9F9;
-  border-bottom: 1px solid #EAEAEA;
+  background-color: #EAEAEA;
+  border-bottom: 1px solid #AAA;
 
   font-family: $main-font;
   font-style: normal;
   font-weight: 350;
   font-size: 21px;
   line-height: 37px;
-  text-align: center;
+  padding-left: 40px;
 
   color: #333333;
 }
 
 .dnd-body{
-  background-color: #F9F9F9;
-  border-right: 1px solid #EAEAEA;
+  background-color: #EAEAEA;
+  border-right: 1px solid #AAA;
 }
 
 .dnd-item{
@@ -1988,7 +1994,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .vykazyTable>.table>tbody>tr>td:nth-child(2){
-  padding-left: 20px;
   padding-right: 0px;
 }
 
@@ -2209,11 +2214,12 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .form-selects-entries{
-  background-color:  #f9f9f9;
+  background-color:  #eaeaea;
   padding-top: 5px;
   padding-bottom: 5px;
   .col-9, .col-10-45, .col-11, .col-11-5, .display-inline-block {
     border: $main-border;
+    margin-bottom: 5px;
   }
 }
 

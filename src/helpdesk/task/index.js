@@ -470,7 +470,6 @@ export default function TasksIndex( props ) {
     } ) )
   }
 
-  console.log( currentUser );
   return (
       <ShowData
         data={processTasks(filterTasks(tasks))}

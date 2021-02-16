@@ -153,11 +153,11 @@ export default function MilestoneAdd( props ) {
             Close
           </Button>
 
-          <Button className="btn"
+          <button className="btn"
             disabled={saving || title === "" || projectLoading}
             onClick={addMilestoneFunc}>
             { saving ? 'Adding...' : 'Add milestone' }
-          </Button>
+          </button>
         </ModalFooter>
       </Modal>
     </div>

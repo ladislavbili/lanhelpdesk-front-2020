@@ -433,211 +433,141 @@ export default function TaskAdd( props ) {
         />
     ),
     Assigned: (
-      <div>
-        { (defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
-          <div className="disabled-info">{assignedTo.label}</div>
-        }
-        { !(defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
-          <Select
-            placeholder="Select required"
-            value={assignedTo}
-            isDisabled={ defaultFields.assignedTo.fixed || !userRights.assignedWrite }
-            isMulti
-            onChange={(users)=> {
-              setAssignedTo(users);
-            }}
-            options={USERS_WITH_PERMISSIONS}
-            styles={selectStyleNoArrowRequired}
-            />
-        }
-      </div>
+      <Select
+        placeholder="Select required"
+        value={assignedTo}
+        isDisabled={ defaultFields.assignedTo.fixed || !userRights.assignedWrite }
+        isMulti
+        onChange={(users)=> {
+          setAssignedTo(users);
+        }}
+        options={USERS_WITH_PERMISSIONS}
+        styles={selectStyleNoArrowRequired}
+        />
     ),
     Status: (
-      <div>
-        { (defaultFields.status.fixed || !userRights.statusWrite) &&
-          <div className="disabled-info">{status.label}</div>
-        }
-        { !(defaultFields.status.fixed || !userRights.statusWrite) &&
-          <Select
-            placeholder="Select required"
-            value={status}
-            isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
-            styles={selectStyleNoArrowColoredRequired}
-            onChange={(status)=>{
-              if(status.action==='PendingDate'){
-                setStatus(status);
-                setPendingDate( moment().add(1,'d') );
-              }else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
-                setStatus(status);
-                setCloseDate( moment() );
-              }
-              else{
-                setStatus(status);
-              }
-            }}
-            options={project ? toSelArr(project.statuses.filter((status) => status.action.toLowerCase() !== 'invoiced' )) : []}
-            />
-        }
-      </div>
+      <Select
+        placeholder="Select required"
+        value={status}
+        isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
+        styles={selectStyleNoArrowColoredRequired}
+        onChange={(status)=>{
+          if(status.action==='PendingDate'){
+            setStatus(status);
+            setPendingDate( moment().add(1,'d') );
+          }else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
+            setStatus(status);
+            setCloseDate( moment() );
+          }
+          else{
+            setStatus(status);
+          }
+        }}
+        options={project ? toSelArr(project.statuses.filter((status) => status.action.toLowerCase() !== 'invoiced' )) : []}
+        />
     ),
     Type: (
-      <div>
-        { !userRights.typeWrite &&
-          <div className="disabled-info">{taskType.label}</div>
-        }
-        { userRights.typeWrite &&
-          <Select
-            placeholder="Select task type"
-            value={taskType}
-            isDisabled={ !userRights.typeWrite }
-            styles={ selectStyleNoArrowRequired }
-            onChange={(taskType)=> {
-              setTaskType(taskType);
-            }}
-            options={taskTypes}
-            />
-        }
-      </div>
+      <Select
+        placeholder="Select task type"
+        value={taskType}
+        isDisabled={ !userRights.typeWrite }
+        styles={ selectStyleNoArrowRequired }
+        onChange={(taskType)=> {
+          setTaskType(taskType);
+        }}
+        options={taskTypes}
+        />
     ),
     Milestone: (
-      <div>
-        { !userRights.milestoneWrite &&
-          <div className="disabled-info">{milestone.label}</div>
-        }
-        { userRights.milestoneWrite &&
-          <Select
-            isDisabled={!userRights.milestoneWrite}
-            placeholder="None"
-            value={milestone}
-            onChange={(milestone)=> {
-              if(status.action==='PendingDate'){
-                if(milestone.startsAt !== null){
-                  setMilestone(milestone);
-                  setPendingDate(moment(milestone.startsAt));
-                  setPendingChangable(false);
-                }else{
-                  setMilestone(milestone);
-                  setPendingChangable(true);
-                }
-              }else{
-                setMilestone(milestone);
-              }
-            }}
-            options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-            styles={ selectStyleNoArrowNoPadding }
-            />
-        }
-      </div>
+      <Select
+        isDisabled={!userRights.milestoneWrite}
+        placeholder="None"
+        value={milestone}
+        onChange={(milestone)=> {
+          if(status.action==='PendingDate'){
+            if(milestone.startsAt !== null){
+              setMilestone(milestone);
+              setPendingDate(moment(milestone.startsAt));
+              setPendingChangable(false);
+            }else{
+              setMilestone(milestone);
+              setPendingChangable(true);
+            }
+          }else{
+            setMilestone(milestone);
+          }
+        }}
+        options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
+        styles={ selectStyleNoArrowNoPadding }
+        />
     ),
     Requester: (
-      <div>
-        { (defaultFields.requester.fixed || !userRights.requesterWrite) &&
-          <div className="disabled-info">{requester.label}</div>
-        }
-        { !(defaultFields.requester.fixed || !userRights.requesterWrite) &&
-          <Select
-            value={requester}
-            placeholder="Select required"
-            isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
-            onChange={(requester)=>{
-              setRequester(requester);
-              const newCompany = companies.find((company) => company.id === requester.id );
-              setCompany(newCompany);
-            }}
-            options={REQUESTERS}
-            styles={ selectStyleNoArrowRequired }
-            />
-        }
-      </div>
+      <Select
+        value={requester}
+        placeholder="Select required"
+        isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
+        onChange={(requester)=>{
+          setRequester(requester);
+          const newCompany = companies.find((company) => company.id === requester.id );
+          setCompany(newCompany);
+        }}
+        options={REQUESTERS}
+        styles={ selectStyleNoArrowRequired }
+        />
     ),
     Company: (
-      <div>
-        { (defaultFields.company.fixed || !userRights.companyWrite) &&
-          <div className="disabled-info">{company.label}</div>
-        }
-        { !(defaultFields.company.fixed || !userRights.companyWrite) &&
-          <Select
-            value={company}
-            placeholder="Select required"
-            isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
-            onChange={(company)=> {
-              setCompany(company);
-              setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
-            }}
-            options={companies}
-            styles={ selectStyleNoArrowRequired }
-            />
-        }
-      </div>
+      <Select
+        value={company}
+        placeholder="Select required"
+        isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
+        onChange={(company)=> {
+          setCompany(company);
+          setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
+        }}
+        options={companies}
+        styles={ selectStyleNoArrowRequired }
+        />
     ),
     Pausal: (
-      <div>
-        { (!userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed) &&
-          <div className="disabled-info">{pausal.label}</div>
-        }
-        { !(!userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed) &&
-          <Select
-            value={pausal}
-            placeholder="Select required"
-            isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-            styles={ selectStyleNoArrowRequired }
-            onChange={(pausal)=> setPausal(pausal)}
-            options={booleanSelects}
-            />
-        }
-      </div>
+      <Select
+        value={pausal}
+        placeholder="Select required"
+        isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
+        styles={ selectStyleNoArrowRequired }
+        onChange={(pausal)=> setPausal(pausal)}
+        options={booleanSelects}
+        />
     ),
     Deadline: (
-      <div>
-        { !userRights.deadlineWrite &&
-          <div className="disabled-info">{deadline}</div>
-        }
-        { userRights.deadlineWrite &&
-          <DatePicker
-            className={classnames("form-control")}
-            selected={deadline}
-            disabled={!userRights.deadlineWrite}
-            onChange={date => setDeadline(date)}
-            placeholderText="No deadline"
-            />
-        }
-      </div>
+      <DatePicker
+        className={classnames("form-control")}
+        selected={deadline}
+        disabled={!userRights.deadlineWrite}
+        onChange={date => setDeadline(date)}
+        placeholderText="No deadline"
+        />
     ),
     Overtime: (
-      <div>
-        { (!userRights.overtimeWrite || defaultFields.overtime.fixed) &&
-          <div className="disabled-info">{overtime.label}</div>
-        }
-        { !(!userRights.overtimeWrite || defaultFields.overtime.fixed) &&
-          <Select
-            placeholder="Select required"
-            value={overtime}
-            isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-            styles={ selectStyleNoArrowRequired }
-            onChange={(overtime) => setOvertime(overtime)}
-            options={booleanSelects}
-            />
-        }
-      </div>
+      <Select
+        placeholder="Select required"
+        value={overtime}
+        isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
+        styles={ selectStyleNoArrowRequired }
+        onChange={(overtime) => setOvertime(overtime)}
+        options={booleanSelects}
+        />
     ),
     Tags: (
-      <div>
-        { (defaultFields.tag.fixed || !userRights.tagsWrite) &&
-          <div className="disabled-info">{tags.map(tag => tag.label).join(" ")}</div>
-        }
-        { !(defaultFields.tag.fixed || !userRights.tagsWrite) &&
-          <div className="f-1">
-            <Select
-              value={tags}
-              placeholder="None"
-              isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-              isMulti
-              onChange={(t)=>setTags(t)}
-              options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
-              styles={ selectStyleNoArrowColoredRequired }
-              />
-          </div>
-        }
+      <div className="f-1">
+        <Select
+          value={tags}
+          placeholder="None"
+          isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
+          isMulti
+          onChange={(t)=>setTags(t)}
+          options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
+          styles={ selectStyleNoArrowColoredRequired }
+          />
       </div>
     )
   }
@@ -656,7 +586,7 @@ export default function TaskAdd( props ) {
                 </div>
               </div>
             </div>
-            { userRights.assignedRead &&
+            { userRights.assignedRead && !defaultFields.assignedTo.fixed && userRights.assignedWrite &&
               <div className="col-8">
                 <div className="row p-r-10">
                   <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
@@ -670,7 +600,7 @@ export default function TaskAdd( props ) {
 
           <div className="row">
             <div className="col-4">
-              {userRights.statusRead &&
+              {userRights.statusRead && !defaultFields.status.fixed && userRights.statusWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Status <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -679,7 +609,7 @@ export default function TaskAdd( props ) {
                 </div>
               }
 
-              { userRights.typeRead &&
+              { userRights.typeRead && userRights.typeWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Typ</Label>
                   <div className="col-9">
@@ -687,7 +617,7 @@ export default function TaskAdd( props ) {
                   </div>
                 </div>
               }
-              { userRights.milestoneRead &&
+              { userRights.milestoneRead && userRights.milestoneWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Milestone</Label>
                   <div className="col-9">
@@ -698,25 +628,25 @@ export default function TaskAdd( props ) {
             </div>
 
             <div className="col-4">
-              {userRights.requesterRead &&
+              {userRights.requesterRead && !defaultFields.requester.fixed &&  userRights.requesterWrite &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Zadal <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">Requester <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Requester }
                   </div>
                 </div>
               }
-              {userRights.companyRead &&
+              {userRights.companyRead && !defaultFields.company.fixed && userRights.companyWrite &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Firma <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">Company <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Company }
                   </div>
                 </div>
               }
-              {userRights.pausalRead &&
+              {userRights.pausalRead && userRights.pausalWrite && company && !company.monthly && !defaultFields.pausal.fixed &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Paušál <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">Pausal <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Pausal }
                   </div>
@@ -725,7 +655,7 @@ export default function TaskAdd( props ) {
             </div>
 
             <div className="col-4">
-              { userRights.deadlineRead &&
+              { userRights.deadlineRead && userRights.deadlineWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Deadline</Label>
                   <div className="col-9">
@@ -733,7 +663,7 @@ export default function TaskAdd( props ) {
                   </div>
                 </div>
               }
-              { userRights.repeatRead &&
+              { userRights.repeatRead && userRights.repeatWrite &&
                 <Repeat
                   taskID={null}
                   repeat={repeat}
@@ -752,9 +682,9 @@ export default function TaskAdd( props ) {
                   addTask={true}
                   />
               }
-              { userRights.overtimeRead &&
+              { userRights.overtimeRead && userRights.overtimeWrite && !defaultFields.overtime.fixed &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Mimo PH <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">Outside PH <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     {layoutComponents.Overtime}
                   </div>
@@ -763,13 +693,39 @@ export default function TaskAdd( props ) {
             </div>
           </div>
 
-          { userRights.tagsRead &&
+          { userRights.tagsRead && !defaultFields.tag.fixed && userRights.tagsWrite &&
             <div className="row p-r-10">
               <Label className="col-0-5 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
               <div className="col-11-5">
                 { layoutComponents.Tags }
               </div>
             </div>
+          }
+
+          { userRights.scheduledRead && assignedTo.length !== 0 &&
+            <Scheduled
+              items={scheduled}
+              users={assignedTo}
+              disabled={assignedTo.length === 0}
+              onChange={(item) => {
+                let newScheduled = [...scheduled];
+                newScheduled[newScheduled.findIndex((item2) => item2.id === item.id )] = item;
+                setScheduled(newScheduled);
+              }}
+              submitItem = { (newScheduled) => {
+                setScheduled([
+                  ...scheduled,
+                  {
+                    ...newScheduled,
+                    id: fakeID--,
+                  }
+                ])
+              }}
+              deleteItem = { (newScheduled) => {
+                setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
+              } }
+              layout={currentUser.taskLayout}
+              />
           }
 
         </div>
@@ -821,7 +777,7 @@ export default function TaskAdd( props ) {
             { layoutComponents.Project(true) }
           </div>
         </div>
-        { userRights.statusRead &&
+        { userRights.statusRead && !defaultFields.status.fixed && userRights.statusWrite &&
           <div className="form-selects-entry-column" >
             <Label>Status <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -829,7 +785,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.milestoneRead &&
+        { userRights.milestoneRead && userRights.milestoneWrite &&
           <div className="form-selects-entry-column" >
             <Label>Milestone</Label>
             <div className="form-selects-entry-column-rest" >
@@ -837,7 +793,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.requesterRead &&
+        { userRights.requesterRead && !defaultFields.requester.fixed &&  userRights.requesterWrite &&
           <div className="form-selects-entry-column" >
             <Label>Requester <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -845,7 +801,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.companyRead &&
+        { userRights.companyRead && !defaultFields.company.fixed && userRights.companyWrite &&
           <div className="form-selects-entry-column" >
             <Label>Company <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -853,7 +809,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.assignedRead &&
+        { userRights.assignedRead && !defaultFields.assignedTo.fixed && userRights.assignedWrite &&
           <div className="form-selects-entry-column" >
             <Label>Assigned <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -861,7 +817,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.deadlineRead &&
+        { userRights.deadlineRead && userRights.deadlineWrite &&
           <div className="form-selects-entry-column" >
             <Label>Deadline</Label>
             <div className="form-selects-entry-column-rest" >
@@ -869,7 +825,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.repeatRead &&
+        { userRights.repeatRead && userRights.repeatWrite &&
           <Repeat
             taskID={null}
             repeat={repeat}
@@ -888,7 +844,7 @@ export default function TaskAdd( props ) {
             vertical={true}
             />
         }
-        { userRights.scheduledRead &&
+        { userRights.scheduledRead && assignedTo.length !== 0 &&
           <Scheduled
             items={scheduled}
             users={assignedTo}
@@ -913,7 +869,7 @@ export default function TaskAdd( props ) {
             layout={currentUser.taskLayout}
             />
         }
-        { userRights.tagsRead &&
+        { userRights.tagsRead && !defaultFields.tag.fixed && userRights.tagsWrite &&
           <div className="form-selects-entry-column" >
             <Label>Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
             <div className="form-selects-entry-column-rest" >
@@ -921,7 +877,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.typeRead &&
+        { userRights.typeRead && userRights.typeWrite &&
           <div className="form-selects-entry-column" >
             <Label>Task Type</Label>
             <div className="form-selects-entry-column-rest" >
@@ -929,7 +885,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.pausalRead &&
+        { userRights.pausalRead && userRights.pausalWrite && company && !company.monthly && !defaultFields.pausal.fixed &&
           <div className="form-selects-entry-column" >
             <Label>Pausal <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -937,7 +893,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.overtimeRead &&
+        { userRights.overtimeRead && userRights.overtimeWrite && !defaultFields.overtime.fixed &&
           <div className="form-selects-entry-column" >
             <Label>Outside PH <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >

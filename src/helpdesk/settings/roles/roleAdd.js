@@ -264,7 +264,7 @@ export default function RoleAdd( props ) {
           </table>
         </div>
 
-        <div className="row">
+        <div className="form-buttons-row">
           {
             props.close &&
             <Button className="btn-link" onClick={() => {
@@ -275,13 +275,13 @@ export default function RoleAdd( props ) {
             </Button>
           }
 
-          <Button className="btn ml-auto" disabled={cannotSave()} onClick={addRoleFunc}>
+          <button className="btn ml-auto" disabled={cannotSave()} onClick={addRoleFunc}>
             {
               saving
               ? 'Adding...'
               : 'Add role'
             }
-          </Button>
+          </button>
         </div>
       </div>
     </div>

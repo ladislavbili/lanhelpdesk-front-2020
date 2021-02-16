@@ -593,13 +593,9 @@ export default function ProjectEdit( props ) {
       </div>
     <div
       className={ classnames(
-        {
-          "scroll-visible": true,
-          "fit-with-header-and-commandbar": !closeModal,
-          "fit-with-header-and-commandbar": closeModal,
-          "p-t-10 p-l-20 p-r-20 p-b-20": !closeModal,
-          "p-30": closeModal,
-        },
+        "p-t-10 p-l-20 p-r-20 p-b-20",
+        "scroll-visible",
+        "fit-with-header-and-commandbar",
       )}
       >
 
@@ -856,7 +852,7 @@ export default function ProjectEdit( props ) {
           }
           />
       }
-      <div className="row">
+      <div className="form-buttons-row">
         {
           closeModal &&
           <Button className="btn-link" onClick={() => closeModal(null, null)}>
@@ -864,18 +860,15 @@ export default function ProjectEdit( props ) {
           </Button>
         }
         { myRights.projectPrimaryWrite &&
-          <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
+          <Button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
             Delete
           </Button>
         }
 
         { (myRights.projectPrimaryWrite || myRights.projectSecondary) &&
-          <Button
+          <button
             className={classnames(
                 "btn ml-auto",
-                {
-                  "disabled": cannotSave
-                },
               )}
             disabled={addTaskErrors && cannotSave}
             onClick={() => {
@@ -888,7 +881,7 @@ export default function ProjectEdit( props ) {
             }}
             >
             {(saving?'Saving...':'Save project')}
-          </Button>
+          </button>
         }
       </div>
       <DeleteReplacement

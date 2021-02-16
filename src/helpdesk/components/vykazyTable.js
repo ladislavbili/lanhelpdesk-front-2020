@@ -218,7 +218,7 @@ export default function Rozpocet( props ) {
       <table className="table form-section-rest">
         <thead>
           <tr>
-            <th colSpan={showColumns.includes(0) ? 2 : 1}>
+            <th colSpan={showColumns.includes(0) ? 3 : 2}>
               <Nav tabs className="b-0 m-0">
                 { showSubtasks && userRights.taskShortSubtasksRead &&
                   <NavItem>
@@ -259,7 +259,7 @@ export default function Rozpocet( props ) {
                 }
               </Nav>
             </th>
-            {showColumns.includes(3) && toggleTab !== "0" && <th width="190">Typ</th> }
+            {false && showColumns.includes(3) && toggleTab !== "0" && <th width="190">Typ</th> }
             {showColumns.includes(2) && toggleTab !== "0" && <th width="190">Rieši</th> }
             {showColumns.includes(4) && <th width="50" className="t-a-r">Mn.</th> }
             {showColumns.includes(5) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Cenník/Nákup</th> }
@@ -285,6 +285,20 @@ export default function Rozpocet( props ) {
                     />
                 </td>
               }
+              {/*Type*/}
+              {showColumns.includes(3) && toggleTab !== "0" &&
+                <td>
+                  <Select
+                    isDisabled={disabled}
+                    value={ !isInvoiced ? subtask.type : subtask.invoicedData.type }
+                    onChange={(type)=>{
+                      updateSubtask(subtask.id,{type:type})
+                    }}
+                    options={taskTypes}
+                    styles={invisibleSelectStyle}
+                    />
+                </td>
+              }
               {/*Name*/}
               {showColumns.includes(1) &&
                 <td className="">
@@ -302,20 +316,6 @@ export default function Rozpocet( props ) {
                     }}
                     onFocus={() => onFocusSubtask(subtask)}
                     onChange={e =>setEditedSubtaskTitle(e.target.value)}
-                    />
-                </td>
-              }
-              {/*Type*/}
-              {showColumns.includes(3) && toggleTab !== "0" &&
-                <td>
-                  <Select
-                    isDisabled={disabled}
-                    value={ !isInvoiced ? subtask.type : subtask.invoicedData.type }
-                    onChange={(type)=>{
-                      updateSubtask(subtask.id,{type:type})
-                    }}
-                    options={taskTypes}
-                    styles={invisibleSelectStyle}
                     />
                 </td>
               }
@@ -413,8 +413,8 @@ export default function Rozpocet( props ) {
                       isNaN(getTotalDiscountedPrice(subtask)) ?
                       'No price' :
                       getTotalDiscountedPrice(subtask) + " €"
-                    ):
-                    `${parseFloat(subtask.invoicedData.price) * parseFloat(subtask.invoicedData.quantity)} €`
+                    ) :
+                    `${(parseFloat(subtask.invoicedData.price) * parseFloat(subtask.invoicedData.quantity))} €`
                   }
                 </td>
               }
@@ -478,6 +478,10 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
+                {/*Type*/}
+                {showColumns.includes(3) &&
+                  <td className="p-t-15 p-l-8">Výjazd</td>
+                }
                 {/*Name*/}
                 {showColumns.includes(1) &&
                   <td>
@@ -491,10 +495,6 @@ export default function Rozpocet( props ) {
                       styles={invisibleSelectStyle}
                       />
                   </td>
-                }
-                {/*Type*/}
-                {showColumns.includes(3) &&
-                  <td className="p-t-15 p-l-8">Výjazd</td>
                 }
                 {/*Riesi*/}
                 {showColumns.includes(2) &&
@@ -661,6 +661,12 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
+                {/*Type*/}
+                {showColumns.includes(3) &&
+                  <td className="p-l-8 p-t-15">
+                    Materiál
+                  </td>
+                }
                 {/*Name*/}
                 {showColumns.includes(1) &&
                   <td className="">
@@ -683,12 +689,6 @@ export default function Rozpocet( props ) {
                       onFocus={() => onFocusMaterial(material)}
                       onChange={e => setEditedMaterialTitle(e.target.value) }
                       />
-                  </td>
-                }
-                {/*Type*/}
-                {showColumns.includes(3) &&
-                  <td className="p-l-8 p-t-15">
-                    Materiál
                   </td>
                 }
                 {/*Riesi*/}
@@ -874,6 +874,12 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
+                {/*Type*/}
+                {showColumns.includes(3) &&
+                  <td className="p-l-8 p-t-15">
+                    Voľná položka
+                  </td>
+                }
                 {/*Name*/}
                 {showColumns.includes(1) &&
                   <td className="">
@@ -896,12 +902,6 @@ export default function Rozpocet( props ) {
                       onFocus={() => onFocusCustomItem(customItem)}
                       onChange={e => setEditedCustomItemTitle(e.target.value) }
                       />
-                  </td>
-                }
-                {/*Type*/}
-                {showColumns.includes(3) &&
-                  <td className="p-l-8 p-t-15">
-                    Voľná položka
                   </td>
                 }
                 {/*Riesi*/}
@@ -1025,9 +1025,23 @@ export default function Rozpocet( props ) {
           {/* ADD Work */}
           {showAddSubtask && !disabled &&
             <tr>
+              {/*Type*/}
+              {showColumns.includes(3) && toggleTab !== "0" &&
+                <td colSpan={2} className="p-l-8">{/*typ*/}
+                  <Select
+                    isDisabled={disabled}
+                    value={newSubtaskType}
+                    options={taskTypes}
+                    onChange={(type)=>{
+                      setNewSubtaskType(type)
+                    }}
+                    styles={selectStyle}
+                    />
+                </td>
+              }
               {/*Name*/}
               {showColumns.includes(1) &&
-                <td colSpan={2} className="p-r-8">
+                <td className="p-r-8">
                   <input
                     disabled={disabled}
                     type="text"
@@ -1062,20 +1076,6 @@ export default function Rozpocet( props ) {
                       }
                     }}
                     onChange={(e)=>setNewSubtaskTitle(e.target.value)}
-                    />
-                </td>
-              }
-              {/*Type*/}
-              {showColumns.includes(3) && toggleTab !== "0" &&
-                <td className="p-l-8">{/*typ*/}
-                  <Select
-                    isDisabled={disabled}
-                    value={newSubtaskType}
-                    options={taskTypes}
-                    onChange={(type)=>{
-                      setNewSubtaskType(type)
-                    }}
-                    styles={selectStyle}
                     />
                 </td>
               }
@@ -1178,9 +1178,13 @@ export default function Rozpocet( props ) {
           {/* ADD Trip */}
           {showAddTrip && !disabled &&
             <tr>
+              {/*Type*/}
+              {showColumns.includes(3) &&
+                <td colSpan={2} className="p-t-15 p-l-8">Výjazd</td>
+              }
               {/*Name*/}
               {showColumns.includes(1) &&
-                <td colSpan={2} className="p-r-8">
+                <td className="p-r-8">
                   <Select
                     isDisabled={disabled}
                     value={newTripType}
@@ -1191,10 +1195,6 @@ export default function Rozpocet( props ) {
                     styles={selectStyle}
                     />
                 </td>
-              }
-              {/*Type*/}
-              {showColumns.includes(3) &&
-                <td className="p-t-15 p-l-8">Výjazd</td>
               }
               {/*Riesi*/}
               {showColumns.includes(2) &&
@@ -1491,9 +1491,15 @@ export default function Rozpocet( props ) {
           {/* ADD Custom item */}
           {showAddCustomItem && !disabled &&
             <tr>
+              {/*Type*/}
+              {showColumns.includes(3) &&
+                <td colSpan={2} className="p-t-15 p-l-8">
+                  Voľná položka
+                </td>
+              }
               {/*Name*/}
               {showColumns.includes(1) &&
-                <td  colSpan={2} className="p-r-8">
+                <td className="p-r-8">
                   <input
                     disabled={disabled}
                     type="text"
@@ -1503,12 +1509,6 @@ export default function Rozpocet( props ) {
                     value={newCustomItemTitle}
                     onChange={(e)=>setNewCustomItemTitle(e.target.value)}
                     />
-                </td>
-              }
-              {/*Type*/}
-              {showColumns.includes(3) &&
-                <td className="p-t-15 p-l-8">
-                  Voľná položka
                 </td>
               }
               {/*Riesi */}

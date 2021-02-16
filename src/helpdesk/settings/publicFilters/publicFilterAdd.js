@@ -417,10 +417,10 @@ export default function PublicFilterAdd( props ) {
             styles={selectStyle} />
         </FormGroup>
 
-        <div className="row">
-          <Button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>
+        <div className="form-buttons-row">
+          <button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>
             {saving?'Adding...':'Add filter'}
-          </Button>
+          </button>
         </div>
       </div>
     </div>

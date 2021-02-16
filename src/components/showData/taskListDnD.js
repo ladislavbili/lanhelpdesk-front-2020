@@ -193,8 +193,6 @@ export default function TaskListDnD( props ) {
     .filter( item => statuses.includes( item.groupItem.id ) )
   );
 
-  console.log( groupRest() );
-
   return (
     <div>
       <CommandBar
@@ -213,7 +211,7 @@ export default function TaskListDnD( props ) {
           allStatuses={allStatuses}
           layout={layout}
           />
-        <div className="flex-row m-l-20">
+        <div className="flex-row m-l-30" >
           <DragDropContext onDragEnd={onDragEnd}>
             {
               GROUP_DATA

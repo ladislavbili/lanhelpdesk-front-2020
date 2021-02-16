@@ -382,26 +382,24 @@ export default function CompanyEdit( props ) {
           </div>
         }
       </div>
-      <div className="fit-with-header-and-commandbar">
+      <div className="fit-with-header-and-commandbar scroll-visible">
         {dataChanged &&
           <div style={{position: "fixed", zIndex: "999", backgroundColor: "rgba(255,255,255,0.5)", top: "0", left: "0", width: "100%", height: "100vh"}}></div>
         }
 
         <div
           className={ classnames(
-            "p-t-10 p-l-20 p-r-20 p-b-20",
-            "form-body-highlighted",
-            "scroll-visible",
+            "p-t-10",
             {
               "bring-to-front": dataChanged
             },
           )}
           >
 
-          <h2 className="m-b-20" >
+          <h2 className="m-b-20 p-l-20 p-r-20" >
             Edit company
           </h2>
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="name">Company name<span className="warning-big">*</span></Label>
               </div>
@@ -420,7 +418,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="dph">DPH</Label>
               </div>
@@ -439,7 +437,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="ico">ICO<span className="warning-big">*</span></Label>
               </div>
@@ -458,7 +456,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="dic">DIC</Label>
               </div>
@@ -477,7 +475,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="ic_dph">IC DPH</Label>
               </div>
@@ -496,7 +494,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="country">Country</Label>
               </div>
@@ -515,7 +513,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="city">City</Label>
               </div>
@@ -534,7 +532,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="street">Street</Label>
               </div>
@@ -553,7 +551,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="psc">PSČ</Label>
               </div>
@@ -572,7 +570,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="mail">E-mail<span className="warning-big">*</span></Label>
               </div>
@@ -592,7 +590,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10">
+            <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="phone">Phone</Label>
               </div>
@@ -611,7 +609,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row">
+            <FormGroup className="row p-l-20 p-r-20">
               <div className="m-r-10 w-20">
                 <Label for="description">Description</Label>
               </div>
@@ -631,7 +629,7 @@ export default function CompanyEdit( props ) {
             </FormGroup>
 
 
-          <div className="p-20 table-highlight-background">
+          <div className="p-20 m-t-15 table-highlight-background">
             <div className="row">
               <span className="m-r-5">
                 <h3>Mesačný paušál</h3>
@@ -756,7 +754,7 @@ export default function CompanyEdit( props ) {
 
         <div
           className={ classnames(
-            "form-footer row",
+            "form-buttons-row p-l-20 p-r-20 p-b-20",
             {
               "bring-to-front": dataChanged
             }
@@ -770,10 +768,10 @@ export default function CompanyEdit( props ) {
               onClick={cancel}>Cancel changes</Button>
           }
           <Button className="btn-red" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</Button>
-          {dataChanged &&
+
             <Button
               className="btn m-r-5 ml-auto"
-              disabled={ cannotSave }
+              disabled={ cannotSave && !dataChanged }
               onClick={()=>{
                 if (pricelist.value === "0" && pricelistName !== ""){
                   savePriceList();
@@ -784,7 +782,7 @@ export default function CompanyEdit( props ) {
               >
               {saving?'Saving...':'Save changes'}
             </Button>
-          }
+
 
         </div>
         <DeleteReplacement

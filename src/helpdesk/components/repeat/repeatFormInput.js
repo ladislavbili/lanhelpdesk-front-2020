@@ -19,7 +19,7 @@ export default function RepeatFormInput( props ) {
 
   //state
   const [ openModal, setOpenModal ] = React.useState( false );
-  const interval = intervals.find( ( interval ) => interval.value === repeat.repeatInterval );
+  const interval = repeat ? intervals.find( ( interval ) => interval.value === repeat.repeatInterval ) : null;
   return (
     <div>
     <div>

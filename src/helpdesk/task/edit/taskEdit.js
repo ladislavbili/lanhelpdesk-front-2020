@@ -1114,115 +1114,178 @@ export default function TaskEdit( props ) {
         />
     ),
     Assigned: (
-      <Select
-        value={assignedTo}
-        placeholder="Select"
-        isMulti
-        isDisabled={defaultFields.assignedTo.fixed||!userRights.assignedWrite}
-        onChange={(users)=> {
-          if (users.some(u => u.id === -1)){
-            setOpenUserAdd(true);
-          } else {
-            setAssignedTo(users);
-            autoUpdateTask({ assignedTo: users.map((user) => user.id) })
-          }
-        }}
-        options={
-          ( canAddUser ? [{id:-1, title:'+ Add user',body:'add', label:'+ Add user',value:null}] : [])
-          .concat(assignedTos)
+      <div>
+        { (defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
+          <div className="disabled-info">{assignedTo ? assignedTo.label : "None"}</div>
         }
-        styles={selectStyleNoArrowRequired}
-        />
+        { !defaultFields.assignedTo.fixed && userRights.assignedWrite &&
+          <Select
+            value={assignedTo}
+            placeholder="Select"
+            isMulti
+            isDisabled={defaultFields.assignedTo.fixed||!userRights.assignedWrite}
+            onChange={(users)=> {
+              if (users.some(u => u.id === -1)){
+                setOpenUserAdd(true);
+              } else {
+                setAssignedTo(users);
+                autoUpdateTask({ assignedTo: users.map((user) => user.id) })
+              }
+            }}
+            options={
+              ( canAddUser ? [{id:-1, title:'+ Add user',body:'add', label:'+ Add user',value:null}] : [])
+              .concat(assignedTos)
+            }
+            styles={selectStyleNoArrowRequired}
+            />
+        }
+      </div>
     ),
     Status: (
-      <Select
-        placeholder="Status required"
-        value={status}
-        isDisabled={defaultFields.status.fixed || !userRights.statusWrite || task.invoiced}
-        styles={selectStyleNoArrowColoredRequired}
-        onChange={ changeStatus }
-        options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action!=='Invoiced')}
-        />
+      <div>
+        { (defaultFields.status.fixed || !userRights.statusWrite || task.invoiced) &&
+          <div className="disabled-info">{status ? status.label : "None"}</div>
+        }
+        { !defaultFields.status.fixed && userRights.statusWrite && !task.invoiced &&
+          <Select
+            placeholder="Status required"
+            value={status}
+            isDisabled={defaultFields.status.fixed || !userRights.statusWrite || task.invoiced}
+            styles={selectStyleNoArrowColoredRequired}
+            onChange={ changeStatus }
+            options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action!=='Invoiced')}
+            />
+        }
+      </div>
     ),
     Type: (
-      <Select
-        placeholder="Zadajte typ"
-        value={taskType}
-        isDisabled={ !userRights.typeWrite }
-        styles={selectStyleNoArrowRequired}
-        onChange={(type)=> {
-          setTaskType(type);
-          autoUpdateTask({ taskType: type.id })
-        }}
-        options={[noTaskType, ...taskTypes]}
-        />
+      <div>
+        { !userRights.typeWrite &&
+          <div className="disabled-info">{taskType ? taskType.label : "None"}</div>
+        }
+        { userRights.typeWrite &&
+          <Select
+            placeholder="Zadajte typ"
+            value={taskType}
+            isDisabled={ !userRights.typeWrite }
+            styles={selectStyleNoArrowRequired}
+            onChange={(type)=> {
+              setTaskType(type);
+              autoUpdateTask({ taskType: type.id })
+            }}
+            options={[noTaskType, ...taskTypes]}
+            />
+        }
+      </div>
     ),
     Milestone: (
-      <Select
-        isDisabled={!userRights.milestoneWrite}
-        value={milestone}
-        onChange={changeMilestone}
-        options={milestones}
-        styles={selectStyleNoArrowNoPadding}
-        />
+      <div>
+        { !userRights.milestoneWrite &&
+          <div className="disabled-info">{milestone ? milestone.label : "None"}</div>
+        }
+        { userRights.milestoneWrite &&
+          <Select
+            isDisabled={!userRights.milestoneWrite}
+            value={milestone}
+            onChange={changeMilestone}
+            options={milestones}
+            styles={selectStyleNoArrowNoPadding}
+            />
+        }
+      </div>
     ),
     Requester: (
-      <Select
-        placeholder="Zadajte žiadateľa"
-        value={requester}
-        isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
-        onChange={changeRequester}
-        options={(canAddUser?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(requesters)}
-        styles={ selectStyleNoArrowRequired}
-        />
+      <div>
+        { (defaultFields.requester.fixed || !userRights.requesterWrite) &&
+          <div className="disabled-info">{requester ? requester.label : "None"}</div>
+        }
+        { !defaultFields.requester.fixed && userRights.requesterWrite &&
+          <Select
+            placeholder="Zadajte žiadateľa"
+            value={requester}
+            isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
+            onChange={changeRequester}
+            options={(canAddUser?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(requesters)}
+            styles={ selectStyleNoArrowRequired}
+            />
+        }
+      </div>
     ),
     Company: (
-      <Select
-        placeholder="Zadajte firmu"
-        value={company}
-        isDisabled={defaultFields.company.fixed || !userRights.companyWrite || task.invoiced}
-        onChange={changeCompany}
-        options={(canAddCompany ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
-        styles={selectStyleNoArrowRequired}
-        />
+      <div>
+        { (defaultFields.company.fixed || !userRights.companyWrite) &&
+          <div className="disabled-info">{company ? company.label : "None"}</div>
+        }
+        { !defaultFields.company.fixed && userRights.companyWrite &&
+          <Select
+            placeholder="Zadajte firmu"
+            value={company}
+            isDisabled={defaultFields.company.fixed || !userRights.companyWrite || task.invoiced}
+            onChange={changeCompany}
+            options={(canAddCompany ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
+            styles={selectStyleNoArrowRequired}
+            />
+        }
+      </div>
     ),
     Pausal: (
-      <Select
-        value={company && parseInt(company.taskWorkPausal) === 0 && pausal.value === false ? {...pausal, label: pausal.label + " (nezmluvný)"} : pausal }
-        isDisabled={!userRights.pausalWrite || !company || !company.monthly || parseInt(company.taskWorkPausal) < 0 || defaultFields.pausal.fixed}
-        styles={selectStyleNoArrowRequired }
-        onChange={(pausal)=> {
-          autoUpdateTask({ pausal: pausal.value })
-          setPausal(pausal);
-        }}
-        options={booleanSelects}
-        />
+      <div>
+        { (!userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed || parseInt(company.taskWorkPausal) < 0) &&
+          <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
+        }
+        { userRights.pausalWrite && company && company.monthly && (parseInt(company.taskWorkPausal) >= 0) && !defaultFields.pausal.fixed &&
+          <Select
+            value={company && parseInt(company.taskWorkPausal) === 0 && pausal.value === false ? {...pausal, label: pausal.label + " (nezmluvný)"} : pausal }
+            isDisabled={!userRights.pausalWrite || !company || !company.monthly || parseInt(company.taskWorkPausal) < 0 || defaultFields.pausal.fixed}
+            styles={selectStyleNoArrowRequired }
+            onChange={(pausal)=> {
+              autoUpdateTask({ pausal: pausal.value })
+              setPausal(pausal);
+            }}
+            options={booleanSelects}
+            />
+        }
+      </div>
     ),
     Deadline: (
-      <DatePicker
-        className={classnames("form-control")}
-        selected={deadline}
-        disabled={!userRights.deadlineWrite}
-        onChange={date => {
-          setDeadline(date);
-          if( date.valueOf() !== null ){
-            autoUpdateTask({ deadline: date.valueOf().toString() })
-          }
-        }}
-        placeholderText="No deadline"
-        />
+      <div>
+        { !userRights.deadlineWrite &&
+          <div className="disabled-info">{deadline}</div>
+        }
+        { userRights.deadlineWrite &&
+          <DatePicker
+            className={classnames("form-control")}
+            selected={deadline}
+            disabled={!userRights.deadlineWrite}
+            onChange={date => {
+              setDeadline(date);
+              if( date.valueOf() !== null ){
+                autoUpdateTask({ deadline: date.valueOf().toString() })
+              }
+            }}
+            placeholderText="No deadline"
+            />
+        }
+      </div>
     ),
     Overtime: (
-      <Select
-        value={overtime}
-        isDisabled={!userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={ selectStyleNoArrowRequired }
-        onChange={(overtime)=> {
-          setOvertime(overtime);
-          autoUpdateTask({ overtime: overtime.value })
-        }}
-        options={booleanSelects}
-        />
+      <div>
+        { (!userRights.overtimeWrite || defaultFields.overtime.fixed) &&
+          <div className="disabled-info">{overtime.label}</div>
+        }
+        { userRights.overtimeWrite && !defaultFields.overtime.fixed &&
+          <Select
+            value={overtime}
+            isDisabled={!userRights.overtimeWrite || defaultFields.overtime.fixed}
+            styles={ selectStyleNoArrowRequired }
+            onChange={(overtime)=> {
+              setOvertime(overtime);
+              autoUpdateTask({ overtime: overtime.value })
+            }}
+            options={booleanSelects}
+            />
+        }
+      </div>
     ),
   }
 
@@ -1559,18 +1622,25 @@ export default function TaskEdit( props ) {
         }
         <div className="row f-1">
           <div className="f-1 center-hor">
-            <Select
-              placeholder="Zvoľte tagy"
-              value={tags}
-              isMulti
-              onChange={(tags)=> {
-                setTags(tags);
-                autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
-              }}
-              options={toSelArr(project === null ? [] : project.project.tags)}
-              isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-              styles={selectStyleNoArrowColoredRequired }
-              />
+            <div>
+              { (defaultFields.tag.fixed || !userRights.tagsWrite) &&
+                <div className="disabled-info">{tags.map(tag => tag.label).join(" ")}</div>
+              }
+              { !defaultFields.tag.fixed && userRights.tagsWrite &&
+                <Select
+                  placeholder="Zvoľte tagy"
+                  value={tags}
+                  isMulti
+                  onChange={(tags)=> {
+                    setTags(tags);
+                    autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
+                  }}
+                  options={toSelArr(project === null ? [] : project.project.tags)}
+                  isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
+                  styles={selectStyleNoArrowColoredRequired }
+                  />
+              }
+            </div>
           </div>
         </div>
       </div>
@@ -2065,10 +2135,10 @@ export default function TaskEdit( props ) {
               "bkg-white",
               {
                 "task-edit-left": currentUser.taskLayout === 2 && !columns,
-                "task-edit-left-columns": (currentUser.taskLayout === 2 && columns) || currentUser.taskLayout === 1,
+                "task-edit-left-columns": (currentUser.taskLayout === 2 && columns) || currentUser.taskLayout === 1 || currentUser.taskLayout === 3,
               },
             )}
-             style={ currentUser.taskLayout === 2 && !columns ? {height: '100vh'} : {}}
+             style={ currentUser.taskLayout === 2 && !columns ? {height: '100%'} : {}}
             >
 
             <div>

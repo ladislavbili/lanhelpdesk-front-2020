@@ -49,7 +49,7 @@ import {
 const localizer = momentLocalizer( moment );
 const formats = {
 
-  dayFormat: ( date, culture, localizer ) => timestampToDate( date ),
+  dayFormat: ( date, culture, localizer ) => localizer.format( date, 'dddd', culture ), //timestampToDate( date ),
   timeGutterFormat: ( date, culture, localizer ) => {
     return timestampToHoursAndMinutes( date );
   },
@@ -127,7 +127,7 @@ export default function TaskCalendar( props ) {
   const [ updateTask ] = useMutation( UPDATE_TASK );
 
   const [ today, setToday ] = React.useState( moment() );
-  const [ calendarLayout, setCalendarLayout ] = React.useState( 'month' );
+  const [ calendarLayout, setCalendarLayout ] = React.useState( 'week' );
 
   const client = useApolloClient();
 
@@ -524,7 +524,7 @@ export default function TaskCalendar( props ) {
   } ) );
 
   if ( match.params.taskID ) {
-    return ( <Edit match={match} columns={true} history={history} /> );
+    return ( <Edit match={match} columns={false} history={history} /> );
   }
 
   return (

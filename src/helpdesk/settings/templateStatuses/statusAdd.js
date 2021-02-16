@@ -90,11 +90,12 @@ export default function StatusAdd( props ) {
         }
       </div>
 
-      <h2 className="p-l-20 m-t-10" >
-        Add status
-      </h2>
+      <div className="scroll-visible p-l-20 p-r-20 p-b-20 p-t-10 fit-with-header-and-commandbar">
 
-      <div className="scroll-visible p-20 fit-with-header-and-commandbar">
+        <h2 className="m-b-20">
+          Add status
+        </h2>
+
         <FormGroup>
           <Label for="name">Status name <span className="warning-big">*</span></Label>
           <Input type="text" name="name" id="name" placeholder="Enter status name" value={title} onChange={(e)=>setTitle(e.target.value)} />
@@ -123,10 +124,10 @@ export default function StatusAdd( props ) {
           color={color}
           onChangeComplete={value => setColor( value.hex )}
           />
-        <div className="row">
-          <Button className="btn m-t-5 ml-auto" disabled={cannotSave()} onClick={addStatusFunc}>
+        <div className="form-buttons-row">
+          <button className="btn m-t-5 ml-auto" disabled={cannotSave()} onClick={addStatusFunc}>
             {saving?'Adding...':'Add status'}
-          </Button>
+          </button>
         </div>
       </div>
     </div>

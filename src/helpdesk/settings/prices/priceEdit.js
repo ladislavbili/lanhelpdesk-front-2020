@@ -206,11 +206,11 @@ export default function PricelistEdit( props ) {
           </div>
         }
       </div>
-      <div className="scroll-visible p-t-10 p-l-20 p-r-20 p-b-20 fit-with-header-and-commandbar">
+      <div className="scroll-visible p-t-10 p-l-20 p-r-20 fit-with-header-and-commandbar">
         <h2 className="m-b-20" >
           Edit price list
         </h2>
-        <label>
+        <label className="m-b-20">
           <Switch
             checked={def}
             onChange={ () => {
@@ -310,7 +310,7 @@ export default function PricelistEdit( props ) {
         </div>
 
         <h3>Všeobecné prirážky</h3>
-        <div className="p-t-10 p-b-10">
+        <div className="p-t-10">
           <FormGroup className="row m-b-10">
             <div className="m-r-10 w-20">
               <Label for="afterPer">After hours percentage</Label>
@@ -410,8 +410,8 @@ export default function PricelistEdit( props ) {
           </ModalFooter>
         </Modal>
 
-        <div className="row">
-          <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewPricelist(true)}>Delete price list</Button>
+        <div className="form-buttons-row m-b-20">
+          <Button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewPricelist(true)}>Delete</Button>
           <Button
             className="btn ml-auto"
             disabled={saving}

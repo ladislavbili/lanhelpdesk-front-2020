@@ -42,7 +42,7 @@ export default function Scheduled( props ) {
       <div className="row">
         <Label className={classnames({"m-l-0 m-t-5 m-r-10": layout === 1})} >Scheduled</Label>
         <button
-          className={classnames("btn btn-link waves-effect h-f-c", {"ml-auto": layout === 2})}
+          className={classnames("btn btn-link waves-effect h-f-c", {"ml-auto": layout === 2}, {"center-hor": layout === 1})}
           disabled={disabled}
           onClick={()=>{
             setAddItem(true);

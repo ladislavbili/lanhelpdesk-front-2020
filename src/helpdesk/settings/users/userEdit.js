@@ -258,10 +258,10 @@ export default function UserEdit( props ) {
           </div>
         }
       </div>
-      <h2 className="p-l-20 m-t-10" >
+      <div className="scroll-visible p-l-20 p-r-20 p-b-20 p-t-10 fit-with-header-and-commandbar">
+      <h2 className="m-b-20" >
         Edit user
       </h2>
-      <div className="scroll-visible p-20 fit-with-header-and-commandbar">
         <FormGroup>
           <Label for="role">Role <span className="warning-big">*</span></Label>
           <Select
@@ -384,7 +384,7 @@ export default function UserEdit( props ) {
             />
         </FormGroup>
 
-        <div className="row">
+        <div className="form-buttons-row">
           { !isDisabled && myData !== undefined && id !== myData.getMyData.id &&
             <Button
               className="btn-red m-r-5"
@@ -402,20 +402,20 @@ export default function UserEdit( props ) {
               {active ? 'Deactivate user' : 'Activate user'}
             </Button>
           }
-          <Button
+          <button
             className="btn-link ml-auto"
             disabled={ saving || isDisabled }
             onClick={ ()=>{
               setPasswordChangeOpen(true);
             }}
-            >{ password === null ? 'Change password' : 'Password change edit' }</Button>
-          <Button
+            >{ password === null ? 'Change password' : 'Password change edit' }</button>
+          <button
             className="btn m-l-5"
             disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
             onClick={ updateUserFunc }
             >
             { saving ? 'Saving user...' : 'Save user' }
-          </Button>
+          </button>
         </div>
         <PasswordChange
           submitPass={(pass) => {

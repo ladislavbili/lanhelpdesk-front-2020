@@ -494,10 +494,10 @@ export default function IMAPEdit( props ) {
             />
         </FormGroup>
 
-        <div className="row">
+        <div className="form-buttons-row">
           <Button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={ deleteIMAPFunc }>Delete</Button>
-          <Button className="btn ml-auto" disabled={saving || tested} onClick={ startTest }>Test IMAP</Button>
-          <Button className="btn m-l-5" disabled={cannotSave} onClick={updateIMAPFunc}>{ saving ? 'Saving IMAP...' : 'Save IMAP' }</Button>
+          <button className="btn ml-auto" disabled={saving || tested} onClick={ startTest }>Test IMAP</button>
+          <button className="btn m-l-5" disabled={cannotSave} onClick={updateIMAPFunc}>{ saving ? 'Saving IMAP...' : 'Save IMAP' }</button>
         </div>
       </div>
     </div>

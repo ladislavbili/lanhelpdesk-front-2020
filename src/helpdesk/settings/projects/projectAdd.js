@@ -290,23 +290,22 @@ export default function ProjectAdd( props ) {
 
   return (
     <div>
-      <div className="dynamic-commandbar a-i-c p-l-20">
-        { cannotSave &&
-          <div className="message error-message" style={{ minWidth: 220 }}>
-            Fill in all the required information!
-          </div>
-        }
-      </div>
+      { !closeModal &&
+        <div className="dynamic-commandbar a-i-c p-l-20">
+          { cannotSave &&
+            <div className="message error-message" style={{ minWidth: 220 }}>
+              Fill in all the required information!
+            </div>
+          }
+        </div>
+      }
 
 
       <div
         className={ classnames(
           {
             "scroll-visible": !closeModal,
-            "fit-with-header-and-commandbar": !closeModal
-          },
-          {
-            "bkg-F9F9F9": closeModal
+            "fit-with-header-and-commandbar": !closeModal,
           },
           "p-t-10 p-l-20 p-r-20 p-b-20",
         )}
@@ -485,16 +484,21 @@ export default function ProjectAdd( props ) {
             }
             />
         }
-        <div className="row">
+        <div className="row form-buttons-row">
           {
             closeModal &&
-            <Button className="btn-link" onClick={() => closeModal(null, null)}> Cancel </Button>
+            <Button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </Button>
           }
-          <Button className={classnames(
-              "btn ml-auto",
-              {
-                "disabled": cannotSave
-              },
+
+          {closeModal && cannotSave &&
+            <div className="ml-auto message error-message" style={{ minWidth: 220 }}>
+              Fill in all the required information!
+            </div>
+          }
+
+          <button className={classnames(
+              "btn",
+              {"ml-auto": !closeModal}
             )}
             disabled={ addTaskErrors && cannotSave }
             onClick={() => {
@@ -507,7 +511,7 @@ export default function ProjectAdd( props ) {
             }}
             >
             {saving?'Adding...':'Add project'}
-          </Button>
+          </button>
         </div>
       </div>
     </div>

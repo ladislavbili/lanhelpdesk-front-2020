@@ -246,9 +246,9 @@ export default function PausalEdit( props ) {
           </div>
         }
       </div>
-    <div className="fit-with-header-and-commandbar-2 scroll-visible">
+    <div className="fit-with-header-and-commandbar scroll-visible">
 
-      <h2 className="p-t-10 p-l-20 p-b-5">Edit service level agreement - {title}</h2>
+      <h2 className="p-t-10 p-l-20">Edit service level agreement - {title}</h2>
 
       <div className="p-20">
 
@@ -335,8 +335,8 @@ export default function PausalEdit( props ) {
         match={match}
          />
 
-       <div className="row">
-         <Button
+       <div className="form-buttons-row">
+         <button
            className="btn ml-auto m-r-5"
            disabled={ cannotSave }
            onClick={()=>{
@@ -345,7 +345,7 @@ export default function PausalEdit( props ) {
              } else {
                updateCompanyFunc();
              }
-           }}>{saving?'Saving...':'Save changes'}</Button>
+           }}>{saving?'Saving...':'Save changes'}</button>
          </div>
 
       </div>

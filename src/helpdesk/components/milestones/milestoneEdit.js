@@ -199,7 +199,7 @@ export default function MilestoneEdit( props ) {
 				className='btn-link p-0'
 				onClick={toggle}
 				>
-				Milestone settings
+				<fa className="fa fa-cog"/>Milestone
 			</Button>
 
         <Modal isOpen={opened}>

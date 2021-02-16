@@ -258,11 +258,12 @@ export default function SMTPEdit( props ) {
         }
       </div>
 
-      <h2 className="p-l-20 m-t-10" >
+      <div className="p-l-20 p-r-20 p-t-10 p-b-20 scroll-visible fit-with-header-and-commandbar">
+
+      <h2 className="m-b-20" >
         Edit SMTP
       </h2>
 
-    <div className="p-20 scroll-visible fit-with-header-and-commandbar">
       <Checkbox
         className = "m-b-5 p-l-0"
         value = { def }
@@ -430,11 +431,11 @@ export default function SMTPEdit( props ) {
         </ModalFooter>
       </Modal>
 
-      <div className="row">
-        <Button className="btn-red m-l-5 mr-auto" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</Button>
+      <div className="form-buttons-row">
+        <Button className="btn-red mr-auto" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</Button>
         <ErrorMessage show={ !loading && !data.smtp.currentlyTested && !data.smtp.working  } message={data.smtp.errorMessage} />
-        <Button className="btn" disabled={saving || tested} onClick={ startTest }>Test SMTP</Button>
-        <Button className="btn m-l-5" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</Button>
+        <button className="btn" disabled={saving || tested} onClick={ startTest }>Test SMTP</button>
+        <button className="btn m-l-5" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</button>
       </div>
     </div>
   </div>

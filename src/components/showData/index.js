@@ -60,8 +60,6 @@ export default function ShowDataContainer( props ) {
     tasklistLayoutData,
   } = props;
 
-  console.log( tasklistLayout );
-
   const {
     data: taskSearchData,
     loading: taskSearchLoading
@@ -218,7 +216,7 @@ export default function ShowDataContainer( props ) {
 					)}
 
 					{tasklistLayout === 2 && (
-						<div className="flex" >
+						<div className="col-xl-12" >
 							{itemID && <props.Edit match={match} columns={false} history={history} />}
 							{!itemID &&
 								<TaskListDnD

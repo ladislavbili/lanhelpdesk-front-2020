@@ -372,13 +372,13 @@ export default function RoleEdit( props ) {
           </table>
         </div>
 
-        <div className="row">
+        <div className="form-buttons-row">
           {props.close &&
             <Button className="btn-link"
               onClick={()=>{props.close()}}>Cancel</Button>
           }
           <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft || currentUserLevel === null || currentUserLevel >= level } onClick={ () => setDeleteOpen(true) }>Delete</Button>
-          <Button className="btn ml-auto" disabled={saving || currentUserLevel === null || currentUserLevel >= level} onClick={updateRoleFunc}>{saving?'Saving...':'Save'}</Button>
+          <button className="btn ml-auto" disabled={saving || currentUserLevel === null || currentUserLevel >= level} onClick={updateRoleFunc}>{saving?'Saving...':'Save'}</button>
         </div>
         <DeleteReplacement
           isOpen={deleteOpen}

@@ -128,7 +128,7 @@ export default function PricelistAdd( props ) {
         <h2 className="m-b-20" >
           Add price list
         </h2>
-        <label>
+        <label className="m-b-20">
           <Switch
             checked={def}
             onChange={ () => setDef(!def) }
@@ -238,10 +238,10 @@ export default function PricelistAdd( props ) {
             </FormGroup>
           </div>
 
-          <div className="row">
-            <Button className="btn ml-auto" disabled={cannotSave()} onClick={addPricelistFunc}>
+          <div className="form-buttons-row">
+            <button className="btn ml-auto" disabled={cannotSave()} onClick={addPricelistFunc}>
               {saving?'Saving prices...':'Save prices'}
-            </Button>
+            </button>
           </div>
       </div>
   </div>

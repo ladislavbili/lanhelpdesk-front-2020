@@ -167,15 +167,15 @@ export default function TripTypeEdit( props ) {
             }}
             />
         </FormGroup>
-        <div className="row">
+        <div className="form-buttons-row">
           <Button
-            className="btn-red m-l-5"
+            className="btn-red"
             disabled={saving || theOnlyOneLeft}
             onClick={() => setDeleteOpen(true)}
             >
             Delete
           </Button>
-          <Button className="btn ml-auto" disabled={saving} onClick={updateTripTypeFunc}>{saving ? 'Saving trip type...' : 'Save trip type'}</Button>
+          <button className="btn ml-auto" disabled={saving} onClick={updateTripTypeFunc}>{saving ? 'Saving trip type...' : 'Save trip type'}</button>
         </div>
         <DeleteReplacement
           isOpen={deleteOpen}

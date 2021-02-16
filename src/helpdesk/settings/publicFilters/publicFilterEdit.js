@@ -681,13 +681,13 @@ export default function PublicFilterEdit( props ) {
         </FormGroup>
 
 
-        <div className="row">
+        <div className="form-buttons-row">
           <Button
             className="btn-red m-l-5"
             onClick={ deletePublicFilter }>
             Delete
           </Button>
-          <Button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>{saving?'Saving...':'Save filter'}</Button>
+          <button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>{saving?'Saving...':'Save filter'}</button>
         </div>
       </div>
     </div>

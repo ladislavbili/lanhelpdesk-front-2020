@@ -158,11 +158,12 @@ export default function StatusEdit( props ) {
         }
       </div>
 
-      <h2 className="p-l-20 m-t-10" >
-        Edit status
-      </h2>
+      <div className="scroll-visible p-l-20 p-r-20 p-b-20 p-t-10 fit-with-header-and-commandbar">
 
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+        <h2 className="m-b-20" >
+          Edit status
+        </h2>
+
         <FormGroup>
           <Label for="name">Status name <span className="warning-big">*</span></Label>
           <Input
@@ -228,7 +229,7 @@ export default function StatusEdit( props ) {
           }}
           />
 
-        <div className="row">
+        <div className="form-buttons-row">
           <Button
             className="btn-red m-l-5 m-t-5"
             disabled={saving || theOnlyOneLeft}
@@ -236,7 +237,7 @@ export default function StatusEdit( props ) {
             >
             Delete
           </Button>
-          <Button className="btn m-t-5 ml-auto" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</Button>
+          <button className="btn m-t-5 ml-auto" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</button>
         </div>
       </div>
     </div>

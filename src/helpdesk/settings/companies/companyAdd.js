@@ -227,13 +227,15 @@ export default function CompanyAdd( props ) {
 
   return (
     <div>
-      <div className="commandbar a-i-c p-l-20">
-        { cannotSave &&
-          <div className="message error-message">
-            Fill in all the required information!
-          </div>
-        }
-      </div>
+      {!closeModal &&
+        <div className="commandbar a-i-c p-l-20">
+          { cannotSave &&
+            <div className="message error-message">
+              Fill in all the required information!
+            </div>
+          }
+        </div>
+      }
       {
         newData &&
         !closeModal &&
@@ -242,19 +244,18 @@ export default function CompanyAdd( props ) {
       <div
         className={
           classnames(
-            "p-t-10 p-l-20 p-r-20 p-b-20",
+            "p-t-10 p-b-20",
             {"scroll-visible fit-with-header-and-commandbar": !closeModal},
-            {"bkg-F9F9F9": closeModal},
             {
               "bring-to-front": newData
             },
           )
         }
         >
-        <h2 className="m-b-20" >
+        <h2 className="m-b-20 p-l-20 p-r-20" >
           Add company
         </h2>
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="name">Company name <span className="warning-big">*</span></Label>
           </div>
@@ -273,7 +274,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="dph">DPH</Label>
           </div>
@@ -292,7 +293,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="ico">ICO <span className="warning-big">*</span></Label>
           </div>
@@ -311,7 +312,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="dic">DIC</Label>
           </div>
@@ -330,7 +331,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="ic_dph">IC DPH</Label>
           </div>
@@ -349,7 +350,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="country">Country</Label>
           </div>
@@ -368,7 +369,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="city">City</Label>
           </div>
@@ -387,7 +388,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="street">Street</Label>
           </div>
@@ -406,7 +407,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="psc">PSČ</Label>
           </div>
@@ -425,7 +426,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="mail">E-mail <span className="warning-big">*</span></Label>
           </div>
@@ -445,7 +446,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row m-b-10">
+        <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="phone">Phone</Label>
           </div>
@@ -464,7 +465,7 @@ export default function CompanyAdd( props ) {
           </div>
         </FormGroup>
 
-        <FormGroup className="row">
+        <FormGroup className="row p-l-20 p-r-20">
           <div className="m-r-10 w-20">
             <Label for="description">Description</Label>
           </div>
@@ -606,31 +607,42 @@ export default function CompanyAdd( props ) {
             />
         </div>
 
-        <div className="row m-t-15">
+        <div className="form-buttons-row p-l-20 p-r-20">
           { closeModal &&
             <Button
-              className="btn-link"
+              className="btn-link mr-auto"
               disabled={saving}
               onClick={closeModal}>Cancel</Button>
           }
           { !closeModal && newData &&
             <Button
-              className="btn-link"
+              className="btn-link mr-auto"
               disabled={saving}
               onClick={cancel}>Cancel</Button>
           }
-          {(newData  || props.addCompany) &&
-            <Button
-              className="btn ml-auto"
-              disabled={cannotSave}
+
+            { closeModal && cannotSave &&
+              <div className="message error-message">
+                Fill in all the required information!
+              </div>
+            }
+
+            <button
+              className={classnames(
+                  "btn",
+                  {"ml-auto": !closeModal}
+                )}
+              disabled={cannotSave && !newData}
               onClick={()=>{
                 if (pricelist.value === "0" && pricelistName !== ""){
                   savePriceList();
                 } else {
                   addCompanyFunc();
                 }
-              }}>{(pricelist.value === "0" && pricelistName !== "" ? "Save changes" : (saving?'Adding...':'Add company'))}</Button>
-            }
+              }}>
+              {(pricelist.value === "0" && pricelistName !== "" ? "Save changes" : (saving?'Adding...':'Add company'))}
+            </button>
+
           </div>
         </div>
       </div>
