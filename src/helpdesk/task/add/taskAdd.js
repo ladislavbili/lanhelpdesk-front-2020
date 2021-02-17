@@ -182,7 +182,8 @@ export default function TaskAdd( props ) {
     if ( filteredAssignedTo.length === 0 && potencialUser ) {
       filteredAssignedTo = [ potencialUser ];
     }
-    let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.includes( item.id ) ) : filteredAssignedTo;
+    let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.map( ( user ) => user.id )
+      .includes( item.id ) ) : filteredAssignedTo;
     setAssignedTo( newAssignedTo );
     let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
     setRequester( newRequester );
@@ -470,10 +471,7 @@ export default function TaskAdd( props ) {
     ),
     Type: (
       <div>
-        { !userRights.typeWrite &&
-          <div className="disabled-info">{taskType.label}</div>
-        }
-        { userRights.typeWrite &&
+        { userRights.typeRead &&
           <Select
             placeholder="Select task type"
             value={taskType}

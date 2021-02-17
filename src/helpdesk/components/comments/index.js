@@ -145,7 +145,7 @@ export default function Comments( props ) {
         }
         {!isEmail &&
           <FormGroup>
-            <Input type="textarea" placeholder="Enter comment" value={newComment} onChange={(e)=>setNewComment(e.target.value)}/>
+            <Input type="textarea" placeholder="Enter comment" style={{ border: '1px solid #c4c4c4' }} value={newComment} onChange={(e)=>setNewComment(e.target.value)}/>
           </FormGroup>
         }
         {isEmail && hasError &&

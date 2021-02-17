@@ -113,19 +113,19 @@ export default function ShowDataContainer( props ) {
         const val1 = getSortValue( item1 );
         const val2 = getSortValue( item2 );
         const returnVal = ascending ? -1 : 1;
-
         if ( val1 === null ) {
           return returnVal * -1;
         } else if ( val2 === null ) {
           return returnVal;
-        } else {
-          return val1 > val2 ? returnVal : returnVal * -1;
         }
-      } )
-      .sort( ( val1, val2 ) => {
-        if ( val1.important && !val2.important ) {
+        if ( val1 > val2 ) {
+          return returnVal;
+        } else if ( val1 < val2 ) {
+          return returnVal * -1
+        }
+        if ( item1.important && !item2.important ) {
           return -1;
-        } else if ( !val2.important && val2.important ) {
+        } else if ( !item1.important && item2.important ) {
           return 1;
         }
         return 0;
@@ -136,7 +136,7 @@ export default function ShowDataContainer( props ) {
     let value = orderByValues.find( ( val ) => val.value === orderBy );
     if ( value.type === 'object' ) {
       if ( value.value === "status" ) {
-        return item[ value.value ] ? ( ( 100 - item[ value.value ].order ) + " " + item.statusChange ) : null;
+        return item[ value.value ] ? ( 100 - item[ value.value ].order ) : null;
       }
       return item[ value.value ] ? item[ value.value ].title.toLowerCase() : null;
     } else if ( value.type === 'text' ) {

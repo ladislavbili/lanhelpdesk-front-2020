@@ -2134,7 +2134,6 @@ export default function TaskEdit( props ) {
                 "task-edit-left-columns": (currentUser.taskLayout === 2 && columns) || currentUser.taskLayout === 1 || currentUser.taskLayout === 3,
               },
             )}
-             style={ currentUser.taskLayout === 2 && !columns ? {height: '100%'} : {}}
             >
 
             <div>

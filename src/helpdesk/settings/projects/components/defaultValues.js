@@ -34,9 +34,9 @@ export default function ProjectDefaultValues( props ) {
     setPausal,
     overtime,
     setOvertime,
-    canBeAssigned,
     statuses,
     users,
+    assignableUsers,
     allTags,
     companies,
     taskTypes,
@@ -156,7 +156,7 @@ export default function ProjectDefaultValues( props ) {
                     onChange={(e)=>
                       setAssignedTo({...assignedTo, value:e.filter((user) => user.id !== null)})
                     }
-                    options={canBeAssigned}
+                    options={assignableUsers}
                     styles={invisibleSelectStyle}
                     />
                 </div>

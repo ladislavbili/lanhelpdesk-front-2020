@@ -216,7 +216,9 @@ export default function TaskAddContainer( props ) {
               defaultUnit={null}
               closeModal={ () => {
                 setOpenAddTaskModal(false);
-                setProjectID(null);
+                if(!sidebarProjectID){
+                  setProjectID(null);
+                }
               }}
               addTask={addTask}
               setTaskLayout={setTaskLayoutFunc}

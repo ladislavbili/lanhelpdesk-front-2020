@@ -341,6 +341,7 @@ query tasks($filter: FilterInput, $projectId: Int, $sort: SortTasksInput){
 			status {
 				id
 				title
+        order
 				color
 				action
 			}

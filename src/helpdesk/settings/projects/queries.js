@@ -309,3 +309,11 @@ query {
   }
 }
 `;
+
+export const GET_NUMBER_OF_TASKS = gql `
+query getNumberOfTasks($projectId: Int!) {
+  getNumberOfTasks(
+    projectId: $projectId,
+  )
+}
+`;

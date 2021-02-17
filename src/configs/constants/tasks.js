@@ -12,6 +12,6 @@ export const defaultTasksAttributesFilter = {
   deadline: "",
 }
 export const defaultTaskSort = {
-  key: 'id',
+  key: 'status',
   asc: true
 }

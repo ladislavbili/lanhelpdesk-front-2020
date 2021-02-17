@@ -61,7 +61,8 @@ import {
   GET_PROJECT,
   UPDATE_PROJECT,
   DELETE_PROJECT,
-  GET_MY_DATA
+  GET_MY_DATA,
+  GET_NUMBER_OF_TASKS,
 } from './queries';
 let fakeID = -1;
 
@@ -108,6 +109,16 @@ export default function ProjectEdit( props ) {
     data: taskTypesData,
     loading: taskTypesLoading
   } = useQuery( GET_TASK_TYPES, fetchNetOptions );
+  const {
+    data: numberOfTasksData,
+    loading: numberOfTasksLoading,
+    error: numberOfTasksError,
+  } = useQuery( GET_NUMBER_OF_TASKS, {
+    variables: {
+      projectId: id
+    }
+  } );
+
   let allProjects = [];
   if ( closeModal ) {
     allProjects = toSelArr( client.readQuery( {
@@ -603,8 +614,6 @@ export default function ProjectEdit( props ) {
     .rights;
   const allTags = getAllTags();
   const allStatuses = getAllStatuses();
-  const canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
-    .filter( ( user ) => userGroups.some( ( userGroup ) => userGroup.user.id ) );
 
   return (
     <div>
@@ -833,12 +842,12 @@ export default function ProjectEdit( props ) {
             setTag={setDefTag}
             statuses={toSelArr(allStatuses)}
             companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
-            canBeAssigned={canBeAssigned}
             users={
               lockedRequester ?
               userGroups.map( (userGroup) => userGroup.user ) :
               (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
             }
+            assignableUsers={userGroups.map( (userGroup) => userGroup.user )}
             allTags={toSelArr(allTags)}
             taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
             />
@@ -897,12 +906,20 @@ export default function ProjectEdit( props ) {
             Delete
           </Button>
         }
+        { !numberOfTasksLoading && !numberOfTasksError &&
+        <div className="ml-auto center-hor p-r-5">
+          { `This project includes ${numberOfTasksData.getNumberOfTasks} tasks.` }
+        </div>
+        }
 
         { (myRights.projectPrimaryWrite || myRights.projectSecondary) &&
           <button
             className={classnames(
-                "btn ml-auto",
-              )}
+              {
+                'ml-auto': false,
+              }
+              ,"btn"
+            )}
             disabled={addTaskErrors && cannotSave}
             onClick={() => {
               if(cannotSave){

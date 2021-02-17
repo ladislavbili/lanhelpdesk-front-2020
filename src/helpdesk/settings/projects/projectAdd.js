@@ -294,9 +294,6 @@ export default function ProjectAdd( props ) {
     return <Loading />
   }
 
-  const canBeAssigned = toSelArr( usersData.basicUsers, 'email' )
-    .filter( ( user ) => userGroups.some( ( userGroup ) => userGroup.user.id ) );
-
   return (
     <div>
       { !closeModal &&
@@ -448,12 +445,12 @@ export default function ProjectAdd( props ) {
           setTaskType={setTaskType}
           statuses={toSelArr(statuses)}
           companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
-          canBeAssigned={canBeAssigned}
           users={
             lockedRequester ?
             userGroups.map( (userGroup) => userGroup.user ) :
             (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
           }
+          assignableUsers={userGroups.map( (userGroup) => userGroup.user )}
           allTags={toSelArr(tags)}
           taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
           />
