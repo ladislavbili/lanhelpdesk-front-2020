@@ -1013,6 +1013,10 @@ tr:last-child, tr:first-child{
     width: 32px;
 }
 
+.minimal-select{
+  min-width: 120px;
+}
+
 .invisible-select{
   width: 100px;
   min-height: 30px;

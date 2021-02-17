@@ -186,6 +186,8 @@ export default function TaskAdd( props ) {
     setAssignedTo( newAssignedTo );
     let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
     setRequester( newRequester );
+    let newType = def.type && ( def.type.fixed || def.type.def ) ? taskTypes.find( ( item ) => item.id === def.type.value.id ) : null;
+    setTaskType( newType );
     let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value.id ) : ( companies && newRequester ? companies.find( ( company ) => company.id === newRequester.company.id ) : null );
     setCompany( newCompany );
 
@@ -489,7 +491,7 @@ export default function TaskAdd( props ) {
           <Select
             placeholder="Select task type"
             value={taskType}
-            isDisabled={ !userRights.typeWrite }
+            isDisabled={defaultFields.type.fixed || !userRights.typeWrite }
             styles={ selectStyleNoArrowRequired }
             onChange={(taskType)=> {
               setTaskType(taskType);

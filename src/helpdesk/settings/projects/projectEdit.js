@@ -53,6 +53,9 @@ import {
   GET_BASIC_USERS,
 } from '../users/queries';
 import {
+  GET_TASK_TYPES,
+} from '../taskTypes/queries';
+import {
   GET_PROJECTS,
   GET_MY_PROJECTS,
   GET_PROJECT,
@@ -101,6 +104,10 @@ export default function ProjectEdit( props ) {
     data: usersData,
     loading: usersLoading
   } = useQuery( GET_BASIC_USERS, fetchNetOptions );
+  const {
+    data: taskTypesData,
+    loading: taskTypesLoading
+  } = useQuery( GET_TASK_TYPES, fetchNetOptions );
   let allProjects = [];
   if ( closeModal ) {
     allProjects = toSelArr( client.readQuery( {
@@ -134,6 +141,10 @@ export default function ProjectEdit( props ) {
   const [ overtime, setOvertime ] = React.useState( defBool );
   const [ pausal, setPausal ] = React.useState( defBool );
   const [ requester, setRequester ] = React.useState( defItem );
+  const [ type, setType ] = React.useState( {
+    ...defItem,
+    required: false
+  } );
   const [ status, setStatus ] = React.useState( defItem );
   const [ defTag, setDefTag ] = React.useState( {
     ...defList,
@@ -228,6 +239,19 @@ export default function ProjectEdit( props ) {
       setCompany( newCompany );
     }
   }, [ projectLoading, companiesLoading ] );
+
+  React.useEffect( () => {
+    if ( !projectLoading && !taskTypesLoading ) {
+      let taskTypes = toSelArr( taskTypesData.taskTypes );
+      let newType = {
+        def: projectData.project.def.type.def,
+        fixed: projectData.project.def.type.fixed,
+        required: projectData.project.def.type.required,
+        value: ( projectData.project.def.type.value ? taskTypes.find( type => type.id === projectData.project.def.type.value.id ) : null )
+      };
+      setType( newType );
+    }
+  }, [ projectLoading, taskTypesLoading ] );
 
   React.useEffect( () => {
     if ( !projectLoading ) {
@@ -404,6 +428,10 @@ export default function ProjectEdit( props ) {
         ...requester,
         value: ( requester.value ? requester.value.id : null )
       },
+      type: {
+        ...type,
+        value: ( type.value ? type.value.id : null )
+      },
       status: {
         ...status,
         value: ( status.value ? status.value.id : null )
@@ -538,6 +566,7 @@ export default function ProjectEdit( props ) {
       ( !group.rights.tags.write && !defTag.def && defTag.required ) ||
       ( !group.rights.assigned.write && !assignedTo.def ) ||
       ( !group.rights.requester.write && !requester.def && requester.required ) ||
+      ( !group.rights.type.write && !type.def && type.required ) ||
       ( !group.rights.company.write && !company.def )
     ) )
   const cannotSave = (
@@ -800,6 +829,8 @@ export default function ProjectEdit( props ) {
             setPausal={setPausal}
             requester={requester}
             setRequester={setRequester}
+            type={type}
+            setType={setType}
             status={status}
             setStatus={setStatus}
             tag={defTag}
@@ -813,6 +844,7 @@ export default function ProjectEdit( props ) {
               (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
             }
             allTags={toSelArr(allTags)}
+            taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
             />
 
           { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
@@ -851,6 +883,7 @@ export default function ProjectEdit( props ) {
               defTag,
               assignedTo,
               requester,
+              type,
               company
             }
           }

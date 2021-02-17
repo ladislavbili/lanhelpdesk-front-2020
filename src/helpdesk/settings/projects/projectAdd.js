@@ -107,6 +107,10 @@ export default function ProjectAdd( props ) {
   const [ overtime, setOvertime ] = React.useState( defBool );
   const [ pausal, setPausal ] = React.useState( defBool );
   const [ requester, setRequester ] = React.useState( defItem );
+  const [ type, setType ] = React.useState( {
+    ...defItem,
+    required: false
+  } );
   const [ status, setStatus ] = React.useState( defItem );
   const [ defTag, setDefTag ] = React.useState( {
     ...defList,
@@ -169,6 +173,10 @@ export default function ProjectAdd( props ) {
       requester: {
         ...requester,
         value: ( requester.value ? requester.value.id : null )
+      },
+      type: {
+        ...type,
+        value: ( type.value ? type.value.id : null )
       },
       status: {
         ...status,
@@ -249,6 +257,7 @@ export default function ProjectAdd( props ) {
       ( !group.rights.tags.write && !defTag.def && defTag.required ) ||
       ( !group.rights.assigned.write && !assignedTo.def ) ||
       ( !group.rights.requester.write && !requester.def && requester.required ) ||
+      ( !group.rights.type.write && !type.def && type.required ) ||
       ( !group.rights.company.write && !company.def )
     ) )
 
@@ -430,6 +439,8 @@ export default function ProjectAdd( props ) {
           setPausal={setPausal}
           requester={requester}
           setRequester={setRequester}
+          type={type}
+          setType={setType}
           status={status}
           setStatus={setStatus}
           tag={defTag}
@@ -480,6 +491,7 @@ export default function ProjectAdd( props ) {
                 defTag,
                 assignedTo,
                 requester,
+                type,
                 company
               }
             }

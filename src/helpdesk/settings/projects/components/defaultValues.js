@@ -26,6 +26,8 @@ export default function ProjectDefaultValues( props ) {
     setStatus,
     requester,
     setRequester,
+    type,
+    setType,
     tag,
     setTag,
     pausal,
@@ -37,6 +39,7 @@ export default function ProjectDefaultValues( props ) {
     users,
     allTags,
     companies,
+    taskTypes,
   } = props;
 
   return (
@@ -278,6 +281,49 @@ export default function ProjectDefaultValues( props ) {
                 disabled={ true }
                 value = { true }
                 onChange={(e)=>setCompany({...company, required: !company.required })}
+                />
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div className="row">
+                <label className="col-3 col-form-label">Task type</label>
+                <div className="col-9">
+                  <Select
+                    value={type.value}
+                    onChange={ (e) => {
+                        setType({...type,value:e})
+                    }}
+                    options={taskTypes}
+                    styles={invisibleSelectStyle}
+                    />
+                </div>
+              </div>
+            </td>
+            <td>
+              <Checkbox
+                centerHor
+                centerVer
+                value = { type.def }
+                onChange={(e)=>setType({...type,def:!type.def})}
+                disabled={type.fixed}
+                />
+            </td>
+            <td>
+              <Checkbox
+                centerHor
+                centerVer
+                value = { type.fixed }
+                onChange={(e)=>setType({...type,fixed:!type.fixed, def: !type.fixed ? true : type.def })}
+                />
+            </td>
+            <td>
+              <Checkbox
+                centerHor
+                centerVer
+                value = { type.required }
+                onChange={(e)=>setType({...type, required: !type.required })}
                 />
             </td>
           </tr>

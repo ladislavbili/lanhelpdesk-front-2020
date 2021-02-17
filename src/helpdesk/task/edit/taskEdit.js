@@ -52,6 +52,7 @@ import CheckboxList from 'helpdesk/components/checkboxList';
 import Scheduled from 'helpdesk/components/scheduled';
 import TaskAdd from '../add';
 import TaskPrint from './taskPrint';
+import StatusChangeModal from 'helpdesk/components/statusChangeModal';
 
 import PendingPicker from 'helpdesk/components/pendingPicker';
 import UserAdd from 'helpdesk/settings/users/userAdd';
@@ -155,6 +156,7 @@ export default function TaskEdit( props ) {
   const [ pendingOpen, setPendingOpen ] = React.useState( false );
   const [ project, setProject ] = React.useState( null );
   const [ requester, setRequester ] = React.useState( null );
+  const [ possibleStatus, setPossibleStatus ] = React.useState( null );
   const [ status, setStatus ] = React.useState( null );
   const [ showDescription, setShowDescription ] = React.useState( false );
   const [ tags, setTags ] = React.useState( [] );
@@ -778,7 +780,8 @@ export default function TaskEdit( props ) {
 
   const changeStatus = ( status ) => {
     if ( status.action === 'PendingDate' ) {
-      setPendingOpen( true );
+      setPendingDate( moment()
+        .add( 1, 'days' ) );
       setPotentialPendingStatus( status );
     } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
       setStatus( status );
@@ -964,7 +967,7 @@ export default function TaskEdit( props ) {
                   type="button"
                   key={status.id}
                   className="btn btn-link waves-effect task-add-layout-button"
-                  onClick={() => changeStatus(status)}
+                  onClick={() => setPossibleStatus(status) }
                   >
                   { status.icon.length > 3 &&
                     <i
@@ -1148,7 +1151,7 @@ export default function TaskEdit( props ) {
       <Select
         placeholder="Zadajte typ"
         value={taskType}
-        isDisabled={ !userRights.typeWrite }
+        isDisabled={ defaultFields.type.fixed || !userRights.typeWrite }
         styles={selectStyleNoArrowRequired}
         onChange={(type)=> {
           setTaskType(type);
@@ -2093,6 +2096,50 @@ export default function TaskEdit( props ) {
               { renderVykazyTable() }
 
               { renderComments() }
+              <StatusChangeModal
+                open={possibleStatus !== null}
+                userRights={ userRights }
+                statuses={project ? toSelArr(project.project.statuses) : []}
+                newStatus={possibleStatus}
+                closeModal={ () => {
+                  setPossibleStatus(null);
+                } }
+                submit={(status, comment, date ) => {
+                  setPossibleStatus(null);
+                  setStatus( status );
+                  if ( status.action === 'PendingDate' ) {
+                    setPendingDate( date );
+                    autoUpdateTask( {
+                      status: status.id,
+                      pendingDate: date
+                        .valueOf()
+                        .toString(),
+                      pendingChangable: true,
+                    } );
+                  } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
+                    setCloseDate( date );
+                    autoUpdateTask( {
+                      status: status.id,
+                      closeDate: date
+                        .valueOf()
+                        .toString(),
+                    } );
+                  } else {
+                    autoUpdateTask( {
+                      status: status.id
+                    } );
+                  }
+                  if(comment.length > 0 ){
+                    submitComment({
+                      id,
+                      message: comment,
+                      attachments: [],
+                      parentCommentId: null,
+                      internal: false,
+                    })
+                  }
+                  }}
+                />
 
               <div className="form-section"></div>
 
