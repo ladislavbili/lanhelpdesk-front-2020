@@ -22,49 +22,49 @@ export default function RepeatFormInput( props ) {
   const interval = repeat ? intervals.find( ( interval ) => interval.value === repeat.repeatInterval ) : null;
   return (
     <div>
-    <div>
-      {vertical &&
-        <div className="form-selects-entry-column">
-          <Label style={{display: "block"}}>Repeat</Label>
-          <div className="form-selects-entry-column-rest">
-            <Button type="button"className="btn btn-repeat" id={"repeatPopover"} onClick={() => {
-              if(!disabled){
-                setOpenModal(true);
-              }
-              }}>
-              {
-                repeat ?
-                `Opakovať každý ${repeat.repeatEvery} ${interval.label}` :
-                "No repeat"
-              }
-            </Button>
+      <div>
+        {vertical &&
+          <div className="form-selects-entry-column">
+            <Label style={{display: "block"}}>Repeat</Label>
+            <div className="form-selects-entry-column-rest">
+              <Button type="button"className="btn btn-repeat" id={"repeatPopover"} onClick={() => {
+                  if(!disabled){
+                    setOpenModal(true);
+                  }
+                }}>
+                {
+                  repeat ?
+                  `Opakovať každý ${repeat.repeatEvery} ${interval.label}` :
+                  "No repeat"
+                }
+              </Button>
+            </div>
           </div>
-        </div>
-      }
-      {!vertical &&
-        <div className="p-r-10">
-          <Label className="col-3 col-form-label">Repeat</Label>
-          <div className="col-9">
-            <Button type="button" className="btn btn-repeat flex" id={"repeatPopover"} onClick={() => {
-              if(!disabled){
-                setOpenModal(true);
-              }
-              }}>
-              {
-                repeat ?
-                `Opakovať každý ${repeat.repeatEvery} ${interval.label}` :
-                "No repeat"
-              }
-            </Button>
+        }
+        {!vertical &&
+          <div className="p-r-10">
+            <Label className="col-3 col-form-label">Repeat</Label>
+            <div className="col-9">
+              <Button type="button" className="btn btn-repeat flex" id={"repeatPopover"} onClick={() => {
+                  if(!disabled){
+                    setOpenModal(true);
+                  }
+                }}>
+                {
+                  repeat ?
+                  `Opakovať každý ${repeat.repeatEvery} ${interval.label}` :
+                  "No repeat"
+                }
+              </Button>
+            </div>
           </div>
-        </div>
-      }
+        }
+      </div>
+      <RepeatFormModal
+        { ...props }
+        isOpen={openModal}
+        closeModal={() => setOpenModal(false)}
+        />
     </div>
-    <RepeatFormModal
-      { ...props }
-      isOpen={openModal}
-      closeModal={() => setOpenModal(false)}
-      />
-  </div>
   );
 }

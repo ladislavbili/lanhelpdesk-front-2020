@@ -93,6 +93,14 @@ requester {
     id
   }
 }
+type {
+  def
+  fixed
+  required
+  value {
+    id
+  }
+}
 status {
   def
   fixed

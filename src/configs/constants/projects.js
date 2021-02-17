@@ -311,6 +311,12 @@ export const noDef = {
     value: null,
     required: true
   },
+  type: {
+    def: false,
+    fixed: false,
+    value: null,
+    required: false
+  },
   pausal: {
     def: false,
     fixed: false,

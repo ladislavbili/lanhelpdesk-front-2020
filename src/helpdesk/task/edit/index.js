@@ -619,7 +619,7 @@ export default function TaskEditContainer( props ) {
     basicCompaniesRefetch();
   }
 
-  const submitComment = ( comment, setSaving ) => {
+  const submitComment = ( comment, setSaving = () => {} ) => {
     const {
       id,
       message,
@@ -651,7 +651,7 @@ export default function TaskEditContainer( props ) {
       } );
   }
 
-  const submitEmail = ( email, setSaving ) => {
+  const submitEmail = ( email, setSaving = () => {} ) => {
     const {
       id,
       attachments,

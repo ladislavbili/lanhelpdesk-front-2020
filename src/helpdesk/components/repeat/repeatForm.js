@@ -233,6 +233,8 @@ export default function RepeatForm( props ) {
     setAssignedTo( newAssignedTo );
     let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
     setRequester( newRequester );
+    let newType = def.type && ( def.type.fixed || def.type.def ) ? taskTypes.find( ( item ) => item.id === def.type.value.id ) : null;
+    setTaskType( newType );
     let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value.id ) : ( companies && newRequester ? companies.find( ( company ) => company.id === newRequester.company.id ) : null );
     setCompany( newCompany );
 
@@ -807,24 +809,24 @@ export default function RepeatForm( props ) {
       <div className="task-add-layout row">
         <h2 className="center-hor p-r-20">{`${ !editMode ? 'Add repeat' : 'Edit repeat' }`}</h2>
         <div className="ml-auto m-r-20">
-        <button
-          type="button"
-          className="btn btn-link waves-effect task-add-layout-button"
-          onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
-          <i className="fas fa-retweet "/>
-          Layout
-        </button>
-
-        { editMode && userRights.repeatWrite &&
           <button
             type="button"
             className="btn btn-link waves-effect task-add-layout-button"
-            onClick={ deleteRepeatFunc }>
-            <i className="far fa-trash-alt "/>
-            Delete Repeat
+            onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
+            <i className="fas fa-retweet "/>
+            Layout
           </button>
-        }
-      </div>
+
+          { editMode && userRights.repeatWrite &&
+            <button
+              type="button"
+              className="btn btn-link waves-effect task-add-layout-button"
+              onClick={ deleteRepeatFunc }>
+              <i className="far fa-trash-alt "/>
+              Delete Repeat
+            </button>
+          }
+        </div>
 
       </div>
     )
@@ -906,7 +908,7 @@ export default function RepeatForm( props ) {
       <Select
         placeholder="Select task type"
         value={taskType}
-        isDisabled={ !userRights.typeWrite }
+        isDisabled={ defaultFields.type.fixed || !userRights.typeWrite }
         styles={ selectStyleNoArrowRequired }
         onChange={(taskType)=> {
           setTaskType(taskType);

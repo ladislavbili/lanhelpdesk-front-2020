@@ -9,6 +9,7 @@ export default function ACLErrors( props ) {
     assignedTo,
     requester,
     company,
+    type,
   } = props;
   let errors = [];
   groups.filter( ( group ) => group.rights.addTasks )
@@ -28,6 +29,9 @@ export default function ACLErrors( props ) {
       }
       if ( !group.rights.requester.write && !requester.def && requester.required ) {
         issueRights.push( 'requester' );
+      }
+      if ( !group.rights.type.write && !type.def && type.required ) {
+        issueRights.push( 'task type' );
       }
       if ( !group.rights.company.write && !company.def ) {
         issueRights.push( 'company' );
