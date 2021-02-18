@@ -14,8 +14,11 @@ export default function EmailRender( props ) {
     getAttachment,
     comment,
     reply,
-    sendEmail
+    sendEmail,
+    openedComments,
+    setOpenedComments,
   } = props;
+
   return (
     <div>
       <div className="media m-b-30 m-t-20">

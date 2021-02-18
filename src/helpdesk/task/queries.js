@@ -84,6 +84,7 @@ const responseTask = `
     id
     title
     color
+    order
   }
   taskType {
     id

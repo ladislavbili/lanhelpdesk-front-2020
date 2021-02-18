@@ -1,24 +1,31 @@
 import React from 'react';
 
+import moment from 'moment';
+import classnames from "classnames";
+import axios from 'axios';
+
 import Select from 'react-select';
 import {
   Label,
   Button
 } from 'reactstrap';
+import CKEditor5 from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 import DatePicker from 'components/DatePicker';
-import moment from 'moment';
+import MultiSelect from 'components/MultiSelectNew';
+import Empty from 'components/Empty';
 
 import Repeat from 'helpdesk/components/repeat/simpleRepeat';
 import Attachments from 'helpdesk/components/attachments';
-
 import VykazyTable from 'helpdesk/components/vykazyTable';
+import CheckboxList from 'helpdesk/components/checkboxList';
+import Scheduled from 'helpdesk/components/scheduled';
+import {
+  getCreationError as getVykazyError
+} from 'helpdesk/components/vykazyTable';
 
-import classnames from "classnames";
-
-import CKEditor5 from '@ckeditor/ckeditor5-react';
 import ck5config from 'configs/components/ck5config';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import axios from 'axios';
 import {
   invisibleSelectStyleNoArrow,
   selectStyleNoArrowNoPadding,
@@ -32,31 +39,24 @@ import {
   invisibleSelectStyleNoArrowRequiredNoPadding,
 } from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect'
-import CheckboxList from 'helpdesk/components/checkboxList';
-import Scheduled from 'helpdesk/components/scheduled';
-import {
-  getCreationError as getVykazyError
-} from 'helpdesk/components/vykazyTable';
 import {
   noMilestone
 } from 'configs/constants/sidebar';
 import {
   noDef
 } from 'configs/constants/projects';
-
+import {
+  backendCleanRights
+} from 'configs/constants/projects';
 import {
   REST_URL
 } from 'configs/restAPI';
-
 import {
   defaultVykazyChanges,
   invoicedAttributes,
   noTaskType
 } from '../constants';
 
-import {
-  backendCleanRights
-} from 'configs/constants/projects';
 
 import {
   toSelArr
@@ -96,6 +96,7 @@ export default function TaskAdd( props ) {
   const [ project, setProject ] = React.useState( projectID ? projects.find( p => p.id === projectID ) : null );
   const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
   const [ defaultFields, setDefaultFields ] = React.useState( noDef );
+  const [ tagsOpen, setTagsOpen ] = React.useState( false );
 
   const [ attachments, setAttachments ] = React.useState( [] );
   const [ assignedTo, setAssignedTo ] = React.useState( USERS_WITH_PERMISSIONS.filter( ( user ) => user.id === currentUser.id ) );
@@ -373,7 +374,7 @@ export default function TaskAdd( props ) {
             className="btn btn-link waves-effect task-add-layout-button"
             onClick={ () => {
               setTaskLayout( currentUser.taskLayout === 1 ? 2 : 1 )
-              }}>
+            }}>
             <i className="fas fa-retweet "/>
             Layout
           </button>
@@ -563,19 +564,6 @@ export default function TaskAdd( props ) {
         onChange={(overtime) => setOvertime(overtime)}
         options={booleanSelects}
         />
-    ),
-    Tags: (
-      <div className="f-1">
-        <Select
-          value={tags}
-          placeholder="None"
-          isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-          isMulti
-          onChange={(t)=>setTags(t)}
-          options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
-          styles={ selectStyleNoArrowColoredRequired }
-          />
-      </div>
     )
   }
 
@@ -699,15 +687,6 @@ export default function TaskAdd( props ) {
               }
             </div>
           </div>
-
-          { userRights.tagsRead && !defaultFields.tag.fixed && userRights.tagsWrite &&
-            <div className="row p-r-10">
-              <Label className="col-0-5 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-              <div className="col-11-5">
-                { layoutComponents.Tags }
-              </div>
-            </div>
-          }
 
           { userRights.scheduledRead && assignedTo.length !== 0 &&
             <Scheduled
@@ -876,14 +855,6 @@ export default function TaskAdd( props ) {
             layout={currentUser.taskLayout}
             />
         }
-        { userRights.tagsRead && !defaultFields.tag.fixed && userRights.tagsWrite &&
-          <div className="form-selects-entry-column" >
-            <Label>Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Tags }
-            </div>
-          </div>
-        }
         { userRights.typeRead && userRights.typeWrite &&
           <div className="form-selects-entry-column" >
             <Label>Task Type</Label>
@@ -912,29 +883,54 @@ export default function TaskAdd( props ) {
     )
   }
 
-  const renderTags = () => {
-    if ( !userRights.tagsRead ) {
-      return null;
-    }
+  const renderMultiSelectTags = () => {
     return (
-      <div className = "form-section" >
-        <Label>Tagy</Label>
-        <div className="f-1 form-section-rest" style={{marginLeft: "5px"}}>
-          <Select
-            value={tags}
-            placeholder="None"
-            isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-            isMulti
-            onChange={(t)=>setTags(t)}
-            options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
-            styles={ project && project.def.tag.required ? invisibleSelectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowColored }
-            />
-        </div>
-      </div>
+      <Empty>
+        { userRights.tagsRead && userRights.tagsWrite &&
+          <div className="row center-hor">
+            <button className="btn btn-link waves-effect p-b-10" onClick={ () => setTagsOpen(true) } >
+              <i className="fa fa-plus" />
+              Tags
+            </button>
+            <MultiSelect
+              className="center-hor"
+              disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
+              direction="right"
+              style={{}}
+              header="Select tags for this task"
+              closeMultiSelect={() => { setTagsOpen(false) }}
+              open={tagsOpen}
+              items={toSelArr(project === null ? [] : project.tags)}
+              selected={tags}
+              onChange={(tags) => {
+                setTags(tags);
+              }}
+              />
+          </div>
+        }
+
+        {
+          userRights.tagsRead && tags
+          .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+          .map( ( tag ) => (
+            <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+              {tag.title}
+            </span>
+          ) )
+        }
+      </Empty>
     )
   }
 
+
   const renderDescription = () => {
+    if ( !userRights.taskDescriptionRead && userRights.tagsRead ) {
+      return (
+        <div className="form-section">
+        {renderMultiSelectTags()}
+      </div>
+      )
+    }
     if ( !userRights.taskDescriptionRead ) {
       return null;
     }
@@ -948,6 +944,7 @@ export default function TaskAdd( props ) {
               Attachment
             </label>
           }
+          {renderMultiSelectTags()}
         </div>
         <div  className="form-section-rest">
           <CKEditor5

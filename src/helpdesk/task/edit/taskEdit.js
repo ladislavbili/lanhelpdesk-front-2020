@@ -11,16 +11,18 @@ import {
   ModalBody,
   ModalHeader,
   ListGroup,
-  ListGroupItem
+  ListGroupItem,
 } from 'reactstrap';
-import DatePicker from 'components/DatePicker';
 import moment from 'moment';
 import classnames from "classnames";
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-import ck5config from 'configs/components/ck5config';
+import DatePicker from 'components/DatePicker';
+import MultiSelect from 'components/MultiSelectNew';
+import Empty from 'components/Empty';
 
+import ck5config from 'configs/components/ck5config';
 import {
   invisibleSelectStyleNoArrow,
   selectStyleNoArrowNoPadding,
@@ -50,11 +52,12 @@ import VykazyTable, {
 } from 'helpdesk/components/vykazyTable';
 import CheckboxList from 'helpdesk/components/checkboxList';
 import Scheduled from 'helpdesk/components/scheduled';
+import StatusChangeModal from 'helpdesk/components/statusChangeModal';
+import PendingPicker from 'helpdesk/components/pendingPicker';
+
 import TaskAdd from '../add';
 import TaskPrint from './taskPrint';
-import StatusChangeModal from 'helpdesk/components/statusChangeModal';
 
-import PendingPicker from 'helpdesk/components/pendingPicker';
 import UserAdd from 'helpdesk/settings/users/userAdd';
 import CompanyAdd from 'helpdesk/settings/companies/companyAdd';
 
@@ -164,9 +167,11 @@ export default function TaskEdit( props ) {
   const [ taskTripPausal, setTaskTripPausal ] = React.useState( 0 );
   const [ taskWorkPausal, setTaskWorkPausal ] = React.useState( 0 );
   const [ title, setTitle ] = React.useState( "" );
+
   const [ toggleTab, setToggleTab ] = React.useState( 1 );
   const [ usedSubtaskPausal, setUsedSubtaskPausal ] = React.useState( 0 );
   const [ usedTripPausal, setUsedTripPausal ] = React.useState( 0 );
+  const [ tagsOpen, setTagsOpen ] = React.useState( false );
 
   const [ changes, setChanges ] = React.useState( {} );
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
@@ -175,6 +180,7 @@ export default function TaskEdit( props ) {
   // sync
   React.useEffect( () => {
     setChanges( {} );
+    setTagsOpen( false );
     setVykazyChanges( defaultVykazyChanges );
     if ( task.invoiced ) {
       setAssignedTo( toSelArr( invoicedTask.assignedTo ) );
@@ -1313,72 +1319,72 @@ export default function TaskEdit( props ) {
           </div>
 
           <div className="row">
-          <div className="col-3">
-            {userRights.statusRead &&
-              <div className="p-r-10">
-                <Label className="col-form-label col-3 ">Status <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Status }
+            <div className="col-3">
+              {userRights.statusRead &&
+                <div className="p-r-10">
+                  <Label className="col-form-label col-3 ">Status <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Status }
+                  </div>
                 </div>
-              </div>
-            }
-            { userRights.typeRead &&
-              <div className="p-r-10">
-                <Label className="col-form-label  col-3">Typ <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Type }
+              }
+              { userRights.typeRead &&
+                <div className="p-r-10">
+                  <Label className="col-form-label  col-3">Typ <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Type }
+                  </div>
                 </div>
-              </div>
-            }
-            { userRights.milestoneRead &&
-              <div className="p-r-10">
-                <Label className="col-form-label  col-3">Milestone</Label>
-                <div className="col-9">
-                  { layoutComponents.Milestone }
+              }
+              { userRights.milestoneRead &&
+                <div className="p-r-10">
+                  <Label className="col-form-label  col-3">Milestone</Label>
+                  <div className="col-9">
+                    { layoutComponents.Milestone }
+                  </div>
                 </div>
-              </div>
-            }
-          </div>
+              }
+            </div>
 
-          <div className="col-3">
-            {userRights.requesterRead &&
-              <div className="p-r-10">
-                <Label className="col-form-label col-3 ">Zadal <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Requester }
+            <div className="col-3">
+              {userRights.requesterRead &&
+                <div className="p-r-10">
+                  <Label className="col-form-label col-3 ">Zadal <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Requester }
+                  </div>
                 </div>
-              </div>
-            }
-            {userRights.companyRead &&
-              <div className="p-r-10">
-                <Label className="col-form-label col-3 ">Firma <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Company }
+              }
+              {userRights.companyRead &&
+                <div className="p-r-10">
+                  <Label className="col-form-label col-3 ">Firma <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Company }
+                  </div>
                 </div>
-              </div>
-            }
-          </div>
+              }
+            </div>
 
-          <div className="col-3">
-            {userRights.pausalRead &&
-              <div className="p-r-10">
-                <Label className="col-form-label col-3 ">Paušál <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Pausal }
+            <div className="col-3">
+              {userRights.pausalRead &&
+                <div className="p-r-10">
+                  <Label className="col-form-label col-3 ">Paušál <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    { layoutComponents.Pausal }
+                  </div>
                 </div>
-              </div>
-            }
-            { userRights.deadlineRead &&
-              <div className="p-r-10">
-                <Label className="col-form-label col-3">Deadline</Label>
-                <div className="col-9">
-                  { layoutComponents.Deadline }
+              }
+              { userRights.deadlineRead &&
+                <div className="p-r-10">
+                  <Label className="col-form-label col-3">Deadline</Label>
+                  <div className="col-9">
+                    { layoutComponents.Deadline }
+                  </div>
                 </div>
-              </div>
-            }
-          </div>
-          <div className="col-3">
-            { userRights.repeatRead &&
+              }
+            </div>
+            <div className="col-3">
+              { userRights.repeatRead &&
                 <Repeat
                   disabled={!userRights.repeatWrite}
                   taskID={id}
@@ -1386,26 +1392,17 @@ export default function TaskEdit( props ) {
                   repeat={task.repeat}
                   layout={currentUser.taskLayout}
                   />
-            }
-            { userRights.overtimeRead &&
-              <div className="p-r-10">
-                <Label className="col-form-label col-4">Mimo PH <span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  {layoutComponents.Overtime}
+              }
+              { userRights.overtimeRead &&
+                <div className="p-r-10">
+                  <Label className="col-form-label col-4">Mimo PH <span className="warning-big">*</span></Label>
+                  <div className="col-9">
+                    {layoutComponents.Overtime}
+                  </div>
                 </div>
-              </div>
-            }
-          </div>
-          </div>
-
-          { userRights.tagsRead &&
-            <div className="p-r-10">
-              <Label className="col-0-5 col-form-label">Tags {  defaultFields.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-              <div className="col-11-5" style={{maxWidth: "100%"}}>
-                { renderTags() }
-              </div>
+              }
             </div>
-          }
+          </div>
 
           { userRights.scheduledRead &&
             <Scheduled
@@ -1469,186 +1466,156 @@ export default function TaskEdit( props ) {
     return (
       <div className={classnames("task-edit-right", {"w-250px": columns})}>
         <div className="">
-        { userRights.projectRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Projekt <span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Project }
+          { userRights.projectRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Projekt <span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Project }
+              </div>
             </div>
-          </div>
-        }
-        { userRights.statusRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Status <span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Status }
+          }
+          { userRights.statusRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Status <span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Status }
+              </div>
             </div>
-          </div>
-        }
-        { userRights.milestoneRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Milestone</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Milestone }
+          }
+          { userRights.milestoneRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Milestone</Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Milestone }
+              </div>
             </div>
-          </div>
-        }
-        { userRights.requesterRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Zadal <span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Requester }
+          }
+          { userRights.requesterRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Zadal <span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Requester }
+              </div>
             </div>
-          </div>
-        }
-        { userRights.companyRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Firma <span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Company }
+          }
+          { userRights.companyRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Firma <span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Company }
+              </div>
             </div>
-          </div>
-        }
-        { userRights.assignedRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Assigned <span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Assigned }
+          }
+          { userRights.assignedRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Assigned <span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Assigned }
+              </div>
             </div>
-          </div>
-        }
-        { userRights.deadlineRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Deadline</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Deadline }
+          }
+          { userRights.deadlineRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Deadline</Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Deadline }
+              </div>
             </div>
-          </div>
-        }
-        { userRights.repeatRead &&
-          <Repeat
-            vertical
-            disabled={!userRights.repeatWrite}
-            duplicateTask={ !task.repeat ? getTaskData() : null}
-            taskID={id}
-            repeat={task.repeat}
-            layout={currentUser.taskLayout}
-            />
-        }
-        { userRights.scheduledRead &&
-          <Scheduled
-            items={task.scheduled.map((item) => ({
-              ...item,
-              from: moment(parseInt(item.from)),
-              to: moment(parseInt(item.to)),
-            }))}
-            users={assignedTo}
-            disabled={ assignedTo.length === 0 }
-            submitItem = { (newScheduled) => {
-              addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from.valueOf().toString() , to: newScheduled.to.valueOf().toString() });
-            }}
-            deleteItem = { (scheduled) => {
-              deleteScheduledTaskFunc(scheduled.id);
-            } }
-            layout={currentUser.taskLayout}
-            />
-        }
+          }
+          { userRights.repeatRead &&
+            <Repeat
+              vertical
+              disabled={!userRights.repeatWrite}
+              duplicateTask={ !task.repeat ? getTaskData() : null}
+              taskID={id}
+              repeat={task.repeat}
+              layout={currentUser.taskLayout}
+              />
+          }
+          { userRights.scheduledRead &&
+            <Scheduled
+              items={task.scheduled.map((item) => ({
+                ...item,
+                from: moment(parseInt(item.from)),
+                to: moment(parseInt(item.to)),
+              }))}
+              users={assignedTo}
+              disabled={ assignedTo.length === 0 }
+              submitItem = { (newScheduled) => {
+                addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from.valueOf().toString() , to: newScheduled.to.valueOf().toString() });
+              }}
+              deleteItem = { (scheduled) => {
+                deleteScheduledTaskFunc(scheduled.id);
+              } }
+              layout={currentUser.taskLayout}
+              />
+          }
 
-        { userRights.tagsRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Tags { defaultFields.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-            <div className="form-selects-entry-column-rest" >
-              { renderTags() }
+          { userRights.typeRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Task Type <span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Type }
+              </div>
             </div>
-          </div>
-        }
-
-        { userRights.typeRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Task Type <span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Type }
+          }
+          { userRights.pausalRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Paušál <span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Pausal }
+              </div>
             </div>
-          </div>
-        }
-        { userRights.pausalRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Paušál <span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Pausal }
+          }
+          { userRights.overtimeRead &&
+            <div className="form-selects-entry-column" >
+              <Label>Mimo PH <span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.Overtime }
+              </div>
             </div>
-          </div>
-        }
-        { userRights.overtimeRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Mimo PH <span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Overtime }
-            </div>
-          </div>
-        }
+          }
         </div>
       </div>
     );
   }
 
-  const renderTags = () => {
-    if ( !userRights.tagsRead ) {
-      if ( task.invoiced ) {
-        return (
-          <span className="bolder">
-            {timestampToString(task.invoicedDate)}
-          </span>
-        )
-      }
-      return null;
-    }
+  const renderMultiSelectTags = () => {
     return (
-      <div className="flex">
-        { task.invoiced &&
-          <div className="bolder">
-            Invoiced: {timestampToString(task.invoicedDate)}
+      <Empty>
+      { userRights.tagsRead && userRights.tagsWrite &&
+        <div className="row center-hor">
+          <button className="btn btn-link waves-effect p-b-10" onClick={ () => setTagsOpen(true) } >
+            <i className="fa fa-plus" />Tags
+            </button>
+            <MultiSelect
+              className="center-hor"
+              disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
+              direction="right"
+              style={{}}
+              header="Select tags for this task"
+              closeMultiSelect={() => { setTagsOpen(false) }}
+              open={tagsOpen}
+              items={toSelArr(project === null ? [] : project.project.tags)}
+              selected={tags}
+              onChange={(tags) => {
+                setTags(tags);
+                autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
+              }}
+              />
           </div>
         }
-        {
-          !task.invoiced && getCantSave() &&
-          <div className="bolder warning">
-            Task can't be automatically saved! Some attributes are missing!
-          </div>
-        }
-        <div className="row f-1">
-          <div className="f-1 center-hor">
-            <div>
-              { (defaultFields.tag.fixed || !userRights.tagsWrite) &&
-                <div className="disabled-info">{tags.map(tag => tag.label).join(" ")}</div>
-              }
-              { !defaultFields.tag.fixed && userRights.tagsWrite &&
-                <Select
-                  placeholder="Zvoľte tagy"
-                  value={tags}
-                  isMulti
-                  onChange={(tags)=> {
-                    setTags(tags);
-                    autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
-                  }}
-                  options={toSelArr(project === null ? [] : project.project.tags)}
-                  isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-                  styles={selectStyleNoArrowColoredRequired }
-                  />
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
-  const renderTagsAndInfo = () => {
-    return (
-      <div className="row">
-        {renderTags()}
-        {renderTaskInfoAndDates()}
-      </div>
+        {
+          userRights.tagsRead && tags
+          .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+          .map( ( tag ) => (
+            <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+              {tag.title}
+            </span>
+          ) )
+        }
+      </Empty>
     )
   }
 
@@ -1699,28 +1666,29 @@ export default function TaskEdit( props ) {
           <Label className="m-r-10">
             Popis úlohy
           </Label>
-            { userRights.taskDescriptionWrite &&
-              <button
-                className="btn btn-link waves-effect m-r-10"
-                style={{height: "20px"}}
-                onClick={()=>{
-                  if(showDescription){
-                    autoUpdateTask({ description  })
-                  }
-                  setShowDescription(!showDescription);
-                }}
-                >
-                <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
-                { !showDescription ? 'edit' : 'save' }
-              </button>
-            }
-            { userRights.taskAttachmentsWrite &&
-              <label htmlFor={`uploadAttachment-${id}`} className="btn btn-link" >
-                <i className="fa fa-plus" />
-                Attachment
-              </label>
+          { userRights.taskDescriptionWrite &&
+            <button
+              className="btn btn-link waves-effect m-r-10"
+              style={{height: "20px"}}
+              onClick={()=>{
+                if(showDescription){
+                  autoUpdateTask({ description  })
+                }
+                setShowDescription(!showDescription);
+              }}
+              >
+              <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
+              { !showDescription ? 'edit' : 'save' }
+            </button>
           }
-          </div>
+          { userRights.taskAttachmentsWrite &&
+            <label htmlFor={`uploadAttachment-${id}`} className="btn btn-link" >
+              <i className="fa fa-plus" />
+              Attachment
+            </label>
+          }
+          { renderMultiSelectTags() }
+        </div>
         <div className="form-section-rest">
           {RenderDescription}
           {renderAttachments(false)}
@@ -1793,47 +1761,6 @@ export default function TaskEdit( props ) {
         addAttachments={addAttachments}
         removeAttachment={removeAttachment}
         />
-    )
-  }
-
-  const renderModalUserAdd = () => {
-    return (
-      <Modal isOpen={openUserAdd} className="modal-without-borders" >
-        <ModalHeader>
-          Add user
-        </ModalHeader>
-        <ModalBody>
-          <UserAdd
-            closeModal={() => setOpenUserAdd(false)}
-            addUserToList={(user) => {
-              addUserToProject(user, project);
-              setProject({
-                ...project,
-                usersWithRights:[
-                  ...project.usersWithRights,
-                  {
-                    id: user.id,
-                    fullName: user.fullName
-                  }
-                ]
-              })
-            } }
-            />
-        </ModalBody>
-      </Modal>
-    )
-  }
-
-  const renderModalCompanyAdd = () => {
-    return (
-      <Modal isOpen={openCompanyAdd} className="modal-without-borders">
-        <ModalBody>
-          <CompanyAdd
-            closeModal={() => setOpenCompanyAdd(false)}
-            addCompanyToList={addCompanyToList}
-            />
-        </ModalBody>
-      </Modal>
     )
   }
 
@@ -2097,6 +2024,97 @@ export default function TaskEdit( props ) {
     )
   }
 
+  const renderStatusChangeModal = () => {
+    return (
+      <StatusChangeModal
+        open={possibleStatus !== null}
+        userRights={ userRights }
+        statuses={project ? toSelArr(project.project.statuses) : []}
+        newStatus={possibleStatus}
+        closeModal={ () => {
+          setPossibleStatus(null);
+        } }
+        submit={(status, comment, date ) => {
+          setPossibleStatus(null);
+          setStatus( status );
+          if ( status.action === 'PendingDate' ) {
+            setPendingDate( date );
+            autoUpdateTask( {
+              status: status.id,
+              pendingDate: date
+              .valueOf()
+              .toString(),
+              pendingChangable: true,
+            } );
+          } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
+            setCloseDate( date );
+            autoUpdateTask( {
+              status: status.id,
+              closeDate: date
+              .valueOf()
+              .toString(),
+            } );
+          } else {
+            autoUpdateTask( {
+              status: status.id
+            } );
+          }
+          if(comment.length > 0 ){
+            submitComment({
+              id,
+              message: comment,
+              attachments: [],
+              parentCommentId: null,
+              internal: false,
+            })
+          }
+        }}
+        />
+    )
+  }
+
+  const renderModalUserAdd = () => {
+    return (
+      <Modal isOpen={openUserAdd} className="modal-without-borders" >
+        <ModalHeader>
+          Add user
+        </ModalHeader>
+        <ModalBody>
+          <UserAdd
+            closeModal={() => setOpenUserAdd(false)}
+            addUserToList={(user) => {
+              addUserToProject(user, project);
+              setProject({
+                ...project,
+                usersWithRights:[
+                  ...project.usersWithRights,
+                  {
+                    id: user.id,
+                    fullName: user.fullName
+                  }
+                ]
+              })
+            } }
+            />
+        </ModalBody>
+      </Modal>
+    )
+  }
+
+  const renderModalCompanyAdd = () => {
+    return (
+      <Modal isOpen={openCompanyAdd} className="modal-without-borders">
+        <ModalBody>
+          <CompanyAdd
+            closeModal={() => setOpenCompanyAdd(false)}
+            addCompanyToList={addCompanyToList}
+            />
+        </ModalBody>
+      </Modal>
+    )
+  }
+
+
   return (
     <div
       className={classnames(
@@ -2149,59 +2167,18 @@ export default function TaskEdit( props ) {
               { renderSimpleSubtasks() }
 
 
-              { renderModalUserAdd() }
-
-              { renderModalCompanyAdd() }
 
               { renderPendingPicker() }
 
               { renderVykazyTable() }
 
               { renderComments() }
-              <StatusChangeModal
-                open={possibleStatus !== null}
-                userRights={ userRights }
-                statuses={project ? toSelArr(project.project.statuses) : []}
-                newStatus={possibleStatus}
-                closeModal={ () => {
-                  setPossibleStatus(null);
-                } }
-                submit={(status, comment, date ) => {
-                  setPossibleStatus(null);
-                  setStatus( status );
-                  if ( status.action === 'PendingDate' ) {
-                    setPendingDate( date );
-                    autoUpdateTask( {
-                      status: status.id,
-                      pendingDate: date
-                        .valueOf()
-                        .toString(),
-                      pendingChangable: true,
-                    } );
-                  } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
-                    setCloseDate( date );
-                    autoUpdateTask( {
-                      status: status.id,
-                      closeDate: date
-                        .valueOf()
-                        .toString(),
-                    } );
-                  } else {
-                    autoUpdateTask( {
-                      status: status.id
-                    } );
-                  }
-                  if(comment.length > 0 ){
-                    submitComment({
-                      id,
-                      message: comment,
-                      attachments: [],
-                      parentCommentId: null,
-                      internal: false,
-                    })
-                  }
-                  }}
-                />
+
+              { renderModalUserAdd() }
+
+              { renderModalCompanyAdd() }
+
+              { renderStatusChangeModal() }
 
               <div className="form-section"></div>
 

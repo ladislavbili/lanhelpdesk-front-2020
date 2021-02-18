@@ -170,7 +170,14 @@ export default function Comments( props ) {
                       subject,
                       tos
                     },
-                    setSaving
+                    setSaving,
+                    () => {
+                      commentsRefetch( {
+                        variables: {
+                          task: id
+                        }
+                      } );
+                    }
                   )
                 }else{
                   submitComment(
@@ -181,7 +188,14 @@ export default function Comments( props ) {
                       parentCommentId: null,
                       internal: isInternal,
                     },
-                    setSaving
+                    setSaving,
+                    () => {
+                      commentsRefetch( {
+                        variables: {
+                          task: id
+                        }
+                      } );
+                    }
                   );
                 }
                 setSaving(true);
@@ -260,6 +274,8 @@ export default function Comments( props ) {
         <div key={comment.id} >
           { comment.isEmail &&
             <Email
+              openedComments={openedComments}
+          setOpenedComments={setOpenedComments}
               getAttachment={getAttachment}
               comment={comment}
               reply={() => {

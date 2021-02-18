@@ -297,7 +297,7 @@ export default function ProjectAdd( props ) {
   return (
     <div>
       { !closeModal &&
-        <div className="dynamic-commandbar a-i-c p-l-20">
+        <div className="dynamic-bg-commandbar a-i-c p-l-20">
           { cannotSave &&
             <div className="message error-message" style={{ minWidth: 220 }}>
               Fill in all the required information!

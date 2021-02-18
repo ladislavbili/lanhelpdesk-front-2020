@@ -619,7 +619,7 @@ export default function TaskEditContainer( props ) {
     basicCompaniesRefetch();
   }
 
-  const submitComment = ( comment, setSaving = () => {} ) => {
+  const submitComment = ( comment, setSaving = () => {}, onFinish = () => {} ) => {
     const {
       id,
       message,
@@ -643,6 +643,7 @@ export default function TaskEditContainer( props ) {
         }
       } )
       .then( ( response ) => {
+        onFinish();
         setSaving( false );
       } )
       .catch( ( err ) => {
@@ -651,7 +652,7 @@ export default function TaskEditContainer( props ) {
       } );
   }
 
-  const submitEmail = ( email, setSaving = () => {} ) => {
+  const submitEmail = ( email, setSaving = () => {}, onFinish = () => {} ) => {
     const {
       id,
       attachments,
@@ -674,6 +675,7 @@ export default function TaskEditContainer( props ) {
         }
       } )
       .then( ( response ) => {
+        onFinish();
         setSaving( false );
       } )
       .catch( ( err ) => {

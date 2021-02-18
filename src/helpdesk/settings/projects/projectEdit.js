@@ -617,7 +617,7 @@ export default function ProjectEdit( props ) {
 
   return (
     <div>
-      <div className="dynamic-commandbar a-i-c p-l-20">
+      <div className="dynamic-bg-commandbar a-i-c p-l-20">
         { dataChanged &&
           <div className="message error-message" style={{ minWidth: 220 }}>
             Save changes before leaving!
