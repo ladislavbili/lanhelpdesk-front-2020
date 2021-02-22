@@ -1817,6 +1817,7 @@ export default function TaskEdit( props ) {
       <VykazyTable
         showColumns={ ( (!userRights.vykazWrite && !userRights.rozpocetWrite ) ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
         showTotals={false}
+        userID={currentUser.id}
         userRights={userRights}
         isInvoiced={task.invoiced}
         canEditInvoiced={canEditInvoiced}

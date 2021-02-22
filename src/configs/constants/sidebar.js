@@ -1,13 +1,13 @@
 export const dashboard = {
   project: {
     id: null,
-    title: 'Any project',
-    label: 'Any project',
+    title: 'All projects',
+    label: 'Alll projects',
     value: null
   },
   id: null,
-  title: 'Any project',
-  label: 'Any project',
+  title: 'All projects',
+  label: 'All projects',
   value: null
 };
 
@@ -21,8 +21,8 @@ export const addProject = {
 };
 export const allMilestones = {
   id: null,
-  title: 'Any milestone',
-  label: 'Any milestone',
+  title: 'All milestones',
+  label: 'All milestones',
   value: null,
   __typename: "Milestone"
 };
