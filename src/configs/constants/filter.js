@@ -22,22 +22,22 @@ export const ofCurrentUser = {
 export const emptyFilter = {
   requester: {
     id: null,
-    label: 'Žiadny',
+    label: 'All',
     value: null
   },
   company: {
     id: null,
-    label: 'Žiadny',
+    label: 'All',
     value: null
   },
   assigned: {
     id: null,
-    label: 'Žiadny',
+    label: 'All',
     value: null
   },
   taskType: {
     id: null,
-    label: 'Žiadny',
+    label: 'All',
     value: null
   },
 

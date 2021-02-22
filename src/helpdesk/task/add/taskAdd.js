@@ -1046,6 +1046,7 @@ export default function TaskAdd( props ) {
         id={company ? company.id : 0}
         showColumns={ [0,1,2,3,4,5,6,7,8] }
         showTotals={false}
+        userID={currentUser.id}
         userRights={userRights}
         isInvoiced={false}
         canEditInvoiced={false}

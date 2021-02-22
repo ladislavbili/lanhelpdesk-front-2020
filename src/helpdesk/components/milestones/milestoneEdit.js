@@ -194,12 +194,12 @@ export default function MilestoneEdit( props ) {
   };
 
   return (
-    <div className='p-l-15 p-r-15'>
+    <div className=''>
 			<Button
-				className='btn-link p-0'
+				className='btn-link p-0 m-r-15'
 				onClick={toggle}
 				>
-				<fa className="fa fa-cog"/>Milestone
+				<fa className="fa fa-cog"/>
 			</Button>
 
         <Modal isOpen={opened}>

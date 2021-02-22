@@ -293,7 +293,7 @@ export default function FilterForm( props ) {
     } else if ( filter.requester === null ) {
       setRequester( emptyFilter.requester );
     } else {
-      setRequester( toSelArr( usersData.basicUsers )
+      setRequester( toSelArr( usersData.basicUsers, "fullName" )
         .find( ( user ) => user.id === filter.requester.id ) );
     }
 
@@ -386,7 +386,7 @@ export default function FilterForm( props ) {
         </div>
       </div>
 
-      <div className=" p-r-15 p-l-15 sidebar-filter">
+      <div className="sidebar-filter">
         <div className="sidebar-filter-row">
           <label htmlFor="example-input-small">Zadal</label>
           <div className="flex">

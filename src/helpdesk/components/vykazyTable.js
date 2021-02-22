@@ -13,10 +13,15 @@ import {
   invisibleSelectStyleNoArrow
 } from 'configs/components/select';
 import Checkbox from 'components/checkbox';
+import {
+  objectToAtributeArray
+} from 'helperFunctions';
+import Switch from "react-switch";
 
 export default function Rozpocet( props ) {
   //data & queries
   const {
+    userID,
     userRights,
     isInvoiced,
     company,
@@ -62,6 +67,12 @@ export default function Rozpocet( props ) {
   //state
   const [ toggleTab, setToggleTab ] = React.useState( defaultTab );
 
+  let defaultAssigned = taskAssigned.length > 0 ? taskAssigned[ 0 ] : null;
+  if ( objectToAtributeArray( taskAssigned, "id" )
+    .includes( userID ) ) {
+    defaultAssigned = taskAssigned.find( assigned => assigned.id === userID );
+  }
+
   //subtasks
   const [ showAddSubtask, setShowAddSubtask ] = React.useState( false );
 
@@ -71,7 +82,7 @@ export default function Rozpocet( props ) {
   const [ focusedSubtask, setFocusedSubtask ] = React.useState( null );
   const [ newSubtaskTitle, setNewSubtaskTitle ] = React.useState( "" );
   const [ newSubtaskType, setNewSubtaskType ] = React.useState( defaultType );
-  const [ newSubtaskAssigned, setNewSubtaskAssigned ] = React.useState( taskAssigned.length > 0 ? taskAssigned[ 0 ] : null );
+  const [ newSubtaskAssigned, setNewSubtaskAssigned ] = React.useState( defaultAssigned );
   const [ newSubtaskQuantity, setNewSubtaskQuantity ] = React.useState( 0 );
   const [ newSubtaskDiscount, setNewSubtaskDiscount ] = React.useState( 0 );
 
@@ -83,7 +94,7 @@ export default function Rozpocet( props ) {
   const [ focusedTrip, setFocusedTrip ] = React.useState( null );
 
   const [ newTripType, setNewTripType ] = React.useState( tripTypes.length > 0 ? tripTypes[ 0 ] : null );
-  const [ newTripAssigned, setNewTripAssigned ] = React.useState( taskAssigned.length > 0 ? taskAssigned[ 0 ] : null );
+  const [ newTripAssigned, setNewTripAssigned ] = React.useState( defaultAssigned );
   const [ newTripQuantity, setNewTripQuantity ] = React.useState( 1 );
   const [ newTripDiscount, setNewTripDiscount ] = React.useState( 0 );
 
@@ -120,8 +131,13 @@ export default function Rozpocet( props ) {
   }, [ company ] )
 
   React.useEffect( () => {
-    setNewSubtaskAssigned( taskAssigned.length > 0 ? taskAssigned[ 0 ] : null );
-    setNewTripAssigned( taskAssigned.length > 0 ? taskAssigned[ 0 ] : null );
+    let defaultAssigned = taskAssigned.length > 0 ? taskAssigned[ 0 ] : null;
+    if ( objectToAtributeArray( taskAssigned, "id" )
+      .includes( userID ) ) {
+      defaultAssigned = taskAssigned.find( assigned => assigned.id === userID );
+    }
+    setNewSubtaskAssigned( defaultAssigned );
+    setNewTripAssigned( defaultAssigned );
   }, [ taskAssigned ] )
 
   React.useEffect( () => {
@@ -261,6 +277,7 @@ export default function Rozpocet( props ) {
             </th>
             {false && showColumns.includes(3) && toggleTab !== "0" && <th width="190">Typ</th> }
             {showColumns.includes(2) && toggleTab !== "0" && <th width="190">Rieši</th> }
+            {<th width="190">Approved</th> }
             {showColumns.includes(4) && <th width="50" className="t-a-r">Mn.</th> }
             {showColumns.includes(5) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Cenník/Nákup</th> }
             {showColumns.includes(6) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Zľava/Marža</th> }
@@ -305,6 +322,7 @@ export default function Rozpocet( props ) {
                   <input
                     disabled={disabled}
                     className="form-control hidden-input"
+                    placeholder="Add note"
                     value={
                       subtask.id === focusedSubtask ?
                       editedSubtaskTitle :
@@ -331,6 +349,20 @@ export default function Rozpocet( props ) {
                     options={taskAssigned}
                     styles={invisibleSelectStyle}
                     />
+                </td>
+              }
+              {/*Approved*/}
+              {<td className="vykazy-approved">
+                <Switch
+                  checked={true}
+                  onChange={ () => {} }
+                  height={16}
+                  width={30}
+                  handleDiameter={12}
+                  checkedIcon={<span className="switchLabel"></span>}
+                  uncheckedIcon={<span className="switchLabel"></span>}
+                  onColor={"#0078D4"} />
+                <span className="m-l-10">Branislav Šusta</span>
                 </td>
               }
               {/*Mnozstvo*/}
@@ -478,10 +510,6 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
-                {/*Type*/}
-                {showColumns.includes(3) &&
-                  <td className="p-t-15 p-l-8">Výjazd</td>
-                }
                 {/*Name*/}
                 {showColumns.includes(1) &&
                   <td>
@@ -496,6 +524,10 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
+                {/*Type*/}
+                {showColumns.includes(3) &&
+                  <td className="p-t-15 p-l-8">Výjazd</td>
+                }
                 {/*Riesi*/}
                 {showColumns.includes(2) &&
                   <td>
@@ -508,6 +540,20 @@ export default function Rozpocet( props ) {
                       options={taskAssigned}
                       styles={invisibleSelectStyle}
                       />
+                  </td>
+                }
+                {/*Approved*/}
+                {<td className="vykazy-approved">
+                  <Switch
+                    checked={true}
+                    onChange={ () => {} }
+                    height={16}
+                    width={30}
+                    handleDiameter={12}
+                    checkedIcon={<span className="switchLabel"></span>}
+                    uncheckedIcon={<span className="switchLabel"></span>}
+                    onColor={"#0078D4"} />
+                  <span className="m-l-10">Branislav Šusta</span>
                   </td>
                 }
                 {/*Mnozstvo*/}
@@ -661,12 +707,6 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
-                {/*Type*/}
-                {showColumns.includes(3) &&
-                  <td className="p-l-8 p-t-15">
-                    Materiál
-                  </td>
-                }
                 {/*Name*/}
                 {showColumns.includes(1) &&
                   <td className="">
@@ -691,9 +731,29 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
+                {/*Type*/}
+                {showColumns.includes(3) &&
+                  <td className="p-l-8 p-t-15">
+                    Materiál
+                  </td>
+                }
                 {/*Riesi*/}
                 {showColumns.includes(2) &&
                   <td></td>
+                }
+                {/*Approved*/}
+                {<td className="vykazy-approved">
+                  <Switch
+                    checked={true}
+                    onChange={ () => {} }
+                    height={16}
+                    width={30}
+                    handleDiameter={12}
+                    checkedIcon={<span className="switchLabel"></span>}
+                    uncheckedIcon={<span className="switchLabel"></span>}
+                    onColor={"#0078D4"} />
+                  <span className="m-l-10">Branislav Šusta</span>
+                  </td>
                 }
                 {/*Mnozstvo*/}
                 {showColumns.includes(4) &&
@@ -874,12 +934,6 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
-                {/*Type*/}
-                {showColumns.includes(3) &&
-                  <td className="p-l-8 p-t-15">
-                    Voľná položka
-                  </td>
-                }
                 {/*Name*/}
                 {showColumns.includes(1) &&
                   <td className="">
@@ -904,9 +958,29 @@ export default function Rozpocet( props ) {
                       />
                   </td>
                 }
+                {/*Type*/}
+                {showColumns.includes(3) &&
+                  <td className="p-l-8 p-t-15">
+                    Voľná položka
+                  </td>
+                }
                 {/*Riesi*/}
                 {showColumns.includes(2) &&
                   <td></td>
+                }
+                {/*Approved*/}
+                {<td className="vykazy-approved">
+                  <Switch
+                    checked={true}
+                    onChange={ () => {} }
+                    height={16}
+                    width={30}
+                    handleDiameter={12}
+                    checkedIcon={<span className="switchLabel"></span>}
+                    uncheckedIcon={<span className="switchLabel"></span>}
+                    onColor={"#0078D4"} />
+                  <span className="m-l-10">Branislav Šusta</span>
+                  </td>
                 }
                 {/*Mnozstvo*/}
                 {showColumns.includes(4) &&
@@ -1022,627 +1096,622 @@ export default function Rozpocet( props ) {
             }
           )}
 
-          {/* ADD Work */}
-          {showAddSubtask && !disabled &&
-            <tr>
-              {/*Type*/}
-              {showColumns.includes(3) && toggleTab !== "0" &&
-                <td colSpan={2} className="p-l-8">{/*typ*/}
-                  <Select
-                    isDisabled={disabled}
-                    value={newSubtaskType}
-                    options={taskTypes}
-                    onChange={(type)=>{
-                      setNewSubtaskType(type)
-                    }}
-                    styles={selectStyle}
-                    />
-                </td>
-              }
-              {/*Name*/}
-              {showColumns.includes(1) &&
-                <td className="p-r-8">
-                  <input
-                    disabled={disabled}
-                    type="text"
-                    className="form-control"
-                    id="inlineFormInput"
-                    placeholder=""
-                    value={newSubtaskTitle}
-                    onKeyPress={(e)=>{
-                      if(
-                        e.key === 'Enter' &&
-                        newSubtaskType !== null &&
-                        newSubtaskAssigned !== null &&
-                        newSubtaskTitle.length > 0
-                      ){
-                        let body={
-                          done:false,
-                          title:newSubtaskTitle,
-                          type: newSubtaskType,
-                          quantity:newSubtaskQuantity!==''?parseInt(newSubtaskQuantity):0,
-                          discount:newSubtaskDiscount!==''?parseInt(newSubtaskDiscount):0,
-                          assignedTo: newSubtaskAssigned,
-                          order:subtasks.length,
-                        }
-
-                        setNewSubtaskTitle('');
-                        setNewSubtaskQuantity(0);
-                        setNewSubtaskDiscount(0);
-                        setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
-                        setShowAddSubtask( false);
-
-                        submitSubtask(body);
-                      }
-                    }}
-                    onChange={(e)=>setNewSubtaskTitle(e.target.value)}
-                    />
-                </td>
-              }
-              {/*Riesi*/}
-              {showColumns.includes(2) && toggleTab !== "0" &&
-                <td className="p-l-8">
-                  <Select
-                    isDisabled={disabled}
-                    value={newSubtaskAssigned}
-                    onChange={(newSubtaskAssigned)=>{
-                      setNewSubtaskAssigned(newSubtaskAssigned);
-                    }}
-                    options={taskAssigned}
-                    styles={invisibleSelectStyleNoArrow}
-                    />
-                </td>
-              }
-              {/*Mnozstvo*/}
-              {showColumns.includes(4) &&
-                <td className="p-l-8 p-r-8">
-                  <input
-                    disabled={disabled}
-                    type="text"
-                    pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-                    value={newSubtaskQuantity.toString()}
-                    onChange={(e)=>setNewSubtaskQuantity(e.target.value.replace(',', '.'))}
-                    className="form-control h-30 t-a-r"
-                    id="inlineFormInput"
-                    placeholder=""
-                    />
-                </td>
-              }
-              {/*Cennik/Nakup*/}
-              {showColumns.includes(5) && toggleTab === "2" &&
-                <td></td>
-              }
-              {/*Zlava/Marža*/}
-              {showColumns.includes(6) && toggleTab === "2" &&
-                <td className="table-highlight-background p-r-8 p-l-8">
-                  <input
-                    disabled={disabled}
-                    type="number"
-                    value={newSubtaskDiscount}
-                    onChange={(e)=>setNewSubtaskDiscount(e.target.value)}
-                    className="form-control input h-30"
-                    id="inlineFormInput"
-                    placeholder=""
-                    />
-                </td>
-              }
-              {/*Cena*/}
-              {showColumns.includes(7) &&
-                <td className="p-t-15 p-l-8 p-r-8 t-a-r font-14">
-                  {
-                    isNaN(getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity }))
-                    ?'No price'
-                    : (getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity })  ).toFixed(2)  + " €"
-                  }
-                </td>
-              }
-              {/*Toolbar*/}
-              {showColumns.includes(8) &&
-                <td className="t-a-r">
-                  <button className="btn btn-link"
-                    disabled={!newSubtaskType || newSubtaskType.id === null || disabled || newSubtaskAssigned===null}
-                    onClick={()=>{
-                      let body={
-                        done:false,
-                        title:newSubtaskTitle,
-                        type: newSubtaskType,
-                        quantity: newSubtaskQuantity !== '' ? parseFloat(newSubtaskQuantity) : 0,
-                        discount:newSubtaskDiscount!==''?newSubtaskDiscount:0,
-                        assignedTo:newSubtaskAssigned,
-                        order:subtasks.length,
-                      }
-
-                      setNewSubtaskTitle('');
-                      setNewSubtaskQuantity(0);
-                      setNewSubtaskDiscount(0);
-                      setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
-                      setShowAddSubtask( false);
-
-                      submitSubtask(body, getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity }));
-                    }}
-                    >
-                    <i className="fa fa-plus" />
-                  </button>
-                  <button className="btn btn-link waves-effect"
-                    disabled={disabled}
-                    onClick={()=>{
-                      setShowAddSubtask(false)
-                    }}
-                    >
-                    <i className="fa fa-times"  />
-                  </button>
-                </td>
-              }
-            </tr>
-          }
-          {/* ADD Trip */}
-          {showAddTrip && !disabled &&
-            <tr>
-              {/*Type*/}
-              {showColumns.includes(3) &&
-                <td colSpan={2} className="p-t-15 p-l-8">Výjazd</td>
-              }
-              {/*Name*/}
-              {showColumns.includes(1) &&
-                <td className="p-r-8">
-                  <Select
-                    isDisabled={disabled}
-                    value={newTripType}
-                    onChange={(newTripType)=>{
-                      setNewTripType(newTripType)
-                    }}
-                    options={tripTypes}
-                    styles={selectStyle}
-                    />
-                </td>
-              }
-              {/*Riesi*/}
-              {showColumns.includes(2) &&
-                <td className="p-l-8">
-                  <Select
-                    isDisabled={disabled}
-                    value={newTripAssigned}
-                    onChange={(newTripAssigned)=>{
-                      setNewTripAssigned(newTripAssigned)
-                    }}
-                    options={taskAssigned}
-                    styles={invisibleSelectStyleNoArrow}
-                    />
-                </td>
-              }
-              {/*Mnozstvo*/}
-              {showColumns.includes(4) &&
-                <td className="p-l-8 p-r-8">
-                  <input
-                    disabled={disabled}
-                    type="text"
-                    pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-                    value={newTripQuantity.toString()}
-                    onChange={(e)=>setNewTripQuantity(e.target.value.replace(',', '.'))}
-                    className="form-control h-30 t-a-r"
-                    id="inlineFormInput"
-                    placeholder="Quantity"
-                    />
-                </td>
-              }
-              {/*Cennik/Nakup*/}
-              {showColumns.includes(5) && toggleTab === "2" &&
-                <td></td>
-              }
-              {/*Zlava/Marža*/}
-              {showColumns.includes(6) && toggleTab === "2" &&
-                <td className="table-highlight-background p-l-8 p-r-8">
-                  <input
-                    disabled={disabled}
-                    type="number"
-                    value={newTripDiscount}
-                    onChange={(e)=>setNewTripDiscount(e.target.value)}
-                    className="form-control h-30"
-                    id="inlineFormInput"
-                    placeholder="Discount"
-                    />
-                </td>
-              }
-              {/*Cena*/}
-              {showColumns.includes(7) &&
-                <td className="p-t-15 p-l-8 p-r-8 t-a-r font-14">
-                  {
-                    isNaN(getTotalDiscountedPrice({discount:newTripDiscount,quantity:newTripQuantity,type:newTripType})) ?
-                    'No price' :
-                    (getTotalDiscountedPrice({discount:newTripDiscount,quantity:newTripQuantity,type:newTripType}) ).toFixed(2) + " €"
-                  }
-                </td>
-              }
-              {/*Toolbar*/}
-              {showColumns.includes(8) &&
-                <td className="t-a-r">
-                  <button className="btn btn-link"
-                    disabled={newTripType===null||isNaN(parseInt(newTripQuantity))||disabled|| newTripAssigned===null}
-                    onClick={()=>{
-                      let body={
-                        type:newTripType,
-                        assignedTo: newTripAssigned,
-                        quantity: newTripQuantity !== '' ? parseFloat(newTripQuantity) : 0,
-                        discount: newTripDiscount!==''?newTripDiscount:0,
-                        done: false,
-                        order: workTrips.length,
-                      }
-
-                      setNewTripAssigned(taskAssigned.length>0?taskAssigned[0]:null);
-                      setNewTripQuantity(1);
-                      setNewTripDiscount(0);
-                      setShowAddTrip(false);
-
-                      submitTrip(body, getTotalDiscountedPrice({discount:newTripDiscount,quantity:newTripQuantity,type:newTripType}));
-                    }}
-                    >
-                    <i className="fa fa-plus" />
-                  </button>
-                  <button className="btn btn-link waves-effect"
-                    disabled={disabled}
-                    onClick={()=>{
-                      setShowAddTrip(false);
-                      setShowAddSubtask(false);
-                    }}>
-                    <i className="fa fa-times"  />
-                  </button>
-                </td>
-              }
-            </tr>
-          }
-          {/* ADD Material */}
-          {showAddMaterial && !disabled &&
-            <tr>
-              {/*Name*/}
-              {showColumns.includes(1) &&
-                <td  colSpan={2} className="p-r-8">
-                  <input
-                    disabled={disabled}
-                    type="text"
-                    className="form-control h-30"
-                    id="inlineFormInput"
-                    placeholder=""
-                    value={newMaterialTitle}
-                    onChange={(e)=>setNewMaterialTitle(e.target.value)}
-                    />
-                </td>
-              }
-              {/*Input Nakupna cena*/}
-              {showColumns.includes(3) &&
-                <td className="p-t-15 p-l-8">
-                  Materiál
-                </td>
-              }
-              {/*Text Nakupna cena*/}
-              {showColumns.includes(2) &&
-                <td className="p-r-8 p-l-8 table-highlight-background">
-                  {
-                    toggleTab === '1' &&
-                    <div className="row">
-                      <div className="w-50 center-hor">
-                        Nákupná cena
-                      </div>
-                      <div className="w-50">
-                        <input
-                          disabled={disabled}
-                          type="number"
-                          value={newMaterialPrice}
-                          onChange={(e)=>{
-                            let newMaterialPrice = e.target.value;
-                            if(!marginChanged){
-                              if(newMaterialPrice==='' || parseFloat(newMaterialPrice) < 50 ){
-                                let newMaterialMargin = (company && company.pricelist ? company.pricelist.materialMargin : 0);
-                                setNewMaterialPrice(newMaterialPrice);
-                                setNewDiscountedMaterialPrice(getDiscountedMaterialPrice({price: newMaterialPrice, margin: newMaterialMargin}).toFixed(2));
-                                setNewMaterialMargin(newMaterialMargin);
-                              }else{
-                                let newMaterialMargin = (company && company.pricelist ? company.pricelist.materialMarginExtra : 0);
-                                setNewMaterialPrice(newMaterialPrice);
-                                setNewDiscountedMaterialPrice(getDiscountedMaterialPrice({price: newMaterialPrice, margin: newMaterialMargin}).toFixed(2));
-                                setNewMaterialMargin(newMaterialMargin);
-                              }
-                            }else{
-                              setNewMaterialPrice(newMaterialPrice);
-                              setNewDiscountedMaterialPrice(getDiscountedMaterialPrice({price: newMaterialPrice, margin: newMaterialMargin}).toFixed(2));
-                            }
-                          }}
-                          className="form-control h-30"
-                          id="inlineFormInput"
-                          placeholder="Nákupná cena"
-                          />
-                      </div>
-                    </div>
-                  }
-                </td>
-              }
-              {/*Mnozstvo*/}
-              {showColumns.includes(4) &&
-                <td className="p-r-8 p-l-8">
-                  <input
-                    disabled={disabled}
-                    type="text"
-                    pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-                    value={newMaterialQuantity.toString()}
-                    onChange={(e)=>setNewMaterialQuantity(e.target.value.replace(',', '.') )}
-                    className="form-control h-30 t-a-r"
-                    id="inlineFormInput"
-                    placeholder=""
-                    />
-                </td>
-              }
-              {/*Cennik/Nakup*/}
-              {showColumns.includes(5) && toggleTab === "2" &&
-                <td className="table-highlight-background p-l-8 p-r-8">
-                  <input
-                    disabled={disabled}
-                    type="number"
-                    value={newMaterialPrice}
-                    onChange={(e)=>{
-                      let newMaterialPrice = e.target.value;
-                      if(!marginChanged){
-                        if(newMaterialPrice==='' || parseFloat(newMaterialPrice) < 50 ){
-                          setNewMaterialPrice(newMaterialPrice);
-                          setNewMaterialMargin(company && company.pricelist ? company.pricelist.materialMargin : 0);
-                        }else{
-                          setNewMaterialPrice(newMaterialPrice);
-                          setNewMaterialMargin(company && company.pricelist ? company.pricelist.materialMarginExtra : 0);
-                        }
-                      }else{
-                        setNewMaterialPrice(newMaterialPrice);
-                      }
-                    }}
-                    className="form-control h-30"
-                    id="inlineFormInput"
-                    placeholder=""
-                    />
-                </td>
-              }
-              {/*Zlava/Marža*/}
-              {showColumns.includes(6) && toggleTab === "2" &&
-                <td className="table-highlight-background p-r-8">
-                  <input
-                    disabled={disabled}
-                    type="number"
-                    value={newMaterialMargin}
-                    onChange={(e)=> {
-                      setNewMaterialMargin(e.target.value);
-                      setMarginChanged(true);
-                    }}
-                    className="form-control h-30"
-                    id="inlineFormInput"
-                    placeholder=""
-                    />
-                </td>
-              }
-              {/*Cena*/}
-              {showColumns.includes(7) &&
-                <td className="p-l-8 p-r-8 t-a-r">
-                  <input
-                    disabled={disabled}
-                    type="number"
-                    value={newDiscountedMaterialPrice}
-                    onChange={(e)=>{
-                      let newDiscountedMaterialPrice = e.target.value;
-
-                      if(!marginChanged){
-                        let newMaterialMargin = (company && company.pricelist ? company.pricelist.materialMargin : 0);
-                        let basicMaterialPrice = getBasicMaterialPrice({price: newDiscountedMaterialPrice, margin: newMaterialMargin});
-
-                        if(newDiscountedMaterialPrice === '' || parseFloat(basicMaterialPrice) > 50 ){
-                          newMaterialMargin = (company && company.pricelist ? company.pricelist.materialMarginExtra : 0);
-                          setNewMaterialPrice( getBasicMaterialPrice({price: newDiscountedMaterialPrice, margin: newMaterialMargin}) );
-                          setNewDiscountedMaterialPrice(newDiscountedMaterialPrice);
-                          setNewMaterialMargin(newMaterialMargin);
-
-                        }else{
-                          setNewMaterialPrice( basicMaterialPrice );
-                          setNewDiscountedMaterialPrice(newDiscountedMaterialPrice);
-                          setNewMaterialMargin(newMaterialMargin);
-                        }
-
-                      }else{
-                        setNewMaterialPrice(getBasicMaterialPrice({price: newDiscountedMaterialPrice, margin:newMaterialMargin}));
-                        setNewDiscountedMaterialPrice(newDiscountedMaterialPrice);
-                      }
-                    }}
-                    className="form-control h-30"
-                    id="inlineFormInput"
-                    placeholder="Cena"
-                    />
-                </td>
-              }
-              {/*Toolbar*/}
-              {showColumns.includes(8) &&
-                <td className="t-a-r">
-                  <button className="btn btn-link"
-                    disabled={disabled}
-                    onClick={()=>{
-                      let body={
-                        margin:newMaterialMargin!==''?parseFloat(newMaterialMargin):0,
-                        price:newMaterialPrice!==''?newMaterialPrice:0,
-                        quantity:newMaterialQuantity!==''? parseFloat(newMaterialQuantity) :0,
-                        title:newMaterialTitle,
-                        done:false,
-                        order: materials.length,
-                      }
-                      setShowAddMaterial( false);
-                      setNewMaterialTitle('');
-                      setNewMaterialQuantity(1);
-                      setNewMaterialMargin(0);
-                      setNewMaterialPrice(0);
-                      setMarginChanged(false);
-
-                      submitMaterial(body);
-                    }}
-                    >
-                    <i className="fa fa-plus" />
-                  </button>
-                  <button className="btn btn-link waves-effect"
-                    disabled={disabled}
-                    onClick={()=>{
-                      setShowAddMaterial(false)
-                    }}>
-                    <i className="fa fa-times"  />
-                  </button>
-                </td>
-              }
-            </tr>
-          }
-          {/* ADD Custom item */}
-          {showAddCustomItem && !disabled &&
-            <tr>
-              {/*Type*/}
-              {showColumns.includes(3) &&
-                <td colSpan={2} className="p-t-15 p-l-8">
-                  Voľná položka
-                </td>
-              }
-              {/*Name*/}
-              {showColumns.includes(1) &&
-                <td className="p-r-8">
-                  <input
-                    disabled={disabled}
-                    type="text"
-                    className="form-control h-30"
-                    id="inlineFormInput"
-                    placeholder=""
-                    value={newCustomItemTitle}
-                    onChange={(e)=>setNewCustomItemTitle(e.target.value)}
-                    />
-                </td>
-              }
-              {/*Riesi */}
-              {showColumns.includes(2) &&
-                <td></td>
-              }
-              {/*Mnozstvo*/}
-              {showColumns.includes(4) &&
-                <td className="p-r-8 p-l-8">
-                  <input
-                    disabled={disabled}
-                    type="text"
-                    pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-                    value={newCustomItemQuantity.toString()}
-                    onChange={(e)=>setNewCustomItemQuantity(e.target.value.replace(',', '.'))}
-                    className="form-control h-30 t-a-r"
-                    id="inlineFormInput"
-                    placeholder=""
-                    />
-                </td>
-              }
-              {/*Cennik/Nakup*/}
-              {showColumns.includes(5) && toggleTab === "2" &&
-                <td className="table-highlight-background p-l-8 p-r-8">
-                </td>
-              }
-              {/*Zlava/Marža*/}
-              {showColumns.includes(6) && toggleTab === "2" &&
-                <td className="table-highlight-background">
-                </td>
-              }
-              {/*Cena*/}
-              {showColumns.includes(7) &&
-                <td className="p-l-8 p-r-8 t-a-r">
-                  <input
-                    disabled={disabled}
-                    type="number"
-                    value={newCustomItemPrice}
-                    onChange={(e)=>{
-                      let newCustomItemPrice = e.target.value;
-                      setNewCustomItemPrice(newCustomItemPrice);
-                    }}
-                    className="form-control h-30"
-                    id="inlineFormInput"
-                    placeholder=""
-                    />
-                </td>
-              }
-              {/*Toolbar*/}
-              {showColumns.includes(8) &&
-                <td className="t-a-r">
-                  <button className="btn btn-link"
-                    disabled={disabled}
-                    onClick={()=>{
-                      let body={
-                        price:newCustomItemPrice!==''?newCustomItemPrice:0,
-                        quantity:newCustomItemQuantity!==''? parseFloat(newCustomItemQuantity):0,
-                        title:newCustomItemTitle,
-                        done:false,
-                        order:customItems.length,
-                      }
-                      setNewCustomItemPrice(0);
-                      setNewCustomItemQuantity(1);
-                      setNewCustomItemTitle('');
-                      setShowAddCustomItem( false);
-                      submitCustomItem(body);
-                    }}
-                    >
-                    <i className="fa fa-plus" />
-                  </button>
-                  <button className="btn btn-link waves-effect"
-                    disabled={disabled}
-                    onClick={()=>{
-                      setShowAddCustomItem(false)
-                    }}>
-                    <i className="fa fa-times"  />
-                  </button>
-                </td>
-              }
-            </tr>
-          }
-          {/* ADD Buttons */}
-          {!showAddSubtask && !showAddTrip && !showAddMaterial && !showAddCustomItem && !disabled &&
-            <tr>
-              <td colSpan={(toggleTab === '1' ? 8 : 10)}>
-                {!showAddSubtask &&
-                  <button className="btn btn-link waves-effect"
-                    disabled={disabled}
-                    onClick={()=>{
-                      setShowAddSubtask(true);
-                    }}
-                    >
-                    <i className="fa fa-plus" />
-                    Práca
-                  </button>
-                }
-                {!showAddTrip && !showSubtasks &&
-                  <button className="btn btn-link waves-effect"
-                    disabled={disabled}
-                    onClick={()=>{
-                      setShowAddTrip(true);
-                    }}
-                    >
-                    <i className="fa fa-plus" />
-                    Výjazd
-                  </button>
-                }
-                {!showAddMaterial && !showSubtasks &&
-                  <button className="btn btn-link waves-effect"
-                    disabled={disabled}
-                    onClick={()=>{
-                      setShowAddMaterial(true);
-                    }}
-                    >
-                    <i className="fa fa-plus" />
-                    Materiál
-                  </button>
-                }
-                {!showAddCustomItem && !showSubtasks &&
-                  <button className="btn btn-link waves-effect"
-                    disabled={disabled}
-                    onClick={()=>{
-                      setShowAddCustomItem(true);
-                    }}
-                    >
-                    <i className="fa fa-plus" />
-                    Vlastná položka
-                  </button>
-                }
-              </td>
-            </tr>
-          }
         </tbody>
       </table>
+
+      <div className="add-buttons">
+      {/* ADD Work */}
+      {showAddSubtask && !disabled &&
+        <div className="row">
+          <div className="m-r-10 center-hor add-title">Add subtask</div>
+          {/*Type*/}
+          {false && showColumns.includes(3) && toggleTab !== "0" &&
+            <div className="w-20 m-r-10">{/*typ*/}
+              <Select
+                isDisabled={disabled}
+                value={newSubtaskType}
+                options={taskTypes}
+                onChange={(type)=>{
+                  setNewSubtaskType(type)
+                }}
+                styles={selectStyle}
+                />
+            </div>
+          }
+          {/*Name*/}
+          { false && showColumns.includes(1) &&
+            <div className="p-r-8">
+              <input
+                disabled={disabled}
+                type="text"
+                className="form-control"
+                id="inlineFormInput"
+                placeholder=""
+                value={newSubtaskTitle}
+                onKeyPress={(e)=>{
+                  if(
+                    e.key === 'Enter' &&
+                    newSubtaskType !== null &&
+                    newSubtaskAssigned !== null &&
+                    newSubtaskTitle.length > 0
+                  ){
+                    let body={
+                      done:false,
+                      title:newSubtaskTitle,
+                      type: newSubtaskType,
+                      quantity:newSubtaskQuantity!==''?parseInt(newSubtaskQuantity):0,
+                      discount:newSubtaskDiscount!==''?parseInt(newSubtaskDiscount):0,
+                      assignedTo: newSubtaskAssigned,
+                      order:subtasks.length,
+                    }
+
+                    setNewSubtaskTitle('');
+                    setNewSubtaskQuantity(0);
+                    setNewSubtaskDiscount(0);
+                    setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
+                    setShowAddSubtask( false);
+
+                    submitSubtask(body);
+                  }
+                }}
+                onChange={(e)=>setNewSubtaskTitle(e.target.value)}
+                />
+            </div>
+          }
+          {/*Riesi*/}
+          { false && showColumns.includes(2) && toggleTab !== "0" &&
+            <div className="p-l-8">
+              <Select
+                isDisabled={disabled}
+                value={newSubtaskAssigned}
+                onChange={(newSubtaskAssigned)=>{
+                  setNewSubtaskAssigned(newSubtaskAssigned);
+                }}
+                options={taskAssigned}
+                styles={invisibleSelectStyleNoArrow}
+                />
+            </div>
+          }
+          {/*Mnozstvo*/}
+          {showColumns.includes(4) &&
+            <div className="p-l-8 p-r-8 w-10">
+              <input
+                disabled={disabled}
+                type="text"
+                pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
+                value={newSubtaskQuantity.toString()}
+                onChange={(e)=>setNewSubtaskQuantity(e.target.value.replace(',', '.'))}
+                className="form-control h-30 t-a-r"
+                id="inlineFormInput"
+                placeholder=""
+                />
+            </div>
+          }
+            <div className="m-r-10 center-hor">hod.</div>
+          {/*Cennik/Nakup*/}
+          { false && showColumns.includes(5) && toggleTab === "2" &&
+            <div></div>
+          }
+          {/*Zlava/Marža*/}
+          {false && showColumns.includes(6) && toggleTab === "2" &&
+            <div className="p-r-8 p-l-8">
+              <input
+                disabled={disabled}
+                type="number"
+                value={newSubtaskDiscount}
+                onChange={(e)=>setNewSubtaskDiscount(e.target.value)}
+                className="form-control input h-30"
+                id="inlineFormInput"
+                placeholder=""
+                />
+            </div>
+          }
+          {/*Cena*/}
+          {false && showColumns.includes(7) &&
+            <div className="p-t-15 p-l-8 p-r-8 t-a-r font-14">
+              {
+                isNaN(getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity }))
+                ?'No price'
+                : (getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity })  ).toFixed(2)  + " €"
+              }
+            </div>
+          }
+          {/*Toolbar*/}
+          {showColumns.includes(8) &&
+            <div className="t-a-r">
+              <button className="btn btn-red-link m-r-0"
+                disabled={disabled}
+                onClick={()=>{
+                  setShowAddSubtask(false)
+                }}
+                >
+                <i className="fa fa-times"  />
+              </button>
+              <button className="btn"
+                disabled={!newSubtaskType || newSubtaskType.id === null || disabled || newSubtaskAssigned===null}
+                onClick={()=>{
+                  let body={
+                    done:false,
+                    title:newSubtaskTitle,
+                    type: newSubtaskType,
+                    quantity: newSubtaskQuantity !== '' ? parseFloat(newSubtaskQuantity) : 0,
+                    discount:newSubtaskDiscount!==''?newSubtaskDiscount:0,
+                    assignedTo:newSubtaskAssigned,
+                    order:subtasks.length,
+                  }
+
+                  setNewSubtaskTitle('');
+                  setNewSubtaskQuantity(0);
+                  setNewSubtaskDiscount(0);
+                  setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
+                  setShowAddSubtask( false);
+
+                  submitSubtask(body, getTotalDiscountedPrice({discount: newSubtaskDiscount, type: newSubtaskType, quantity: newSubtaskQuantity }));
+                }}
+                >
+                <i className="fa fa-plus p-r-0" />
+              </button>
+            </div>
+          }
+        </div>
+      }
+      {/* ADD Trip */}
+      {showAddTrip && !disabled &&
+        <div className="row">
+          <div className="m-r-10 center-hor add-title">Add trip</div>
+          {/*Name*/}
+          {showColumns.includes(1) &&
+            <div className="m-r-10 w-20">
+              <Select
+                isDisabled={disabled}
+                value={newTripType}
+                onChange={(newTripType)=>{
+                  setNewTripType(newTripType)
+                }}
+                options={tripTypes}
+                styles={selectStyle}
+                />
+            </div>
+          }
+          {/*Riesi*/}
+          {false && showColumns.includes(2) &&
+            <div className="p-l-8">
+              <Select
+                isDisabled={disabled}
+                value={newTripAssigned}
+                onChange={(newTripAssigned)=>{
+                  setNewTripAssigned(newTripAssigned)
+                }}
+                options={taskAssigned}
+                styles={invisibleSelectStyleNoArrow}
+                />
+            </div>
+          }
+          {/*Mnozstvo*/}
+          {showColumns.includes(4) &&
+            <div className="p-l-8 m-r-8 w-10 row">
+                <input
+                  disabled={disabled}
+                  type="text"
+                  pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
+                  value={newTripQuantity.toString()}
+                  onChange={(e)=>setNewTripQuantity(e.target.value.replace(',', '.'))}
+                  className="form-control h-30 t-a-r"
+                  id="inlineFormInput"
+                  placeholder="Quantity"
+                  />
+            </div>
+          }
+          <div className="center-hor m-r-10">ks</div>
+          {/*Cennik/Nakup*/}
+          {false && showColumns.includes(5) && toggleTab === "2" &&
+            <div></div>
+          }
+          {/*Zlava/Marža*/}
+          {false && showColumns.includes(6) && toggleTab === "2" &&
+            <div className="table-highlight-background p-l-8 p-r-8">
+              <input
+                disabled={disabled}
+                type="number"
+                value={newTripDiscount}
+                onChange={(e)=>setNewTripDiscount(e.target.value)}
+                className="form-control h-30"
+                id="inlineFormInput"
+                placeholder="Discount"
+                />
+            </div>
+          }
+          {/*Cena*/}
+          {false && showColumns.includes(7) &&
+            <div className="p-t-15 p-l-8 p-r-8 t-a-r font-14">
+              {
+                isNaN(getTotalDiscountedPrice({discount:newTripDiscount,quantity:newTripQuantity,type:newTripType})) ?
+                'No price' :
+                (getTotalDiscountedPrice({discount:newTripDiscount,quantity:newTripQuantity,type:newTripType}) ).toFixed(2) + " €"
+              }
+            </div>
+          }
+          {/*Toolbar*/}
+          {showColumns.includes(8) &&
+            <div className="t-a-r">
+              <button className="btn btn-red-link m-r-0"
+                disabled={disabled}
+                onClick={()=>{
+                  setShowAddTrip(false);
+                  setShowAddSubtask(false);
+                }}>
+                <i className="fa fa-times"  />
+              </button>
+              <button className="btn"
+                disabled={newTripType===null||isNaN(parseInt(newTripQuantity))||disabled|| newTripAssigned===null}
+                onClick={()=>{
+                  let body={
+                    type:newTripType,
+                    assignedTo: newTripAssigned,
+                    quantity: newTripQuantity !== '' ? parseFloat(newTripQuantity) : 0,
+                    discount: newTripDiscount!==''?newTripDiscount:0,
+                    done: false,
+                    order: workTrips.length,
+                  }
+
+                  setNewTripAssigned(taskAssigned.length>0?taskAssigned[0]:null);
+                  setNewTripQuantity(1);
+                  setNewTripDiscount(0);
+                  setShowAddTrip(false);
+
+                  submitTrip(body, getTotalDiscountedPrice({discount:newTripDiscount,quantity:newTripQuantity,type:newTripType}));
+                }}
+                >
+                <i className="fa fa-plus p-r-0" />
+              </button>
+            </div>
+          }
+        </div>
+      }
+      {/* ADD Material */}
+      {showAddMaterial && !disabled &&
+        <div className="row">
+          <div className="m-r-10 center-hor add-title">Add material</div>
+          {/*Name*/}
+          {showColumns.includes(1) &&
+            <div className="m-r-8 w-20">
+              <input
+                disabled={disabled}
+                type="text"
+                className="form-control h-30"
+                id="inlineFormInput"
+                placeholder=""
+                value={newMaterialTitle}
+                onChange={(e)=>setNewMaterialTitle(e.target.value)}
+                />
+            </div>
+          }
+          {/*Input Nakupna cena*/}
+          {false && showColumns.includes(3) &&
+            <div className="p-t-15 p-l-8">
+              Materiál
+            </div>
+          }
+          {/*Mnozstvo*/}
+          {showColumns.includes(4) &&
+            <div className="m-r-10 p-l-8 w-10">
+              <input
+                disabled={disabled}
+                type="text"
+                pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
+                value={newMaterialQuantity.toString()}
+                onChange={(e)=>setNewMaterialQuantity(e.target.value.replace(',', '.') )}
+                className="form-control h-30 t-a-r"
+                id="inlineFormInput"
+                placeholder=""
+                />
+            </div>
+          }
+          <div className="m-r-10 center-hor">ks</div>
+          {/*Text Nakupna cena*/}
+          {false && showColumns.includes(2) &&
+            <div className="p-r-8 p-l-8">
+                    <input
+                      disabled={disabled}
+                      type="number"
+                      value={newMaterialPrice}
+                      onChange={(e)=>{
+                        let newMaterialPrice = e.target.value;
+                        if(!marginChanged){
+                          if(newMaterialPrice==='' || parseFloat(newMaterialPrice) < 50 ){
+                            let newMaterialMargin = (company && company.pricelist ? company.pricelist.materialMargin : 0);
+                            setNewMaterialPrice(newMaterialPrice);
+                            setNewDiscountedMaterialPrice(getDiscountedMaterialPrice({price: newMaterialPrice, margin: newMaterialMargin}).toFixed(2));
+                            setNewMaterialMargin(newMaterialMargin);
+                          }else{
+                            let newMaterialMargin = (company && company.pricelist ? company.pricelist.materialMarginExtra : 0);
+                            setNewMaterialPrice(newMaterialPrice);
+                            setNewDiscountedMaterialPrice(getDiscountedMaterialPrice({price: newMaterialPrice, margin: newMaterialMargin}).toFixed(2));
+                            setNewMaterialMargin(newMaterialMargin);
+                          }
+                        }else{
+                          setNewMaterialPrice(newMaterialPrice);
+                          setNewDiscountedMaterialPrice(getDiscountedMaterialPrice({price: newMaterialPrice, margin: newMaterialMargin}).toFixed(2));
+                        }
+                      }}
+                      className="form-control h-30"
+                      id="inlineFormInput"
+                      placeholder="Nákupná cena"
+                      />
+            </div>
+          }
+
+          {/*Cennik/Nakup*/}
+          {false && showColumns.includes(5) && toggleTab === "2" &&
+            <div className="table-highlight-background p-l-8 p-r-8">
+              <input
+                disabled={disabled}
+                type="number"
+                value={newMaterialPrice}
+                onChange={(e)=>{
+                  let newMaterialPrice = e.target.value;
+                  if(!marginChanged){
+                    if(newMaterialPrice==='' || parseFloat(newMaterialPrice) < 50 ){
+                      setNewMaterialPrice(newMaterialPrice);
+                      setNewMaterialMargin(company && company.pricelist ? company.pricelist.materialMargin : 0);
+                    }else{
+                      setNewMaterialPrice(newMaterialPrice);
+                      setNewMaterialMargin(company && company.pricelist ? company.pricelist.materialMarginExtra : 0);
+                    }
+                  }else{
+                    setNewMaterialPrice(newMaterialPrice);
+                  }
+                }}
+                className="form-control h-30"
+                id="inlineFormInput"
+                placeholder=""
+                />
+            </div>
+          }
+          {/*Zlava/Marža*/}
+          {false && showColumns.includes(6) && toggleTab === "2" &&
+            <div className="p-r-8">
+              <input
+                disabled={disabled}
+                type="number"
+                value={newMaterialMargin}
+                onChange={(e)=> {
+                  setNewMaterialMargin(e.target.value);
+                  setMarginChanged(true);
+                }}
+                className="form-control h-30"
+                id="inlineFormInput"
+                placeholder=""
+                />
+            </div>
+          }
+          {/*Cena*/}
+          {showColumns.includes(7) &&
+            <div className="p-l-8 m-r-8 t-a-r w-10">
+              <input
+                disabled={disabled}
+                type="number"
+                value={newDiscountedMaterialPrice}
+                onChange={(e)=>{
+                  let newDiscountedMaterialPrice = e.target.value;
+
+                  if(!marginChanged){
+                    let newMaterialMargin = (company && company.pricelist ? company.pricelist.materialMargin : 0);
+                    let basicMaterialPrice = getBasicMaterialPrice({price: newDiscountedMaterialPrice, margin: newMaterialMargin});
+
+                    if(newDiscountedMaterialPrice === '' || parseFloat(basicMaterialPrice) > 50 ){
+                      newMaterialMargin = (company && company.pricelist ? company.pricelist.materialMarginExtra : 0);
+                      setNewMaterialPrice( getBasicMaterialPrice({price: newDiscountedMaterialPrice, margin: newMaterialMargin}) );
+                      setNewDiscountedMaterialPrice(newDiscountedMaterialPrice);
+                      setNewMaterialMargin(newMaterialMargin);
+
+                    }else{
+                      setNewMaterialPrice( basicMaterialPrice );
+                      setNewDiscountedMaterialPrice(newDiscountedMaterialPrice);
+                      setNewMaterialMargin(newMaterialMargin);
+                    }
+
+                  }else{
+                    setNewMaterialPrice(getBasicMaterialPrice({price: newDiscountedMaterialPrice, margin:newMaterialMargin}));
+                    setNewDiscountedMaterialPrice(newDiscountedMaterialPrice);
+                  }
+                }}
+                className="form-control h-30"
+                id="inlineFormInput"
+                placeholder="Cena"
+                />
+            </div>
+          }
+          <div className="m-r-10 center-hor">cena/ks</div>
+          {/*Toolbar*/}
+          {showColumns.includes(8) &&
+            <div className="t-a-r">
+              <button className="btn btn-red-link m-r-0"
+                disabled={disabled}
+                onClick={()=>{
+                  setShowAddMaterial(false)
+                }}>
+                <i className="fa fa-times"  />
+              </button>
+              <button className="btn"
+                disabled={disabled}
+                onClick={()=>{
+                  let body={
+                    margin:newMaterialMargin!==''?parseFloat(newMaterialMargin):0,
+                    price:newMaterialPrice!==''?newMaterialPrice:0,
+                    quantity:newMaterialQuantity!==''? parseFloat(newMaterialQuantity) :0,
+                    title:newMaterialTitle,
+                    done:false,
+                    order: materials.length,
+                  }
+                  setShowAddMaterial( false);
+                  setNewMaterialTitle('');
+                  setNewMaterialQuantity(1);
+                  setNewMaterialMargin(0);
+                  setNewMaterialPrice(0);
+                  setMarginChanged(false);
+
+                  submitMaterial(body);
+                }}
+                >
+                <i className="fa fa-plus p-r-0" />
+              </button>
+            </div>
+          }
+        </div>
+      }
+      {/* ADD Custom item */}
+      {showAddCustomItem && !disabled &&
+        <div className="row">
+        <div className="m-r-10 center-hor add-title">Add custom item</div>
+          {/*Name*/}
+          {showColumns.includes(1) &&
+            <div className="m-r-10 w-20">
+              <input
+                disabled={disabled}
+                type="text"
+                className="form-control h-30"
+                id="inlineFormInput"
+                placeholder=""
+                value={newCustomItemTitle}
+                onChange={(e)=>setNewCustomItemTitle(e.target.value)}
+                />
+            </div>
+          }
+          {/*Riesi */}
+          { false && showColumns.includes(2) &&
+            <div></div>
+          }
+          {/*Mnozstvo*/}
+          {showColumns.includes(4) &&
+            <div className="p-r-8 p-l-8 w-10">
+              <input
+                disabled={disabled}
+                type="text"
+                pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
+                value={newCustomItemQuantity.toString()}
+                onChange={(e)=>setNewCustomItemQuantity(e.target.value.replace(',', '.'))}
+                className="form-control h-30 t-a-r"
+                id="inlineFormInput"
+                placeholder=""
+                />
+            </div>
+          }
+          <div className="m-r-10 center-hor">ks</div>
+          {/*Cennik/Nakup*/}
+          {false && showColumns.includes(5) && toggleTab === "2" &&
+            <div className="table-highlight-background p-l-8 p-r-8">
+            </div>
+          }
+          {/*Zlava/Marža*/}
+          {false && showColumns.includes(6) && toggleTab === "2" &&
+            <div className="table-highlight-background">
+            </div>
+          }
+          {/*Cena*/}
+          {showColumns.includes(7) &&
+            <div className="p-l-8 m-r-10 t-a-r w-10">
+              <input
+                disabled={disabled}
+                type="number"
+                value={newCustomItemPrice}
+                onChange={(e)=>{
+                  let newCustomItemPrice = e.target.value;
+                  setNewCustomItemPrice(newCustomItemPrice);
+                }}
+                className="form-control h-30"
+                id="inlineFormInput"
+                placeholder=""
+                />
+            </div>
+          }
+          <div className="m-r-10 center-hor">cena/ks</div>
+          {/*Toolbar*/}
+          {showColumns.includes(8) &&
+            <div className="t-a-r">
+              <button className="btn btn-red-link m-r-0"
+                disabled={disabled}
+                onClick={()=>{
+                  setShowAddCustomItem(false)
+                }}>
+                <i className="fa fa-times"  />
+              </button>
+              <button className="btn"
+                disabled={disabled}
+                onClick={()=>{
+                  let body={
+                    price:newCustomItemPrice!==''?newCustomItemPrice:0,
+                    quantity:newCustomItemQuantity!==''? parseFloat(newCustomItemQuantity):0,
+                    title:newCustomItemTitle,
+                    done:false,
+                    order:customItems.length,
+                  }
+                  setNewCustomItemPrice(0);
+                  setNewCustomItemQuantity(1);
+                  setNewCustomItemTitle('');
+                  setShowAddCustomItem( false);
+                  submitCustomItem(body);
+                }}
+                >
+                <i className="fa fa-plus p-r-0" />
+              </button>
+            </div>
+          }
+        </div>
+      }
+      {/* ADD Buttons */}
+      {!showAddSubtask && !showAddTrip && !showAddMaterial && !showAddCustomItem && !disabled &&
+        <tr>
+          <td colSpan={(toggleTab === '1' ? 8 : 10)}>
+            {!showAddSubtask &&
+              <button className="btn btn-link waves-effect"
+                disabled={disabled}
+                onClick={()=>{
+                  setShowAddSubtask(true);
+                }}
+                >
+                <i className="fa fa-plus" />
+                Práca
+              </button>
+            }
+            {!showAddTrip && !showSubtasks &&
+              <button className="btn btn-link waves-effect"
+                disabled={disabled}
+                onClick={()=>{
+                  setShowAddTrip(true);
+                }}
+                >
+                <i className="fa fa-plus" />
+                Výjazd
+              </button>
+            }
+            {!showAddMaterial && !showSubtasks &&
+              <button className="btn btn-link waves-effect"
+                disabled={disabled}
+                onClick={()=>{
+                  setShowAddMaterial(true);
+                }}
+                >
+                <i className="fa fa-plus" />
+                Materiál
+              </button>
+            }
+            {!showAddCustomItem && !showSubtasks &&
+              <button className="btn btn-link waves-effect"
+                disabled={disabled}
+                onClick={()=>{
+                  setShowAddCustomItem(true);
+                }}
+                >
+                <i className="fa fa-plus" />
+                Vlastná položka
+              </button>
+            }
+          </td>
+        </tr>
+      }
+      </div>
+
       {/* Statistics */}
       <div className="row">
         {message}
