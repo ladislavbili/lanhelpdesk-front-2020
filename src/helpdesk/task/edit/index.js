@@ -82,7 +82,8 @@ export default function TaskEditContainer( props ) {
   const {
     match,
     taskID,
-    closeModal
+    closeModal,
+    history
   } = props;
 
   const inModal = props.inModal === true;

@@ -10,6 +10,8 @@ import {
   Button
 } from 'reactstrap';
 import DatePicker from 'components/DatePicker';
+import MultiSelect from 'components/MultiSelectNew';
+import Empty from 'components/Empty';
 import SimpleRepeat from 'helpdesk/components/repeat/simpleRepeat';
 import moment from 'moment';
 
@@ -137,6 +139,7 @@ export default function RepeatForm( props ) {
 
   //state
   const [ layout, setLayout ] = React.useState( 2 );
+  const [ tagsOpen, setTagsOpen ] = React.useState( false );
 
   const [ project, setProject ] = React.useState( null );
   const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
@@ -997,19 +1000,6 @@ export default function RepeatForm( props ) {
         options={booleanSelects}
         />
     ),
-    Tags: (
-      <div className="f-1">
-        <Select
-          value={tags}
-          placeholder="None"
-          isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-          isMulti
-          onChange={(tags)=> { setTags(tags); saveChange({ tags: tags.map((tag) => tag.id ) }) }}
-          options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
-          styles={ selectStyleNoArrowColoredRequired }
-          />
-      </div>
-    )
   }
 
   const renderSelectsLayout1 = () => {
@@ -1143,17 +1133,6 @@ export default function RepeatForm( props ) {
               }
             </div>
           </div>
-
-          { userRights.tagsRead &&
-            !defaultFields.tag.fixed &&
-            userRights.tagsWrite &&
-            <div className="row p-r-10">
-              <Label className="col-0-5 col-form-label">Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-              <div className="col-11-5">
-                { layoutComponents.Tags }
-              </div>
-            </div>
-          }
 
         </div>
       </div>
@@ -1316,16 +1295,6 @@ export default function RepeatForm( props ) {
             layout={layout}
             />
         }
-        { userRights.tagsRead &&
-          !defaultFields.tag.fixed &&
-          userRights.tagsWrite &&
-          <div className="form-selects-entry-column" >
-            <Label>Tags { project && project.def.tag.required ? <span className="warning-big">*</span> : ""}</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Tags }
-            </div>
-          </div>
-        }
         { userRights.typeRead &&
           userRights.typeWrite &&
           <div className="form-selects-entry-column" >
@@ -1361,27 +1330,43 @@ export default function RepeatForm( props ) {
     )
   }
 
-  const renderTags = () => {
-    if ( !userRights.tagsRead ) {
-      return null;
-    }
+  const renderMultiSelectTags = () => {
     return (
-      <div className = "form-section" >
-        <Label>Tagy</Label>
-        <div className="f-1 form-section-rest" style={{marginLeft: "5px"}}>
-          <Select
-            value={tags}
-            placeholder="None"
-            isDisabled={defaultFields.tag.fixed || !userRights.tagsWrite}
-            isMulti
-            onChange={ (t) => { setTags(tags); saveChange({ tags: tags.map((tag) => tag.id ) }) }}
-            options={ !userRights.tagsRead || project === null ? [] : toSelArr(project.tags)}
-            styles={ project && project.def.tag.required ? invisibleSelectStyleNoArrowColoredRequired : invisibleSelectStyleNoArrowColored }
-            />
-        </div>
-      </div>
+      <Empty>
+        { userRights.tagsWrite &&
+          <div className="row center-hor">
+            <button className="btn btn-link waves-effect p-b-10" onClick={ () => setTagsOpen(true) } >
+              <i className="fa fa-plus" />
+              Tags
+            </button>
+            <MultiSelect
+              className="center-hor"
+              disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
+              direction="right"
+              style={{}}
+              header="Select tags for this task"
+              closeMultiSelect={() => { setTagsOpen(false) }}
+              open={tagsOpen}
+              items={toSelArr(project === null ? [] : project.tags)}
+              selected={tags}
+              onChange={ (tags) => { setTags(tags); saveChange({ tags: tags.map((tag) => tag.id ) }) }}
+              />
+          </div>
+        }
+
+        {
+          userRights.tagsRead && tags
+          .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+          .map( ( tag ) => (
+            <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+              {tag.title}
+            </span>
+          ) )
+        }
+      </Empty>
     )
   }
+
 
   const renderDescription = () => {
     if ( !userRights.taskDescriptionRead && !userRights.taskAttachmentsRead ) {
@@ -1449,6 +1434,7 @@ export default function RepeatForm( props ) {
               Attachment
             </label>
           }
+          {renderMultiSelectTags()}
         </div>
         <div  className="form-section-rest">
           {RenderDescription}

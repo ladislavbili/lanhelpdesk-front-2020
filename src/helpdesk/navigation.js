@@ -24,7 +24,7 @@ import AccessDenied from 'components/accessDenied';
 
 import TaskList from './task';
 
-import NotificationList from './notifications';
+import NotificationList from 'components/notifications';
 
 import Loading from 'components/loading';
 import RepeatsList from 'helpdesk/components/repeat/repeatsList';

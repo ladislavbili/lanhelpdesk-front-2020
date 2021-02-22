@@ -17,16 +17,12 @@ import {
 import {
   Link
 } from 'react-router-dom';
-import {
-  setIsLoggedIn
-} from 'apollo/localSchema/actions';
-import ErrorIcon from 'components/errorMessages/errorIcon'
+import ErrorIcon from 'components/errorMessages/errorIcon';
+import NotificationIcon from 'components/notifications/notificationIcon';
 import classnames from 'classnames';
-
 import {
   getLocation,
 } from 'helperFunctions';
-
 
 import UserProfile from 'helpdesk/settings/users/userProfile';
 
@@ -51,31 +47,12 @@ export default function PageHeader( props ) {
 
   const client = useApolloClient();
   //state
-  const [ notificationsOpen, setNotificationsOpen ] = React.useState( false );
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
   const [ settingsOpen, setSettingsOpen ] = React.useState( false );
-  const [ unreadNotifications /*, setUnreadNotifications */ ] = React.useState( [] );
   const [ modalUserProfileOpen, setModalUserProfileOpen ] = React.useState( false );
 
   const currentUser = myData ? myData.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
-
-  const processNotifications = () => {
-    return [];
-    /*
-    return data.getMyData.notifications.map((notification) => {
-      let task = props.tasks.find((task) => task.id === notification.task);
-      return {
-        ...notification,
-        task: task !== undefined
-          ? task
-          : {
-            id: notification.task,
-            title: 'Unknown task'
-          }
-      }
-    })*/
-  }
 
   const URL = getLocation( history );
   return (
@@ -129,64 +106,16 @@ export default function PageHeader( props ) {
           }
         </div>
         <div className="ml-auto center-hor row">
-          <div className=" header-icon center-hor clickable" onClick={() => setModalUserProfileOpen(true)}>{`${currentUser.name} ${currentUser.surname}`} <i className="fas fa-user m-l-5"/></div>
+          <div className=" header-icon center-hor clickable" onClick={() => setModalUserProfileOpen(true)}>
+            {`${currentUser.name} ${currentUser.surname}`}
+            <i className="fas fa-user m-l-5"/>
+          </div>
 
           { accessRights.viewErrors &&
             <ErrorIcon history={history} location={URL} />
           }
 
-          <Dropdown className="center-hor" isOpen={notificationsOpen} toggle={() => setNotificationsOpen(!notificationsOpen)}>
-            <DropdownToggle className="header-dropdown">
-              <i className="header-icon-with-text fa fa fa-envelope"/>
-            </DropdownToggle>
-            <DropdownMenu right>
-              <DropdownItem header={true}>Notifications</DropdownItem>
-              <DropdownItem divider={true}/> {currentUser.notifications && currentUser.notifications.length === 0 && <DropdownItem>You have no notifications!</DropdownItem>}
-                {
-                  processNotifications().splice(0, 5).map( (notification) =>
-                  <DropdownItem
-                    key={notification.id}
-                    onClick={ () => {
-                      history.push('/helpdesk/notifications/' + notification.id + '/' + notification.task.id)
-                      if (!notification.read) {
-                        //    rebase.updateDoc('user_notifications/' + notification.id, {read: true});
-                      }
-                    }}
-                    className={classnames({
-                      'notification-read-small': notification.read,
-                      'notification-not-read-small': !notification.read
-                    })}
-                    >
-                    <div>
-                      <i className={classnames({
-                          'far fa-envelope-open': notification.read,
-                          'fas fa-envelope': !notification.read
-                        })}
-                        />
-                      {notification.message}
-                    </div>
-                    <div style={{
-                        overflowX: 'hidden',
-                        maxWidth: 250
-                      }}
-                      >
-                      {notification.task.id}: {notification.task.title}
-                    </div>
-                  </DropdownItem>
-                )
-              }
-              <DropdownItem divider={true}/>
-              <DropdownItem onClick={() => history.push('/helpdesk/notifications/')}>
-                <span style={{ fontWeight: 'bold' }} >Go to notifications</span>
-                {
-                  unreadNotifications.length > 0 ?
-                  (' ' + unreadNotifications.length + ' more unread...') :
-                  ''
-                }
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-          <span className="header-icon-text clickable">{unreadNotifications.length}</span>
+          <NotificationIcon history={history} location={URL} />
 
           {
             (currentUser) &&
@@ -207,32 +136,32 @@ export default function PageHeader( props ) {
                     {item.title}
                   </DropdownItem>
                 )}
-            </DropdownMenu>
-          </Dropdown>
-        }
-        <i
-          className="header-icon clickable fa fa-sign-out-alt center-hor"
-          onClick={() => {
-            if (window.confirm('Are you sure you want to log out?')) {
-              logoutUser().then(() => {
-                location.reload(false);
-              } );
-            }
-          }}
-          />
+              </DropdownMenu>
+            </Dropdown>
+          }
+          <i
+            className="header-icon clickable fa fa-sign-out-alt center-hor"
+            onClick={() => {
+              if (window.confirm('Are you sure you want to log out?')) {
+                logoutUser().then(() => {
+                  location.reload(false);
+                } );
+              }
+            }}
+            />
+        </div>
       </div>
-    </div>
 
-    <Modal style={{width: "800px"}} isOpen={modalUserProfileOpen}>
-      <ModalHeader>
-        User profile
-      </ModalHeader>
+      <Modal style={{width: "800px"}} isOpen={modalUserProfileOpen}>
+        <ModalHeader>
+          User profile
+        </ModalHeader>
         <ModalBody>
           <UserProfile
             closeModal={() => setModalUserProfileOpen(false)}
             />
         </ModalBody>
       </Modal>
-  </div>
+    </div>
   );
 }

@@ -516,8 +516,10 @@ export default function TaskAdd( props ) {
         isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
         onChange={(requester)=>{
           setRequester(requester);
-          const newCompany = companies.find((company) => company.id === requester.id );
-          setCompany(newCompany);
+          if(userRights.companyWrite && !defaultFields.company.fixed){
+            const newCompany = companies.find((company) => company.id === requester.id );
+            setCompany(newCompany);
+          }
         }}
         options={REQUESTERS}
         styles={ selectStyleNoArrowRequired }
