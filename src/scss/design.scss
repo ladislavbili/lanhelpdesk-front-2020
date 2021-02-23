@@ -1982,11 +1982,15 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     border: 1px solid #c4c4c4;
   }
   .add-buttons{
+    margin-top: 8px;
     margin-left: 10px;
     margin-bottom: 15px;
   }
    .add-title{
      font-family: $main-font-bold;
+   }
+   .vykazy-approved{
+     margin-top: calc(25px - 17px);
    }
 /*   .react-switch-handle{
     height: 10px;
@@ -2182,6 +2186,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     .task-title-input{
       border: $main-border !important;
       margin-left: 0;
+    }
+    .task-title-input-2{
+      border: 1px solid #c4c4c4 !important;
+      margin-left: $input-padding;
+      width: calc(100% - #{$input-padding});
     }
   }
   /*.nav-tabs>.nav-item>.nav-link{

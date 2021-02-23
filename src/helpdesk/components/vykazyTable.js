@@ -352,17 +352,19 @@ export default function Rozpocet( props ) {
                 </td>
               }
               {/*Approved*/}
-              {<td className="vykazy-approved">
-                <Switch
-                  checked={true}
-                  onChange={ () => {} }
-                  height={16}
-                  width={30}
-                  handleDiameter={12}
-                  checkedIcon={<span className="switchLabel"></span>}
-                  uncheckedIcon={<span className="switchLabel"></span>}
-                  onColor={"#0078D4"} />
-                <span className="m-l-10">Branislav Šusta</span>
+              {<td>
+                <div className="vykazy-approved">
+                  <Switch
+                    checked={true}
+                    onChange={ () => {} }
+                    height={16}
+                    width={30}
+                    handleDiameter={12}
+                    checkedIcon={<span className="switchLabel"></span>}
+                    uncheckedIcon={<span className="switchLabel"></span>}
+                    onColor={"#0078D4"} />
+                  <span className="m-l-10">Branislav Šusta</span>
+                </div>
                 </td>
               }
               {/*Mnozstvo*/}
@@ -543,7 +545,8 @@ export default function Rozpocet( props ) {
                   </td>
                 }
                 {/*Approved*/}
-                {<td className="vykazy-approved">
+                {<td>
+                  <div className="vykazy-approved">
                   <Switch
                     checked={true}
                     onChange={ () => {} }
@@ -554,6 +557,7 @@ export default function Rozpocet( props ) {
                     uncheckedIcon={<span className="switchLabel"></span>}
                     onColor={"#0078D4"} />
                   <span className="m-l-10">Branislav Šusta</span>
+                </div>
                   </td>
                 }
                 {/*Mnozstvo*/}
@@ -742,7 +746,8 @@ export default function Rozpocet( props ) {
                   <td></td>
                 }
                 {/*Approved*/}
-                {<td className="vykazy-approved">
+                {<td>
+                  <div className="vykazy-approved">
                   <Switch
                     checked={true}
                     onChange={ () => {} }
@@ -753,6 +758,7 @@ export default function Rozpocet( props ) {
                     uncheckedIcon={<span className="switchLabel"></span>}
                     onColor={"#0078D4"} />
                   <span className="m-l-10">Branislav Šusta</span>
+                </div>
                   </td>
                 }
                 {/*Mnozstvo*/}
@@ -969,7 +975,8 @@ export default function Rozpocet( props ) {
                   <td></td>
                 }
                 {/*Approved*/}
-                {<td className="vykazy-approved">
+                {<td>
+                  <div className="vykazy-approved">
                   <Switch
                     checked={true}
                     onChange={ () => {} }
@@ -980,6 +987,7 @@ export default function Rozpocet( props ) {
                     uncheckedIcon={<span className="switchLabel"></span>}
                     onColor={"#0078D4"} />
                   <span className="m-l-10">Branislav Šusta</span>
+                </div>
                   </td>
                 }
                 {/*Mnozstvo*/}

@@ -390,7 +390,7 @@ export default function TaskAdd( props ) {
         <span className="form-section-rest">
           <input type="text"
             value={title}
-            className="input basic-border full-width form-control"
+            className="task-title-input-2 full-width form-control"
             onChange={ (e) => setTitle(e.target.value) }
             placeholder="ENTER NEW TASK NAME" />
         </span>
