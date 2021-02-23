@@ -361,8 +361,14 @@ export default function RepeatForm( props ) {
       ...item,
       id: fakeID--
     } ) ) );
-    setMaterials( duplicateTask.materials );
-    setCustomItems( duplicateTask.customItems );
+    setMaterials( duplicateTask.materials.map( ( item ) => ( {
+      ...item,
+      id: fakeID--
+    } ) ) );
+    setCustomItems( duplicateTask.customItems.map( ( item ) => ( {
+      ...item,
+      id: fakeID--
+    } ) ) );
   }
 
   React.useEffect( () => {
@@ -1550,7 +1556,9 @@ export default function RepeatForm( props ) {
       <VykazyTable
         showColumns={ ( (!userRights.vykazWrite && !userRights.rozpocetWrite ) ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
         showTotals={false}
+        userID={currentUser.id}
         userRights={userRights}
+        autoApproved={false}
         isInvoiced={false}
         canEditInvoiced={false}
         company={company}
@@ -1573,7 +1581,12 @@ export default function RepeatForm( props ) {
             updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
           }
           let newSubtasks=[...subtasks];
-          newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
+          let index = newSubtasks.findIndex((subtask)=>subtask.id===id);
+          if(newData.approved && newSubtasks[index].approved !== newData.approved ){
+            newSubtasks[index]={...newSubtasks[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+          }else{
+            newSubtasks[index]={...newSubtasks[index],...newData };
+          }
           setSubtasks(newSubtasks);
         }}
         updateSubtasks={(multipleSubtasks)=>{
@@ -1610,7 +1623,12 @@ export default function RepeatForm( props ) {
             updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
           }
           let newTrips=[...workTrips];
-          newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
+          let index = newTrips.findIndex((trip)=>trip.id===id);
+          if(newData.approved && newTrips[index].approved !== newData.approved ){
+            newTrips[index]={...newTrips[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+          }else{
+            newTrips[index]={...newTrips[index],...newData };
+          }
           setWorkTrips(newTrips);
         }}
         updateTrips={(multipleTrips)=>{
@@ -1647,7 +1665,12 @@ export default function RepeatForm( props ) {
             updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
           }
           let newMaterials=[...materials];
-          newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
+          let index = newMaterials.findIndex((material)=>material.id===id);
+          if(newData.approved && newMaterials[index].approved !== newData.approved ){
+            newMaterials[index]={...newMaterials[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+          }else{
+            newMaterials[index]={...newMaterials[index],...newData };
+          }
           setMaterials(newMaterials);
         }}
         updateMaterials={(multipleMaterials)=>{
@@ -1684,7 +1707,12 @@ export default function RepeatForm( props ) {
             updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id ),...newData});
           }
           let newCustomItems=[...customItems];
-          newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
+          let index = newCustomItems.findIndex((item)=>item.id===id);
+          if(newData.approved && newCustomItems[index].approved !== newData.approved ){
+            newCustomItems[index]={...newCustomItems[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+          }else{
+            newCustomItems[index]={...newCustomItems[index],...newData };
+          }
           setCustomItems(newCustomItems);
         }}
         updateCustomItems={(multipleCustomItems)=>{

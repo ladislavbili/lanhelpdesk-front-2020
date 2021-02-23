@@ -51,7 +51,8 @@ export default function Rozpocet( props ) {
     submitTrip,
     submitMaterial,
     submitCustomItem,
-    message
+    message,
+    autoApproved
   } = props;
 
   let defaultTab = '6';
@@ -277,7 +278,7 @@ export default function Rozpocet( props ) {
             </th>
             {false && showColumns.includes(3) && toggleTab !== "0" && <th width="190">Typ</th> }
             {showColumns.includes(2) && toggleTab !== "0" && <th width="190">Rieši</th> }
-            {<th width="190">Approved</th> }
+            {!autoApproved && <th width="190">Approved</th> }
             {showColumns.includes(4) && <th width="50" className="t-a-r">Mn.</th> }
             {showColumns.includes(5) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Cenník/Nákup</th> }
             {showColumns.includes(6) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Zľava/Marža</th> }
@@ -352,18 +353,19 @@ export default function Rozpocet( props ) {
                 </td>
               }
               {/*Approved*/}
-              {<td>
+              { !autoApproved && <td>
                 <div className="vykazy-approved">
                   <Switch
-                    checked={true}
-                    onChange={ () => {} }
+                    checked={subtask.approved}
+                    disabled={disabled}
+                    onChange={ () => { updateSubtask( subtask.id, { approved: !subtask.approved } ) } }
                     height={16}
                     width={30}
                     handleDiameter={12}
                     checkedIcon={<span className="switchLabel"></span>}
                     uncheckedIcon={<span className="switchLabel"></span>}
                     onColor={"#0078D4"} />
-                  <span className="m-l-10">Branislav Šusta</span>
+                  <span className="m-l-10">{ subtask.approved ? subtask.approvedBy.fullName : 'Neschválené' }</span>
                 </div>
                 </td>
               }
@@ -545,18 +547,18 @@ export default function Rozpocet( props ) {
                   </td>
                 }
                 {/*Approved*/}
-                {<td>
+                {!autoApproved && <td>
                   <div className="vykazy-approved">
                   <Switch
-                    checked={true}
-                    onChange={ () => {} }
+                    checked={trip.approved}                    disabled={disabled}
+                    onChange={ () => { updateTrip( trip.id, { approved: !trip.approved } ) } }
                     height={16}
                     width={30}
                     handleDiameter={12}
                     checkedIcon={<span className="switchLabel"></span>}
                     uncheckedIcon={<span className="switchLabel"></span>}
                     onColor={"#0078D4"} />
-                  <span className="m-l-10">Branislav Šusta</span>
+                  <span className="m-l-10">{ trip.approved ? trip.approvedBy.fullName : 'Neschválené' }</span>
                 </div>
                   </td>
                 }
@@ -746,18 +748,19 @@ export default function Rozpocet( props ) {
                   <td></td>
                 }
                 {/*Approved*/}
-                {<td>
+                {!autoApproved && <td>
                   <div className="vykazy-approved">
                   <Switch
-                    checked={true}
-                    onChange={ () => {} }
+                    checked={material.approved}                    disabled={disabled}
+                    onChange={ () => { updateMaterial( material.id, { approved: !material.approved } ) } }
                     height={16}
                     width={30}
                     handleDiameter={12}
                     checkedIcon={<span className="switchLabel"></span>}
                     uncheckedIcon={<span className="switchLabel"></span>}
-                    onColor={"#0078D4"} />
-                  <span className="m-l-10">Branislav Šusta</span>
+                    onColor={"#0078D4"}
+                    />
+                  <span className="m-l-10">{ material.approved ? material.approvedBy.fullName : 'Neschválené' }</span>
                 </div>
                   </td>
                 }
@@ -975,18 +978,18 @@ export default function Rozpocet( props ) {
                   <td></td>
                 }
                 {/*Approved*/}
-                {<td>
+                {!autoApproved && <td>
                   <div className="vykazy-approved">
                   <Switch
-                    checked={true}
-                    onChange={ () => {} }
+                    checked={customItem.approved}                    disabled={disabled}
+                    onChange={ () => { updateCustomItem( customItem.id, { approved: !customItem.approved } ) } }
                     height={16}
                     width={30}
                     handleDiameter={12}
                     checkedIcon={<span className="switchLabel"></span>}
                     uncheckedIcon={<span className="switchLabel"></span>}
                     onColor={"#0078D4"} />
-                  <span className="m-l-10">Branislav Šusta</span>
+                  <span className="m-l-10">{ customItem.approved ? customItem.approvedBy.fullName : 'Neschválené' }</span>
                 </div>
                   </td>
                 }
@@ -1145,6 +1148,7 @@ export default function Rozpocet( props ) {
                   ){
                     let body={
                       done:false,
+                      approved: false,
                       title:newSubtaskTitle,
                       type: newSubtaskType,
                       quantity:newSubtaskQuantity!==''?parseInt(newSubtaskQuantity):0,
@@ -1240,6 +1244,7 @@ export default function Rozpocet( props ) {
                 onClick={()=>{
                   let body={
                     done:false,
+                    approved: false,
                     title:newSubtaskTitle,
                     type: newSubtaskType,
                     quantity: newSubtaskQuantity !== '' ? parseFloat(newSubtaskQuantity) : 0,
@@ -1359,6 +1364,7 @@ export default function Rozpocet( props ) {
                     quantity: newTripQuantity !== '' ? parseFloat(newTripQuantity) : 0,
                     discount: newTripDiscount!==''?newTripDiscount:0,
                     done: false,
+                    approved: false,
                     order: workTrips.length,
                   }
 
@@ -1550,6 +1556,7 @@ export default function Rozpocet( props ) {
                     quantity:newMaterialQuantity!==''? parseFloat(newMaterialQuantity) :0,
                     title:newMaterialTitle,
                     done:false,
+                    approved: false,
                     order: materials.length,
                   }
                   setShowAddMaterial( false);
@@ -1652,6 +1659,7 @@ export default function Rozpocet( props ) {
                     quantity:newCustomItemQuantity!==''? parseFloat(newCustomItemQuantity):0,
                     title:newCustomItemTitle,
                     done:false,
+                    approved: false,
                     order:customItems.length,
                   }
                   setNewCustomItemPrice(0);

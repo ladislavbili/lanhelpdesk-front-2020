@@ -114,6 +114,11 @@ repeatTemplate{
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -132,6 +137,11 @@ repeatTemplate{
     id
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -151,6 +161,11 @@ repeatTemplate{
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     margin
     price
@@ -160,6 +175,11 @@ repeatTemplate{
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     price
   }
@@ -412,11 +432,12 @@ mutation deleteRepeatTemplateShortSubtask($id: Int!) {
 
 //table
 export const ADD_SUBTASK = gql `
-mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $repeatTemplate: Int!, $assignedTo: Int!) {
+mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $repeatTemplate: Int!, $assignedTo: Int!) {
   addRepeatTemplateSubtask(
     title: $title,
     order: $order,
     done: $done,
+    approved: $approved,
     quantity: $quantity,
     discount: $discount,
     type: $type,
@@ -427,6 +448,11 @@ mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -445,12 +471,13 @@ mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!
 `;
 
 export const UPDATE_SUBTASK = gql `
-mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
   updateRepeatTemplateSubtask(
     id: $id,
     title: $title,
     order: $order,
     done: $done,
+    approved: $approved,
     quantity: $quantity,
     discount: $discount,
     type: $type,
@@ -460,6 +487,11 @@ mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $do
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -488,10 +520,11 @@ mutation deleteRepeatTemplateSubtask($id: Int!) {
 `;
 
 export const ADD_WORKTRIP = gql `
-mutation addWorkRepeatTemplateTrip($order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $repeatTemplate: Int!, $assignedTo: Int!) {
+mutation addWorkRepeatTemplateTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $repeatTemplate: Int!, $assignedTo: Int!) {
   addRepeatTemplateWorkTrip(
     order: $order,
     done: $done,
+    approved: $approved,
     quantity: $quantity,
     discount: $discount,
     type: $type,
@@ -501,6 +534,11 @@ mutation addWorkRepeatTemplateTrip($order: Int!, $done: Boolean!, $quantity: Flo
     id
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -519,11 +557,12 @@ mutation addWorkRepeatTemplateTrip($order: Int!, $done: Boolean!, $quantity: Flo
 `;
 
 export const UPDATE_WORKTRIP = gql `
-mutation updateRepeatTemplateWorkTrip($id: Int!, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+mutation updateRepeatTemplateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
   updateRepeatTemplateWorkTrip(
     id: $id,
     order: $order,
     done: $done,
+    approved: $approved,
     quantity: $quantity,
     discount: $discount,
     type: $type,
@@ -532,6 +571,11 @@ mutation updateRepeatTemplateWorkTrip($id: Int!, $order: Int, $done: Boolean, $q
     id
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -560,11 +604,12 @@ mutation deleteRepeatTemplateWorkTrip($id: Int!) {
 `;
 
 export const ADD_MATERIAL = gql `
-mutation addRepeatTemplateMaterial($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $margin: Float!, $price: Float!, $repeatTemplate: Int!) {
+mutation addRepeatTemplateMaterial($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $margin: Float!, $price: Float!, $repeatTemplate: Int!) {
   addRepeatTemplateMaterial(
     title: $title,
     order: $order,
     done: $done,
+    approved: $approved,
     quantity: $quantity,
     margin: $margin,
     price: $price,
@@ -574,6 +619,11 @@ mutation addRepeatTemplateMaterial($title: String!, $order: Int!, $done: Boolean
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     margin
     price
@@ -582,12 +632,13 @@ mutation addRepeatTemplateMaterial($title: String!, $order: Int!, $done: Boolean
 `;
 
 export const UPDATE_MATERIAL = gql `
-mutation updateRepeatTemplateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $margin: Float, $price: Float) {
+mutation updateRepeatTemplateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $margin: Float, $price: Float) {
   updateRepeatTemplateMaterial(
     id: $id,
     title: $title,
     order: $order,
     done: $done,
+    approved: $approved,
     quantity: $quantity,
     margin: $margin,
     price: $price,
@@ -596,6 +647,11 @@ mutation updateRepeatTemplateMaterial($id: Int!, $title: String, $order: Int, $d
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     margin
     price
@@ -614,11 +670,12 @@ mutation deleteRepeatTemplateMaterial($id: Int!) {
 `;
 
 export const ADD_CUSTOM_ITEM = gql `
-mutation addRepeatTemplateCustomItem($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $price: Float!, $repeatTemplate: Int!) {
+mutation addRepeatTemplateCustomItem($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $price: Float!, $repeatTemplate: Int!) {
   addRepeatTemplateCustomItem(
     title: $title,
     order: $order,
     done: $done,
+    approved: $approved,
     quantity: $quantity,
     price: $price,
     repeatTemplate: $repeatTemplate,
@@ -627,6 +684,11 @@ mutation addRepeatTemplateCustomItem($title: String!, $order: Int!, $done: Boole
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     price
   }
@@ -634,12 +696,13 @@ mutation addRepeatTemplateCustomItem($title: String!, $order: Int!, $done: Boole
 `;
 
 export const UPDATE_CUSTOM_ITEM = gql `
-mutation updateRepeatTemplateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $price: Float) {
+mutation updateRepeatTemplateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $price: Float) {
   updateRepeatTemplateCustomItem(
     id: $id,
     title: $title,
     order: $order,
     done: $done,
+    approved: $approved,
     quantity: $quantity,
     price: $price,
   ){
@@ -647,6 +710,11 @@ mutation updateRepeatTemplateCustomItem($id: Int!, $title: String, $order: Int, 
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     price
   }
