@@ -449,8 +449,27 @@ export default function TasksSidebar( props ) {
             </div>
           }
 
-                    { showFilterAdd && <hr className="m-l-15 m-r-15 m-t-15 m-b-15" /> }
+                    { showFilterAdd && <hr className="m-l-15 m-r-15 m-t-15" /> }
 
+  { showFilterAdd &&
+                    <div className="sidebar-label row" onClick={() => setShowFilters(!showFilters)}>
+                      <div>
+                        <img
+                          className="m-r-5"
+                          style={{
+                            color: "#212121",
+                            height: "17px",
+                            marginBottom: "3px"
+                          }}
+                          src={filterIcon}
+                          alt="Filter icon not found"
+                          />
+                        <Label>
+                          { parseInt(match.params.filterID) ? "Edit filter" : "Add filter" }
+                        </Label>
+                      </div>
+                    </div>
+ }
                   { showFilterAdd &&
                     <Filter
                       history={history}

@@ -371,7 +371,7 @@ export default function TaskAdd( props ) {
         <div className="ml-auto m-r-20">
           <button
             type="button"
-            className="btn btn-link waves-effect task-add-layout-button"
+            className="btn-link waves-effect task-add-layout-button"
             onClick={ () => {
               setTaskLayout( currentUser.taskLayout === 1 ? 2 : 1 )
             }}>
@@ -890,7 +890,7 @@ export default function TaskAdd( props ) {
       <Empty>
         { userRights.tagsRead && userRights.tagsWrite &&
           <div className="row center-hor">
-            <button className="btn btn-link waves-effect p-b-10" onClick={ () => setTagsOpen(true) } >
+            <button className="btn-link waves-effect p-b-10" onClick={ () => setTagsOpen(true) } >
               <i className="fa fa-plus" />
               Tags
             </button>
@@ -941,7 +941,7 @@ export default function TaskAdd( props ) {
         <div className="row" style={{alignItems: "baseline"}}>
           <Label className="m-r-10">Popis úlohy</Label>
           { userRights.taskAttachmentsRead && userRights.taskAttachmentsWrite &&
-            <label htmlFor={`uploadAttachment-${null}`} className="btn btn-link" >
+            <label htmlFor={`uploadAttachment-${null}`} className="btn-link" >
               <i className="fa fa-plus" />
               Attachment
             </label>
@@ -1153,7 +1153,7 @@ export default function TaskAdd( props ) {
       <div className="form-section task-edit-buttons">
         <div className="row form-section-rest">
           {closeModal &&
-            <Button className="btn btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
+            <Button className="btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
           }
           {canCreateVykazyError()}
           <button

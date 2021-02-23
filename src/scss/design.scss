@@ -273,6 +273,9 @@ html{
   height: 100%;
 }
 
+.h-20px{
+  height: 20px !important;
+}
 .h-60px{
   height: 60px;
 }
@@ -613,10 +616,17 @@ h4{
 
 .btn-link, .btn-link:hover, .btn-link:active, .btn-link:focus, .btn-link:disabled, .btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn){
   background-color: inherit;
+  height: $button-height;
+  border: 0px;
+  border-radius: 0px;
   padding: 0px;
+  font: $font-value;
   color: $color-link;
   text-decoration: none;
   box-shadow: none;
+  margin-left: 0px;
+  margin-right: 15px;
+  outline: none;
 }
 
 .btn-link-reversed{
@@ -1328,7 +1338,10 @@ tr:nth-last-child(2){ //, tr:first-child{
 
 .sidebar-filter{
   width: calc(100% - 30px);
-  margin: 10px 15px 0px 15px;
+  margin: 10px 15px 0px calc(15px - #{$input-padding});
+  label, .btn-link{
+    margin-left: $input-padding;
+  }
 }
 
 .sidebar-btn-link{
@@ -1419,10 +1432,17 @@ tr:nth-last-child(2){ //, tr:first-child{
   font-family: Segoe UI;
   font-style: normal;
   font-weight: 350;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 20px;
   letter-spacing: 0.5px;
-  color: #3C3C3C;
+  color: #0078D4;
+}
+
+.sidebar-filter-commandbar{
+  .btn-link:not(.inner), .filter-add-btn{
+    width: 20%;
+    margin-right: 0px !important;
+  }
 }
 
 .sidebar-filter-row{
@@ -1472,7 +1492,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   font-size: 12px;
   line-height: 20px;
   letter-spacing: 0.5px;
-  color: #3C3C3C;
+  color: #0078D4;
   margin-top: 0px;
   margin-left: 15px;
   width: calc(100% - 30px);
@@ -1487,6 +1507,23 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .sidebar-filter-navlink{
   padding-left: 0px !important;
+}
+
+.filter-date-picker-popover{
+  background-color: #eaeaea;
+  padding: 10px 15px;
+  input{
+    background-color: white;
+  }
+  .btn-link-reversed, .btn-link-reversed:hover, .btn-link-reversed:active,
+  .btn-link-reversed:focus, .btn-link-reversed:active:focus{
+    font: 14px Segoe UI;
+    color: #a6a6a6;
+    padding: 3.75px 7.5px;
+    border: none;
+    outline: none;
+    background-color: #f2f2f2;
+  }
 }
 
 
@@ -1736,9 +1773,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .task-container>.table{
   background-color: transparent; //white;
-  margin-left: 20px;
-  margin-right: 20px;
-  width: calc(100% - 40px) !important; //0
+  margin-left: 30px;
+  margin-right: 30px;
+  width: calc(100% - 60px) !important; //0
 }
 
 .task-container>.table>thead{

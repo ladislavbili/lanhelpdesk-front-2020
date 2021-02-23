@@ -1111,6 +1111,65 @@ export const invisibleSelectStyleOtherFont = {
 
 };
 
+export const invisibleSelectStyleBlueFont = {
+  control: ( base, state ) => ( {
+    ...base,
+    minHeight: 30,
+    backgroundColor: state.isFocused ? 'white' : 'inherit',
+    borderWidth: 0,
+    borderRadius: 0,
+    fontFamily: "Segoe UI",
+    fontStyle: "normal",
+    fontWeight: 350,
+    fontSize: "14px",
+    lineHeight: "20px",
+    letterSpacing: "0.5px",
+    color: "#0078D4",
+  } ),
+  dropdownIndicator: base => ( {
+    ...base,
+    padding: 4,
+  } ),
+  clearIndicator: base => ( {
+    ...base,
+    padding: 4,
+  } ),
+  multiValue: base => ( {
+    ...base,
+    backgroundColor: "#F2F1F1",
+    borderRadius: 0,
+    color: "#0078D4",
+  } ),
+  placeholder: base => ( {
+    ...base,
+    color: "#0078D4",
+    fontSize: "14px",
+  } ),
+  singleValue: base => ( {
+    ...base,
+    backgroundColor: "#F2F1F1",
+    borderRadius: 0,
+    color: "#0078D4",
+  } ),
+  valueContainer: base => ( {
+    ...base,
+    padding: '0px 6px',
+    borderRadius: 0
+  } ),
+  input: base => ( {
+    ...base,
+    margin: 0,
+    padding: 0,
+    backgroundColor: "inherit",
+    borderRadius: 0
+  } ),
+  indicatorSeparator: base => ( {
+    ...base,
+    width: 0,
+  } ),
+
+};
+
 export const selectStyle = {
   control: base => ( {
     ...base,

@@ -18,11 +18,12 @@ import {
 import AddFilter from './filterAdd';
 import Loading from 'components/loading';
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
+import FilterDatePickerPopover from 'components/filterDatePickerPopover';
 import {
   setFilter,
 } from 'apollo/localSchema/actions';
 import {
-  invisibleSelectStyleOtherFont
+  invisibleSelectStyleBlueFont
 } from 'configs/components/select';
 import {
   oneOfOptions,
@@ -341,10 +342,11 @@ export default function FilterForm( props ) {
 
   let canModify = id !== null;
 
+
   return (
-    <div>
-      <div className="d-flex m-l-15 m-t-5">
-        <button type="button" className="btn-link-reversed" onClick={applyFilter}><i className="fa fa-check icon-M"/></button>
+      <div>
+      <div className="d-flex m-t-5 sidebar-filter-commandbar">
+        <button type="button" className="btn-link" onClick={applyFilter}><i className="fa fa-check icon-M p-r-0 m-r-0"/></button>
         {
           <AddFilter
             filter={getCleanCurrentFilter()}
@@ -353,11 +355,11 @@ export default function FilterForm( props ) {
             />
         }
 
-        <button type="button" className="btn-link-reversed m-2" onClick={resetFilter}><i className="fa fa-sync icon-M"/></button>
+        <button type="button" className="btn-link" onClick={resetFilter}><i className="fa fa-sync icon-M p-r-0 m-r-0"/></button>
         { canModify &&
-          <button type="button" className="btn-link-reversed m-2" onClick={deleteFilterFunc}><i className="far fa-trash-alt icon-M"/></button>
+          <button type="button" className="btn-link" onClick={deleteFilterFunc}><i className="far fa-trash-alt icon-M p-r-0 m-r-0"/></button>
         }
-        <button type="button" className="btn-link-reversed m-2" onClick={() => close()}><i className="fa fa-times icon-M"/></button>
+        <button type="button" className="btn-link" onClick={() => close()}><i className="fa fa-times icon-M p-r-0 m-r-0"/></button>
       </div>
       <div>
         <div className="sidebar-filter-label">
@@ -396,7 +398,7 @@ export default function FilterForm( props ) {
                 setRequester(newValue);
               }}
               value={requester}
-              styles={invisibleSelectStyleOtherFont} />
+              styles={invisibleSelectStyleBlueFont} />
           </div>
         </div>
         <div className="sidebar-filter-row">
@@ -408,7 +410,7 @@ export default function FilterForm( props ) {
                 setCompany(comp);
               }}
               value={company}
-              styles={invisibleSelectStyleOtherFont} />
+              styles={invisibleSelectStyleBlueFont} />
           </div>
         </div>
 
@@ -421,25 +423,25 @@ export default function FilterForm( props ) {
                 setAssigned(newValue);
               }}
               value={assigned}
-              styles={invisibleSelectStyleOtherFont} />
+              styles={invisibleSelectStyleBlueFont} />
           </div>
         </div>
 
-        <FilterDatePickerInCalendar
-          label="Status date"
-          minimal
-          showNowFrom={statusDateFromNow}
-          dateFrom={statusDateFrom}
-          setShowNowFrom={(statusDateFromNow)=> setStatusDateFromNow(statusDateFromNow)}
-          setDateFrom={(statusDateFrom)=> setStatusDateFrom(statusDateFrom)}
-          showNowTo={statusDateToNow}
-          dateTo={statusDateTo}
-          setShowNowTo={(statusDateToNow)=> setStatusDateToNow(statusDateToNow)}
-          setDateTo={(statusDateTo)=>setStatusDateTo(statusDateTo)}
-          />
+      <FilterDatePickerPopover
+        label="Status date"
+        minimal
+        showNowFrom={statusDateFromNow}
+        dateFrom={statusDateFrom}
+        setShowNowFrom={(statusDateFromNow)=> setStatusDateFromNow(statusDateFromNow)}
+        setDateFrom={(statusDateFrom)=> setStatusDateFrom(statusDateFrom)}
+        showNowTo={statusDateToNow}
+        dateTo={statusDateTo}
+        setShowNowTo={(statusDateToNow)=> setStatusDateToNow(statusDateToNow)}
+        setDateTo={(statusDateTo)=>setStatusDateTo(statusDateTo)}
+        />
 
         {/* Pending Date */}
-        <FilterDatePickerInCalendar
+        <FilterDatePickerPopover
           label="Pending date"
           minimal
           showNowFrom={pendingDateFromNow}
@@ -453,7 +455,7 @@ export default function FilterForm( props ) {
           />
 
         {/* Close Date */}
-        <FilterDatePickerInCalendar
+        <FilterDatePickerPopover
           label="Close date"
           minimal
           showNowFrom={closeDateFromNow}
@@ -467,7 +469,7 @@ export default function FilterForm( props ) {
           />
 
         {/* Deadline */}
-        <FilterDatePickerInCalendar
+        <FilterDatePickerPopover
           label="Deadline"
           minimal
           showNowFrom={deadlineFromNow}
@@ -487,7 +489,7 @@ export default function FilterForm( props ) {
               options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypes))}
               onChange={(newValue)=> setTaskType(newValue)}
               value={taskType}
-              styles={invisibleSelectStyleOtherFont} />
+              styles={invisibleSelectStyleBlueFont} />
           </div>
         </div>
 
@@ -499,11 +501,12 @@ export default function FilterForm( props ) {
               onChange={(oneOf)=> setOneOf(oneOf)}
               value={oneOf}
               isMulti
-              styles={invisibleSelectStyleOtherFont} />
+              styles={invisibleSelectStyleBlueFont} />
           </div>
         </div>
       </div>
 
-    </div>
+    <
+    /div>
   )
 }

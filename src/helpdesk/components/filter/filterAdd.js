@@ -203,8 +203,8 @@ export default function FilterAdd( props ) {
   const canCreatePublicFilters = currentUserData.getMyData.role.accessRights.publicFilters;
 
   return (
-    <div>
-    <Button className="btn-link-reversed m-2" onClick={() => setOpened(!opened)}>
+    <div className="filter-add-btn">
+    <Button className="btn-link inner m-l-19" onClick={() => setOpened(!opened)}>
       <i className="far fa-save icon-M"/>
     </Button>
 

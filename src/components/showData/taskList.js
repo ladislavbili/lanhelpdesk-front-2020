@@ -171,7 +171,7 @@ export default function List( props ) {
                   }else if (display.type === 'checkbox'){
                     return <th key={display.value} colSpan={'1'} >
                       <Checkbox
-                        className = "m-l-7 m-t-3 p-l-0"
+                        className = "m-l-7 m-t-6 p-l-0"
                         value = { data.every((item) => item.checked ) }
                         label = ""
                         onChange={ (e) => checkTask('all', e.target.checked) }
