@@ -141,6 +141,7 @@ export default function ProjectEdit( props ) {
   const [ title, setTitle ] = React.useState( "" );
   const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
+  const [ autoApproved, setAutoApproved ] = React.useState( true );
   const [ groups, setGroups ] = React.useState( [] );
   const [ userGroups, setUserGroups ] = React.useState( [] );
   const [ addTags, setAddTags ] = React.useState( [] );
@@ -180,6 +181,7 @@ export default function ProjectEdit( props ) {
       setTitle( projectData.project.title );
       setDescription( projectData.project.description );
       setLockedRequester( projectData.project.lockedRequester );
+      setAutoApproved( projectData.project.autoApproved );
       let newOvertime = {
         def: projectData.project.def.overtime.def,
         fixed: projectData.project.def.overtime.fixed,
@@ -458,6 +460,7 @@ export default function ProjectEdit( props ) {
           title,
           description,
           lockedRequester,
+          autoApproved,
           def: newDef,
           addTags,
           updateTags,
@@ -678,6 +681,18 @@ export default function ProjectEdit( props ) {
       }
       { myRights.projectSecondary &&
         <div>
+          <div className="row">
+            <Checkbox
+              className = "m-l-5 m-r-5"
+              centerHor
+              disabled={false}
+              value = { autoApproved}
+              onChange={() => setAutoApproved( !autoApproved) }
+              />
+            <span className="clickable" onClick = { () => setAutoApproved( !autoApproved) }>
+              All subtasks, work trips, materials and custom items are automatically approved.
+            </span>
+          </div>
           <Statuses
             statuses={allStatuses}
             addStatus={(newStatus) => {

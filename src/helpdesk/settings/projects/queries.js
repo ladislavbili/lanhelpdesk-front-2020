@@ -126,6 +126,7 @@ query {
       id
       title
       lockedRequester
+      autoApproved
       milestones {
         id
         title
@@ -177,6 +178,7 @@ id
 title
 description
 lockedRequester
+autoApproved
 statuses{
   id
   title
@@ -214,6 +216,7 @@ mutation addProject(
   $title: String!,
   $description: String!,
   $lockedRequester: Boolean!,
+  $autoApproved: Boolean!,
   $def: ProjectDefaultsInput!,
   $tags: [NewTagInput]!,
   $statuses: [NewStatusInput]!
@@ -224,6 +227,7 @@ mutation addProject(
     title: $title,
     description: $description,
     lockedRequester: $lockedRequester,
+    autoApproved: $autoApproved,
     def: $def,
     tags: $tags,
     statuses: $statuses,
@@ -251,6 +255,7 @@ mutation updateProject(
   $title: String,
   $description: String,
   $lockedRequester: Boolean,
+  $autoApproved: Boolean,
   $def: ProjectDefaultsInput,
   $deleteTags: [Int]!,
   $updateTags: [TagUpdateInput]!,
@@ -268,6 +273,7 @@ mutation updateProject(
     title: $title
     description: $description
     lockedRequester: $lockedRequester
+    autoApproved: $autoApproved
     def: $def
     deleteTags: $deleteTags
     updateTags: $updateTags

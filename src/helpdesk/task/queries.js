@@ -69,6 +69,7 @@ const responseTask = `
   project{
     id
     title
+    autoApproved
   }
   requester{
     id
@@ -123,6 +124,11 @@ const responseTask = `
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -147,6 +153,11 @@ const responseTask = `
     id
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -173,6 +184,11 @@ const responseTask = `
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     margin
     price
@@ -188,6 +204,11 @@ const responseTask = `
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     price
   }
@@ -328,6 +349,7 @@ query tasks($filter: FilterInput, $projectId: Int, $sort: SortTasksInput){
 			project{
 				id
 				title
+        autoApproved
         right{
           ${groupRights}
         }
@@ -543,12 +565,13 @@ mutation deleteShortSubtask($id: Int!) {
 
 //table
 export const ADD_SUBTASK = gql `
-mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
+mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
   addSubtask(
     title: $title,
 		order: $order,
 		done: $done,
-		quantity: $quantity,
+		approved: $approved,
+    quantity: $quantity,
 		discount: $discount,
 		type: $type,
 		task: $task,
@@ -558,6 +581,11 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: F
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -576,12 +604,13 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $quantity: F
 `;
 
 export const UPDATE_SUBTASK = gql `
-mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
   updateSubtask(
 		id: $id,
     title: $title,
 		order: $order,
 		done: $done,
+		approved: $approved,
 		quantity: $quantity,
 		discount: $discount,
 		type: $type,
@@ -591,6 +620,11 @@ mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -619,10 +653,11 @@ mutation deleteSubtask($id: Int!) {
 `;
 
 export const ADD_WORKTRIP = gql `
-mutation addWorkTrip($order: Int!, $done: Boolean!, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
+mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
   addWorkTrip(
 		order: $order,
 		done: $done,
+		approved: $approved,
 		quantity: $quantity,
 		discount: $discount,
 		type: $type,
@@ -632,6 +667,11 @@ mutation addWorkTrip($order: Int!, $done: Boolean!, $quantity: Float!, $discount
     id
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -650,11 +690,12 @@ mutation addWorkTrip($order: Int!, $done: Boolean!, $quantity: Float!, $discount
 `;
 
 export const UPDATE_WORKTRIP = gql `
-mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
   updateWorkTrip(
 		id: $id,
 		order: $order,
 		done: $done,
+		approved: $approved,
 		quantity: $quantity,
 		discount: $discount,
 		type: $type,
@@ -663,6 +704,11 @@ mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $quantity: Float
     id
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     discount
     type {
@@ -691,11 +737,12 @@ mutation deleteWorkTrip($id: Int!) {
 `;
 
 export const ADD_MATERIAL = gql `
-mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $margin: Float!, $price: Float!, $task: Int!) {
+mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $margin: Float!, $price: Float!, $task: Int!) {
   addMaterial(
     title: $title,
 		order: $order,
 		done: $done,
+		approved: $approved,
 		quantity: $quantity,
 		margin: $margin,
 		price: $price,
@@ -705,6 +752,11 @@ mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $quantity: 
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     margin
     price
@@ -713,12 +765,13 @@ mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $quantity: 
 `;
 
 export const UPDATE_MATERIAL = gql `
-mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $margin: Float, $price: Float) {
+mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $margin: Float, $price: Float) {
   updateMaterial(
 		id: $id,
     title: $title,
 		order: $order,
 		done: $done,
+		approved: $approved,
 		quantity: $quantity,
 		margin: $margin,
 		price: $price,
@@ -727,6 +780,11 @@ mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, 
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     margin
     price
@@ -745,11 +803,12 @@ mutation deleteMaterial($id: Int!) {
 `;
 
 export const ADD_CUSTOM_ITEM = gql `
-mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $quantity: Float!, $price: Float!, $task: Int!) {
+mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $price: Float!, $task: Int!) {
   addCustomItem(
     title: $title,
 		order: $order,
 		done: $done,
+		approved: $approved,
 		quantity: $quantity,
 		price: $price,
 		task: $task,
@@ -758,6 +817,11 @@ mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $quantity
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     price
   }
@@ -765,12 +829,13 @@ mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $quantity
 `;
 
 export const UPDATE_CUSTOM_ITEM = gql `
-mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $quantity: Float, $price: Float) {
+mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $price: Float) {
   updateCustomItem(
 		id: $id,
     title: $title,
 		order: $order,
 		done: $done,
+		approved: $approved,
 		quantity: $quantity,
 		price: $price,
   ){
@@ -778,6 +843,11 @@ mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean
     title
     order
     done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
     quantity
     price
   }

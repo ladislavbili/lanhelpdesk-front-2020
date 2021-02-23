@@ -99,6 +99,7 @@ export default function ProjectAdd( props ) {
   const [ title, setTitle ] = React.useState( "" );
   const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
+  const [ autoApproved, setAutoApproved ] = React.useState( true );
   const [ groups, setGroups ] = React.useState( defaultGroups );
   const [ userGroups, setUserGroups ] = React.useState( [] );
 
@@ -198,6 +199,7 @@ export default function ProjectAdd( props ) {
           title,
           description,
           lockedRequester,
+          autoApproved,
           def: newDef,
           groups: newGroups,
           userGroups: newUserGroups,
@@ -328,6 +330,19 @@ export default function ProjectAdd( props ) {
           <Label htmlFor="description">Popis</Label>
           <Input type="textarea" className="form-control" id="description" placeholder="Zadajte text" value={description} onChange={(e) => setDescription( e.target.value )}/>
         </FormGroup>
+
+        <div className="row">
+          <Checkbox
+            className = "m-l-5 m-r-5"
+            centerHor
+            disabled={false}
+            value = { autoApproved}
+            onChange={() => setAutoApproved( !autoApproved) }
+            />
+          <span className="clickable" onClick = { () => setAutoApproved( !autoApproved) }>
+            All subtasks, work trips, materials and custom items are automatically approved.
+          </span>
+        </div>
 
         <Statuses
           statuses={statuses}

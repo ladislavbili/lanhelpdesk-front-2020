@@ -261,6 +261,7 @@ export default function TaskAdd( props ) {
             title: item.title,
             order: item.order,
             done: item.done,
+            approved: item.approved,
             quantity: item.quantity,
             discount: item.discount,
             type: item.type.id,
@@ -269,6 +270,7 @@ export default function TaskAdd( props ) {
           workTrips: workTrips.map( item => ( {
             order: item.order,
             done: item.done,
+            approved: item.approved,
             quantity: item.quantity,
             discount: item.discount,
             type: item.type.id,
@@ -278,6 +280,7 @@ export default function TaskAdd( props ) {
             title: item.title,
             order: item.order,
             done: item.done,
+            approved: item.approved,
             quantity: item.quantity,
             margin: item.margin,
             price: parseFloat( item.price )
@@ -286,6 +289,7 @@ export default function TaskAdd( props ) {
             title: item.title,
             order: item.order,
             done: item.done,
+            approved: item.approved,
             quantity: item.quantity,
             price: parseFloat( item.price )
           } ) ),
@@ -1047,6 +1051,7 @@ export default function TaskAdd( props ) {
         showColumns={ [0,1,2,3,4,5,6,7,8] }
         showTotals={false}
         userID={currentUser.id}
+        autoApproved={project ? project.autoApproved : false}
         userRights={userRights}
         isInvoiced={false}
         canEditInvoiced={false}
@@ -1063,7 +1068,12 @@ export default function TaskAdd( props ) {
         taskTypes={taskTypes}
         updateSubtask={(id,newData)=>{
           let newSubtasks=[...subtasks];
-          newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
+          let index = newSubtasks.findIndex((subtask)=>subtask.id===id);
+          if(newData.approved && newSubtasks[index].approved !== newData.approved ){
+            newSubtasks[index]={...newSubtasks[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+          }else{
+            newSubtasks[index]={...newSubtasks[index],...newData };
+          }
           setSubtasks(newSubtasks);
         }}
         updateSubtasks={(multipleSubtasks)=>{
@@ -1085,7 +1095,12 @@ export default function TaskAdd( props ) {
         }}
         updateTrip={(id,newData)=>{
           let newTrips=[...workTrips];
-          newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
+          let index = newTrips.findIndex((trip)=>trip.id===id);
+          if(newData.approved && newTrips[index].approved !== newData.approved ){
+            newTrips[index]={...newTrips[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+          }else{
+            newTrips[index]={...newTrips[index],...newData };
+          }
           setWorkTrips(newTrips);
         }}
         updateTrips={(multipleTrips)=>{
@@ -1107,7 +1122,12 @@ export default function TaskAdd( props ) {
         }}
         updateMaterial={(id,newData)=>{
           let newMaterials=[...materials];
-          newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
+          let index = newMaterials.findIndex((material)=>material.id===id);
+          if(newData.approved && newMaterials[index].approved !== newData.approved ){
+            newMaterials[index]={...newMaterials[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+          }else{
+            newMaterials[index]={...newMaterials[index],...newData };
+          }
           setMaterials(newMaterials);
         }}
         updateMaterials={(multipleMaterials)=>{
@@ -1129,7 +1149,12 @@ export default function TaskAdd( props ) {
         }}
         updateCustomItem={(id,newData)=>{
           let newCustomItems=[...customItems];
-          newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
+          let index = newCustomItems.findIndex((item)=>item.id===id);
+          if(newData.approved && newCustomItems[index].approved !== newData.approved ){
+            newCustomItems[index]={...newCustomItems[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+          }else{
+            newCustomItems[index]={...newCustomItems[index],...newData };
+          }
           setCustomItems(newCustomItems);
         }}
         updateCustomItems={(multipleCustomItems)=>{
