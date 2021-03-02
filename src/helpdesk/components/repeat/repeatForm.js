@@ -1743,16 +1743,18 @@ export default function RepeatForm( props ) {
       <div className="form-section task-edit-buttons">
         <div className="row form-section-rest">
           {closeModal &&
-            <button className="btn-link-cancel" onClick={() => closeModal()}>Cancel</button>
+            <button className="btn-link-cancel m-l-20" onClick={() => closeModal()}>Cancel</button>
           }
+          <div className="row pull-right">
           {canCreateVykazyError()}
           <button
-            className="btn pull-right"
+            className="btn"
             disabled={ cantSave }
             onClick={ triggerSave }
             >
             { editMode ? 'Update repeat' : 'Create repeat' }
           </button>
+        </div>
         </div>
       </div>
     )

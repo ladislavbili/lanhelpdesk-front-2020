@@ -236,7 +236,7 @@ export default function ErrorList( props ) {
     <div className="content">
       <div className="row m-0 p-0 taskList-container">
         <div className="col-lg-4">
-          <div className="commandbar">
+          <div className="commandbar p-l-10">
             <div className="search-row">
               <div className="search">
                 <button className="search-btn" type="button">
@@ -261,7 +261,7 @@ export default function ErrorList( props ) {
             </span>
           </div>
           <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
-            <div className=" p-l-10 p-b-10 row">
+            <div className="p-b-10 row">
               <h2>
                 Error messages
               </h2>
@@ -269,14 +269,14 @@ export default function ErrorList( props ) {
             <div>
               <button
                 type="button"
-                className="btn-link"
+                className="btn-link btn-distance"
                 onClick={markAllAsRead}
                 disabled={errors.every((error)=>error.read)}>
                 Označit všetky ako prečítané
               </button>
               <button
                 type="button"
-                className="btn-link"
+                className="btn-link btn-distance"
                 onClick={deleteAll}
                 disabled={errors.length === 0}>
                 Vymazať všetky
@@ -290,7 +290,7 @@ export default function ErrorList( props ) {
               </button>
             </div>
             <div>
-              <table className="table table-hover">
+              <table className="table">
                 <tbody>
                   {
                     errors.map((error) =>
@@ -309,7 +309,7 @@ export default function ErrorList( props ) {
                             <div>
                               {error.user ? error.user.email : "no user"}
                             </div>
-                            <div className="ml-auto m-r-55">
+                            <div className="ml-auto">
                               {timestampToString(parseInt(error.createdAt))}
                             </div>
                           </div>
