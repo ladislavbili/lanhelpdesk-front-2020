@@ -920,7 +920,7 @@ hr{
 }
 
 .table>tbody>tr:hover {
-  background-color: transparent; //#f4f8fb;
+  //background-color: ; //#f4f8fb;
 }
 
 th {
@@ -1282,7 +1282,7 @@ td {
 }
 
 .header-dropdown, .header-dropdown:hover{
-  background-color: inherit;
+  background-color: transparent !important;
   border-width: 0px;
   padding: 0px;
   width: 30px;
@@ -1290,7 +1290,7 @@ td {
 
 .header-icon, .header-icon:active, .header-icon:focus{
   font-size:15px;
-  background-color: inherit;
+  background-color: transparent !important;
   border-width: 0;
   margin-right: 10px;
   color: white;
@@ -1298,7 +1298,7 @@ td {
 
 .header-icon-with-text, .header-icon-with-text:hover, .header-icon-with-text:active, .header-icon-with-text:focus{
   font-size:15px;
-  background-color: inherit;
+  background-color: transparent !important;
   border-width: 0;
   margin-right: -4px;
   color: white;
@@ -1321,10 +1321,16 @@ td {
 }
 
 .notification-read{
+  background-color: white;
 }
 
 .notification-not-read{
+  background-color: white;
   font-weight: bold;
+}
+
+.sidebar-item-active{
+  background-color: #deeaf3 ;
 }
 
 .toolbar-item{
@@ -1688,7 +1694,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .nav:not(.nav-tabs) a.active {
   font-weight: 900;
   color: #0078D4 !important;
-  background-color: transparent;
+  background-color: #deeaf3;
   text-decoration: none !important;
 }
 
@@ -1699,7 +1705,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .nav:not(.nav-tabs) a:hover {
-  background-color: #F6F6F6;
+  //background-color: inherit;
   color: #0078D4 !important;
   text-decoration: none !important;
 }
@@ -2163,6 +2169,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   max-width: 1620px;
   min-width: 400px;
   width: calc(100% - 300px) !important;
+  min-height: calc(100vh - 110px) !important;
 }
 
 .task-edit-left-columns{
