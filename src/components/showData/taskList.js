@@ -106,7 +106,7 @@ export default function List( props ) {
           statuses={statuses}
           setStatuses={setStatuses}
           allStatuses={allStatuses}
-          underSearchButtonEvent={() => setUnderSearchOpen(!underSearchOpen)}
+          underSearchButtonEvent={underSearchLabel ? (() => setUnderSearchOpen(!underSearchOpen)) : null}
           underSearchButtonLabel={underSearchLabel}
           layout={layout}
           />

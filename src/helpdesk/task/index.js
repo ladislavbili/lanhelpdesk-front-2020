@@ -476,8 +476,8 @@ export default function TasksIndex( props ) {
         useBreadcrums={true}
         breadcrumsData={getBreadcrumsData()}
         setStatuses={setUserStatusesFunc}
-        underSearch={RowTaskAdd}
-        underSearchLabel={'Task'}
+        underSearch={null}
+        underSearchLabel={null}
         statuses={currentUser.statuses.map((status) => status.id ).filter((statusID) => statuses.some((status) => status.id === statusID ) )}
         allStatuses={statuses}
         checkTask={checkTask}

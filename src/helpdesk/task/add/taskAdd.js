@@ -588,7 +588,7 @@ export default function TaskAdd( props ) {
             { userRights.assignedRead && !defaultFields.assignedTo.fixed && userRights.assignedWrite &&
               <div className="col-8">
                 <div className="row p-r-10">
-                  <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
+                  <Label className="col-1-45 col-form-label">Assigned {project.def.assignedTo.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-10-45">
                     { layoutComponents.Assigned }
                   </div>
@@ -601,7 +601,7 @@ export default function TaskAdd( props ) {
             <div className="col-4">
               {userRights.statusRead && !defaultFields.status.fixed && userRights.statusWrite &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Status <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">Status {project.def.status.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     { layoutComponents.Status }
                   </div>
@@ -610,7 +610,7 @@ export default function TaskAdd( props ) {
 
               { userRights.typeRead && userRights.typeWrite &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Typ</Label>
+                  <Label className="col-3 col-form-label">Task type {project.def.type.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     { layoutComponents.Type }
                   </div>
@@ -629,7 +629,7 @@ export default function TaskAdd( props ) {
             <div className="col-4">
               {userRights.requesterRead && !defaultFields.requester.fixed &&  userRights.requesterWrite &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Requester <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">Requester {project.def.requester.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     { layoutComponents.Requester }
                   </div>
@@ -637,7 +637,7 @@ export default function TaskAdd( props ) {
               }
               {userRights.companyRead && !defaultFields.company.fixed && userRights.companyWrite &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Company <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">Company {project.def.company.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     { layoutComponents.Company }
                   </div>
@@ -645,7 +645,7 @@ export default function TaskAdd( props ) {
               }
               {userRights.pausalRead && userRights.pausalWrite && company && !company.monthly && !defaultFields.pausal.fixed &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Pausal <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">Pausal {project.def.pausal.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     { layoutComponents.Pausal }
                   </div>
@@ -683,7 +683,7 @@ export default function TaskAdd( props ) {
               }
               { userRights.overtimeRead && userRights.overtimeWrite && !defaultFields.overtime.fixed &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Outside PH <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">Outside PH {project.def.overtime.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     {layoutComponents.Overtime}
                   </div>
@@ -769,7 +769,7 @@ export default function TaskAdd( props ) {
         </div>
         { userRights.statusRead && !defaultFields.status.fixed && userRights.statusWrite &&
           <div className="form-selects-entry-column" >
-            <Label>Status <span className="warning-big">*</span></Label>
+            <Label>Status {project.def.status.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Status }
             </div>
@@ -785,7 +785,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.requesterRead && !defaultFields.requester.fixed &&  userRights.requesterWrite &&
           <div className="form-selects-entry-column" >
-            <Label>Requester <span className="warning-big">*</span></Label>
+            <Label>Requester {project.def.requester.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Requester }
             </div>
@@ -793,7 +793,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.companyRead && !defaultFields.company.fixed && userRights.companyWrite &&
           <div className="form-selects-entry-column" >
-            <Label>Company <span className="warning-big">*</span></Label>
+            <Label>Company {project.def.company.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Company }
             </div>
@@ -801,7 +801,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.assignedRead && !defaultFields.assignedTo.fixed && userRights.assignedWrite &&
           <div className="form-selects-entry-column" >
-            <Label>Assigned <span className="warning-big">*</span></Label>
+            <Label>Assigned {project.def.assignedTo.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Assigned }
             </div>
@@ -861,7 +861,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.typeRead && userRights.typeWrite &&
           <div className="form-selects-entry-column" >
-            <Label>Task Type</Label>
+            <Label>Task Type {project.def.type.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Type }
             </div>
@@ -869,7 +869,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.pausalRead && userRights.pausalWrite && company && !company.monthly && !defaultFields.pausal.fixed &&
           <div className="form-selects-entry-column" >
-            <Label>Pausal <span className="warning-big">*</span></Label>
+            <Label>Pausal {project.def.pausal.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Pausal }
             </div>
@@ -877,7 +877,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.overtimeRead && userRights.overtimeWrite && !defaultFields.overtime.fixed &&
           <div className="form-selects-entry-column" >
-            <Label>Outside PH <span className="warning-big">*</span></Label>
+            <Label>Outside PH {project.def.overtime.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Overtime }
             </div>
@@ -894,7 +894,7 @@ export default function TaskAdd( props ) {
           <div className="row center-hor">
             <button className="btn-link waves-effect p-b-10" onClick={ () => setTagsOpen(true) } >
               <i className="fa fa-plus" />
-              Tags
+              Tags {project.def.tag.required && <span className="warning-big">*</span>}
             </button>
             <MultiSelect
               className="center-hor"
@@ -943,7 +943,7 @@ export default function TaskAdd( props ) {
         <div className="row" style={{alignItems: "baseline"}}>
           <Label className="m-r-10">Popis úlohy</Label>
           { userRights.taskAttachmentsRead && userRights.taskAttachmentsWrite &&
-            <label htmlFor={`uploadAttachment-${null}`} className="btn-link" >
+            <label htmlFor={`uploadAttachment-${null}`} className="btn-link h-20px" >
               <i className="fa fa-plus" />
               Attachment
             </label>
@@ -1178,13 +1178,15 @@ export default function TaskAdd( props ) {
           {closeModal &&
             <Button className="btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
           }
-          {canCreateVykazyError()}
-          <button
-            className="btn pull-right"
-            disabled={ cantSave }
-            onClick={addTaskFunc}
-            > Create task
-          </button>
+          <div className="pull-right row">
+            {canCreateVykazyError()}
+            <button
+              className="btn"
+              disabled={ cantSave }
+              onClick={addTaskFunc}
+              > Create task
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -1208,7 +1210,6 @@ export default function TaskAdd( props ) {
     <div style={{backgroundColor: "#f9f9f9"}}>
       <div
         className={classnames(
-          "scrollable",
           "min-height-400",
           { "row": currentUser.taskLayout === 2}
         )}

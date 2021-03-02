@@ -574,7 +574,7 @@ h4{
 }
 
 .basic-border{
-  border: $main-border;
+  border: $main-border !important;
 }
 
 .basic-border-top{
@@ -589,7 +589,7 @@ h4{
 
 //---------------všeobecné-elementy---------------------
 
-.btn{
+.btn, .btn:hover, .btn:focus, .btn:focus:active, .btn:active, .btn:disabled, .btn:focus:active{
   background-color: $basic-button-color;
   border: 0px;
   height: $button-height;
@@ -597,21 +597,14 @@ h4{
   color: #FFFFFF;
   font: $font-value;
   margin-left: 0px;
-  margin-right: 15px;
+  margin-right: 0px;
   box-shadow: none;
   outline: none;
+  opacity: 100;
 }
 
 .btn:last-child{
   margin-right: 0px;
-}
-
-.btn:hover, .btn:focus, .btn:focus:active, .btn:active, .btn:disabled, .btn:focus:active{
-  background-color: $basic-button-color;
-  color: #FFFFFF;
-  box-shadow: none;
-  outline: none;
-  opacity: 100;
 }
 
 .btn-link, .btn-link:hover, .btn-link:active, .btn-link:focus, .btn-link:disabled, .btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn){
@@ -718,15 +711,20 @@ h4{
   background-color: transparent;
 }
 
-.btn-red{
+.btn-red, .btn-red:hover, .btn-red:active, .btn-red:active:focus, .btn-red:focus{
   background-color: red;
   color: white;
+  border: 0px;
+  height: $button-height;
+  border-radius: 0px;
+  font: $font-value;
+  margin-left: 0px;
+  margin-right: 15px;
+  box-shadow: none;
+  outline: none;
+  opacity: 100;
 }
 
-.btn-red:hover{
-  background-color: red;
-  color: white;
-}
 
 .btn-danger{
   background-color: red;
@@ -975,8 +973,8 @@ tr:nth-last-child(2){ //, tr:first-child{
   color: $color-value;
   border-radius: 0px;
   box-shadow: none;
-  height: calc(1.5em + .75rem + 4px);
-  border: $main-border;
+  height: 30px; //calc(1.5em + .75rem + 4px);
+  border: $secondary-border;
 }
 
 .form-control:disabled{
@@ -1767,6 +1765,12 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   border-bottom: $main-border;
 }
 
+.task-add-date-picker-placeholder{
+    ::placeholder{
+      color:red;
+    }
+}
+
 .task-container-col{
   background-color: #FFF;
 }
@@ -2233,6 +2237,16 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   /*.nav-tabs>.nav-item>.nav-link{
   @extend label:not(.col-form-label);
 }*/
+}
+
+.form-section.task-edit-buttons{
+  position: absolute;
+  bottom: 30px;
+  .pull-right{
+    width: 500px;
+    position: absolute;
+    left: 450px;
+  }
 }
 
 .form-section:last-child{

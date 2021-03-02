@@ -42,7 +42,7 @@ export default function Scheduled( props ) {
       <div className="row">
         <Label className={classnames({"m-l-0 m-t-5 m-r-10": layout === 1})} >Scheduled</Label>
         <button
-          className={classnames("btn btn-link waves-effect h-f-c", {"ml-auto": layout === 2}, {"center-hor": layout === 1})}
+          className={classnames("btn-link m-r-0 h-f-c", {"ml-auto": layout === 2}, {"center-hor": layout === 1})}
           disabled={disabled}
           onClick={()=>{
             setAddItem(true);
@@ -70,7 +70,7 @@ export default function Scheduled( props ) {
               }
             </span>
             <button
-              className="btn btn-link waves-effect ml-auto"
+              className="btn-link ml-auto"
               disabled={disabled}
               onClick={()=>{
                 deleteItem(item);
@@ -124,8 +124,8 @@ export default function Scheduled( props ) {
                 />
             </FormGroup>
             <div className="p-t-5 row">
-              <Button
-                className="btn-red m-l-5 btn btn-secondary"
+              <button
+                className="btn-red m-l-5"
                 onClick={() => {
                   setAddItem(!addItem)
                   setNewUser(null);
@@ -134,7 +134,7 @@ export default function Scheduled( props ) {
                 }}
                 >
                 Close
-              </Button>
+              </button>
               <Button
                 disabled={
                   newUser === null ||

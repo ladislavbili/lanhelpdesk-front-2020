@@ -138,7 +138,7 @@ export default function CommandBar( props ) {
 							>
 
               { canAddCustomAttributes &&
-              <button type="button" className="btn waves-effect" onClick={() => setOpenCustomAttributes(true)}>
+              <button type="button" className="btn-link" onClick={() => setOpenCustomAttributes(true)}>
                 <i className="fa fa-plus"/> Custom Attribute
               </button>
             }

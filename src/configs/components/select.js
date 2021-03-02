@@ -475,7 +475,7 @@ export const selectStyleNoArrowRequired = {
   } ),
   menu: base => ( {
     ...base,
-    zIndex: 50,
+    zIndex: 9990,
     ...value
   } ),
 
@@ -1175,7 +1175,8 @@ export const selectStyle = {
     ...base,
     minHeight: 30,
     backgroundColor: 'white',
-    borderRadius: 0
+    borderRadius: 0,
+    borderColor: "#c4c4c4 !important",
   } ),
   dropdownIndicator: base => ( {
     ...base,

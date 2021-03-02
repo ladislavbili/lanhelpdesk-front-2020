@@ -95,7 +95,7 @@ export default function SimpleRepeat( props ) {
         <PopoverHeader>Opakovanie</PopoverHeader>
         <PopoverBody>
           <div>
-            <FormGroup>
+            <FormGroup className="task-add-date-picker-placeholder">
               <Label>Start date *</Label>
               <DatePicker
                 className="form-control hidden-input"
@@ -137,6 +137,7 @@ export default function SimpleRepeat( props ) {
                 value = { active }
                 onChange={() => setActive(!active )}
                 />
+
             <div className="row">
               <Button
                 className="btn btn-link"
