@@ -204,9 +204,9 @@ export default function FilterAdd( props ) {
 
   return (
     <div className="filter-add-btn">
-    <Button className="btn-link inner m-l-19" onClick={() => setOpened(!opened)}>
+    <button className="btn-link inner m-l-19" onClick={() => setOpened(!opened)}>
       <i className="far fa-save icon-M"/>
-    </Button>
+    </button>
 
     <Modal style={{width: "800px"}} isOpen={opened}>
       <ModalHeader>
@@ -275,14 +275,17 @@ export default function FilterAdd( props ) {
 
       </ModalBody>
       <ModalFooter>
-        <Button className="mr-auto btn-link" disabled={saving} onClick={() => setOpened(!opened)}>
+        <button className="mr-auto btn-link" disabled={saving} onClick={() => setOpened(!opened)}>
           Close
-        </Button>
+        </button>
 
-        <Button
+        <button
           className="btn"
           disabled={saving || title === "" || (!global && project===null)}
-          onClick={addFilterFunc}>{id!==null?(saving?'Saving...':'Save filter'):(saving?'Adding...':'Add filter')}</Button>
+          onClick={addFilterFunc}
+          >
+          {id!==null?(saving?'Saving...':'Save filter'):(saving?'Adding...':'Add filter')}
+        </button>
         </ModalFooter>
       </Modal>
     </div>

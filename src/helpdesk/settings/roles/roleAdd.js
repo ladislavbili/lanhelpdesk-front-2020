@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 import ErrorMessage from 'components/errorMessage';
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -267,12 +266,12 @@ export default function RoleAdd( props ) {
         <div className="form-buttons-row">
           {
             props.close &&
-            <Button className="btn-link" onClick={() => {
+            <button className="btn-link" onClick={() => {
                 props.close()
               }}
               >
               Cancel
-            </Button>
+            </button>
           }
 
           <button className="btn ml-auto" disabled={cannotSave()} onClick={addRoleFunc}>

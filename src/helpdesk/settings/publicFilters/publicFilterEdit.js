@@ -4,7 +4,6 @@ import {
   useQuery
 } from "@apollo/client";
 import {
-  Button,
   FormGroup,
   Label,
   Input,
@@ -682,11 +681,11 @@ export default function PublicFilterEdit( props ) {
 
 
         <div className="form-buttons-row">
-          <Button
+          <button
             className="btn-red m-l-5"
             onClick={ deletePublicFilter }>
             Delete
-          </Button>
+          </button>
           <button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>{saving?'Saving...':'Save filter'}</button>
         </div>
       </div>

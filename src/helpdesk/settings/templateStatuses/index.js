@@ -3,9 +3,6 @@ import {
   useQuery
 } from "@apollo/client";
 
-import {
-  Button
-} from 'reactstrap';
 import StatusAdd from './statusAdd';
 import StatusEdit from './statusEdit';
 import {
@@ -51,11 +48,11 @@ export default function StatusesList( props ) {
                     />
                 </div>
               </div>
-              <Button
+              <button
                 className="btn-link center-hor"
                 onClick={()=>history.push('/helpdesk/settings/statuses/add')}>
                 <i className="fa fa-plus p-l-5 p-r-5"/>Status
-              </Button>
+              </button>
             </div>
             <div className=" p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
               <h2 className=" p-l-10 p-b-10 ">

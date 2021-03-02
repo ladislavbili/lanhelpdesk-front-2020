@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input,
@@ -495,9 +494,9 @@ export default function IMAPEdit( props ) {
         </FormGroup>
 
         <div className="form-buttons-row">
-          <Button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={ deleteIMAPFunc }>Delete</Button>
-          <button className="btn ml-auto" disabled={saving || tested} onClick={ startTest }>Test IMAP</button>
-          <button className="btn m-l-5" disabled={cannotSave} onClick={updateIMAPFunc}>{ saving ? 'Saving IMAP...' : 'Save IMAP' }</button>
+          <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={ deleteIMAPFunc }>Delete</button>
+          <button className="btn ml-auto btn=distance" disabled={saving || tested} onClick={ startTest }>Test IMAP</button>
+          <button className="btn" disabled={cannotSave} onClick={updateIMAPFunc}>{ saving ? 'Saving IMAP...' : 'Save IMAP' }</button>
         </div>
       </div>
     </div>

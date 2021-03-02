@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input,
@@ -422,20 +421,20 @@ export default function SMTPEdit( props ) {
           }
         </ModalBody>
         <ModalFooter>
-          <Button className="btn-link mr-auto"onClick={() => setChoosingNewSMTP(false)}>
+          <button className="btn-link mr-auto"onClick={() => setChoosingNewSMTP(false)}>
             Cancel
-          </Button>
-          <Button className="btn ml-auto" disabled={!newSMTP || (def ? !newDefSMTP : false)} onClick={deleteSMTPFunc}>
+          </button>
+          <button className="btn ml-auto" disabled={!newSMTP || (def ? !newDefSMTP : false)} onClick={deleteSMTPFunc}>
             Complete deletion
-          </Button>
+          </button>
         </ModalFooter>
       </Modal>
 
       <div className="form-buttons-row">
-        <Button className="btn-red mr-auto" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</Button>
+        <button className="btn-red mr-auto" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</button>
         <ErrorMessage show={ !loading && !data.smtp.currentlyTested && !data.smtp.working  } message={data.smtp.errorMessage} />
-        <button className="btn" disabled={saving || tested} onClick={ startTest }>Test SMTP</button>
-        <button className="btn m-l-5" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</button>
+        <button className="btn btn-distance" disabled={saving || tested} onClick={ startTest }>Test SMTP</button>
+        <button className="btn" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</button>
       </div>
     </div>
   </div>

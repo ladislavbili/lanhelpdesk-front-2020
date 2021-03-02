@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Button,
   Popover,
   PopoverHeader,
   PopoverBody,
@@ -32,13 +31,13 @@ export default function ProjectGroups( props ) {
 
   return (
     <div>
-      <Button
+      <button
         id={`edit-project-group-${group.id}`}
-        className="btn waves-effect m-r-5"
+        className="btn m-r-5"
         onClick={ () => setOpen(true) }
         >
         EDIT
-      </Button>
+      </button>
       <Popover
         placement="right"
         target={`edit-project-group-${group.id}`}
@@ -55,15 +54,17 @@ export default function ProjectGroups( props ) {
             <Label for="role">Order</Label>
             <Input placeholder="Set order" value={order} onChange={(e) => setOrder(e.target.value)}/>
           </FormGroup>
-          <Button
+          <button
+            className="btn btn-distance"
             onClick={ () => {
               setTitle(group.title);
               setOrder(group.order);
             } }
             >
             Restore
-          </Button>
-          <Button
+          </button>
+          <button
+            className="btn"
             disabled={ title.length === 0 || isNaN(parseInt(order)) }
             onClick={ () => {
               updateGroup({ title, id: group.id, order })
@@ -71,7 +72,7 @@ export default function ProjectGroups( props ) {
             } }
             >
             Update
-          </Button>
+          </button>
         </PopoverBody>
       </Popover>
     </div>

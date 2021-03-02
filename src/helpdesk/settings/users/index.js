@@ -3,9 +3,6 @@ import {
   useQuery
 } from "@apollo/client";
 
-import {
-  Button
-} from 'reactstrap';
 import Multiselect from 'components/multiselect';
 import {
   toSelArr
@@ -80,11 +77,11 @@ export default function UserListContainer( props ) {
                   />
               </div>
             </div>
-            <Button
+            <button
               className="btn-link center-hor"
               onClick={()=> history.push('/helpdesk/settings/users/add')}>
               <i className="fa fa-plus p-l-5 p-r-5"/> User
-              </Button>
+              </button>
             </div>
             <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
               <div className="row p-l-10 p-b-10">

@@ -3,9 +3,6 @@ import {
   useQuery
 } from "@apollo/client";
 
-import {
-  Button
-} from 'reactstrap';
 import Loading from 'components/loading';
 import classnames from 'classnames';
 

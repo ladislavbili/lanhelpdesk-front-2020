@@ -618,8 +618,12 @@ h4{
   text-decoration: none;
   box-shadow: none;
   margin-left: 0px;
-  margin-right: 15px;
+  margin-right: 0px;
   outline: none;
+}
+
+.btn-distance {
+  margin-right: 10px !important;
 }
 
 .btn-link-reversed{
@@ -637,17 +641,19 @@ h4{
   text-decoration: none;
 }
 
-.btn-link-cancel, .btn-link-cancel:hover, .btn-link-cancel:active, .btn-link-cancel:focus, .btn-link-cancel:focus:active{
+.btn-link-cancel, .btn-link-cancel:hover, .btn-link-cancel:active, .btn-link-cancel:focus, .btn-link-cancel:focus:active, .btn-link-cancel:disabled {
   background-color: inherit;
   padding-left: 0px;
   color: #A6A6A6;
   text-decoration: none;
+  outline: none;
+  border: none;
 }
 
 .sidebar-btn, .sidebar-btn:hover, .sidebar-btn:active, .sidebar-btn:focus:active,  .sidebar-btn:focus{
-  width: calc(100% - 10px);
+  width: calc(100% - 30px);
   color: white;
-  margin: 10px 5px 0px 5px;
+  margin: 10px 15px 0px 15px;
   padding-left: 10px;
   height: $button-height;
   text-align: left;
@@ -668,17 +674,15 @@ h4{
 }
 
 
-.btn-repeat{
+.btn-repeat, .btn-repeat:hover, .btn-repeat:focus, .btn-repeat:focus:active, .btn-repeat:active, .btn-repeat:disabled, .btn-repeat:focus:active{
   background-color: white !important;
   font: $font-no-value;
   color: $color-no-value;
   width: 100%;
   text-align: left;
-}
-.btn-repeat:hover{
-  cursor: pointer;
-  background-color: white !important;
-  color: black;
+  outline: none;
+  border: none;
+  height: $button-height;
 }
 
 .btn-repeat-white{
@@ -706,9 +710,21 @@ h4{
   width: 30px;*/
 }
 
-.btn-red-link, .btn-red-link:hover, .btn-red-link:active, .btn-red-link:active:focus, .btn-red-link:focus{
+.btn-link-red, .btn-link-red:hover, .btn-link-red:active, .btn-link-red:active:focus, .btn-link-red:focus{
   color: red;
   background-color: transparent;
+  outline: none;
+  border: none;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-right: 0px;
+  margin-left: 0px;
+  height: $button-height;
+  border: 0px;
+  border-radius: 0px;
+  font: $font-value;
+  box-shadow: none;
+  opacity: 100;
 }
 
 .btn-red, .btn-red:hover, .btn-red:active, .btn-red:active:focus, .btn-red:focus{
@@ -923,12 +939,7 @@ th:last-child{
 td {
   color: $contrasting-font-color;
 }
-tr{
-//  border-bottom: 1px solid $table-lines !important;
-}
-tr:nth-last-child(2){ //, tr:first-child{
-  border-bottom: 1px solid #ddd;//0px solid $table-lines !important;
-}
+
 .tr-no-lines>th {
   border-bottom: 0px solid $table-lines !important;
 }
@@ -969,6 +980,15 @@ tr:nth-last-child(2){ //, tr:first-child{
 }
 
 .form-control{
+  font: $font-value;
+  color: $color-value;
+  border-radius: 0px;
+  box-shadow: none;
+  height: 30px; //calc(1.5em + .75rem + 4px);
+  border: $main-border;
+}
+
+.form-control-secondary{
   font: $font-value;
   color: $color-value;
   border-radius: 0px;
@@ -1261,14 +1281,14 @@ tr:nth-last-child(2){ //, tr:first-child{
   border-bottom: 1px solid white;
 }
 
-.header-dropdown{
+.header-dropdown, .header-dropdown:hover{
   background-color: inherit;
   border-width: 0px;
   padding: 0px;
   width: 30px;
 }
 
-.header-icon{
+.header-icon, .header-icon:active, .header-icon:focus{
   font-size:15px;
   background-color: inherit;
   border-width: 0;
@@ -1276,7 +1296,7 @@ tr:nth-last-child(2){ //, tr:first-child{
   color: white;
 }
 
-.header-icon-with-text{
+.header-icon-with-text, .header-icon-with-text:hover, .header-icon-with-text:active, .header-icon-with-text:focus{
   font-size:15px;
   background-color: inherit;
   border-width: 0;
@@ -1607,7 +1627,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   margin-bottom: auto;
 }
 
-.search-btn{
+.search-btn, .search-btn:hover, .search-btn:active, .search-btn:focus, .search-btn:disabled{
   background-color: white;
   border: $main-border;
   border-right: none;
@@ -2232,6 +2252,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
       border: 1px solid #c4c4c4 !important;
       margin-left: $input-padding;
       width: calc(100% - #{$input-padding});
+    }
+  }
+  .form-section-rest.placeholder-highlight{
+    ::placeholder{
+      color: red;
     }
   }
   /*.nav-tabs>.nav-item>.nav-link{

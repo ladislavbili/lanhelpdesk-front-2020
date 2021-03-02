@@ -13,7 +13,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Button
 } from 'reactstrap';
 import TaskAdd from './taskAdd';
 
@@ -142,7 +141,7 @@ export default function TaskAddContainer( props ) {
     return (
       <button
         type="button"
-        className="btn-link task-add-layout-button"
+        className="btn-link task-add-layout-button btn-distance"
         disabled={disabled}
         onClick={()=> {
           setOpenAddTaskModal(true);

@@ -3,9 +3,6 @@ import {
   useQuery
 } from "@apollo/client";
 
-import {
-  Button
-} from 'reactstrap';
 import TripTypeAdd from './tripTypeAdd';
 import TripTypeEdit from './tripTypeEdit';
 import Loading from 'components/loading';
@@ -50,11 +47,11 @@ export default function TripTypeListContainer( props ) {
                   />
               </div>
             </div>
-            <Button
+            <button
               className="btn-link center-hor"
               onClick={ () => history.push('/helpdesk/settings/tripTypes/add') }>
               <i className="fa fa-plus p-l-5 p-r-5"/> Trip type
-            </Button>
+            </button>
           </div>
           <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
             <h2 className=" p-l-10 p-b-10 ">

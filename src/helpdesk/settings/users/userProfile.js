@@ -6,7 +6,6 @@ import {
   cache
 } from "@apollo/client";
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -210,28 +209,28 @@ export default function UserProfile( props ) {
       </FormGroup>
 
       <div className="row">
-        <Button
+        <button
           className="btn-link"
           onClick={closeModal}
           >
           Cancel
-        </Button>
-        <Button
-          className="btn-link ml-auto"
+        </button>
+        <button
+          className="btn-link ml-auto btn-distance"
           disabled={ saving }
           onClick={ ()=>{
             setPasswordChangeOpen(true);
           }}
           >
           { password === null ? 'Change password' : 'Password change edit' }
-        </Button>
-        <Button
-          className="btn m-l-5"
+        </button>
+        <button
+          className="btn"
           disabled={ saving || !isEmail(email) }
           onClick={updateProfileFunc}
           >
           { saving ? 'Saving user...' : 'Save user' }
-        </Button>
+        </button>
       </div>
       <PasswordChange
         submitPass={(pass) => {

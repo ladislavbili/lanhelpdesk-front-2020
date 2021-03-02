@@ -6,7 +6,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -262,12 +261,12 @@ export default function UserAddContainer( props ) {
 
         <div className="form-buttons-row">
           {closeModal &&
-            <Button
-              className="btn btn-link"
+            <button
+              className="btn-link"
               onClick={ closeModal }
               >
               Cancel
-            </Button>
+            </button>
           }
           { closeModal && cannotAddUser() &&
             <div className=" ml-auto message error-message">

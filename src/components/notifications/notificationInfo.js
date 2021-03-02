@@ -36,7 +36,7 @@ export default function NotificationInfo( props ) {
           <Label className="m-r-5">Task:</Label>
           {`${notification.task.id}:${notification.task.title}`}
         </div>
-        <button className="btn btn-link" onClick={() => {}}>
+        <button className="btn-link" onClick={() => {}}>
           Cancel notifications
         </button>
       </div>

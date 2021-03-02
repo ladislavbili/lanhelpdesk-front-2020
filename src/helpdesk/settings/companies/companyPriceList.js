@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -104,14 +103,17 @@ export default function CompanyPriceList( props ) {
             pricelist.value !== "0" &&
             pricelist.def &&
             <div>
-              <Button
-                className="btn-link-reversed p-l-0"
+              <button
+                className="btn-link p-l-0"
                 onClick={()=>{
                   if (window.confirm("You will be redirected to a page where you can edit this pricelist. All unsaved progress will be lost, are you sure you want to proceed?")){
                     cancel();
                     history.push(`/helpdesk/settings/pricelists/${pricelist.id}`)
                   }
-              }}>Edit default pricelist</Button>
+              }}
+              >
+              Edit default pricelist
+            </button>
             </div>
           }
 			</div>

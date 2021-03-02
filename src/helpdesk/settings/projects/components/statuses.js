@@ -3,7 +3,6 @@ import {
   Popover,
   PopoverHeader,
   PopoverBody,
-  Button,
 } from 'reactstrap';
 import {
   SketchPicker
@@ -88,13 +87,13 @@ export default function Statuses( props ) {
                   />
               </td>
               <td>
-                <Button
+                <button
                   id={`add-color-picker-${status.id}`}
                   style={{backgroundColor: status.color }}
-                  className={`full-width ${inputError(status.color, 'color')}`}
+                  className={`btn full-width ${inputError(status.color, 'color')}`}
                   onClick={ () => setEditColorID(status.id) }
                   >
-                </Button>
+                </button>
                 <Popover
                   placement="left"
                   target={`add-color-picker-${status.id}`}
@@ -113,7 +112,7 @@ export default function Statuses( props ) {
               </td>
               <td>
                 <button
-                  className="btn waves-effect m-r-5"
+                  className="btn m-r-5"
                   onClick={() => deleteStatus(status.id) }
                   >
                   <i className="fa fa-times" />
@@ -155,13 +154,13 @@ export default function Statuses( props ) {
                 />
             </td>
             <td>
-              <Button
+              <button
                 id="add-color-picker"
                 style={{backgroundColor: color }}
-                className={`full-width ${inputError(color, 'color')}`}
+                className={`btn full-width ${inputError(color, 'color')}`}
                 onClick={ () => setEditColorID('add') }
                 >
-              </Button>
+              </button>
               <Popover
                 placement="left"
                 isOpen={editColorID !== null && editColorID === 'add' }
@@ -180,7 +179,7 @@ export default function Statuses( props ) {
             </td>
             <td>
               <button
-                className="btn waves-effect m-r-5"
+                className="btn m-r-5"
                 disabled={title.length === 0 || !color.includes('#') || isNaN(parseInt(order)) }
                 onClick={() => {
                   addStatus({

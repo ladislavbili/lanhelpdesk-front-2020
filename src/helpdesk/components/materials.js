@@ -1,75 +1,84 @@
-import React, { Component } from 'react';
+import React, {
+  Component
+} from 'react';
 import Select from 'react-select';
-import { selectStyle, invisibleSelectStyle} from 'configs/components/select';
+import {
+  selectStyle,
+  invisibleSelectStyle
+} from 'configs/components/select';
 
 export default class Rozpocet extends Component {
-	constructor(props){
-		super(props);
-		const newMargin= this.props.company && this.props.company.pricelist ? this.props.company.pricelist.materialMargin : 0;
-		const newUnit= this.props.units.find((item)=>item.id===this.props.defaultUnit);
-		this.state={
-			editedMaterialTitle: "",
-			editedMaterialQuantity: "0",
-			editedMaterialUnit:null,
-			editedMaterialMargin:null,
-			editedMaterialPrice:null,
-			focusedMaterial: null,
-			selectedIDs:[],
+  constructor( props ) {
+    super( props );
+    const newMargin = this.props.company && this.props.company.pricelist ? this.props.company.pricelist.materialMargin : 0;
+    const newUnit = this.props.units.find( ( item ) => item.id === this.props.defaultUnit );
+    this.state = {
+      editedMaterialTitle: "",
+      editedMaterialQuantity: "0",
+      editedMaterialUnit: null,
+      editedMaterialMargin: null,
+      editedMaterialPrice: null,
+      focusedMaterial: null,
+      selectedIDs: [],
 
-			newTitle:'',
-			newQuantity:1,
-			newUnit:newUnit?newUnit:null,
-			newMargin,
-			newPrice:0,
-			marginChanged:false,
-		}
-		this.getDPH.bind(this);
-	}
+      newTitle: '',
+      newQuantity: 1,
+      newUnit: newUnit ? newUnit : null,
+      newMargin,
+      newPrice: 0,
+      marginChanged: false,
+    }
+    this.getDPH.bind( this );
+  }
 
-	componentWillReceiveProps(props){
-		if((this.props.company===null && props.company!==null) ||
-		(this.props.company && props.company && props.company.id!==this.props.company.id)){
-			this.setState({newMargin: (props.company && props.company.pricelist ? props.company.pricelist.materialMargin : 0)});
-		}
-		if(this.props.units && props.units && this.props.units.length!==props.units.length){
-			let newUnit= props.units[0];
-			if(props.defaultUnit!==null){
-				newUnit=props.units.find((item)=>item.id===props.defaultUnit)
-			}
-			this.setState({newUnit});
-		}
-		if(this.props.match.params.taskID!==props.match.params.taskID){
-			let newUnit= props.units[0];
-			if(props.defaultUnit!==null){
-				newUnit=props.units.find((item)=>item.id===props.defaultUnit)
-			}
-			this.setState({
-				newTitle:'',
-				newQuantity:1,
-				newUnit,
-				newMargin: props.company && props.company.pricelist ? props.company.pricelist.materialMargin : 0,
-				newPrice:0,
-				marginChanged:false,
-			})
-		}
-	}
+  componentWillReceiveProps( props ) {
+    if ( ( this.props.company === null && props.company !== null ) ||
+      ( this.props.company && props.company && props.company.id !== this.props.company.id ) ) {
+      this.setState( {
+        newMargin: ( props.company && props.company.pricelist ? props.company.pricelist.materialMargin : 0 )
+      } );
+    }
+    if ( this.props.units && props.units && this.props.units.length !== props.units.length ) {
+      let newUnit = props.units[ 0 ];
+      if ( props.defaultUnit !== null ) {
+        newUnit = props.units.find( ( item ) => item.id === props.defaultUnit )
+      }
+      this.setState( {
+        newUnit
+      } );
+    }
+    if ( this.props.match.params.taskID !== props.match.params.taskID ) {
+      let newUnit = props.units[ 0 ];
+      if ( props.defaultUnit !== null ) {
+        newUnit = props.units.find( ( item ) => item.id === props.defaultUnit )
+      }
+      this.setState( {
+        newTitle: '',
+        newQuantity: 1,
+        newUnit,
+        newMargin: props.company && props.company.pricelist ? props.company.pricelist.materialMargin : 0,
+        newPrice: 0,
+        marginChanged: false,
+      } )
+    }
+  }
 
-	getDPH(){
-		let dph = 20;
-		if(this.props.company && this.props.company.dph > 0){
-			dph = this.props.company.dph;
-		}
-		return (100+dph)/100;
-	}
+  getDPH() {
+    let dph = 20;
+    if ( this.props.company && this.props.company.dph > 0 ) {
+      dph = this.props.company.dph;
+    }
+    return ( 100 + dph ) / 100;
+  }
 
-	render() {
-		const unitPrice= this.state.newPrice?(this.state.newPrice*(this.state.newMargin/100+1)):0;
-		let editedFinalUnitPrice = 0;
-		if(this.state.focusedMaterial!==null){
-			editedFinalUnitPrice = (parseFloat(this.state.editedMaterialPrice)*(1+parseFloat(this.state.editedMaterialMargin)/100))
-		}
-		return (
-			<div>
+  render() {
+    const unitPrice = this.state.newPrice ? ( this.state.newPrice * ( this.state.newMargin / 100 + 1 ) ) : 0;
+    let editedFinalUnitPrice = 0;
+    if ( this.state.focusedMaterial !== null ) {
+      editedFinalUnitPrice = ( parseFloat( this.state.editedMaterialPrice ) * ( 1 + parseFloat( this.state.editedMaterialMargin ) / 100 ) )
+    }
+    return (
+      <div>
 				<div className="row">
 					<div className="col-md-12">
 						<div>
@@ -232,7 +241,7 @@ export default class Rozpocet extends Component {
 														/>
 												</td>}
 											{ this.props.showColumns.includes(6) && <td className="t-a-r">
-												<button className="btn btn-link waves-effect" disabled={this.props.disabled}>
+												<button className="btn-link btn-distance" disabled={this.props.disabled}>
 														<i className="fa fa-sync-alt" onClick={()=>{
 																if(parseInt(material.price) <= 50){
 																	this.props.updateMaterial(material.id,{margin:(this.props.company && this.props.company.pricelist)?parseInt(this.props.company.pricelist.materialMargin):material.margin})
@@ -241,14 +250,14 @@ export default class Rozpocet extends Component {
 																}
 															}} />
 												</button>
-												<button className="btn btn-link waves-effect" disabled={this.props.disabled}>
+												<button className="btn-link btn-distance" disabled={this.props.disabled}>
 													<i className="fa fa-arrow-up"  />
 												</button>
-												<button className="btn btn-link waves-effect" disabled={this.props.disabled}>
+												<button className="btn-link btn-distance" disabled={this.props.disabled}>
 														<i className="fa fa-arrow-down"  />
 												</button>
 
-												<button className="btn btn-link waves-effect"
+												<button className="btn-link"
 													disabled={this.props.disabled}
 													onClick={()=>{
 														if(window.confirm('Are you sure?')){
@@ -265,7 +274,7 @@ export default class Rozpocet extends Component {
 									{!this.state.showAddItem && !this.props.disabled &&
 										<tr >
 										<td colSpan={this.props.showColumns.length}>
-											<button className="btn btn-table-add-item"
+											<button className="btn-table-add-item"
 												onClick={()=>{
 												 this.setState({showAddItem: true});
 												}}>
@@ -352,7 +361,7 @@ export default class Rozpocet extends Component {
 												/>
 										</td>}
 										{ this.props.showColumns.includes(6) && <td className="t-a-r">
-											<button className="btn btn-link waves-effect"
+											<button className="btn-link"
 												disabled={this.state.newUnit===null||this.props.disabled}
 												onClick={()=>{
 													let body={
@@ -376,7 +385,7 @@ export default class Rozpocet extends Component {
 												>
 												<i className="fa fa-plus" />
 											</button>
-											<button className="btn btn-link waves-effect"
+											<button className="btn-link"
 												disabled={this.props.disabled}
 												onClick={()=>{
 													this.setState({showAddItem: false})
@@ -419,6 +428,6 @@ export default class Rozpocet extends Component {
 
 					</div>
 				</div>
-			);
-		}
-	}
+    );
+  }
+}

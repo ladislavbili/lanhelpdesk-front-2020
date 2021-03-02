@@ -4,7 +4,6 @@ import {
   useQuery
 } from "@apollo/client";
 import {
-  Button,
   FormGroup,
   Label,
   Input,
@@ -374,10 +373,10 @@ export default function RoleEdit( props ) {
 
         <div className="form-buttons-row">
           {props.close &&
-            <Button className="btn-link"
-              onClick={()=>{props.close()}}>Cancel</Button>
+            <button className="btn-link btn-distance"
+              onClick={()=>{props.close()}}>Cancel</button>
           }
-          <Button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft || currentUserLevel === null || currentUserLevel >= level } onClick={ () => setDeleteOpen(true) }>Delete</Button>
+          <button className="btn-red" disabled={saving || theOnlyOneLeft || currentUserLevel === null || currentUserLevel >= level } onClick={ () => setDeleteOpen(true) }>Delete</button>
           <button className="btn ml-auto" disabled={saving || currentUserLevel === null || currentUserLevel >= level} onClick={updateRoleFunc}>{saving?'Saving...':'Save'}</button>
         </div>
         <DeleteReplacement

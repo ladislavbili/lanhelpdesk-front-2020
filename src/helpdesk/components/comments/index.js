@@ -156,8 +156,8 @@ export default function Comments( props ) {
 
         <div className="row m-b-30">
 
-          <Button
-            className="btn waves-effect center-hor m-t-0"
+          <button
+            className="btn center-hor m-t-0 btn-distance"
             disabled={(!isEmail && newComment==='')||
               (isEmail&&(tos.length < 1 ||subject===''||emailBody===''))||saving}
               onClick={() => {
@@ -206,7 +206,7 @@ export default function Comments( props ) {
                 setTos( [] );
               }}>
               Submit
-            </Button>
+            </button>
             { userRights.emails && userRights.addComments &&
               <Checkbox
                 className = "m-r-15 center-hor "
@@ -250,7 +250,7 @@ export default function Comments( props ) {
                 <span style={{color: "#0078D4"}}>
                   {`${attachment.name} (${Math.round(parseInt(attachment.size)/1024)}kB)`}
                 </span>
-                <button className="btn btn-link-reversed waves-effect"
+                <button className="btn-link"
                   style={{height: "15px",
                     marginTop: "-8px",
                     marginLeft: "5px",

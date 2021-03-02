@@ -2,7 +2,6 @@ import React, {
   Component
 } from 'react';
 import {
-  Button,
   FormGroup
 } from 'reactstrap';
 
@@ -47,23 +46,23 @@ export default class FilterDatePickerSeparated extends Component {
           <div className="col-6">
             { !showCalendarFrom && !showNowFrom &&
               <div className="flex">
-                <Button
-                  className="btn-link-reversed center-hor"
+                <button
+                  className="btn-link center-hor"
                   onClick={()=>{
                     setShowNowFrom(true)
                   }}
                   >
                   Set now
-                </Button>
+                </button>
                 |
-                <Button
-                  className="btn-link-reversed center-hor"
+                <button
+                  className="btn-link center-hor"
                   onClick={()=>{
                     this.setState({ showCalendarFrom: true })
                   }}
                   >
                   Set date
-                </Button>
+                </button>
               </div>
             }
             { showCalendarFrom &&
@@ -89,23 +88,23 @@ export default class FilterDatePickerSeparated extends Component {
           <div className="col-6">
             { !showCalendarTo && !showNowTo &&
               <div className="flex">
-                <Button
-                  className="btn-link-reversed center-hor"
+                <button
+                  className="btn-link center-hor"
                   onClick={()=>{
                     setShowNowTo(true)
                   }}
                   >
                   Set now
-                </Button>
+                </button>
                 |
-                <Button
-                  className="btn-link-reversed center-hor"
+                <button
+                  className="btn-link center-hor"
                   onClick={()=>{
                     this.setState({ showCalendarTo: true })
                   }}
                   >
                   Set date
-                </Button>
+                </button>
               </div>
             }
             { showCalendarTo &&

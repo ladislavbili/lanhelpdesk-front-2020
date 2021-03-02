@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -609,16 +608,22 @@ export default function CompanyAdd( props ) {
 
         <div className="form-buttons-row p-l-20 p-r-20">
           { closeModal &&
-            <Button
-              className="btn-link mr-auto"
+            <button
+              className="btn-link-cancel mr-auto"
               disabled={saving}
-              onClick={closeModal}>Cancel</Button>
+              onClick={closeModal}
+              >
+              Cancel
+            </button>
           }
           { !closeModal && newData &&
-            <Button
-              className="btn-link mr-auto"
+            <button
+              className="btn-link-cancel mr-auto"
               disabled={saving}
-              onClick={cancel}>Cancel</Button>
+              onClick={cancel}
+              >
+              Cancel
+            </button>
           }
 
             { closeModal && cannotSave &&
@@ -639,7 +644,8 @@ export default function CompanyAdd( props ) {
                 } else {
                   addCompanyFunc();
                 }
-              }}>
+              }}
+              >
               {(pricelist.value === "0" && pricelistName !== "" ? "Save changes" : (saving?'Adding...':'Add company'))}
             </button>
 

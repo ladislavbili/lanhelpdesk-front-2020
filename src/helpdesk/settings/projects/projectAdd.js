@@ -4,7 +4,6 @@ import {
   useQuery
 } from "@apollo/client";
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -511,7 +510,7 @@ export default function ProjectAdd( props ) {
         <div className="row form-buttons-row">
           {
             closeModal &&
-            <Button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </Button>
+            <button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </button>
           }
 
           {closeModal && cannotSave &&

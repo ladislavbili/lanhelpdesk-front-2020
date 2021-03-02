@@ -4,7 +4,6 @@ import {
   useQuery
 } from "@apollo/client";
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -386,31 +385,31 @@ export default function UserEdit( props ) {
 
         <div className="form-buttons-row">
           { !isDisabled && myData !== undefined && id !== myData.getMyData.id &&
-            <Button
-              className="btn-red m-r-5"
+            <button
+              className="btn-red btn-distance"
               disabled={deletingUser}
               onClick={deleteUserFunc}
               >
               Delete
-            </Button>
+            </button>
           }
           { !isDisabled && myData !== undefined && id !== myData.getMyData.id &&
-            <Button
-              className={ active ? "btn-grey" : "btn-green"}
+            <button
+              className={ active ? "btn btn-grey" : "btn btn-green"}
               onClick={()=> deactivateUser(active)}
               >
               {active ? 'Deactivate user' : 'Activate user'}
-            </Button>
+            </button>
           }
           <button
-            className="btn-link ml-auto"
+            className="btn-link ml-auto btn-distance"
             disabled={ saving || isDisabled }
             onClick={ ()=>{
               setPasswordChangeOpen(true);
             }}
             >{ password === null ? 'Change password' : 'Password change edit' }</button>
           <button
-            className="btn m-l-5"
+            className="btn"
             disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
             onClick={ updateUserFunc }
             >

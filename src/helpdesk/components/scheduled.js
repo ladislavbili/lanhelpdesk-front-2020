@@ -4,7 +4,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Button,
   FormGroup,
   Label
 } from 'reactstrap';
@@ -125,7 +124,7 @@ export default function Scheduled( props ) {
             </FormGroup>
             <div className="p-t-5 row">
               <button
-                className="btn-red m-l-5"
+                className="btn-link-cancel btn-distance"
                 onClick={() => {
                   setAddItem(!addItem)
                   setNewUser(null);
@@ -135,13 +134,13 @@ export default function Scheduled( props ) {
                 >
                 Close
               </button>
-              <Button
+              <button
                 disabled={
                   newUser === null ||
                   newFrom === null ||
                   newTo === null
                 }
-                className="btn-primary center-hor ml-auto"
+                className="btn center-hor ml-auto"
                 onClick={() => {
                   submitItem({user: newUser, from: newFrom, to: newTo})
                   setNewUser(null);
@@ -151,7 +150,7 @@ export default function Scheduled( props ) {
                 }}
                 >
                 Add
-              </Button>
+              </button>
             </div>
           </ModalBody>
         </Modal>

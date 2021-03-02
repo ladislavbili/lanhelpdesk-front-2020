@@ -3,9 +3,6 @@ import {
   useQuery
 } from "@apollo/client";
 
-import {
-  Button
-} from 'reactstrap';
 import CompanyAdd from './companyAdd';
 import CompanyEdit from './companyEdit';
 import Loading from 'components/loading';
@@ -49,11 +46,11 @@ export default function CompanysList( props ) {
                     />
                 </div>
               </div>
-              <Button
+              <button
                 className="btn-link center-hor"
                 onClick={()=>history.push('/helpdesk/settings/companies/add')}>
                 <i className="fa fa-plus p-l-5 p-r-5"/> Company
-              </Button>
+              </button>
             </div>
 
             <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">

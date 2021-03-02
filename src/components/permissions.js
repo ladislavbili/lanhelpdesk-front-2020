@@ -1,72 +1,85 @@
-import React, { Component } from 'react';
-import { Button } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
 
 import Select from "react-select";
-import {selectStyle} from "configs/components/select";
+import {
+  selectStyle
+} from "configs/components/select";
 
-import {rebase} from '../index';
+import {
+  rebase
+} from '../index';
 
 export default class Permissions extends Component {
-	constructor(props) {
-		super();
-		this.state = {
-			users: [],
-			view: props.view || [],
-			edit: props.edit || [],
-			permissions: props.permissions || [],
-			chosenUser: null,
-		};
+  constructor( props ) {
+    super();
+    this.state = {
+      users: [],
+      view: props.view || [],
+      edit: props.edit || [],
+      permissions: props.permissions || [],
+      chosenUser: null,
+    };
 
 
-		this.addUser.bind(this);
-	}
+    this.addUser.bind( this );
+  }
 
-	componentWillMount() {
-	  rebase.bindCollection('/users', {
-	    context: this,
-			withIds: true,
-			state: "users",
-	    then(data) {
-	    },
-	    onFailure(err) {
-				console.log(err);
-	    }
-	  });
-	}
+  componentWillMount() {
+    rebase.bindCollection( '/users', {
+      context: this,
+      withIds: true,
+      state: "users",
+      then( data ) {},
+      onFailure( err ) {
+        console.log( err );
+      }
+    } );
+  }
 
-	componentWillReceiveProps(props){
-		if (this.props.id !== props.id){
-			this.setState({
-				view: props.view,
-				edit: props.edit,
-				permissions: props.permissions,
-			})
-		}
-	}
+  componentWillReceiveProps( props ) {
+    if ( this.props.id !== props.id ) {
+      this.setState( {
+        view: props.view,
+        edit: props.edit,
+        permissions: props.permissions,
+      } )
+    }
+  }
 
-	addUser(){
-		this.setState({
-			view: [...this.state.view, this.state.chosenUser.id],
-			chosenUser: null,
-		})
-	}
+  addUser() {
+    this.setState( {
+      view: [ ...this.state.view, this.state.chosenUser.id ],
+      chosenUser: null,
+    } )
+  }
 
-	render() {
-		const USERS_TABLE = this.state.users
-												.filter(user => this.state.view.includes(user.id) || this.state.edit.includes(user.id) || this.state.permissions.includes(user.id))
-												.map(user => {
-													let u = {id: user.id, name: user.username};
-													u.view = this.state.view.includes(user.id);
-													u.edit = this.state.edit.includes(user.id);
-													u.permissions = this.state.permissions.includes(user.id);
-													return u;
-												});
-		const USERS_SELECT = this.state.users
-													.filter(user => !this.state.view.includes(user.id) && !this.state.edit.includes(user.id) && !this.state.permissions.includes(user.id))
-													.map(user => {return {...user, value: user.id, label: user.username}});
+  render() {
+    const USERS_TABLE = this.state.users
+      .filter( user => this.state.view.includes( user.id ) || this.state.edit.includes( user.id ) || this.state.permissions.includes( user.id ) )
+      .map( user => {
+        let u = {
+          id: user.id,
+          name: user.username
+        };
+        u.view = this.state.view.includes( user.id );
+        u.edit = this.state.edit.includes( user.id );
+        u.permissions = this.state.permissions.includes( user.id );
+        return u;
+      } );
+    const USERS_SELECT = this.state.users
+      .filter( user => !this.state.view.includes( user.id ) && !this.state.edit.includes( user.id ) && !this.state.permissions.includes( user.id ) )
+      .map( user => {
+        return {
+          ...user,
+          value: user.id,
+          label: user.username
+        }
+      } );
 
-		return (
-			<div >
+    return (
+      <div >
 				<hr />
 				<h3 className="m-t-20" style={{color: "red"}}> DEMO - prava </h3>
 				<div className="row">
@@ -84,7 +97,7 @@ export default class Permissions extends Component {
 							/>
 					</div>
 					<div>
-						<Button className="btn" onClick={() => this.addUser()}>Pridať</Button>
+						<button className="btn" onClick={() => this.addUser()}>Pridať</button>
 					</div>
 				</div>
 
@@ -166,6 +179,6 @@ export default class Permissions extends Component {
 				}
 
 			</div>
-		);
-	}
+    );
+  }
 }

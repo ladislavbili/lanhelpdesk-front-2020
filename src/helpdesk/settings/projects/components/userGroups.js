@@ -1,7 +1,4 @@
 import React from 'react';
-import {
-  Button
-} from 'reactstrap';
 
 import Select from "react-select";
 import {
@@ -48,7 +45,7 @@ export default function ProjectPermissions( props ) {
 							/>
 					</div>
 					<div>
-						<Button
+						<button
 							className="btn"
 							disabled={ chosenUser === null || group === null }
 							onClick={() => {
@@ -57,7 +54,7 @@ export default function ProjectPermissions( props ) {
 							}}
 							>
               Pridať
-            </Button>
+            </button>
 					</div>
 				</div>
 
@@ -91,7 +88,7 @@ export default function ProjectPermissions( props ) {
                       />
                   </td>
 										<td>
-											<button className="btn btn-link waves-effect" disabled={(!isAdmin)} onClick={()=>{
+											<button className="btn-link" disabled={(!isAdmin)} onClick={()=>{
 													if(window.confirm('Are you sure?')){
 														deleteRight(permission)
 													}

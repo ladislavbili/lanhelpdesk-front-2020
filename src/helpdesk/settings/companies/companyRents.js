@@ -114,7 +114,7 @@ export default function CompanyRents( props ) {
 										</td>
 
 										<td className="t-a-r">
-											<button className="btn btn-link waves-effect"
+											<button className="btn-link"
 												disabled={disabled}
 												onClick={()=>{
 													if(window.confirm('Are you sure?')){
@@ -223,7 +223,7 @@ export default function CompanyRents( props ) {
 											/>
 									</td>
 									<td className="t-a-r">
-										<button className="btn btn-link waves-effect"
+										<button className="btn-link"
 											disabled={
 												disabled||
 												title===''||

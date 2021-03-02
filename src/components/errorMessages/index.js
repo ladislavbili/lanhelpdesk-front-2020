@@ -269,21 +269,21 @@ export default function ErrorList( props ) {
             <div>
               <button
                 type="button"
-                className="btn btn-link waves-effect"
+                className="btn-link"
                 onClick={markAllAsRead}
                 disabled={errors.every((error)=>error.read)}>
                 Označit všetky ako prečítané
               </button>
               <button
                 type="button"
-                className="btn btn-link waves-effect"
+                className="btn-link"
                 onClick={deleteAll}
                 disabled={errors.length === 0}>
                 Vymazať všetky
               </button>
               <button
                 type="button"
-                className="btn btn-link waves-effect"
+                className="btn-link"
                 onClick={deleteRead}
                 disabled={errors.filter((error)=>error.read).length === 0}>
                 Vymazať prečítané

@@ -3,9 +3,6 @@ import {
   useQuery
 } from "@apollo/client";
 
-import {
-  Button
-} from 'reactstrap';
 import PublicFilterAdd from './publicFilterAdd';
 import PublicFilterEdit from './publicFilterEdit';
 import {
@@ -77,11 +74,11 @@ export default function PublicFilterList( props ) {
                   />
               </div>
             </div>
-            <Button
+            <button
               className="btn-link center-hor"
               onClick={()=> history.push('/helpdesk/settings/publicFilters/add')}>
               <i className="fa fa-plus p-l-5 p-r-5"/> Public Filter
-            </Button>
+            </button>
           </div>
           <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
             <div className="row p-l-10 p-b-10">

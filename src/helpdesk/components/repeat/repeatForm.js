@@ -7,7 +7,6 @@ import {
 import Select from 'react-select';
 import {
   Label,
-  Button
 } from 'reactstrap';
 import DatePicker from 'components/DatePicker';
 import MultiSelect from 'components/MultiSelectNew';
@@ -820,7 +819,7 @@ export default function RepeatForm( props ) {
         <div className="ml-auto m-r-20">
           <button
             type="button"
-            className="btn btn-link waves-effect task-add-layout-button"
+            className="btn-link task-add-layout-button btn-distance"
             onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
             <i className="fas fa-retweet "/>
             Layout
@@ -829,7 +828,7 @@ export default function RepeatForm( props ) {
           { editMode && userRights.repeatWrite &&
             <button
               type="button"
-              className="btn btn-link waves-effect task-add-layout-button"
+              className="btn-link task-add-layout-button"
               onClick={ deleteRepeatFunc }>
               <i className="far fa-trash-alt "/>
               Delete Repeat
@@ -859,7 +858,7 @@ export default function RepeatForm( props ) {
               {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Close date: " : "PendingDate: "}
             </span>
             <DatePicker
-              className="form-control hidden-input bolder"
+              className="form-control"
               selected={(status.action==='CloseDate' || status.action==='CloseInvalid') ? closeDate : pendingDate }
               disabled={userRights.statusWrite}
               onChange={date => {
@@ -1341,7 +1340,7 @@ export default function RepeatForm( props ) {
       <Empty>
         { userRights.tagsWrite &&
           <div className="row center-hor">
-            <button className="btn btn-link waves-effect p-b-10" onClick={ () => setTagsOpen(true) } >
+            <button className="btn-link p-b-10" onClick={ () => setTagsOpen(true) } >
               <i className="fa fa-plus" />
               Tags
             </button>
@@ -1421,7 +1420,7 @@ export default function RepeatForm( props ) {
           <Label className="m-r-10">Popis úlohy</Label>
           { userRights.taskDescriptionWrite &&
             <button
-              className="btn btn-link waves-effect m-r-10"
+              className="btn-link btn-distance"
               style={{height: "20px"}}
               onClick={()=>{
                 if(showDescription){
@@ -1435,7 +1434,7 @@ export default function RepeatForm( props ) {
             </button>
           }
           { userRights.taskAttachmentsWrite &&
-            <label htmlFor={`uploadAttachment-${null}`} className="btn btn-link" >
+            <label htmlFor={`uploadAttachment-${null}`} className="btn-link m-l-0" >
               <i className="fa fa-plus" />
               Attachment
             </label>
@@ -1744,7 +1743,7 @@ export default function RepeatForm( props ) {
       <div className="form-section task-edit-buttons">
         <div className="row form-section-rest">
           {closeModal &&
-            <Button className="btn btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
+            <button className="btn-link-cancel" onClick={() => closeModal()}>Cancel</button>
           }
           {canCreateVykazyError()}
           <button

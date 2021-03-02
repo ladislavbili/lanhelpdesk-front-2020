@@ -4,7 +4,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Button
 } from 'reactstrap';
 import {
   GET_PROJECT,
@@ -28,13 +27,13 @@ export default function ProjectEditContainer( props ) {
 
   return (
     <div className='p-l-15 p-r-15'>
-      <Button
+      <button
         className='btn-link p-0'
         onClick={() => setOpened(true)}
         >
         <i className="fa fa-cog"/>
         Project
-      </Button>
+      </button>
       <Modal isOpen={opened}>
         <ModalHeader>
           Edit project

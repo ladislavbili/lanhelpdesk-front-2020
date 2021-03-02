@@ -45,7 +45,7 @@ export default function ProjectSelectModal( props ) {
                 />
             </FormGroup>
             <div className="row m-t-30">
-              <Button className="btn btn-link-cancel" onClick={closeModal}>Cancel</Button>
+              <Button className="btn-link-cancel" onClick={closeModal}>Cancel</Button>
               <button
                 className="btn ml-auto"
                 disabled={ project === null }

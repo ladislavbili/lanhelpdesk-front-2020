@@ -4,7 +4,6 @@ import {
   useQuery
 } from "@apollo/client";
 import {
-  Button,
   FormGroup,
   Label,
   Input,
@@ -174,7 +173,7 @@ export default function TaskTypeEdit( props ) {
         </FormGroup>
 
         <div className="form-buttons-row">
-          <Button
+          <button
             className="btn-red"
             disabled={saving || theOnlyOneLeft}
             onClick={() => {
@@ -183,7 +182,7 @@ export default function TaskTypeEdit( props ) {
             }}
             >
             Delete
-          </Button>
+          </button>
           <button className="btn ml-auto" disabled={saving} onClick={updateTaskTypeFunc}>{saving?'Saving task type...':'Save task type'}</button>
         </div>
         <DeleteReplacement

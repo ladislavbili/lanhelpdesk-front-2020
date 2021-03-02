@@ -5,7 +5,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Button,
   Label,
   Input,
   FormGroup,
@@ -109,17 +108,17 @@ export default function StatusChangeModal( props ) {
             </FormGroup>
 
           <div className="row">
-            <Button className="btn-link" onClick={closeModal}>
+            <button className="btn-link-cancel" onClick={closeModal}>
               Close
-            </Button>
+            </button>
 
-            <Button
-              className="ml-auto"
+            <button
+              className="ml-auto btn"
               disabled={ !date || !date.isValid() || !status }
               onClick={() => submit(status, comment, date) }
               >
               Change status
-            </Button>
+            </button>
           </div>
         </ModalBody>
       </Modal>

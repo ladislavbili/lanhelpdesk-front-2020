@@ -7,7 +7,6 @@ import axios from 'axios';
 import Select from 'react-select';
 import {
   Label,
-  Button
 } from 'reactstrap';
 import CKEditor5 from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -32,9 +31,11 @@ import {
   invisibleSelectStyleNoArrowNoPadding,
   invisibleSelectStyleNoArrowColored,
   selectStyleNoArrowColoredRequired,
+  selectStyleNoArrowColoredRequiredPlaceHolderHighlight,
   invisibleSelectStyleNoArrowColoredRequired,
   invisibleSelectStyleNoArrowColoredRequiredNoPadding,
   selectStyleNoArrowRequired,
+  selectStyleNoArrowRequiredPlaceHolderHighlight,
   invisibleSelectStyleNoArrowRequired,
   invisibleSelectStyleNoArrowRequiredNoPadding,
 } from 'configs/components/select';
@@ -64,6 +65,8 @@ import {
 
 let fakeID = -1;
 
+const localCreationError = "Please fill in all required information.";
+
 export default function TaskAdd( props ) {
   //data & queries
   const {
@@ -91,7 +94,6 @@ export default function TaskAdd( props ) {
   }
 
   //state
-
   const [ project, setProject ] = React.useState( projectID ? projects.find( p => p.id === projectID ) : null );
   const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
   const [ defaultFields, setDefaultFields ] = React.useState( noDef );
@@ -129,7 +131,7 @@ export default function TaskAdd( props ) {
   const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
   const [ scheduled, setScheduled ] = React.useState( [] );
 
-
+  const [ showLocalCreationError, setShowLocalCreationError ] = React.useState( false );
 
   const getNewID = () => {
     return fakeID--;
@@ -354,16 +356,19 @@ export default function TaskAdd( props ) {
       } );
   }
 
-  const cantSave = (
+  const cannotSave = (
     saving ||
     loading ||
-    title === "" ||
-    status === null ||
-    project === null ||
-    assignedTo.length === 0 ||
-    !company ||
-    ( project.def.tag.required && tags.length === 0 )
-  )
+    title.length === 0 ||
+    ( project.def.status.required && !status ) ||
+    ( project.def.assignedTo.required && !assignedTo ) ||
+    ( project.def.requester.required && !requester ) ||
+    ( project.def.tag.required && tags.length === 0 ) ||
+    ( project.def.pausal.required && !pausal ) ||
+    ( project.def.overtime.required && !overtime ) ||
+    ( project.def.company.required && !company ) ||
+    ( project.def.type.required && !taskType )
+  );
 
   //RENDERS
   const renderHeader = () => {
@@ -373,7 +378,7 @@ export default function TaskAdd( props ) {
         <div className="ml-auto m-r-20">
           <button
             type="button"
-            className="btn-link waves-effect task-add-layout-button"
+            className="btn-link task-add-layout-button"
             onClick={ () => {
               setTaskLayout( currentUser.taskLayout === 1 ? 2 : 1 )
             }}>
@@ -389,7 +394,7 @@ export default function TaskAdd( props ) {
     return (
       <div className="form-section">
         <Label>Task name<span className="warning-big m-l-5">*</span> </Label>
-        <span className="form-section-rest">
+        <span className={classnames("form-section-rest", {"placeholder-highlight": showLocalCreationError })}>
           <input type="text"
             value={title}
             className="task-title-input-2 full-width form-control"
@@ -448,7 +453,7 @@ export default function TaskAdd( props ) {
           setAssignedTo(users);
         }}
         options={USERS_WITH_PERMISSIONS}
-        styles={selectStyleNoArrowRequired}
+        styles={showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired}
         />
     ),
     Status: (
@@ -456,7 +461,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={status}
         isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
-        styles={selectStyleNoArrowColoredRequired}
+        styles={showLocalCreationError ? selectStyleNoArrowColoredRequiredPlaceHolderHighlight : selectStyleNoArrowColoredRequired}
         onChange={(status)=>{
           if(status.action==='PendingDate'){
             setStatus(status);
@@ -479,7 +484,7 @@ export default function TaskAdd( props ) {
             placeholder="Select task type"
             value={taskType}
             isDisabled={defaultFields.type.fixed || !userRights.typeWrite }
-            styles={ selectStyleNoArrowRequired }
+            styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
             onChange={(taskType)=> {
               setTaskType(taskType);
             }}
@@ -524,7 +529,7 @@ export default function TaskAdd( props ) {
           }
         }}
         options={REQUESTERS}
-        styles={ selectStyleNoArrowRequired }
+        styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
         />
     ),
     Company: (
@@ -537,7 +542,7 @@ export default function TaskAdd( props ) {
           setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
         }}
         options={companies}
-        styles={ selectStyleNoArrowRequired }
+        styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
         />
     ),
     Pausal: (
@@ -545,7 +550,7 @@ export default function TaskAdd( props ) {
         value={pausal}
         placeholder="Select required"
         isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-        styles={ selectStyleNoArrowRequired }
+        styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
         onChange={(pausal)=> setPausal(pausal)}
         options={booleanSelects}
         />
@@ -564,7 +569,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={overtime}
         isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={ selectStyleNoArrowRequired }
+        styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
         onChange={(overtime) => setOvertime(overtime)}
         options={booleanSelects}
         />
@@ -892,7 +897,7 @@ export default function TaskAdd( props ) {
       <Empty>
         { userRights.tagsRead && userRights.tagsWrite &&
           <div className="row center-hor">
-            <button className="btn-link waves-effect p-b-10" onClick={ () => setTagsOpen(true) } >
+            <button className="btn-link p-b-10" onClick={ () => setTagsOpen(true) } >
               <i className="fa fa-plus" />
               Tags {project.def.tag.required && <span className="warning-big">*</span>}
             </button>
@@ -926,7 +931,6 @@ export default function TaskAdd( props ) {
     )
   }
 
-
   const renderDescription = () => {
     if ( !userRights.taskDescriptionRead && userRights.tagsRead ) {
       return (
@@ -943,7 +947,7 @@ export default function TaskAdd( props ) {
         <div className="row" style={{alignItems: "baseline"}}>
           <Label className="m-r-10">Popis úlohy</Label>
           { userRights.taskAttachmentsRead && userRights.taskAttachmentsWrite &&
-            <label htmlFor={`uploadAttachment-${null}`} className="btn-link h-20px" >
+            <label htmlFor={`uploadAttachment-${null}`} className="btn-link h-20px btn-distance" >
               <i className="fa fa-plus" />
               Attachment
             </label>
@@ -1176,14 +1180,19 @@ export default function TaskAdd( props ) {
       <div className="form-section task-edit-buttons">
         <div className="row form-section-rest">
           {closeModal &&
-            <Button className="btn-link-cancel" onClick={() => closeModal()}>Cancel</Button>
+            <button className="btn-link-cancel" onClick={() => closeModal()}>Cancel</button>
           }
           <div className="pull-right row">
-            {canCreateVykazyError()}
+            {showLocalCreationErrorFunc()}
             <button
               className="btn"
-              disabled={ cantSave }
-              onClick={addTaskFunc}
+              onClick={() => {
+                if (cannotSave) {
+                  setShowLocalCreationError(true);
+                } else {
+                  addTaskFunc();
+                }
+              }}
               > Create task
             </button>
           </div>
@@ -1205,6 +1214,21 @@ export default function TaskAdd( props ) {
       </span>
     );
   }
+
+  const showLocalCreationErrorFunc = () => {
+    if ( !cannotSave ) {
+      return (
+        <span className="center-hor ml-auto">
+        </span>
+      );
+    }
+    return (
+      <span className="message error-message center-hor ml-auto">
+        {localCreationError}
+      </span>
+    );
+  }
+
 
   return (
     <div style={{backgroundColor: "#f9f9f9"}}>

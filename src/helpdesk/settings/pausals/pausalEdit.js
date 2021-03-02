@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -345,7 +344,10 @@ export default function PausalEdit( props ) {
              } else {
                updateCompanyFunc();
              }
-           }}>{saving?'Saving...':'Save changes'}</button>
+           }}
+           >
+           {saving?'Saving...':'Save changes'}
+         </button>
          </div>
 
       </div>

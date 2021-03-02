@@ -11,7 +11,6 @@ import {
   ModalHeader,
   FormGroup,
   Label,
-  Button,
   Input
 } from 'reactstrap';
 import {
@@ -90,7 +89,7 @@ export default function CustomAttributes( props ) {
               <td> {customAttribute.defaultValue} </td>
               <td> {customAttribute.required ? 'Yes' : 'No'} </td>
               <td>
-                <button className="btn btn-link waves-effect" disabled={disabled} onClick={()=>{
+                <button className="btn-link btn-distance" disabled={disabled} onClick={()=>{
                     if(window.confirm('Are you sure?')){
                       deleteCustomAttribute(customAttribute.id);
                     }
@@ -98,7 +97,7 @@ export default function CustomAttributes( props ) {
                   <i className="fa fa-times"  />
                 </button>
                 <button
-                  className="btn btn-link waves-effect"
+                  className="btn-link"
                   disabled={disabled}
                   onClick={()=>{
                     setEditCustomAttributeOpen(customAttribute);
@@ -110,7 +109,7 @@ export default function CustomAttributes( props ) {
           )}
           <tr>
             <td colSpan={8}>
-              <button className="btn waves-effect"
+              <button className="btn"
                 disabled={disabled}
                 onClick={()=>{
                   setAddCustomAttributeOpen(true);

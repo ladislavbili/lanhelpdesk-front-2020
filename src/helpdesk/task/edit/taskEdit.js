@@ -870,7 +870,7 @@ export default function TaskEdit( props ) {
             {!columns &&
               <button
                 type="button"
-                className="btn-link task-add-layout-button"
+                className="btn-link task-add-layout-button btn-distance"
                 onClick={() => {
                   if(inModal){
                     closeModal()
@@ -889,7 +889,7 @@ export default function TaskEdit( props ) {
               <button
                 type="button"
                 disabled={getCantSave()}
-                className="btn-danger task-add-layout-button"
+                className="btn-danger task-add-layout-button btn-distance"
                 onClick={() => submitInvoicedTask(true)}
                 >
                 Re-open
@@ -899,7 +899,7 @@ export default function TaskEdit( props ) {
               <button
                 type="button"
                 disabled={getCantSave()}
-                className="btn-link task-add-layout-button"
+                className="btn-link task-add-layout-button btn-distance"
                 onClick={() => submitInvoicedTask(false)}
                 >
                 <i className="far fa-save" />
@@ -934,7 +934,7 @@ export default function TaskEdit( props ) {
             { userRights.deleteTasks &&
               <button
                 type="button"
-                className="btn-link task-add-layout-button"
+                className="btn-link task-add-layout-button btn-distance"
                 onClick={deleteTaskFunc}
                 >
                 <i className="far fa-trash-alt" />
@@ -946,7 +946,7 @@ export default function TaskEdit( props ) {
                 type="button"
                 style={{color: important ? '#ffc107' : '#0078D4'}}
                 disabled={ !userRights.important }
-                className="btn-link task-add-layout-button"
+                className="btn-link task-add-layout-button btn-distance"
                 onClick={()=>{
                   autoUpdateTask({ important: !important })
                   setImportant(!important);
@@ -958,7 +958,7 @@ export default function TaskEdit( props ) {
             }
             <button
               type="button"
-              className="btn-link task-add-layout-button"
+              className="btn-link task-add-layout-button btn-distance"
               onClick={() => setTaskLayout(currentUser.taskLayout === 1 ? 2 : 1)}
               >
               <i className="fas fa-retweet "/>
@@ -972,7 +972,7 @@ export default function TaskEdit( props ) {
                 <button
                   type="button"
                   key={status.id}
-                  className="btn-link task-add-layout-button"
+                  className="btn-link task-add-layout-button btn-distance"
                   onClick={() => setPossibleStatus(status) }
                   >
                   { status.icon.length > 3 &&
@@ -1668,7 +1668,7 @@ export default function TaskEdit( props ) {
           </Label>
           { userRights.taskDescriptionWrite &&
             <button
-              className="btn-link m-r-10"
+              className="btn-link btn-distance"
               style={{height: "20px"}}
               onClick={()=>{
                 if(showDescription){
@@ -1682,7 +1682,7 @@ export default function TaskEdit( props ) {
             </button>
           }
           { userRights.taskAttachmentsWrite &&
-            <label htmlFor={`uploadAttachment-${id}`} className="btn-link" >
+            <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0" >
               <i className="fa fa-plus" />
               Attachment
             </label>

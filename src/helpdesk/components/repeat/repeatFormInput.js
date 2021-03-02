@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Button,
   Label,
 } from 'reactstrap';
 
@@ -27,7 +26,7 @@ export default function RepeatFormInput( props ) {
           <div className="form-selects-entry-column">
             <Label style={{display: "block"}}>Repeat</Label>
             <div className="form-selects-entry-column-rest">
-              <Button type="button"className="btn btn-repeat" id={"repeatPopover"} onClick={() => {
+              <button type="button"className="btn-repeat" id={"repeatPopover"} onClick={() => {
                   if(!disabled){
                     setOpenModal(true);
                   }
@@ -37,7 +36,7 @@ export default function RepeatFormInput( props ) {
                   `Opakovať každý ${repeat.repeatEvery} ${interval.label}` :
                   "No repeat"
                 }
-              </Button>
+              </button>
             </div>
           </div>
         }
@@ -45,7 +44,7 @@ export default function RepeatFormInput( props ) {
           <div className="p-r-10">
             <Label className="col-3 col-form-label">Repeat</Label>
             <div className="col-9">
-              <Button type="button" className="btn btn-repeat flex" id={"repeatPopover"} onClick={() => {
+              <button type="button" className="btn-repeat flex" id={"repeatPopover"} onClick={() => {
                   if(!disabled){
                     setOpenModal(true);
                   }
@@ -55,7 +54,7 @@ export default function RepeatFormInput( props ) {
                   `Opakovať každý ${repeat.repeatEvery} ${interval.label}` :
                   "No repeat"
                 }
-              </Button>
+              </button>
             </div>
           </div>
         }

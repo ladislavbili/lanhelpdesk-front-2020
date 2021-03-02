@@ -5,9 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button
-} from 'reactstrap';
-import {
   GET_IMAPS,
   TEST_IMAPS
 } from './queries';
@@ -77,11 +74,13 @@ export default function IMAPsList( props ) {
                   />
               </div>
             </div>
-            <Button
+            <button
               className="btn-link center-hor"
-              onClick={()=>history.push('/helpdesk/settings/imaps/add')}>
-              <i className="fa fa-plus p-l-5 p-r-5"/> IMAP
-              </Button>
+              onClick={()=>history.push('/helpdesk/settings/imaps/add')}
+              >
+              <i className="fa fa-plus p-l-5 p-r-5"/>
+              IMAP
+              </button>
             </div>
             <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
               <div className="row">
@@ -89,13 +88,13 @@ export default function IMAPsList( props ) {
                   IMAPs
                 </h2>
                 { !imapTesting &&
-                  <Button
+                  <button
                     disabled={ imapTesting }
-                    className="btn-primary center-hor ml-auto"
+                    className="btn center-hor ml-auto"
                     onClick={testIMAPs}
                     >
                     Test IMAPs
-                  </Button>
+                  </button>
                 }
                 { imapTesting &&
                   <div className="center-hor ml-auto">

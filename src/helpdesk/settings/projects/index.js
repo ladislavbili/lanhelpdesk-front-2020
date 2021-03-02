@@ -3,9 +3,6 @@ import {
   useQuery
 } from "@apollo/client";
 
-import {
-  Button
-} from 'reactstrap';
 import ProjectAdd from './projectAdd';
 import ProjectEdit from './projectEdit';
 import Loading from 'components/loading';
@@ -76,11 +73,11 @@ export default function ProjectsList( props ) {
                   />
               </div>
             </div>
-            <Button
+            <button
               className="btn-link center-hor"
               onClick={()=>history.push('/helpdesk/settings/projects/add')}>
               <i className="fa fa-plus p-l-5 p-r-5"/> Project
-              </Button>
+              </button>
             </div>
             <div className="p-t-9 p-r-10 p-l-10 scroll-visible scrollable fit-with-header-and-commandbar">
               <h2 className=" p-l-10 p-b-10 ">

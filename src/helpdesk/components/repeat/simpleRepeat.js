@@ -2,7 +2,6 @@ import React from 'react';
 import Select from 'react-select';
 import Checkbox from 'components/checkbox';
 import {
-  Button,
   Popover,
   PopoverHeader,
   PopoverBody,
@@ -66,13 +65,13 @@ export default function SimpleRepeat( props ) {
         <div className="form-selects-entry-column">
           <Label style={{display: "block"}}>Repeat</Label>
           <div className="form-selects-entry-column-rest">
-            <Button type="button"className="btn btn-repeat" id={"repeatPopover"} onClick={toggleRepeat}>
+            <button type="button"className="btn-repeat" id={"repeatPopover"} onClick={toggleRepeat}>
               {
                 repeat ?
                 ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
                 "No repeat"
               }
-            </Button>
+            </button>
           </div>
         </div>
       }
@@ -80,13 +79,13 @@ export default function SimpleRepeat( props ) {
         <div className="row p-r-10">
           <Label className="col-3 col-form-label">Repeat</Label>
           <div className="col-9">
-            <Button type="button" className="btn btn-repeat flex" id={"repeatPopover"} onClick={toggleRepeat}>
+            <button type="button" className="btn-repeat flex" id={"repeatPopover"} onClick={toggleRepeat}>
               {
                 repeat ?
                 ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
                 "No repeat"
               }
-            </Button>
+            </button>
           </div>
         </div>
       }
@@ -98,7 +97,7 @@ export default function SimpleRepeat( props ) {
             <FormGroup className="task-add-date-picker-placeholder">
               <Label>Start date *</Label>
               <DatePicker
-                className="form-control hidden-input"
+                className="form-control"
                 selected={startsAt}
                 onChange={setStartsAt}
                 placeholderText="No start date"
@@ -110,7 +109,7 @@ export default function SimpleRepeat( props ) {
               <div className="row">
                 <div className="w-50 p-r-20">
                   <Input type="number"
-                    className={(parseInt(repeatEvery) < 0 ) ? "form-control-warning" : ""}
+                    className={(parseInt(repeatEvery) < 0 ) ? "form-control-warning form-control-secondary" : "form-control-secondary"}
                     placeholder="Enter number"
                     value={( repeatEvery )}
                     onChange={(e)=> setRepeatEvery(e.target.value)}
@@ -139,12 +138,12 @@ export default function SimpleRepeat( props ) {
                 />
 
             <div className="row">
-              <Button
-                className="btn btn-link"
+              <button
+                className="btn-link"
                 onClick={() => setOpen(false) }>
                 Close
-              </Button>
-              <Button
+              </button>
+              <button
                 className="btn ml-auto"
                 onClick={()=>{
                   if(
@@ -168,7 +167,7 @@ export default function SimpleRepeat( props ) {
                 }}
                 >
                 Save
-              </Button>
+              </button>
             </div>
           </div>
         </PopoverBody>

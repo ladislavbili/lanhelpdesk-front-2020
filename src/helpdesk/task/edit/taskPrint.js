@@ -21,7 +21,7 @@ export default class TaskPrint extends Component {
       <div className="display-inline">
 					<ReactToPrint
 						trigger={() =>
-							<button className="btn btn-link-reversed waves-effect" disabled={!this.props.isLoaded}>
+							<button className="btn-link btn-distance" disabled={!this.props.isLoaded}>
 								<i
 									className="fas fa-print"
 									/> Print

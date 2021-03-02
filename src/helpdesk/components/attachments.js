@@ -67,7 +67,7 @@ export default function TaskAttachments( props ) {
           />
         { false && !disabled && !top &&
           <div className="attachment-label">
-            <label htmlFor={`uploadAttachment-${taskID}`} className="btn btn-link" >
+            <label htmlFor={`uploadAttachment-${taskID}`} className="btn-link" >
               <i className="fa fa-plus" />
               Attachment
             </label>
@@ -90,7 +90,7 @@ export default function TaskAttachments( props ) {
           </div>
         )}
         { false && !disabled && top &&
-          <label htmlFor={`uploadAttachment-${taskID}`} className="btn btn-link" >
+          <label htmlFor={`uploadAttachment-${taskID}`} className="btn-link" >
             <i className="fa fa-plus" />
             Attachment
           </label>

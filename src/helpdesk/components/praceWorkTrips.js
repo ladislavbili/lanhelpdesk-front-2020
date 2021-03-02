@@ -1,163 +1,181 @@
-import React, { Component } from 'react';
-import {Input } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  Input
+} from 'reactstrap';
 import Select from 'react-select';
-import { selectStyle, invisibleSelectStyle} from 'configs/components/select';
-import { sameStringForms} from '../../helperFunctions';
+import {
+  selectStyle,
+  invisibleSelectStyle
+} from 'configs/components/select';
+import {
+  sameStringForms
+} from '../../helperFunctions';
 
 export default class PraceWorkTrips extends Component {
-	constructor(props){
-		super(props);
-		this.state={
-			showAddSubtask:false,
+  constructor( props ) {
+    super( props );
+    this.state = {
+      showAddSubtask: false,
 
-			editedSubtaskTitle: "",
-			editedSubtaskType:null,
-			editedSubtaskQuantity: 0,
-			editedSubtaskDiscount:0,
-			focusedSubtask: null,
-			selectedIDs:[],
+      editedSubtaskTitle: "",
+      editedSubtaskType: null,
+      editedSubtaskQuantity: 0,
+      editedSubtaskDiscount: 0,
+      focusedSubtask: null,
+      selectedIDs: [],
 
-			newSubtaskTitle:'',
-			newSubtaskType:this.props.defaultType,
-			newSubtaskAssigned:this.props.taskAssigned.length>0?this.props.taskAssigned[0]:null,
-			newSubtaskQuantity:0,
-			newSubtaskDiscount:0,
+      newSubtaskTitle: '',
+      newSubtaskType: this.props.defaultType,
+      newSubtaskAssigned: this.props.taskAssigned.length > 0 ? this.props.taskAssigned[ 0 ] : null,
+      newSubtaskQuantity: 0,
+      newSubtaskDiscount: 0,
 
-			//trips
-			showAddTrip:false,
+      //trips
+      showAddTrip: false,
 
-			focusedTrip:null,
-			editedTripQuantity:0,
-			editedTripDiscount:0,
+      focusedTrip: null,
+      editedTripQuantity: 0,
+      editedTripDiscount: 0,
 
-			newTripType:this.props.tripTypes.length>0?this.props.tripTypes[0]:null,
-			newTripAssignedTo:this.props.taskAssigned.length>0?this.props.taskAssigned[0]:null,
-			newTripQuantity:1,
-			newTripDiscount:0,
-		}
-		this.onFocusWorkTrip.bind(this);
-		this.onFocusSubtask.bind(this);
-		this.getTotalPrice.bind(this);
-		this.getTotalDiscountedPrice.bind(this);
-		this.getDPH.bind(this);
-	}
+      newTripType: this.props.tripTypes.length > 0 ? this.props.tripTypes[ 0 ] : null,
+      newTripAssignedTo: this.props.taskAssigned.length > 0 ? this.props.taskAssigned[ 0 ] : null,
+      newTripQuantity: 1,
+      newTripDiscount: 0,
+    }
+    this.onFocusWorkTrip.bind( this );
+    this.onFocusSubtask.bind( this );
+    this.getTotalPrice.bind( this );
+    this.getTotalDiscountedPrice.bind( this );
+    this.getDPH.bind( this );
+  }
 
-	componentWillReceiveProps(props){
-		if(this.props.taskID!==props.taskID){
-			this.setState({
-				focusedSubtask:null,
-				showAddSubtask:false,
-				newSubtaskTitle:'',
-				newSubtaskType:props.defaultType,
-				newSubtaskQuantity:0,
-				newSubtaskDiscount:0,
-				newSubtaskAssigned:props.taskAssigned.length>0?props.taskAssigned[0]:null,
+  componentWillReceiveProps( props ) {
+    if ( this.props.taskID !== props.taskID ) {
+      this.setState( {
+        focusedSubtask: null,
+        showAddSubtask: false,
+        newSubtaskTitle: '',
+        newSubtaskType: props.defaultType,
+        newSubtaskQuantity: 0,
+        newSubtaskDiscount: 0,
+        newSubtaskAssigned: props.taskAssigned.length > 0 ? props.taskAssigned[ 0 ] : null,
 
-				focusedTrip:null,
-				showAddTrip:false,
-				newTripType:props.tripTypes.length>0?props.tripTypes[0]:null,
-				newTripAssignedTo:props.taskAssigned.length>0?props.taskAssigned[0]:null,
-				newTripQuantity:1,
-				newTripDiscount:0,
-			})
-		}else if(!sameStringForms(this.props.defaultType,props.defaultType)){
-			this.setState({
-				newSubtaskType:props.defaultType,
-			})
-		}
+        focusedTrip: null,
+        showAddTrip: false,
+        newTripType: props.tripTypes.length > 0 ? props.tripTypes[ 0 ] : null,
+        newTripAssignedTo: props.taskAssigned.length > 0 ? props.taskAssigned[ 0 ] : null,
+        newTripQuantity: 1,
+        newTripDiscount: 0,
+      } )
+    } else if ( !sameStringForms( this.props.defaultType, props.defaultType ) ) {
+      this.setState( {
+        newSubtaskType: props.defaultType,
+      } )
+    }
 
-		if(!sameStringForms(this.props.taskAssigned,props.taskAssigned)){
-			if(!props.taskAssigned.some((item)=>item.id===(this.state.newSubtaskAssigned?this.state.newSubtaskAssigned.id:null))){
-				if(props.taskAssigned.length>0){
-					this.setState({newSubtaskAssigned:props.taskAssigned[0],newTripAssignedTo:props.taskAssigned[0] });
-				}else{
-					this.setState({newSubtaskAssigned:null, newTripAssignedTo:null });
-				}
-			}
-		}
-	}
+    if ( !sameStringForms( this.props.taskAssigned, props.taskAssigned ) ) {
+      if ( !props.taskAssigned.some( ( item ) => item.id === ( this.state.newSubtaskAssigned ? this.state.newSubtaskAssigned.id : null ) ) ) {
+        if ( props.taskAssigned.length > 0 ) {
+          this.setState( {
+            newSubtaskAssigned: props.taskAssigned[ 0 ],
+            newTripAssignedTo: props.taskAssigned[ 0 ]
+          } );
+        } else {
+          this.setState( {
+            newSubtaskAssigned: null,
+            newTripAssignedTo: null
+          } );
+        }
+      }
+    }
+  }
 
-	getCreationError(){
-		let noType = this.state.newSubtaskType===null;
-		let noAssigned = this.state.newSubtaskAssigned===null;
-		let noCompany = this.props.company===null;
-		if(!noType && !noAssigned && !noCompany){
-			return ''
-		}
-		if(noType && noAssigned && noCompany){
-			return 'You must first assign the task to someone, pick task type and company!';
-		}
-		if(!noType && noAssigned && noCompany){
-			return 'You must first assign the task to someone and pick company!';
-		}
-		if(!noType && !noAssigned && noCompany){
-			return 'You must first pick company!';
-		}
-		if(!noType && noAssigned && !noCompany){
-			return 'You must first assign the task to someone!';
-		}
-		if(noType && !noAssigned && noCompany){
-			return 'You must first pick task type and company!';
-		}
-		if(noType && !noAssigned && !noCompany){
-			return 'You must first pick task type!';
-		}
-		if(noType && noAssigned && !noCompany){
-			return 'You must first assign the task to someone and pick task type!';
-		}
-	}
+  getCreationError() {
+    let noType = this.state.newSubtaskType === null;
+    let noAssigned = this.state.newSubtaskAssigned === null;
+    let noCompany = this.props.company === null;
+    if ( !noType && !noAssigned && !noCompany ) {
+      return ''
+    }
+    if ( noType && noAssigned && noCompany ) {
+      return 'You must first assign the task to someone, pick task type and company!';
+    }
+    if ( !noType && noAssigned && noCompany ) {
+      return 'You must first assign the task to someone and pick company!';
+    }
+    if ( !noType && !noAssigned && noCompany ) {
+      return 'You must first pick company!';
+    }
+    if ( !noType && noAssigned && !noCompany ) {
+      return 'You must first assign the task to someone!';
+    }
+    if ( noType && !noAssigned && noCompany ) {
+      return 'You must first pick task type and company!';
+    }
+    if ( noType && !noAssigned && !noCompany ) {
+      return 'You must first pick task type!';
+    }
+    if ( noType && noAssigned && !noCompany ) {
+      return 'You must first assign the task to someone and pick task type!';
+    }
+  }
 
-	onFocusWorkTrip(trip){
-		this.setState({
-			editedTripQuantity:trip.quantity,
-			editedTripDiscount:trip.discount,
-			focusedTrip:trip.id
-		})
-	}
+  onFocusWorkTrip( trip ) {
+    this.setState( {
+      editedTripQuantity: trip.quantity,
+      editedTripDiscount: trip.discount,
+      focusedTrip: trip.id
+    } )
+  }
 
-	onFocusSubtask(subtask){
-		this.setState({
-			editedSubtaskTitle: subtask.title,
-			editedSubtaskQuantity: subtask.quantity?subtask.quantity:'',
-			editedSubtaskType: subtask.type,
-			editedSubtaskDiscount: subtask.discount,
-			focusedSubtask: subtask.id
-		});
-	}
+  onFocusSubtask( subtask ) {
+    this.setState( {
+      editedSubtaskTitle: subtask.title,
+      editedSubtaskQuantity: subtask.quantity ? subtask.quantity : '',
+      editedSubtaskType: subtask.type,
+      editedSubtaskDiscount: subtask.discount,
+      focusedSubtask: subtask.id
+    } );
+  }
 
-	getPrice(type){
-		if(!type){
-			return NaN;
-		}
-		let price = (this.props.company.pricelist ? type.prices.find((price)=>price.pricelist===this.props.company.pricelist.id) : undefined);
-		if(price === undefined){
-			price = NaN;
-		}else{
-			price = price.price;
-		}
-		return parseFloat(parseFloat(price).toFixed(2));
-	}
+  getPrice( type ) {
+    if ( !type ) {
+      return NaN;
+    }
+    let price = ( this.props.company.pricelist ? type.prices.find( ( price ) => price.pricelist === this.props.company.pricelist.id ) : undefined );
+    if ( price === undefined ) {
+      price = NaN;
+    } else {
+      price = price.price;
+    }
+    return parseFloat( parseFloat( price )
+      .toFixed( 2 ) );
+  }
 
-	getTotalPrice(item){
-		return parseFloat(this.getPrice(item.type)*parseInt(item.quantity).toFixed(2))
-	}
+  getTotalPrice( item ) {
+    return parseFloat( this.getPrice( item.type ) * parseInt( item.quantity )
+      .toFixed( 2 ) )
+  }
 
-	getTotalDiscountedPrice(item){
-		return parseFloat(parseFloat(this.getTotalPrice(item)*(100-parseInt(item.discount))/100).toFixed(2))
-	}
+  getTotalDiscountedPrice( item ) {
+    return parseFloat( parseFloat( this.getTotalPrice( item ) * ( 100 - parseInt( item.discount ) ) / 100 )
+      .toFixed( 2 ) )
+  }
 
-	getDPH(){
-		let dph = 20;
-		if(this.props.company && this.props.company.dph > 0){
-			dph = this.props.company.dph;
-		}
-		return (100+dph)/100;
-	}
+  getDPH() {
+    let dph = 20;
+    if ( this.props.company && this.props.company.dph > 0 ) {
+      dph = this.props.company.dph;
+    }
+    return ( 100 + dph ) / 100;
+  }
 
-	render() {
-		//const afterHours= this.props.company && this.state.newExtraWork ? this.props.company.pricelist.afterHours : 0;
-		return (
-				<div className="row m-b-30">
+  render() {
+    //const afterHours= this.props.company && this.state.newExtraWork ? this.props.company.pricelist.afterHours : 0;
+    return (
+      <div className="row m-b-30">
 					<div className="col-md-12">
 						<div>
 							<div className="" style={{color: "#FF4500", height: "20px"}}>
@@ -302,13 +320,13 @@ export default class PraceWorkTrips extends Component {
 											</td>}
 
 											{ this.props.showColumns.includes(8) && <td className="t-a-r">
-												<button className="btn btn-link waves-effect" disabled={this.props.disabled}>
+												<button className="btn-link" disabled={this.props.disabled}>
 													<i className="fa fa-arrow-up"  />
 												</button>
-												<button className="btn btn-link waves-effect" disabled={this.props.disabled}>
+												<button className="btn-link" disabled={this.props.disabled}>
 														<i className="fa fa-arrow-down"  />
 												</button>
-												<button className="btn btn-link waves-effect" disabled={this.props.disabled}
+												<button className="btn-link" disabled={this.props.disabled}
 													onClick={()=>{
 														if(window.confirm('Are you sure?')){
 															this.props.removeSubtask(subtask.id);
@@ -415,13 +433,13 @@ export default class PraceWorkTrips extends Component {
 													this.getTotalDiscountedPrice(trip)}
 											</td>}
 											{ this.props.showColumns.includes(8) && <td className="t-a-r">
-												<button className="btn btn-link waves-effect" disabled={this.props.disabled}>
+												<button className="btn-link" disabled={this.props.disabled}>
 													<i className="fa fa-arrow-up"  />
 												</button>
-												<button className="btn btn-link waves-effect" disabled={this.props.disabled}>
+												<button className="btn-link" disabled={this.props.disabled}>
 														<i className="fa fa-arrow-down"  />
 												</button>
-												<button className="btn btn-link waves-effect" disabled={this.props.disabled}
+												<button className="btn-link" disabled={this.props.disabled}
 													onClick={()=>{
 														if(window.confirm('Are you sure?')){
 															this.props.removeTrip(trip.id);
@@ -508,7 +526,7 @@ export default class PraceWorkTrips extends Component {
 												}
 											</td>}
 											{ this.props.showColumns.includes(8) && <td className="t-a-r">
-											<button className="btn btn-link waves-effect"
+											<button className="btn-link"
 												disabled={this.state.newSubtaskType===null||this.props.disabled|| this.state.newSubtaskAssigned===null}
 												onClick={()=>{
 													let body={
@@ -532,7 +550,7 @@ export default class PraceWorkTrips extends Component {
 												>
 												<i className="fa fa-plus" />
 											</button>
-											<button className="btn btn-link waves-effect"
+											<button className="btn-link"
 												disabled={this.props.disabled}
 												onClick={()=>{
 													this.setState({showAddSubtask: false})
@@ -607,7 +625,7 @@ export default class PraceWorkTrips extends Component {
 												}
 											</td>}
 											{ this.props.showColumns.includes(8) && <td className="t-a-r">
-												<button className="btn btn-link waves-effect"
+												<button className="btn-link"
 													disabled={this.state.newTripType===null||isNaN(parseInt(this.state.newTripQuantity))||this.props.disabled|| this.state.newTripAssignedTo===null}
 													onClick={()=>{
 														let body={
@@ -630,7 +648,7 @@ export default class PraceWorkTrips extends Component {
 													>
 													<i className="fa fa-plus" />
 												</button>
-												<button className="btn btn-link waves-effect"
+												<button className="btn-link"
 													disabled={this.props.disabled}
 													onClick={()=>{
 														this.setState({showAddTrip: false,showAddSubtask:false})
@@ -711,6 +729,6 @@ export default class PraceWorkTrips extends Component {
 						</div>
 					</div>
 				</div>
-			);
-		}
-	}
+    );
+  }
+}

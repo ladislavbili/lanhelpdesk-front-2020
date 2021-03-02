@@ -9,7 +9,6 @@ import {
 import {
   Modal,
   ModalBody,
-  Button
 } from 'reactstrap';
 import RowTaskAdd from './rowTaskAdd';
 

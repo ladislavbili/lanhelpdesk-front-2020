@@ -464,7 +464,7 @@ export default function Rozpocet( props ) {
               {showColumns.includes(8) &&
                 <td className="t-a-r">	{/* //akcie*/}
                   <button
-                    className="btn btn-link waves-effect"
+                    className="btn-link btn-distance"
                     disabled={ disabled || index === 0 }
                     onClick={()=>{
                       updateSubtasks([
@@ -478,7 +478,7 @@ export default function Rozpocet( props ) {
                     <i className="fa fa-arrow-up"  />
                   </button>
                   <button
-                    className="btn btn-link waves-effect"
+                    className="btn-link btn-distance"
                     disabled={ disabled || index === sortedWorks.length - 1 }
                     onClick={()=>{
                       updateSubtasks([
@@ -491,7 +491,7 @@ export default function Rozpocet( props ) {
                     >
                     <i className="fa fa-arrow-down"  />
                   </button>
-                  <button className="btn btn-link waves-effect" disabled={disabled}
+                  <button className="btn-link" disabled={disabled}
                     onClick={()=>{
                       if(window.confirm('Are you sure?')){
                         removeSubtask(subtask.id);
@@ -660,7 +660,7 @@ export default function Rozpocet( props ) {
                 {showColumns.includes(8) &&
                   <td className="t-a-r">
                     <button
-                      className="btn btn-link waves-effect"
+                      className="btn-link btn-distance"
                       disabled={ disabled || index === 0 }
                       onClick={()=>{
                         updateTrips([
@@ -674,7 +674,7 @@ export default function Rozpocet( props ) {
                       <i className="fa fa-arrow-up"  />
                     </button>
                     <button
-                      className="btn btn-link waves-effect"
+                      className="btn-link btn-distance"
                       disabled={ disabled || index === sortedTrips.length - 1 }
                       onClick={()=>{
                         updateTrips([
@@ -688,7 +688,7 @@ export default function Rozpocet( props ) {
                       <i className="fa fa-arrow-down"  />
                     </button>
                     <button
-                      className="btn btn-link waves-effect"
+                      className="btn-link"
                       disabled={disabled}
                       onClick={()=>{
                         if(window.confirm('Are you sure?')){
@@ -879,7 +879,7 @@ export default function Rozpocet( props ) {
                 {/*Toolbar*/}
                 {showColumns.includes(8) &&
                   <td className="t-a-r">
-                    <button className="btn btn-link waves-effect" disabled={disabled}>
+                    <button className="btn-link btn-distance" disabled={disabled}>
                       <i
                         className="fa fa-sync-alt"
                         onClick={()=>{
@@ -892,7 +892,7 @@ export default function Rozpocet( props ) {
                         />
                     </button>
                     <button
-                      className="btn btn-link waves-effect"
+                      className="btn-link btn-distance"
                       disabled={ disabled || index === 0 }
                       onClick={()=>{
                         updateMaterials([
@@ -906,7 +906,7 @@ export default function Rozpocet( props ) {
                       <i className="fa fa-arrow-up"  />
                     </button>
                     <button
-                      className="btn btn-link waves-effect"
+                      className="btn-link btn-distance"
                       disabled={ disabled || index === sortedMaterials.length - 1 }
                       onClick={()=>{
                         updateMaterials([
@@ -919,7 +919,7 @@ export default function Rozpocet( props ) {
                       >
                       <i className="fa fa-arrow-down"  />
                     </button>
-                    <button className="btn btn-link waves-effect"
+                    <button className="btn-link"
                       disabled={disabled}
                       onClick={()=>{
                         if(window.confirm('Are you sure?')){
@@ -1072,7 +1072,7 @@ export default function Rozpocet( props ) {
                 {showColumns.includes(8) &&
                   <td className="t-a-r">
                     <button
-                      className="btn btn-link waves-effect"
+                      className="btn-link btn-distance"
                       disabled={ disabled || index === 0 }
                       onClick={()=>{
                         updateCustomItems([
@@ -1086,7 +1086,7 @@ export default function Rozpocet( props ) {
                       <i className="fa fa-arrow-up"  />
                     </button>
                     <button
-                      className="btn btn-link waves-effect"
+                      className="btn-link btn-distance"
                       disabled={ disabled || index === sortedCustomItems.length - 1 }
                       onClick={()=>{
                         updateCustomItems([
@@ -1099,7 +1099,7 @@ export default function Rozpocet( props ) {
                       >
                       <i className="fa fa-arrow-down"  />
                     </button>
-                    <button className="btn btn-link waves-effect"
+                    <button className="btn-link"
                       disabled={disabled}
                       onClick={()=>{
                         if(window.confirm('Are you sure?')){
@@ -1237,8 +1237,8 @@ export default function Rozpocet( props ) {
           }
           {/*Toolbar*/}
           {showColumns.includes(8) &&
-            <div className="t-a-r">
-              <button className="btn btn-red-link m-r-0"
+            <div className="row">
+              <button className="btn-link-red"
                 disabled={disabled}
                 onClick={()=>{
                   setShowAddSubtask(false)
@@ -1353,8 +1353,8 @@ export default function Rozpocet( props ) {
           }
           {/*Toolbar*/}
           {showColumns.includes(8) &&
-            <div className="t-a-r">
-              <button className="btn btn-red-link m-r-0"
+            <div className="row">
+              <button className="btn-link-red"
                 disabled={disabled}
                 onClick={()=>{
                   setShowAddTrip(false);
@@ -1546,8 +1546,8 @@ export default function Rozpocet( props ) {
           <div className="m-r-10 center-hor">cena/ks</div>
           {/*Toolbar*/}
           {showColumns.includes(8) &&
-            <div className="t-a-r">
-              <button className="btn btn-red-link m-r-0"
+            <div className="row">
+              <button className="btn-link-red"
                 disabled={disabled}
                 onClick={()=>{
                   setShowAddMaterial(false)
@@ -1650,8 +1650,8 @@ export default function Rozpocet( props ) {
           <div className="m-r-10 center-hor">cena/ks</div>
           {/*Toolbar*/}
           {showColumns.includes(8) &&
-            <div className="t-a-r">
-              <button className="btn btn-red-link m-r-0"
+            <div className="row">
+              <button className="btn-link-red"
                 disabled={disabled}
                 onClick={()=>{
                   setShowAddCustomItem(false)
@@ -1687,7 +1687,7 @@ export default function Rozpocet( props ) {
         <div className="row">
           <div className="m-r-10 center-hor add-title">
             {!showAddSubtask &&
-              <button className="btn btn-link waves-effect"
+              <button className="btn-link btn-distance"
                 disabled={disabled}
                 onClick={()=>{
                   setShowAddSubtask(true);
@@ -1698,7 +1698,7 @@ export default function Rozpocet( props ) {
               </button>
             }
             {!showAddTrip && !showSubtasks &&
-              <button className="btn btn-link waves-effect"
+              <button className="btn-link btn-distance"
                 disabled={disabled}
                 onClick={()=>{
                   setShowAddTrip(true);
@@ -1709,18 +1709,18 @@ export default function Rozpocet( props ) {
               </button>
             }
             {!showAddMaterial && !showSubtasks &&
-              <button className="btn btn-link waves-effect"
+              <button className="btn-link btn-distance"
                 disabled={disabled}
                 onClick={()=>{
                   setShowAddMaterial(true);
                 }}
                 >
-                <i className="fa fa-plus" />
+                <i className="fa fa-plus btn-distance" />
                 Materiál
               </button>
             }
             {!showAddCustomItem && !showSubtasks &&
-              <button className="btn btn-link waves-effect"
+              <button className="btn-link"
                 disabled={disabled}
                 onClick={()=>{
                   setShowAddCustomItem(true);

@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -230,13 +229,13 @@ export default function StatusEdit( props ) {
           />
 
         <div className="form-buttons-row">
-          <Button
+          <button
             className="btn-red m-l-5 m-t-5"
             disabled={saving || theOnlyOneLeft}
             onClick={ deleteStatusFunc }
             >
             Delete
-          </Button>
+          </button>
           <button className="btn m-t-5 ml-auto" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</button>
         </div>
       </div>

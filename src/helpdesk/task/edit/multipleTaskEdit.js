@@ -12,7 +12,6 @@ import {
   Nav,
   NavItem,
   NavLink,
-  Button
 } from 'reactstrap';
 import DatePicker from 'components/DatePicker';
 import moment from 'moment';
@@ -388,17 +387,17 @@ export default class MultipleTaskEdit extends Component {
           { this.renderComments() }
 
           <div className="row">
-            <Button
+            <button
               className="btn-link"
               onClick={()=>{this.props.close()}}
               >  Cancel
-            </Button>
+            </button>
 
-            <Button
+            <button
               className="btn ml-auto"
               onClick={()=>{this.submit()}}
               >  Save
-            </Button>
+            </button>
           </div>
 
         </div>
@@ -415,7 +414,7 @@ export default class MultipleTaskEdit extends Component {
         </span>
         <button
           type="button"
-          className="btn btn-link waves-effect ml-auto asc"
+          className="btn-link ml-auto asc"
           onClick={() => this.setState({layout: (this.state.layout === "1" ? "2" : "1")})}>
           Switch layout
         </button>

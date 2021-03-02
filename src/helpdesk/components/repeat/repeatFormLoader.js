@@ -11,7 +11,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Button
 } from 'reactstrap';
 import Loading from 'components/loading';
 import {

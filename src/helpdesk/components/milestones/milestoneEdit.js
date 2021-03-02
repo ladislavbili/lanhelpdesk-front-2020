@@ -12,7 +12,6 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Button,
   FormGroup,
   Label,
   Input
@@ -195,12 +194,12 @@ export default function MilestoneEdit( props ) {
 
   return (
     <div className=''>
-			<Button
+			<button
 				className='btn-link p-0 m-r-15'
 				onClick={toggle}
 				>
 				<fa className="fa fa-cog"/>
-			</Button>
+			</button>
 
         <Modal isOpen={opened}>
           <ModalHeader>
@@ -261,19 +260,19 @@ export default function MilestoneEdit( props ) {
           </ModalBody>
 
           <ModalFooter>
-            <Button className="btn-link" disabled={saving} onClick={toggle}>
+            <button className="btn-link-cancel btn-distance" disabled={saving} onClick={toggle}>
               Close
-            </Button>
+            </button>
 
-            <Button className="btn-danger" disabled={saving} onClick={deleteMilestoneFunc}>
+            <button className="btn-red" disabled={saving} onClick={deleteMilestoneFunc}>
               Delete
-            </Button>
+            </button>
 
-            <Button className="btn ml-auto"
+            <button className="btn ml-auto"
               disabled={ saving || title === "" }
               onClick={updateMilestoneFunc}>
               {saving?'Saving...':'Save milestone'}
-            </Button>
+            </button>
           </ModalFooter>
         </Modal>
         </div>

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Button,
   FormGroup,
   Modal,
   ModalBody,
@@ -44,12 +43,12 @@ export default function PasswordChange( props ) {
         </FormGroup>
       </ModalBody>
       <ModalFooter>
-        <Button className="btn-link mr-auto"onClick={() => submitPass(null)}>
+        <button className="btn-link mr-auto"onClick={() => submitPass(null)}>
           Cancel
-        </Button>
-        <Button className="btn ml-auto" disabled={newPass.length < 6 || newPass !== newPassCheck } onClick={() => submitPass(newPass)}>
+        </button>
+        <button className="btn ml-auto" disabled={newPass.length < 6 || newPass !== newPassCheck } onClick={() => submitPass(newPass)}>
           Change password
-        </Button>
+        </button>
       </ModalFooter>
     </Modal>
   )

@@ -1,50 +1,59 @@
-import React, { Component } from 'react';
+import React, {
+  Component
+} from 'react';
 import Select from 'react-select';
-import { TabContent, TabPane, Input } from 'reactstrap';
-import { selectStyle, invisibleSelectStyle} from 'configs/components/select';
+import {
+  TabContent,
+  TabPane,
+  Input
+} from 'reactstrap';
+import {
+  selectStyle,
+  invisibleSelectStyle
+} from 'configs/components/select';
 
 
 export default class Subtasks extends Component {
-	constructor(props){
-		super(props);
-		this.state={
-			editedTitle: "",
-			focused: null,
-			activeTab: "1",
+  constructor( props ) {
+    super( props );
+    this.state = {
+      editedTitle: "",
+      focused: null,
+      activeTab: "1",
 
-			newTitle:'',
-			//newAssigned:this.props.taskAssigned.length>0?this.props.taskAssigned[0]:null
-		}
-		this.onFocus.bind(this);
-	}
+      newTitle: '',
+      //newAssigned:this.props.taskAssigned.length>0?this.props.taskAssigned[0]:null
+    }
+    this.onFocus.bind( this );
+  }
 
-	onFocus(subtask){
-		this.setState({
-			editedTitle: subtask.title,
-			focused: subtask.id
-		});
-	}
+  onFocus( subtask ) {
+    this.setState( {
+      editedTitle: subtask.title,
+      focused: subtask.id
+    } );
+  }
 
-	componentWillReceiveProps(props){
-		if(this.props.match.params.taskID!==props.match.params.taskID){
-			this.setState({
-				newTitle:'',
-			})
-		}
-		/*if(this.props.taskAssigned.length!==props.taskAssigned.length || (props.taskAssigned.length>0 && props.taskAssigned[0].id!==this.props.taskAssigned[0].id) ){
-			if(!props.taskAssigned.some((item)=>item.id===(this.state.newAssigned?this.state.newAssigned.id:null))){
-				if(props.taskAssigned.length>0){
-					this.setState({newAssigned:props.taskAssigned[0]});
-				}else{
-					this.setState({newAssigned:null});
-				}
-			}
-		}*/
-	}
+  componentWillReceiveProps( props ) {
+    if ( this.props.match.params.taskID !== props.match.params.taskID ) {
+      this.setState( {
+        newTitle: '',
+      } )
+    }
+    /*if(this.props.taskAssigned.length!==props.taskAssigned.length || (props.taskAssigned.length>0 && props.taskAssigned[0].id!==this.props.taskAssigned[0].id) ){
+    	if(!props.taskAssigned.some((item)=>item.id===(this.state.newAssigned?this.state.newAssigned.id:null))){
+    		if(props.taskAssigned.length>0){
+    			this.setState({newAssigned:props.taskAssigned[0]});
+    		}else{
+    			this.setState({newAssigned:null});
+    		}
+    	}
+    }*/
+  }
 
-	render() {
-		return (
-			<div className="m-t-10">
+  render() {
+    return (
+      <div className="m-t-10">
 				<div className="row">
 					<div className="full-width">
 				{/*		<Nav tabs className="b-0">
@@ -123,7 +132,7 @@ export default class Subtasks extends Component {
 																		/>
 																</td>}
 																<td className="t-a-r">
-																	<button className="btn btn-link-reversed waves-effect" onClick={()=>{
+																	<button className="btn-link" onClick={()=>{
 																			if(window.confirm('Are you sure?')){
 																				this.props.removeSubtask(subtask.id);
 																			}
@@ -140,7 +149,7 @@ export default class Subtasks extends Component {
 													<td>
 													</td>
 													<td>
-														<button className="btn btn-table-add-item"
+														<button className="btn-link"
 															onClick={()=>{
 															 this.setState({showAddItem: true});
 															}}>
@@ -153,7 +162,7 @@ export default class Subtasks extends Component {
 								{this.state.showAddItem &&
 													<tr>
 														<td>
-															<button className="btn btn-link waves-effect" onClick={()=>{
+															<button className="btn-link" onClick={()=>{
 																	this.setState({showAddItem: false})
 																}}>
 																<i className="fa fa-times"  />
@@ -182,7 +191,7 @@ export default class Subtasks extends Component {
 															/>
 													</td>}
 													<div>
-														<button className="btn btn-link waves-effect"
+														<button className="btn-link"
 															disabled={this.state.newTitle===''}
 															onClick={()=>{
 																let body={
@@ -216,6 +225,6 @@ export default class Subtasks extends Component {
 				</div>
 			</div>
 
-		);
-	}
+    );
+  }
 }

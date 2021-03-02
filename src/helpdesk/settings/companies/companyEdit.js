@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input,
@@ -762,15 +761,18 @@ export default function CompanyEdit( props ) {
           >
 
           {dataChanged &&
-            <Button
-              className="btn-link"
+            <button
+              className="btn-link-cancel btn-distance"
               disabled={saving}
-              onClick={cancel}>Cancel changes</Button>
+              onClick={cancel}
+              >
+              Cancel changes
+            </button>
           }
-          <Button className="btn-red" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</Button>
+          <button className="btn-red btn-distance" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</button>
 
-            <Button
-              className="btn m-r-5 ml-auto"
+            <button
+              className="btn ml-auto"
               disabled={ cannotSave && !dataChanged }
               onClick={()=>{
                 if (pricelist.value === "0" && pricelistName !== ""){
@@ -781,7 +783,7 @@ export default function CompanyEdit( props ) {
               }}
               >
               {saving?'Saving...':'Save changes'}
-            </Button>
+            </button>
 
 
         </div>

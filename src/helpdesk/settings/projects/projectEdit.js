@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -912,14 +911,14 @@ export default function ProjectEdit( props ) {
       <div className="form-buttons-row">
         {
           closeModal &&
-          <Button className="btn-link" onClick={() => closeModal(null, null)}>
+          <button className="btn-link" onClick={() => closeModal(null, null)}>
             Close
-          </Button>
+          </button>
         }
         { myRights.projectPrimaryWrite &&
-          <Button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
+          <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
             Delete
-          </Button>
+          </button>
         }
         { !numberOfTasksLoading && !numberOfTasksError &&
         <div className="ml-auto center-hor p-r-5">

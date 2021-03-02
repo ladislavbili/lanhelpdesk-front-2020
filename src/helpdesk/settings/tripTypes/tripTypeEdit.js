@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -168,13 +167,13 @@ export default function TripTypeEdit( props ) {
             />
         </FormGroup>
         <div className="form-buttons-row">
-          <Button
+          <button
             className="btn-red"
             disabled={saving || theOnlyOneLeft}
             onClick={() => setDeleteOpen(true)}
             >
             Delete
-          </Button>
+          </button>
           <button className="btn ml-auto" disabled={saving} onClick={updateTripTypeFunc}>{saving ? 'Saving trip type...' : 'Save trip type'}</button>
         </div>
         <DeleteReplacement

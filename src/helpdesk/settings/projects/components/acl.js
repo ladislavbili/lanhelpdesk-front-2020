@@ -112,7 +112,7 @@ export default function ProjectACL( props ) {
                     group={group}
                     />
                   <button
-                    className="btn waves-effect m-r-5"
+                    className="btn m-r-5"
                     onClick={() => {
                       if(window.confirm('Delete this role? All users with it will be removed from project!')){
                         deleteGroup(group.id);

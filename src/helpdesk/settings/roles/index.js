@@ -3,9 +3,6 @@ import {
   useQuery
 } from "@apollo/client";
 
-import {
-  Button
-} from 'reactstrap';
 import RoleAdd from './roleAdd';
 import RoleEdit from './roleEdit';
 import Loading from 'components/loading';
@@ -52,11 +49,11 @@ export default function RolesList( props ) {
                   />
               </div>
             </div>
-            <Button
+            <button
               className="btn-link center-hor"
               onClick={()=> history.push('/helpdesk/settings/roles/add')}>
               <i className="fa fa-plus p-l-5 p-r-5"/> Role
-              </Button>
+              </button>
             </div>
             <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
               <div className="row p-l-10 p-b-10">

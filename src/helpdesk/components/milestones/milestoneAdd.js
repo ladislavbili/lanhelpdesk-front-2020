@@ -6,7 +6,6 @@ import {
 
 import DatePicker from 'components/DatePicker';
 import {
-  Button,
   FormGroup,
   Label,
   Input,
@@ -149,9 +148,9 @@ export default function MilestoneAdd( props ) {
         </div>
 
         <ModalFooter>
-          <Button className="btn-link mr-auto" disabled={saving} onClick={() => closeModal(null)}>
+          <button className="btn-link-cancel mr-auto" disabled={saving} onClick={() => closeModal(null)}>
             Close
-          </Button>
+          </button>
 
           <button className="btn"
             disabled={saving || title === "" || projectLoading}

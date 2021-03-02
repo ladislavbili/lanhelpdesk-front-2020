@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Button,
   FormGroup,
   Label,
   Input
@@ -117,13 +116,13 @@ export default function Login( props ) {
             }}
             />
         </FormGroup>
-        <Button color="primary"
+        <button
           className="btn login-item"
           disabled={ signingIn || email.length === 0 || password.length === 0 }
           onClick={ login }
           >
           Login
-        </Button>
+        </button>
         {error !== null &&
           <div style={{color:'red'}}>
             {error}

@@ -3,7 +3,6 @@ import React, {
 } from 'react';
 import Select from 'react-select';
 import {
-  Button,
   FormGroup,
   Label,
   Modal,
@@ -87,17 +86,20 @@ export default class PendingPicker extends Component {
 
               </ModalBody>
               <ModalFooter>
-              <Button className="mr-auto btn-link" onClick={this.props.closeModal}>
+              <button className="mr-auto btn-link" onClick={this.props.closeModal}>
                 Close
-              </Button>
+              </button>
 
 
-              <Button
+              <button
                 className="btn"
                 disabled={ milestoneActive ? (this.state.milestone===null):(this.state.pendingDate===null)}
                 onClick={()=>{
                   this.props.savePending({...this.state})
-                }}>Save pending</Button>
+                }}
+                >
+                Save pending
+              </button>
             </ModalFooter>
           </Modal>
     );

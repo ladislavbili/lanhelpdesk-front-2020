@@ -5,7 +5,6 @@ import {
 } from "@apollo/client";
 
 import {
-  Button,
   FormGroup,
   Label,
   Input,
@@ -401,22 +400,24 @@ export default function PricelistEdit( props ) {
             }
           </ModalBody>
           <ModalFooter>
-            <Button className="btn-link mr-auto"onClick={() => setChoosingNewPricelist(false)}>
+            <button className="btn-link-cancel mr-auto"onClick={() => setChoosingNewPricelist(false)}>
               Cancel
-            </Button>
-            <Button className="btn ml-auto" disabled={!newPricelist || (def ? !newDefPricelist : false)} onClick={deletePricelistFunc}>
+            </button>
+            <button className="btn ml-auto" disabled={!newPricelist || (def ? !newDefPricelist : false)} onClick={deletePricelistFunc}>
               Complete deletion
-            </Button>
+            </button>
           </ModalFooter>
         </Modal>
 
         <div className="form-buttons-row m-b-20">
-          <Button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewPricelist(true)}>Delete</Button>
-          <Button
+          <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewPricelist(true)}>Delete</button>
+          <button
             className="btn ml-auto"
             disabled={saving}
-            onClick={updatePricelistFunc}>{saving?'Saving prices...':'Save prices'}</Button>
-
+            onClick={updatePricelistFunc}
+            >
+            {saving?'Saving prices...':'Save prices'}
+          </button>
         </div>
       </div>
     </div>

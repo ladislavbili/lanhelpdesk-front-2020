@@ -46,7 +46,7 @@ export default function CheckboxList( props ) {
             placeholder={placeholder}
             />
             <button
-              className="btn btn-link waves-effect"
+              className="btn-link"
               disabled={disabled}
               onClick={()=>{
                 deleteItem(item);
@@ -76,7 +76,7 @@ export default function CheckboxList( props ) {
             placeholder={newPlaceholder}
             />
           <button
-            className="btn btn-link waves-effect"
+            className="btn-link btn-distance"
             disabled={disabled}
             onClick={()=>{
               submitItem({
@@ -91,7 +91,7 @@ export default function CheckboxList( props ) {
             <i className="fa fa-plus" />
           </button>
           <button
-            className="btn btn-link waves-effect"
+            className="btn-link"
             disabled={disabled}
             onClick={()=>{
               setAddItem(false);
@@ -103,7 +103,7 @@ export default function CheckboxList( props ) {
       }
       { !addItem &&
         <button
-          className="btn btn-link waves-effect"
+          className="btn-link"
           disabled={disabled}
           onClick={()=>{
             setAddItem(true);

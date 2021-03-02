@@ -11,7 +11,6 @@ import {
   ModalHeader,
   FormGroup,
   Label,
-  Button,
   Input
 } from 'reactstrap';
 import {
@@ -245,9 +244,9 @@ export default function CustomAttributes( props ) {
           </FormGroup>
         }
         <div className="row">
-          <Button className="btn waves-effect" onClick={() => closeModal()}> Cancel </Button>
+          <button className="btn-link-cancel" onClick={() => closeModal()}> Cancel </button>
 
-          <Button className="btn ml-auto"
+          <button className="btn ml-auto"
             disabled={cantSave}
             onClick={() =>{
               addCustomAttribute({
@@ -273,7 +272,7 @@ export default function CustomAttributes( props ) {
             }}
             >
             Add custom attribute
-          </Button>
+          </button>
         </div>
       </ModalBody>
     </Modal>
