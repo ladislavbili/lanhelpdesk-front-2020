@@ -10,6 +10,7 @@ export default function MultiSelect( props ) {
 
   const {
     className,
+    menuClassName,
     disabled,
     direction,
     style,
@@ -35,7 +36,7 @@ export default function MultiSelect( props ) {
       >
       <DropdownToggle className="bkg-white p-0 m-0" style={{ width: 0 }}>
       </DropdownToggle>
-      <DropdownMenu style={{width:'max-content'}} className="p-0">
+      <DropdownMenu style={{width:'max-content'}} className={`${menuClassName ? menuClassName : ''} p-0`}>
         <div className="dynamic-commandbar multiselect-header">
           {header}
         </div>

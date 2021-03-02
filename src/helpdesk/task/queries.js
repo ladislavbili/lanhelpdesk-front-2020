@@ -7,14 +7,252 @@ import {
 } from 'helpdesk/settings/projects/queries';
 
 const responseTask = `
+id
+important
+invoiced
+invoicedDate
+title
+updatedAt
+createdAt
+closeDate
+metadata{
+  subtasksApproved
+  subtasksPending
+  tripsApproved
+  tripsPending
+  materialsApproved
+  materialsPending
+  itemsApproved
+  itemsPending
+}
+taskAttachments{
   id
-  important
-  invoiced
-  invoicedDate
+  path
+  filename
+  size
+  mimetype
+}
+assignedTo {
+  id
+  name
+  surname
+  email
+}
+company {
+  id
   title
+  dph
+  usedTripPausal
+  usedSubtaskPausal
+  taskWorkPausal
+  taskTripPausal
+  monthly
+  monthlyPausal
+  pricelist {
+    id
+    title
+    materialMargin
+    prices {
+      type
+      price
+      taskType {
+        id
+      }
+      tripType {
+        id
+      }
+    }
+  }
+}
+createdBy {
+  id
+  name
+  surname
+}
+deadline
+description
+milestone{
+  id
+  title
+}
+pendingDate
+project{
+  id
+  title
+  autoApproved
+}
+requester{
+  id
+  fullName
+}
+status {
+  id
+  title
+  color
+  action
+}
+tags {
+  id
+  title
+  color
+  order
+}
+taskType {
+  id
+  title
+}
+repeat {
+  id
+  repeatEvery
+  repeatInterval
+  startsAt
+  active
+}
+scheduled{
+  id
+  user{
+    id
+    fullName
+    email
+  }
+  from
+  to
+}
+shortSubtasks{
+  id
+  title
+  done
+}
+subtasks {
+  invoicedData{
+    price
+    quantity
+    type
+    assignedTo
+  }
+  id
+  title
+  order
+  done
+  approved
+  approvedBy{
+    id
+    fullName
+  }
+  quantity
+  discount
+  type {
+    id
+    title
+  }
+  assignedTo {
+    id
+    email
+    company {
+      id
+    }
+  }
+}
+workTrips {
+  invoicedData{
+    price
+    quantity
+    type
+    assignedTo
+  }
+  id
+  order
+  done
+  approved
+  approvedBy{
+    id
+    fullName
+  }
+  quantity
+  discount
+  type {
+    id
+    title
+  }
+  assignedTo {
+    id
+    email
+    company {
+      id
+    }
+  }
+}
+materials {
+  invoicedData{
+    title
+    quantity
+    price
+    totalPrice
+    margin
+  }
+  id
+  title
+  order
+  done
+  approved
+  approvedBy{
+    id
+    fullName
+  }
+  quantity
+  margin
+  price
+}
+customItems {
+  invoicedData{
+    title
+    quantity
+    price
+    totalPrice
+  }
+  id
+  title
+  order
+  done
+  approved
+  approvedBy{
+    id
+    fullName
+  }
+  quantity
+  price
+}
+invoicedTasks {
+  assignedTo {
+    title
+    UserId
+  }
+  tags {
+    title
+    color
+    TagId
+  }
+  project
+  requester
+  taskType
+  company
+  milestone
+}
+`
+
+const listTasks = `
+tasks {
+  id
+  title
+  invoiced
   updatedAt
   createdAt
+  important
   closeDate
+  overtime
+  pausal
+  pendingChangable
+  statusChange
   metadata{
     subtasksApproved
     subtasksPending
@@ -25,44 +263,14 @@ const responseTask = `
     itemsApproved
     itemsPending
   }
-  taskAttachments{
-    id
-    path
-    filename
-    size
-    mimetype
-  }
   assignedTo {
     id
-    name
-    surname
+    fullName
     email
   }
   company {
     id
     title
-    dph
-    usedTripPausal
-    usedSubtaskPausal
-    taskWorkPausal
-    taskTripPausal
-    monthly
-    monthlyPausal
-    pricelist {
-      id
-      title
-      materialMargin
-      prices {
-        type
-        price
-        taskType {
-          id
-        }
-        tripType {
-          id
-        }
-      }
-    }
   }
   createdBy {
     id
@@ -80,164 +288,38 @@ const responseTask = `
     id
     title
     autoApproved
+    right{
+      ${groupRights}
+    }
   }
   requester{
     id
+    name
+    surname
     fullName
+    email
   }
   status {
     id
     title
+    order
     color
     action
   }
   tags {
     id
     title
-    color
-    order
   }
   taskType {
     id
     title
   }
-  repeat {
-    id
-    repeatEvery
-    repeatInterval
-    startsAt
-    active
-  }
-  scheduled{
-    id
-    user{
-      id
-      fullName
-      email
-    }
-    from
-    to
-  }
-  shortSubtasks{
-    id
-    title
-    done
-  }
-  subtasks {
-    invoicedData{
-      price
-      quantity
-      type
-      assignedTo
-    }
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    discount
-    type {
-      id
-      title
-    }
-    assignedTo {
-      id
-      email
-      company {
-        id
-      }
-    }
-  }
-  workTrips {
-    invoicedData{
-      price
-      quantity
-      type
-      assignedTo
-    }
-    id
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    discount
-    type {
-      id
-      title
-    }
-    assignedTo {
-      id
-      email
-      company {
-        id
-      }
-    }
-  }
-  materials {
-    invoicedData{
-      title
-      quantity
-      price
-      totalPrice
-      margin
-    }
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    margin
-    price
-  }
-  customItems {
-    invoicedData{
-      title
-      quantity
-      price
-      totalPrice
-    }
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    price
-  }
-  invoicedTasks {
-    assignedTo {
-      title
-      UserId
-    }
-    tags {
-      title
-      color
-      TagId
-    }
-    project
-    requester
-    taskType
-    company
-    milestone
-  }
+}
+execTime
+secondaryTimes {
+  time
+  source
+}
 `
 
 export const ADD_TASK = gql `
@@ -323,85 +405,7 @@ query tasks($filter: FilterInput, $projectId: Int, $sort: SortTasksInput){
     projectId: $projectId,
     sort: $sort,
   ){
-		tasks {
-			id
-			title
-      invoiced
-			updatedAt
-			createdAt
-			important
-			closeDate
-			overtime
-			pausal
-			pendingChangable
-			statusChange
-      metadata{
-        subtasksApproved
-        subtasksPending
-        tripsApproved
-        tripsPending
-        materialsApproved
-        materialsPending
-        itemsApproved
-        itemsPending
-      }
-			assignedTo {
-				id
-				fullName
-				email
-			}
-			company {
-				id
-				title
-			}
-			createdBy {
-				id
-				name
-				surname
-			}
-			deadline
-			description
-			milestone{
-				id
-				title
-			}
-			pendingDate
-			project{
-				id
-				title
-        autoApproved
-        right{
-          ${groupRights}
-        }
-			}
-			requester{
-				id
-				name
-				surname
-				fullName
-				email
-			}
-			status {
-				id
-				title
-        order
-				color
-				action
-			}
-			tags {
-				id
-				title
-			}
-			taskType {
-				id
-				title
-			}
-		}
-    execTime
-    secondaryTimes {
-      time
-      source
-    }
+    ${listTasks}
   }
 }
 `;
@@ -418,11 +422,11 @@ mutation deleteTask($id: Int!) {
 
 export const GET_TASK = gql `
 query task($id: Int!){
-	task(
-		id: $id
-	)  {
-		${responseTask}
-	}
+  task(
+    id: $id
+  )  {
+    ${responseTask}
+  }
 }
 `;
 
@@ -448,8 +452,8 @@ mutation updateTask(
   $taskType: Int,
 ) {
   updateTask(
-		id: $id,
-		important: $important,
+    id: $id,
+    important: $important,
     title: $title,
     closeDate: $closeDate,
     assignedTo: $assignedTo,
@@ -478,18 +482,18 @@ query {
     id
     tasklistLayout
     taskLayout
-		statuses {
-			id
-			title
-			color
-			action
-		}
-		company {
-			id
-			title
-		}
+    statuses {
+      id
+      title
+      color
+      action
+    }
+    company {
+      id
+      title
+    }
     role {
-			level
+      level
       accessRights {
         projects
         publicFilters
@@ -517,8 +521,8 @@ export const ADD_SCHEDULED_TASK = gql `
 mutation addScheduledTask($from: String!, $to: String!, $task: Int!, $UserId: Int!) {
   addScheduledTask(
     from: $from,
-		to: $to,
-		task: $task,
+    to: $to,
+    task: $task,
     UserId: $UserId
   ){
     id
@@ -548,7 +552,7 @@ export const ADD_SHORT_SUBTASK = gql `
 mutation addShortSubtask($title: String!, $done: Boolean!, $task: Int!) {
   addShortSubtask(
     title: $title,
-		done: $done,
+    done: $done,
     task: $task
   ){
     id
@@ -561,9 +565,9 @@ mutation addShortSubtask($title: String!, $done: Boolean!, $task: Int!) {
 export const UPDATE_SHORT_SUBTASK = gql `
 mutation updateShortSubtask($id: Int!, $title: String, $done: Boolean) {
   updateShortSubtask(
-		id: $id,
+    id: $id,
     title: $title,
-		done: $done,
+    done: $done,
   ){
     id
     title
@@ -588,14 +592,14 @@ export const ADD_SUBTASK = gql `
 mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
   addSubtask(
     title: $title,
-		order: $order,
-		done: $done,
-		approved: $approved,
+    order: $order,
+    done: $done,
+    approved: $approved,
     quantity: $quantity,
-		discount: $discount,
-		type: $type,
-		task: $task,
-		assignedTo: $assignedTo,
+    discount: $discount,
+    type: $type,
+    task: $task,
+    assignedTo: $assignedTo,
   ){
     id
     title
@@ -626,15 +630,15 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: B
 export const UPDATE_SUBTASK = gql `
 mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
   updateSubtask(
-		id: $id,
+    id: $id,
     title: $title,
-		order: $order,
-		done: $done,
-		approved: $approved,
-		quantity: $quantity,
-		discount: $discount,
-		type: $type,
-		assignedTo: $assignedTo,
+    order: $order,
+    done: $done,
+    approved: $approved,
+    quantity: $quantity,
+    discount: $discount,
+    type: $type,
+    assignedTo: $assignedTo,
   ){
     id
     title
@@ -675,14 +679,14 @@ mutation deleteSubtask($id: Int!) {
 export const ADD_WORKTRIP = gql `
 mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
   addWorkTrip(
-		order: $order,
-		done: $done,
-		approved: $approved,
-		quantity: $quantity,
-		discount: $discount,
-		type: $type,
-		task: $task,
-		assignedTo: $assignedTo,
+    order: $order,
+    done: $done,
+    approved: $approved,
+    quantity: $quantity,
+    discount: $discount,
+    type: $type,
+    task: $task,
+    assignedTo: $assignedTo,
   ){
     id
     order
@@ -712,14 +716,14 @@ mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantit
 export const UPDATE_WORKTRIP = gql `
 mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
   updateWorkTrip(
-		id: $id,
-		order: $order,
-		done: $done,
-		approved: $approved,
-		quantity: $quantity,
-		discount: $discount,
-		type: $type,
-		assignedTo: $assignedTo,
+    id: $id,
+    order: $order,
+    done: $done,
+    approved: $approved,
+    quantity: $quantity,
+    discount: $discount,
+    type: $type,
+    assignedTo: $assignedTo,
   ){
     id
     order
@@ -760,13 +764,13 @@ export const ADD_MATERIAL = gql `
 mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $margin: Float!, $price: Float!, $task: Int!) {
   addMaterial(
     title: $title,
-		order: $order,
-		done: $done,
-		approved: $approved,
-		quantity: $quantity,
-		margin: $margin,
-		price: $price,
-		task: $task,
+    order: $order,
+    done: $done,
+    approved: $approved,
+    quantity: $quantity,
+    margin: $margin,
+    price: $price,
+    task: $task,
   ){
     id
     title
@@ -787,14 +791,14 @@ mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $approved: 
 export const UPDATE_MATERIAL = gql `
 mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $margin: Float, $price: Float) {
   updateMaterial(
-		id: $id,
+    id: $id,
     title: $title,
-		order: $order,
-		done: $done,
-		approved: $approved,
-		quantity: $quantity,
-		margin: $margin,
-		price: $price,
+    order: $order,
+    done: $done,
+    approved: $approved,
+    quantity: $quantity,
+    margin: $margin,
+    price: $price,
   ){
     id
     title
@@ -826,12 +830,12 @@ export const ADD_CUSTOM_ITEM = gql `
 mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $price: Float!, $task: Int!) {
   addCustomItem(
     title: $title,
-		order: $order,
-		done: $done,
-		approved: $approved,
-		quantity: $quantity,
-		price: $price,
-		task: $task,
+    order: $order,
+    done: $done,
+    approved: $approved,
+    quantity: $quantity,
+    price: $price,
+    task: $task,
   ){
     id
     title
@@ -851,13 +855,13 @@ mutation addCustomItem($title: String!, $order: Int!, $done: Boolean!, $approved
 export const UPDATE_CUSTOM_ITEM = gql `
 mutation updateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $price: Float) {
   updateCustomItem(
-		id: $id,
+    id: $id,
     title: $title,
-		order: $order,
-		done: $done,
-		approved: $approved,
-		quantity: $quantity,
-		price: $price,
+    order: $order,
+    done: $done,
+    approved: $approved,
+    quantity: $quantity,
+    price: $price,
   ){
     id
     title
@@ -897,13 +901,13 @@ mutation deleteTaskAttachment($id: Int!) {
 export const UPDATE_INVOICED_TASK = gql `
 mutation updateInvoicedTask($id: Int!, $taskChanges: TaskChangeInput, $stmcChanges: SMTCChangesInput, $cancelInvoiced: Boolean!) {
   updateInvoicedTask(
-		id: $id,
+    id: $id,
     cancelInvoiced: $cancelInvoiced,
     taskChanges: $taskChanges,
-		stmcChanges: $stmcChanges,
+    stmcChanges: $stmcChanges,
   ){
-		${responseTask}
-	}
+    ${responseTask}
+  }
 }
 `
 
@@ -918,22 +922,22 @@ query calendarEvents($filter: FilterInput, $projectId: Int){
     updatedAt
     startsAt
     endsAt
-		task {
-			id
-			title
-			project{
-				id
-				title
+    task {
+      id
+      title
+      project{
+        id
+        title
         right{
           ${groupRights}
         }
-			}
-			status {
-				id
-				title
-				color
-				action
-			}
+      }
+      status {
+        id
+        title
+        color
+        action
+      }
     }
   }
 }

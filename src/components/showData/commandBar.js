@@ -19,6 +19,7 @@ import {
   DropdownToggle,
 } from 'reactstrap';
 import Checkbox from 'components/checkbox';
+import MultiSelect from 'components/MultiSelectNew';
 import CustomAttributes from "helpdesk/settings/projects/components/customAttributes";
 import {
   objectToAtributeArray
@@ -38,9 +39,17 @@ export default function CommandBar( props ) {
     setLayout,
     showLayoutSwitch,
     dndLayout,
-    calendarLayout
+    calendarLayout,
+    displayValues: allDisplayValues,
+    setVisibility,
   } = props;
 
+  const displayValues = allDisplayValues
+    .filter( ( displayValue ) => displayValue.type !== 'checkbox' )
+    .map( ( displayValue ) => ( {
+      ...displayValue,
+      id: displayValue.value
+    } ) );
   const [ popoverOpen, setPopoverOpen ] = React.useState( false );
   const [ openCustomAttributes, setOpenCustomAttributes ] = React.useState( false );
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
@@ -58,7 +67,7 @@ export default function CommandBar( props ) {
   const [ fetchProjectGroups, {
     loading: projectGroupsLoading,
     data: projectGroupsData
-	} ] = useLazyQuery( GET_PROJECT_GROUPS );
+  } ] = useLazyQuery( GET_PROJECT_GROUPS );
 
   const currentUser = myData ? myData.getMyData : {};
 
@@ -99,52 +108,52 @@ export default function CommandBar( props ) {
   return (
     <div className={"task-list-commandbar " + (props.layout !== 0 ? "p-l-30" : "p-l-0")}>
 
-			<div className="breadcrum-bar center-hor">
-				{
-					props.useBreadcrums !== true &&
-					<div className="breadcrumbs">
-						<h2>
-							{props.listName?props.listName:""}
-						</h2>
-					</div>
-				}
-				{props.useBreadcrums  &&
-					<div className="flex-row breadcrumbs">
-						{ FILTERED_BREADCRUMBS.map((breadcrum, index) =>
-							<h2
-								className="clickable"
-								key={index}
-								onClick={breadcrum.onClick}>{`${index !== 0 ? '\\' : ''}${breadcrum.label}`}</h2>
-						)}
-					</div>
-				}
+      <div className="breadcrum-bar center-hor">
+        {
+          props.useBreadcrums !== true &&
+          <div className="breadcrumbs">
+            <h2>
+              {props.listName?props.listName:""}
+            </h2>
+          </div>
+        }
+        {props.useBreadcrums  &&
+          <div className="flex-row breadcrumbs">
+            { FILTERED_BREADCRUMBS.map((breadcrum, index) =>
+              <h2
+                className="clickable"
+                key={index}
+                onClick={breadcrum.onClick}>{`${index !== 0 ? '\\' : ''}${breadcrum.label}`}</h2>
+            )}
+          </div>
+        }
 
-			</div>
+      </div>
 
-			<div className="ml-auto p-2 align-self-center">
-				<div className="d-flex flex-row">
-					<div className={classnames({"m-r-20": (props.link.includes("settings")
-						|| (props.link.includes("lanwiki") && props.layout === 1)
-						|| (props.link.includes("passmanager") && props.layout === 1)
-						|| (props.link.includes("expenditures") && props.layout === 1)
-						|| (props.link.includes("helpdesk") && !props.link.includes("settings") && props.layout !== 0))},
+      <div className="ml-auto p-2 align-self-center">
+        <div className="d-flex flex-row">
+          <div className={classnames({"m-r-20": (props.link.includes("settings")
+            || (props.link.includes("lanwiki") && props.layout === 1)
+            || (props.link.includes("passmanager") && props.layout === 1)
+            || (props.link.includes("expenditures") && props.layout === 1)
+            || (props.link.includes("helpdesk") && !props.link.includes("settings") && props.layout !== 0))},
 
-						{"m-r-5": (props.link.includes("helpdesk") && !props.link.includes("settings") && props.layout === 0)
-							|| (props.link.includes("passmanager") && props.layout === 0)
-							|| (props.link.includes("expenditures") && props.layout === 0)
-							|| (props.link.includes("lanwiki") && props.layout === 0)},
+            {"m-r-5": (props.link.includes("helpdesk") && !props.link.includes("settings") && props.layout === 0)
+              || (props.link.includes("passmanager") && props.layout === 0)
+              || (props.link.includes("expenditures") && props.layout === 0)
+              || (props.link.includes("lanwiki") && props.layout === 0)},
 
-							"d-flex", "flex-row", "align-items-center", "ml-auto")}
-							>
+              "d-flex", "flex-row", "align-items-center", "ml-auto")}
+              >
 
               { canAddCustomAttributes &&
-              <button type="button" className="btn-link" onClick={() => setOpenCustomAttributes(true)}>
-                <i className="fa fa-plus"/> Custom Attribute
-              </button>
-            }
+                <button type="button" className="btn-link" onClick={() => setOpenCustomAttributes(true)}>
+                  <i className="fa fa-plus"/> Custom Attribute
+                  </button>
+                }
 
-              <Modal isOpen={openCustomAttributes} className="modal-without-borders">
-                <ModalBody style={{padding: "20px"}}>
+                <Modal isOpen={openCustomAttributes} className="modal-without-borders">
+                  <ModalBody style={{padding: "20px"}}>
                     <CustomAttributes
                       disabled={false}
                       customAttributes={[]}
@@ -154,103 +163,109 @@ export default function CommandBar( props ) {
                       }}
                       deleteCustomAttribute={() => {}}
                       />
-                </ModalBody>
-                <ModalFooter className="p-l-20 p-r-20">
-                  <button type="button" className="btn btn-link-cancel mr-auto" onClick={() => setOpenCustomAttributes(false)}>
-                    Close
-                  </button>
-                </ModalFooter>
-              </Modal>
+                  </ModalBody>
+                  <ModalFooter className="p-l-20 p-r-20">
+                    <button type="button" className="btn btn-link-cancel mr-auto" onClick={() => setOpenCustomAttributes(false)}>
+                      Close
+                    </button>
+                  </ModalFooter>
+                </Modal>
 
+                <div className="text-basic m-r-5 m-l-5">
+                  Sort by
+                </div>
 
-
-							<div className="text-basic m-r-5 m-l-5">
-								Sort by
-							</div>
-
-							<select
-								value={props.orderBy}
-								className="invisible-select text-bold text-highlight"
-								onChange={(e)=>props.setOrderBy(e.target.value)}>
-								{ props.orderByValues.map((item,index) =>
-									<option value={item.value} key={index}>{item.label}</option>
-								) }
-							</select>
-
-							{ !props.ascending &&
-								<button type="button" className="btn btn-link btn-outline-blue waves-effect" onClick={()=>props.setAscending(true)}>
-									<i className="fas fa-arrow-up" />
-								</button>
-							}
-
-							{ props.ascending &&
-								<button type="button" className="btn btn-link btn-outline-blue waves-effect" onClick={()=>props.setAscending(false)}>
-									<i className="fas fa-arrow-down" />
-								</button>
-							}
-
-              <button type="button" id="checkboxPopover" className="btn btn-link waves-effect">
-                <i className="fa fa-cog"/>
-              </button>
-              <Popover  trigger="legacy" placement="bottom" isOpen={popoverOpen} target="checkboxPopover" toggle={toggle}>
-                <PopoverHeader>Show columns</PopoverHeader>
-                <PopoverBody>
+                <select
+                  value={props.orderBy}
+                  className="invisible-select text-bold text-highlight"
+                  onChange={(e)=>props.setOrderBy(e.target.value)}>
                   { props.orderByValues.map((item,index) =>
-                    <Checkbox
-      								key = {index}
-      								className = "m-r-5"
-      								label = {item.label}
-      								value = { item.value }
-      								onChange = {()=>{
-      									// show/hide respective elements
-      								}}
-      								/>
+                    <option value={item.value} key={index}>{item.label}</option>
                   ) }
-                </PopoverBody>
-              </Popover>
+                </select>
 
-              {
-                showLayoutSwitch &&
-                <Dropdown className="center-hor"
-                  isOpen={layoutOpen}
-                  toggle={() => setLayoutOpen(!layoutOpen)}
-                  >
-                  <DropdownToggle className="btn btn-link">
-                    <i className={"fa " + getLayoutIcon()}/>
-                  </DropdownToggle>
-                  <DropdownMenu right>
-                    <div className="btn-group-vertical" data-toggle="buttons">
-                      <label className={classnames({'active':currentUser.tasklistLayout === 0}, "btn btn-link")}>
-                        <input type="radio" name="options" onChange={() => setLayout(0)} checked={currentUser.tasklistLayout === 0}/>
-                        <i className="fa fa-columns"/>
-                      </label>
-                      <label className={classnames({'active':currentUser.tasklistLayout === 1}, "btn btn-link")}>
-                        <input type="radio" name="options" checked={currentUser.tasklistLayout === 1} onChange={() => setLayout(1)}/>
-                        <i className="fa fa-list"/>
-                      </label>
-                      {
-                        dndLayout &&
-                        <label className={classnames({'active':currentUser.tasklistLayout === 2}, "btn btn-link")}>
-                          <input type="radio" name="options" onChange={() => setLayout(2)} checked={currentUser.tasklistLayout === 2}/>
-                          <i className="fa fa-map"/>
+                { !props.ascending &&
+                  <button type="button" className="btn btn-link btn-outline-blue waves-effect" onClick={()=>props.setAscending(true)}>
+                    <i className="fas fa-arrow-up" />
+                  </button>
+                }
+
+                { props.ascending &&
+                  <button type="button" className="btn btn-link btn-outline-blue waves-effect" onClick={()=>props.setAscending(false)}>
+                    <i className="fas fa-arrow-down" />
+                  </button>
+                }
+
+                <div className="row">
+                  <button className="btn btn-link waves-effect" onClick={ toggle } >
+                    <i className="fa fa-cog" />
+                  </button>
+                  <MultiSelect
+                    className="center-hor"
+                    menuClassName="m-t-30"
+                    direction="left"
+                    style={{}}
+                    header="Select task list columns"
+                    closeMultiSelect={toggle}
+                    open={popoverOpen}
+                    items={displayValues}
+                    selected={displayValues.filter((displayValue) => displayValue.show )}
+                    onChange={(_, item, deleted ) => {
+                      let newVisibility = {};
+                      displayValues.forEach((displayValue) => {
+                        if(displayValue.id !== item.id){
+                          newVisibility[displayValue.value] = displayValue.show;
+                        }else{
+                          newVisibility[displayValue.value] = !deleted;
+                        }
+                      })
+                      setVisibility(newVisibility);
+                    }}
+                    />
+                </div>
+
+                {
+                  showLayoutSwitch &&
+                  <Dropdown className="center-hor"
+                    isOpen={layoutOpen}
+                    toggle={() => setLayoutOpen(!layoutOpen)}
+                    >
+                    <DropdownToggle className="btn btn-link">
+                      <i className={"fa " + getLayoutIcon()}/>
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                      <div className="btn-group-vertical" data-toggle="buttons">
+                        <label className={classnames({'active':currentUser.tasklistLayout === 0}, "btn btn-link")}>
+                          <input type="radio" name="options" onChange={() => setLayout(0)} checked={currentUser.tasklistLayout === 0}/>
+                          <i className="fa fa-columns"/>
                         </label>
-                      }
-
-                      {
-                        calendarLayout &&
-                        <label className={classnames({'active':currentUser.tasklistLayout === 3}, "btn btn-link")}>
-                          <input type="radio" name="options" onChange={() => setLayout(3)} checked={currentUser.tasklistLayout === 3}/>
-                          <i className="fa fa-calendar-alt"/>
+                        <label className={classnames({'active':currentUser.tasklistLayout === 1}, "btn btn-link")}>
+                          <input type="radio" name="options" checked={currentUser.tasklistLayout === 1} onChange={() => setLayout(1)}/>
+                          <i className="fa fa-list"/>
                         </label>
-                      }
-                    </div>
-                  </DropdownMenu>
-                </Dropdown>
-              }
+                        {
+                          dndLayout &&
+                          <label className={classnames({'active':currentUser.tasklistLayout === 2}, "btn btn-link")}>
+                            <input type="radio" name="options" onChange={() => setLayout(2)} checked={currentUser.tasklistLayout === 2}/>
+                            <i className="fa fa-map"/>
+                          </label>
+                        }
 
-						</div>
-					</div>
-				</div>
-			</div>
+                        {
+                          calendarLayout &&
+                          <label className={classnames({'active':currentUser.tasklistLayout === 3}, "btn btn-link")}>
+                            <input type="radio" name="options" onChange={() => setLayout(3)} checked={currentUser.tasklistLayout === 3}/>
+                            <i className="fa fa-calendar-alt"/>
+                          </label>
+                        }
+                      </div>
+                    </DropdownMenu>
+                  </Dropdown>
+                }
+
+              </div>
+            </div>
+          </div>
+        </div>
   );
 }

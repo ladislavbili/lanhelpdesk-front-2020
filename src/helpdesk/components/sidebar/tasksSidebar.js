@@ -204,6 +204,7 @@ export default function TasksSidebar( props ) {
   const repeatPage = window.location.pathname === '/helpdesk/repeats';
 
   const renderProjects = () => {
+    const URLprefix = `/helpdesk/taskList/i/${ filterData.localFilter.id ? filterData.localFilter.id :'all'}`
     return (
       <Nav vertical>
         {
@@ -214,7 +215,7 @@ export default function TasksSidebar( props ) {
                 onClick={() => {
                   setProject(project);
                   if(!repeatPage){
-                    history.push(`${match.url}`)
+                    history.push(URLprefix);
                   }else{
                     history.push(`/helpdesk/repeats`)
                   }
@@ -383,131 +384,131 @@ export default function TasksSidebar( props ) {
             </Button>
           }
           <hr className = "m-l-15 m-r-15 m-t-11" />
-          </div>
-        }
+        </div>
+      }
 
 
-          <div className="sidebar-label row" onClick={() => setShowProjects(!showProjects)}>
+      <div className="sidebar-label row" onClick={() => setShowProjects(!showProjects)}>
+        <div>
+          <img
+            className="m-r-9"
+            src={folderIcon}
+            alt="Folder icon not found"
+            />
+          <Label>
+            Project
+          </Label>
+        </div>
+        <div className="ml-auto">
+          { showProjects && <i className="fas fa-chevron-up" /> }
+          { !showProjects && <i className="fas fa-chevron-down" /> }
+        </div>
+      </div>
+
+      { showProjects && renderProjects() }
+
+      { showProjects && myData.getMyData.role.accessRights.addProjects &&
+        <NavItem className="row full-width">
+          <Button
+            className='btn btn-link'
+            onClick={() => setOpenProjectAdd(true)}
+            >
+            <i className="fa fa-plus p-l-15" />
+            { addProject.project.title }
+          </Button>
+        </NavItem>
+      }
+
+      { projectData.localProject.id !== null && <hr className="m-l-15 m-r-15 m-t-11" /> }
+
+      { projectData.localProject.id !== null &&
+        <div className="">
+          <div className="sidebar-label row"  onClick={() => setShowMilestones(!showMilestones)}>
             <div>
-              <img
-                className="m-r-9"
-                src={folderIcon}
-                alt="Folder icon not found"
-                />
+              <i className="fas fa-retweet "/>
               <Label>
-                Project
+                Milestone
               </Label>
             </div>
             <div className="ml-auto">
-              { showProjects && <i className="fas fa-chevron-up" /> }
-              { !showProjects && <i className="fas fa-chevron-down" /> }
+              { showMilestones && <i className="fas fa-chevron-up" /> }
+              { !showMilestones && <i className="fas fa-chevron-down" /> }
             </div>
           </div>
+          { showMilestones && renderMilestones() }
+          { showMilestones && projectData.localProject.project.id !== null && canEditProject &&
+            <NavItem className="row full-width">
+              <Button
+                className='btn btn-link p-l-15'
+                onClick={() => setOpenMilestoneAdd(true)}
+                >
+                <i className="fa fa-plus" />
+                { addMilestone.title }
+              </Button>
+            </NavItem>
+          }
+        </div>
+      }
 
-          { showProjects && renderProjects() }
+      { showFilterAdd && <hr className="m-l-15 m-r-15 m-t-15" /> }
 
-          { showProjects && myData.getMyData.role.accessRights.addProjects &&
+      { showFilterAdd &&
+        <div className="sidebar-label row" onClick={() => setShowFilters(!showFilters)}>
+          <div>
+            <img
+              className="m-r-5"
+              style={{
+                color: "#212121",
+                height: "17px",
+                marginBottom: "3px"
+              }}
+              src={filterIcon}
+              alt="Filter icon not found"
+              />
+            <Label>
+              { parseInt(match.params.filterID) ? "Edit filter" : "Add filter" }
+            </Label>
+          </div>
+        </div>
+      }
+      { showFilterAdd &&
+        <Filter
+          history={history}
+          close={ () => {
+            setShowFilterAdd(false);
+          }}
+          />
+      }
+      <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" />
+
+      { !showFilterAdd &&
+        <div className='p-l-15 p-r-15'>
+
+          { myData.getMyData.role.accessRights.companies &&
             <NavItem className="row full-width">
               <Button
                 className='btn btn-link'
-                onClick={() => setOpenProjectAdd(true)}
+                onClick={() => setOpenCompanyAdd(true)}
                 >
-                <i className="fa fa-plus p-l-15" />
-                { addProject.project.title }
+                <i className="fa fa-plus" />
+                { addCompany.title }
               </Button>
             </NavItem>
           }
 
-          { projectData.localProject.id !== null && <hr className="m-l-15 m-r-15 m-t-11" /> }
-
-          { projectData.localProject.id !== null &&
-            <div className="">
-              <div className="sidebar-label row"  onClick={() => setShowMilestones(!showMilestones)}>
-                <div>
-                  <i className="fas fa-retweet "/>
-                  <Label>
-                    Milestone
-                  </Label>
-                </div>
-                <div className="ml-auto">
-                  { showMilestones && <i className="fas fa-chevron-up" /> }
-                  { !showMilestones && <i className="fas fa-chevron-down" /> }
-                </div>
-              </div>
-              { showMilestones && renderMilestones() }
-              { showMilestones && projectData.localProject.project.id !== null && canEditProject &&
-                <NavItem className="row full-width">
-                  <Button
-                    className='btn btn-link p-l-15'
-                    onClick={() => setOpenMilestoneAdd(true)}
-                    >
-                    <i className="fa fa-plus" />
-                    { addMilestone.title }
-                  </Button>
-                </NavItem>
-              }
-            </div>
+          { myData.getMyData.role.accessRights.users &&
+            <NavItem className="row full-width">
+              <Button
+                className='btn btn-link'
+                onClick={() => setOpenUserAdd(true)}
+                >
+                <i className="fa fa-plus" />
+                { addUser.title }
+              </Button>
+            </NavItem>
           }
-
-                    { showFilterAdd && <hr className="m-l-15 m-r-15 m-t-15" /> }
-
-  { showFilterAdd &&
-                    <div className="sidebar-label row" onClick={() => setShowFilters(!showFilters)}>
-                      <div>
-                        <img
-                          className="m-r-5"
-                          style={{
-                            color: "#212121",
-                            height: "17px",
-                            marginBottom: "3px"
-                          }}
-                          src={filterIcon}
-                          alt="Filter icon not found"
-                          />
-                        <Label>
-                          { parseInt(match.params.filterID) ? "Edit filter" : "Add filter" }
-                        </Label>
-                      </div>
-                    </div>
- }
-                  { showFilterAdd &&
-                    <Filter
-                      history={history}
-                      close={ () => {
-                        setShowFilterAdd(false);
-                      }}
-                      />
-                  }
-                  <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" />
-
-          { !showFilterAdd &&
-          <div className='p-l-15 p-r-15'>
-
-            { myData.getMyData.role.accessRights.companies &&
-              <NavItem className="row full-width">
-                <Button
-                  className='btn btn-link'
-                  onClick={() => setOpenCompanyAdd(true)}
-                  >
-                  <i className="fa fa-plus" />
-                  { addCompany.title }
-                </Button>
-              </NavItem>
-            }
-
-            { myData.getMyData.role.accessRights.users &&
-              <NavItem className="row full-width">
-                <Button
-                  className='btn btn-link'
-                  onClick={() => setOpenUserAdd(true)}
-                  >
-                  <i className="fa fa-plus" />
-                  { addUser.title }
-                </Button>
-              </NavItem>
-            }
-          </div>
-          }
+        </div>
+      }
 
       { openProjectAdd &&
         <ProjectAdd
@@ -570,26 +571,26 @@ export default function TasksSidebar( props ) {
     </div>
   ); {
     /*
-        <ProjectEdit
-        closeModal={(editedProject, rights) => {
-        if(editedProject !== null){
-        const project = {
-        project: { ...projectData.localProject.project, ...editedProject },
-        right: rights,
-        id: editedProject.id,
-        value: editedProject.id,
-        title: editedProject.title,
-        label: editedProject.title,
-        }
-        setProject(project);
-        refetchMyProjects();
-        }
-        }}
-        projectDeleted={()=>{
-        setProject(dashboard);
-        refetchMyProjects();
-        }}
-        />
-        */
+    <ProjectEdit
+    closeModal={(editedProject, rights) => {
+    if(editedProject !== null){
+    const project = {
+    project: { ...projectData.localProject.project, ...editedProject },
+    right: rights,
+    id: editedProject.id,
+    value: editedProject.id,
+    title: editedProject.title,
+    label: editedProject.title,
+    }
+    setProject(project);
+    refetchMyProjects();
+    }
+    }}
+    projectDeleted={()=>{
+    setProject(dashboard);
+    refetchMyProjects();
+    }}
+    />
+    */
   }
 }
