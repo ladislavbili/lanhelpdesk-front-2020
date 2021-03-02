@@ -168,6 +168,23 @@ export default function TasksIndex( props ) {
 
   //state
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
+  const [ visibility, setVisibility ] = React.useState( {
+    id: true,
+    status: true,
+    important: true,
+    invoiced: true,
+    title: true,
+    requester: true,
+    company: true,
+    assignedTo: true,
+    createdAt: true,
+    deadline: true,
+    project: true,
+    milestone: true,
+    taskType: true,
+    overtime: true,
+    pausal: true,
+  } );
 
   if ( dataLoading ) {
     return ( <Loading /> );
@@ -302,10 +319,10 @@ export default function TasksIndex( props ) {
     setUserStatuses( {
         variables: {
           ids: [
-            ...currentUser.statuses.map( ( status ) => status.id )
-            .filter( ( statusID ) => !statuses.some( ( status ) => status.id === statusID ) ),
-            ...ids
-          ]
+          ...currentUser.statuses.map( ( status ) => status.id )
+          .filter( ( statusID ) => !statuses.some( ( status ) => status.id === statusID ) ),
+          ...ids
+        ]
         }
       } )
       .then( ( response ) => {} )
@@ -408,90 +425,100 @@ export default function TasksIndex( props ) {
 
   return (
       <ShowData
-        data={processTasks(filterTasks(tasks))}
-        filterBy={[
-          {value:'assignedTo',type:'list',func:((total,user)=>total+=user.email+' '+user.fullName+' ')},
-          {value:'statusChange',type:'date'},
-          {value:'createdAt',type:'date'},
-          {value:'requester',type:'user'},
-          {value:'deadline',type:'date'},
-          {value:'status',type:'object'},
-          {value:'title',type:'text'},
-          {value:'id',type:'int'},
-          {value:'company',type:'object'},
-        ]}
-        displayCol={displayCol}
-        displayFooter={displayFooter}
-        filterName="help-tasks"
-        displayValues={[
-          {value:'checked', label: '', type:'checkbox'},
-          {value:'id',label:'ID',type:'int'},
-          {value:'status',label:'Status',type:'object'},
-          {value:'important',label:'',type:'important'},
-          {value:'invoiced',label:'',type:'invoiced'},
-          {value:'title',label:'Title',type:'text'},
-          {value:'requester',label:'Requester',type:'user'},
-          {value:'company',label:'Company',type:'object'},
-          {value:'assignedTo',label:'Assigned',type:'list',func:(items)=>
-            (<div>
-              {
-                items.map((item)=><div key={item.id}>{item.fullName}</div>)
-              }
-            </div>)
-          },
-          {value:'createdAt',label:'Created at',type:'date'},
-          {value:'deadline',label:'Deadline',type:'date'}
-        ]}
-        orderByValues={[
-          {value:'id',label:'ID',type:'int'},
-          {value:'status',label:'Status',type:'object'},
-          {value:'title',label:'Title',type:'text'},
-          {value:'requester',label:'Requester',type:'user'},
-          {value:'assignedTo',label:'Assigned',type:'list',func:((total,user)=>total+=user.email+' '+user.name+' '+user.surname+' ')},
-          {value:'createdAt',label:'Created at',type:'date'},
-          {value:'deadline',label:'Deadline',type:'date'}
-        ]}
-        setOrderBy={(value) => {
-          setTasksSort({ ...tasksSort, key: value })
-        }}
-        orderBy={ tasksSort.key }
-        setAscending={(ascending) => {
-          setTasksSort({ ...tasksSort, asc: ascending })
-        }}
-        ascending={ tasksSort.asc }
-        dndGroupAttribute="status"
-        dndGroupData={statuses}
-        calendar={TaskCalendar}
-        calendarAllDayData={getCalendarAllDayData}
-        calendarEventsData={getCalendarEventsData}
-        link={link}
-        history={history}
-        itemID={match.params.taskID ? match.params.taskID : ""}
-        listID={match.params.listID}
-        match={match}
-        isTask={true}
-        listName={localFilter.title}
-        Edit={TaskEdit}
-        Empty={TaskEmpty}
-        useBreadcrums={true}
-        breadcrumsData={getBreadcrumsData()}
-        setStatuses={setUserStatusesFunc}
-        underSearch={null}
-        underSearchLabel={null}
-        statuses={currentUser.statuses.map((status) => status.id ).filter((statusID) => statuses.some((status) => status.id === statusID ) )}
-        allStatuses={statuses}
-        checkTask={checkTask}
-        deleteTask={deleteTaskFunc}
+      data={processTasks(filterTasks(tasks))}
+      filterBy={[
+        {value:'assignedTo',type:'list',func:((total,user)=>total+=user.email+' '+user.fullName+' ')},
+        {value:'statusChange',type:'date'},
+        {value:'createdAt',type:'date'},
+        {value:'requester',type:'user'},
+        {value:'deadline',type:'date'},
+        {value:'status',type:'object'},
+        {value:'title',type:'text'},
+        {value:'id',type:'int'},
+        {value:'company',type:'object'},
+      ]}
+      displayCol={displayCol}
+      displayFooter={displayFooter}
+      filterName="help-tasks"
+      displayValues={[
+        {value:'checked', label: '', type:'checkbox', show: true },
+        {value:'id',label:'ID',type:'int', show: visibility['id'] },
+        {value:'status',label:'Status',type:'object', show: visibility['status'] },
+        {value:'important',label:'Important',type:'important', show: visibility['important'] },
+        {value:'invoiced',label:'Invoiced',type:'invoiced', show: visibility['invoiced'] },
+        {value:'title',label:'Title',type:'text', show: visibility['title'] },
+        {value:'project',label:'Project',type:'object', show: visibility['project'] },
+        {value:'milestone',label:'Milestone',type:'object', show: visibility['milestone'] },
+        {value:'requester',label:'Requester',type:'user', show: visibility['requester'] },
+        {value:'company',label:'Company',type:'object', show: visibility['company'] },
+        {
+          value:'assignedTo',
+          label:'Assigned',
+          type:'list',
+          func: (items) => (
+            <div>
+              { items.map((item)=><div key={item.id}>{item.fullName}</div>) }
+            </div>
+          ),
+          show: visibility['assignedTo']
+        },
+        {value:'taskType',label:'Task Type',type:'object', show: visibility['taskType'] },
+        {value:'createdAt',label:'Created at',type:'date', show: visibility['createdAt'] },
+        {value:'deadline',label:'Deadline',type:'date', show: visibility['deadline'] },
+        {value:'pausal',label:'Pausal',type:'boolean', show: visibility['pausal'] },
+        {value:'overtime',label:'Overtime',type:'boolean', show: visibility['overtime'] },
+      ]}
+      setVisibility={setVisibility}
+      orderByValues={[
+        {value:'id',label:'ID',type:'int'},
+        {value:'status',label:'Status',type:'object'},
+        {value:'title',label:'Title',type:'text'},
+        {value:'requester',label:'Requester',type:'user'},
+        {value:'assignedTo',label:'Assigned',type:'list',func:((total,user)=>total+=user.email+' '+user.name+' '+user.surname+' ')},
+        {value:'createdAt',label:'Created at',type:'date'},
+        {value:'deadline',label:'Deadline',type:'date'}
+      ]}
+      setOrderBy={(value) => {
+        setTasksSort({ ...tasksSort, key: value })
+      }}
+      orderBy={ tasksSort.key }
+      setAscending={(ascending) => {
+        setTasksSort({ ...tasksSort, asc: ascending })
+      }}
+      ascending={ tasksSort.asc }
+      dndGroupAttribute="status"
+      dndGroupData={statuses}
+      calendar={TaskCalendar}
+      calendarAllDayData={getCalendarAllDayData}
+      calendarEventsData={getCalendarEventsData}
+      link={link}
+      history={history}
+      itemID={match.params.taskID ? match.params.taskID : ""}
+      listID={match.params.listID}
+      match={match}
+      isTask={true}
+      listName={localFilter.title}
+      Edit={TaskEdit}
+      Empty={TaskEmpty}
+      useBreadcrums={true}
+      breadcrumsData={getBreadcrumsData()}
+      setStatuses={setUserStatusesFunc}
+      underSearch={null}
+      underSearchLabel={null}
+      statuses={currentUser.statuses.map((status) => status.id ).filter((statusID) => statuses.some((status) => status.id === statusID ) )}
+      allStatuses={statuses}
+      checkTask={checkTask}
+      deleteTask={deleteTaskFunc}
 
-        tasklistLayout={currentUser.tasklistLayout}
-        tasklistLayoutData={{
-            setLayout: function(value) {
-              setTasklistLayoutFunc(value);
-            },
-            showLayoutSwitch: true,
-            dndLayout: localProject.title !== "Any project",
-            calendarLayout: true,
-        }}
-        />
-    );
-  }
+      tasklistLayout={currentUser.tasklistLayout}
+      tasklistLayoutData={{
+        setLayout: function(value) {
+          setTasklistLayoutFunc(value);
+        },
+        showLayoutSwitch: true,
+        dndLayout: localProject.title !== "Any project",
+        calendarLayout: true,
+      }}
+      />
+  );
+}

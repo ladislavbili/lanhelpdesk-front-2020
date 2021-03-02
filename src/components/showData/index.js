@@ -34,6 +34,7 @@ export default function ShowDataContainer( props ) {
     listName,
     filterBy,
     displayValues,
+    setVisibility,
     orderByValues,
     orderBy,
     ascending,
@@ -202,6 +203,7 @@ export default function ShowDataContainer( props ) {
 									match={match}
 									data={filterDataFunc()}
 									displayValues={displayValues}
+                  setVisibility={setVisibility}
 									filterName={listName}
 									isTask={isTask}
 									setStatuses={setStatuses}

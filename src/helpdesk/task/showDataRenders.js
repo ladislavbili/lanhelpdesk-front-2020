@@ -1,3 +1,8 @@
+import React from 'react';
+import {
+  timestampToString,
+} from 'helperFunctions';
+
 export const displayCol = ( task ) => {
   return (
     <li>
@@ -130,8 +135,8 @@ export const displayFooter = ( tasks ) => {
           <thead>
             <tr>
               <th>Status</th>
-              { statistics.map((item) => (
-                <th>
+              { statistics.map((item, index) => (
+                <th key={index}>
                   <span className="m-r-5 p-l-5 p-r-5" style={{ backgroundColor: item.status.color, color: 'white', borderRadius: 3, fontWeight: 'normal' }}>
                     {item.status.title}
                   </span>
@@ -143,10 +148,10 @@ export const displayFooter = ( tasks ) => {
           <tbody>
             <tr>
               <td>
-                Task number
+                Počet úloh
               </td>
               { statistics.map((item) => (
-                <td>
+                <td key={item.status.id}>
                   {item.taskCounter}
                 </td>
               ) ) }
@@ -156,23 +161,10 @@ export const displayFooter = ( tasks ) => {
             </tr>
             <tr>
               <td>
-                Neschválené hodiny - práce
+                Schvalené hodiny
               </td>
               { statistics.map((item) => (
-                <td>
-                  {item.metadata.subtasksPending}
-                </td>
-              ) ) }
-              <td>
-                {totals.metadata.subtasksPending}
-              </td>
-            </tr>
-            <tr>
-              <td>
-                Schválené hodiny - práce
-              </td>
-              { statistics.map((item) => (
-                <td>
+                <td key={item.status.id}>
                   {item.metadata.subtasksApproved}
                 </td>
               ) ) }
@@ -182,23 +174,23 @@ export const displayFooter = ( tasks ) => {
             </tr>
             <tr>
               <td>
-                Neschválené hodiny - výjazdy
+                Neschvalené hodiny
               </td>
               { statistics.map((item) => (
-                <td>
-                  {item.metadata.tripsPending}
+                <td key={item.status.id}>
+                  {item.metadata.subtasksPending}
                 </td>
               ) ) }
               <td>
-                {totals.metadata.tripsPending}
+                {totals.metadata.subtasksPending}
               </td>
             </tr>
             <tr>
               <td>
-                Schválené hodiny - výjazdy
+                Schvalené výjazdy
               </td>
               { statistics.map((item) => (
-                <td>
+                <td key={item.status.id}>
                   {item.metadata.tripsApproved}
                 </td>
               ) ) }
@@ -208,23 +200,23 @@ export const displayFooter = ( tasks ) => {
             </tr>
             <tr>
               <td>
-                Neschválené hodiny - materiále
+                Neschválené výjazdy
               </td>
               { statistics.map((item) => (
-                <td>
-                  {item.metadata.materialsPending}
+                <td key={item.status.id}>
+                  {item.metadata.tripsPending}
                 </td>
               ) ) }
               <td>
-                {totals.metadata.materialsPending}
+                {totals.metadata.tripsPending}
               </td>
             </tr>
             <tr>
               <td>
-                Schválené hodiny - materiále
+                Schvalený materiál
               </td>
               { statistics.map((item) => (
-                <td>
+                <td key={item.status.id}>
                   {item.metadata.materialsApproved}
                 </td>
               ) ) }
@@ -234,23 +226,23 @@ export const displayFooter = ( tasks ) => {
             </tr>
             <tr>
               <td>
-                Neschválené hodiny - vlastné položky
+                Neschvalený materiál
               </td>
               { statistics.map((item) => (
-                <td>
-                  {item.metadata.itemsPending}
+                <td key={item.status.id}>
+                  {item.metadata.materialsPending}
                 </td>
               ) ) }
               <td>
-                {totals.metadata.itemsPending}
+                {totals.metadata.materialsPending}
               </td>
             </tr>
             <tr>
               <td>
-                Schválené hodiny - vlastné položky
+                Schvalené položky
               </td>
               { statistics.map((item) => (
-                <td>
+                <td key={item.status.id}>
                   {item.metadata.itemsApproved}
                 </td>
               ) ) }
@@ -260,10 +252,23 @@ export const displayFooter = ( tasks ) => {
             </tr>
             <tr>
               <td>
+                Neschválené položky
+              </td>
+              { statistics.map((item) => (
+                <td key={item.status.id}>
+                  {item.metadata.itemsPending}
+                </td>
+              ) ) }
+              <td>
+                {totals.metadata.itemsPending}
+              </td>
+            </tr>
+            <tr>
+              <td>
                 Spolu hodiny
               </td>
               { statistics.map((item) => (
-                <td>
+                <td key={item.status.id}>
                   {
                     item.metadata.subtasksPending +
                     item.metadata.subtasksApproved +

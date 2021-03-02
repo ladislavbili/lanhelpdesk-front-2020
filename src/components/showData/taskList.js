@@ -45,6 +45,7 @@ export default function List( props ) {
     setStatuses,
     allStatuses,
     displayValues,
+    setVisibility,
     data,
     deleteTask,
     checkTask,
@@ -68,7 +69,7 @@ export default function List( props ) {
     }
   }
   const filter = tasksFilterData.tasksAttributesFilter;
-
+  const filteredDisplayValues = displayValues.filter( ( displayValue ) => displayValue.show )
   const renderWithIcons = ( displayValues, item, index, Component ) => {
     if ( ![ 'important', 'invoiced' ].includes( displayValues[ index - 1 ].type ) ) {
       return Component;
@@ -96,6 +97,7 @@ export default function List( props ) {
     <div>
       <CommandBar
         {...commandBar}
+        setVisibility={setVisibility}
         listName={listName}
         {...tasklistLayoutData}
         />
@@ -119,7 +121,7 @@ export default function List( props ) {
           <thead>
             <tr>
               {
-                displayValues.map((display,index)=> {
+                filteredDisplayValues.map((display,index)=> {
                   if(display.type==='important' || display.type==='invoiced' ) {
                     return null;
                   }else if (display.type === 'checkbox'){
@@ -152,7 +154,7 @@ export default function List( props ) {
                   return (
                     <th
                       style={(display.value === "createdAt" || display.value === "deadline" ? {textAlign: "right"} : {})}
-                      colSpan={((index===0 || index ===1 || displayValues[index-1].type!=='important') && display.value !== "deadline")?'1':'2'}
+                      colSpan={((index===0 || index ===1 || filteredDisplayValues[index-1].type!=='important') )?'1':'2'}
                       key={display.value}
                       width={display.value === 'title' ? "30%" : ((display.value === "id" || display.value === "status") ? "50px" : '')}>
                       {display.label}
@@ -166,7 +168,7 @@ export default function List( props ) {
           <tbody>
             <tr>
               {
-                displayValues.map((display,index)=>{
+                filteredDisplayValues.map((display,index)=>{
                   if(display.type==='important' || display.type==='invoiced'){
                     return null;
                   }else if (display.type === 'checkbox'){
@@ -182,9 +184,9 @@ export default function List( props ) {
                   }else {
                     const value = (filter[display.value] === "cur" ? currentUser().fullName : filter[display.value]);
                     return <th key={display.value} >
-                      <div className={(display.value === "deadline" ? "row" : "")}>
+                      <div className={(index === filteredDisplayValues.length - 1 ? "row" : "")}>
 
-                        <div style={display.value === "deadline" ? {flex: "1"} : {}}>
+                        <div style={index === filteredDisplayValues.length - 1 ? {flex: "1"} : {}}>
                           <input
                             type="text"
                             value={ value }
@@ -195,7 +197,7 @@ export default function List( props ) {
                             }}
                             />
                         </div>
-                        {display.value === "deadline" &&
+                        {index === filteredDisplayValues.length - 1 &&
                           <div className="ml-auto">
                             <button type="button" className="btn btn-link waves-effect" onClick={clearFilter}>
                               <i
@@ -214,7 +216,7 @@ export default function List( props ) {
               data
               .filter((item) =>
               {
-                return displayValues
+                return filteredDisplayValues
                 .every((display)=> {
                   let value = getItemDisplayValue(item,display);
                   if(display.value === "assignedTo"){
@@ -251,14 +253,14 @@ export default function List( props ) {
               <tr
                 key={item.id}
                 className="clickable">
-                { displayValues
+                { filteredDisplayValues
                   .map((display,index)=>{
                     if(display.value === "important" || display.value === "invoiced" ){
                       return null;
                     }
                     return (
                       <td
-                        colSpan={ (index === displayValues.length-1) ? "2" : "1" }
+                        colSpan={ (index === filteredDisplayValues.length-1) ? "2" : "1" }
                         style={{
                           ...(["createdAt", "deadline"].includes(display.value) ? {textAlign: "right"} : {}),
                         }}
@@ -271,7 +273,7 @@ export default function List( props ) {
                         }}
                         >
                         {	display.type !== 'checkbox' &&
-                          renderWithIcons( displayValues, item, index, getItemDisplayValue(item,display) )
+                          renderWithIcons( filteredDisplayValues, item, index, getItemDisplayValue(item,display) )
                         }
                         { display.type === 'checkbox' &&
                           <Checkbox

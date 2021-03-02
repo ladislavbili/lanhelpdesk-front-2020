@@ -40,7 +40,7 @@ export const getItemDisplayValue = ( item, value ) => {
   if ( !item[ value.value ] && ( value.type === 'important' || value.type === 'invoiced' || value.type === 'checkbox' ) ) {
     return null;
   }
-  if ( !item[ value.value ] ) {
+  if ( !item[ value.value ] && value.type !== 'boolean' ) {
     return 'Neexistuje';
   }
   if ( value.type === 'object' ) {
@@ -68,6 +68,8 @@ export const getItemDisplayValue = ( item, value ) => {
       }</a>;
   } else if ( value.type === 'int' ) {
     return parseInt( item[ value.value ] );
+  } else if ( value.type === 'boolean' ) {
+    return item[ value.value ] ? "Yes" : "No";
   } else if ( value.type === 'list' ) {
     return value.func( item[ value.value ] );
   } else if ( value.type === 'date' ) {

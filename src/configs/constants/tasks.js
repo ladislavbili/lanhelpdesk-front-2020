@@ -10,6 +10,11 @@ export const defaultTasksAttributesFilter = {
   assignedTo: "",
   createdAt: "",
   deadline: "",
+  project: "",
+  milestone: "",
+  taskType: "",
+  overtime: "",
+  pausal: "",
 }
 export const defaultTaskSort = {
   key: 'status',
