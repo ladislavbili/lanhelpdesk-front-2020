@@ -145,6 +145,12 @@ export default function Rozpocet( props ) {
     setNewSubtaskType( defaultType )
   }, [ defaultType ] )
 
+  React.useEffect( () => {
+    if ( defaultType === null && taskTypes.length > 0 ) {
+      setNewSubtaskType( taskTypes[ 0 ] )
+    }
+  }, [ taskTypes ] )
+
   const onFocusWorkTrip = ( trip ) => {
     setEditedTripQuantity( trip.quantity );
     setEditedTripDiscount( trip.discount );
@@ -550,7 +556,8 @@ export default function Rozpocet( props ) {
                 {!autoApproved && <td>
                   <div className="vykazy-approved">
                   <Switch
-                    checked={trip.approved}                    disabled={disabled}
+                    checked={trip.approved}
+                    disabled={disabled}
                     onChange={ () => { updateTrip( trip.id, { approved: !trip.approved } ) } }
                     height={16}
                     width={30}
@@ -1199,7 +1206,7 @@ export default function Rozpocet( props ) {
                 />
             </div>
           }
-            <div className="m-r-10 center-hor">hod.</div>
+          <div className="m-r-10 center-hor">hod.</div>
           {/*Cennik/Nakup*/}
           { false && showColumns.includes(5) && toggleTab === "2" &&
             <div></div>
@@ -1677,8 +1684,8 @@ export default function Rozpocet( props ) {
       }
       {/* ADD Buttons */}
       {!showAddSubtask && !showAddTrip && !showAddMaterial && !showAddCustomItem && !disabled &&
-        <tr>
-          <td colSpan={(toggleTab === '1' ? 8 : 10)}>
+        <div className="row">
+          <div className="m-r-10 center-hor add-title">
             {!showAddSubtask &&
               <button className="btn btn-link waves-effect"
                 disabled={disabled}
@@ -1723,8 +1730,8 @@ export default function Rozpocet( props ) {
                 Vlastná položka
               </button>
             }
-          </td>
-        </tr>
+          </div>
+        </div>
       }
       </div>
 

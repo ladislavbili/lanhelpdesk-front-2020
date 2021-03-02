@@ -69,9 +69,9 @@ export default function MultiSelect( props ) {
             >
             { selected.some((selected) => selected.id === item.id )
               ?
-              <i class="far fa-check-circle" style={{ color: 'green' }} />
+              <i className="far fa-check-circle" style={{ color: 'green' }} />
               :
-              <i class="fa fa-times" style={{ color: 'red', width: 18, paddingLeft: 1 }} />
+              <i className="fa fa-times" style={{ color: 'red', width: 18, paddingLeft: 1 }} />
             }
             <span className="m-r-5 p-l-5 p-r-5" style={ coloredItems ? { backgroundColor: item.color, color: 'white', borderRadius: 3, fontWeight: 'normal' } : {} }>
               {item.label}

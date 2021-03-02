@@ -43,6 +43,7 @@ export default function ShowDataContainer( props ) {
     itemID,
     link,
     displayCol,
+    displayFooter,
     isTask,
     setStatuses,
     statuses,
@@ -192,6 +193,7 @@ export default function ShowDataContainer( props ) {
 							{!itemID &&
 								<TaskList
                   layout={tasklistLayout}
+                  displayFooter={displayFooter}
 									commandBar={props}
 									useBreadcrums={useBreadcrums}
 									breadcrumsData={breadcrumsData}

@@ -15,6 +15,16 @@ const responseTask = `
   updatedAt
   createdAt
   closeDate
+  metadata{
+    subtasksApproved
+    subtasksPending
+    tripsApproved
+    tripsPending
+    materialsApproved
+    materialsPending
+    itemsApproved
+    itemsPending
+  }
   taskAttachments{
     id
     path
@@ -325,6 +335,16 @@ query tasks($filter: FilterInput, $projectId: Int, $sort: SortTasksInput){
 			pausal
 			pendingChangable
 			statusChange
+      metadata{
+        subtasksApproved
+        subtasksPending
+        tripsApproved
+        tripsPending
+        materialsApproved
+        materialsPending
+        itemsApproved
+        itemsPending
+      }
 			assignedTo {
 				id
 				fullName

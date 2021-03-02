@@ -64,7 +64,6 @@ import {
 
 let fakeID = -1;
 
-
 export default function TaskAdd( props ) {
   //data & queries
   const {
@@ -131,10 +130,9 @@ export default function TaskAdd( props ) {
   const [ scheduled, setScheduled ] = React.useState( [] );
 
 
-  let counter = 0;
 
   const getNewID = () => {
-    return counter++;
+    return fakeID--;
   }
 
   const userRights = (

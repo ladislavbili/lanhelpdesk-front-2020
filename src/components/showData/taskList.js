@@ -40,6 +40,7 @@ export default function List( props ) {
     link,
     commandBar,
     listName,
+    displayFooter,
     statuses,
     setStatuses,
     allStatuses,
@@ -290,6 +291,7 @@ export default function List( props ) {
             )}
           </tbody>
         </table>
+        { displayFooter && displayFooter(data) }
       </div>
 
 

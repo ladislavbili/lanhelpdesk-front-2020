@@ -47,7 +47,8 @@ export const invoicedAttributes = {
     'totalPrice',
   ],
 }
-export const defaultCheckboxList = [ {
+export const defaultCheckboxList = [
+  {
     id: 1,
     title: 'Test item 1',
     done: false,
@@ -63,7 +64,6 @@ export const defaultCheckboxList = [ {
     done: false,
   },
 ]
-
 export const noTaskType = {
   label: 'No type',
   title: 'No type',
