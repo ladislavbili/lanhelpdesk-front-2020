@@ -11,7 +11,6 @@ import moment from 'moment';
 import {
   displayCol,
   displayCal,
-  displayFooter,
 } from './showDataRenders';
 
 import ShowData from 'components/showData';
@@ -443,7 +442,6 @@ export default function TasksIndex( props ) {
         {value:'company',type:'object'},
       ]}
       displayCol={displayCol}
-      displayFooter={displayFooter}
       filterName="help-tasks"
       displayValues={[
         {value:'checked', label: '', type:'checkbox', show: true },

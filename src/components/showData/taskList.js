@@ -13,7 +13,6 @@ import {
   getItemDisplayValue
 }
 from 'helperFunctions';
-import CommandBar from './commandBar';
 import ListHeader from './listHeader';
 import Checkbox from '../checkbox';
 
@@ -38,24 +37,13 @@ export default function List( props ) {
   const {
     history,
     link,
-    commandBar,
-    listName,
-    displayFooter,
-    statuses,
-    setStatuses,
-    allStatuses,
     displayValues,
-    setVisibility,
     data,
     deleteTask,
     checkTask,
-    layout,
-    underSearch: UnderSearch,
-    underSearchLabel,
-    tasklistLayoutData,
   } = props;
+
   const [ editOpen, setEditOpen ] = React.useState( false );
-  const [ underSearchOpen, setUnderSearchOpen ] = React.useState( false );
 
   const {
     data: tasksFilterData
@@ -93,30 +81,9 @@ export default function List( props ) {
     )
   }
 
+
   return (
     <div>
-      <CommandBar
-        {...commandBar}
-        setVisibility={setVisibility}
-        listName={listName}
-        {...tasklistLayoutData}
-        />
-      <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
-        <ListHeader
-          {...commandBar}
-          listName={listName}
-          statuses={statuses}
-          setStatuses={setStatuses}
-          allStatuses={allStatuses}
-          underSearchButtonEvent={underSearchLabel ? (() => setUnderSearchOpen(!underSearchOpen)) : null}
-          underSearchButtonLabel={underSearchLabel}
-          layout={layout}
-          />
-        {
-          UnderSearch !== undefined &&
-          underSearchOpen &&
-          <UnderSearch/>
-        }
         <table className="table">
           <thead>
             <tr>
@@ -153,7 +120,7 @@ export default function List( props ) {
                   }
                   return (
                     <th
-                      style={(display.value === "createdAt" || display.value === "deadline" ? {textAlign: "right"} : {})}
+                      style={(display.value === "createdAt" ? {textAlign: "right"} : {})}
                       key={display.value}
                       width={display.value === 'title' ? "30%" : ((display.value === "id" || display.value === "status") ? "50px" : '')}>
                       {display.label}
@@ -196,11 +163,14 @@ export default function List( props ) {
                             />
                         </div>
                         {index === filteredDisplayValues.length - 1 &&
-                          <div className="ml-auto">
-                            <button type="button" className="btn btn-link waves-effect" onClick={clearFilter}>
+                          <div className="ml-auto row">
+                            <button type="button" className="btn-link m-l-8 m-r-5" onClick={clearFilter}>
                               <i
-                                className="fas fa-times commandbar-command-icon m-l-8 text-highlight"
+                                className="fas fa-times commandbar-command-icon text-highlight"
                                 />
+                            </button>
+                            <button type="button" className="btn" onClick={() => {}}>
+                              Filter
                             </button>
                           </div>
                         }
@@ -291,15 +261,22 @@ export default function List( props ) {
             )}
           </tbody>
         </table>
-        { displayFooter && displayFooter(data) }
-      </div>
+
+        <div className="row m-b-10 m-r-30">
+          <div className="message success-message ml-auto">Loaded 50/242 tasks</div>
+          <button className="btn-link m-r-5">
+            Load all tasks |
+          </button>
+          <button className="btn-link">
+            Load next 50 tasks
+          </button>
+        </div>
 
 
-      <Modal isOpen={editOpen}  >
-        <ModalBody className="scrollable" >
+    <Modal isOpen={editOpen}>
+    <ModalBody className="scrollable" >
           <MultipleTaskEdit tasks={data.filter(d => d.checked)} close={() => setEditOpen(false)} />
-        </ModalBody>
-      </Modal>
+        </ModalBody> </Modal>
 
     </div>
   );
