@@ -580,7 +580,6 @@ export default function TaskAdd( props ) {
     return (
       <div className = "form-section form-selects-entries" >
         <div className="form-section-rest">
-
           <div className="col-12 row">
             <div className="col-4">
               <div className="row p-r-10">

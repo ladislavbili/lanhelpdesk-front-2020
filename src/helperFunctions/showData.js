@@ -41,7 +41,7 @@ export const getItemDisplayValue = ( item, value ) => {
     return null;
   }
   if ( !item[ value.value ] && ![ 'boolean', 'attribute' ].includes( value.type ) ) {
-    return 'Neexistuje';
+    return '---';
   }
   if ( value.type === 'object' ) {
     if ( value.value === "status" ) {

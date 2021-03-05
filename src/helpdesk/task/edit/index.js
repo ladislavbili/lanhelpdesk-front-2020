@@ -10,6 +10,8 @@ import moment from 'moment';
 
 import Loading from 'components/loading';
 import TaskEdit from './taskEdit';
+import AccessDenied from 'components/accessDenied';
+import ErrorMessage from 'components/errorMessage';
 import axios from 'axios';
 
 import {
@@ -40,6 +42,7 @@ import {
 import {
   GET_MY_DATA,
   GET_TASK,
+  GET_TASKS,
 
   ADD_USER_TO_PROJECT,
   DELETE_TASK,
@@ -121,7 +124,8 @@ export default function TaskEditContainer( props ) {
   const {
     data: taskData,
     loading: taskLoading,
-    refetch: taskRefetch
+    refetch: taskRefetch,
+    error: taskError
   } = useQuery( GET_TASK, {
     variables: {
       id
@@ -579,7 +583,8 @@ export default function TaskEditContainer( props ) {
               variables: {
                 filterId: filterData.localFilter.id,
                 filter: localFilterToValues( filterData.localFilter ),
-                projectId: projectData.localProject.id
+                projectId: projectData.localProject.id,
+                sort: null
               }
             } )
             .tasks;
@@ -588,10 +593,12 @@ export default function TaskEditContainer( props ) {
             variables: {
               filterId: filterData.localFilter.id,
               filter: localFilterToValues( filterData.localFilter ),
-              projectId: projectData.localProject.id
+              projectId: projectData.localProject.id,
+              sort: null
             },
             data: {
-              tasks: tasks.filter( ( task ) => task.id !== id )
+              ...tasks,
+              tasks: tasks.tasks.filter( ( task ) => task.id !== id )
             }
           } );
           if ( inModal ) {
@@ -785,9 +792,19 @@ export default function TaskEditContainer( props ) {
     myProjectsLoading ||
     taskLoading
   )
+
+  if ( taskError ) {
+    return (
+      <AccessDenied>
+        <ErrorMessage show={true} message={taskError.message} />
+      </AccessDenied>
+    )
+  }
+
   if ( dataLoading ) {
     return ( <Loading /> );
   }
+
 
   return (
     <TaskEdit

@@ -25,6 +25,7 @@ import {
   REST_URL
 } from 'configs/restAPI';
 
+//Apollo cashe
 export const cache = new InMemoryCache( {
   typePolicies: {
     Query: {
@@ -40,6 +41,7 @@ const link = new HttpLink( {
   credentials: "include"
 } );
 
+//refreshne access a refresh token
 export async function refreshToken() {
   return axios.request( {
     url: `${REST_URL}/refresh_token`,
@@ -48,6 +50,7 @@ export async function refreshToken() {
   }, )
 }
 
+//pomaha spracovat opakovaný request v pripade zlyhania
 const promiseToObservable = promise => (
   new Observable( ( subscriber ) => {
     promise.then(
