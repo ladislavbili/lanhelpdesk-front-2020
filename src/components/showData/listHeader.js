@@ -164,7 +164,7 @@ export default function ListHeader( props ) {
               }
 
               <div className="row">
-                <button className="btn-link" onClick={ toggle } >
+                <button className="btn-link m-l-10" onClick={ toggle } >
                   <i className="fa fa-cog" />
                 </button>
                 <MultiSelect

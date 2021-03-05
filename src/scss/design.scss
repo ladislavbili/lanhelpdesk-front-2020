@@ -323,6 +323,10 @@ html{
   margin-right: -40px;
 }
 
+.m-l--40{
+  margin-left: -40px !important;
+}
+
 .m-t-17p{
   margin-top: 17% !important;
 }
@@ -1844,7 +1848,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     //border-color: #F9F9F9 !important;
   }
 
-  .table>tbody>tr:first-child>th{
+  .table>tbody>tr:first-child>th:not(last-child){
     padding: 4px 10px 10px 0px !important;
     background-color: transparent;
     font-family: $main-font;
@@ -1857,6 +1861,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     .checkbox-mark{
       border: 0px;
     }
+  }
+
+  .table>tbody>tr:first-child>th:last-child{
+    padding: 4px 0px 10px 0px !important;
   }
 
   .table>tbody>tr>th{
@@ -2009,6 +2017,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 .small-p{
   margin: 0px;
+}
+
+.statistics {
+  h2{
+    line-height: 2em;
+    font-size: 1.5em;
+  }
 }
 
 //-------------------END-tasklist-------------------------

@@ -50,7 +50,7 @@ export default function Search( props ) {
           className="form-control search-text"
           value={taskSearchData.taskSearch}
           onChange={(e)=>setTaskSearch(e.target.value)}
-          placeholder="Search"
+          placeholder="Search in all attributes"
           />
         <button className="search-btn" type="button">
           <i className="fa fa-search flip" />

@@ -137,10 +137,12 @@ export default function CommandBar( props ) {
                       setShowStatistics(!showStatistics);
                     }}
                     height={22}
-                    width={90}
-                    checkedIcon={<span className="switchLabel">Statistics</span>}
-                    uncheckedIcon={<span className="switchLabel-right">Tasks</span>}
-                    onColor={"#0078D4"} />
+                    width={100}
+                    checkedIcon={<span className="switchLabel p-l-20">Tasks</span>}
+                    uncheckedIcon={<span className="switchLabel-right m-l--40">Statistics</span>}
+                    onColor={"#0078D4"}
+                    offColor={"#0078D4"}
+                    />
                   <span className="m-l-10"></span>
                 </label>
               </div>

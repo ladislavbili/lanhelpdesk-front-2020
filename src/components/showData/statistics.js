@@ -66,170 +66,215 @@ export default function Statistics( props ) {
     } );
 
   return (
-    <table className="table m-t-20">
-          <thead>
-            <tr>
-              <th>Status</th>
-              { statistics.map((item, index) => (
-                <th key={index}>
-                  <span className="m-r-5 p-l-5 p-r-5" style={{ backgroundColor: item.status.color, color: 'white', borderRadius: 3, fontWeight: 'normal' }}>
-                    {item.status.title}
-                  </span>
-                </th>
-              ) ) }
-              <th>Spolu</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                Počet úloh
+    <div className="statistics">
+      <table className="table m-t-20">
+        <thead>
+          <tr>
+            <th>Status</th>
+            { statistics.map((item, index) => (
+              <th key={index}>
+                <span className="m-r-5 p-l-5 p-r-5" style={{ backgroundColor: item.status.color, color: 'white', borderRadius: 3, fontWeight: 'normal' }}>
+                  {item.status.title}
+                </span>
+              </th>
+            ) ) }
+            <th>Spolu</th>
+          </tr>
+        </thead>
+
+        <h2 className="m-l-8 m-t-5">Number of tasks</h2>
+        <tbody>
+          <tr>
+            <td>
+              Spolu
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                {item.taskCounter}
               </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {item.taskCounter}
-                </td>
-              ) ) }
-              <td>
-                {totals.taskCounter}
+            ) ) }
+            <td>
+              {totals.taskCounter}
+            </td>
+          </tr>
+        </tbody>
+
+        <h2 className="m-l-8 m-t-5">Hodiny</h2>
+        <tbody>
+          <tr>
+            <td>
+              Neschvalené
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                {item.metadata.subtasksPending}
               </td>
-            </tr>
-            <tr>
-              <td>
-                Schvalené hodiny
+            ) ) }
+            <td>
+              {totals.metadata.subtasksPending}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Schvalené
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                {item.metadata.subtasksApproved}
               </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {item.metadata.subtasksApproved}
-                </td>
-              ) ) }
-              <td>
-                {totals.metadata.subtasksApproved}
+            ) ) }
+            <td>
+              {totals.metadata.subtasksApproved}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Spolu
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                { item.metadata.subtasksPending + item.metadata.subtasksApproved }
               </td>
-            </tr>
-            <tr>
-              <td>
-                Neschvalené hodiny
+            ) ) }
+            <td>
+              { totals.metadata.subtasksPending + totals.metadata.subtasksApproved }
+            </td>
+          </tr>
+        </tbody>
+
+        <h2 className="m-l-8 m-t-5">Výjazdy</h2>
+        <tbody>
+          <tr>
+            <td>
+              Neschválené
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                {item.metadata.tripsPending}
               </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {item.metadata.subtasksPending}
-                </td>
-              ) ) }
-              <td>
-                {totals.metadata.subtasksPending}
+            ) ) }
+            <td>
+              {totals.metadata.tripsPending}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Schvalené
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                {item.metadata.tripsApproved}
               </td>
-            </tr>
-            <tr>
-              <td>
-                Schvalené výjazdy
+            ) ) }
+            <td>
+              {totals.metadata.tripsApproved}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Spolu
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                { item.metadata.tripsPending + item.metadata.tripsApproved }
               </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {item.metadata.tripsApproved}
-                </td>
-              ) ) }
-              <td>
-                {totals.metadata.tripsApproved}
+            ) ) }
+            <td>
+              { totals.metadata.tripsPending + totals.metadata.tripsApproved }
+            </td>
+          </tr>
+        </tbody>
+
+        <h2 className="m-l-8 m-t-5">Materiál</h2>
+        <tbody>
+          <tr>
+            <td>
+              Neschvalený
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                {item.metadata.materialsPending}
               </td>
-            </tr>
-            <tr>
-              <td>
-                Neschválené výjazdy
+            ) ) }
+            <td>
+              {totals.metadata.materialsPending}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Schvalený
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                {item.metadata.materialsApproved}
               </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {item.metadata.tripsPending}
-                </td>
-              ) ) }
-              <td>
-                {totals.metadata.tripsPending}
+            ) ) }
+            <td>
+              {totals.metadata.materialsApproved}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Spolu
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                { item.metadata.materialsPending + item.metadata.materialsApproved }
               </td>
-            </tr>
-            <tr>
-              <td>
-                Schvalený materiál
+            ) ) }
+            <td>
+              {
+                totals.metadata.materialsPending + totals.metadata.materialsApproved
+              }
+            </td>
+          </tr>
+        </tbody>
+
+        <h2 className="m-l-8 m-t-5">Voľné položky</h2>
+        <tbody>
+          <tr>
+            <td>
+              Schvalené
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                {item.metadata.itemsApproved}
               </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {item.metadata.materialsApproved}
-                </td>
-              ) ) }
-              <td>
-                {totals.metadata.materialsApproved}
+            ) ) }
+            <td>
+              {totals.metadata.itemsApproved}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Neschválené
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                {item.metadata.itemsPending}
               </td>
-            </tr>
-            <tr>
-              <td>
-                Neschvalený materiál
+            ) ) }
+            <td>
+              {totals.metadata.itemsPending}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Spolu hodiny
+            </td>
+            { statistics.map((item) => (
+              <td key={item.status.id}>
+                { item.metadata.itemsPending + item.metadata.itemsApproved }
               </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {item.metadata.materialsPending}
-                </td>
-              ) ) }
-              <td>
-                {totals.metadata.materialsPending}
-              </td>
-            </tr>
-            <tr>
-              <td>
-                Schvalené položky
-              </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {item.metadata.itemsApproved}
-                </td>
-              ) ) }
-              <td>
-                {totals.metadata.itemsApproved}
-              </td>
-            </tr>
-            <tr>
-              <td>
-                Neschválené položky
-              </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {item.metadata.itemsPending}
-                </td>
-              ) ) }
-              <td>
-                {totals.metadata.itemsPending}
-              </td>
-            </tr>
-            <tr>
-              <td>
-                Spolu hodiny
-              </td>
-              { statistics.map((item) => (
-                <td key={item.status.id}>
-                  {
-                    item.metadata.subtasksPending +
-                    item.metadata.subtasksApproved +
-                    item.metadata.tripsPending +
-                    item.metadata.tripsApproved +
-                    item.metadata.materialsPending +
-                    item.metadata.materialsApproved +
-                    item.metadata.itemsPending +
-                    item.metadata.itemsApproved
-                  }
-                </td>
-              ) ) }
-              <td>
-                {
-                  totals.metadata.subtasksPending +
-                  totals.metadata.subtasksApproved +
-                  totals.metadata.tripsPending +
-                  totals.metadata.tripsApproved +
-                  totals.metadata.materialsPending +
-                  totals.metadata.materialsApproved +
-                  totals.metadata.itemsPending +
-                  totals.metadata.itemsApproved
-                }
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            ) ) }
+            <td>
+              {
+                totals.metadata.itemsPending + totals.metadata.itemsApproved
+              }
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   );
 }

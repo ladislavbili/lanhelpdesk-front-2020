@@ -120,7 +120,7 @@ export default function List( props ) {
                   }
                   return (
                     <th
-                      style={(display.value === "createdAt" || display.value === "deadline" ? {textAlign: "right"} : {})}
+                      style={(display.value === "createdAt" ? {textAlign: "right"} : {})}
                       key={display.value}
                       width={display.value === 'title' ? "30%" : ((display.value === "id" || display.value === "status") ? "50px" : '')}>
                       {display.label}
@@ -163,11 +163,14 @@ export default function List( props ) {
                             />
                         </div>
                         {index === filteredDisplayValues.length - 1 &&
-                          <div className="ml-auto">
-                            <button type="button" className="btn-link" onClick={clearFilter}>
+                          <div className="ml-auto row">
+                            <button type="button" className="btn-link m-l-8 m-r-5" onClick={clearFilter}>
                               <i
-                                className="fas fa-times commandbar-command-icon m-l-8 text-highlight"
+                                className="fas fa-times commandbar-command-icon text-highlight"
                                 />
+                            </button>
+                            <button type="button" className="btn" onClick={() => {}}>
+                              Filter
                             </button>
                           </div>
                         }
@@ -258,6 +261,16 @@ export default function List( props ) {
             )}
           </tbody>
         </table>
+
+        <div className="row m-b-10 m-r-30">
+          <div className="message success-message ml-auto">Loaded 50/242 tasks</div>
+          <button className="btn-link m-r-5">
+            Load all tasks |
+          </button>
+          <button className="btn-link">
+            Load next 50 tasks
+          </button>
+        </div>
 
 
     <Modal isOpen={editOpen}>
