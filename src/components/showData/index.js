@@ -9,7 +9,7 @@ import {
 } from 'apollo/localSchema/queries';
 
 import TaskCol from './taskCol';
-import TaskList from './taskList';
+import TaskList from './taskListStatisticsContainer';
 import TaskListDnD from './taskListDnD';
 import {
   localFilterToValues
@@ -44,7 +44,6 @@ export default function ShowDataContainer( props ) {
     itemID,
     link,
     displayCol,
-    displayFooter,
     isTask,
     setStatuses,
     statuses,
@@ -194,7 +193,6 @@ export default function ShowDataContainer( props ) {
 							{!itemID &&
 								<TaskList
                   layout={tasklistLayout}
-                  displayFooter={displayFooter}
 									commandBar={props}
 									useBreadcrums={useBreadcrums}
 									breadcrumsData={breadcrumsData}

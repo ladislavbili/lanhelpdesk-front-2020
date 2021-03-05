@@ -37,9 +37,9 @@
     "react-to-print": "^2.10.3",
     "reactstrap": "^7.1.0"
   },
-  "dependencies": {
-  "node-sass": "^4.14.1",
-  "react-scripts": "^4.0.0"
+  "devDependencies": {
+    "node-sass": "^4.14.1",
+    "react-scripts": "^4.0.0"
   },
   "scripts": {
     "start": "react-scripts --max_old_space_size=8192 start",

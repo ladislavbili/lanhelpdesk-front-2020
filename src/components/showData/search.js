@@ -45,9 +45,6 @@ export default function Search( props ) {
       )}
       >
       <div className="search">
-        <button className="search-btn" type="button">
-          <i className="fa fa-search flip" />
-        </button>
         <input
           type="text"
           className="form-control search-text"
@@ -55,11 +52,14 @@ export default function Search( props ) {
           onChange={(e)=>setTaskSearch(e.target.value)}
           placeholder="Search"
           />
+        <button className="search-btn" type="button">
+          <i className="fa fa-search flip" />
+        </button>
       </div>
 
       { isTask &&
         <Button
-          className="btn-link-reversed center-hor m-l-10"
+          className="btn-link center-hor m-l-10"
           onClick={()=>{
             setMilestone(allMilestones);
             setProject(dashboard);

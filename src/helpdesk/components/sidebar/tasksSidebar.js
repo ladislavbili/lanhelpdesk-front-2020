@@ -387,7 +387,7 @@ export default function TasksSidebar( props ) {
         </div>
       }
 
-
+{ !showFilterAdd &&
       <div className="sidebar-label row" onClick={() => setShowProjects(!showProjects)}>
         <div>
           <img
@@ -404,10 +404,11 @@ export default function TasksSidebar( props ) {
           { !showProjects && <i className="fas fa-chevron-down" /> }
         </div>
       </div>
+    }
 
-      { showProjects && renderProjects() }
+      {  !showFilterAdd && showProjects && renderProjects() }
 
-      { showProjects && myData.getMyData.role.accessRights.addProjects &&
+      {  !showFilterAdd && showProjects && myData.getMyData.role.accessRights.addProjects &&
         <NavItem className="row full-width">
           <Button
             className='btn btn-link'
@@ -419,9 +420,9 @@ export default function TasksSidebar( props ) {
         </NavItem>
       }
 
-      { projectData.localProject.id !== null && <hr className="m-l-15 m-r-15 m-t-11" /> }
+      { !showFilterAdd && projectData.localProject.id !== null && <hr className="m-l-15 m-r-15 m-t-11" /> }
 
-      { projectData.localProject.id !== null &&
+      { !showFilterAdd && projectData.localProject.id !== null &&
         <div className="">
           <div className="sidebar-label row"  onClick={() => setShowMilestones(!showMilestones)}>
             <div>
@@ -449,8 +450,6 @@ export default function TasksSidebar( props ) {
           }
         </div>
       }
-
-      { showFilterAdd && <hr className="m-l-15 m-r-15 m-t-15" /> }
 
       { showFilterAdd &&
         <div className="sidebar-label row" onClick={() => setShowFilters(!showFilters)}>
