@@ -1,13 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-  Provider
-} from 'react-redux';
 
 import Navigation from 'navigation';
 import Login from 'components/login';
-
-import createStore from 'redux/store';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -22,9 +17,6 @@ import {
   GET_IS_LOGGED_IN,
 } from 'apollo/localSchema/queries';
 
-export const database = {};
-export const rebase = {};
-
 const client = createClient();
 
 const IsLoggedIn = () => {
@@ -34,15 +26,11 @@ const IsLoggedIn = () => {
   return data.isLoggedIn ? <Navigation /> : <Login />;
 }
 
-const store = createStore();
-
 const Root = () => {
   return (
     <div>
       <ApolloProvider client={client}>
-        <Provider store={store}>
           <IsLoggedIn />
-        </Provider>
       </ApolloProvider>
     </div>
   )

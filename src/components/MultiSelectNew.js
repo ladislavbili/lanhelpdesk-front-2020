@@ -11,9 +11,13 @@ export default function MultiSelect( props ) {
   const {
     className,
     menuClassName,
+    bodyClassName,
     disabled,
+    showFilter,
     direction,
     style,
+    menuStyle,
+    bodyStyle,
     header,
     closeMultiSelect,
     open,
@@ -36,50 +40,60 @@ export default function MultiSelect( props ) {
       >
       <DropdownToggle className="bkg-white p-0 m-0" style={{ width: 0 }}>
       </DropdownToggle>
-      <DropdownMenu style={{width:'max-content'}} className={`${menuClassName ? menuClassName : ''} p-0`}>
+      <DropdownMenu
+        className={`${menuClassName ? menuClassName : ''} p-0`}
+        style={ menuStyle ? { width:'max-content', ...menuStyle} : { width:'max-content' } }
+        >
         <div className="dynamic-commandbar multiselect-header">
           {header}
         </div>
-        <input
-          className="form-control"
-          placeholder="Filter"
-          disabled={disabled}
-          value={ filter }
-          onChange={e => setFilter(e.target.value) }
-          />
-        { !items &&
-          <span className="message error-message">{ ` Provided items are of value ${items}` }</span>
-        }
-        { items && items.filter((item) => item.label.toLowerCase().includes(filter.toLowerCase()) ).map((item) => (
-          <div
-            key={item.id}
-            className="multiselect-item"
-            onClick={() => {
-              if(disabled){
-                return;
-              }
-              const removed = selected.some((selected) => selected.id === item.id );
-              const newItems = ( removed
+        <div
+          className={`${bodyClassName ? bodyClassName : ''}`}
+          style={ bodyStyle ? bodyStyle : {} }
+          >
+          { showFilter !== false &&
+            <input
+              className="form-control"
+              placeholder="Filter"
+              disabled={disabled}
+              value={ filter }
+              onChange={e => setFilter(e.target.value) }
+              />
+          }
+          { !items &&
+            <span className="message error-message">{ ` Provided items are of value ${items}` }</span>
+          }
+          { items && items.filter((item) => item.label.toLowerCase().includes(filter.toLowerCase()) ).map((item) => (
+            <div
+              key={item.id}
+              className="multiselect-item"
+              onClick={() => {
+                if(disabled){
+                  return;
+                }
+                const removed = selected.some((selected) => selected.id === item.id );
+                const newItems = ( removed
+                  ?
+                  selected.filter((selected) => selected.id !== item.id )
+                  :
+                  [ ...selected, item ]
+                )
+                onChange( newItems, item, removed )
+              }}
+              >
+              { selected.some((selected) => selected.id === item.id )
                 ?
-                selected.filter((selected) => selected.id !== item.id )
+                <i className="far fa-check-circle" style={{ color: 'green' }} />
                 :
-                [ ...selected, item ]
-              )
-              onChange( newItems, item, removed )
-            }}
-            >
-            { selected.some((selected) => selected.id === item.id )
-              ?
-              <i className="far fa-check-circle" style={{ color: 'green' }} />
-              :
-              <i className="fa fa-times" style={{ color: 'red', width: 18, paddingLeft: 1 }} />
-            }
-            <span className="m-r-5 p-l-5 p-r-5" style={ coloredItems ? { backgroundColor: item.color, color: 'white', borderRadius: 3, fontWeight: 'normal' } : {} }>
-              {item.label}
-            </span>
-          </div>
-        ))
-      }
+                <i className="fa fa-times" style={{ color: 'red', width: 18, paddingLeft: 1 }} />
+              }
+              <span className="m-r-5 p-l-5 p-r-5" style={ coloredItems ? { backgroundColor: item.color, color: 'white', borderRadius: 3, fontWeight: 'normal' } : {} }>
+                {item.label}
+              </span>
+            </div>
+          ))
+        }
+      </div>
     </DropdownMenu>
   </ButtonDropdown>
   );

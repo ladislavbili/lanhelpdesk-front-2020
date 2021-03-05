@@ -11,7 +11,6 @@ import {
   Label
 } from 'reactstrap';
 
-import TimeAgo from 'react-timeago'
 import Select from 'react-select';
 import {
   timestampToString,
@@ -26,7 +25,7 @@ import CKEditor5 from '@ckeditor/ckeditor5-react';
 import ck5config from 'configs/components/ck5config';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
-import PictureUpload from './PictureUpload';
+//import PictureUpload from './PictureUpload';
 
 import classnames from "classnames";
 import Comments from './comments';
@@ -119,7 +118,7 @@ export default function NoteEdit( props ) {
           Picture upload
         </ModalHeader>
         <ModalBody className="m-t-15">
-          <PictureUpload appendImage={appendImage}/>
+          {/*<PictureUpload appendImage={appendImage}/>*/}
         </ModalBody>
         <ModalFooter>
           <Button className="btn-link mr-auto" onClick={toggleModal}>Close</Button>{'  '}

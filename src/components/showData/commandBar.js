@@ -203,10 +203,13 @@ export default function CommandBar( props ) {
                   <MultiSelect
                     className="center-hor"
                     menuClassName="m-t-30"
+                    bodyClassName="p-l-10 p-r-10 scrollable"
+                    bodyStyle={{ maxHeight: 300 }}
                     direction="left"
                     style={{}}
                     header="Select task list columns"
                     closeMultiSelect={toggle}
+                    showFilter={false}
                     open={popoverOpen}
                     items={displayValues}
                     selected={displayValues.filter((displayValue) => displayValue.show )}
@@ -214,9 +217,9 @@ export default function CommandBar( props ) {
                       let newVisibility = {};
                       displayValues.forEach((displayValue) => {
                         if(displayValue.id !== item.id){
-                          newVisibility[displayValue.value] = displayValue.show;
+                          newVisibility[displayValue.visKey ? displayValue.visKey : displayValue.value ] = displayValue.show;
                         }else{
-                          newVisibility[displayValue.value] = !deleted;
+                          newVisibility[displayValue.visKey ? displayValue.visKey : displayValue.value] = !deleted;
                         }
                       })
                       setVisibility(newVisibility);

@@ -308,6 +308,7 @@ tasks {
   }
   tags {
     id
+    color
     title
   }
   taskType {
@@ -320,6 +321,33 @@ secondaryTimes {
   time
   source
 }
+`
+
+const tasklistPreferenceBody = `
+taskId
+status
+important
+invoiced
+title
+requester
+company
+assignedTo
+createdAtV
+deadline
+project
+milestone
+taskType
+overtime
+pausal
+tags
+subtasksApproved
+subtasksPending
+tripsApproved
+tripsPending
+materialsApproved
+materialsPending
+itemsApproved
+itemsPending
 `
 
 export const ADD_TASK = gql `
@@ -502,6 +530,78 @@ query {
         vykazy
       }
     }
+  }
+}
+`;
+
+export const GET_TASKLIST_COLUMNS_PREFERENCES = gql `
+query tasklistColumnPreference(
+  $projectId: Int
+){
+  tasklistColumnPreference(
+    projectId: $projectId
+  )  {
+    ${tasklistPreferenceBody}
+  }
+}
+`;
+
+export const ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES = gql `
+mutation addOrUpdateTasklistColumnPerference(
+  $projectId: Int
+  $taskId: Boolean
+  $status: Boolean
+  $important: Boolean
+  $invoiced: Boolean
+  $title: Boolean
+  $requester: Boolean
+  $company: Boolean
+  $assignedTo: Boolean
+  $createdAtV: Boolean
+  $deadline: Boolean
+  $project: Boolean
+  $milestone: Boolean
+  $taskType: Boolean
+  $overtime: Boolean
+  $pausal: Boolean
+  $tags: Boolean
+  $subtasksApproved: Boolean
+  $subtasksPending: Boolean
+  $tripsApproved: Boolean
+  $tripsPending: Boolean
+  $materialsApproved: Boolean
+  $materialsPending: Boolean
+  $itemsApproved: Boolean
+  $itemsPending: Boolean
+) {
+  addOrUpdateTasklistColumnPerference(
+    projectId: $projectId
+    taskId: $taskId
+    status: $status
+    important: $important
+    invoiced: $invoiced
+    title: $title
+    requester: $requester
+    company: $company
+    assignedTo: $assignedTo
+    createdAtV: $createdAtV
+    deadline: $deadline
+    project: $project
+    milestone: $milestone
+    taskType: $taskType
+    overtime: $overtime
+    pausal: $pausal
+    tags: $tags
+    subtasksApproved: $subtasksApproved
+    subtasksPending: $subtasksPending
+    tripsApproved: $tripsApproved
+    tripsPending: $tripsPending
+    materialsApproved: $materialsApproved
+    materialsPending: $materialsPending
+    itemsApproved: $itemsApproved
+    itemsPending: $itemsPending
+  ){
+    ${tasklistPreferenceBody}
   }
 }
 `;

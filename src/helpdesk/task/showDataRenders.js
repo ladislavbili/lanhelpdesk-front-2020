@@ -91,45 +91,46 @@ export const displayFooter = ( tasks ) => {
       itemsPending: 0,
     }
   }
-  tasks.forEach( ( task ) => {
-    const index = statistics.findIndex( ( data ) => data.status.id === task.status.id )
-    totals.taskCounter++;
-    totals.metadata.subtasksApproved += task.metadata.subtasksApproved;
-    totals.metadata.subtasksPending += task.metadata.subtasksPending;
-    totals.metadata.tripsApproved += task.metadata.tripsApproved;
-    totals.metadata.tripsPending += task.metadata.tripsPending;
-    totals.metadata.materialsApproved += task.metadata.materialsApproved;
-    totals.metadata.materialsPending += task.metadata.materialsPending;
-    totals.metadata.itemsApproved += task.metadata.itemsApproved;
-    totals.metadata.itemsPending += task.metadata.itemsPending;
-    if ( index !== -1 ) {
-      statistics[ index ].taskCounter++;
-      statistics[ index ].metadata.subtasksApproved += task.metadata.subtasksApproved;
-      statistics[ index ].metadata.subtasksPending += task.metadata.subtasksPending;
-      statistics[ index ].metadata.tripsApproved += task.metadata.tripsApproved;
-      statistics[ index ].metadata.tripsPending += task.metadata.tripsPending;
-      statistics[ index ].metadata.materialsApproved += task.metadata.materialsApproved;
-      statistics[ index ].metadata.materialsPending += task.metadata.materialsPending;
-      statistics[ index ].metadata.itemsApproved += task.metadata.itemsApproved;
-      statistics[ index ].metadata.itemsPending += task.metadata.itemsPending;
+  tasks.filter( ( task ) => task.status )
+    .forEach( ( task ) => {
+      const index = statistics.findIndex( ( data ) => data.status.id === task.status.id )
+      totals.taskCounter++;
+      totals.metadata.subtasksApproved += task.metadata.subtasksApproved;
+      totals.metadata.subtasksPending += task.metadata.subtasksPending;
+      totals.metadata.tripsApproved += task.metadata.tripsApproved;
+      totals.metadata.tripsPending += task.metadata.tripsPending;
+      totals.metadata.materialsApproved += task.metadata.materialsApproved;
+      totals.metadata.materialsPending += task.metadata.materialsPending;
+      totals.metadata.itemsApproved += task.metadata.itemsApproved;
+      totals.metadata.itemsPending += task.metadata.itemsPending;
+      if ( index !== -1 ) {
+        statistics[ index ].taskCounter++;
+        statistics[ index ].metadata.subtasksApproved += task.metadata.subtasksApproved;
+        statistics[ index ].metadata.subtasksPending += task.metadata.subtasksPending;
+        statistics[ index ].metadata.tripsApproved += task.metadata.tripsApproved;
+        statistics[ index ].metadata.tripsPending += task.metadata.tripsPending;
+        statistics[ index ].metadata.materialsApproved += task.metadata.materialsApproved;
+        statistics[ index ].metadata.materialsPending += task.metadata.materialsPending;
+        statistics[ index ].metadata.itemsApproved += task.metadata.itemsApproved;
+        statistics[ index ].metadata.itemsPending += task.metadata.itemsPending;
 
-    } else {
-      statistics.push( {
-        status: task.status,
-        taskCounter: 1,
-        metadata: {
-          subtasksApproved: task.metadata.subtasksApproved,
-          subtasksPending: task.metadata.subtasksPending,
-          tripsApproved: task.metadata.tripsApproved,
-          tripsPending: task.metadata.tripsPending,
-          materialsApproved: task.metadata.materialsApproved,
-          materialsPending: task.metadata.materialsPending,
-          itemsApproved: task.metadata.itemsApproved,
-          itemsPending: task.metadata.itemsPending,
-        }
-      } )
-    }
-  } )
+      } else {
+        statistics.push( {
+          status: task.status,
+          taskCounter: 1,
+          metadata: {
+            subtasksApproved: task.metadata.subtasksApproved,
+            subtasksPending: task.metadata.subtasksPending,
+            tripsApproved: task.metadata.tripsApproved,
+            tripsPending: task.metadata.tripsPending,
+            materialsApproved: task.metadata.materialsApproved,
+            materialsPending: task.metadata.materialsPending,
+            itemsApproved: task.metadata.itemsApproved,
+            itemsPending: task.metadata.itemsPending,
+          }
+        } )
+      }
+    } )
   return (
     <table className="table m-t-20">
           <thead>
