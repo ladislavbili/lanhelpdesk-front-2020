@@ -1,5 +1,4 @@
 import React from 'react';
-import TimeAgo from 'react-timeago';
 import ShowData from 'components/showData';
 import NoteContainer from './NoteContainer';
 import NoteEmpty from './noteEmpty';

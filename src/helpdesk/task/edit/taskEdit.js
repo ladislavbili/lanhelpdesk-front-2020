@@ -191,7 +191,7 @@ export default function TaskEdit( props ) {
     setDeadline( task.deadline ? moment( parseInt( task.deadline ) ) : null );
     setDescription( task.description );
     setImportant( task.important );
-    const project = projects.find( ( project ) => project.id === task.project.id );
+    const project = task.project === null ? null : projects.find( ( project ) => project.id === task.project.id );
     const milestone = project && task.milestone ? toSelArr( project.project.milestones )
       .find( ( milestone ) => milestone.id === task.milestone.id ) : undefined;
     setOvertime( ( task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );

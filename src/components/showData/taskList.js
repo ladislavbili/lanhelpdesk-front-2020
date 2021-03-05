@@ -154,7 +154,6 @@ export default function List( props ) {
                   return (
                     <th
                       style={(display.value === "createdAt" || display.value === "deadline" ? {textAlign: "right"} : {})}
-                      colSpan={((index===0 || index ===1 || filteredDisplayValues[index-1].type!=='important') )?'1':'2'}
                       key={display.value}
                       width={display.value === 'title' ? "30%" : ((display.value === "id" || display.value === "status") ? "50px" : '')}>
                       {display.label}
@@ -167,8 +166,7 @@ export default function List( props ) {
 
           <tbody>
             <tr>
-              {
-                filteredDisplayValues.map((display,index)=>{
+              { filteredDisplayValues.map((display,index)=>{
                   if(display.type==='important' || display.type==='invoiced'){
                     return null;
                   }else if (display.type === 'checkbox'){

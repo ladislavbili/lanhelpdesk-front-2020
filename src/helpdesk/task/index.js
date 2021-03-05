@@ -32,6 +32,10 @@ import {
   allMilestones
 } from 'configs/constants/sidebar';
 
+import {
+  defaultTasklistColumnPreference
+} from 'configs/constants/tasks';
+
 import RowTaskAdd from './add/row';
 
 import {
@@ -47,6 +51,8 @@ import {
   DELETE_TASK,
   GET_MY_DATA,
   GET_CALENDAR_EVENTS,
+  GET_TASKLIST_COLUMNS_PREFERENCES,
+  ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES
 } from './queries';
 
 import {
@@ -121,6 +127,16 @@ export default function TasksIndex( props ) {
   } );
 
   const {
+    data: preferencesData,
+    loading: preferencesLoading,
+    refetch: preferencesRefetch
+  } = useQuery( GET_TASKLIST_COLUMNS_PREFERENCES, {
+    variables: {
+      projectId: localProject.id
+    },
+  } );
+
+  const {
     data: tasksData,
     loading: tasksLoading,
     refetch: tasksRefetch,
@@ -139,6 +155,7 @@ export default function TasksIndex( props ) {
   } ] = useMutation( DELETE_TASK );
   const [ setUserStatuses ] = useMutation( SET_USER_STATUSES );
   const [ setTasklistLayout ] = useMutation( SET_TASKLIST_LAYOUT );
+  const [ addOrUpdatePreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES );
 
   const dataLoading = (
     currentUserLoading ||
@@ -147,8 +164,10 @@ export default function TasksIndex( props ) {
     milestoneLoading ||
     tasksLoading ||
     tasksSortLoading ||
-    calendarEventsLoading
+    calendarEventsLoading ||
+    preferencesLoading
   );
+
   //sync
   React.useEffect( () => {
     tasksRefetch( {
@@ -168,23 +187,6 @@ export default function TasksIndex( props ) {
 
   //state
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
-  const [ visibility, setVisibility ] = React.useState( {
-    id: true,
-    status: true,
-    important: true,
-    invoiced: true,
-    title: true,
-    requester: true,
-    company: true,
-    assignedTo: true,
-    createdAt: true,
-    deadline: true,
-    project: true,
-    milestone: true,
-    taskType: true,
-    overtime: true,
-    pausal: true,
-  } );
 
   if ( dataLoading ) {
     return ( <Loading /> );
@@ -423,6 +425,9 @@ export default function TasksIndex( props ) {
     } ) )
   }
 
+  const preference = ( preferencesData && preferencesData.tasklistColumnPreference ) ? preferencesData.tasklistColumnPreference : defaultTasklistColumnPreference;
+
+
   return (
       <ShowData
       data={processTasks(filterTasks(tasks))}
@@ -442,15 +447,15 @@ export default function TasksIndex( props ) {
       filterName="help-tasks"
       displayValues={[
         {value:'checked', label: '', type:'checkbox', show: true },
-        {value:'id',label:'ID',type:'int', show: visibility['id'] },
-        {value:'status',label:'Status',type:'object', show: visibility['status'] },
-        {value:'important',label:'Important',type:'important', show: visibility['important'] },
-        {value:'invoiced',label:'Invoiced',type:'invoiced', show: visibility['invoiced'] },
-        {value:'title',label:'Title',type:'text', show: visibility['title'] },
-        {value:'project',label:'Project',type:'object', show: visibility['project'] },
-        {value:'milestone',label:'Milestone',type:'object', show: visibility['milestone'] },
-        {value:'requester',label:'Requester',type:'user', show: visibility['requester'] },
-        {value:'company',label:'Company',type:'object', show: visibility['company'] },
+        {value:'id',label:'ID',type:'int', show: preference['taskId'], visKey: 'taskId' },
+        {value:'status',label:'Status',type:'object', show: preference['status'] },
+        {value:'important',label:'Important',type:'important', show: preference['important'] },
+        {value:'invoiced',label:'Invoiced',type:'invoiced', show: preference['invoiced'] },
+        {value:'title',label:'Title',type:'text', show: preference['title'] },
+        {value:'project',label:'Project',type:'object', show: preference['project'] },
+        {value:'milestone',label:'Milestone',type:'object', show: preference['milestone'] },
+        {value:'requester',label:'Requester',type:'user', show: preference['requester'] },
+        {value:'company',label:'Company',type:'object', show: preference['company'] },
         {
           value:'assignedTo',
           label:'Assigned',
@@ -460,15 +465,71 @@ export default function TasksIndex( props ) {
               { items.map((item)=><div key={item.id}>{item.fullName}</div>) }
             </div>
           ),
-          show: visibility['assignedTo']
+          show: preference['assignedTo']
         },
-        {value:'taskType',label:'Task Type',type:'object', show: visibility['taskType'] },
-        {value:'createdAt',label:'Created at',type:'date', show: visibility['createdAt'] },
-        {value:'deadline',label:'Deadline',type:'date', show: visibility['deadline'] },
-        {value:'pausal',label:'Pausal',type:'boolean', show: visibility['pausal'] },
-        {value:'overtime',label:'Overtime',type:'boolean', show: visibility['overtime'] },
+        {
+          value:'tags',
+          label:'Tags',
+          type:'list',
+          func: (items) => (
+            <div>
+              { items.map((item)=>(
+                <div style={{ background: item.color, color: 'white', borderRadius: 3 }} className="m-r-5 m-t-5 p-l-5 p-r-5">
+                  {item.title}
+                </div>
+              ) ) }
+            </div>
+          ),
+          show: preference['tags']
+        },
+        {value:'taskType',label:'Task Type',type:'object', show: preference['taskType'] },
+        {value:'createdAt',label:'Created at',type:'date', show: preference['createdAtV'], visKey: 'createdAtV' },
+        {value:'deadline',label:'Deadline',type:'date', show: preference['deadline'] },
+        {value:'pausal',label:'Pausal',type:'boolean', show: preference['pausal'] },
+        {value:'overtime',label:'Overtime',type:'boolean', show: preference['overtime'] },
+        {value:'subtasksApproved',label:'Schvalené hodiny',type:'attribute', obj:'metadata', show: preference['subtasksApproved'] },
+        {value:'subtasksPending',label:'Neschvalené hodiny',type:'attribute', obj:'metadata', show: preference['subtasksPending'] },
+        {value:'tripsApproved',label:'Schvalené výjazdy',type:'attribute', obj:'metadata', show: preference['tripsApproved'] },
+        {value:'tripsPending',label:'Neschválené výjazdy',type:'attribute', obj:'metadata', show: preference['tripsPending'] },
+        {value:'materialsApproved',label:'Schvalený materiál',type:'attribute', obj:'metadata', show: preference['materialsApproved'] },
+        {value:'materialsPending',label:'Neschvalený materiál',type:'attribute', obj:'metadata', show: preference['materialsPending'] },
+        {value:'itemsApproved',label:'Schvalené položky',type:'attribute', obj:'metadata', show: preference['itemsApproved'] },
+        {value:'itemsPending',label:'Neschválené položky',type:'attribute', obj:'metadata', show: preference['itemsPending'] },
       ]}
-      setVisibility={setVisibility}
+      setVisibility={(visibility) => {
+        addOrUpdatePreferences({
+          variables: {
+            ...visibility,
+            projectId: localProject.id,
+          }
+        }).then((response) => {
+
+          const preference = client.readQuery( {
+            query: GET_TASKLIST_COLUMNS_PREFERENCES,
+            variables: {
+              projectId: localProject.id
+            },
+          } )
+          .tasklistColumnPreference;
+          let newPreference = preference ? preference : {};
+          console.log( preference );
+          newPreference = {
+            ...newPreference,
+            ...response.data.addOrUpdateTasklistColumnPerference
+          }
+          client.writeQuery( {
+            query: GET_TASKLIST_COLUMNS_PREFERENCES,
+            variables: {
+              projectId: localProject.id
+            },
+            data: {
+              tasklistColumnPreference: newPreference
+            }
+          } );
+        } ).catch((error) => {
+          console.log(error);
+        })
+      }}
       orderByValues={[
         {value:'id',label:'ID',type:'int'},
         {value:'status',label:'Status',type:'object'},
