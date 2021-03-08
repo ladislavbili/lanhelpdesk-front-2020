@@ -239,6 +239,9 @@ html{
 .w-95{
   width: 95%;
 }
+.w-100{
+  width: 100%;
+}
 .w-20px{
   width: 20px;
 }
@@ -509,6 +512,14 @@ h4{
   text-align: left;
 }
 
+.v-a-m{
+  vertical-align: middle;
+}
+
+.v-a-b{
+  vertical-align: baseline !important;
+}
+
 .a-i-c{
   align-items: center;
 }
@@ -581,6 +592,10 @@ h4{
   border: $main-border !important;
 }
 
+.secondary-border{
+  border: $secondary-border !important;
+}
+
 .basic-border-top{
   border-top: $main-border;
 }
@@ -647,6 +662,7 @@ h4{
 
 .btn-link-cancel, .btn-link-cancel:hover, .btn-link-cancel:active, .btn-link-cancel:focus, .btn-link-cancel:focus:active, .btn-link-cancel:disabled {
   background-color: inherit;
+  font: $font-value;
   padding-left: 0px;
   color: #A6A6A6;
   text-decoration: none;
@@ -990,6 +1006,7 @@ td {
   box-shadow: none;
   height: 30px; //calc(1.5em + .75rem + 4px);
   border: $main-border;
+  outline: none;
 }
 
 .form-control-secondary{
@@ -999,6 +1016,7 @@ td {
   box-shadow: none;
   height: 30px; //calc(1.5em + .75rem + 4px);
   border: $secondary-border;
+  outline: none;
 }
 
 .form-control:disabled{
@@ -1008,7 +1026,7 @@ td {
 }
 
 
-.form-control:focus{
+.form-control:focus, .form-control-secondary:focus{
   box-shadow: none;
   border-width: 1px;
   border-color: $basic-button-color;
@@ -1843,6 +1861,18 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     border: none;
   }
 
+  .table>tbody>tr{
+    border-bottom: 1px solid rgba(0,0,0,0.1)
+  }
+
+  .table>tbody>tr:last-child, .table>tbody>tr:first-child{
+    border-bottom: none;
+  }
+
+  .statistics>.table>tbody>tr{
+    border-bottom: none;
+  }
+
   .table>thead>tr>th{
     border: none;
     //border-color: #F9F9F9 !important;
@@ -1898,6 +1928,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     font-size: 12px;
     color: #767676 !important;
     border: none;
+    vertical-align: middle;
   }
 
   .table>tbody>tr>td.title{
@@ -2117,16 +2148,31 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   margin-bottom: 0px !important;
 }
 
+.vykazyTableNav{
+  font-family: $main-font-color;
+  height: 28px;
+  font-size: 14px;
+}
+
+.vykazyTableNav.active{
+  font-family: Segoe UI Semibold;
+  height: 208x !important;
+  color: #333 !important;
+  font-weight: 600;
+  border-bottom: 1px solid $basic-button-color !important;
+  background-color: transparent !important;
+}
+
 .vykazyTable>.table>thead{
   width: 100%;
 }
 .vykazyTable>.table>thead>tr>th{
   padding-left: 8px;
   padding-right: 8px;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .vykazyTable>.table>thead>tr>th:first-child{
-  padding-bottom: 0px;
   padding-left: 0px;
 }
 
@@ -2253,6 +2299,19 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   margin-bottom: 0px;
 }
 
+.statusChangeModal{
+  .modal-content{
+    padding: 20px;
+    h1{
+      margin-bottom: 20px;
+    }
+    .react-datepicker-wrapper, .form-control{
+      width: 100%;
+    }
+  }
+}
+
+
 .attachments{
   background-color: inherit;
   padding: 5px 20px 20px 0px;
@@ -2360,6 +2419,22 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
   .react-datepicker-popper{
     z-index: 9999;
+  }
+}
+
+.scheduled{
+  width: 320px;
+  background-color: #eaeaea;
+  .popover-header{
+    padding: 10px 15px;
+    font-size: 1.5em;
+    background-color: transparent;
+  }
+  .popover-body{
+    padding: 10px 15px;
+  }
+  .react-datepicker-wrapper{
+    width: 100%;
   }
 }
 
@@ -2711,25 +2786,33 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .lanwiki-content{
-  .col-lg-4{
-    .commandbar{
-      padding-left: $list-odsadenie;
+  .commandbar {
+    background-color: #deeaf3;
+    padding-left: $list-odsadenie;
+    .search-row{
+      width: 100%;
+      padding-right: calc(#{$list-odsadenie} + 15px);
     }
   }
+
   li{
     list-style-type: none;
   }
   .lanwiki-list{
+    background-color: white;
     li{
       margin: 10px $list-odsadenie;
       padding-bottom: 10px;
-      border-bottom: $main-border;
+      border-bottom: $secondary-border;
       .pull-right{
         font: $font-info-text;
         color: #767676;
       }
       .lanwiki-tags{
         font: $font-info-text;
+      }
+      .list-title{
+        font: $font-info-text-bold;
       }
     }
   }
@@ -2755,10 +2838,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
       }
     }
     .lanwiki-title{
-      background-color: white;
-      border: $main-border;
+      border-bottom: $secondary-border;
       h1{
-        margin-left: $input-padding;
+        margin-left: 0px;
+        margin-bottom: 5px;
       }
     }
   }

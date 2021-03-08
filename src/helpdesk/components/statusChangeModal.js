@@ -70,44 +70,44 @@ export default function StatusChangeModal( props ) {
 
 
   return (
-    <div>
-      <Modal isOpen={open}>
+    <Modal isOpen={open} className="statusChangeModal small-modal">
         <ModalBody>
+          <h1>Change status</h1>
           <div className="row" >
-            <div className="row">
+            <div className="w-50 p-r-10">
               <Label className="center-hor">
                 New status
               </Label>
               <Select
                 placeholder="Status required"
-                className="m-l-5 minimal-select"
+                className=""
                 value={status}
                 styles={selectStyleNoArrowColoredRequired}
                 onChange={ changeStatus }
                 options={(statuses).filter((status)=>status.action!=='Invoiced')}
                 />
             </div>
-            <div className="ml-auto">
+            <div className="w-50">
               <Label className="center-hor">
-                {getDateType()}:
+                {getDateType()}
               </Label>
-              <DatePicker
-                className="form-control hidden-input bolder"
-                selected={date}
-                disabled={ !status || !['CloseDate', 'Invalid', 'PendingDate'].includes(status.action) }
-                onChange={setDate}
-                placeholderText={`No ${getDateType().toLowerCase()}`}
-                />
+                <DatePicker
+                  className="form-control bkg-white"
+                  selected={date}
+                  disabled={ !status || !['CloseDate', 'Invalid', 'PendingDate'].includes(status.action) }
+                  onChange={setDate}
+                  placeholderText={`No ${getDateType().toLowerCase()}`}
+                  />
             </div>
           </div>
-            <FormGroup className="m-t-20">
+            <FormGroup className="m-t-10">
               <Label>
-                Comment change:
+                Comment change
               </Label>
               <Input type="textarea" disabled={!userRights.addComments} placeholder="Enter comment" rows="4" value={comment} onChange={(e)=>setComment(e.target.value)}/>
             </FormGroup>
 
-          <div className="row">
+          <div className="row m-t-30">
             <button className="btn-link-cancel" onClick={closeModal}>
               Close
             </button>
@@ -122,6 +122,5 @@ export default function StatusChangeModal( props ) {
           </div>
         </ModalBody>
       </Modal>
-    </div>
   );
 }

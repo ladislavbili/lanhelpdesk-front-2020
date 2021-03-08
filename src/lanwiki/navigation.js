@@ -1,11 +1,5 @@
 import React from 'react';
 import {
-  useQuery,
-  useMutation,
-  gql,
-  useApolloClient,
-} from "@apollo/client";
-import {
   Route,
   Switch
 } from 'react-router-dom';
@@ -17,10 +11,6 @@ import SelectPage from '../components/SelectPage';
 import ListNotes from './Notes';
 import TagAdd from './Tags/TagAdd';
 import TagEdit from './Tags/TagEdit';
-
-import {
-  layout
-} from './constants';
 
 export default function Navigation( props ) {
 

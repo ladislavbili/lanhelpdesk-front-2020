@@ -1585,7 +1585,7 @@ export default function TaskEdit( props ) {
       <Empty>
       { userRights.tagsRead && userRights.tagsWrite &&
         <div className="row mb-auto">
-          <button className="btn-link m-b-10 h-20px" onClick={ () => setTagsOpen(true) } >
+          <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
             <i className="fa fa-plus" />Tags
             </button>
             <MultiSelect

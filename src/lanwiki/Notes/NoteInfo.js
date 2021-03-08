@@ -28,7 +28,9 @@ export default function NoteInfo( props ) {
   return (
     <div className={"lanwiki-note scrollable fit-with-header-and-commandbar"} >
 
-      <h1>{`${note.id}: ${note.title}`}</h1>
+      <div className="lanwiki-title">
+        <h1>{`${note.id}: ${note.title}`}</h1>
+      </div>
 
       <hr/>
 

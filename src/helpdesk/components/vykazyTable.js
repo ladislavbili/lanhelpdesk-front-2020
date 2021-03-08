@@ -241,55 +241,32 @@ export default function Rozpocet( props ) {
       <table className="table form-section-rest">
         <thead>
           <tr>
-            <th colSpan={showColumns.includes(0) ? 3 : 2}>
-              <Nav tabs className="b-0 m-0">
-                { showSubtasks && userRights.taskShortSubtasksRead &&
-                  <NavItem>
-                    <NavLink
-                      className={classnames({ active: toggleTab === '0'}, "clickable", "")}
-                      onClick={() => setToggleTab('0')}
-                      >
-                      Subtasks
-                    </NavLink>
-                  </NavItem>
-                }
-                { !showSubtasks && userRights.vykazRead &&
-                  <NavItem>
-                    <NavLink
-                      className={classnames({ active: toggleTab === '1'}, "clickable", "")}
-                      onClick={() => setToggleTab('1')}
-                      >
-                      Výkaz
-                    </NavLink>
-                  </NavItem>
-                }
-                { !showSubtasks &&
-                  <NavItem>
-                    <NavLink>
-                      |
-                    </NavLink>
-                  </NavItem>
-                }
-                { !showSubtasks && userRights.rozpocetRead &&
-                  <NavItem>
-                    <NavLink
-                      className={classnames({ active: toggleTab === '2' }, "clickable", "")}
-                      onClick={() => setToggleTab('2')}
-                      >
-                      Rozpočet
-                    </NavLink>
-                  </NavItem>
-                }
-              </Nav>
+            <th
+              width='4%'
+              onClick={() => setToggleTab('1')}
+              className={classnames("clickable vykazyTableNav", {active: toggleTab === '1'})}
+              >
+              Výkaz
             </th>
+            <th width='1'>|</th>
+            <th
+              width='7%'
+              onClick={() => setToggleTab('2')}
+              className={classnames("clickable vykazyTableNav" , {active: toggleTab === '2'})}
+              >
+              Rozpočet
+            </th>
+            <th width='10%'></th>
+            <th width=''></th>
+
             {false && showColumns.includes(3) && toggleTab !== "0" && <th width="190">Typ</th> }
-            {showColumns.includes(2) && toggleTab !== "0" && <th width="190">Rieši</th> }
-            {!autoApproved && <th width="190">Approved</th> }
-            {showColumns.includes(4) && <th width="50" className="t-a-r">Mn.</th> }
-            {showColumns.includes(5) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Cenník/Nákup</th> }
-            {showColumns.includes(6) && toggleTab === "2" && <th width="70" className="table-highlight-background t-a-r">Zľava/Marža</th> }
-            {showColumns.includes(7) && toggleTab !== "0" && <th width="70" className="t-a-r">Cena</th> }
-            {showColumns.includes(8) && !isInvoiced && <th width="120" className="t-a-c">Akcie</th> }
+            {showColumns.includes(2) && toggleTab !== "0" && <th width="15%">Rieši</th> }
+            {!autoApproved && <th width="15%">Approved</th> }
+            {showColumns.includes(4) && <th width="5%" className="t-a-r">Mn.</th> }
+            {showColumns.includes(5) && toggleTab === "2" && <th width="8%" className="table-highlight-background t-a-r">Cenník/Nákup</th> }
+            {showColumns.includes(6) && toggleTab === "2" && <th width="8%" className="table-highlight-background t-a-r">Zľava/Marža</th> }
+            {showColumns.includes(7) && toggleTab !== "0" && <th width="8%" className="t-a-r">Cena</th> }
+            {showColumns.includes(8) && !isInvoiced && <th width="8%" className="t-a-c">Akcie</th> }
           </tr>
         </thead>
         <tbody>
@@ -298,7 +275,7 @@ export default function Rozpocet( props ) {
             <tr key={subtask.id}>
               {/*Checkbox done*/}
               {showColumns.includes(0) &&
-                <td width="10">
+                <td width="10" colSpan={2}>
                   <Checkbox
                     className="m-t-5"
                     disabled= { disabled || isInvoiced }
@@ -311,7 +288,7 @@ export default function Rozpocet( props ) {
               }
               {/*Type*/}
               {showColumns.includes(3) && toggleTab !== "0" &&
-                <td>
+                <td colSpan={2}>
                   <Select
                     isDisabled={disabled}
                     value={ !isInvoiced ? subtask.type : subtask.invoicedData.type }
@@ -325,7 +302,7 @@ export default function Rozpocet( props ) {
               }
               {/*Name*/}
               {showColumns.includes(1) &&
-                <td className="">
+                <td className="" colSpan={1}>
                   <input
                     disabled={disabled}
                     className="form-control hidden-input"
@@ -1715,7 +1692,7 @@ export default function Rozpocet( props ) {
                   setShowAddMaterial(true);
                 }}
                 >
-                <i className="fa fa-plus btn-distance" />
+                <i className="fa fa-plus" />
                 Materiál
               </button>
             }

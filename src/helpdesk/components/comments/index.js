@@ -132,7 +132,7 @@ export default function Comments( props ) {
         }
         {isEmail && <FormGroup className="row m-b-10">
           <Label className="m-r-10 center-hor" style={{width:50}}>Subject:</Label>
-          <Input className="flex" type="text" placeholder="Enter subject" value={subject} onChange={(e)=>setSubject(e.target.value)}/>
+          <Input className="form-control-secondary flex" type="text" placeholder="Enter subject" value={subject} onChange={(e)=>setSubject(e.target.value)}/>
         </FormGroup>}
         {isEmail &&
           <FormGroup>
@@ -228,11 +228,12 @@ export default function Comments( props ) {
             }
 
             <div className='center-hor'>
-              <label
-                className="btn"
-                htmlFor="uploadCommentAttachments">
-                <i className="fa fa-plus" /> Attachement
-              </label>
+              <button
+                className="btn-link v-a-m"
+                htmlFor="uploadCommentAttachments"
+                >
+                  <i className="fa fa-plus" /> Attachement
+                </button>
               <input type="file" id="uploadCommentAttachments" multiple={true} style={{display:'none'}}
                 onChange={(e)=>{
                   if(e.target.files.length>0){

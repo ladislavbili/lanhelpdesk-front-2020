@@ -115,7 +115,7 @@ export default function Sidebar( props ) {
 
       </Nav>
 
-      <hr className='m-t-10 m-b-10'/>
+      <hr className='m-t-10 m-b-5 m-l-15 m-r-15'/>
 
       <button
         className="btn sidebar-btn"
@@ -131,7 +131,7 @@ export default function Sidebar( props ) {
 
       <div className='p-l-15 p-r-15'>
 
-        <NavItem className="row full-width">
+        <NavItem className="row full-width p-l-10">
           <Button
             className='btn btn-link'
             onClick={ () => history.push(`/lanwiki/tag-add`) }
@@ -145,7 +145,7 @@ export default function Sidebar( props ) {
           match.params.listID &&
           match.params.listID !== 'all' &&
 
-          <NavItem className="row full-width">
+          <NavItem className="row full-width p-l-10">
             <Button
               className='btn btn-link'
               onClick={ () => history.push(`/lanwiki/tag-edit/${match.params.listID}`) }

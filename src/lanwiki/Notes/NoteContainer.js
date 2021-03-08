@@ -36,16 +36,16 @@ export default function NoteContainer( props ) {
 
   return (
     <div>
-      <div className="commandbar">
+      <div className="commandbar p-l-30">
         {
           !editFormOpen &&
-          <button type="button" className="btn btn-link center-hor" onClick={() => setEditFormOpen(true)}>
+          <button type="button" className="btn-link center-hor btn-distance" onClick={() => setEditFormOpen(true)}>
             Edit
           </button>
         }
         {
           !editFormOpen &&
-          <button type="button" className="btn btn-link center-hor" onClick={remove}>
+          <button type="button" className="btn-link center-hor" onClick={remove}>
             Delete
           </button>
         }

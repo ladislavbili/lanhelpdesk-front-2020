@@ -30,7 +30,7 @@ export default function List( props ) {
 
   return (
     <div className="lanwiki-content row">
-          <div className="col-lg-4">
+          <div className="col-lg-3">
             <div className="commandbar">
               <div className="search-row">
                 <div className="search">
@@ -56,7 +56,7 @@ export default function List( props ) {
                             {`Updated: 09.02.2021`}
             							</span>
             						</p>
-            						<p>
+            						<p className="list-title">
                           {note.title}
             						</p>
             					</div>
@@ -67,7 +67,7 @@ export default function List( props ) {
                   ))}
             </div>
           </div>
-          <div className="col-lg-8">
+          <div className="col-lg-9">
             {
               match.params.listID && notes.some((item)=>item.id===parseInt(match.params.listID)) && <NoteContainer {...{history, match}} />
             }

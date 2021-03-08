@@ -122,8 +122,8 @@ export default function Comments( props ) {
 
       <div className="row m-b-30">
 
-        <Button
-          className="btn waves-effect center-hor m-t-0"
+        <button
+          className="btn center-hor m-t-0 btn-distance"
           disabled={(!isEmail && newComment==='')||
             (isEmail&&(tos.length < 1 ||subject===''||emailBody===''))||saving}
             onClick={() => {
@@ -158,10 +158,10 @@ export default function Comments( props ) {
               setTos( [] );
             }}>
             Submit
-          </Button>
+          </button>
 
           <Checkbox
-            className = "m-r-15 center-hor "
+            className = "center-hor btn-distance"
             centerHor
             label = "E-mail"
             value = { isEmail }
@@ -179,11 +179,11 @@ export default function Comments( props ) {
           }
 
           <div className='center-hor'>
-            <label
-              className="btn"
+            <button
+              className="btn-link"
               htmlFor="uploadCommentAttachments">
-              Add Attachement
-            </label>
+              <i className="fa fa-plus" /> Attachement
+            </button>
             <input type="file" id="uploadCommentAttachments" multiple={true} style={{display:'none'}}
               onChange={(e)=>{
                 if(e.target.files.length>0){

@@ -263,7 +263,7 @@ export default function List( props ) {
         </table>
 
         <div className="row m-b-10 m-r-30">
-          <div className="message success-message ml-auto">Loaded 50/242 tasks</div>
+          <div className="message ml-auto m-t-1">Loaded tasks 50/242</div>
           <button className="btn-link m-r-5">
             Load all tasks |
           </button>

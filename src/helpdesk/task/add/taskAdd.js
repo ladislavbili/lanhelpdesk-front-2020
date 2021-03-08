@@ -896,7 +896,7 @@ export default function TaskAdd( props ) {
       <Empty>
         { userRights.tagsRead && userRights.tagsWrite &&
           <div className="row center-hor">
-            <button className="btn-link p-b-10" onClick={ () => setTagsOpen(true) } >
+            <button className="btn-link p-b-10 btn-distance" onClick={ () => setTagsOpen(true) } >
               <i className="fa fa-plus" />
               Tags {project.def.tag.required && <span className="warning-big">*</span>}
             </button>

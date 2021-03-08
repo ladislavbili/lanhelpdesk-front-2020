@@ -104,6 +104,22 @@ export default function PageHeader( props ) {
               LanWiki
             </Link>
           }
+          {
+            accessRights.testSections &&
+            <Link
+              to={{ pathname: `/cmdb` }}
+              className={
+                "header-link" +
+                (
+                  URL.includes("cmdb") ?
+                  " header-link-active" :
+                  ""
+                )
+              }
+              >
+              CMDB
+            </Link>
+          }
         </div>
         <div className="ml-auto center-hor row">
           <div className=" header-icon center-hor clickable" onClick={() => setModalUserProfileOpen(true)}>

@@ -86,13 +86,13 @@ export default function NoteEdit( props ) {
 
   return (
     <div className={"lanwiki-note scrollable fit-with-header-and-commandbar"} >
-      <div className="row lanwiki-title">
-        <h1 className="center-hor">{note.id}:</h1>
-        <span className="center-hor flex m-l-5">
+      <div className="row lanwiki-title ">
+        <h1 className="center-hor p-l-0 m-b-5">{note.id}:</h1>
+        <span className="center-hor flex m-l-5 m-b-5">
           <input
             type="text"
             value={name}
-            className="task-title-input hidden-input flex"
+            className="task-title-input hidden-input flex form-control"
             onChange={ (e) =>  setName(e.target.value) }
             placeholder="Enter task name"
             />

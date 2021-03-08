@@ -1,9 +1,9 @@
 import React from 'react';
 import Checkbox from 'components/checkbox';
 import {
-  Modal,
-  ModalBody,
-  ModalHeader,
+  Popover,
+  PopoverHeader,
+  PopoverBody,
   FormGroup,
   Label
 } from 'reactstrap';
@@ -42,6 +42,7 @@ export default function Scheduled( props ) {
         <Label className={classnames({"m-l-0 m-t-5 m-r-10": layout === 1})} >Scheduled</Label>
         <button
           className={classnames("btn-link m-r-0 h-f-c", {"ml-auto": layout === 2}, {"center-hor": layout === 1})}
+          id="scheduledPopover"
           disabled={disabled}
           onClick={()=>{
             setAddItem(true);
@@ -79,13 +80,14 @@ export default function Scheduled( props ) {
             </button>
           </div>
         ) }
-        <Modal isOpen={addItem}  >
-          <ModalHeader>Add scheduled</ModalHeader>
-          <ModalBody>
+
+        <Popover  className="scheduled" placement="top" style={{maxWidth: '350px !important', width: '350px !important'}} isOpen={addItem} target="scheduledPopover" toggle={() => {setAddItem(!addItem)}}>
+          <h2 className="center-hor p-r-20 p-l-20 p-t-20 p-b-10">Add scheduled</h2>
+          <PopoverBody>
             <FormGroup>
-              <Label style={{width:50}}>From</Label>
+              <Label className="w-100">From</Label>
               <DatePicker
-                className="form-control hidden-input"
+                className="form-control-secondary w-100"
                 selected={newFrom}
                 disabled={disabled}
                 onChange={date => {
@@ -98,9 +100,9 @@ export default function Scheduled( props ) {
                 />
             </FormGroup>
             <FormGroup>
-              <Label style={{width:50}}>To</Label>
+              <Label className="w-100">To</Label>
               <DatePicker
-                className="form-control hidden-input"
+                className="form-control-secondary w-100"
                 selected={newTo}
                 disabled={disabled}
                 onChange={date => {
@@ -152,8 +154,8 @@ export default function Scheduled( props ) {
                 Add
               </button>
             </div>
-          </ModalBody>
-        </Modal>
+          </PopoverBody>
+        </Popover>
       </div>
     </div>
   )

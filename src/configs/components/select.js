@@ -1086,11 +1086,16 @@ export const sidebarSelectStyle = {
   singleValue: ( provided, state ) => {
     return {
       ...provided,
-      marginLeft: 30,
+      marginLeft: 0,
+      marginRight: 0,
       color: "#212121",
       backgroundColor: "transparent",
     };
   },
+  valueContainer: base => ( {
+    ...base,
+    backgroundColor: "#f2f1f1"
+  } ),
   indicatorSeparator: ( provided, state ) => {
     return {
       ...provided,
@@ -1108,10 +1113,16 @@ export const sidebarSelectStyle = {
       padding: 0
     };
   },
+  option: ( styles ) => {
+    return {
+      ...styles,
+      backgroundColor: "cyan",
+    };
+  },
   input: ( provided, state ) => {
     return {
       ...provided,
-      marginLeft: 30
+      marginLeft: 30,
     };
   },
   placeholder: ( provided, state ) => {
@@ -1364,38 +1375,60 @@ export const invisibleSelectStyleBlueFont = {
 };
 
 export const selectStyle = {
-  control: base => ( {
+  control: ( base, state ) => ( {
     ...base,
     minHeight: 30,
     backgroundColor: 'white',
-    borderRadius: 0,
-    borderColor: "#c4c4c4 !important",
     border: "none",
+    borderRadius: 0,
+    border: "1px solid #c4c4c4",
   } ),
   dropdownIndicator: base => ( {
     ...base,
+    color: "transparent",
     padding: 4,
   } ),
   clearIndicator: base => ( {
     ...base,
     padding: 4,
   } ),
-  multiValue: base => ( {
+  multiValue: ( base, {
+    data
+  } ) => {
+    return {
+      ...base,
+      backgroundColor: data.color ? data.color : "#F2F1F1",
+      borderRadius: 0,
+    };
+  },
+  multiValueLabel: ( base, {
+    data
+  } ) => ( {
     ...base,
-    backgroundColor: 'white',
-    borderRadius: 0
+    color: data.color ? "white" : "black",
+  } ),
+  multiValueRemove: ( styles, {
+    data
+  } ) => ( {
+    ...styles,
+    color: data.color ? "white" : "black",
+    backgroundColor: data.color ? data.color : "#F2F1F1",
+    ':hover': {
+      backgroundColor: "rgba(0,0,0,0.5)",
+      color: 'white',
+    },
   } ),
   valueContainer: base => ( {
     ...base,
-    padding: '0px 6px',
+    padding: '0px 5px',
     borderRadius: 0,
-    ...value
+    ...value,
   } ),
   input: base => ( {
     ...base,
     margin: 0,
     padding: 0,
-    backgroundColor: 'inherit',
+    backgroundColor: "white",
     borderRadius: 0
   } ),
   indicatorSeparator: base => ( {
@@ -1404,14 +1437,12 @@ export const selectStyle = {
   } ),
   placeholder: base => ( {
     ...base,
-    ...noValue
+    ...noValueMandatory
   } ),
   menu: base => ( {
     ...base,
     zIndex: 50,
   } ),
-
-
 };
 
 export const selectStyleNoArrow = {

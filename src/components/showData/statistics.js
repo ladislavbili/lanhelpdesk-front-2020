@@ -99,7 +99,19 @@ export default function Statistics( props ) {
           </tr>
         </tbody>
 
-        <h2 className="m-l-8 m-t-5">Hodiny</h2>
+        <thead>
+          <tr>
+            <h2 className="m-l-8 m-t-5">Hodiny</h2>
+              { statistics.map((item) => (
+                <td key={item.status.id} className="v-a-b" style={{borderTop: "none"}}>
+                  hod.
+                </td>
+              ) ) }
+              <td className="v-a-b" style={{borderTop: "none"}}>
+                hod.
+              </td>
+          </tr>
+        </thead>
         <tbody>
           <tr>
             <td>
@@ -142,7 +154,19 @@ export default function Statistics( props ) {
           </tr>
         </tbody>
 
-        <h2 className="m-l-8 m-t-5">Výjazdy</h2>
+        <thead>
+          <tr>
+            <h2 className="m-l-8 m-t-5">Výjazdy</h2>
+              { statistics.map((item) => (
+                <td key={item.status.id} className="v-a-b" style={{borderTop: "none"}}>
+                  ks.
+                </td>
+              ) ) }
+              <td className="v-a-b" style={{borderTop: "none"}}>
+                ks.
+              </td>
+          </tr>
+        </thead>
         <tbody>
           <tr>
             <td>
@@ -185,7 +209,19 @@ export default function Statistics( props ) {
           </tr>
         </tbody>
 
-        <h2 className="m-l-8 m-t-5">Materiál</h2>
+        <thead>
+          <tr>
+            <h2 className="m-l-8 m-t-5">Materiál</h2>
+              { statistics.map((item) => (
+                <td key={item.status.id} className="v-a-b" style={{borderTop: "none"}}>
+                  ks.
+                </td>
+              ) ) }
+              <td className="v-a-b" style={{borderTop: "none"}}>
+                ks.
+              </td>
+          </tr>
+        </thead>
         <tbody>
           <tr>
             <td>
@@ -230,7 +266,19 @@ export default function Statistics( props ) {
           </tr>
         </tbody>
 
-        <h2 className="m-l-8 m-t-5">Voľné položky</h2>
+        <thead>
+          <tr>
+            <h2 className="m-l-8 m-t-5">Voľné položky</h2>
+              { statistics.map((item) => (
+                <td key={item.status.id} className="v-a-b" style={{borderTop: "none"}}>
+                  ks.
+                </td>
+              ) ) }
+              <td className="v-a-b" style={{borderTop: "none"}}>
+                ks.
+              </td>
+          </tr>
+        </thead>
         <tbody>
           <tr>
             <td>
