@@ -1381,7 +1381,7 @@ export const selectStyle = {
     backgroundColor: 'white',
     border: "none",
     borderRadius: 0,
-    border: "1px solid #c4c4c4",
+    border: "0px solid #c4c4c4",
   } ),
   dropdownIndicator: base => ( {
     ...base,

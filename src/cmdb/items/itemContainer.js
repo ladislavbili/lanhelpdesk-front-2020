@@ -1,51 +1,49 @@
-import React, { Component } from 'react';
+import React from 'react';
 import ItemEdit from './itemEdit';
 import ItemView from './itemView';
 
-export default class ItemContainer extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			edit:false,
-			saving:false,
-			delete:false
-		};
-	}
+export default function ItemContainer( props ) {
 
-	render() {
-		return (
-			<div className="form-background fit-with-header" style={{padding:0,border:'none'}}>
-				<div className="commandbar flex-row p-l-25">
-							{ !this.state.edit &&
-								<button type="button" className="center-hor btn btn-link-reversed waves-effect" onClick={()=>this.setState({edit:true})}>
+  const [ editFormOpen, setEditFormOpen ] = React.useState( false );
+  const [ saving, setSaving ] = React.useState( false );
+  const [ deleting, setDeleting ] = React.useState( false );
+
+  return (
+    <div className="fit-with-header">
+				<div className="commandbar flex-row">
+							{ !editFormOpen &&
+								<button type="button" className="center-hor btn-link btn-distance" onClick={() => setEditFormOpen(true)}>
 									<i
 										className="fas fa-pen commandbar-command-icon"
 										/>
-									{false && <img
-										className="commandbar-icon"
-										src={require('../../scss/icons/edit.svg')}
-										alt="Generic placeholder XX"
-										/>}
-									{" Edit"}
+									Edit
 								</button>
 							}
-							{ this.state.edit &&
-								<button type="button" className="center-hor btn btn-link-reversed waves-effect" onClick={()=>this.setState({edit:false})}>
+							{ editFormOpen &&
+								<button type="button" className="center-hor btn-link btn-distance" onClick={() => setEditFormOpen(false) }>
 									<i
 										className="fas fa-file-invoice commandbar-command-icon"
 										/>
-									{" View"}
+									View
 								</button>
 							}
-							{ this.state.edit &&
-								<button type="button" className="center-hor btn btn-link-reversed waves-effect" onClick={()=>this.setState({saving:true})} disabled={this.state.saving}>
+							{ !editFormOpen &&
+								<button type="button" className="center-hor btn-link btn-distance" onClick={()=>{}}>
+									<i
+										className="fas fa-print commandbar-command-icon"
+										/>
+									Print
+								</button>
+							}
+							{ editFormOpen &&
+								<button type="button" className="center-hor btn-link" onClick={()=>{}} disabled={saving}>
 									<i
 										className="fas fa-save commandbar-command-icon"
 										/>
-									{this.state.saving?" Saving...":" Save"}
+									{editFormOpen?" Saving...":" Save"}
 								</button>
 							}
-							<button type="button" className="center-hor btn btn-link-reversed waves-effect" onClick={()=>this.setState({delete:true})} disabled={this.state.delete}>
+							<button type="button" className="center-hor btn-link" onClick={()=>{}} disabled={deleting}>
 								<i
 									className="fas fa-trash commandbar-command-icon"
 									/>
@@ -53,14 +51,13 @@ export default class ItemContainer extends Component {
 							</button>
 				</div>
 				{
-					this.state.edit &&
-					<ItemEdit {...this.props} toView={() => this.setState({edit: false})} delete={this.state.delete} saving={this.state.saving} setDeleting={(deleting)=>this.setState({delete:deleting})} setSaving={(saving)=>this.setState({saving})} />
+					editFormOpen &&
+					<ItemEdit {...props} close={() => {}} delete={() => {}} saving={saving} setDeleting={(deleting)=>{}} setSaving={(saving)=>{}} />
 				}
 				{
-					!this.state.edit &&
-					<ItemView {...this.props} delete={this.state.delete} setDeleting={(deleting)=>this.setState({delete:deleting})} />
+					!editFormOpen &&
+					<ItemView {...props} delete={() => {}} setDeleting={(deleting)=>{}} />
 				}
 			</div>
-			);
-		}
-	}
+  );
+}

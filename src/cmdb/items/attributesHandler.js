@@ -1,50 +1,62 @@
-import React, { Component } from 'react';
-import { Input, Label } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  Input,
+  Label
+} from 'reactstrap';
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
+import {
+  selectStyle
+} from "configs/components/select";
 
-export default class AttributesHandler extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      editID:null,
-      editValue:''
-    }
-    this.drawAttribute.bind(this);
+export default function AttributesHandler( props ) {
 
-  }
+  const {
+    attributes
+  } = props;
 
-  drawAttribute(attribute){
-    switch (attribute.type.id) {
-      case 'input':{
-        return <Input type="text" value={this.props.values[attribute.id]} onChange={(e)=>this.props.setValue(attribute.id,e.target.value)}/>
+  const drawAttribute = ( attribute ) => {
+    switch ( attribute.type.id ) {
+      case 'input': {
+        return <Input type="text" value={attribute.value} onChange={(e)=>{}}/>
       }
-      case 'textarea':{
-        return <Input type="textarea" value={this.props.values[attribute.id]} onChange={(e)=>this.props.setValue(attribute.id,e.target.value)}/>
+      case 'textarea': {
+        return <Input type="textarea" value={attribute.value} onChange={(e)=>{}}/>
       }
-      case 'select':{
-        return <Select options={attribute.options}  value={this.props.values[attribute.id]} styles={selectStyle} onChange={(item)=>this.props.setValue(attribute.id,item)} />
+      case 'select': {
+        return <Select options={attribute.options}  value={attribute.value} styles={selectStyle} onChange={(item)=>{}} />
       }
       default:
         return <p>{attribute.type.id} of {attribute.title}</p>
     }
   }
 
-  render(){
-    return (
-      <div className="m-t-10">
+  return (
+    <div className="cmdb-selects">
+      {
+        attributes.map((attribute, index) =>
         {
-          this.props.attributes.sort((item1,item2)=>item1.order-item2.order).map((item)=>
-          <div key={item.id} className="row m-b-10 col-lg-6 cmdb-selects-info">
-            <div className="w-30">
-              <Label>{item.title.length > 0 ? item.title : "Untitled"}:</Label>
-            </div>
-            <div className="flex">
-              {this.drawAttribute(item)}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
+          if ( index % 2 === 0 ) {
+            return (
+              <div className="row">
+                <div key={attribute.label} className="entry">
+                  <label className="">{attribute.label}</label>
+                  {drawAttribute(attribute)}
+                </div>
+                {
+                  index < attributes.length - 1 &&
+                  <div key={attributes[index + 1].label} className="entry">
+                    <label className="">{attributes[index + 1].label}</label>
+                    {drawAttribute(attributes[index + 1])}
+                  </div>
+                }
+              </div>
+            )
+          }
+        }
+      )
+    }
+  </div>
+  );
 }

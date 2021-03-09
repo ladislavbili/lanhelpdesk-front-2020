@@ -81,13 +81,13 @@ export default function Scheduled( props ) {
           </div>
         ) }
 
-        <Popover  className="scheduled" placement="top" style={{maxWidth: '350px !important', width: '350px !important'}} isOpen={addItem} target="scheduledPopover" toggle={() => {setAddItem(!addItem)}}>
-          <h2 className="center-hor p-r-20 p-l-20 p-t-20 p-b-10">Add scheduled</h2>
+        <Popover  className="scheduled" placement="bottom" style={{maxWidth: '350px !important', width: '350px !important'}} isOpen={addItem} target="scheduledPopover" toggle={() => {setAddItem(!addItem)}}>
+          <h2 className="center-hor">Add scheduled</h2>
           <PopoverBody>
             <FormGroup>
               <Label className="w-100">From</Label>
               <DatePicker
-                className="form-control-secondary w-100"
+                className="form-control w-100"
                 selected={newFrom}
                 disabled={disabled}
                 onChange={date => {
@@ -102,9 +102,10 @@ export default function Scheduled( props ) {
             <FormGroup>
               <Label className="w-100">To</Label>
               <DatePicker
-                className="form-control-secondary w-100"
+                className="form-control w-100"
                 selected={newTo}
                 disabled={disabled}
+                popperPlacement="auto-left"
                 onChange={date => {
                   setNewTo(date);
                   if(newFrom === null){

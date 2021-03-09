@@ -1159,6 +1159,10 @@ td {
   width: 100% !important;
 }
 
+.react-datepicker__time-container{
+  right: -85px !important;
+  top: -1px !important;
+}
 
 
 .input-error{
@@ -1192,6 +1196,50 @@ td {
 //----------------END-všeobecné-elementy----------------
 
 //--------------------CMDB-------------------------
+
+.cmdb{
+    .commandbar {
+      background-color: #deeaf3;
+      padding-left: $list-odsadenie;
+      .search-row{
+        width: 100%;
+        padding-right: calc(#{$list-odsadenie} + 15px);
+      }
+    }
+
+    .cmdb-selects{
+    width: 60%;
+      .entry{
+        display: inline;
+        width: 50%;
+        height: 50px;
+        margin-bottom: 10px;
+      }
+      label{
+        display: block;
+        font: $main-font-size $main-font-bold ;
+      }
+      .value{
+        font: $main-font-size $main-font;
+      }
+    }
+
+    .table>tbody>tr>td{
+      height: $button-height;
+      vertical-align: middle;
+    }
+}
+
+.cmdb.sidebar{
+  .sidebar-label{
+    label{
+      font: $font-info-text;
+    }
+  }
+  hr{
+    margin: 10px 15px;
+  }
+}
 
 .cmdb-title {
   font-family: Segoe UI;
@@ -1234,21 +1282,6 @@ td {
   text-align: right;
   color: #5c5c5c;
   border-radius: 1.72185px;
-}
-
-.cmdb-selects{
-  display: block;
-  margin-top: 5px;
-  max-width: 800px;
-}
-
-.cmdb-selects-info{
-  padding-right: 10px;
-  height: 30px;
-}
-
-.cmdb-selects-info:nth-child(even){
-  padding-right: 0px;
 }
 
 .cmdb-tab{
@@ -2425,9 +2458,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .scheduled{
   width: 320px;
   background-color: #eaeaea;
-  .popover-header{
-    padding: 10px 15px;
-    font-size: 1.5em;
+  border: none;
+  .popover-header, h2{
+    padding-right: 20px;
+    padding-left: 16px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    font: $font-label;
     background-color: transparent;
   }
   .popover-body{
@@ -2837,11 +2874,18 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
         margin-top: 15px;
       }
     }
+    .lanwiki-title-edit{
+      border: $secondary-border;
+      background-color: white;
+      input{
+        border: none;
+      }
+    }
     .lanwiki-title{
-      border-bottom: $secondary-border;
       h1{
         margin-left: 0px;
         margin-bottom: 5px;
+        border-bottom: $secondary-border;
       }
     }
   }

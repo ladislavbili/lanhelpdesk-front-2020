@@ -46,17 +46,6 @@ export default function Sidebar( props ) {
     if ( end !== -1 ) {
       id = id.substring( 0, end );
     }
-
-    /*rebase.addToCollection('/lanwiki-notes',
-    { name: "Untitled",
-    	tags: (id !== "all" ? [id] : []),
-    	body: "",
-    	lastUpdated: new Date().getTime(),
-    	dateCreated: new Date().getTime(),
-    })
-    .then((note) => {
-    	this.props.history.push(`/lanwiki/i/${id}/${note.id}`);
-    });*/
   }
 
   return (
@@ -100,25 +89,29 @@ export default function Sidebar( props ) {
                 }}>
                 {item.title}
               </span>
-              <div
-                className={classnames("sidebar-icon", "clickable", {"active" : item.id === parseInt(match.params.listID)})}
-                onClick={() => {
-                  setTagEdit(item);
-                  setOpenEdit(true);
-                }}
-                >
-                <i className="fa fa-cog"/>
-              </div>
+              {
+                 item.id === parseInt(match.params.listID)  &&
+                <div
+                  className={classnames("sidebar-icon", "clickable", {"active" : item.id === parseInt(match.params.listID)})}
+                  onClick={() => {
+                    setTagEdit(item);
+                    setOpenEdit(true);
+                  }}
+                  >
+                  <i className="fa fa-cog"/>
+                </div>
+              }
             </NavItem>
           )
         }
 
       </Nav>
 
-      <hr className='m-t-10 m-b-5 m-l-15 m-r-15'/>
+      <hr className='m-t-10 m-b-5 m-l-5 m-r-5'/>
 
       <button
-        className="btn sidebar-btn"
+        className="btn sidebar-btn m-l-5 m-r-5"
+        style={{width: "calc(100% - 10px)"}}
         disabled={false}
         onClick={(e) => {
           e.preventDefault();
@@ -131,9 +124,9 @@ export default function Sidebar( props ) {
 
       <div className='p-l-15 p-r-15'>
 
-        <NavItem className="row full-width p-l-10">
+        <NavItem className="row full-width">
           <Button
-            className='btn btn-link'
+            className='btn-link'
             onClick={ () => history.push(`/lanwiki/tag-add`) }
             >
             <i className="fa fa-plus" />
@@ -145,9 +138,9 @@ export default function Sidebar( props ) {
           match.params.listID &&
           match.params.listID !== 'all' &&
 
-          <NavItem className="row full-width p-l-10">
+          <NavItem className="row full-width">
             <Button
-              className='btn btn-link'
+              className='btn-link'
               onClick={ () => history.push(`/lanwiki/tag-edit/${match.params.listID}`) }
               >
               <i className="fa fa-cog" />
