@@ -22,7 +22,7 @@ import ProjectEdit from 'helpdesk/components/projects/projectEdit';
 
 import AccessDenied from 'components/accessDenied';
 
-import TaskList from './task';
+import TaskList from './task/tasklist';
 
 import NotificationList from 'components/notifications';
 

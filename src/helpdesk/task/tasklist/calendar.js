@@ -1,19 +1,26 @@
 import React from 'react';
 import {
-  gql,
   useMutation,
   useQuery,
   useApolloClient,
 } from "@apollo/client";
+
+import Loading from 'components/loading';
+
+// http://intljusticemission.github.io/react-big-calendar/examples/index.html
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import {
   Calendar,
   momentLocalizer
 } from "react-big-calendar";
-import moment from "moment";
-import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 
-import CommandBar from 'components/showData/commandBar';
-import ListHeader from 'components/showData/listHeader';
+import CommandBar from './components/commandBar';
+import ListHeader from './components/listHeader';
+import TaskEdit from 'helpdesk/task/edit';
+import moment from "moment";
+
 import {
   fromMomentToUnix,
   timestampToDate,
@@ -22,17 +29,11 @@ import {
   localFilterToValues,
 } from 'helperFunctions';
 
-import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-
-import Loading from 'components/loading';
-
 import {
-  GET_MY_DATA,
   ADD_CALENDAR_EVENT,
   UPDATE_CALENDAR_EVENT,
   DELETE_CALENDAR_EVENT
-} from './queries';
+} from '../queries';
 
 import {
   GET_TASK,
@@ -40,11 +41,6 @@ import {
   UPDATE_TASK,
   GET_CALENDAR_EVENTS,
 } from 'helpdesk/task/queries';
-
-import {
-  GET_FILTER,
-  GET_PROJECT,
-} from 'apollo/localSchema/queries';
 
 const localizer = momentLocalizer( moment );
 const formats = {
@@ -80,17 +76,16 @@ const formats = {
 }
 const DnDCalendar = withDragAndDrop( Calendar );
 
-// http://intljusticemission.github.io/react-big-calendar/examples/index.html
 
 export default function TaskCalendar( props ) {
   const {
     match,
     history,
+    tasks,
     statuses,
     allStatuses,
     statusesLoaded,
     setUserFilterStatuses,
-    data,
     commandBar,
     listName,
     link,
@@ -101,11 +96,6 @@ export default function TaskCalendar( props ) {
     layout,
     tasklistLayoutData,
   } = props;
-
-  const {
-    data: currentUserData,
-    loading: currentUserLoading
-  } = useQuery( GET_MY_DATA );
 
   const {
     data: filterData,
@@ -267,7 +257,7 @@ export default function TaskCalendar( props ) {
             calendarEvents: [ ...allCalendarEvents, {
               ...response.data.addCalendarEvent,
               __typename: 'CalendarEvent'
-                  } ]
+          } ]
           }
         } );
       } )
@@ -409,7 +399,6 @@ export default function TaskCalendar( props ) {
     }
   };
 
-
   const onEventDropTASKS = ( item ) => {
     const canEdit = item.event.project.right.write;
 
@@ -514,6 +503,84 @@ export default function TaskCalendar( props ) {
     }
   };
 
+  const getCalendarEventsData = () => {
+    return calendarEvents.map( ( event ) => {
+      let newEvent = {
+        eventID: event.id,
+        ...event.task,
+        ...event,
+        isTask: false,
+        titleFunction: displayCal,
+        start: new Date( moment( parseInt( event.startsAt ) )
+          .valueOf() ),
+        end: new Date( moment( parseInt( event.endsAt ) )
+          .valueOf() ),
+      };
+      delete newEvent.task;
+      return newEvent;
+    } )
+  }
+
+  const getCalendarAllDayData = ( tasks ) => {
+    return tasks.map( ( task ) => {
+        let newTask = {
+          ...task,
+          isTask: true,
+          titleFunction: displayCal,
+          allDay: true,
+        }
+        if ( !task.status ) {
+          return {
+            ...newTask,
+            status: statuses.find( ( status ) => status.action === 'IsNew' ),
+            start: new Date( moment()
+              .valueOf() ),
+          }
+        }
+        switch ( task.status.action ) {
+          case 'Invoiced': {
+            return {
+              ...newTask,
+              start: new Date( moment( parseInt( task.invoicedDate ) )
+                .valueOf() ),
+            }
+          }
+          case 'CloseDate': {
+            return {
+              ...newTask,
+              start: new Date( moment( parseInt( task.closeDate ) )
+                .valueOf() ),
+            }
+          }
+          case 'CloseInvalid': {
+            return {
+              ...newTask,
+              start: new Date( moment( parseInt( task.closeDate ) )
+                .valueOf() ),
+            }
+          }
+          case 'PendingDate': {
+            return {
+              ...newTask,
+              start: new Date( moment( parseInt( task.pendingDate ) )
+                .valueOf() ),
+            }
+          }
+          default: {
+            return {
+              ...newTask,
+              start: new Date( moment()
+                .valueOf() ),
+            }
+          }
+        }
+      } )
+      .map( ( task ) => ( {
+        ...task,
+        end: task.start
+      } ) )
+  }
+
   if ( currentUserLoading ) {
     return ( <Loading /> );
   }
@@ -524,7 +591,7 @@ export default function TaskCalendar( props ) {
   } ) );
 
   if ( match.params.taskID ) {
-    return ( <Edit match={match} columns={false} history={history} /> );
+    return ( <TaskEdit match={match} columns={false} history={history} /> );
   }
 
   return (

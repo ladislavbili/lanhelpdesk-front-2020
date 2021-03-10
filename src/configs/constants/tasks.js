@@ -29,7 +29,6 @@ export const defaultTaskSort = {
   key: 'status',
   asc: true
 }
-
 export const defaultTasklistColumnPreference = {
   taskId: true,
   status: true,
@@ -56,3 +55,43 @@ export const defaultTasklistColumnPreference = {
   itemsApproved: false,
   itemsPending: false,
 }
+export const orderByValues = [
+  {
+    value: 'id',
+    label: 'ID',
+    type: 'int'
+  },
+  {
+    value: 'status',
+    label: 'Status',
+    type: 'object'
+  },
+  {
+    value: 'title',
+    label: 'Title',
+    type: 'text'
+  },
+  {
+    value: 'requester',
+    label: 'Requester',
+    type: 'user'
+  },
+  {
+    value: 'createdAt',
+    label: 'Created at',
+    type: 'date'
+  },
+  {
+    value: 'deadline',
+    label: 'Deadline',
+    type: 'date'
+  }
+]
+export const unimplementedAttributes = [
+  'scheduledFrom', 'scheduledFromNow', 'scheduledTo', 'scheduledToNow',
+  'createdAtFrom', 'createdAtFromNow', 'createdAtTo', 'createdAtToNow',
+  'important',
+  'invoiced',
+  'pausal',
+  'overtime'
+]
