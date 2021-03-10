@@ -19,7 +19,8 @@ import {
   timestampToString,
   orderArr,
   splitArrayByFilter,
-  localFilterToValues
+  localFilterToValues,
+  deleteAttributes
 } from 'helperFunctions';
 
 import {
@@ -120,7 +121,17 @@ export default function TasksIndex( props ) {
     refetch: calendarEventsRefetch
   } = useQuery( GET_CALENDAR_EVENTS, {
     variables: {
-      filter: localFilterToValues( localFilter ),
+      filter: deleteAttributes(
+        localFilterToValues( localFilter ),
+        [
+          'scheduledFrom', 'scheduledFromNow', 'scheduledTo', 'scheduledToNow',
+          'createdAtFrom', 'createdAtFromNow', 'createdAtTo', 'createdAtToNow',
+          'important',
+          'invoiced',
+          'pausal',
+          'overtime'
+        ]
+      ),
       projectId: localProject.id
     },
   } );
@@ -142,7 +153,17 @@ export default function TasksIndex( props ) {
   } = useQuery( GET_TASKS, {
     variables: {
       filterId: localFilter.id,
-      filter: localFilterToValues( localFilter ),
+      filter: deleteAttributes(
+        localFilterToValues( localFilter ),
+        [
+          'scheduledFrom', 'scheduledFromNow', 'scheduledTo', 'scheduledToNow',
+          'createdAtFrom', 'createdAtFromNow', 'createdAtTo', 'createdAtToNow',
+          'important',
+          'invoiced',
+          'pausal',
+          'overtime'
+        ]
+      ),
       projectId: localProject.id,
       sort: null
     },
@@ -485,14 +506,6 @@ export default function TasksIndex( props ) {
         {value:'deadline',label:'Deadline',type:'date', show: preference['deadline'] },
         {value:'pausal',label:'Pausal',type:'boolean', show: preference['pausal'] },
         {value:'overtime',label:'Overtime',type:'boolean', show: preference['overtime'] },
-        {value:'subtasksApproved',label:'Schvalené hodiny',type:'attribute', obj:'metadata', show: preference['subtasksApproved'] },
-        {value:'subtasksPending',label:'Neschvalené hodiny',type:'attribute', obj:'metadata', show: preference['subtasksPending'] },
-        {value:'tripsApproved',label:'Schvalené výjazdy',type:'attribute', obj:'metadata', show: preference['tripsApproved'] },
-        {value:'tripsPending',label:'Neschválené výjazdy',type:'attribute', obj:'metadata', show: preference['tripsPending'] },
-        {value:'materialsApproved',label:'Schvalený materiál',type:'attribute', obj:'metadata', show: preference['materialsApproved'] },
-        {value:'materialsPending',label:'Neschvalený materiál',type:'attribute', obj:'metadata', show: preference['materialsPending'] },
-        {value:'itemsApproved',label:'Schvalené položky',type:'attribute', obj:'metadata', show: preference['itemsApproved'] },
-        {value:'itemsPending',label:'Neschválené položky',type:'attribute', obj:'metadata', show: preference['itemsPending'] },
       ]}
       setVisibility={(visibility) => {
         addOrUpdatePreferences({
