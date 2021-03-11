@@ -1,87 +1,28 @@
 import React from 'react';
-import {
-  useQuery,
-  gql
-} from "@apollo/client";
-
-import {
-  GET_TASK_SEARCH,
-} from 'apollo/localSchema/queries';
-
-import TaskCol from './taskCol';
-import TaskList from './taskListStatisticsContainer';
-import TaskListDnD from './taskListDnD';
+import ColumnList from './columnList';
+import TableList from './tableList';
 import {
   localFilterToValues
 } from 'helperFunctions';
 
 import moment from 'moment';
 
-import {
-  GET_FILTER,
-  GET_PROJECT,
-} from 'apollo/localSchema/queries';
-
-import {
-  GET_MY_DATA
-} from './queries';
-
 export default function ShowDataContainer( props ) {
   const {
-    history,
-    match,
     data,
-    listName,
-    filterBy,
-    displayValues,
-    setVisibility,
+    layout,
     orderByValues,
     orderBy,
     ascending,
-    useBreadcrums,
-    breadcrumsData,
-    Empty,
+    filterBy,
+    generalSearch,
     itemID,
-    link,
-    displayCol,
-    isTask,
-    setStatuses,
-    statuses,
-    allStatuses,
     Edit,
-    checkTask,
-    deleteTask,
-    dndGroupAttribute,
-    dndGroupData,
-    calendarAllDayData,
-    calendarEventsData,
-    underSearch,
-    underSearchLabel,
-    tasklistLayout,
-    tasklistLayoutData,
   } = props;
-
-  const {
-    data: taskSearchData,
-    loading: taskSearchLoading
-  } = useQuery( GET_TASK_SEARCH );
-
-  const {
-    data: myData
-  } = useQuery( GET_MY_DATA );
-
-  //local
-  const {
-    data: filterData,
-  } = useQuery( GET_FILTER );
-
-  const {
-    data: projectData,
-  } = useQuery( GET_PROJECT );
 
   const filterDataFunc = () => {
     return data.filter( ( item ) => {
-        if ( taskSearchData.taskSearch === "" ) {
+        if ( generalSearch === "" ) {
           return true;
         }
         let filterString = "";
@@ -108,7 +49,7 @@ export default function ShowDataContainer( props ) {
           }
         } );
         return filterString.toLowerCase()
-          .includes( taskSearchData.taskSearch.toLowerCase() );
+          .includes( generalSearch.toLowerCase() );
       } )
       .sort( ( item1, item2 ) => {
         const val1 = getSortValue( item1 );
@@ -157,126 +98,30 @@ export default function ShowDataContainer( props ) {
 
   return (
     <div className="content-page">
-			<div className="content" style={{ paddingTop: 0 }}>
-				<div className="row m-0">
-					{tasklistLayout === 0 && (
-						<div className='col-xl-12'>
-							<TaskCol
-                layout={tasklistLayout}
-								commandBar={props}
-								useBreadcrums={useBreadcrums}
-								breadcrumsData={breadcrumsData}
-								listName={listName}
-								history={history}
-								Empty={Empty}
-								match={match}
-								data={filterDataFunc()}
-								itemID={itemID}
-								link={link}
-								displayCol={displayCol}
-								isTask={isTask}
-								setStatuses={setStatuses}
-								statuses={statuses}
-								allStatuses={allStatuses}
-								Edit={Edit}
-                underSearch={underSearch}
-                underSearchLabel={underSearchLabel}
-                tasklistLayoutData={tasklistLayoutData}
-								/>
-						</div>
-					)}
+      <div className="content" style={{ paddingTop: 0 }}>
+        <div className="row m-0">
+          { layout === 0 &&
+            <div className='col-xl-12'>
+              <ColumnList
+                {...props}
+                data={filterDataFunc()}
+                />
+            </div>
+          }
 
-
-					{tasklistLayout === 1 && (
-						<div className="flex" >
-							{itemID && <props.Edit match={match} columns={false} history={history} />}
-							{!itemID &&
-								<TaskList
-                  layout={tasklistLayout}
-									commandBar={props}
-									useBreadcrums={useBreadcrums}
-									breadcrumsData={breadcrumsData}
-									listName={listName}
-									history={history}
-									match={match}
-									data={filterDataFunc()}
-									displayValues={displayValues}
-                  setVisibility={setVisibility}
-									filterName={listName}
-									isTask={isTask}
-									setStatuses={setStatuses}
-									statuses={statuses}
-									allStatuses={allStatuses}
-									link={link}
-									checkTask={checkTask}
-									deleteTask={deleteTask}
-                  underSearch={underSearch}
-                  underSearchLabel={underSearchLabel}
-                  tasklistLayoutData={tasklistLayoutData}
-									/>}
-						</div>
-					)}
-
-					{tasklistLayout === 2 && (
-						<div className="col-xl-12" >
-							{itemID && <props.Edit match={match} columns={false} history={history} />}
-							{!itemID &&
-								<TaskListDnD
-                  layout={tasklistLayout}
-									commandBar={props}
-									useBreadcrums={useBreadcrums}
-									breadcrumsData={breadcrumsData}
-									listName={listName}
-									history={history}
-									match={match}
-									data={filterDataFunc()}
-									displayValues={displayValues}
-									displayCol={displayCol}
-									link={link}
-									groupBy={dndGroupAttribute}
-									groupData={dndGroupData}
-									isTask={isTask}
-									setStatuses={setStatuses}
-									statuses={statuses}
-									allStatuses={allStatuses}
-                  underSearch={underSearch}
-                  underSearchLabel={underSearchLabel}
-                  tasklistLayoutData={tasklistLayoutData}
-									/>
-							}
-						</div>
-					)}
-					{tasklistLayout === 3 && (
-						<div className='col-xl-12'>
-							<props.calendar
-                layout={tasklistLayout}
-								commandBar={props}
-								useBreadcrums={useBreadcrums}
-								breadcrumsData={breadcrumsData}
-								listName={listName}
-								history={history}
-								match={match}
-								data={
-									(calendarAllDayData ? calendarAllDayData(filterDataFunc()):[]).concat(
-										calendarEventsData ? calendarEventsData(filterDataFunc()):[]
-									)
-								}
-								link={link}
-								groupBy={dndGroupAttribute}
-								groupData={dndGroupData}
-								isTask={isTask}
-								setStatuses={setStatuses}
-								statuses={statuses}
-								allStatuses={allStatuses}
-								Edit={Edit}
-                underSearch={underSearch}
-                underSearchLabel={underSearchLabel}
-                tasklistLayoutData={tasklistLayoutData}
-								/>
-						</div>
-					)}
-				</div>
-			</div>
+          { layout === 1 &&
+            <div className="flex" >
+              {itemID && <Edit {...props} />}
+              {!itemID &&
+                <TableList
+                  {...props}
+                  data={filterDataFunc()}
+                  />
+              }
+            </div>
+          }
+        </div>
+      </div>
     </div>
   );
 }

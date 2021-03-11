@@ -106,8 +106,6 @@ mutation setUserStatuses($ids: [Int]!) {
 			level
       accessRights {
         projects
-        mailViaComment
-        viewInternal
         publicFilters
         users
         companies

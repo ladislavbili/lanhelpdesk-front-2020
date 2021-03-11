@@ -1,8 +1,6 @@
 import React from 'react';
 import {
-  useQuery,
   useMutation,
-  gql,
   useApolloClient
 }
 from "@apollo/client";
@@ -13,10 +11,16 @@ import {
 } from 'reactstrap';
 import CommandBar from './components/commandBar';
 import ListHeader from './components/listHeader';
+import ItemRender from './components/columnItemRender';
 import classnames from 'classnames';
 import {
-  fromMomentToUnix,
-  updateArrayItem
+  unimplementedAttributes,
+} from 'configs/constants/tasks';
+import {
+  localFilterToValues,
+  deleteAttributes,
+  updateArrayItem,
+  filterUnique,
 } from 'helperFunctions';
 import moment from 'moment';
 import {
@@ -31,51 +35,40 @@ import {
   GET_TASKS,
 } from 'helpdesk/task/queries';
 
-const groupBy = "status";
-
 export default function TaskListDnD( props ) {
   const {
     history,
     link,
-    commandBar,
-    listName,
-    statuses,
-    setStatuses,
-    allStatuses,
-    groupBy,
-    groupData,
-    displayCol,
-    data,
-    useBreadcrums,
-    breadcrumsData,
-    filterId,
-    filterValues,
-    originalProjectId,
-    layout,
-    setLayout,
-    tasklistLayoutData,
+    localProject,
+    localFilter,
+    tasks,
   } = props;
 
+  const statuses = (
+    localProject.project.statuses ?
+    localProject.project.statuses :
+    filterUnique( tasks.map( ( task ) => task.status ), 'id' )
+  )
   const [ updateTask ] = useMutation( UPDATE_TASK );
 
   const client = useApolloClient();
 
   const groupDataFunc = () => {
     let grouped = [];
-    groupData.forEach( ( groupItem ) => grouped.push( {
-      groupItem: {
-        ...groupItem,
-        title: groupItem.title ? groupItem.title : 'Undefined title',
-        color: groupItem.color ? groupItem.color : '#b8d9db'
+    statuses.forEach( ( status ) => grouped.push( {
+      status: {
+        ...status,
+        title: status.title ? status.title : 'Undefined title',
+        color: status.color ? status.color : '#b8d9db'
       },
-      data: data.filter( ( dataItem ) => dataItem[ groupBy ] !== undefined && dataItem[ groupBy ].id === groupItem.id )
+      tasks: tasks.filter( ( task ) => task.status !== undefined && task.status.id === status.id )
     } ) );
     return grouped;
   }
 
   const groupRest = () => {
-    const ids = groupData.map( ( groupItem ) => groupItem.id );
-    return data.filter( ( dataItem ) => dataItem[ groupBy ] === undefined || !ids.includes( dataItem[ groupBy ].id ) );
+    const ids = statuses.map( ( story ) => story.id );
+    return tasks.filter( ( task ) => task.status === undefined || !ids.includes( task.status.id ) );
   }
 
   const updateTaskFunc = ( id, status, updateData ) => {
@@ -116,9 +109,13 @@ export default function TaskListDnD( props ) {
           let execTasks = client.readQuery( {
               query: GET_TASKS,
               variables: {
-                filterId,
-                filter: filterValues,
-                projectId: originalProjectId
+                filterId: localFilter.id,
+                filter: deleteAttributes(
+                  localFilterToValues( localFilter ),
+                  unimplementedAttributes
+                ),
+                projectId: localProject.id,
+                sort: null
               }
             } )
             .tasks;
@@ -131,9 +128,13 @@ export default function TaskListDnD( props ) {
           client.writeQuery( {
             query: GET_TASKS,
             variables: {
-              filterId,
-              filter: filterValues,
-              projectId: originalProjectId
+              filterId: localFilter.id,
+              filter: deleteAttributes(
+                localFilterToValues( localFilter ),
+                unimplementedAttributes
+              ),
+              projectId: localProject.id,
+              sort: null
             },
             data: {
               tasks: {
@@ -157,21 +158,18 @@ export default function TaskListDnD( props ) {
     source,
     destination
   } ) => {
-    if ( source !== null &&
+    if (
+      source !== null &&
       destination !== null &&
-      parseInt( source.droppableId ) === parseInt( destination.droppableId ) ) {
+      parseInt( source.droppableId ) === parseInt( destination.droppableId )
+    ) {
       return;
     }
-    const groups = (
-      statuses.length === 0 ?
-      groupDataFunc() :
-      groupDataFunc()
-      .filter( item => statuses.includes( item.groupItem.id ) )
-    );
+    const groups = groupDataFunc()
 
-    const targetStatus = allStatuses.find( ( status ) => status.id === parseInt( destination.droppableId ) );
-    const item = groups.find( ( group ) => group.groupItem.id === parseInt( source.droppableId ) )
-      .data[ source.index ];
+    const targetStatus = statuses.find( ( status ) => status.id === parseInt( destination.droppableId ) );
+    const item = groups.find( ( group ) => group.status.id === parseInt( source.droppableId ) )
+      .tasks[ source.index ];
     let updateData = {
       id: item.id,
       status: targetStatus.id,
@@ -188,41 +186,27 @@ export default function TaskListDnD( props ) {
     updateTaskFunc( item.id, targetStatus, updateData );
   }
 
-  const GROUP_DATA = (
-    statuses.length === 0 ?
-    groupDataFunc() :
-    groupDataFunc()
-    .filter( item => statuses.includes( item.groupItem.id ) )
-  );
+  const taskGroups = groupDataFunc();
 
   return (
     <div>
         <CommandBar
-          {...commandBar}
-          listName={listName}
-          {...tasklistLayoutData}
+          {...props}
           />
         <div className="scroll-visible overflow-x fit-with-header-and-commandbar task-container">
           <ListHeader
-            {...commandBar}
-            listName={listName}
-            useBreadcrums={useBreadcrums}
-            breadcrumsData={breadcrumsData}
-            statuses={statuses}
-            setStatuses={setStatuses}
-            allStatuses={allStatuses}
-            layout={layout}
+            {...props}
             />
           <div className="flex-row m-l-30" >
             <DragDropContext onDragEnd={onDragEnd}>
               {
-                GROUP_DATA
-                .filter( (group) => group.groupItem.action !== 'Invoiced' )
+                taskGroups
+                .filter( (group) => group.status.action !== 'Invoiced' )
                 .map(
-                  (group)=>
-                  <Card className="dnd-column" key={group.groupItem.id}>
-                    <CardHeader className="dnd-header">{group.groupItem.title}</CardHeader>
-                    <Droppable droppableId={group.groupItem.id.toString()}>
+                  (group) =>
+                  <Card className="dnd-column" key={group.status.id}>
+                    <CardHeader className="dnd-header">{group.status.title}</CardHeader>
+                    <Droppable droppableId={group.status.id.toString()}>
                       {
                         (provided, snapshot) => (
                           <div
@@ -233,7 +217,7 @@ export default function TaskListDnD( props ) {
                             }}
                             >
                             {
-                              group.data.map((item, index) => (
+                              group.tasks.map((item, index) => (
                                 <Draggable
                                   key={item.id}
                                   draggableId={item.id.toString()}
@@ -248,13 +232,13 @@ export default function TaskListDnD( props ) {
                                         >
                                         <ul
                                           className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
-                                          style={{borderLeft: "3px solid " + group.groupItem.color}}
+                                          style={{borderLeft: "3px solid " + group.status.color}}
                                           onClick={(e)=>{
                                             history.push(link+'/'+item.id);
                                           }}
                                           key={item.id}
                                           >
-                                          {displayCol(item)}
+                                          <ItemRender task={item} />
                                         </ul>
                                       </div>
                                     )
@@ -272,30 +256,30 @@ export default function TaskListDnD( props ) {
               }
             </DragDropContext>
             {
-              GROUP_DATA
-              .filter( (group) => group.groupItem.action === 'Invoiced' )
+              taskGroups
+              .filter( (group) => group.status.action === 'Invoiced' )
               .map(
                 (group) =>
-                <Card className="dnd-column" key={group.groupItem.id}>
-                  <CardHeader className="dnd-header">{group.groupItem.title}</CardHeader>
+                <Card className="dnd-column" key={group.status.id}>
+                  <CardHeader className="dnd-header">{group.status.title}</CardHeader>
                   <CardBody className="dnd-body">
                     {
-                      group.data.map(
+                      group.tasks.map(
                         (item)=>
                         <ul
                           className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
-                          style={{borderLeft: "3px solid " + group.groupItem.color}}
+                          style={{borderLeft: "3px solid " + group.status.color}}
                           onClick={(e)=>{
                             history.push(link+'/'+item.id);
                           }}
                           key={item.id}
                           >
-                          {displayCol(item)}
+                          <ItemRender task={item} />
                         </ul>
                       )
                     }
                     {
-                      group.data.length===0 &&
+                      group.tasks.length===0 &&
                       <div className="center-ver" style={{textAlign:'center'}}>
                         Neboli nájdené žiadne výsledky pre tento filter
                       </div>
@@ -320,7 +304,7 @@ export default function TaskListDnD( props ) {
                         }}
                         key={item.id}
                         >
-                        {displayCol(item)}
+                        <ItemRender task={item} />
                       </ul>
                     )
                   }

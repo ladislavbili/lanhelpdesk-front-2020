@@ -88,7 +88,7 @@ export default function CommandBar( props ) {
     .filter( ( breadcrum ) => breadcrum.show );
 
   return (
-    <div className={"task-list-commandbar " + (tasklistLayout !== 0 ? "p-l-30 p-r-19" : "p-l-0")}>
+    <div className="task-list-commandbar p-l-30 p-r-19">
       <div className="breadcrum-bar center-hor">
         <div className="flex-row breadcrumbs">
           { filteredBreadcrums.map( (breadcrum, index) =>
@@ -140,22 +140,22 @@ export default function CommandBar( props ) {
                   <label className={classnames({'active':tasklistLayout === 0}, "btn btn-link t-a-l")}>
                     <input type="radio" name="options" onChange={() => setTasklistLayout(0)} checked={tasklistLayout === 0}/>
                     <i className="fa fa-columns"/>
-                    Trojstlpec
+                    {` Trojstlpec`}
                   </label>
                   <label className={classnames({'active':tasklistLayout === 1}, "btn btn-link t-a-l")}>
                     <input type="radio" name="options" checked={tasklistLayout === 1} onChange={() => setTasklistLayout(1)}/>
                     <i className="fa fa-list"/>
-                    Zoznam
+                    {` Zoznam`}
                   </label>
                   <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link t-a-l")}>
                     <input type="radio" name="options" onChange={() => setTasklistLayout(2)} checked={tasklistLayout === 2}/>
                     <i className="fa fa-map"/>
-                    DnD
+                    {` DnD`}
                   </label>
                   <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link t-a-l")}>
                     <input type="radio" name="options" onChange={() => setTasklistLayout(3)} checked={tasklistLayout === 3}/>
                     <i className="fa fa-calendar-alt"/>
-                    Kalendár
+                    {` Kalendár`}
                   </label>
                 </div>
               </DropdownMenu>

@@ -2,68 +2,54 @@ import React from 'react';
 
 import CommandBar from './components/commandBar';
 import ListHeader from './components/listHeader';
+import TaskEdit from '../edit';
+import TaskEmpty from '../taskEmpty';
+import ItemRender from './components/columnItemRender';
 import classnames from "classnames";
 
-export default function ColumnDisplay( props ) {
+export default function ColumnList( props ) {
   const {
     match,
     history,
-    commandBar,
-    listName,
-    Empty,
-    data,
-    itemID,
     link,
-    displayCol,
-    setStatuses,
-    statuses,
-    allStatuses,
-    Edit,
-    layout,
-    tasklistLayoutData
+    tasks,
   } = props;
+
+  const taskID = parseInt( match.params.taskID );
   return (
     <div>
       <CommandBar
-        {...commandBar}
-        listName={listName}
-        {...tasklistLayoutData}
+        {...props}
         />
-      <ListHeader multiselect={false} layout={layout} {...commandBar} listName={listName} statuses={statuses} setStatuses={setStatuses} allStatuses={allStatuses} />
+      <ListHeader {...props} multiselect={false} />
 
       <div className="row p-0 task-container">
 
         <div className="p-0 golden-ratio-382">
           <div className="scroll-visible fit-with-header-and-commandbar-2 task-list">
-            {
-              data.map((item, index)=>
+            { tasks.map((task, index) =>
               <ul
-                className={classnames("taskCol", "clickable", "list-unstyled", {'selected-item': itemID.toString() === item.id.toString()})}
-                id="upcoming"
-                style={{borderLeft: (link.includes("helpdesk") ? ("3px solid " + (item.status ? (item.status.color?item.status.color:'white') : "white")) : "")}}
+                className={classnames( "taskCol", "clickable", "list-unstyled", {'selected-item': taskID === task.id} )}
+                style={{borderLeft: "3px solid " + ( task.status ? ( task.status.color ? task.status.color : 'white' ) : "white") }}
                 onClick={()=>{
-                  history.push(link+'/'+item.id);
+                  history.push(link+'/'+task.id);
                 }}
-                key={item.id}>
-                {displayCol(item)}
+                key={task.id}>
+                <ItemRender task={task} />
               </ul>
-            )
-          }
-          {
-            data.length===0 &&
+            ) }
+          { tasks.length===0 &&
             <div className="center-ver" style={{textAlign:'center'}}>
               Neboli nájdené žiadne výsledky pre tento filter
             </div>
           }
         </div>
       </div>
-      {
-        itemID && itemID!=='add' && data.some((item)=>item.id.toString()===itemID.toString()) &&
-        <Edit match={match} columns={true} history={history} />
+      { !isNaN(taskID) && tasks.some((task) => task.id === taskID ) &&
+        <TaskEdit match={match} columns={true} history={history} />
       }
-      {
-        (!itemID || !data.some((item)=>item.id+""===itemID)) &&
-        (Empty?<Empty/>:null)
+      { ( isNaN(taskID) || !tasks.some((task)=>task.id === taskID)) &&
+        <TaskEmpty />
       }
 
     </div>

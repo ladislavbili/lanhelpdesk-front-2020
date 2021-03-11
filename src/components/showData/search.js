@@ -5,38 +5,15 @@ import {
   Button
 } from 'reactstrap';
 import classnames from "classnames";
-import {
-  useQuery
-} from "@apollo/client";
-import {
-  GET_TASK_SEARCH,
-} from 'apollo/localSchema/queries';
-import {
-  dashboard,
-  allMilestones,
-} from 'configs/constants/sidebar';
-
-import {
-  setMilestone,
-  setProject,
-  setTaskSearch,
-} from 'apollo/localSchema/actions';
 
 export default function Search( props ) {
   const {
     link,
-    layout,
-    isTask,
-    history,
-    //setFilter
+    generalSearch,
+    setGeneralSearch,
   } = props;
 
-  const {
-    data: taskSearchData,
-    loading: taskSearchLoading
-  } = useQuery( GET_TASK_SEARCH );
-
-  const [ search, setSearch ] = React.useState( taskSearchData.taskSearch );
+  const [ search, setSearch ] = React.useState( generalSearch );
 
   return (
     <div
@@ -53,7 +30,7 @@ export default function Search( props ) {
           onChange={(e)=>setSearch(e.target.value)}
           onKeyPress={(e)=>{
             if( e.key === 'Enter' ){
-              setTaskSearch(search)
+              setGeneralSearch(search)
             }
           }}
           placeholder="Search in id and task title"
@@ -62,19 +39,6 @@ export default function Search( props ) {
           <i className="fa fa-search flip" />
         </button>
       </div>
-
-      { isTask &&
-        <Button
-          className="btn-link center-hor m-l-10"
-          onClick={()=>{
-            setMilestone(allMilestones);
-            setProject(dashboard);
-            history.push(`/helpdesk/taskList/i/all`)
-          }}
-          >
-          Global
-        </Button>
-      }
     </div>
   );
 }
