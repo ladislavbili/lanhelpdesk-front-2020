@@ -14,6 +14,7 @@ import {
 
 import {
   defaultTasklistColumnPreference,
+  attributeLimitingRights,
   unimplementedAttributes,
 } from 'configs/constants/tasks';
 
@@ -196,13 +197,9 @@ export default function TasksIndex( props ) {
   }
 
   const setPreference = ( visibility ) => {
-    console.log( {
-      preference,
-      visibility
-    } );
     addOrUpdatePreferences( {
         variables: {
-          ...preference,
+          ...createPreferences(),
           ...visibility,
           projectId: localProject.id,
         }
@@ -330,13 +327,26 @@ export default function TasksIndex( props ) {
     } ) )
   }
 
-  const preference = ( preferencesData && preferencesData.tasklistColumnPreference ) ? preferencesData.tasklistColumnPreference : defaultTasklistColumnPreference;
-
-
-  localFilter
-  localProject
-  localMilestone
-  calendarEventsData
+  const createPreferences = () => {
+    let preference = defaultTasklistColumnPreference;
+    if ( preferencesData && preferencesData.tasklistColumnPreference ) {
+      preference = {
+        ...preference,
+        ...preferencesData.tasklistColumnPreference
+      };
+    }
+    if ( localProject.project.id === null ) {
+      return preference;
+    }
+    attributeLimitingRights.forEach( ( limitingRight ) => {
+      if ( !localProject.right[ limitingRight.right ] ) {
+        console.log( preference, limitingRight.preference );
+        preference[ limitingRight.preference ] = false;
+      }
+    } )
+    return preference;
+  }
+  //  console.log( [ createPreferences(), preferencesData ] );
 
   return (
     <TasklistSwitch
@@ -354,7 +364,7 @@ export default function TasksIndex( props ) {
       calendarEvents={calendarEventsData.calendarEvents}
       tasks={processTasks(tasks)}
       checkTask={checkTask}
-      preference = {preference}
+      preference = {createPreferences()}
       setPreference={setPreference}
       orderBy={ tasksSort.key }
       setOrderBy={(value) => {

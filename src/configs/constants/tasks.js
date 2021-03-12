@@ -87,6 +87,48 @@ export const orderByValues = [
     type: 'date'
   }
 ]
+export const attributeLimitingRights = [
+  {
+    right: 'assignedRead',
+    preference: 'assignedTo'
+  },
+  {
+    right: 'companyRead',
+    preference: 'company'
+  },
+  {
+    right: 'overtimeRead',
+    preference: 'overtime'
+  },
+  {
+    right: 'pausalRead',
+    preference: 'pausal'
+  },
+  {
+    right: 'requesterRead',
+    preference: 'requester'
+  },
+  {
+    right: 'statusRead',
+    preference: 'status'
+  },
+  {
+    right: 'tagsRead',
+    preference: 'tags'
+  },
+  {
+    right: 'deadlineRead',
+    preference: 'deadline'
+  },
+  {
+    right: 'milestoneRead',
+    preference: 'milestone'
+  },
+  {
+    right: 'typeRead',
+    preference: 'taskType'
+  },
+]
 export const unimplementedAttributes = [
   'scheduledFrom', 'scheduledFromNow', 'scheduledTo', 'scheduledToNow',
   'createdAtFrom', 'createdAtFromNow', 'createdAtTo', 'createdAtToNow',

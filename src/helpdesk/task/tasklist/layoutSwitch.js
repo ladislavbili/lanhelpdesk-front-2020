@@ -29,6 +29,7 @@ export default function TasklistSwitch( props ) {
     tasklistLayout,
     setTasklistLayout,
   } = props;
+
   const displayValues = [
     {
       value: 'checked',
@@ -147,62 +148,6 @@ export default function TasklistSwitch( props ) {
       label: 'Overtime',
       type: 'boolean',
       show: preference[ 'overtime' ]
-    },
-    {
-      value: 'subtasksApproved',
-      label: 'Schvalené hodiny',
-      type: 'attribute',
-      obj: 'metadata',
-      show: preference[ 'subtasksApproved' ]
-    },
-    {
-      value: 'subtasksPending',
-      label: 'Neschvalené hodiny',
-      type: 'attribute',
-      obj: 'metadata',
-      show: preference[ 'subtasksPending' ]
-    },
-    {
-      value: 'tripsApproved',
-      label: 'Schvalené výjazdy',
-      type: 'attribute',
-      obj: 'metadata',
-      show: preference[ 'tripsApproved' ]
-    },
-    {
-      value: 'tripsPending',
-      label: 'Neschválené výjazdy',
-      type: 'attribute',
-      obj: 'metadata',
-      show: preference[ 'tripsPending' ]
-    },
-    {
-      value: 'materialsApproved',
-      label: 'Schvalený materiál',
-      type: 'attribute',
-      obj: 'metadata',
-      show: preference[ 'materialsApproved' ]
-    },
-    {
-      value: 'materialsPending',
-      label: 'Neschvalený materiál',
-      type: 'attribute',
-      obj: 'metadata',
-      show: preference[ 'materialsPending' ]
-    },
-    {
-      value: 'itemsApproved',
-      label: 'Schvalené položky',
-      type: 'attribute',
-      obj: 'metadata',
-      show: preference[ 'itemsApproved' ]
-    },
-    {
-      value: 'itemsPending',
-      label: 'Neschválené položky',
-      type: 'attribute',
-      obj: 'metadata',
-      show: preference[ 'itemsPending' ]
     },
   ];
   const taskID = match.params.taskID;

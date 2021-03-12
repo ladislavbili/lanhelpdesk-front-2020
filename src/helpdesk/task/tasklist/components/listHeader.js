@@ -7,7 +7,8 @@ import Checkbox from 'components/checkbox';
 import MultiSelect from 'components/MultiSelectNew';
 import classnames from "classnames";
 import {
-  orderByValues
+  orderByValues,
+  attributeLimitingRights,
 } from 'configs/constants/tasks';
 
 export default function ListHeader( props ) {
@@ -18,6 +19,7 @@ export default function ListHeader( props ) {
     setSelectedStatuses,
     multiselect,
     setPreference,
+    preference,
   } = props;
 
   const displayValues = (
@@ -29,6 +31,16 @@ export default function ListHeader( props ) {
       id: displayValue.value
     } ) ) : []
   );
+
+  const getPreferenceColumns = () => {
+    if ( localProject.project.id === null ) {
+      return displayValues;
+    }
+    let notAllowedColumns = attributeLimitingRights.filter( ( limitingRight ) => !localProject.right[ limitingRight.right ] )
+      .map( ( limitingRight ) => limitingRight.preference );
+    return displayValues.filter( ( column ) => !notAllowedColumns.includes( column.value ) );
+  }
+
   const allStatuses = localProject.project.statuses ? localProject.project.statuses : [];
   const [ columnPreferencesOpen, setColumnPreferencesOpen ] = React.useState( false );
   const openColumnPreferences = () => setColumnPreferencesOpen( !columnPreferencesOpen );
@@ -156,8 +168,8 @@ export default function ListHeader( props ) {
                 closeMultiSelect={openColumnPreferences}
                 showFilter={false}
                 open={columnPreferencesOpen}
-                items={displayValues}
-                selected={displayValues.filter((displayValue) => displayValue.show )}
+                items={getPreferenceColumns()}
+                selected={getPreferenceColumns().filter((displayValue) => displayValue.show )}
                 onChange={(_, item, deleted ) => {
                   let newVisibility = {};
                   displayValues.forEach((displayValue) => {
