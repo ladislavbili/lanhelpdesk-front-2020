@@ -1,9 +1,12 @@
 import React from 'react';
 import {
-  timestampToString,
+  timestampToString
 } from 'helperFunctions';
 
-export const displayCol = ( task ) => {
+export default function ColumnItemRender( props ) {
+  const {
+    task
+  } = props;
   return (
     <li>
       <div className="taskCol-title">
@@ -57,21 +60,5 @@ export const displayCol = ( task ) => {
           </div>
         }
       </li>
-  )
-}
-
-export const displayCal = ( task, showEvent ) => {
-  return (
-    <div style={ showEvent ? { backgroundColor:'#eaf6ff', borderRadius:5 } : {} }>
-        <p className="m-0">
-          {showEvent && <span className="label-event">
-            Event
-          </span>}
-          <span className="label-info" style={{backgroundColor:task.status && task.status.color?task.status.color:'white'}}>
-            {task.status?task.status.title:'Neznámy status'}
-          </span>
-          <span className="attribute-label m-l-3">#{task.id} | {task.title}</span>
-        </p>
-      </div>
   )
 }

@@ -74,7 +74,7 @@ export default function NotificationIcon( props ) {
                       } )
                       .then( ( response ) => {
                         history.push(`${location}/notifications/${notification.id}` )
-                      }).error((err) => {
+                      }).catch((err) => {
                         console.log(err);
                       })
                   }else{

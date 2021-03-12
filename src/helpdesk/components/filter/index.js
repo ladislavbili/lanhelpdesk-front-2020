@@ -142,9 +142,34 @@ export default function FilterForm( props ) {
     setDeadlineTo,
     deadlineToNow,
     setDeadlineToNow,
+    scheduledFrom,
+    setScheduledFrom,
+    scheduledFromNow,
+    setScheduledFromNow,
+    scheduledTo,
+    setScheduledTo,
+    scheduledToNow,
+    setScheduledToNow,
+    createdAtFrom,
+    setCreatedAtFrom,
+    createdAtFromNow,
+    setCreatedAtFromNow,
+    createdAtTo,
+    setCreatedAtTo,
+    createdAtToNow,
+    setCreatedAtToNow,
+    important,
+    setImportant,
+    invoiced,
+    setInvoiced,
+    pausal,
+    setPausal,
+    overtime,
+    setOvertime,
     oneOf,
     setOneOf,
   } = fromObjectToState( emptyFilter );
+  //createdAt important invoiced pausal overtime
 
   const dataLoading = (
     myDataLoading ||
@@ -194,7 +219,19 @@ export default function FilterForm( props ) {
         setDeadlineFromNow,
         setDeadlineTo,
         setDeadlineToNow,
-        setOneOf
+        setScheduledFrom,
+        setScheduledFromNow,
+        setScheduledTo,
+        setScheduledToNow,
+        setCreatedAtFrom,
+        setCreatedAtFromNow,
+        setCreatedAtTo,
+        setCreatedAtToNow,
+        setImportant,
+        setInvoiced,
+        setPausal,
+        setOvertime,
+        setOneOf,
       }, emptyFilter );
     } else {
       setFilter( myFiltersData.myFilters.find( ( myFilter ) => myFilter.id === id ) );
@@ -344,7 +381,7 @@ export default function FilterForm( props ) {
 
 
   return (
-      <div>
+    <div>
       <div className="d-flex m-t-5 sidebar-filter-commandbar">
         <button type="button" className="btn-link" onClick={applyFilter}><i className="fa fa-check icon-M p-r-0 m-r-0"/></button>
         {
@@ -390,7 +427,7 @@ export default function FilterForm( props ) {
 
       <div className="sidebar-filter">
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Zadal</label>
+          <label htmlFor="example-input-small">Zadal - multiselect</label>
           <div className="flex">
             <Select
               options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(users)}
@@ -402,7 +439,7 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Firma</label>
+          <label htmlFor="example-input-small">Firma - multiselect</label>
           <div className="flex">
             <Select
               options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companies))}
@@ -415,7 +452,7 @@ export default function FilterForm( props ) {
         </div>
 
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Riesi</label>
+          <label htmlFor="example-input-small">Riesi - multiselect</label>
           <div className="flex">
             <Select
               options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(users, 'email'))}
@@ -427,18 +464,18 @@ export default function FilterForm( props ) {
           </div>
         </div>
 
-      <FilterDatePickerPopover
-        label="Status date"
-        minimal
-        showNowFrom={statusDateFromNow}
-        dateFrom={statusDateFrom}
-        setShowNowFrom={(statusDateFromNow)=> setStatusDateFromNow(statusDateFromNow)}
-        setDateFrom={(statusDateFrom)=> setStatusDateFrom(statusDateFrom)}
-        showNowTo={statusDateToNow}
-        dateTo={statusDateTo}
-        setShowNowTo={(statusDateToNow)=> setStatusDateToNow(statusDateToNow)}
-        setDateTo={(statusDateTo)=>setStatusDateTo(statusDateTo)}
-        />
+        <FilterDatePickerPopover
+          label="Status date"
+          minimal
+          showNowFrom={statusDateFromNow}
+          dateFrom={statusDateFrom}
+          setShowNowFrom={(statusDateFromNow)=> setStatusDateFromNow(statusDateFromNow)}
+          setDateFrom={(statusDateFrom)=> setStatusDateFrom(statusDateFrom)}
+          showNowTo={statusDateToNow}
+          dateTo={statusDateTo}
+          setShowNowTo={(statusDateToNow)=> setStatusDateToNow(statusDateToNow)}
+          setDateTo={(statusDateTo)=>setStatusDateTo(statusDateTo)}
+          />
 
         {/* Pending Date */}
         <FilterDatePickerPopover
@@ -483,7 +520,7 @@ export default function FilterForm( props ) {
           />
 
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Typ práce</label>
+          <label htmlFor="example-input-small">Typ práce - multiselect</label>
           <div className="flex">
             <Select
               options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypes))}
@@ -492,21 +529,102 @@ export default function FilterForm( props ) {
               styles={invisibleSelectStyleBlueFont} />
           </div>
         </div>
+        {/* Scheduled */}
+        <FilterDatePickerPopover
+          label="Scheduled date"
+          minimal
+          showNowFrom={scheduledFromNow}
+          dateFrom={scheduledFrom}
+          setShowNowFrom={(scheduledFromNow)=> setScheduledFromNow( scheduledFromNow )}
+          setDateFrom={(scheduledFrom)=> setScheduledFrom( scheduledFrom )}
+          showNowTo={scheduledToNow}
+          dateTo={scheduledTo}
+          setShowNowTo={(scheduledToNow)=> setScheduledToNow( scheduledToNow )}
+          setDateTo={(scheduledTo)=> setScheduledTo( scheduledTo )}
+          />
+        {/* Created at */}
+        <FilterDatePickerPopover
+          label="Created at"
+          minimal
+          showNowFrom={createdAtFromNow}
+          dateFrom={createdAtFrom}
+          setShowNowFrom={(createdAtFromNow)=> setCreatedAtFromNow( createdAtFromNow )}
+          setDateFrom={(createdAtFrom)=> setCreatedAtFrom( createdAtFrom )}
+          showNowTo={createdAtToNow}
+          dateTo={createdAtTo}
+          setShowNowTo={(createdAtToNow)=> setCreatedAtToNow( createdAtToNow )}
+          setDateTo={(createdAtTo)=> setCreatedAtTo( createdAtTo )}
+          />
 
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
+          <label htmlFor="example-input-small">Important - select</label>
           <div className="flex">
             <Select
-              options={oneOfOptions}
-              onChange={(oneOf)=> setOneOf(oneOf)}
-              value={oneOf}
-              isMulti
-              styles={invisibleSelectStyleBlueFont} />
+              options={[{label:'Any',value:null,id:null},{label:'Ano',value:'ano',id:'ano'},{label:'Nie',value:'nie',id:'nie'}]}
+              onChange={(imp) => {
+                setImportant(imp);
+              }}
+              value={important}
+              styles={invisibleSelectStyleBlueFont}
+              />
           </div>
         </div>
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Invoiced - select</label>
+          <div className="flex">
+            <Select
+              options={[{label:'Any',value:null,id:null},{label:'Ano',value:'ano',id:'ano'},{label:'Nie',value:'nie',id:'nie'}]}
+              onChange={(invoiced) => {
+                setInvoiced(invoiced);
+              }}
+              value={invoiced}
+              styles={invisibleSelectStyleBlueFont}
+              />
+          </div>
+        </div>
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Pausal - select</label>
+          <div className="flex">
+            <Select
+              options={[{label:'Any',value:null,id:null},{label:'Ano',value:'ano',id:'ano'},{label:'Nie',value:'nie',id:'nie'}]}
+              onChange={(pausal) => {
+                setPausal(pausal);
+              }}
+              value={pausal}
+              styles={invisibleSelectStyleBlueFont}
+              />
+          </div>
+        </div>
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Overtime - select</label>
+          <div className="flex">
+            <Select
+              options={[{label:'Any',value:null,id:null},{label:'Ano',value:'ano',id:'ano'},{label:'Nie',value:'nie',id:'nie'}]}
+              onChange={(overtime) => {
+                setOvertime(overtime);
+              }}
+              value={overtime}
+              styles={invisibleSelectStyleBlueFont}
+              />
+          </div>
+        </div>
+
+        { false &&
+          <div className="sidebar-filter-row">
+            <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
+            <div className="flex">
+              <Select
+                options={oneOfOptions}
+                onChange={(oneOf)=> setOneOf(oneOf)}
+                value={oneOf}
+                isMulti
+                styles={invisibleSelectStyleBlueFont}
+                />
+            </div>
+          </div>
+        }
       </div>
 
-    <
-    /div>
+    </div>
   )
 }

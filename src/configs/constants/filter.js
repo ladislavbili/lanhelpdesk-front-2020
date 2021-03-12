@@ -63,6 +63,37 @@ export const emptyFilter = {
   deadlineTo: null,
   deadlineToNow: false,
 
+  scheduledFrom: null,
+  scheduledFromNow: false,
+  scheduledTo: null,
+  scheduledToNow: false,
+
+  createdAtFrom: null,
+  createdAtFromNow: false,
+  createdAtTo: null,
+  createdAtToNow: false,
+
+  important: {
+    id: null,
+    label: 'Any',
+    value: null
+  },
+  invoiced: {
+    id: null,
+    label: 'Any',
+    value: null
+  },
+  pausal: {
+    id: null,
+    label: 'Any',
+    value: null
+  },
+  overtime: {
+    id: null,
+    label: 'Any',
+    value: null
+  },
+
   public: false,
   oneOf: []
 }
@@ -104,4 +135,19 @@ export const getEmptyFilter = () => ( {
   deadlineFromNow: false,
   deadlineTo: null,
   deadlineToNow: false,
+
+  scheduledFrom: null,
+  scheduledFromNow: false,
+  scheduledTo: null,
+  scheduledToNow: false,
+
+  createdAtFrom: null,
+  createdAtFromNow: false,
+  createdAtTo: null,
+  createdAtToNow: false,
+
+  important: null,
+  invoiced: null,
+  pausal: null,
+  overtime: null,
 } )
