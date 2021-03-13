@@ -1,7 +1,4 @@
 import React from 'react';
-import {
-  useQuery
-} from "@apollo/client";
 import Search from './search';
 import Checkbox from 'components/checkbox';
 import MultiSelect from 'components/MultiSelectNew';
@@ -20,6 +17,7 @@ export default function ListHeader( props ) {
     multiselect,
     setPreference,
     preference,
+    ascending,
   } = props;
 
   const displayValues = (
@@ -141,14 +139,14 @@ export default function ListHeader( props ) {
               ) }
             </select>
 
-            { !props.ascending &&
-              <button type="button" className="btn-link" onClick={()=>props.setAscending(true)}>
+            { ascending &&
+              <button type="button" className="btn-link" onClick={()=>props.setAscending(false)}>
                 <i className="fas fa-arrow-up" />
               </button>
             }
 
-            { props.ascending &&
-              <button type="button" className="btn-link" onClick={()=>props.setAscending(false)}>
+            { !ascending &&
+              <button type="button" className="btn-link" onClick={()=>props.setAscending(true)}>
                 <i className="fas fa-arrow-down" />
               </button>
             }

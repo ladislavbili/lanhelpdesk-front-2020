@@ -97,6 +97,7 @@ export default function TasksIndex( props ) {
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
+  const tasksSort = tasksSortData.tasksSort;
 
   //network
   const {
@@ -135,7 +136,7 @@ export default function TasksIndex( props ) {
         unimplementedAttributes
       ),
       projectId: localProject.id,
-      sort: null
+      sort: tasksSort
     },
     notifyOnNetworkStatusChange: true,
   } );
@@ -153,17 +154,33 @@ export default function TasksIndex( props ) {
     tasksRefetch( {
       variables: {
         filterId: localFilter.id,
-        filter: localFilterToValues( localFilter ),
-        projectId: localProject.id
-      }
+        filter: deleteAttributes(
+          localFilterToValues( localFilter ),
+          unimplementedAttributes
+        ),
+        projectId: localProject.id,
+        sort: tasksSort
+      },
     } );
     calendarEventsRefetch( {
       variables: {
-        filter: localFilterToValues( localFilter ),
+        filter: deleteAttributes(
+          localFilterToValues( localFilter ),
+          unimplementedAttributes
+        ),
         projectId: localProject.id
       }
     } );
-  }, [ localFilter, localProject.id ] );
+  }, [ localFilter, localProject.id, tasksSort ] );
+
+  //monitor and log timings
+  /*
+  React.useEffect( () => {
+    if ( !tasksLoading ) {
+      console.log( [ tasksData.tasks.execTime, tasksData.tasks.secondaryTimes ] );
+    }
+  }, [ tasksLoading ] );
+  */
 
   //state
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
@@ -181,7 +198,6 @@ export default function TasksIndex( props ) {
 
   const tasks = tasksData.tasks.tasks;
   const currentUser = currentUserData.getMyData;
-  const tasksSort = tasksSortData.tasksSort;
 
   //done
   const setTasklistLayoutFunc = ( value ) => {
