@@ -7,16 +7,15 @@ import {
 } from 'react-router-dom';
 
 import Sidebar from './Sidebar';
-import ErrorMessages from 'components/errorMessages';
 import PageHeader from '../components/PageHeader';
 import SelectPage from '../components/SelectPage';
 import ItemList from './items';
 import ItemContainer from './items/itemContainer';
-/*
-import SidebarItemAdd from './settings/sidebarItemAdd';
-import SidebarItemEdit from './settings/sidebarItemEdit';
-import StatusList from './settings/statuses';
 import ItemAdd from './items/itemAdd';
+import ItemCategoryAdd from './settings/itemCategoryAdd';
+import ItemCategoryEdit from './settings/itemCategoryEdit';
+/*
+import StatusList from './settings/statuses';
 */
 
 export default function Navigation( props ) {
@@ -37,19 +36,16 @@ export default function Navigation( props ) {
         </Switch>
         <div className="main">
           <Route exact path='/cmdb/i/:itemCategoryID' component={ItemList} />
+          <Route exact path='/cmdb/i/:itemCategoryID/i/add' component={ItemAdd} />
           <Route exact path='/cmdb/i/:itemCategoryID/:itemID' component={ItemContainer} />
+          <Route exact path='/cmdb/add-category' component={ItemCategoryAdd} />
+          <Route exact path='/cmdb/edit-category/:itemCategoryID' component={ItemCategoryEdit} />
         </div>
       </div>
     </div>
   );
 }
 /*
-<Route exact path="/cmdb/errorMessages" component={ErrorMessages} />
-<Route exact path='/cmdb/add' component={SidebarItemAdd} />
-<Route exact path='/cmdb/edit/:sidebarID' component={SidebarItemEdit} />
-<Route exact path='/cmdb/i/:sidebarID/i/add' component={ItemAdd} />
-<Route exact path='/cmdb/i/:sidebarID/:itemID' component={ItemContainer} />
-
 
 <Route exact path='/cmdb/settings/statuses' component={StatusList} />
 <Route exact path='/cmdb/settings/status/add' component={StatusList} />

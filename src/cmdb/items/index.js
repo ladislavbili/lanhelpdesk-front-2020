@@ -44,13 +44,13 @@ export default function ItemList( props ) {
 
   return (
     <div className="row">
-			<div className="commandbar p-l-20 row">
+			<div className="commandbar row">
 				<div className="center-hor">
 					<h2>{'Item'}</h2>
 				</div>
 
-				<div className="d-flex flex-row align-items-center ml-auto m-r-20">
-					<div className="text-basic m-r-5 m-l-5">
+				<div className="sort-by">
+					<div className="btn-distance">
 						Sort by
 					</div>
 
@@ -66,13 +66,13 @@ export default function ItemList( props ) {
 							</select>
 						{
 							!ascending &&
-							<button type="button" className="btn btn-link btn-outline-blue waves-effect center-hor" onClick={()=>{}}>
+							<button type="button" className="btn-link center-hor" onClick={()=>{}}>
 								<i className="fas fa-arrow-up" />
 							</button>
 						}
 						{
 							ascending &&
-							<button type="button" className="btn btn-link btn-outline-blue waves-effect center-hor" onClick={()=>{}}>
+							<button type="button" className="btn-link center-hor" onClick={()=>{}}>
 								<i className="fas fa-arrow-down" />
 							</button>
 						}
@@ -80,12 +80,8 @@ export default function ItemList( props ) {
 				</div>
 
 				<div className="fit-with-header-and-commandbar full-width scroll-visible">
-					<div className="d-flex m-b-10 flex-row">
-						<div className="search-row">
-							<div className="search">
-								<button className="search-btn" type="button">
-									<i className="fa fa-search" />
-								</button>
+					<div className="search-row">
+							<div className="search btn-distance">
 								<input
 									type="text"
 									className="form-control search-text"
@@ -93,25 +89,28 @@ export default function ItemList( props ) {
 									onChange={(e)=> setSearch(e.target.value)}
 									placeholder="Search"
 									/>
-							</div>
+              <button className="search-btn" type="button">
+                <i className="fa fa-search" />
+              </button>
+            </div>
 							<button
 								className="btn-link center-hor"
 								>
 								Global
 							</button>
-						</div>
 					</div>
 
 					<table className="table">
 						<thead>
 							<tr>
-								<th>ID</th>
+								<th width="5%">ID</th>
 								<th>Type</th>
 								<th>Title</th>
 								<th>Function</th>
 								<th>IP Address</th>
 								<th>Location</th>
-								<th colSpan="2">Status</th>
+								<th>Status</th>
+								<th width="2%"></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -144,9 +143,10 @@ export default function ItemList( props ) {
 								<td>{item.type}</td>
 								<td>{item.title}</td>
 								<td>{item.func}</td>
+                <td className="ips">{item.ip.map((item2)=><span key={item2}>{item2}  </span>)}</td>
 								<td>{item.location}</td>
-								<td>{item.ip.map((item2)=><span key={item2}>{item2}  </span>)}</td>
-								<td colSpan="2">{item.status}</td>
+								<td className="status"><span>{item.status}</span></td>
+  							<td></td>
 							</tr>
 						)
 					}

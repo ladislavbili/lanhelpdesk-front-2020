@@ -5,7 +5,10 @@ import {
   NavItem,
   Nav,
   Label,
-  Button
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
 } from 'reactstrap';
 import {
   NavLink as Link
@@ -18,6 +21,8 @@ import {
   sidebarSelectStyle,
   invisibleSelectStyle
 } from 'configs/components/select';
+
+import CompanyAdd from 'helpdesk/settings/companies/companyAdd';
 
 import {
   itemCategories as items,
@@ -42,6 +47,7 @@ export default function Sidebar( props ) {
   } = props;
 
   const [ company, setCompany ] = React.useState( dashboard );
+  const [ openCompanyAdd, setOpenCompanyAdd ] = React.useState( false );
 
   return (
     <div className="sidebar">
@@ -137,7 +143,7 @@ export default function Sidebar( props ) {
 						<button
               className="btn sidebar-btn m-l-5 m-r-5"
               style={{width: "calc(100% - 10px)"}}
-							onClick={() => history.push('/cmdb/add')}
+							onClick={() => history.push(`/cmdb/i/${match.params.itemCategoryID}/i/add`) }
 							>
 							<i className="fa fa-plus" />
 							Item
@@ -150,7 +156,7 @@ export default function Sidebar( props ) {
         <NavItem className="row full-width">
           <Button
             className='btn-link'
-            onClick={ () =>  {} }
+            onClick={ () =>  setOpenCompanyAdd(true) }
             >
             <i className="fa fa-plus" />
             Company
@@ -168,7 +174,16 @@ export default function Sidebar( props ) {
         </NavItem>
 
 
-				{false && <CompanyAdd />}
+        { openCompanyAdd &&
+          <Modal isOpen={openCompanyAdd} className="modal-without-borders">
+            <ModalBody>
+              <CompanyAdd
+                closeModal={() => setOpenCompanyAdd(false)}
+                addCompanyToList={() => {}}
+                />
+            </ModalBody>
+          </Modal>
+        }
 
       </div>
 				</div> <

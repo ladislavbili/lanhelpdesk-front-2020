@@ -1,109 +1,92 @@
-import React, { Component } from 'react';
-import { Input } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  Input
+} from 'reactstrap';
 
-export default class Passwords extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      newItemID:0,
+export default function Passwords( props ) {
 
-      editItemID:null,
-      editFake: true,
+  const {
+    items,
+    onChange
+  } = props;
 
-      editTitle:'',
-      editIP:'',
-      editLogin:'',
-      editPassword:'',
-      editNote:'',
+  const [ newItemID, setNewItemID ] = React.useState( 0 );
 
-      newTitle:'',
-      newIP:'',
-      newLogin:'',
-      newPassword:'',
-      newNote:'',
+  const [ editItemID, setEditItemID ] = React.useState( null );
+  const [ editFake, setEditFake ] = React.useState( true );
 
-      addingItem: false,
+  const [ editTitle, setEditTitle ] = React.useState( '' );
+  const [ editIP, setEditIP ] = React.useState( '' );
+  const [ editLogin, setEditLogin ] = React.useState( '' );
+  const [ editPassword, setEditPassword ] = React.useState( '' );
+  const [ editNote, setEditNote ] = React.useState( '' );
+
+  const [ newTitle, setNewTitle ] = React.useState( '' );
+  const [ newIP, setNewIP ] = React.useState( '' );
+  const [ newLogin, setNewLogin ] = React.useState( '' );
+  const [ newPassword, setNewPassword ] = React.useState( '' );
+  const [ newNote, setNewNote ] = React.useState( '' );
+
+  const [ addingItem, setAddingItem ] = React.useState( false );
+
+  const onBlur = () => {
+    /*let body={
+      title:editTitle,
+      IP:editIP,
+      login:editLogin,
+      password:editPassword,
+      note:editNote,
+      id:editItemID,
+      fake:editFake,
     }
-    this.onBlur.bind(this);
-    this.onFocus.bind(this);
+    let newData = [...onFocusprops.items];
+    newData[newData.findIndex((item)=>item.id===editItemID)]=body;
+    onFocusprops.onChange(newData);
+    onFocussetState({ editItemID: null });*/
   }
 
-onBlur(){
-  let body={
-    title:this.state.editTitle,
-    IP:this.state.editIP,
-    login:this.state.editLogin,
-    password:this.state.editPassword,
-    note:this.state.editNote,
-    id:this.state.editItemID,
-    fake:this.state.editFake,
+  const onFocus = ( item ) => {
+    /*  onFocussetState({
+        editTitle:item.title,
+        editIP:item.IP,
+        editLogin:item.login,
+        editPassword:item.password,
+        editNote:item.note,
+        editItemID:item.id,
+        editFake:item.fake,
+      });*/
   }
-  let newData = [...this.props.items];
-  newData[newData.findIndex((item)=>item.id===this.state.editItemID)]=body;
-  this.props.onChange(newData);
-  this.setState({ editItemID: null });
-}
 
-onFocus(item) {
-  this.setState({
-    editTitle:item.title,
-    editIP:item.IP,
-    editLogin:item.login,
-    editPassword:item.password,
-    editNote:item.note,
-    editItemID:item.id,
-    editFake:item.fake,
-  });
-}
-
-//className="invisible-input"
-
-  render(){
-    return (
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>IP/URL</th>
-            <th>Login</th>
-            <th>Password</th>
-            <th>Note</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          { this.props.items.map((item,index)=>
+  return (
+    <table className="table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>IP/URL</th>
+          <th>Login</th>
+          <th>Password</th>
+          <th>Note</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          items.map((item,index)=> (
             <tr key={item.id}>
               <td>
                 <Input
                   type="text"
                   className="form-control hidden-input"
                   value={
-                  item.id === this.state.editItemID
-                    ? this.state.editTitle
+                    item.id === editItemID
+                    ? editTitle
                     : item.title
                   }
-                  onBlur={this.onBlur.bind(this)}
-                  onFocus={()=>this.onFocus(item)}
-                  onChange={e =>{
-                    this.setState({ editTitle: e.target.value })}
-                  }
-                />
-              </td>
-              <td>
-                <Input
-                  type="text"
-                  className="form-control hidden-input"
-                  value={
-                    item.id === this.state.editItemID
-                    ? this.state.editIP
-                    : item.IP
-                  }
-                  onBlur={this.onBlur.bind(this)}
-                  onFocus={()=>this.onFocus(item)}
-                  onChange={e =>{
-                    this.setState({ editIP: e.target.value })}
-                  }
+                  onBlur={onBlur}
+                  onFocus={()=>onFocus(item)}
+                  onChange={e => setEditTitle( e.target.value )}
                   />
               </td>
               <td>
@@ -111,57 +94,64 @@ onFocus(item) {
                   type="text"
                   className="form-control hidden-input"
                   value={
-                  item.id === this.state.editItemID
-                    ? this.state.editLogin
+                    item.id === editItemID
+                    ? editIP
+                    : item.IP
+                  }
+                  onBlur={onBlur}
+                  onFocus={()=>onFocus(item)}
+                  onChange={e => setEditIP( e.target.value )}
+                  />
+              </td>
+              <td>
+                <Input
+                  type="text"
+                  className="form-control hidden-input"
+                  value={
+                    item.id === editItemID
+                    ? editLogin
                     : item.login
                   }
-                  onBlur={this.onBlur.bind(this)}
-                  onFocus={()=>this.onFocus(item)}
-                  onChange={e =>{
-                    this.setState({ editLogin: e.target.value })}
-                  }
-                />
+                  onBlur={onBlur}
+                  onFocus={()=>onFocus(item)}
+                  onChange={e => setEditLogin( e.target.value )}
+                  />
               </td>
               <td>
                 <Input
                   type="text"
                   className="form-control hidden-input"
                   value={
-                  item.id === this.state.editItemID
-                    ? this.state.editPassword
+                    item.id === editItemID
+                    ? editPassword
                     : item.password
                   }
-                  onBlur={this.onBlur.bind(this)}
-                  onFocus={()=>this.onFocus(item)}
-                  onChange={e =>{
-                    this.setState({ editPassword: e.target.value })}
-                  }
-                />
+                  onBlur={onBlur}
+                  onFocus={()=>onFocus(item)}
+                  onChange={e => setEditPassword( e.target.value )}
+                  />
               </td>
               <td>
                 <Input
                   type="text"
                   className="form-control hidden-input"
                   value={
-                  item.id === this.state.editItemID
-                    ? this.state.editNote
+                    item.id === editItemID
+                    ? editNote
                     : item.note
                   }
-                  onBlur={this.onBlur.bind(this)}
-                  onFocus={()=>this.onFocus(item)}
-                  onChange={e =>{
-                    this.setState({ editNote: e.target.value })}
-                  }
-                />
+                  onBlur={onBlur}
+                  onFocus={()=>onFocus(item)}
+                  onChange={e => setEditNote( e.target.value )}
+                  />
               </td>
-
               <td>
                 <button className="btn-link waves-effect"
                   onClick={()=>{
                     if(window.confirm('Are you sure?')){
-                      let newData = [...this.props.items];
+                      let newData = [...items];
                       newData.splice(index,1);
-                      this.props.onChange(newData);
+                      onChange(newData);
                     }
                   }}
                   >
@@ -169,103 +159,97 @@ onFocus(item) {
                 </button>
               </td>
             </tr>
-            )
-          }
-          {this.state.addingItem &&
-              <tr>
-                <td>
-                  <Input
-                    type="text"
-                    value={this.state.newTitle}
-                    onChange={(e)=>this.setState({newTitle:e.target.value})}
-                    className="form-control"
-                    id="inlineFormInput"
-                    placeholder="Enter title"
-                    />
-                </td>
-                <td>
-                  <Input
-                    type="text"
-                    value={this.state.newIP}
-                    onChange={(e)=>this.setState({newIP:e.target.value})}
-                    className="form-control"
-                    id="inlineFormInput"
-                    placeholder="Enter IP"
-                    />
-                </td>
-                <td>
-                  <Input
-                    type="text"
-                    value={this.state.newLogin}
-                    onChange={(e)=>this.setState({newLogin:e.target.value})}
-                    className="form-control"
-                    id="inlineFormInput"
-                    placeholder="Enter login"
-                    />
-                </td>
-                <td>
-                  <Input
-                    type="text"
-                    value={this.state.newPassword}
-                    onChange={(e)=>this.setState({newPassword:e.target.value})}
-                    className="form-control"
-                    id="inlineFormInput"
-                    placeholder="Enter password"
-                    />
-                </td>
-                <td>
-                  <Input
-                    type="text"
-                    value={this.state.newNote}
-                    onChange={(e)=>this.setState({newNote:e.target.value})}
-                    className="form-control"
-                    id="inlineFormInput"
-                    placeholder="Enter note"
-                    />
-                </td>
-                <td>
-                  <button className="btn-link waves-effect"
-                    disabled={this.state.newIP===''}
-                    onClick={()=>{
-                      let body={
-                        title:this.state.newTitle,
-                        IP:this.state.newIP,
-                        login:this.state.newLogin,
-                        password:this.state.newPassword,
-                        note:this.state.newNote,
-                        id:this.state.newItemID,
-                        fake:true,
-                      }
+          ))
+        }
+        {
+          addingItem &&
+          <tr>
+            <td>
+              <Input
+                type="text"
+                value={newTitle}
+                onChange={(e)=>setNewTitle(e.target.value)}
+                className="form-control"
+                id="inlineFormInput"
+                placeholder="Enter title"
+                />
+            </td>
+            <td>
+              <Input
+                type="text"
+                value={newIP}
+                onChange={(e)=>setNewIP(e.target.value)}
+                className="form-control"
+                id="inlineFormInput"
+                placeholder="Enter IP"
+                />
+            </td>
+            <td>
+              <Input
+                type="text"
+                value={newLogin}
+                onChange={(e)=>setNewLogin(e.target.value)}
+                className="form-control"
+                id="inlineFormInput"
+                placeholder="Enter login"
+                />
+            </td>
+            <td>
+              <Input
+                type="text"
+                value={newPassword}
+                onChange={(e)=>setNewPassword(e.target.value)}
+                className="form-control"
+                id="inlineFormInput"
+                placeholder="Enter password"
+                />
+            </td>
+            <td>
+              <Input
+                type="text"
+                value={newNote}
+                onChange={(e)=>setNewNote(e.target.value)}
+                className="form-control"
+                id="inlineFormInput"
+                placeholder="Enter note"
+                />
+            </td>
+            <td>
+              <button className="btn-link waves-effect"
+                disabled={newIP===''}
+                onClick={()=>{
+                  let body={
+                    title:newTitle,
+                    IP:newIP,
+                    login:newLogin,
+                    password:newPassword,
+                    note:newNote,
+                    id:newItemID,
+                    fake:true,
+                  };
 
-                      this.setState({
-                        newTitle:'',
-                        newIP:'',
-                        newLogin:'',
-                        newPassword:'',
-                        newNote:'',
-                        newItemID:this.state.newItemID+1,
-                        addingItem: false,
-                      });
-
-                      this.props.onChange([...this.props.items,body]);
-                      }
-                    }
-                    >
-                    <i className="fa fa-plus" />
-                  </button>
-                </td>
-              </tr>
-            }
-            {!this.state.addingItem &&
-              <tr className="add-item" onClick={() => this.setState({addingItem: true,})}>
-                <td>
-                  + Add item
-                </td>
-              </tr>
-            }
-        </tbody>
-
-      </table>
-    );
-  }
+                  setNewTitle('');
+                  setNewIP('');
+                  setNewLogin('');
+                  setNewPassword('');
+                  setNewNote('');
+                  setNewItemID(newItemID+1);
+                  setAddingItem( false);
+                  onChange([...items,body]);
+                }}
+                >
+                <i className="fa fa-plus" />
+              </button>
+            </td>
+          </tr>
+        }
+        {
+          !addingItem &&
+          <tr className="add-item" onClick={() => setAddingItem( true)}>
+            <td> + Add item </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  );
 }

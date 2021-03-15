@@ -14,11 +14,9 @@ import {
   selectStyle
 } from "configs/components/select";
 import AttributesHandler from './attributesHandler';
-//import IPList from './ipList';
-//import Passwords from './passwords';
-//import TextareaList from '../components/backups';
-//import BackupTasksDescription from '../components/backupsDescription';
-//import Links from './links';
+import IPList from './ipList';
+import Passwords from './passwords';
+import InteractiveTasksDescription from '../components/interactiveDescription';
 
 import {
   exampleItem as item
@@ -49,14 +47,14 @@ export default function ItemEdit( props ) {
       </div>
 
       <AttributesHandler
-      attributes={item.attributes}
-      values={[]}
-      setValue={(id, val)=>{}}
-      />
+        attributes={item.attributes}
+        values={[]}
+        setValue={(id, val)=>{}}
+        />
 
 
-    <FormGroup className = "col-lg-12  m-t-20" >
-      <Label className="m-0" style={{height: "30px"}}>Description</Label>
+      <FormGroup className = "col-lg-12  m-t-20" >
+        <Label className="m-0" style={{height: "30px"}}>Description</Label>
         <div className = "row" >
           <div className="flex p-r-15">
             <CKEditor
@@ -75,33 +73,47 @@ export default function ItemEdit( props ) {
           </div>
         </div>
       </FormGroup>
-      {
-        /*
-        <div className="m-t-20 col-lg-12">
-        <IPList items={[]} onChange={(items)=>{}} />
-        </div>
 
-        <div className="m-t-20 col-lg-12">
-        <Passwords items={[]} onChange={(items)=>{}} />
-        </div>
+      <div className="m-t-20 col-lg-12">
+        <IPList items={item.ips} onChange={(items)=>{}} />
+      </div>
 
-        <div className="m-t-20 col-lg-12">
+      <div className="m-t-20 col-lg-12">
+        <Passwords items={item.passwords} onChange={(items)=>{}} />
+      </div>
+
+      <div className="m-t-20 col-lg-12">
         <Label>Backup tasks description</Label>
         <div className="row">
-        <div className="flex p-r-15">
-        <BackupTasksDescription
-        item={{}}
-        onChange={(item)=>{}}
-        width={300}
-        />
+          <div className="flex p-r-15">
+            <InteractiveTasksDescription
+              item={item.backupTasksDescription}
+              onChange={(item)=>{}}
+              width={300}
+              />
+          </div>
+          <div className="cmdb-yellow">
+            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis.
+          </div>
         </div>
-        <div className="cmdb-yellow">
-        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis. Pellentesque placerat elit a nunc. Nullam tortor odio, rutrum quis, egestas ut, posuere sed, felis. Vestibulum placerat feugiat nisl. Suspendisse lacinia, odio non feugiat vestibulum, sem erat blandit metus, ac nonummy magna odio pharetra felis.
+      </div>
+
+      <div className="m-t-20 col-lg-12">
+        <Label>Monitoring tasks description</Label>
+        <div className="row">
+          <div className="flex p-r-15">
+            <InteractiveTasksDescription
+              item={item.monitoringTasksDescription}
+              onChange={(item)=>{}}
+              width={300}
+              />
+          </div>
+          <div className="cmdb-yellow">
+            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis.
+          </div>
         </div>
-        </div>
-        </div>
-        */
-      }
+      </div>
+
     </div>
   );
 }

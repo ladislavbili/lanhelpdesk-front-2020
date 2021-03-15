@@ -16,12 +16,7 @@ export default function ItemView( props ) {
 
 
   const deleteItem = () => {
-    if ( window.confirm( 'Are you sure?' ) ) {
-      /*    this.setState({saving:true,loading:true})
-
-          this.props.setDeleting(false);
-          this.props.history.goBack();*/
-    }
+    if ( window.confirm( 'Are you sure?' ) ) {}
   }
 
   return (

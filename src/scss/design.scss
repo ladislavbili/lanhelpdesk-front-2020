@@ -1198,49 +1198,105 @@ td {
 //--------------------CMDB-------------------------
 
 .cmdb{
-    .commandbar {
-      background-color: #deeaf3;
-      padding-left: $list-odsadenie;
-      .search-row{
-        width: 100%;
-        padding-right: calc(#{$list-odsadenie} + 15px);
-      }
-    }
+  .main{
+    background-color: white;
+  }
 
-    .cmdb-selects{
-    width: 60%;
-      .entry{
-        display: inline;
-        width: 50%;
-        height: 50px;
-        margin-bottom: 10px;
-      }
+  .sidebar{
+    background-color: #f6f6f6;
+    border-right: 1px solid #eaeaea;
+    .sidebar-label{
       label{
-        display: block;
-        font: $main-font-size $main-font-bold ;
-      }
-      .value{
-        font: $main-font-size $main-font;
+        font: $font-info-text;
       }
     }
+    hr{
+      margin: 10px 15px;
+    }
+  }
 
-    .table>tbody>tr>td{
+  .row:before, .row:after{
+    content: none;
+  }
+  .commandbar {
+    background-color: #e6f2fb; //#deeaf3;
+    padding-left: $page-header-odsadenie;
+    .sort-by{
+      display: flex!important;
+      flex-direction: row!important;
+      align-items: center;
+      margin-left: auto!important;
+      margin-right: 15px;
+    }
+  }
+
+  .search-row{
+    flex-direction: row!important;
+    display: flex!important;
+    margin-top: 20px;
+    margin-left: $page-header-odsadenie !important;
+
+    .search{
+      border: $thick-border;
+    }
+  }
+
+  .table{
+    margin: 10px $page-header-odsadenie;
+    width: calc(100% - 60px) !important;
+    tr{
       height: $button-height;
+    }
+    tr:not(first-child):not(:nth-child(1)){
+      border-bottom: 1px solid #f7f7f7;
+    }
+    th, td{
       vertical-align: middle;
+      border: none;
+      padding-left: 0px;
     }
-}
-
-.cmdb.sidebar{
-  .sidebar-label{
-    label{
+    td:not(:first-child){
       font: $font-info-text;
+      color: #989898;
+    }
+    td{
+      border: none;
+    }
+    .ips>span{
+      display: block;
+    }
+    .status{
+      text-align: right;
+      span{
+        background-color: #f4f4f4;
+        padding: 3px 12px;
+      }
+    }
+    .form-control{
+      border: $thick-border;
     }
   }
-  hr{
-    margin: 10px 15px;
+
+  .cmdb-selects{
+    width: 60%;
+    .entry{
+      display: inline;
+      width: 50%;
+      height: 50px;
+      margin-bottom: 10px;
+    }
+    label{
+      display: block;
+      font: $main-font-size $main-font-bold ;
+    }
+    .value{
+      font: $main-font-size $main-font;
+    }
   }
+
 }
 
+/*
 .cmdb-title {
   font-family: Segoe UI;
   font-style: normal;
@@ -1282,11 +1338,7 @@ td {
   text-align: right;
   color: #5c5c5c;
   border-radius: 1.72185px;
-}
-
-.cmdb-tab{
-  border-right: 2px solid #333;
-}
+}*/
 
 .cmdb-yellow{
   width: 30%;
