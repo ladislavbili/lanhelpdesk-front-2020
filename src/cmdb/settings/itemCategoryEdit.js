@@ -60,21 +60,24 @@ export default function SidebarItemEdit( props ) {
   }
 
   return (
-    <div className="card-box fit-with-header p-t-15" style={{maxWidth:1000}}>
-          <h1> Edit item category</h1>
-          <FormGroup>
-            <Label for="name">Item name</Label>
-            <Input
-              type="text"
-              name="name"
-              id="name"
-              placeholder="Enter item name"
-              value={title}
-              onChange={(e)=>{
-                setTitle(e.target.value);
-              }}
-              />
-          </FormGroup>
+    <div className="scrollable edit" >
+    <div className="contents fit-with-header item-category-form" >
+      <h1> Edit item category</h1>
+
+        <FormGroup className="m-t-20">
+          <label for="name">Item name</label>
+          <Input
+            type="text"
+            name="name"
+            id="name"
+            className="item-category-title"
+            placeholder="Enter item name"
+            value={title}
+            onChange={(e)=>{
+              setTitle(e.target.value);
+            }}
+            />
+        </FormGroup>
 
           {
             false &&
@@ -93,44 +96,34 @@ export default function SidebarItemEdit( props ) {
             </FormGroup>
           }
 
-          <div className="m-t-20 col-lg-12">
-            <Label>Description note</Label>
-            <div className="flex p-r-15">
-              <InteractiveTasksDescription
-                item={descriptionNote}
-                onChange={(item)=>{}}
-                width={300}
-                />
-            </div>
-          </div>
 
-          <div className="m-t-20 col-lg-12">
-            <Label>Backup note</Label>
-            <div className="flex p-r-15">
-              <InteractiveTasksDescription
-                item={backupNote}
-                onChange={(item)=>{}}
-                width={300}
-                />
-            </div>
-          </div>
+                    <Label className="m-t-20">Description note</Label>
+                    <InteractiveTasksDescription
+                      item={descriptionNote}
+                      onChange={(item)=>{}}
+                      width={300}
+                      />
 
-          <div className="m-t-20 col-lg-12">
-            <Label>Monitoring note</Label>
-            <div className="flex p-r-15">
-              <InteractiveTasksDescription
-                item={monitoringNote}
-                onChange={(item)=>{}}
-                width={300}
-                />
-            </div>
-          </div>
+                    <Label className="m-t-15">Backup note</Label>
+                    <InteractiveTasksDescription
+                      item={backupNote}
+                      onChange={(item)=>{}}
+                      width={300}
+                      />
+
+
+                    <Label className="m-t-15">Monitoring note</Label>
+                    <InteractiveTasksDescription
+                      item={monitoringNote}
+                      onChange={(item)=>{}}
+                      width={300}
+                      />
 
           <div className="row m-t-20">
             <button
               type="button"
               className="center-hor btn-link-cancel btn-distance"
-              onClick={() =>{}}
+              onClick={() => props.history.goBack()}
               >
               Cancel
             </button>
@@ -144,6 +137,7 @@ export default function SidebarItemEdit( props ) {
               {saving?'Saving...':'Save'}
             </button>
           </div>
+        </div>
     </div>
   );
 }

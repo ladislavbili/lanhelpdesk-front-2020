@@ -32,7 +32,6 @@ export default function NoteInfo( props ) {
         <h1>{`${note.id}: ${note.title}`}</h1>
       </div>
 
-      <hr/>
 
       <div className="note-tags">
         <Label>Tags</Label>

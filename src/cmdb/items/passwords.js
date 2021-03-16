@@ -146,7 +146,7 @@ export default function Passwords( props ) {
                   />
               </td>
               <td>
-                <button className="btn-link waves-effect"
+                <button className="btn-link"
                   onClick={()=>{
                     if(window.confirm('Are you sure?')){
                       let newData = [...items];
@@ -214,8 +214,8 @@ export default function Passwords( props ) {
                 placeholder="Enter note"
                 />
             </td>
-            <td>
-              <button className="btn-link waves-effect"
+            <td className="row">
+              <button className="btn-link"
                 disabled={newIP===''}
                 onClick={()=>{
                   let body={
@@ -240,13 +240,19 @@ export default function Passwords( props ) {
                 >
                 <i className="fa fa-plus" />
               </button>
+              <button
+                className="btn-link"
+                onClick={()=> setAddingItem( false) }
+                >
+                <i className="fa fa-times" />
+              </button>
             </td>
           </tr>
         }
         {
           !addingItem &&
-          <tr className="add-item" onClick={() => setAddingItem( true)}>
-            <td> + Add item </td>
+          <tr >
+            <button className="btn-link add-item" onClick={() =>setAddingItem(true)}>+ Item</button>
           </tr>
         }
       </tbody>

@@ -73,8 +73,7 @@ export default function IPList( props ) {
           <th>IP</th>
           <th>Mask</th>
           <th>Gateway</th>
-          <th>DNS 1</th>
-          <th>DNS 2</th>
+          <th>DNS </th>
           <th>VLAN</th>
           <th colSpan={2}>Note</th>
         </tr>
@@ -158,20 +157,6 @@ export default function IPList( props ) {
                   type="text"
                   value={
                     item.id === editItemID
-                    ? editDNS2
-                    : item.DNS2
-                  }
-                  className="form-control hidden-input"
-                  onChange={e => setEditDNS2(e.target.value) }
-                  onBlur={ onBlur }
-                  onFocus={ () => onFocus(item) }
-                  />
-              </td>
-              <td>
-                <Input
-                  type="text"
-                  value={
-                    item.id === editItemID
                     ? editVLAN
                     : item.VLAN
                   }
@@ -196,7 +181,7 @@ export default function IPList( props ) {
                   />
               </td>
               <td>
-                <button className="btn btn-link waves-effect"
+                <button className="btn btn-link"
                   onClick={()=>{
                     if(window.confirm('Are you sure?')){
                       //    let newData = [...IPs];
@@ -267,16 +252,6 @@ export default function IPList( props ) {
             <td>
               <Input
                 type="text"
-                value={ newDNS2 }
-                onChange={(e) => setNewDNS2(e.target.value)}
-                className="form-control"
-                id="inlineFormInput"
-                placeholder=""
-                />
-            </td>
-            <td>
-              <Input
-                type="text"
                 value={ newVLAN }
                 onChange={(e) => setNewVLAN(e.target.value)}
                 className="form-control"
@@ -295,8 +270,8 @@ export default function IPList( props ) {
                 />
             </td>
 
-            <td>
-              <button className="btn-link waves-effect"
+            <td className="row">
+              <button className="btn-link"
                 disabled={newIP===''}
                 onClick={()=>{
                   let body={
@@ -304,8 +279,7 @@ export default function IPList( props ) {
                     IP:newIP,
                     mask:newMask,
                     gateway:newGateway,
-                    DNS1:newDNS,
-                    DNS2:newDNS2,
+                    DNS1:newDNS1,
                     VLAN:newVLAN,
                     note:newNote,
                     id:newItemID,
@@ -326,13 +300,19 @@ export default function IPList( props ) {
                 >
                 <i className="fa fa-plus" />
               </button>
+              <button
+                className="btn-link"
+                onClick={()=> setAddingItem( false) }
+                >
+                <i className="fa fa-times" />
+              </button>
             </td>
           </tr>
         }
         {
           !addingItem &&
-          <tr className="add-item" onClick={() =>setAddingItem(true)}>
-            <td> + Add item </td>
+          <tr >
+            <button className="btn-link add-item" onClick={() =>setAddingItem(true)}>+ Item</button>
           </tr>
         }
       </tbody>

@@ -87,37 +87,61 @@ export const exampleItem = {
     {
       label: "Status",
       value: "Active",
-      type: "none"
+      type: {
+        id: 'select',
+      },
+      options: [
+        {
+          value: 0,
+          label: "Inactive"
+        },
+        {
+          value: 1,
+          label: "Active"
+        },
+      ]
     },
     {
       label: "Umiestnenie",
       value: "",
-      type: "none"
+      type: {
+        id: 'input',
+      }
       },
     {
       label: "Item type",
       value: "Servery",
-      type: "none"
+      type: {
+        id: 'textarea',
+      }
     },
     {
       label: "Dátum inštalácie",
       value: "",
-      type: "none"
+      type: {
+        id: 'input',
+      }
     },
     {
       label: "Item connection",
       value: "xen01.lansystems.sk",
-      type: "none"
+      type: {
+        id: 'input',
+      }
     },
     {
       label: "Záruka do",
       value: "",
-      type: "none"
+      type: {
+        id: 'input',
+      }
     },
     {
       label: "Firma",
       value: "Aston Esquire",
-      type: "none"
+      type: {
+        id: 'input',
+      }
     },
   ]
 
@@ -194,5 +218,18 @@ export const users = [
     email: "customer@test.sk",
     username: "Mr. Customer",
     id: 1
+  }
+];
+
+export const usersWithRights = [
+  {
+    email: "senk@test.sk",
+    username: "SONKA",
+    id: 2,
+    rights: {
+      admin: false,
+      edit: true,
+      view: true
+    }
   }
 ];

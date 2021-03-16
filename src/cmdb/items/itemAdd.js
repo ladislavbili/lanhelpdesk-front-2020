@@ -51,10 +51,9 @@ export default function ItemAdd( props ) {
   }
 
   return (
-    <div className="fit-with-header">
+    <div>
       <div className="commandbar flex-row">
-
-        <button type="button" className="center-hor btn-link btn-distance" onClick={() =>{}}>
+        <button type="button" className="center-hor btn-link btn-distance" onClick={() => props.history.goBack()} >
           <i
             className="fas fa-arrow-left"
             />
@@ -68,83 +67,82 @@ export default function ItemAdd( props ) {
         </button>
       </div>
 
-      <div className="card-box fit-with-header-and-commandbar p-t-15 scrollable" >
-        <div className="row m-b-10">
-          <h2 className="center-hor flex cmdb-title-edit m-r-10">
-            <Input
+      <div className="scrollable edit">
+        <div className="fit-with-header-and-commandbar contents" >
+
+          <div className="m-t-15">
+            <label>Item name</label>
+            <input
               type="text"
+              className="title-edit flex"
+              style={{width: "100%"}}
               placeholder="Enter name"
               value={title}
               onChange={(e)=>setTitle(e.target.value)}
               />
-          </h2>
-        </div>
+          </div>
 
-        <AttributesHandler
-          attributes={[]}
-          values={[]}
-          setValue={(id, val)=>{}}
-          />
+          <AttributesHandler
+            attributes={[]}
+            values={[]}
+            setValue={(id, val)=>{}}
+            />
 
-        <FormGroup className = "col-lg-12  m-t-20" >
-          <Label className="m-0" style={{height: "30px"}}>Description</Label>
-          <div className = "row" >
-            <div className="flex p-r-15">
-              <CKEditor
-                data={null}
-                onChange={(e)=>{}}
-                config={ {
-                  codeSnippet_languages: {
-                    javascript: 'JavaScript',
-                    php: 'PHP'
-                  }
-                } }
-                />
+          <FormGroup className="row">
+            <div className="description">
+              <label>Description</label>
+              <div className="flex p-r-15">
+                <CKEditor
+                  data={null}
+                  onChange={(e)=>{}}
+                  config={ {
+                    codeSnippet_languages: {
+                      javascript: 'JavaScript',
+                      php: 'PHP'
+                    }
+                  } }
+                  />
+              </div>
             </div>
-            <div className = "cmdb-yellow" >
+            <div className = "description-yellow" >
               Lorem ipsum dolor sit amet, consectetuer adipiscing elit.Aenean et est a dui semper facilisis.Pellentesque placerat elit a nunc.Nullam tortor odio, rutrum quis, egestas ut, posuere sed, felis.Vestibulum placerat feugiat nisl.Suspendisse lacinia, odio non feugiat vestibulum, sem erat blandit metus, ac nonummy magna odio pharetra felis.
             </div>
-          </div>
-        </FormGroup>
+          </FormGroup>
 
-        <div className="m-t-20 col-lg-12">
           <IPList items={[]} onChange={(items)=>{}} />
-        </div>
 
-        <div className="m-t-20 col-lg-12">
           <Passwords items={[]} onChange={(items)=>{}} />
-        </div>
 
-        <div className="m-t-20 col-lg-12">
-          <Label>Backup tasks description</Label>
-          <div className="row">
-            <div className="flex p-r-15">
-              <InteractiveTasksDescription
-                item={backupTasksDescription}
-                onChange={(item)=>{}}
-                width={300}
-                />
+          <div className="row m-t-10">
+            <div className="description">
+              <Label>Backup tasks description</Label>
+              <div className="">
+                <InteractiveTasksDescription
+                  item={backupTasksDescription}
+                  onChange={(item)=>{}}
+                  width={300}
+                  />
+              </div>
             </div>
-            <div className="cmdb-yellow">
+            <div className="description-yellow">
               Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis.
             </div>
           </div>
-        </div>
 
-        <div className="m-t-20 col-lg-12">
-          <Label>Monitoring tasks description</Label>
-          <div className="row">
-            <div className="flex p-r-15">
+          <div className="row m-t-10">
+            <div className="description">
+              <Label>Monitoring tasks description</Label>
               <InteractiveTasksDescription
                 item={monitoringTasksDescription}
                 onChange={(item)=>{}}
                 width={300}
                 />
             </div>
-            <div className="cmdb-yellow">
+            <div className="description-yellow">
               Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis.
             </div>
           </div>
+
         </div>
       </div>
     </div>

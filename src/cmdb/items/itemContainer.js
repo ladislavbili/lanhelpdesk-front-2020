@@ -36,11 +36,11 @@ export default function ItemContainer( props ) {
 								</button>
 							}
 							{ editFormOpen &&
-								<button type="button" className="center-hor btn-link" onClick={()=>{}} disabled={saving}>
+								<button type="button" className="center-hor btn-link btn-distance" onClick={()=>{}} disabled={saving}>
 									<i
 										className="fas fa-save commandbar-command-icon"
 										/>
-									{editFormOpen?" Saving...":" Save"}
+                  Save
 								</button>
 							}
 							<button type="button" className="center-hor btn-link" onClick={()=>{}} disabled={deleting}>

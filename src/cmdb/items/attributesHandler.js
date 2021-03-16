@@ -33,7 +33,7 @@ export default function AttributesHandler( props ) {
   }
 
   return (
-    <div className="cmdb-selects">
+    <div className="item-attributes">
       {
         attributes.map((attribute, index) =>
         {
@@ -41,14 +41,18 @@ export default function AttributesHandler( props ) {
             return (
               <div className="row">
                 <div key={attribute.label} className="entry">
-                  <label className="">{attribute.label}</label>
-                  {drawAttribute(attribute)}
+                  <label>{attribute.label}</label>
+                  <div className="value-input">
+                    {drawAttribute(attribute)}
+                  </div>
                 </div>
                 {
                   index < attributes.length - 1 &&
                   <div key={attributes[index + 1].label} className="entry">
-                    <label className="">{attributes[index + 1].label}</label>
+                    <label>{attributes[index + 1].label}</label>
+                    <div className="value-input">
                     {drawAttribute(attributes[index + 1])}
+                  </div>
                   </div>
                 }
               </div>
