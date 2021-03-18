@@ -4,9 +4,6 @@ import {
   useQuery,
 } from "@apollo/client";
 import {
-  gql
-} from '@apollo/client';;
-import {
   Input
 } from 'reactstrap';
 import Select from 'react-select';
@@ -29,7 +26,8 @@ import {
   oneOfOptions,
   getEmptyGeneralFilter,
   emptyFilter,
-  ofCurrentUser
+  ofCurrentUser,
+  booleanSelectOptions
 } from 'configs/constants/filter';
 
 import {
@@ -102,14 +100,14 @@ export default function FilterForm( props ) {
   const [ saving, setSaving ] = React.useState( null );
 
   const {
-    requester,
-    setRequester,
-    company,
-    setCompany,
-    assigned,
-    setAssigned,
-    taskType,
-    setTaskType,
+    requesters,
+    setRequesters,
+    companies,
+    setCompanies,
+    assignedTos,
+    setAssignedTos,
+    taskTypes,
+    setTaskTypes,
     statusDateFrom,
     setStatusDateFrom,
     statusDateFromNow,
@@ -199,10 +197,10 @@ export default function FilterForm( props ) {
     if ( id === null ) {
       setTitle( '' );
       setDefaultFromObject( {
-        setRequester,
-        setCompany,
-        setAssigned,
-        setTaskType,
+        setRequesters,
+        setCompanies,
+        setAssignedTos,
+        setTaskTypes,
         setStatusDateFrom,
         setStatusDateFromNow,
         setStatusDateTo,
@@ -269,13 +267,13 @@ export default function FilterForm( props ) {
   }
 
   const getCurrentFilter = () => ( {
-    assignedToCur: assigned.id === 'cur',
-    assignedTo: assigned.id === 'cur' ? null : assigned,
-    requesterCur: requester.id === 'cur',
-    requester: requester.id === 'cur' ? null : requester,
-    companyCur: company.id === 'cur',
-    company: company.id === 'cur' ? null : company,
-    taskType: taskType,
+    assignedToCur: assignedTos.some( ( assignedTo ) => assignedTo.id === 'cur' ),
+    assignedTos: assignedTos.filter( ( assignedTo ) => assignedTo.id !== 'cur' ),
+    requesterCur: requesters.some( ( requester ) => requester.id === 'cur' ),
+    requesters: requesters.filter( ( requester ) => requester.id !== 'cur' ),
+    companyCur: companies.some( ( company ) => company.id === 'cur' ),
+    companies: companies.filter( ( company ) => company.id !== 'cur' ),
+    taskTypes,
     oneOf: oneOf.map( ( oneOf ) => oneOf.value ),
 
     statusDateFrom: statusDateFrom === null ? null : statusDateFrom.valueOf()
@@ -302,54 +300,60 @@ export default function FilterForm( props ) {
     deadlineTo: deadlineTo === null ? null : deadlineTo.valueOf()
       .toString(),
     deadlineToNow,
+    scheduledFrom: scheduledFrom === null ? null : scheduledFrom.valueOf()
+      .toString(),
+    scheduledFromNow,
+    scheduledTo: scheduledTo === null ? null : scheduledTo.valueOf()
+      .toString(),
+    scheduledToNow,
+    createdAtFrom: createdAtFrom === null ? null : createdAtFrom.valueOf()
+      .toString(),
+    createdAtFromNow,
+    createdAtTo: createdAtTo === null ? null : createdAtTo.valueOf()
+      .toString(),
+    createdAtToNow,
+    important: important.value,
+    invoiced: invoiced.value,
+    pausal: pausal.value,
+    overtime: overtime.value,
   } )
 
-  const getCleanCurrentFilter = () => ( {
-    ...getCurrentFilter(),
-    assignedTo: assigned.id === 'cur' ? null : assigned.id,
-    requester: requester.id === 'cur' ? null : requester.id,
-    company: company.id === 'cur' ? null : company.id,
-    taskType: taskType.id
-  } )
-
+  const getCleanCurrentFilter = () => {
+    const filter = getCurrentFilter();
+    return ( {
+      ...filter,
+      assignedTos: filter.assignedTos.map( ( item ) => item.id ),
+      requesters: filter.requesters.map( ( item ) => item.id ),
+      companies: filter.companies.map( ( item ) => item.id ),
+      taskTypes: filter.taskTypes.map( ( item ) => item.id ),
+    } )
+  }
   const setFilterState = ( filter ) => {
     setTitle( filter.title );
     //filter data
     filter = filter.filter;
+    setCompanies( [
+      ...( filter.companyCur ? [ ofCurrentUser ] : [] ),
+      ...toSelArr( companiesData.basicCompanies )
+      .filter( ( company ) => filter.companies.some( ( company2 ) => company.id === company2.id ) )
+    ] );
 
-    if ( filter.companyCur ) {
-      setCompany( ofCurrentUser );
-    } else if ( filter.company === null ) {
-      setCompany( emptyFilter.company );
-    } else {
-      setCompany( toSelArr( companiesData.basicCompanies )
-        .find( ( company ) => company.id === filter.company.id ) );
-    }
+    setRequesters( [
+      ...( filter.requesterCur ? [ ofCurrentUser ] : [] ),
+      ...toSelArr( usersData.basicUsers, "fullName" )
+      .filter( ( user ) => filter.requesters.some( ( user2 ) => user.id === user2.id ) )
+    ] );
 
-    if ( filter.requesterCur ) {
-      setRequester( ofCurrentUser );
-    } else if ( filter.requester === null ) {
-      setRequester( emptyFilter.requester );
-    } else {
-      setRequester( toSelArr( usersData.basicUsers, "fullName" )
-        .find( ( user ) => user.id === filter.requester.id ) );
-    }
+    setRequesters( [
+      ...( filter.assignedToCur ? [ ofCurrentUser ] : [] ),
+      ...toSelArr( usersData.basicUsers, "fullName" )
+      .filter( ( user ) => filter.assignedTos.some( ( user2 ) => user.id === user2.id ) )
+    ] );
 
-    if ( filter.assignedToCur ) {
-      setAssigned( emptyFilter.assigned );
-    } else if ( filter.assignedTo === null ) {
-      setAssigned( emptyFilter.assigned );
-    } else {
-      setAssigned( toSelArr( usersData.basicUsers )
-        .find( ( user ) => user.id === filter.assignedTo.id ) );
-    }
-
-    if ( filter.taskType !== null ) {
-      setTaskType( toSelArr( taskTypesData.taskTypes )
-        .find( ( taskType ) => taskType.id === filter.taskType.id ) );
-    } else {
-      setTaskType( emptyFilter.taskType );
-    }
+    setTaskTypes(
+      toSelArr( taskTypesData.taskTypes )
+      .filter( ( taskType ) => filter.taskTypes.some( ( taskType2 ) => taskType.id === taskType2.id ) )
+    );
 
     setStatusDateFromNow( filter.statusDateFromNow );
     setStatusDateFrom( filter.statusDateFrom === null ? null : moment( parseInt( filter.statusDateFrom ) ) );
@@ -367,18 +371,29 @@ export default function FilterForm( props ) {
     setDeadlineFrom( filter.deadlineFrom === null ? null : moment( parseInt( filter.deadlineFrom ) ) );
     setDeadlineToNow( filter.deadlineToNow );
     setDeadlineTo( filter.deadlineTo === null ? null : moment( parseInt( filter.deadlineTo ) ) );
+    setScheduledFrom( filter.scheduledFromNow );
+    setScheduledFromNow( filter.scheduledFrom === null ? null : moment( parseInt( filter.scheduledFrom ) ) );
+    setScheduledTo( filter.scheduledToNow );
+    setScheduledToNow( filter.scheduledTo === null ? null : moment( parseInt( filter.scheduledTo ) ) );
+    setCreatedAtFrom( filter.createdAtFromNow );
+    setCreatedAtFromNow( filter.createdAtFrom === null ? null : moment( parseInt( filter.createdAtFrom ) ) );
+    setCreatedAtTo( filter.createdAtToNow );
+    setCreatedAtToNow( filter.createdAtTo === null ? null : moment( parseInt( filter.createdAtTo ) ) );
     setOneOf( oneOfOptions.filter( ( oneOf ) => filter.oneOf.includes( oneOf.value ) ) );
+    setImportant( booleanSelectOptions.find( ( option ) => option.id === filter.important ) );
+    setInvoiced( booleanSelectOptions.find( ( option ) => option.id === filter.invoiced ) );
+    setPausal( booleanSelectOptions.find( ( option ) => option.id === filter.pausal ) );
+    setOvertime( booleanSelectOptions.find( ( option ) => option.id === filter.overtime ) );
   }
 
   if ( dataLoading ) {
     return <Loading />
   }
   const users = toSelArr( usersData.basicUsers, 'email' );
-  const companies = toSelArr( companiesData.basicCompanies );
-  const taskTypes = toSelArr( taskTypesData.taskTypes );
+  const allCompanies = toSelArr( companiesData.basicCompanies );
+  const allTaskTypes = toSelArr( taskTypesData.taskTypes );
 
   let canModify = id !== null;
-
 
   return (
     <div>
@@ -386,7 +401,7 @@ export default function FilterForm( props ) {
         <button type="button" className="btn-link" onClick={applyFilter}><i className="fa fa-check icon-M p-r-0 m-r-0"/></button>
         {
           <AddFilter
-            filter={getCleanCurrentFilter()}
+            filter={getCurrentFilter()}
             title={title}
             {...props}
             />
@@ -427,39 +442,61 @@ export default function FilterForm( props ) {
 
       <div className="sidebar-filter">
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Zadal - multiselect</label>
+          <label htmlFor="example-input-small">Zadal</label>
           <div className="flex">
             <Select
-              options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(users)}
-              onChange={(newValue)=> {
-                setRequester(newValue);
+              options={[{label:'Current',value:'cur',id:'cur'}].concat(users)}
+              isMulti
+              onChange={(newValues)=> {
+                setRequesters(newValues);
               }}
-              value={requester}
-              styles={invisibleSelectStyleBlueFont} />
-          </div>
-        </div>
-        <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Firma - multiselect</label>
-          <div className="flex">
-            <Select
-              options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companies))}
-              onChange={(comp) => {
-                setCompany(comp);
-              }}
-              value={company}
-              styles={invisibleSelectStyleBlueFont} />
+              value={requesters}
+              styles={invisibleSelectStyleBlueFont}
+              />
           </div>
         </div>
 
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Riesi - multiselect</label>
+          <label htmlFor="example-input-small">Firma</label>
           <div className="flex">
             <Select
-              options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(users, 'email'))}
-              onChange={(newValue)=> {
-                setAssigned(newValue);
+              options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(allCompanies))}
+              isMulti
+              onChange={(companies) => {
+                setCompanies(companies);
               }}
-              value={assigned}
+              value={companies}
+              styles={invisibleSelectStyleBlueFont}
+              />
+          </div>
+        </div>
+
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Rieši</label>
+          <div className="flex">
+            <Select
+              options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(users, 'email'))}
+              isMulti
+              onChange={(newValues)=> {
+                setAssignedTos(newValues);
+              }}
+              value={assignedTos}
+              styles={invisibleSelectStyleBlueFont}
+              />
+          </div>
+        </div>
+
+        {/*Task type*/}
+        <div className="sidebar-filter-row">
+          <label htmlFor="example-input-small">Typ práce</label>
+          <div className="flex">
+            <Select
+              options={toSelArr(allTaskTypes)}
+              isMulti
+              onChange={(newValues)=> {
+                setTaskTypes(newValues);
+              }}
+              value={taskTypes}
               styles={invisibleSelectStyleBlueFont} />
           </div>
         </div>
@@ -519,16 +556,6 @@ export default function FilterForm( props ) {
           setDateTo={(deadlineTo)=> setDeadlineTo( deadlineTo )}
           />
 
-        <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Typ práce - multiselect</label>
-          <div className="flex">
-            <Select
-              options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypes))}
-              onChange={(newValue)=> setTaskType(newValue)}
-              value={taskType}
-              styles={invisibleSelectStyleBlueFont} />
-          </div>
-        </div>
         {/* Scheduled */}
         <FilterDatePickerPopover
           label="Scheduled date"
@@ -542,6 +569,7 @@ export default function FilterForm( props ) {
           setShowNowTo={(scheduledToNow)=> setScheduledToNow( scheduledToNow )}
           setDateTo={(scheduledTo)=> setScheduledTo( scheduledTo )}
           />
+
         {/* Created at */}
         <FilterDatePickerPopover
           label="Created at"
@@ -557,10 +585,10 @@ export default function FilterForm( props ) {
           />
 
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Important - select</label>
+          <label htmlFor="example-input-small">Important</label>
           <div className="flex">
             <Select
-              options={[{label:'Any',value:null,id:null},{label:'Ano',value:'ano',id:'ano'},{label:'Nie',value:'nie',id:'nie'}]}
+              options={booleanSelectOptions}
               onChange={(imp) => {
                 setImportant(imp);
               }}
@@ -570,10 +598,10 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Invoiced - select</label>
+          <label htmlFor="example-input-small">Invoiced</label>
           <div className="flex">
             <Select
-              options={[{label:'Any',value:null,id:null},{label:'Ano',value:'ano',id:'ano'},{label:'Nie',value:'nie',id:'nie'}]}
+              options={booleanSelectOptions}
               onChange={(invoiced) => {
                 setInvoiced(invoiced);
               }}
@@ -583,10 +611,10 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Pausal - select</label>
+          <label htmlFor="example-input-small">Paušál</label>
           <div className="flex">
             <Select
-              options={[{label:'Any',value:null,id:null},{label:'Ano',value:'ano',id:'ano'},{label:'Nie',value:'nie',id:'nie'}]}
+              options={booleanSelectOptions}
               onChange={(pausal) => {
                 setPausal(pausal);
               }}
@@ -596,10 +624,10 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Overtime - select</label>
+          <label htmlFor="example-input-small">Overtime</label>
           <div className="flex">
             <Select
-              options={[{label:'Any',value:null,id:null},{label:'Ano',value:'ano',id:'ano'},{label:'Nie',value:'nie',id:'nie'}]}
+              options={booleanSelectOptions}
               onChange={(overtime) => {
                 setOvertime(overtime);
               }}
@@ -608,21 +636,6 @@ export default function FilterForm( props ) {
               />
           </div>
         </div>
-
-        { false &&
-          <div className="sidebar-filter-row">
-            <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
-            <div className="flex">
-              <Select
-                options={oneOfOptions}
-                onChange={(oneOf)=> setOneOf(oneOf)}
-                value={oneOf}
-                isMulti
-                styles={invisibleSelectStyleBlueFont}
-                />
-            </div>
-          </div>
-        }
       </div>
 
     </div>

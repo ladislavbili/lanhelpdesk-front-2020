@@ -2,6 +2,59 @@ import {
   gql
 } from '@apollo/client';
 
+const filter = `
+filter {
+  oneOf
+  assignedToCur
+  assignedTos {
+    id
+    email
+  }
+  requesterCur
+  requesters {
+    id
+    email
+  }
+  companyCur
+  companies {
+    id
+    title
+  }
+  taskTypes {
+    id
+    title
+  }
+  important
+  invoiced
+  pausal
+  overtime
+  statusDateFrom
+  statusDateFromNow
+  statusDateTo
+  statusDateToNow
+  pendingDateFrom
+  pendingDateFromNow
+  pendingDateTo
+  pendingDateToNow
+  closeDateFrom
+  closeDateFromNow
+  closeDateTo
+  closeDateToNow
+  deadlineFrom
+  deadlineFromNow
+  deadlineTo
+  deadlineToNow
+  scheduledFrom
+  scheduledFromNow
+  scheduledTo
+  scheduledToNow
+  createdAtFrom
+  createdAtFromNow
+  createdAtTo
+  createdAtToNow
+}
+`
+
 export const GET_MY_FILTERS = gql `
 query {
   myFilters {
@@ -22,44 +75,7 @@ query {
       id
       title
     }
-    filter {
-      oneOf
-      assignedToCur
-      assignedTo {
-        id
-        email
-      }
-      requesterCur
-      requester {
-        id
-        email
-      }
-      companyCur
-      company {
-        id
-        title
-      }
-      taskType {
-        id
-        title
-      }
-      statusDateFrom
-      statusDateFromNow
-      statusDateTo
-      statusDateToNow
-      pendingDateFrom
-      pendingDateFromNow
-      pendingDateTo
-      pendingDateToNow
-      closeDateFrom
-      closeDateFromNow
-      closeDateTo
-      closeDateToNow
-      deadlineFrom
-      deadlineFromNow
-      deadlineTo
-      deadlineToNow
-    }
+    ${filter}
   }
 }
 `;
@@ -103,44 +119,7 @@ query myFilter($id: Int!) {
       id
       title
     }
-    filter {
-      assignedToCur
-      assignedTo {
-        id
-        fullName
-      }
-      requesterCur
-      requester {
-        id
-        fullName
-      }
-      companyCur
-      company {
-        id
-        title
-      }
-      taskType {
-        id
-        title
-      }
-      oneOf
-      statusDateFrom
-      statusDateFromNow
-      statusDateTo
-      statusDateToNow
-      pendingDateFrom
-      pendingDateFromNow
-      pendingDateTo
-      pendingDateToNow
-      closeDateFrom
-      closeDateFromNow
-      closeDateTo
-      closeDateToNow
-      deadlineFrom
-      deadlineFromNow
-      deadlineTo
-      deadlineToNow
-    }
+    ${filter}
     project {
       id
     }
@@ -186,44 +165,7 @@ mutation addFilter(
     id
     title
   }
-  filter {
-    oneOf
-    assignedToCur
-    assignedTo {
-      id
-      email
-    }
-    requesterCur
-    requester {
-      id
-      email
-    }
-    companyCur
-    company {
-      id
-      title
-    }
-    taskType {
-      id
-      title
-    }
-    statusDateFrom
-    statusDateFromNow
-    statusDateTo
-    statusDateToNow
-    pendingDateFrom
-    pendingDateFromNow
-    pendingDateTo
-    pendingDateToNow
-    closeDateFrom
-    closeDateFromNow
-    closeDateTo
-    closeDateToNow
-    deadlineFrom
-    deadlineFromNow
-    deadlineTo
-    deadlineToNow
-  }
+  ${filter}
 }
 }
 `;
@@ -259,44 +201,7 @@ mutation updateFilter( $id: Int!, $title: String, $pub: Boolean!, $global: Boole
     id
     title
   }
-  filter {
-    oneOf
-    assignedToCur
-    assignedTo {
-      id
-      email
-    }
-    requesterCur
-    requester {
-      id
-      email
-    }
-    companyCur
-    company {
-      id
-      title
-    }
-    taskType {
-      id
-      title
-    }
-    statusDateFrom
-    statusDateFromNow
-    statusDateTo
-    statusDateToNow
-    pendingDateFrom
-    pendingDateFromNow
-    pendingDateTo
-    pendingDateToNow
-    closeDateFrom
-    closeDateFromNow
-    closeDateTo
-    closeDateToNow
-    deadlineFrom
-    deadlineFromNow
-    deadlineTo
-    deadlineToNow
-  }
+  ${filter}
 }
 }
 `;

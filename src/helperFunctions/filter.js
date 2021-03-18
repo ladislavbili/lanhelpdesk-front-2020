@@ -66,12 +66,13 @@ export const filterProjectsByPermissions = ( projects, currentUser ) => {
 }
 
 export const localFilterToValues = ( localFilter ) => {
+  console.log( localFilter );
   let filterValues = {
     ...localFilter.filter,
-    assignedTo: localFilter.filter.assignedTo === null ? null : localFilter.filter.assignedTo.id,
-    requester: localFilter.filter.requester === null ? null : localFilter.filter.requester.id,
-    company: localFilter.filter.company === null ? null : localFilter.filter.company.id,
-    taskType: localFilter.filter.taskType === null ? null : localFilter.filter.taskType.id,
+    assignedTos: localFilter.filter.assignedTos.map( ( user ) => user.id ),
+    requesters: localFilter.filter.requesters.map( ( user ) => user.id ),
+    companies: localFilter.filter.companies.map( ( company ) => company.id ),
+    taskTypes: localFilter.filter.taskTypes.map( ( taskType ) => taskType.id ),
   }
   delete filterValues.__typename;
   return filterValues;

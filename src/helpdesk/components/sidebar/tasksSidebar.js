@@ -377,7 +377,10 @@ export default function TasksSidebar( props ) {
           { showFilters &&
             <Button
               className='btn btn-link ml-auto m-l-15'
-              onClick={() => setShowFilterAdd(true)}
+              onClick={() => {
+                setFilter( getEmptyGeneralFilter() );
+                setShowFilterAdd(true);
+              }}
               >
               <i className="fa fa-plus"/>
               Filter
@@ -387,24 +390,24 @@ export default function TasksSidebar( props ) {
         </div>
       }
 
-{ !showFilterAdd &&
-      <div className="sidebar-label row" onClick={() => setShowProjects(!showProjects)}>
-        <div>
-          <img
-            className="m-r-9"
-            src={folderIcon}
-            alt="Folder icon not found"
-            />
-          <Label>
-            Project
-          </Label>
+      { !showFilterAdd &&
+        <div className="sidebar-label row" onClick={() => setShowProjects(!showProjects)}>
+          <div>
+            <img
+              className="m-r-9"
+              src={folderIcon}
+              alt="Folder icon not found"
+              />
+            <Label>
+              Project
+            </Label>
+          </div>
+          <div className="ml-auto">
+            { showProjects && <i className="fas fa-chevron-up" /> }
+            { !showProjects && <i className="fas fa-chevron-down" /> }
+          </div>
         </div>
-        <div className="ml-auto">
-          { showProjects && <i className="fas fa-chevron-up" /> }
-          { !showProjects && <i className="fas fa-chevron-down" /> }
-        </div>
-      </div>
-    }
+      }
 
       {  !showFilterAdd && showProjects && renderProjects() }
 

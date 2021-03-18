@@ -18,28 +18,11 @@ export const ofCurrentUser = {
   id: 'cur'
 };
 
-
 export const emptyFilter = {
-  requester: {
-    id: null,
-    label: 'All',
-    value: null
-  },
-  company: {
-    id: null,
-    label: 'All',
-    value: null
-  },
-  assigned: {
-    id: null,
-    label: 'All',
-    value: null
-  },
-  taskType: {
-    id: null,
-    label: 'All',
-    value: null
-  },
+  requesters: [],
+  companies: [],
+  assignedTos: [],
+  taskTypes: [],
 
   statusDateFrom: null,
   statusDateFromNow: false,
@@ -111,12 +94,12 @@ export const getEmptyGeneralFilter = () => ( {
 
 export const getEmptyFilter = () => ( {
   assignedToCur: false,
-  assignedTo: null,
+  assignedTos: [],
   requesterCur: false,
-  requester: null,
+  requesters: [],
   companyCur: false,
-  company: null,
-  taskType: null,
+  companies: [],
+  taskTypes: [],
   oneOf: [],
 
   statusDateFrom: null,
@@ -151,3 +134,17 @@ export const getEmptyFilter = () => ( {
   pausal: null,
   overtime: null,
 } )
+
+export const booleanSelectOptions = [ {
+  label: 'Any',
+  value: null,
+  id: null
+}, {
+  label: 'Ano',
+  value: 'ano',
+  id: 'ano'
+}, {
+  label: 'Nie',
+  value: 'nie',
+  id: 'nie'
+} ]

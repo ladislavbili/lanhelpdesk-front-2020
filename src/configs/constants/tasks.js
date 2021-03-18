@@ -130,10 +130,4 @@ export const attributeLimitingRights = [
   },
 ]
 export const unimplementedAttributes = [
-  'scheduledFrom', 'scheduledFromNow', 'scheduledTo', 'scheduledToNow',
-  'createdAtFrom', 'createdAtFromNow', 'createdAtTo', 'createdAtToNow',
-  'important',
-  'invoiced',
-  'pausal',
-  'overtime'
 ]
