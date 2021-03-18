@@ -32,15 +32,16 @@ export default function List( props ) {
     checkTask,
     currentUser,
     attributesFilter,
-    setAttributeFilter,
-    setAttributesFilter,
+    setLocalTaskStringFilter,
+    setSingleLocalTaskStringFilter,
+    setGlobalTaskStringFilter,
   } = props;
 
   const [ editOpen, setEditOpen ] = React.useState( false );
 
   const clearFilter = () => {
     if ( window.confirm( "Are you sure you want to clear the filter?" ) ) {
-      setAttributesFilter( defaultTasksAttributesFilter );
+      setLocalTaskStringFilter( defaultTasksAttributesFilter );
     }
   }
   const filteredDisplayValues = displayValues.filter( ( displayValue ) => displayValue.show )
@@ -153,7 +154,7 @@ export default function List( props ) {
               className="form-control"
               style={{fontSize: "12px", marginRight: "10px"}}
               onChange={(e) => {
-                setAttributeFilter(display.value, e.target.value);
+                setSingleLocalTaskStringFilter(display.value, e.target.value);
               }}
               />
           </div>
@@ -164,7 +165,7 @@ export default function List( props ) {
                   className="fas fa-times commandbar-command-icon text-highlight"
                   />
               </button>
-              <button type="button" className="btn" onClick={() => {}}>
+              <button type="button" className="btn" onClick={setGlobalTaskStringFilter}>
                 Filter
               </button>
             </div>

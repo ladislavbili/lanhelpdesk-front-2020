@@ -4,6 +4,4 @@ export * from './milestone/queries';
 export * from './project/queries';
 export * from './reports/queries';
 
-export * from './tasksAttributesFilter/queries';
-export * from './taskSearch/queries';
-export * from './tasksSort/queries';
+export * from './tasklist/queries';

@@ -34,18 +34,22 @@ import {
   setProject,
   setMilestone,
   setTasksSort,
-  setTasksAttributeFilter,
-  setTasksAttributesFilter,
-  setTaskSearch,
+  setLocalTaskSearch,
+  setGlobalTaskSearch,
+  setLocalTaskStringFilter,
+  setSingleLocalTaskStringFilter,
+  setGlobalTaskStringFilter,
 } from 'apollo/localSchema/actions';
 
 import {
   GET_FILTER,
   GET_PROJECT,
   GET_MILESTONE,
-  GET_TASK_SEARCH,
   GET_TASKS_SORT,
-  GET_TASKS_ATTRIBUTES_FILTER,
+  GET_LOCAL_TASK_SEARCH,
+  GET_GLOBAL_TASK_SEARCH,
+  GET_LOCAL_TASK_STRING_FILTER,
+  GET_GLOBAL_TASK_STRING_FILTER,
 } from 'apollo/localSchema/queries';
 
 import {
@@ -83,21 +87,39 @@ export default function TasksIndex( props ) {
   } = useQuery( GET_MILESTONE );
 
   const {
-    data: taskSearchData,
-  } = useQuery( GET_TASK_SEARCH );
-
-  const {
     data: tasksSortData,
   } = useQuery( GET_TASKS_SORT );
 
   const {
-    data: attributesFilterData
-  } = useQuery( GET_TASKS_ATTRIBUTES_FILTER );
+    data: localSearchData,
+  } = useQuery( GET_LOCAL_TASK_SEARCH );
+
+  const {
+    data: globalSearchData,
+  } = useQuery( GET_GLOBAL_TASK_SEARCH );
+
+  const {
+    data: localStringFilter,
+  } = useQuery( GET_LOCAL_TASK_STRING_FILTER );
+
+  const {
+    data: globalStringFilter,
+  } = useQuery( GET_GLOBAL_TASK_STRING_FILTER );
 
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
   const tasksSort = tasksSortData.tasksSort;
+  const taskVariables = {
+    projectId: localProject.id,
+    filter: deleteAttributes(
+      localFilterToValues( localFilter ),
+      unimplementedAttributes
+    ),
+    sort: tasksSort,
+    search: globalSearchData.globalTaskSearch,
+    stringFilter: globalStringFilter.globalTaskStringFilter,
+  }
 
   //network
   const {
@@ -129,15 +151,7 @@ export default function TasksIndex( props ) {
     loading: tasksLoading,
     refetch: tasksRefetch,
   } = useQuery( GET_TASKS, {
-    variables: {
-      filterId: localFilter.id,
-      filter: deleteAttributes(
-        localFilterToValues( localFilter ),
-        unimplementedAttributes
-      ),
-      projectId: localProject.id,
-      sort: tasksSort
-    },
+    variables: taskVariables,
     notifyOnNetworkStatusChange: true,
   } );
 
@@ -152,15 +166,7 @@ export default function TasksIndex( props ) {
   //refetch calendar and tasks
   React.useEffect( () => {
     tasksRefetch( {
-      variables: {
-        filterId: localFilter.id,
-        filter: deleteAttributes(
-          localFilterToValues( localFilter ),
-          unimplementedAttributes
-        ),
-        projectId: localProject.id,
-        sort: tasksSort
-      },
+      variables: taskVariables,
     } );
     calendarEventsRefetch( {
       variables: {
@@ -171,16 +177,14 @@ export default function TasksIndex( props ) {
         projectId: localProject.id
       }
     } );
-  }, [ localFilter, localProject.id, tasksSort ] );
+  }, [ localFilter, localProject.id, tasksSort, globalSearchData, globalStringFilter ] );
 
   //monitor and log timings
-  /*
   React.useEffect( () => {
     if ( !tasksLoading ) {
-      console.log( [ tasksData.tasks.execTime, tasksData.tasks.secondaryTimes ] );
+      console.log( 'timings', [ tasksData.tasks.execTime, tasksData.tasks.secondaryTimes ] );
     }
   }, [ tasksLoading ] );
-  */
 
   //state
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
@@ -362,7 +366,6 @@ export default function TasksIndex( props ) {
     } )
     return preference;
   }
-  //  console.log( [ createPreferences(), preferencesData ] );
 
   return (
     <TasklistSwitch
@@ -375,8 +378,6 @@ export default function TasksIndex( props ) {
       setLocalProject={setProject}
       localMilestone = {localMilestone}
       setLocalMilestone={setMilestone}
-      taskSearch={taskSearchData.taskSearch}
-      setTaskSearch={setTaskSearch}
       calendarEvents={calendarEventsData.calendarEvents}
       tasks={processTasks(tasks)}
       checkTask={checkTask}
@@ -395,9 +396,15 @@ export default function TasksIndex( props ) {
       deleteTask={deleteTaskFunc}
       tasklistLayout={currentUser.tasklistLayout}
       setTasklistLayout={setTasklistLayoutFunc}
-      attributesFilter={attributesFilterData.tasksAttributesFilter}
-      setAttributeFilter={setTasksAttributeFilter}
-      setAttributesFilter={setTasksAttributesFilter}
+
+      taskSearch={localSearchData.localTaskSearch}
+      setLocalTaskSearch={setLocalTaskSearch}
+      setGlobalTaskSearch={setGlobalTaskSearch}
+
+      attributesFilter={localStringFilter.localTaskStringFilter}
+      setLocalTaskStringFilter={setLocalTaskStringFilter}
+      setSingleLocalTaskStringFilter={setSingleLocalTaskStringFilter}
+      setGlobalTaskStringFilter={setGlobalTaskStringFilter}
       />
   );
 }

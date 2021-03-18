@@ -20,10 +20,9 @@ export default function Search( props ) {
     taskSearch,
     setLocalProject,
     setLocalMilestone,
-    setTaskSearch,
+    setLocalTaskSearch,
+    setGlobalTaskSearch,
   } = props;
-
-  const [ search, setSearch ] = React.useState( taskSearch );
 
   return (
     <div
@@ -33,11 +32,11 @@ export default function Search( props ) {
         <input
           type="text"
           className="form-control search-text"
-          value={search}
-          onChange={(e)=>setSearch(e.target.value)}
+          value={taskSearch}
+          onChange={(e)=>setLocalTaskSearch(e.target.value)}
           onKeyPress={(e)=>{
             if( e.key === 'Enter' ){
-              setTaskSearch(search)
+              setGlobalTaskSearch()
             }
           }}
           placeholder="Search in id and task title"
@@ -55,7 +54,13 @@ export default function Search( props ) {
           history.push(`/helpdesk/taskList/i/all`)
         }}
         >
-        Global
+        Global search
+      </Button>
+      <Button
+        className="btn-link center-hor m-l-10"
+        onClick={setGlobalTaskSearch}
+        >
+        Search through tasks
       </Button>
     </div>
   );

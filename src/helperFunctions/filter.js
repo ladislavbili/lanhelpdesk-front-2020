@@ -66,7 +66,6 @@ export const filterProjectsByPermissions = ( projects, currentUser ) => {
 }
 
 export const localFilterToValues = ( localFilter ) => {
-  console.log( localFilter );
   let filterValues = {
     ...localFilter.filter,
     assignedTos: localFilter.filter.assignedTos.map( ( user ) => user.id ),

@@ -427,11 +427,19 @@ mutation addUserToProject(
 `;
 
 export const GET_TASKS = gql `
-query tasks($filter: FilterInput, $projectId: Int, $sort: SortTasksInput){
+query tasks(
+  $projectId: Int
+  $filter: FilterInput
+  $sort: SortTasksInput
+  $search: String
+  $stringFilter: StringFilterInput
+){
   tasks (
-    filter: $filter,
-    projectId: $projectId,
-    sort: $sort,
+    projectId: $projectId
+    filter: $filter
+    sort: $sort
+    search: $search
+    stringFilter: $stringFilter
   ){
     ${listTasks}
   }
