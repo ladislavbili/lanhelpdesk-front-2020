@@ -23,6 +23,7 @@ import {
 export default function CommandBar( props ) {
   const {
     currentUser,
+    loading,
     showStatistics,
     setShowStatistics,
     tasklistLayout,
@@ -114,6 +115,7 @@ export default function CommandBar( props ) {
               <label className="center-hor">
                 <Switch
                   checked={showStatistics}
+                  disabled={loading}
                   onChange={() => {
                     setShowStatistics(!showStatistics);
                   }}

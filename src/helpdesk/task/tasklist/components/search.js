@@ -5,6 +5,7 @@ import classnames from "classnames";
 import {
   Button
 } from 'reactstrap';
+import Loading from 'components/loading';
 import {
   dashboard,
   allMilestones,
@@ -17,6 +18,7 @@ export default function Search( props ) {
     layout,
     isTask,
     history,
+    loading,
     taskSearch,
     setLocalProject,
     setLocalMilestone,
@@ -35,14 +37,14 @@ export default function Search( props ) {
           value={taskSearch}
           onChange={(e)=>setLocalTaskSearch(e.target.value)}
           onKeyPress={(e)=>{
-            if( e.key === 'Enter' ){
+            if( e.key === 'Enter' && !loading ){
               setGlobalTaskSearch()
             }
           }}
           placeholder="Search in id and task title"
           />
         <button className="search-btn" type="button">
-          <i className="fa fa-search flip" />
+          <i className={`fa fa-${loading ? 'spinner' : 'search'} flip`} />
         </button>
       </div>
 
@@ -57,6 +59,7 @@ export default function Search( props ) {
         Global search
       </Button>
       <Button
+        disabled={loading}
         className="btn-link center-hor m-l-10"
         onClick={setGlobalTaskSearch}
         >

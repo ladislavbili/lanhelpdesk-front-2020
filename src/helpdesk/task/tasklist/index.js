@@ -196,14 +196,13 @@ export default function TasksIndex( props ) {
     preferencesLoading
   );
 
-  if ( dataLoading ) {
+  if ( currentUserLoading ) {
     return ( <Loading /> );
   }
 
-  const tasks = tasksData.tasks.tasks;
+  const tasks = dataLoading ? [] : tasksData.tasks.tasks;
   const currentUser = currentUserData.getMyData;
 
-  //done
   const setTasklistLayoutFunc = ( value ) => {
     setTasklistLayout( {
         variables: {
@@ -253,7 +252,6 @@ export default function TasksIndex( props ) {
       } )
   }
 
-  //done
   const checkTask = ( id ) => {
     if ( id === 'all' ) {
       if ( markedTasks.length === tasks.length ) {
@@ -270,7 +268,6 @@ export default function TasksIndex( props ) {
     }
   }
 
-  //done
   const deleteTaskFunc = () => {
     if ( window.confirm( "Are you sure?" ) ) {
       let tasksForDelete = tasks.filter( ( task ) => markedTasks.includes( task.id ) );
@@ -321,7 +318,7 @@ export default function TasksIndex( props ) {
       }
     }
   }
-  //done
+
   const setUserStatusesFunc = ( ids ) => {
     let projectStatusIds = ( localProject.project.statuses ? localProject.project.statuses : [] )
       .map( ( status ) => status.id );
@@ -371,6 +368,7 @@ export default function TasksIndex( props ) {
     <TasklistSwitch
       history={history}
       match={match}
+      loading={dataLoading}
       currentUser={currentUser}
       localFilter = {localFilter}
       setLocalFilter={setFilter}
@@ -378,10 +376,10 @@ export default function TasksIndex( props ) {
       setLocalProject={setProject}
       localMilestone = {localMilestone}
       setLocalMilestone={setMilestone}
-      calendarEvents={calendarEventsData.calendarEvents}
-      tasks={processTasks(tasks)}
+      calendarEvents={dataLoading ? [] : calendarEventsData.calendarEvents}
+      tasks={dataLoading ? [] : processTasks(tasks) }
       checkTask={checkTask}
-      preference = {createPreferences()}
+      preference = { preferencesLoading ? defaultTasklistColumnPreference : createPreferences()}
       setPreference={setPreference}
       orderBy={ tasksSort.key }
       setOrderBy={(value) => {

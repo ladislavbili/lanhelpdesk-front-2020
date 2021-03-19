@@ -10,6 +10,7 @@ import {
 
 export default function ListHeader( props ) {
   const {
+    loading,
     localProject,
     displayValues: allDisplayValues,
     selectedStatuses,
@@ -52,6 +53,7 @@ export default function ListHeader( props ) {
             className="m-l-5  m-r-10"
             style={{marginTop: 'auto', height: '20px'}}
             label= "All"
+            disabled={loading}
             value={ selectedStatuses.length===0 || allStatuses.every((status)=>selectedStatuses.includes(status.id)) }
             onChange={()=>{
               if(selectedStatuses.length===0){
@@ -65,6 +67,7 @@ export default function ListHeader( props ) {
           { allStatuses.map((status)=>
             <Checkbox
               key={status.id}
+              disabled={loading}
               className="m-l-5 m-r-10"
               style={{marginTop: 'auto', height: '20px'}}
               label={ status.title }
@@ -85,6 +88,7 @@ export default function ListHeader( props ) {
       { multiselect && selectedStatuses &&
         <Multiselect
           className="ml-auto m-r-10"
+          disabled={loading}
           options={ [{ id:'All', label: 'All' }, ...allStatuses.map((status)=>({...status,label:status.title}))] }
           value={
             [{ id:'All', label: 'All' }, ...allStatuses.map((status)=>({...status,label:status.title}))]
@@ -156,6 +160,7 @@ export default function ListHeader( props ) {
                 <i className="fa fa-cog" />
               </button>
               <MultiSelect
+                disabled={loading}
                 className="center-hor"
                 menuClassName="m-t-30"
                 bodyClassName="p-l-10 p-r-10 scrollable"

@@ -13,19 +13,21 @@ import {
   getItemDisplayValue
 }
 from 'helperFunctions';
+import Checkbox from 'components/checkbox';
+import Loading from 'components/loading';
 import CommandBar from './components/commandBar';
 import ListHeader from './components/listHeader';
-import Checkbox from 'components/checkbox';
 import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
 
 import {
   defaultTasksAttributesFilter
 } from 'configs/constants/tasks';
 
-export default function List( props ) {
+export default function TableList( props ) {
   const {
     history,
     link,
+    loading,
     displayValues,
     tasks,
     deleteTask,
@@ -42,6 +44,7 @@ export default function List( props ) {
   const clearFilter = () => {
     if ( window.confirm( "Are you sure you want to clear the filter?" ) ) {
       setLocalTaskStringFilter( defaultTasksAttributesFilter );
+      setGlobalTaskStringFilter();
     }
   }
   const filteredDisplayValues = displayValues.filter( ( displayValue ) => displayValue.show )
@@ -51,7 +54,7 @@ export default function List( props ) {
       .every( ( display ) => {
         let value = getItemDisplayValue( task, display );
         if ( display.value === "assignedTo" ) {
-          value = task[ "assignedTo" ].map( task => `${task.name} ${task.surname} (${task.email})` )
+          value = task[ "assignedTo" ].map( user => `${user.fullName} (${user.email})` )
             .toString();
         }
         if ( display.value === "status" ) {
@@ -85,6 +88,7 @@ export default function List( props ) {
         return result;
       } );
   }
+
   const renderHeader = ( display ) => {
     if ( display.type === 'important' || display.type === 'invoiced' ) {
       return null;
@@ -97,6 +101,9 @@ export default function List( props ) {
         >
         <div
           onClick={() => {
+            if(loading){
+              return;
+            }
             if( !tasks.some( (task) => task.checked ) ){
               window.alert('Please first pick tasks to delete!');
               return;
@@ -110,6 +117,9 @@ export default function List( props ) {
         <div
           className="m-l-5"
           onClick={() => {
+            if(loading){
+              return;
+            }
             if( !tasks.some( (task) => task.checked ) ){
               window.alert('Please first pick tasks to edit!');
               return;
@@ -136,6 +146,7 @@ export default function List( props ) {
       return <th key={display.value} width="40" >
         <Checkbox
           className = "m-l-7 m-t-6 p-l-0"
+          disabled={loading}
           value = { tasks.every((task) => task.checked ) }
           label = ""
           onChange={ (e) => checkTask('all', e.target.checked) }
@@ -149,6 +160,7 @@ export default function List( props ) {
 
           <div style={index === filteredDisplayValues.length - 1 ? {flex: "1"} : {}}>
             <input
+              disabled={loading}
               type="text"
               value={ value }
               className="form-control"
@@ -160,12 +172,12 @@ export default function List( props ) {
           </div>
           {index === filteredDisplayValues.length - 1 &&
             <div className="ml-auto row">
-              <button type="button" className="btn-link m-l-8 m-r-5" onClick={clearFilter}>
+              <button type="button" disabled={loading} className="btn-link m-l-8 m-r-5" onClick={clearFilter}>
                 <i
                   className="fas fa-times commandbar-command-icon text-highlight"
                   />
               </button>
-              <button type="button" className="btn" onClick={setGlobalTaskStringFilter}>
+              <button type="button" disabled={loading} className="btn" onClick={setGlobalTaskStringFilter}>
                 Filter
               </button>
             </div>
@@ -241,7 +253,6 @@ export default function List( props ) {
     )
   }
 
-
   return (
     <div>
       <CommandBar
@@ -272,6 +283,13 @@ export default function List( props ) {
               .map((task) =>
               renderTask(task)
             )}
+            { loading &&
+              <tr>
+                <td colSpan="100">
+                <Loading />
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
 

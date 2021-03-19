@@ -2,6 +2,7 @@ import React from 'react';
 
 import CommandBar from './components/commandBar';
 import ListHeader from './components/listHeader';
+import Loading from 'components/loading';
 import TaskEdit from '../edit';
 import TaskEmpty from '../taskEmpty';
 import ItemRender from './components/columnItemRender';
@@ -11,6 +12,7 @@ export default function ColumnList( props ) {
   const {
     match,
     history,
+    loading,
     link,
     tasks,
   } = props;
@@ -27,7 +29,10 @@ export default function ColumnList( props ) {
 
         <div className="p-0 golden-ratio-382">
           <div className="scroll-visible fit-with-header-and-commandbar-2 task-list">
-            { tasks.map((task, index) =>
+            { loading &&
+              <Loading/>
+            }
+            { !loading && tasks.map((task, index) =>
               <ul
                 className={classnames( "taskCol", "clickable", "list-unstyled", {'selected-item': taskID === task.id} )}
                 style={{borderLeft: "3px solid " + ( task.status ? ( task.status.color ? task.status.color : 'white' ) : "white") }}
@@ -38,7 +43,7 @@ export default function ColumnList( props ) {
                 <ItemRender task={task} />
               </ul>
             ) }
-          { tasks.length===0 &&
+          { !loading && tasks.length===0 &&
             <div className="center-ver" style={{textAlign:'center'}}>
               Neboli nájdené žiadne výsledky pre tento filter
             </div>
