@@ -135,21 +135,16 @@ export default function Sidebar( props ) {
 							</NavItem>
 						)
 					}
-
-
-          					<hr/>
-
-					<NavItem className="row full-width">
-						<button
-              className="btn sidebar-btn m-l-5 m-r-5"
-              style={{width: "calc(100% - 10px)"}}
-							onClick={() => history.push(`/cmdb/i/${match.params.itemCategoryID}/i/add`) }
-							>
-							<i className="fa fa-plus" />
-							Item
-						</button>
-					</NavItem>
+          	<hr/>
 				</Nav>
+
+        <button
+          className="btn sidebar-btn"
+          onClick={() => history.push(`/cmdb/i/${match.params.itemCategoryID}/i/add`) }
+          >
+          <i className="fa fa-plus" />
+          Item
+        </button>
 
       <div className='p-l-15 p-r-15'>
 

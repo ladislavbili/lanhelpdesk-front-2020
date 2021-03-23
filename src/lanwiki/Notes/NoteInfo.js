@@ -28,12 +28,12 @@ export default function NoteInfo( props ) {
   return (
     <div className={"lanwiki-note scrollable fit-with-header-and-commandbar"} >
 
-      <div className="lanwiki-title">
+      <div className="lanwiki-title group">
         <h1>{`${note.id}: ${note.title}`}</h1>
       </div>
 
 
-      <div className="note-tags">
+      <div className="group">
         <Label>Tags</Label>
         <div>
           {note.tags.map((tag)=> (
@@ -42,7 +42,7 @@ export default function NoteInfo( props ) {
         </div>
       </div>
 
-      <div className="m-b-20">
+      <div className="group">
         {note.body}
       </div>
 

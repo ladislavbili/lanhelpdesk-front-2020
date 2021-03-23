@@ -43,13 +43,41 @@ export default function ItemList( props ) {
   }
 
   return (
-    <div className="row">
-      <div className="commandbar row">
+    <div className="content-page row">
+      <div className="content" style={{width: "100%"}}>
+
+      <div className="task-list-commandbar p-l-30 p-r-19">
         <div className="center-hor">
-          <h2>{'Item'}</h2>
+          <h2>{'ALL'}</h2>
+        </div>
+      </div>
+
+      <div className="full-width scroll-visible fit-with-header-and-commandbar task-container">
+
+        <div className="d-flex h-60px flex-row m-l-30">
+        <div className="search-row">
+          <div className="search btn-distance">
+            <input
+              type="text"
+              className="form-control search-text"
+              value={search}
+              onChange={(e)=> setSearch(e.target.value)}
+              placeholder="Search"
+              />
+            <button className="search-btn" type="button">
+              <i className="fa fa-search" />
+            </button>
+          </div>
+          <button
+            className="btn-link center-hor"
+            >
+            Global
+          </button>
         </div>
 
-        <div className="sort-by">
+
+        <div className="ml-auto m-r-30">
+          <div className="align-items-center flex-row">
           <div className="btn-distance">
             Sort by
           </div>
@@ -77,30 +105,12 @@ export default function ItemList( props ) {
             </button>
           }
         </div>
-      </div>
-
-      <div className="fit-with-header-and-commandbar full-width scroll-visible">
-        <div className="search-row">
-          <div className="search btn-distance">
-            <input
-              type="text"
-              className="form-control search-text"
-              value={search}
-              onChange={(e)=> setSearch(e.target.value)}
-              placeholder="Search"
-              />
-            <button className="search-btn" type="button">
-              <i className="fa fa-search" />
-            </button>
-          </div>
-          <button
-            className="btn-link center-hor"
-            >
-            Global
-          </button>
         </div>
 
-        <table className="item-list table">
+      </div>
+
+
+        <table className="table">
           <thead>
             <tr>
               <th width="5%">ID</th>
@@ -153,6 +163,7 @@ export default function ItemList( props ) {
           </tbody>
         </table>
       </div>
+    </div>
   	</div>
   );
 }
