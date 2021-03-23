@@ -57,8 +57,9 @@ export default function ItemEdit( props ) {
           />
 
         <FormGroup className="row m-t-10">
+          <label>Description</label>
+          <div className="row">
           <div className="description">
-            <label>Description</label>
             <div className="">
               <CKEditor
                 data={null}
@@ -75,15 +76,17 @@ export default function ItemEdit( props ) {
           <div className = "description-yellow" >
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit.Aenean et est a dui semper facilisis.Pellentesque placerat elit a nunc.Nullam tortor odio, rutrum quis, egestas ut, posuere sed, felis.Vestibulum placerat feugiat nisl.Suspendisse lacinia, odio non feugiat vestibulum, sem erat blandit metus, ac nonummy magna odio pharetra felis.
           </div>
+        </div>
         </FormGroup>
 
         <IPList items={item.ips} onChange={(items)=>{}} />
 
         <Passwords items={item.passwords} onChange={(items)=>{}} />
 
-        <div className="row m-b-20">
+        <div className="m-b-20">
+          <Label>Backup tasks description</Label>
+          <div className="row">
           <div className="description">
-            <Label>Backup tasks description</Label>
             <InteractiveTasksDescription
               item={item.backupTasksDescription}
               onChange={(item)=>{}}
@@ -94,10 +97,12 @@ export default function ItemEdit( props ) {
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis.
           </div>
         </div>
+        </div>
 
-        <div className="row">
+        <div className="">
+          <Label>Monitoring tasks description</Label>
+          <div className="row">
           <div className="description">
-            <Label>Monitoring tasks description</Label>
             <InteractiveTasksDescription
               item={item.monitoringTasksDescription}
               onChange={(item)=>{}}
@@ -107,6 +112,7 @@ export default function ItemEdit( props ) {
           <div className="description-yellow">
             Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis.
           </div>
+        </div>
         </div>
 
       </div>

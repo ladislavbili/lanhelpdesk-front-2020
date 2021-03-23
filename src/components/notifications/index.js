@@ -242,7 +242,7 @@ export default function NotificationList( props ) {
                   </button>
                 </div>
               </div>
-              <span className="center-hor" style={{width: "40%"}}>
+              <span className="center-hor ml-auto" style={{width: "30%", backgroundColor: "white"}}>
                 <Select
                   value={type}
                   onChange={(type) => setType( type ) }
@@ -276,11 +276,9 @@ export default function NotificationList( props ) {
               </button>
             </div>
             <div>
-              <table className="table">
-                <tbody>
                   {
                     notifications.map((notification) =>
-                    <tr
+                    <li
                       key={notification.id}
                       className={classnames({ 'notification-read': notification.read,
                         'notification-not-read': !notification.read,
@@ -288,7 +286,7 @@ export default function NotificationList( props ) {
                         "clickable")}
                         onClick={() => setNotificationReadFunc(notification)}
                         >
-                        <td className={(selectedNotificationID === notification.id ? "text-highlight":"")}>
+                        <div className={(selectedNotificationID === notification.id ? "text-highlight":"")}>
                           <i className={classnames({ 'far fa-envelope-open': notification.read, 'fas fa-envelope': !notification.read })} />
                           {`${notification.task.id}:${notification.task.title}`}
                           <div className="row">
@@ -296,18 +294,16 @@ export default function NotificationList( props ) {
                               <Label className="p-r-5">User:</Label>
                               {notification.fromUser ? notification.fromUser.fullName : "no user"}
                             </div>
-                            <div className="ml-auto m-r-55">
+                            <div className="ml-auto">
                               {timestampToString(parseInt(notification.createdAt))}
                             </div>
                           </div>
                           <Label className="p-r-5">Subject:</Label>
                           {notification.subject}
-                        </td>
-                      </tr>
+                        </div>
+                      </li>
                     )
                   }
-                </tbody>
-              </table>
               {
                 notifications.length === 0 &&
                 <ListGroupItem>There are no notifications!</ListGroupItem>
@@ -323,7 +319,7 @@ export default function NotificationList( props ) {
           }
           {
             selectedNotificationID === null &&
-            <div className="commandbar"></div>
+            <div className="fit-with-header" style={{backgroundColor: "white"}}></div>
           }
         </div>
     </div>

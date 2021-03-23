@@ -255,7 +255,7 @@ export default function ErrorList( props ) {
                   </button>
                 </div>
               </div>
-              <span className="center-hor" style={{width: "40%"}}>
+              <span className="center-hor ml-auto" style={{width: "30%", backgroundColor: "white"}}>
                 <Select
                   value={type}
                   onChange={(type) => setType( type ) }
@@ -289,11 +289,9 @@ export default function ErrorList( props ) {
               </button>
             </div>
             <div>
-              <table className="table">
-                <tbody>
                   {
                     errors.map((error) =>
-                    <tr
+                    <li
                       key={error.id}
                       className={classnames({ 'notification-read': error.read,
                         'notification-not-read': !error.read,
@@ -301,7 +299,7 @@ export default function ErrorList( props ) {
                         "clickable")}
                         onClick={() => setErrorMessageReadFunc(error)}
                         >
-                        <td className={(selectedErrorID === error.id ? "text-highlight":"")}>
+                        <div className={(selectedErrorID === error.id ? "text-highlight":"")}>
                           <i className={classnames({ 'far fa-envelope-open': error.read, 'fas fa-envelope': !error.read })} />
                           {error.source}
                           <div className="row">
@@ -313,12 +311,10 @@ export default function ErrorList( props ) {
                             </div>
                           </div>
                           <div style={{overflowX:'hidden'}}>{error.errorMessage.substring(0, 150)}...</div>
-                        </td>
-                      </tr>
+                        </div>
+                      </li>
                     )
                   }
-                </tbody>
-              </table>
               {
                 errorMessages.length === 0 &&
                 <ListGroupItem>There are no errors!</ListGroupItem>
@@ -334,7 +330,7 @@ export default function ErrorList( props ) {
           }
           {
             selectedErrorID === null &&
-            <div className="commandbar"></div>
+            <div className="fit-with-header" style={{backgroundColor: "white"}}></div>
           }
         </div>
     </div>

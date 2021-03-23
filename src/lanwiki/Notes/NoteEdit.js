@@ -83,7 +83,7 @@ export default function NoteEdit( props ) {
   };
 
   return (
-    <div className={"lanwiki-note scrollable fit-with-header-and-commandbar"}>
+    <div className={"lanwiki-note scrollable fit-with-header"}>
       <div className="row lanwiki-title-edit group">
         <h1 className="center-hor p-l-5">{note.id}:</h1>
         <span className="center-hor flex m-l-5">
@@ -99,7 +99,7 @@ export default function NoteEdit( props ) {
 
       <div className="note-tags-edit group">
         <Label>Tags</Label>
-        <div className="f-1">
+        <div className="f-1 select">
           <Select
             value={tags}
             isMulti
@@ -125,7 +125,6 @@ export default function NoteEdit( props ) {
 
       <FormGroup
         className="group"
-        style={{ position: "relative", zIndex: modalOpen ? "1" : "9999" }}
       >
         {false && (
           <button className="btn-link p-l-0" onClick={toggleModal}>
