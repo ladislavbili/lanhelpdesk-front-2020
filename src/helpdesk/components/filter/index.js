@@ -371,14 +371,14 @@ export default function FilterForm( props ) {
     setDeadlineFrom( filter.deadlineFrom === null ? null : moment( parseInt( filter.deadlineFrom ) ) );
     setDeadlineToNow( filter.deadlineToNow );
     setDeadlineTo( filter.deadlineTo === null ? null : moment( parseInt( filter.deadlineTo ) ) );
-    setScheduledFrom( filter.scheduledFromNow );
-    setScheduledFromNow( filter.scheduledFrom === null ? null : moment( parseInt( filter.scheduledFrom ) ) );
-    setScheduledTo( filter.scheduledToNow );
-    setScheduledToNow( filter.scheduledTo === null ? null : moment( parseInt( filter.scheduledTo ) ) );
-    setCreatedAtFrom( filter.createdAtFromNow );
-    setCreatedAtFromNow( filter.createdAtFrom === null ? null : moment( parseInt( filter.createdAtFrom ) ) );
-    setCreatedAtTo( filter.createdAtToNow );
-    setCreatedAtToNow( filter.createdAtTo === null ? null : moment( parseInt( filter.createdAtTo ) ) );
+    setScheduledFromNow( filter.scheduledFromNow );
+    setScheduledFrom( filter.scheduledFrom === null ? null : moment( parseInt( filter.scheduledFrom ) ) );
+    setScheduledToNow( filter.scheduledToNow );
+    setScheduledTo( filter.scheduledTo === null ? null : moment( parseInt( filter.scheduledTo ) ) );
+    setCreatedAtFromNow( filter.createdAtFromNow );
+    setCreatedAtFrom( filter.createdAtFrom === null ? null : moment( parseInt( filter.createdAtFrom ) ) );
+    setCreatedAtToNow( filter.createdAtToNow );
+    setCreatedAtTo( filter.createdAtTo === null ? null : moment( parseInt( filter.createdAtTo ) ) );
     setOneOf( oneOfOptions.filter( ( oneOf ) => filter.oneOf.includes( oneOf.value ) ) );
     setImportant( booleanSelectOptions.find( ( option ) => option.id === filter.important ) );
     setInvoiced( booleanSelectOptions.find( ( option ) => option.id === filter.invoiced ) );
@@ -401,7 +401,7 @@ export default function FilterForm( props ) {
         <button type="button" className="btn-link" onClick={applyFilter}><i className="fa fa-check icon-M p-r-0 m-r-0"/></button>
         {
           <AddFilter
-            filter={getCurrentFilter()}
+            filter={getCleanCurrentFilter()}
             title={title}
             {...props}
             />

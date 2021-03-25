@@ -184,13 +184,13 @@ export default function TasklistSwitch( props ) {
               <Statistics {...generalProps} />
             </div>
           }
-          { tasklistLayout === 0 && !showStatistics &&
+          { false &&
             <div className='col-xl-12'>
               <ColumnList {...generalProps} />
             </div>
           }
 
-          {tasklistLayout === 1 && !showStatistics &&
+          {(tasklistLayout === 1 || tasklistLayout === 0) && !showStatistics &&
             <div className="flex" >
               { taskID && <TaskEdit match={match} columns={false} history={history} /> }
               { !taskID &&

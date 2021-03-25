@@ -66,7 +66,8 @@ export default function TasksIndex( props ) {
     history,
     match,
   } = props;
-
+  const page = match.params.page ? parseInt( match.params.page ) : 1;
+  const limit = 30;
   const {
     data: currentUserData,
     loading: currentUserLoading,
@@ -119,7 +120,10 @@ export default function TasksIndex( props ) {
     sort: tasksSort,
     search: globalSearchData.globalTaskSearch,
     stringFilter: globalStringFilter.globalTaskStringFilter,
+    page,
+    limit,
   }
+
 
   //network
   const {
@@ -378,6 +382,9 @@ export default function TasksIndex( props ) {
       setLocalMilestone={setMilestone}
       calendarEvents={dataLoading ? [] : calendarEventsData.calendarEvents}
       tasks={dataLoading ? [] : processTasks(tasks) }
+      count={ tasksLoading ? null : tasksData.tasks.count }
+      page={page}
+      limit={limit}
       checkTask={checkTask}
       preference = { preferencesLoading ? defaultTasklistColumnPreference : createPreferences()}
       setPreference={setPreference}

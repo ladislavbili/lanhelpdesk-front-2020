@@ -40,7 +40,7 @@ export default function CommandBar( props ) {
   const getLayoutIcon = () => {
     switch ( tasklistLayout ) {
       case 0:
-        return "fa-columns";
+        //return "fa-columns";
       case 1:
         return "fa-list";
       case 2:
@@ -139,12 +139,16 @@ export default function CommandBar( props ) {
               </DropdownToggle>
               <DropdownMenu right>
                 <div className="btn-group-vertical" data-toggle="buttons">
-                  <label className={classnames({'active':tasklistLayout === 0}, "btn btn-link t-a-l")}>
+                  {
+                    /*
+                    <label className={classnames({'active':tasklistLayout === 0}, "btn btn-link t-a-l")}>
                     <input type="radio" name="options" onChange={() => setTasklistLayout(0)} checked={tasklistLayout === 0}/>
                     <i className="fa fa-columns"/>
                     {` Trojstlpec`}
-                  </label>
-                  <label className={classnames({'active':tasklistLayout === 1}, "btn btn-link t-a-l")}>
+                    </label>
+                    */
+                  }
+                  <label className={classnames({'active':tasklistLayout === 1 || tasklistLayout === 0}, "btn btn-link t-a-l")}>
                     <input type="radio" name="options" checked={tasklistLayout === 1} onChange={() => setTasklistLayout(1)}/>
                     <i className="fa fa-list"/>
                     {` Zoznam`}

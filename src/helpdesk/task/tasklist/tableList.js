@@ -17,6 +17,7 @@ import Checkbox from 'components/checkbox';
 import Loading from 'components/loading';
 import CommandBar from './components/commandBar';
 import ListHeader from './components/listHeader';
+import Pagination from './components/pagination';
 import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
 
 import {
@@ -26,7 +27,7 @@ import {
 export default function TableList( props ) {
   const {
     history,
-    link,
+    match,
     loading,
     displayValues,
     tasks,
@@ -39,6 +40,10 @@ export default function TableList( props ) {
     setGlobalTaskStringFilter,
   } = props;
 
+  let path = `/helpdesk/taskList/i/${match.params.listID}`;
+  if ( match.params.page ) {
+    path = `${path}/p/${match.params.page}`
+  }
   const [ editOpen, setEditOpen ] = React.useState( false );
 
   const clearFilter = () => {
@@ -228,7 +233,7 @@ export default function TableList( props ) {
                 className={display.value}
                 onClick={(e)=>{
                   if (display.type !== 'checkbox'){
-                    history.push(link+'/'+task.id);
+                    history.push(`${ path }/${ task.id }`);
                   }
                 }}
                 >
@@ -292,17 +297,7 @@ export default function TableList( props ) {
             }
           </tbody>
         </table>
-
-        <div className="row m-b-10 m-r-30">
-          <div className="message ml-auto m-t-1">Loaded tasks 50/242</div>
-          <button className="btn-link m-r-5">
-            Load all tasks |
-          </button>
-          <button className="btn-link">
-            Load next 50 tasks
-          </button>
-        </div>
-
+        <Pagination {...props} />
 
         <Modal isOpen={editOpen}>
           <ModalBody className="scrollable" >

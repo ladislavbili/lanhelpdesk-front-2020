@@ -316,6 +316,7 @@ tasks {
     title
   }
 }
+count
 execTime
 secondaryTimes {
   time
@@ -433,6 +434,8 @@ query tasks(
   $sort: SortTasksInput
   $search: String
   $stringFilter: StringFilterInput
+  $limit: Int
+  $page: Int
 ){
   tasks (
     projectId: $projectId
@@ -440,6 +443,8 @@ query tasks(
     sort: $sort
     search: $search
     stringFilter: $stringFilter
+    limit: $limit
+    page: $page
   ){
     ${listTasks}
   }

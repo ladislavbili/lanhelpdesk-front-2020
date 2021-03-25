@@ -64,9 +64,10 @@ export default function Navigation( props ) {
           <Route exact path="/helpdesk/errorMessages" component={accessRights.viewErrors ? ErrorMessages : AccessDenied} />
 
           <Route exact path="/helpdesk" component={TaskList} />
-          <Route exact path="/helpdesk/taskList" component={TaskList} />
           <Route exact path="/helpdesk/taskList/i/:listID" component={TaskList} />
+          <Route exact path="/helpdesk/taskList/i/:listID/p/:page" component={TaskList} />
           <Route exact path="/helpdesk/taskList/i/:listID/:taskID" component={TaskList} />
+          <Route exact path="/helpdesk/taskList/i/:listID/p/:page/:taskID" component={TaskList} />
           <Route exact path="/helpdesk/notifications" component={NotificationList} />
           <Route exact path="/helpdesk/notifications/:notificationID/:taskID" component={NotificationList} />
           <Route exact path="/helpdesk/project/:projectID" component={ProjectEdit} />
