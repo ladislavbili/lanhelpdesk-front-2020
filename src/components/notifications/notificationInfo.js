@@ -14,9 +14,8 @@ export default function NotificationInfo( props ) {
   } = props;
 
   return (
-    <div>
-      <div className="commandbar"></div>
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+    <div style={{backgroundColor: "white"}}>
+      <div className="p-20 scroll-visible fit-with-header">
         <div>
           <Label className="m-r-5">User:</Label>
           {` ${notification.fromUser.fullName}`}

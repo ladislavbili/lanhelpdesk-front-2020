@@ -64,8 +64,8 @@ export default function Comments( props ) {
   }
 
   return (
-    <div>
-      <div className="row">
+    <div className="group">
+      <div className="row header">
         <NavItem>
           <NavLink className="active">
             Comment
@@ -83,42 +83,44 @@ export default function Comments( props ) {
         </NavItem>
       </div>
       <div>
-        {
-          isEmail && <FormGroup className="row m-b-10">
-          <Label className="m-r-10 center-hor" style={{width:50}}>To:</Label>
-          <div className="flex">
-            <Creatable
-              isMulti
-              value={tos}
-              onChange={(newData) => setTos(newData)}
-              options={users}
-              styles={selectStyle}/>
+        <div className="rest">
+          {
+            isEmail && <FormGroup className="row m-b-10">
+            <Label className="m-r-10 center-hor" style={{width:50}}>To:</Label>
+            <div className="flex">
+              <Creatable
+                isMulti
+                value={tos}
+                onChange={(newData) => setTos(newData)}
+                options={users}
+                styles={selectStyle}/>
+            </div>
+          </FormGroup>
+        }
+        {isEmail && <FormGroup className="row m-b-10">
+          <Label className="m-r-10 center-hor" style={{width:50}}>Subject:</Label>
+          <Input className="flex" type="text" placeholder="Enter subject" value={subject} onChange={(e)=>setSubject(e.target.value)}/>
+        </FormGroup>}
+        {isEmail &&
+          <FormGroup>
+            <Label className="">Message</Label>
+            <CKEditor
+              data={emailBody}
+              onChange={(evt)=>setEmailBody(evt.editor.getData()) }
+              />
+          </FormGroup>
+        }
+        {!isEmail &&
+          <FormGroup>
+            <Input type="textarea" placeholder="Enter comment" value={newComment} onChange={(e)=>setNewComment(e.target.value)}/>
+          </FormGroup>
+        }
+        {isEmail && hasError &&
+          <div style={{color:'red'}}>
+            E-mail failed to send! Check console for more information
           </div>
-        </FormGroup>
-      }
-      {isEmail && <FormGroup className="row m-b-10">
-        <Label className="m-r-10 center-hor" style={{width:50}}>Subject:</Label>
-        <Input className="flex" type="text" placeholder="Enter subject" value={subject} onChange={(e)=>setSubject(e.target.value)}/>
-      </FormGroup>}
-      {isEmail &&
-        <FormGroup>
-          <Label className="">Message</Label>
-          <CKEditor
-            data={emailBody}
-            onChange={(evt)=>setEmailBody(evt.editor.getData()) }
-            />
-        </FormGroup>
-      }
-      {!isEmail &&
-        <FormGroup>
-          <Input type="textarea" placeholder="Enter comment" value={newComment} onChange={(e)=>setNewComment(e.target.value)}/>
-        </FormGroup>
-      }
-      {isEmail && hasError &&
-        <div style={{color:'red'}}>
-          E-mail failed to send! Check console for more information
-        </div>
-      }
+        }
+      </div>
 
       <div className="row m-b-30">
 

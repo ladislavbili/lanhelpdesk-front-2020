@@ -12,7 +12,7 @@ import Select from 'react-select';
 import classnames from 'classnames';
 import Loading from 'components/loading';
 import {
-  invisibleSelectStyleNoArrow
+  invisibleSelectStyle
 } from 'configs/components/select';
 import NotificationInfo from './notificationInfo';
 
@@ -219,68 +219,66 @@ export default function NotificationList( props ) {
 
   const notifications = filterNotifications();
   return (
-    <div className="content">
-      <div className="row m-0 p-0 taskList-container">
+    <div className="lanwiki-content row">
         <div className="col-lg-4">
-          <div className="commandbar">
-            <div className="search-row">
-              <div className="search">
-                <button className="search-btn" type="button">
-                  <i className="fa fa-search" />
-                </button>
-                <input
-                  type="text"
-                  className="form-control search-text"
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter( e.target.value )}
-                  placeholder="Search"
-                  />
-              </div>
-            </div>
-            <span className="ml-3 center-hor mr-3" style={{width:175}}>
-              <Select
-                value={type}
-                onChange={(type) => setType( type ) }
-                options={getTypes()}
-                styles={invisibleSelectStyleNoArrow}
-                />
-            </span>
-          </div>
-          <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
-            <div className=" p-l-10 p-b-10 row">
-              <h2>
+
+          <div className="scroll-visible fit-with-header lanwiki-list">
+              <h1>
                 Notifications
-              </h2>
+              </h1>
+
+            <div className="row">
+              <div className="search-row" style={{width: "60%"}}>
+                <div className="search">
+                  <input
+                    type="text"
+                    className="form-control search-text"
+                    value={searchFilter}
+                    onChange={(e) => setSearchFilter( e.target.value )}
+                    placeholder="Search"
+                    />
+                  <button className="search-btn" type="button">
+                    <i className="fa fa-search" />
+                  </button>
+                </div>
+              </div>
+              <span className="center-hor ml-auto" style={{width: "30%", backgroundColor: "white"}}>
+                <Select
+                  value={type}
+                  onChange={(type) => setType( type ) }
+                  options={getTypes()}
+                  styles={invisibleSelectStyle}
+                  />
+              </span>
             </div>
+
             <div>
               <button
                 type="button"
-                className="btn btn-link waves-effect"
+                className="btn-link btn-distance"
                 onClick={markAllAsRead}
                 disabled={notifications.every((notification)=>notification.read)}>
                 Označit všetky ako prečítané
               </button>
               <button
                 type="button"
-                className="btn btn-link waves-effect"
+                className="btn-link btn-distance"
                 onClick={deleteAll}
                 disabled={notifications.length === 0}>
                 Vymazať všetky
               </button>
               <button
                 type="button"
-                className="btn btn-link waves-effect"
+                className="btn-link"
                 onClick={deleteRead}
                 disabled={ !notifications.some( (notification) => notification.read) }>
                 Vymazať prečítané
               </button>
             </div>
             <div>
-              <table className="table table-hover">
-                <tbody>
                   {
                     notifications.map((notification) =>
-                    <tr
+                    <li
                       key={notification.id}
                       className={classnames({ 'notification-read': notification.read,
                         'notification-not-read': !notification.read,
@@ -288,7 +286,7 @@ export default function NotificationList( props ) {
                         "clickable")}
                         onClick={() => setNotificationReadFunc(notification)}
                         >
-                        <td className={(selectedNotificationID === notification.id ? "text-highlight":"")}>
+                        <div className={(selectedNotificationID === notification.id ? "text-highlight":"")}>
                           <i className={classnames({ 'far fa-envelope-open': notification.read, 'fas fa-envelope': !notification.read })} />
                           {`${notification.task.id}:${notification.task.title}`}
                           <div className="row">
@@ -296,18 +294,16 @@ export default function NotificationList( props ) {
                               <Label className="p-r-5">User:</Label>
                               {notification.fromUser ? notification.fromUser.fullName : "no user"}
                             </div>
-                            <div className="ml-auto m-r-55">
+                            <div className="ml-auto">
                               {timestampToString(parseInt(notification.createdAt))}
                             </div>
                           </div>
                           <Label className="p-r-5">Subject:</Label>
                           {notification.subject}
-                        </td>
-                      </tr>
+                        </div>
+                      </li>
                     )
                   }
-                </tbody>
-              </table>
               {
                 notifications.length === 0 &&
                 <ListGroupItem>There are no notifications!</ListGroupItem>
@@ -323,10 +319,9 @@ export default function NotificationList( props ) {
           }
           {
             selectedNotificationID === null &&
-            <div className="commandbar"></div>
+            <div className="fit-with-header" style={{backgroundColor: "white"}}></div>
           }
         </div>
-      </div>
     </div>
   );
 }

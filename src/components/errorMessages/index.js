@@ -12,7 +12,7 @@ import Select from 'react-select';
 import classnames from 'classnames';
 import Loading from 'components/loading';
 import {
-  invisibleSelectStyleNoArrow
+  invisibleSelectStyle
 } from 'configs/components/select';
 import ErrorInfo from './errorInfo';
 
@@ -233,39 +233,38 @@ export default function ErrorList( props ) {
   const errors = filterErrors();
 
   return (
-    <div className="content">
-      <div className="row m-0 p-0 taskList-container">
+    <div className="lanwiki-content row">
         <div className="col-lg-4">
-          <div className="commandbar p-l-10">
-            <div className="search-row">
-              <div className="search">
-                <button className="search-btn" type="button">
-                  <i className="fa fa-search" />
-                </button>
-                <input
-                  type="text"
-                  className="form-control search-text"
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter( e.target.value )}
-                  placeholder="Search"
-                  />
+
+          <div className="scroll-visible fit-with-header lanwiki-list">
+
+            <h1>Error messages</h1>
+
+            <div className="row">
+              <div className="search-row" style={{width: "60%"}}>
+                <div className="search">
+                  <input
+                    type="text"
+                    className="form-control search-text"
+                    value={searchFilter}
+                    onChange={(e) => setSearchFilter( e.target.value )}
+                    placeholder="Search"
+                    />
+                  <button className="search-btn" type="button">
+                    <i className="fa fa-search" />
+                  </button>
+                </div>
               </div>
+              <span className="center-hor ml-auto" style={{width: "30%", backgroundColor: "white"}}>
+                <Select
+                  value={type}
+                  onChange={(type) => setType( type ) }
+                  options={getTypes()}
+                  styles={invisibleSelectStyle}
+                  />
+              </span>
             </div>
-            <span className="ml-3 center-hor mr-3" style={{width:175}}>
-              <Select
-                value={type}
-                onChange={(type) => setType( type ) }
-                options={getTypes()}
-                styles={invisibleSelectStyleNoArrow}
-                />
-            </span>
-          </div>
-          <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
-            <div className="p-b-10 row">
-              <h2>
-                Error messages
-              </h2>
-            </div>
+
             <div>
               <button
                 type="button"
@@ -290,11 +289,9 @@ export default function ErrorList( props ) {
               </button>
             </div>
             <div>
-              <table className="table">
-                <tbody>
                   {
                     errors.map((error) =>
-                    <tr
+                    <li
                       key={error.id}
                       className={classnames({ 'notification-read': error.read,
                         'notification-not-read': !error.read,
@@ -302,7 +299,7 @@ export default function ErrorList( props ) {
                         "clickable")}
                         onClick={() => setErrorMessageReadFunc(error)}
                         >
-                        <td className={(selectedErrorID === error.id ? "text-highlight":"")}>
+                        <div className={(selectedErrorID === error.id ? "text-highlight":"")}>
                           <i className={classnames({ 'far fa-envelope-open': error.read, 'fas fa-envelope': !error.read })} />
                           {error.source}
                           <div className="row">
@@ -314,12 +311,10 @@ export default function ErrorList( props ) {
                             </div>
                           </div>
                           <div style={{overflowX:'hidden'}}>{error.errorMessage.substring(0, 150)}...</div>
-                        </td>
-                      </tr>
+                        </div>
+                      </li>
                     )
                   }
-                </tbody>
-              </table>
               {
                 errorMessages.length === 0 &&
                 <ListGroupItem>There are no errors!</ListGroupItem>
@@ -335,10 +330,9 @@ export default function ErrorList( props ) {
           }
           {
             selectedErrorID === null &&
-            <div className="commandbar"></div>
+            <div className="fit-with-header" style={{backgroundColor: "white"}}></div>
           }
         </div>
-      </div>
     </div>
   );
 }

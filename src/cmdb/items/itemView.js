@@ -62,13 +62,15 @@ export default function ItemView( props ) {
         }
       </div>
 
-      <div className="row m-t-10">
-        <div className="description">
-          <label>Description</label>
-          <div dangerouslySetInnerHTML={{__html: item.description.length === 0 ? "No description" : item.description.replace(/(?:\r\n|\r|\n)/g, '<br>') }}></div>
-        </div>
-        <div className="description-yellow">
-          Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis. Pellentesque placerat elit a nunc. Nullam tortor odio, rutrum quis, egestas ut, posuere sed, felis. Vestibulum placerat feugiat nisl. Suspendisse lacinia, odio non feugiat vestibulum, sem erat blandit metus, ac nonummy magna odio pharetra felis.
+      <div className="m-t-10">
+        <label>Description</label>
+        <div className="row">
+          <div className="description">
+            <div dangerouslySetInnerHTML={{__html: item.description.length === 0 ? "No description" : item.description.replace(/(?:\r\n|\r|\n)/g, '<br>') }}></div>
+          </div>
+          <div className="description-yellow">
+            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis. Pellentesque placerat elit a nunc. Nullam tortor odio, rutrum quis, egestas ut, posuere sed, felis. Vestibulum placerat feugiat nisl. Suspendisse lacinia, odio non feugiat vestibulum, sem erat blandit metus, ac nonummy magna odio pharetra felis.
+          </div>
         </div>
       </div>
 
@@ -138,9 +140,10 @@ export default function ItemView( props ) {
         </tbody>
       </table>
 
-      <div className="row m-b-20">
+      <div className="m-b-20">
+        <label>Backup tasks Description</label>
+        <div className="row">
         <div className="description">
-          <label>Backup tasks Description</label>
           <div>
             {item.backupsDescription ? item.backupsDescription : "No backup tasks description Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis. Pellentesque placerat elit a nunc. Nullam tortor odio, rutrum quis, egestas ut, posuere sed, felis. Vestibulum placerat feugiat nisl. Suspendisse lacinia, odio non feugiat vestibulum, sem erat blandit metus, ac nonummy magna odio pharetra felis."}
           </div>
@@ -149,10 +152,12 @@ export default function ItemView( props ) {
           Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis. Pellentesque placerat elit a nunc. Nullam tortor odio, rutrum quis, egestas ut, posuere sed, felis. Vestibulum placerat feugiat nisl. Suspendisse lacinia, odio non feugiat vestibulum, sem erat blandit metus, ac nonummy magna odio pharetra felis.
         </div>
       </div>
+      </div>
 
-      <div className="row">
+      <div className="">
+        <label>Monitoring Description</label>
+        <div className="row">
         <div className="description">
-          <label>Monitoring Description</label>
           <div>
             {item.monitoringDescription ? item.monitoringDescription : "No monitoring description Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis. Pellentesque placerat elit a nunc. Nullam tortor odio, rutrum quis, egestas ut, posuere sed, felis. Vestibulum placerat feugiat nisl. Suspendisse lacinia, odio non feugiat vestibulum, sem erat blandit metus, ac nonummy magna odio pharetra felis."}
           </div>
@@ -160,6 +165,7 @@ export default function ItemView( props ) {
         <div className="description-yellow">
           Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean et est a dui semper facilisis. Pellentesque placerat elit a nunc. Nullam tortor odio, rutrum quis, egestas ut, posuere sed, felis. Vestibulum placerat feugiat nisl. Suspendisse lacinia, odio non feugiat vestibulum, sem erat blandit metus, ac nonummy magna odio pharetra felis.
         </div>
+      </div>
       </div>
 
     <Comments

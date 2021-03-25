@@ -107,11 +107,10 @@ export default function Sidebar( props ) {
 
       </Nav>
 
-      <hr className='m-t-10 m-b-5 m-l-5 m-r-5'/>
+      <hr className='m-t-10 m-b-5 m-l-15 m-r-15'/>
 
       <button
-        className="btn sidebar-btn m-l-5 m-r-5"
-        style={{width: "calc(100% - 10px)"}}
+        className="btn sidebar-btn"
         disabled={false}
         onClick={(e) => {
           e.preventDefault();

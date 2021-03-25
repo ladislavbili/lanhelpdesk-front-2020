@@ -30,13 +30,13 @@ export default function List( props ) {
 
   return (
     <div className="lanwiki-content row">
-          <div className="col-lg-3">
-            <div className="commandbar">
+          <div className="col-lg-4">
+            <div className="scroll-visible fit-with-header lanwiki-list">
+
+              <h1>{match.params.listID === 'all' ? "ALL" : tags.find(tag => tag.id === parseInt( match.params.listID ))?.title}</h1>
+
               <div className="search-row">
                 <div className="search">
-                  <button className="search-btn" type="button">
-                    <i className="fa fa-search" />
-                  </button>
                   <input
                     type="text"
                     className="form-control search-text"
@@ -44,10 +44,12 @@ export default function List( props ) {
                     onChange={ (e) => setNotesFilter(e.target.value) }
                     placeholder="Search"
                     />
+                  <button className="search-btn" type="button">
+                    <i className="fa fa-search" />
+                  </button>
                 </div>
               </div>
-            </div>
-            <div className="scroll-visible fit-with-header-and-commandbar lanwiki-list">
+
                   {mappedNotes.filter((item)=>item.title.toLowerCase().includes(notesFilter.toLowerCase())).map((note)=> (
                     <li>
             					<div>
@@ -67,7 +69,7 @@ export default function List( props ) {
                   ))}
             </div>
           </div>
-          <div className="col-lg-9">
+          <div className="col-lg-8">
             {
               match.params.listID && notes.some((item)=>item.id===parseInt(match.params.listID)) && <NoteContainer {...{history, match}} />
             }

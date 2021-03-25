@@ -26,9 +26,8 @@ export default function ErrorInfo( props ) {
 
   const error = errorMessage;
   return (
-    <div>
-      <div className="commandbar"></div>
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+    <div className="">
+      <div className="lanwiki-note scroll-visible fit-with-header">
         <div>
           <Label>Type:</Label>
           {` ${error.type}`}

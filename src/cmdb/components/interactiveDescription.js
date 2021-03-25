@@ -23,7 +23,7 @@ export default function InteractiveDescription( props ) {
   const [ editTextHeight, setEditTextHeight ] = React.useState( 29 );
 
   return (
-    <div className="flex border" >
+    <div className="flex" >
       <Input className="no-scrolling"
         style={{
           height: editText === "" ? item.textHeight : editTextHeight,
