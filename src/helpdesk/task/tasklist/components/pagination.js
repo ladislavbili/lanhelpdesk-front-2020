@@ -32,7 +32,7 @@ export default function Pagination( props ) {
   const path = `/helpdesk/taskList/i/${match.params.listID}/p/`;
 
   return (
-    <div className="row m-b-10 m-r-30 ml-auto">
+    <div className="row m-b-10 ml-auto">
       <div className="message ml-auto m-t-1">{ `${ tasksFrom }-${ tasksTo } from total of ${count} tasks` }</div>
         <Button
           disabled={  page === 1 }

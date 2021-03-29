@@ -27,12 +27,12 @@ export default function ProjectSelectModal( props ) {
   return (
     <Modal isOpen={true} className="small-modal" >
       <ModalBody>
-        <div>
-          <div className="task-add-layout-2 m-l-20 row">
-            <h2 className="center-hor p-r-20">Create new task</h2>
+        <div className="m-l-30 m-r-30">
+          <div className="task-add-layout-2 p-l-0 row">
+            <h2 className="center-hor">Create new task</h2>
           </div>
-          <div className="m-30 m-t-15">
-            <FormGroup>
+          <div>
+            <FormGroup className="m-b-0">
               <Label>Project <span className="warning-big">*</span></Label>
               <Select
                 placeholder="Zadajte projekt"
@@ -44,10 +44,10 @@ export default function ProjectSelectModal( props ) {
                 styles={selectStyleNoArrowRequired}
                 />
             </FormGroup>
-            <div className="row m-t-30">
-              <Button className="btn-link-cancel" onClick={closeModal}>Cancel</Button>
+            <div className="task-add-layout-2 p-l-0 row ">
+              <Button className="btn-link-cancel a-s-c" onClick={closeModal}>Cancel</Button>
               <button
-                className="btn ml-auto"
+                className="btn ml-auto a-s-c"
                 disabled={ project === null }
                 onClick={() => { onSubmit(project.id) }}
                 > Select

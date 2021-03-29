@@ -96,7 +96,7 @@ export default function CommandBar( props ) {
             <h2
               className="clickable"
               key={index}
-              onClick={breadcrum.onClick}>{`${index !== 0 ? '\\' : ''}${breadcrum.label}`}</h2>
+              onClick={breadcrum.onClick}>{`${index !== 0 && breadcrum.label ? '\\' : ''}${breadcrum.label}`}</h2>
           )}
         </div>
       </div>

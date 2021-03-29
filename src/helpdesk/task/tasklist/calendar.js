@@ -20,6 +20,8 @@ import CommandBar from './components/commandBar';
 import ListHeader from './components/listHeader';
 import TaskEdit from 'helpdesk/task/edit';
 import ItemRender from './components/calendarItemRender';
+import StackItemRender from './components/taskStackItemRender';
+import Pagination from './components/pagination';
 import moment from "moment";
 import {
   unimplementedAttributes,
@@ -516,7 +518,7 @@ export default function TaskCalendar( props ) {
         if ( !task.status ) {
           return {
             ...newTask,
-            status: statuses.find( ( status ) => status.action === 'IsNew' ),
+            status: statuses ? statuses.find( ( status ) => status.action === 'IsNew' ) : null,
             start: new Date( moment()
               .valueOf() ),
           }
@@ -570,31 +572,47 @@ export default function TaskCalendar( props ) {
 
   let events = data.map( ( event ) => ( {
     ...event,
-    title: <ItemRender task={event} showEvent={!event.isTask && calendarLayout === 'month'} />
+    title: <ItemRender task={event} showEvent={!event.isTask && calendarLayout === 'month'} />,
+    stackItem: <StackItemRender task={event} showEvent={!event.isTask && calendarLayout === 'month'} />,
+
   } ) );
 
   if ( match.params.taskID ) {
     return ( <TaskEdit match={match} columns={false} history={history} /> );
   }
 
+
   return (
     <div>
       <CommandBar {...props} />
-      <div className="full-width scroll-visible fit-with-header-and-commandbar task-container">
+      <div className="full-width scroll-visible fit-with-header-and-commandbar calendar-container">
         <ListHeader {...props} />
+        <div className="row">
+          <div className="task-stack">
+            <h1>Tasks stack</h1>
+           { events.map(event=>
+               (event.stackItem)
+           )}
+                   <Pagination {...props}
+                     count={events.length}
+                       page={1}
+                       limit={50}
+                       loading={false}
+                       />
+          </div>
         <DnDCalendar
-          events = { events }
+          events = { []  }
           defaultDate = { new Date( moment().valueOf() ) }
           defaultView = { calendarLayout }
-          style = {{ height: "100vh", padding: "20px" }}
-          views={['month', 'week']}
+          style = {{padding: "20px" }}
+          views={['month', 'week', 'work_week', 'day', 'agenda']}
           drilldownView="day"
           localizer = { localizer }
           resizable
           popup={true}
           formats={formats}
 
-          min={
+          scrollToTime={
             new Date(
               today.get('year'),
               today.get('month'),
@@ -613,6 +631,7 @@ export default function TaskCalendar( props ) {
             setCalendarLayout(viewType);
           }}
           />
+      </div>
       </div>
     </div>
   );

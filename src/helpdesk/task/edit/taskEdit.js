@@ -257,6 +257,8 @@ export default function TaskEdit( props ) {
   const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights, 'fullName' ) : users );
   const milestones = [ noMilestone ].concat( ( project ? toSelArr( project.project.milestones ) : [] ) );
 
+  const layout = 2; //currentUser.taskLayout
+
   //functions
   const getCantSave = ( change = {} ) => {
     const compare = {
@@ -956,6 +958,7 @@ export default function TaskEdit( props ) {
                 Important
               </button>
             }
+            {false &&
             <button
               type="button"
               className="btn-link task-add-layout-button btn-distance"
@@ -964,6 +967,7 @@ export default function TaskEdit( props ) {
               <i className="fas fa-retweet "/>
               Layout
             </button>
+          }
 
             { !task.invoiced && userRights.statusWrite &&
               (project ? toSelArr(project.project.statuses) : [])
@@ -1390,7 +1394,7 @@ export default function TaskEdit( props ) {
                   taskID={id}
                   duplicateTask={ !task.repeat ? getTaskData() : null}
                   repeat={task.repeat}
-                  layout={currentUser.taskLayout}
+                  layout={layout}
                   />
               }
               { userRights.overtimeRead &&
@@ -1419,7 +1423,7 @@ export default function TaskEdit( props ) {
               deleteItem = { (scheduled) => {
                 deleteScheduledTaskFunc(scheduled.id);
               } }
-              layout={currentUser.taskLayout}
+              layout={layout}
               />
           }
         </div>
@@ -1529,7 +1533,7 @@ export default function TaskEdit( props ) {
               duplicateTask={ !task.repeat ? getTaskData() : null}
               taskID={id}
               repeat={task.repeat}
-              layout={currentUser.taskLayout}
+              layout={layout}
               />
           }
           { userRights.scheduledRead &&
@@ -1547,7 +1551,7 @@ export default function TaskEdit( props ) {
               deleteItem = { (scheduled) => {
                 deleteScheduledTaskFunc(scheduled.id);
               } }
-              layout={currentUser.taskLayout}
+              layout={layout}
               />
           }
 
@@ -2117,6 +2121,7 @@ export default function TaskEdit( props ) {
     )
   }
 
+  console.log( layout, columns );
 
   return (
     <div
@@ -2127,7 +2132,7 @@ export default function TaskEdit( props ) {
         "flex",
         "min-height-400",
         {
-          "basic-border-top": currentUser.taskLayout === 1
+          "basic-border-top": layout === 1
         }
       )}
       >
@@ -2143,7 +2148,7 @@ export default function TaskEdit( props ) {
         <div
           className={classnames(
             {
-              "row": currentUser.taskLayout === 2,
+              "row":  layout === 2,
             },
           )}
           >
@@ -2151,19 +2156,19 @@ export default function TaskEdit( props ) {
             className={classnames(
               "bkg-white",
               {
-                "task-edit-left": currentUser.taskLayout === 2 && !columns,
-                "task-edit-left-columns": (currentUser.taskLayout === 2 && columns) || currentUser.taskLayout === 1 || currentUser.taskLayout === 3,
+                "task-edit-left":  layout === 2 && !columns,
+                "task-edit-left-columns": (layout === 2 && columns) || layout === 1 || layout === 3,
               },
             )}
             >
 
             <div>
               { renderTitle() }
-              { currentUser.taskLayout === 2 && <hr className="m-t-5 m-b-15"/> }
+              { layout === 2 && <hr className="m-t-5 m-b-15"/> }
 
               {canCreateVykazyError()}
 
-              { currentUser.taskLayout === 1 ? renderSelectsLayout1() : null }
+              { layout === 1 ? renderSelectsLayout1() : null }
 
               { renderDescription() }
 
@@ -2190,7 +2195,7 @@ export default function TaskEdit( props ) {
 
           </div>
 
-          { currentUser.taskLayout === 2 && renderSelectsLayout2Side() }
+          { layout === 2 && renderSelectsLayout2Side() }
         </div>
       </div>
     </div>

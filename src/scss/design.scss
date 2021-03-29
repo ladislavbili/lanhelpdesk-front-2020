@@ -544,6 +544,10 @@ h4 {
   align-items: center;
 }
 
+.a-s-c{
+  align-self: center;
+}
+
 .col-1-5 {
   flex: 0 0 12.5%;
   max-width: 12.5%;
@@ -1995,6 +1999,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     order: -1;
   }
 }
+.task-container{
+  .search{
+    width: 50% !important;
+  }
+}
 
 .search-btn,
 .search-btn:hover,
@@ -2183,13 +2192,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
 
   .table > tbody > tr {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #eaeaea;
   }
-
+/*
   .table > tbody > tr:last-child,
   .table > tbody > tr:first-child {
     border-bottom: none;
-  }
+  }*/
 
   .statistics > .table > tbody > tr {
     border-bottom: none;
@@ -2380,6 +2389,52 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 //-------------------END-tasklist-------------------------
 
+//--------------------calendar-------------------------
+.calendar-container{
+  .task-stack{
+    width: 300px;
+    padding: 0px $page-header-odsadenie;
+    h1{
+      margin-bottom: 20px;
+    }
+    .stack-item{
+      padding: 5px;
+      min-height: 30px;
+      margin-bottom: 15px;
+      box-shadow: 3px 3px 5px #d9d8d8;
+      .attribute-label{
+        vertical-align: middle;
+      }
+    }
+  }
+  .rbc-calendar{
+    background-color: white;
+    flex: 1;
+    height: calc(100vh - 170px);
+    .rbc-toolbar-label{
+      font-size: 2.5rem;
+    }
+    .rbc-btn-group{
+      button{
+        background-color: #2c3e50;
+        color: white;
+        border-color:  #2c3e50;
+      }
+      button.rbc-active{
+        background-color: #1a252f;
+        color: white
+      }
+    }
+    .rbc-today{
+      background-color: #fffadf;
+    }
+    .rbc-time-content{
+      overflow-y: auto;
+    }
+  }
+}
+//--------------------END-calendar-------------------------
+
 //----------------------taskEdit--------------------------
 .task-title-input {
   font-size: 2.5rem;
@@ -2446,7 +2501,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   .add-buttons {
     margin-top: 8px;
     margin-left: 10px;
-    margin-bottom: 15px;
   }
   .add-title {
     font-family: $main-font-bold;
@@ -2577,12 +2631,12 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   position: relative;
   padding: calc(#{$odsadenie-form} - #{$difference-form})
     calc(#{$odsadenie-form} - #{$difference-form})
-    calc(#{$odsadenie-form} - #{$difference-form})
+    0px
     calc(#{$odsadenie-form} - #{$difference-form});
   max-width: 1620px;
   min-width: 400px;
   width: calc(100% - 300px) !important;
-  min-height: calc(100vh - 110px) !important;
+//  min-height: calc(100vh - 110px) !important;
 }
 
 .task-edit-left-columns {
@@ -2698,6 +2752,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }*/
 }
 
+.form-section:last-child, .form-section:nth-last-child(2) {
+  margin-bottom: 0px;
+}
+
 .form-section.task-edit-buttons {
   position: absolute;
   bottom: 30px;
@@ -2708,9 +2766,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
 }
 
-.form-section:last-child {
-  margin-bottom: 0px;
-}
 
 .form-selects-entry-column {
   font: $font-label;
@@ -2745,6 +2800,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   .react-datepicker-popper {
     z-index: 9999;
   }
+}
+
+.form-selects-entry-column:last-child{
+  margin-bottom: 0px !important;
 }
 
 .scheduled {

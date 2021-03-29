@@ -93,6 +93,8 @@ export default function TaskAdd( props ) {
     return user ? user : null;
   }
 
+  const layout = 2; //currentUser.taskLayout
+
   //state
   const [ project, setProject ] = React.useState( projectID ? projects.find( p => p.id === projectID ) : null );
   const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
@@ -375,6 +377,7 @@ export default function TaskAdd( props ) {
     return (
       <div className="task-add-layout-2 row">
         <h2 className="center-hor">Create new task</h2>
+        {false &&
         <div className="ml-auto m-r-20">
           <button
             type="button"
@@ -386,6 +389,7 @@ export default function TaskAdd( props ) {
             Layout
           </button>
         </div>
+      }
       </div>
     )
   }
@@ -718,7 +722,7 @@ export default function TaskAdd( props ) {
               deleteItem = { (newScheduled) => {
                 setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
               } }
-              layout={currentUser.taskLayout}
+              layout={layout}
               />
           }
 
@@ -860,7 +864,7 @@ export default function TaskAdd( props ) {
             deleteItem = { (newScheduled) => {
               setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
             } }
-            layout={currentUser.taskLayout}
+            layout={layout}
             />
         }
         { userRights.typeRead && userRights.typeWrite &&
@@ -1234,24 +1238,24 @@ export default function TaskAdd( props ) {
       <div
         className={classnames(
           "min-height-400",
-          { "row": currentUser.taskLayout === 2}
+          { "row": layout === 2}
         )}
         >
 
         <div
           className={classnames(
             {
-              "task-edit-left": currentUser.taskLayout === 2
+              "task-edit-left": layout === 2
             },
             {
-              "task-edit-left-columns": currentUser.taskLayout !== 2
+              "task-edit-left-columns": layout !== 2
             }
           )}>
           {renderHeader()}
 
           { renderTitle() }
 
-          { currentUser.taskLayout === 1 && renderSelectsLayout1()  }
+          { layout === 1 && renderSelectsLayout1()  }
 
           { renderDescription() }
 
@@ -1260,10 +1264,11 @@ export default function TaskAdd( props ) {
 
           { renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
+<div className="task-add-layout-2"></div>
           { renderButtons() }
         </div>
 
-        { currentUser.taskLayout === 2 && renderSelectsLayout2Side() }
+        { layout === 2 && renderSelectsLayout2Side() }
 
       </div>
 
