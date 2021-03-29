@@ -197,8 +197,12 @@ export default function TableList( props ) {
     }
     return (
       <span>
-        {(displayValues[index-1].type === 'important' || displayValues[index-2].type === 'important') && getItemDisplayValue(task,displayValues.find((displayValue) => displayValue.type === 'important' )) }
-        {(displayValues[index-1].type === 'invoiced' || displayValues[index-2].type === 'invoiced') && getItemDisplayValue(task,displayValues.find((displayValue) => displayValue.type === 'invoiced' )) }
+        {
+          (displayValues[index-1].type === 'important' || displayValues[index-2].type === 'important') && getItemDisplayValue(task,displayValues.find((displayValue) => displayValue.type === 'important' ))
+        }
+        {(
+          displayValues[index-1].type === 'invoiced' || displayValues[index-2].type === 'invoiced') && getItemDisplayValue(task,displayValues.find((displayValue) => displayValue.type === 'invoiced' ))
+        }
         <span className="task-list-title" style={{
             paddingLeft:
             (
@@ -238,7 +242,7 @@ export default function TableList( props ) {
                 }}
                 >
                 {	display.type !== 'checkbox' &&
-                  renderWithIcons( filteredDisplayValues, task, index, getItemDisplayValue(task,display) )
+                  renderWithIcons( filteredDisplayValues, task, index, getItemDisplayValue(task,display, attributesFilter[display.value]) )
                 }
                 { display.type === 'checkbox' &&
                   <Checkbox

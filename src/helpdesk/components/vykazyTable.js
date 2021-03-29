@@ -486,7 +486,7 @@ export default function Rozpocet( props ) {
               return (<tr key={trip.id}>
                 {/*Checkbox done*/}
                 {showColumns.includes(0) &&
-                  <td width="10">
+                  <td width="10" colSpan="2">
                     <Checkbox
                       className="m-t-5"
                       disabled= { disabled || isInvoiced }
@@ -499,7 +499,7 @@ export default function Rozpocet( props ) {
                 }
                 {/*Name*/}
                 {showColumns.includes(1) &&
-                  <td>
+                  <td colSpan="2">
                     <Select
                       isDisabled={disabled }
                       value={ !isInvoiced ? trip.type : trip.invoicedData.type }
@@ -686,7 +686,7 @@ export default function Rozpocet( props ) {
               return (<tr key={material.id}>
                 {/*Checkbox done*/}
                 {showColumns.includes(0) &&
-                  <td width="10">
+                  <td width="10"  colSpan="2">
                     <Checkbox
                       className="m-t-5"
                       disabled= { disabled || isInvoiced }
@@ -699,7 +699,7 @@ export default function Rozpocet( props ) {
                 }
                 {/*Name*/}
                 {showColumns.includes(1) &&
-                  <td className="">
+                  <td className=""  colSpan="2">
                     <input
                       disabled={disabled}
                       className="form-control hidden-input"
@@ -916,7 +916,7 @@ export default function Rozpocet( props ) {
               return (<tr key={customItem.id}>
                 {/*Checkbox done*/}
                 {showColumns.includes(0) &&
-                  <td width="10">
+                  <td width="10" colSpan="2">
                     <Checkbox
                       className="m-t-5"
                       disabled= { disabled || isInvoiced }
@@ -929,7 +929,7 @@ export default function Rozpocet( props ) {
                 }
                 {/*Name*/}
                 {showColumns.includes(1) &&
-                  <td className="">
+                  <td className="" colSpan="2">
                     <input
                       disabled={disabled}
                       className="form-control hidden-input"

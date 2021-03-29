@@ -24,6 +24,11 @@ filter {
     id
     title
   }
+  tags {
+    id
+    title
+    color
+  }
   important
   invoiced
   pausal
@@ -169,7 +174,6 @@ mutation addFilter(
 }
 }
 `;
-
 
 export const UPDATE_FILTER = gql `
 mutation updateFilter( $id: Int!, $title: String, $pub: Boolean!, $global: Boolean!, $dashboard: Boolean!, $order: Int, $roles: [Int], $filter: FilterInput, $projectId: Int,) {

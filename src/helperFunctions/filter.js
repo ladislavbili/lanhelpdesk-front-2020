@@ -72,6 +72,7 @@ export const localFilterToValues = ( localFilter ) => {
     requesters: localFilter.filter.requesters.map( ( user ) => user.id ),
     companies: localFilter.filter.companies.map( ( company ) => company.id ),
     taskTypes: localFilter.filter.taskTypes.map( ( taskType ) => taskType.id ),
+    tags: localFilter.filter.tags.map( ( tag ) => tag.id ),
   }
   delete filterValues.__typename;
   return filterValues;

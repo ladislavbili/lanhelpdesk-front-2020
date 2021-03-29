@@ -54,7 +54,7 @@ export default function FilterAdd( props ) {
   //data & queries
   const {
     filter,
-    title,
+    projectId,
     close,
     history
   } = props;
@@ -90,17 +90,17 @@ export default function FilterAdd( props ) {
     myProjectsLoading ||
     filterLoading
   )
+  const id = filterData.localFilter.id;
 
   //state
   const [ pub, setPub ] = React.useState( false );
   const [ global, setGlobal ] = React.useState( false );
   const [ dashboard, setDashboard ] = React.useState( false );
-  const [ project, setProject ] = React.useState( null );
   const [ roles, setRoles ] = React.useState( [] );
   const [ saving, setSaving ] = React.useState( false );
   const [ opened, setOpened ] = React.useState( false );
+  const [ title, setTitle ] = React.useState( id ? filterData.localFilter.title : '' );
 
-  const id = filterData.localFilter.id;
 
   React.useEffect( () => {
     if ( !dataLoading ) {
@@ -108,8 +108,8 @@ export default function FilterAdd( props ) {
       setPub( filter.pub );
       setGlobal( filter.global );
       setDashboard( filter.dashboard );
-      setProject( filter.project ? toSelItem( filter.project ) : null );
       setRoles( filter.roles ? toSelArr( filter.roles ) : [] );
+      setTitle( id ? filter.title : '' )
     }
   }, [ id, dataLoading ] );
 
@@ -122,7 +122,7 @@ export default function FilterAdd( props ) {
             pub,
             global,
             dashboard,
-            projectId: project ? project.id : null,
+            projectId,
             filter,
             roles: roles.map( item => item.id )
           }
@@ -157,7 +157,7 @@ export default function FilterAdd( props ) {
             pub,
             global,
             dashboard,
-            projectId: project ? project.id : null,
+            projectId,
             filter,
             roles: roles.map( item => item.id )
           }
@@ -204,88 +204,94 @@ export default function FilterAdd( props ) {
 
   return (
     <div className="filter-add-btn">
-    <button className="btn-link inner m-l-19" onClick={() => setOpened(!opened)}>
-      <i className="far fa-save icon-M"/>
-    </button>
+      <button className="btn-link inner m-l-19" onClick={() => setOpened(!opened)}>
+        <i className="far fa-save icon-M"/>
+      </button>
 
-    <Modal style={{width: "800px"}} isOpen={opened}>
-      <ModalHeader>
-        Add filter - "{title}"
-      </ModalHeader>
-      <ModalBody>
-
-        { canCreatePublicFilters &&
-          <Checkbox
-            className = "m-l-5 m-r-5"
-            label = "Public (everyone see this filter)"
-            value = { pub }
-            onChange={(e)=> setPub(!pub)}
+      <Modal style={{width: "800px"}} isOpen={opened}>
+        <ModalHeader>
+          { projectId ? "Add filter to project ": "Add general filter"  }
+        </ModalHeader>
+        <ModalBody>
+          {/* Filter name */}
+          <Label>Filter name</Label>
+          <Input
+            type="text"
+            className="from-control m-t-5 m-b-5"
+            placeholder="Enter filter name"
+            autoFocus
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+            }}
             />
-        }
 
-        { canCreatePublicFilters && pub &&
-          <FormGroup>{/* Roles */}
-            <Label className="">Roles</Label>
-            <Select
-              placeholder="Choose roles"
-              value={roles}
-              isMulti
-              onChange={(newRoles)=>{
-                if(newRoles.some((role) => role.id === 'all' )){
-                  if( roleData.basicRoles.length === roles.length ){
-                    setRoles([]);
-                  }else{
-                    setRoles(toSelArr(roleData.basicRoles))
-                  }
-                }else{
-                  setRoles(newRoles);
-                }
-              }}
-              options={toSelArr([{id: 'all', title: roleData.basicRoles.length === roles.length ? 'Clear' : 'All' }].concat(roleData.basicRoles))}
-              styles={selectStyle}
+          {/* PUBLIC - every user can see */}
+          { canCreatePublicFilters &&
+            <Checkbox
+              className = "m-l-5 m-r-5"
+              label = "Public (everyone see this filter)"
+              value = { pub }
+              onChange={(e)=> setPub(!pub)}
               />
-          </FormGroup>
-        }
+          }
 
-        <Checkbox
-          className = "m-l-5 m-r-5"
-          label = "Global (shown in all projects)"
-          value = { global }
-          onChange={(e)=> setGlobal(!global)}
-          />
+          {/* ROLES - what role in case of public */}
+          { canCreatePublicFilters && pub &&
+            <FormGroup>{/* Roles */}
+              <Label className="">Roles</Label>
+              <Select
+                placeholder="Choose roles"
+                value={roles}
+                isMulti
+                onChange={(newRoles)=>{
+                  if(newRoles.some((role) => role.id === 'all' )){
+                    if( roleData.basicRoles.length === roles.length ){
+                      setRoles([]);
+                    }else{
+                      setRoles(toSelArr(roleData.basicRoles))
+                    }
+                  }else{
+                    setRoles(newRoles);
+                  }
+                }}
+                options={toSelArr([{id: 'all', title: roleData.basicRoles.length === roles.length ? 'Clear' : 'All' }].concat(roleData.basicRoles))}
+                styles={selectStyle}
+                />
+            </FormGroup>
+          }
+          {/* In all projects - FILTER ONLY */}
+          { !projectId &&
+            <Checkbox
+              className = "m-l-5 m-r-5"
+              label = "Global (shown in all projects)"
+              value = { global }
+              onChange={(e)=> setGlobal(!global)}
+              />
+          }
+          {/* In DASHBOARD - FILTER ONLY */}
+          { !projectId &&
+            <Checkbox
+              className = "m-l-5 m-r-5"
+              label = "Dashboard (shown in dashboard)"
+              value = { dashboard }
+              onChange={(e)=>setDashboard(!dashboard)}
+              />
+          }
 
-        <div className="m-b-10">
-          <Label className="form-label">Projekt</Label>
-          <Select
-            placeholder="Vyberte projekt"
-            value={project}
-            isDisabled={global}
-            onChange={(pro)=> setProject(pro)}
-            options={toSelArr(myProjectsData.myProjects.map((myProject) => myProject.project ))}
-            styles={selectStyle}
-            />
-        </div>
+        </ModalBody>
+        <ModalFooter>
+          <button className="mr-auto btn-link" disabled={saving} onClick={() => setOpened(!opened)}>
+            Close
+          </button>
 
-        <Checkbox
-          className = "m-l-5 m-r-5"
-          label = "Dashboard (shown in dashboard)"
-          value = { dashboard }
-          onChange={(e)=>setDashboard(!dashboard)}
-          />
-
-      </ModalBody>
-      <ModalFooter>
-        <button className="mr-auto btn-link" disabled={saving} onClick={() => setOpened(!opened)}>
-          Close
-        </button>
-
-        <button
-          className="btn"
-          disabled={saving || title === "" || (!global && project===null)}
-          onClick={addFilterFunc}
-          >
-          {id!==null?(saving?'Saving...':'Save filter'):(saving?'Adding...':'Add filter')}
-        </button>
+          <button
+            className="btn"
+            disabled={saving || title === "" || (!global && !dashboard && !projectId)}
+            onClick={addFilterFunc}
+            >
+            {id !== null ? (saving?'Saving...':'Save filter') : (saving ? 'Adding...' : 'Add filter' )}
+          </button>
         </ModalFooter>
       </Modal>
     </div>

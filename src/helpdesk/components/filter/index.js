@@ -14,6 +14,8 @@ import {
 } from 'helperFunctions';
 import AddFilter from './filterAdd';
 import Loading from 'components/loading';
+import Empty from 'components/Empty';
+import MultiSelect from 'components/MultiSelectNew';
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
 import FilterDatePickerPopover from 'components/filterDatePickerPopover';
 import {
@@ -36,7 +38,8 @@ import {
   DELETE_FILTER,
 } from './queries';
 import {
-  GET_FILTER
+  GET_FILTER,
+  GET_PROJECT,
 } from 'apollo/localSchema/queries';
 import {
   GET_BASIC_USERS
@@ -88,6 +91,11 @@ export default function FilterForm( props ) {
     loading: filterLoading
   } = useQuery( GET_FILTER );
 
+  const {
+    data: localProjectData,
+  } = useQuery( GET_PROJECT );
+
+  const projectId = localProjectData.localProject.id;
   const id = filterData.localFilter.id;
 
   //state
@@ -95,9 +103,8 @@ export default function FilterForm( props ) {
     client
   } ] = useMutation( DELETE_FILTER );
 
-  const [ title, setTitle ] = React.useState( '' );
-  const [ editTitleOpen, setEditTitleOpen ] = React.useState( false );
   const [ saving, setSaving ] = React.useState( null );
+  const [ tagsOpen, setTagsOpen ] = React.useState( false );
 
   const {
     requesters,
@@ -108,6 +115,8 @@ export default function FilterForm( props ) {
     setAssignedTos,
     taskTypes,
     setTaskTypes,
+    tags,
+    setTags,
     statusDateFrom,
     setStatusDateFrom,
     statusDateFromNow,
@@ -176,13 +185,14 @@ export default function FilterForm( props ) {
     taskTypesLoading ||
     filterLoading ||
     myFiltersLoading
-  )
+  );
 
   React.useEffect( () => {
     if ( !dataLoading ) {
       let filter = filterData.localFilter;
       //filter information
       setFilterState( filter );
+      setTagsOpen( false );
     }
   }, [ id, dataLoading ] );
 
@@ -201,6 +211,7 @@ export default function FilterForm( props ) {
         setCompanies,
         setAssignedTos,
         setTaskTypes,
+        setTags,
         setStatusDateFrom,
         setStatusDateFromNow,
         setStatusDateTo,
@@ -274,6 +285,7 @@ export default function FilterForm( props ) {
     companyCur: companies.some( ( company ) => company.id === 'cur' ),
     companies: companies.filter( ( company ) => company.id !== 'cur' ),
     taskTypes,
+    tags,
     oneOf: oneOf.map( ( oneOf ) => oneOf.value ),
 
     statusDateFrom: statusDateFrom === null ? null : statusDateFrom.valueOf()
@@ -326,10 +338,10 @@ export default function FilterForm( props ) {
       requesters: filter.requesters.map( ( item ) => item.id ),
       companies: filter.companies.map( ( item ) => item.id ),
       taskTypes: filter.taskTypes.map( ( item ) => item.id ),
+      tags: filter.tags.map( ( item ) => item.id ),
     } )
   }
   const setFilterState = ( filter ) => {
-    setTitle( filter.title );
     //filter data
     filter = filter.filter;
     setCompanies( [
@@ -354,6 +366,15 @@ export default function FilterForm( props ) {
       toSelArr( taskTypesData.taskTypes )
       .filter( ( taskType ) => filter.taskTypes.some( ( taskType2 ) => taskType.id === taskType2.id ) )
     );
+    if ( projectId ) {
+      console.log( localProjectData );
+      setTags(
+        toSelArr( localProjectData.localProject.project.tags )
+        .filter( ( tag1 ) => filter.tags.some( ( tag2 ) => tag1.id === tag2.id ) )
+      );
+    } else {
+      setTags( [] );
+    }
 
     setStatusDateFromNow( filter.statusDateFromNow );
     setStatusDateFrom( filter.statusDateFrom === null ? null : moment( parseInt( filter.statusDateFrom ) ) );
@@ -395,17 +416,18 @@ export default function FilterForm( props ) {
 
   let canModify = id !== null;
 
+  console.log( localProjectData.localProject );
+
   return (
     <div>
       <div className="d-flex m-t-5 sidebar-filter-commandbar">
         <button type="button" className="btn-link" onClick={applyFilter}><i className="fa fa-check icon-M p-r-0 m-r-0"/></button>
-        {
-          <AddFilter
-            filter={getCleanCurrentFilter()}
-            title={title}
-            {...props}
-            />
-        }
+        <AddFilter
+          filter={getCleanCurrentFilter()}
+          projectId={projectId}
+          originalFilter={filterData.localFilter}
+          {...props}
+          />
 
         <button type="button" className="btn-link" onClick={resetFilter}><i className="fa fa-sync icon-M p-r-0 m-r-0"/></button>
         { canModify &&
@@ -413,34 +435,52 @@ export default function FilterForm( props ) {
         }
         <button type="button" className="btn-link" onClick={() => close()}><i className="fa fa-times icon-M p-r-0 m-r-0"/></button>
       </div>
-      <div>
-        <div className="sidebar-filter-label">
-          Filter name
+
+      { filterData.localFilter.id &&
+        <div>
+          <div className="sidebar-filter-label">
+            Filter name
+          </div>
+          <div>
+            <h5 className="sidebar-filter-name">{ filterData.localFilter.title }</h5>
+          </div>
         </div>
-        <div
-          className=""
-          onClick={() => setEditTitleOpen(true)}
-          >
-          {!editTitleOpen &&
-            <h5 className="sidebar-filter-name">{ title.length !== 0 ? title : 'New filter title' }</h5>
-          }
-          {editTitleOpen &&
-            <Input
-              type="text"
-              className="from-control sidebar-filter-input"
-              placeholder="Enter filter name"
-              autoFocus
-              value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-              }}
-              onBlur={() => setEditTitleOpen(false)}
-              />
-          }
-        </div>
-      </div>
+      }
+
 
       <div className="sidebar-filter">
+        { projectId && localProjectData.localProject.right.tagsRead &&
+        <div className="sidebar-filter-row">
+          <Empty>
+            <div className="row mb-auto">
+              <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
+                <i className="fa fa-plus" />
+                Tags
+              </button>
+              <MultiSelect
+                className="center-hor"
+                direction="right"
+                header="Select tags for this task"
+                closeMultiSelect={() => { setTagsOpen(false) }}
+                open={tagsOpen}
+                items={toSelArr(localProjectData.localProject.project.tags)}
+                selected={tags}
+                onChange={(tags) => { setTags(tags) }}
+                />
+            </div>
+
+            { tags
+              .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+              .map( ( tag ) => (
+                <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+                  {tag.title}
+                </span>
+              ) )
+            }
+          </Empty>
+        </div>
+      }
+
         <div className="sidebar-filter-row">
           <label htmlFor="example-input-small">Zadal</label>
           <div className="flex">
