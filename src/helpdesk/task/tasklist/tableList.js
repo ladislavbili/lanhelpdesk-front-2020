@@ -21,7 +21,9 @@ import Pagination from './components/pagination';
 import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
 
 import {
-  defaultTasksAttributesFilter
+  defaultTasksAttributesFilter,
+  approvedMetadataAttributes,
+  pendingMetadataAttributes,
 } from 'configs/constants/tasks';
 
 export default function TableList( props ) {
@@ -74,6 +76,9 @@ export default function TableList( props ) {
         }
         if ( display.value === "password" ) {
           value = task[ "password" ];
+        }
+        if ( display.value === 'statistics' ) {
+          value = `${approvedMetadataAttributes.reduce((acc, cur)=> acc + task.metadata[cur] ,0)}/${[...approvedMetadataAttributes,...pendingMetadataAttributes].reduce((acc, cur)=> acc + task.metadata[cur] ,0)}`;
         }
         if ( display.value === 'important' ) {
           return true;
@@ -292,6 +297,28 @@ export default function TableList( props ) {
               .map((task) =>
               renderTask(task)
             )}
+            { displayValues.find((displayValue) => displayValue.value === 'statistics' ).show &&
+            <tr>
+              <td colSpan={filteredDisplayValues.length - 3}>
+              Statistics total
+              </td>
+              <td>
+              { (( ) => {
+                const approved = tasks.reduce((acc1, cur1) => {
+                  return acc1 + approvedMetadataAttributes.reduce((acc2, cur2) => {
+                    return acc2 + cur1.metadata[cur2];
+                  }, 0 );
+                },0)
+                const total = approved + tasks.reduce((acc1, cur1) => {
+                  return acc1 + pendingMetadataAttributes.reduce((acc2, cur2) => {
+                    return acc2 + cur1.metadata[cur2];
+                  }, 0 );
+                },0);
+                return `${approved}/${total}`;
+              })() }
+              </td>
+            </tr>
+            }
             { loading &&
               <tr>
                 <td colSpan="100">

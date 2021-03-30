@@ -9,6 +9,10 @@ import Statistics from './statistics';
 
 import moment from 'moment';
 
+import {
+  approvedMetadataAttributes,
+  pendingMetadataAttributes,
+} from 'configs/constants/tasks';
 
 export default function TasklistSwitch( props ) {
   const {
@@ -110,7 +114,7 @@ export default function TasklistSwitch( props ) {
       func: ( items ) => (
         <div>
           { items.map((item)=>(
-            <div style={{ background: item.color, color: 'white', borderRadius: 3 }} className="m-r-5 m-t-5 p-l-5 p-r-5">
+            <div key={item.id} style={{ background: item.color, color: 'white', borderRadius: 3 }} className="m-r-5 m-t-5 p-l-5 p-r-5">
               {item.title}
             </div>
           ) ) }
@@ -148,6 +152,16 @@ export default function TasklistSwitch( props ) {
       label: 'Overtime',
       type: 'boolean',
       show: preference[ 'overtime' ]
+    },
+    {
+      value: 'statistics',
+      label: 'Statistics',
+      type: 'func',
+      filterFunc: ( task ) => task.id,
+      func: ( task ) => (
+        `${approvedMetadataAttributes.reduce((acc, cur)=> acc + task.metadata[cur] ,0)}/${[...pendingMetadataAttributes,...approvedMetadataAttributes].reduce((acc, cur)=> acc + task.metadata[cur] ,0)}`
+      ),
+      show: preference[ 'statistics' ]
     },
   ];
   const taskID = match.params.taskID;

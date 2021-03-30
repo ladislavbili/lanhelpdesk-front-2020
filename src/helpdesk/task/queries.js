@@ -341,14 +341,7 @@ taskType
 overtime
 pausal
 tags
-subtasksApproved
-subtasksPending
-tripsApproved
-tripsPending
-materialsApproved
-materialsPending
-itemsApproved
-itemsPending
+statistics
 `
 
 export const ADD_TASK = gql `
@@ -578,14 +571,7 @@ mutation addOrUpdateTasklistColumnPerference(
   $overtime: Boolean
   $pausal: Boolean
   $tags: Boolean
-  $subtasksApproved: Boolean
-  $subtasksPending: Boolean
-  $tripsApproved: Boolean
-  $tripsPending: Boolean
-  $materialsApproved: Boolean
-  $materialsPending: Boolean
-  $itemsApproved: Boolean
-  $itemsPending: Boolean
+  $statistics: Boolean
 ) {
   addOrUpdateTasklistColumnPerference(
     projectId: $projectId
@@ -605,14 +591,7 @@ mutation addOrUpdateTasklistColumnPerference(
     overtime: $overtime
     pausal: $pausal
     tags: $tags
-    subtasksApproved: $subtasksApproved
-    subtasksPending: $subtasksPending
-    tripsApproved: $tripsApproved
-    tripsPending: $tripsPending
-    materialsApproved: $materialsApproved
-    materialsPending: $materialsPending
-    itemsApproved: $itemsApproved
-    itemsPending: $itemsPending
+    statistics: $statistics
   ){
     ${tasklistPreferenceBody}
   }

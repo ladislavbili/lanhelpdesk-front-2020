@@ -13,6 +13,7 @@ export const defaultTasksAttributesFilter = {
   tags: "",
   overtime: "",
   pausal: "",
+  statistics: "",
 }
 export const defaultTaskSort = {
   key: 'status',
@@ -35,14 +36,7 @@ export const defaultTasklistColumnPreference = {
   overtime: false,
   pausal: false,
   tags: false,
-  subtasksApproved: false,
-  subtasksPending: false,
-  tripsApproved: false,
-  tripsPending: false,
-  materialsApproved: false,
-  materialsPending: false,
-  itemsApproved: false,
-  itemsPending: false,
+  statistics: false,
 }
 export const orderByValues = [
   {
@@ -117,6 +111,12 @@ export const attributeLimitingRights = [
     right: 'typeRead',
     preference: 'taskType'
   },
+  {
+    right: 'rozpocetRead',
+    preference: 'statistics'
+  },
 ]
 export const unimplementedAttributes = [
 ]
+export const approvedMetadataAttributes = [ 'itemsApproved', 'materialsApproved', 'subtasksApproved', 'tripsApproved' ];
+export const pendingMetadataAttributes = [ 'itemsPending', 'materialsPending', 'subtasksPending', 'tripsPending' ];

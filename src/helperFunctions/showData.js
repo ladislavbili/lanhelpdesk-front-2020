@@ -40,7 +40,7 @@ export const getItemDisplayValue = ( item, value ) => {
   if ( !item[ value.value ] && ( value.type === 'important' || value.type === 'invoiced' || value.type === 'checkbox' ) ) {
     return null;
   }
-  if ( !item[ value.value ] && ![ 'boolean', 'attribute' ].includes( value.type ) ) {
+  if ( !item[ value.value ] && ![ 'boolean', 'attribute', 'func' ].includes( value.type ) ) {
     return '---';
   }
   if ( value.type === 'object' ) {
@@ -74,6 +74,8 @@ export const getItemDisplayValue = ( item, value ) => {
     return item[ value.value ] ? "Yes" : "No";
   } else if ( value.type === 'list' ) {
     return value.func( item[ value.value ] );
+  } else if ( value.type === 'func' ) {
+    return value.func( item );
   } else if ( value.type === 'date' ) {
     return timestampToString( item[ value.value ] );
   } else if ( value.type === 'user' ) {
