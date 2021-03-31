@@ -1,3 +1,14 @@
+import {
+  timestampToDate,
+  timestampToHoursAndMinutes,
+} from 'helperFunctions';
+
+import {
+  momentLocalizer
+} from "react-big-calendar";
+
+import moment from 'moment';
+
 export const defaultTasksAttributesFilter = {
   id: "",
   status: "",
@@ -118,5 +129,37 @@ export const attributeLimitingRights = [
     preference: 'taskType'
   },
 ]
+export const calendarLocalizer = momentLocalizer( moment );
+export const calendarDateFormats = {
+  dayFormat: ( date, culture, localizer ) => localizer.format( date, 'dddd', culture ), //timestampToDate( date ),
+  timeGutterFormat: ( date, culture, localizer ) => {
+    return timestampToHoursAndMinutes( date );
+  },
+  dayRangeHeaderFormat: ( {
+    start,
+    end
+  }, culture, localizer ) => {
+    return timestampToDate( start ) + ' - ' + timestampToDate( end );
+  },
+  agendaHeaderFormat: ( {
+    start,
+    end
+  }, culture, localizer ) => {
+    return timestampToDate( start ) + ' - ' + timestampToDate( end );
+  },
+  selectRangeFormat: ( {
+    start,
+    end
+  }, culture, localizer ) => {
+    return timestampToHoursAndMinutes( start ) + ' - ' + timestampToHoursAndMinutes( end );
+  },
+  eventTimeRangeFormat: ( {
+    start,
+    end
+  }, culture, localizer ) => {
+    return timestampToHoursAndMinutes( start ) + ' - ' + timestampToHoursAndMinutes( end );
+  },
+}
+
 export const unimplementedAttributes = [
 ]

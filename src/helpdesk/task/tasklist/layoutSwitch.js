@@ -209,7 +209,10 @@ export default function TasklistSwitch( props ) {
           }
           {tasklistLayout === 3 && !showStatistics &&
             <div className='col-xl-12'>
-              <Calendar {...generalProps} />
+              {taskID && <TaskEdit match={match} columns={false} history={history} />}
+              {!taskID &&
+                <Calendar {...generalProps} />
+              }
             </div>
           }
         </div>

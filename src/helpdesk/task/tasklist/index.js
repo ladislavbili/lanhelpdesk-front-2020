@@ -124,22 +124,6 @@ export default function TasksIndex( props ) {
     limit,
   }
 
-
-  //network
-  const {
-    data: calendarEventsData,
-    loading: calendarEventsLoading,
-    refetch: calendarEventsRefetch
-  } = useQuery( GET_CALENDAR_EVENTS, {
-    variables: {
-      filter: deleteAttributes(
-        localFilterToValues( localFilter ),
-        unimplementedAttributes
-      ),
-      projectId: localProject.id
-    },
-  } );
-
   const {
     data: preferencesData,
     loading: preferencesLoading,
@@ -172,15 +156,6 @@ export default function TasksIndex( props ) {
     tasksRefetch( {
       variables: taskVariables,
     } );
-    calendarEventsRefetch( {
-      variables: {
-        filter: deleteAttributes(
-          localFilterToValues( localFilter ),
-          unimplementedAttributes
-        ),
-        projectId: localProject.id
-      }
-    } );
   }, [ localFilter, localProject.id, tasksSort, globalSearchData, globalStringFilter ] );
 
   //monitor and log timings
@@ -196,7 +171,6 @@ export default function TasksIndex( props ) {
   const dataLoading = (
     currentUserLoading ||
     tasksLoading ||
-    calendarEventsLoading ||
     preferencesLoading
   );
 
@@ -380,7 +354,6 @@ export default function TasksIndex( props ) {
       setLocalProject={setProject}
       localMilestone = {localMilestone}
       setLocalMilestone={setMilestone}
-      calendarEvents={dataLoading ? [] : calendarEventsData.calendarEvents}
       tasks={dataLoading ? [] : processTasks(tasks) }
       count={ tasksLoading ? null : tasksData.tasks.count }
       page={page}
