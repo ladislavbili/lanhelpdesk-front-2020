@@ -301,7 +301,7 @@ export default function TableList( props ) {
             }
           </tbody>
         </table>
-        <Pagination {...props} />
+        <Pagination {...props} taskList/>
 
         <Modal isOpen={editOpen}>
           <ModalBody className="scrollable" >

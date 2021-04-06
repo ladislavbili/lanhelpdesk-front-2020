@@ -134,6 +134,7 @@ body {
 .main {
   background-color: #eaeaea; //$main-background-color;
   width: calc(100% - #{$sidebar-width} - 2px);
+  flex: 1 1;
 }
 
 //-------------------overflow----------------------
@@ -1598,10 +1599,16 @@ td {
     display: flex !important;
     height: 100%;
 
-    h1 {
+    h1, i {
       color: #fff;
       font-size: 27px;
       margin-top: 2px;
+    }
+    i{
+      margin-top: auto;
+      margin-bottom: auto;
+      margin-left: 15px;
+      cursor: pointer;
     }
   }
 }
@@ -1707,8 +1714,98 @@ td {
   list-style-type: none;
   background: #f2f1f1; //$sidebar-background-color;
   position: relative;
+  z-index: 999;
+}
+
+.sidebar-compressed {
+  width: $compressed-sidebar-width;
+  background-color: $header-color;
+  border: none;
+  border-right: $main-border;
+  list-style-type: none;
+  position: relative;
   top: inherit;
   z-index: 999;
+  .btn.popover-toggler{
+    height: 3em !important;
+    width: 100% !important;
+    background-color: $header-color;
+    .fa, .fas{
+      padding-right: 0px;
+    }
+    i, img{
+      height: 20px;
+      font-size: 20px;
+      color: white;
+    }
+    img.invert{
+      -webkit-filter:invert(100%);
+      filter:progid:DXImageTransform.Microsoft.BasicImage(invert='1');
+    }
+  }
+  .btn.popover-toggler:first-child{
+    margin-top: 0.5em;
+    }
+
+.popover{
+  display: none;
+}
+
+.popover-toggler:hover{
+    .popover{
+
+      padding: 15px 0px;
+      display: block;
+      position: absolute;
+      background-color: white;
+      width: 270px;
+      left: 55px;
+      top: 0px;
+
+      i, img{
+        height: 1.5em;
+        font-size: 1.5em;
+        color: $basic-button-color;
+        padding-left: 0px !important;
+        margin-right: 5px;
+      }
+
+      .sidebar-btn{
+        background-color: $basic-button-color;
+        margin-top: 15px;
+        width: calc(100% - 30px);
+        margin-left: 15px !important;
+        margin-right: 15px !important;
+        margin: 0px;
+        color: white;
+        i{
+          color: white !important;
+            height: 1em;
+            font-size: 1em;
+        }
+      }
+      .btn-link {
+        margin-left: 0px !important;
+        padding-left: 15px !important;
+        i {
+          height: 1em;
+          font-size: 1em;
+        }
+      }
+
+      .sidebar-label {
+        padding: 0px 15px;
+        .fa, .fas{
+          color: black;
+        }
+      }
+      .sidebar-menu-item{
+        font-size: 14px;
+      }
+
+    }
+}
+
 }
 
 .sidebar-menu {
@@ -2291,7 +2388,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .dnd-header {
   background-color: #eaeaea;
-  border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid rgba(0,0,0,.1);;
 
   font-family: $main-font;
   font-style: normal;
@@ -2305,7 +2402,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .dnd-body {
   background-color: #eaeaea;
-  border-right: 1px solid #aaa;
+  border-right: 1px solid rgba(0,0,0,.1);;
 }
 
 .dnd-item {

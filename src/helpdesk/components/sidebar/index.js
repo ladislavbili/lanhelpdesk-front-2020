@@ -7,6 +7,7 @@ import {
 import SettingsSidebar from './settingsSidebar';
 import TasksSidebar from './tasksSidebar';
 import settings from 'configs/constants/settings';
+import classnames from 'classnames';
 import {
   GET_MY_DATA
 } from './queries';
@@ -14,11 +15,14 @@ import {
 export default function Sidebar( props ) {
   //data & queries
   const {
-    history
+    history,
+    sidebarOpen,
+    setSidebarOpen
   } = props;
   const {
     data
   } = useQuery( GET_MY_DATA );
+
 
   let currentUser = {};
 
@@ -32,10 +36,10 @@ export default function Sidebar( props ) {
   const showSettings = history.location.pathname.includes( 'settings' ) && canSeeSettings;
 
   return (
-    <div className="sidebar">
+    <div className={classnames({"sidebar": sidebarOpen || showSettings, "sidebar-compressed": !sidebarOpen && !showSettings})}>
        <div className="scrollable fit-with-header">
          {!showSettings &&
-           <TasksSidebar {...props}/>
+           <TasksSidebar {...props} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} sidebarOpen={sidebarOpen}/>
          }
          {showSettings &&
            <SettingsSidebar {...props}/>

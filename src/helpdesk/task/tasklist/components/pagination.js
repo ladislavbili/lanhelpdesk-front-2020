@@ -3,7 +3,7 @@ import {
   Button
 } from 'reactstrap';
 import Loading from 'components/loading';
-
+import classnames from 'classnames';
 
 export default function Pagination( props ) {
   const {
@@ -14,6 +14,7 @@ export default function Pagination( props ) {
     shortForm,
     limit,
     loading,
+    taskList
   } = props;
 
   const tasksFrom = limit * ( page - 1 ) + 1;
@@ -33,7 +34,7 @@ export default function Pagination( props ) {
   const path = `/helpdesk/taskList/i/${match.params.listID}/p/`;
 
   return (
-    <div className="row m-b-10 ml-auto">
+    <div className={classnames("row m-b-10 ml-auto", {"m-r-30": taskList})}>
       <div className="message ml-auto m-t-1">
         { `${ tasksFrom }-${ tasksTo } ${!shortForm ? 'from total': ''} of ${count}${!shortForm ? 'tasks' : ''}` }
       </div>

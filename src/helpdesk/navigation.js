@@ -40,6 +40,8 @@ export default function Navigation( props ) {
     refetch: myDataRefetch
   } = useQuery( GET_MY_DATA );
 
+  const [ sidebarOpen, setSidebarOpen ] = React.useState( true );
+
   const client = useApolloClient();
 
   const currentUser = myData ? myData.getMyData : {};
@@ -49,7 +51,7 @@ export default function Navigation( props ) {
     <div>
       <div className="page-header">
         <div className="center-ver row center flex">
-          <SelectPage />
+          <SelectPage sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
           <PageHeader {...props}
             settings={settings} />
         </div>
@@ -57,8 +59,8 @@ export default function Navigation( props ) {
 
       <div className="row center center-ver">
         <Switch>
-        <Route path="/helpdesk/taskList/i/:filterID" component={Sidebar} />
-        <Route path="/helpdesk" component={Sidebar} />
+        <Route path="/helpdesk/taskList/i/:filterID" render={(props) => <Sidebar {...props} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />} />
+        <Route path="/helpdesk" render={(props) => <Sidebar {...props} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />} />
         </Switch>
         <div className="main">
           <Route exact path="/helpdesk/errorMessages" component={accessRights.viewErrors ? ErrorMessages : AccessDenied} />

@@ -1,6 +1,7 @@
 $header-height: 40px;
 $height-without-header: calc( 100vh - calc(#{$header-height})  );
 $sidebar-width: 270px;
+$compressed-sidebar-width: 55px;
 $sidebar-item-height: 40px;
 
 $inputs-border: 6px solid red;
