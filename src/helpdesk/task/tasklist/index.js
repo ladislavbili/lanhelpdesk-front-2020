@@ -58,7 +58,8 @@ import {
   GET_MY_DATA,
   GET_CALENDAR_EVENTS,
   GET_TASKLIST_COLUMNS_PREFERENCES,
-  ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES
+  GET_SCHEDULED_TASKS,
+  ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES,
 } from '../queries';
 
 export default function TasksIndex( props ) {
@@ -111,12 +112,13 @@ export default function TasksIndex( props ) {
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
   const tasksSort = tasksSortData.tasksSort;
+  const filterVariables = deleteAttributes(
+    localFilterToValues( localFilter ),
+    unimplementedAttributes
+  );
   const taskVariables = {
     projectId: localProject.id,
-    filter: deleteAttributes(
-      localFilterToValues( localFilter ),
-      unimplementedAttributes
-    ),
+    filter: filterVariables,
     sort: tasksSort,
     search: globalSearchData.globalTaskSearch,
     stringFilter: globalStringFilter.globalTaskStringFilter,
@@ -141,6 +143,20 @@ export default function TasksIndex( props ) {
   } = useQuery( GET_TASKS, {
     variables: taskVariables,
     notifyOnNetworkStatusChange: true,
+  } );
+
+  const {
+    data: scheduledData,
+    loading: scheduledLoading,
+    refetch: scheduledRefetch,
+  } = useQuery( GET_SCHEDULED_TASKS, {
+    variables: {
+      projectId: localProject.id,
+      filter: filterVariables,
+      from: null,
+      to: null,
+      userId: null,
+    },
   } );
 
   const [ deleteTask, {
@@ -171,7 +187,8 @@ export default function TasksIndex( props ) {
   const dataLoading = (
     currentUserLoading ||
     tasksLoading ||
-    preferencesLoading
+    preferencesLoading ||
+    scheduledLoading
   );
 
   if ( currentUserLoading ) {
@@ -335,7 +352,6 @@ export default function TasksIndex( props ) {
     }
     attributeLimitingRights.forEach( ( limitingRight ) => {
       if ( !localProject.right[ limitingRight.right ] ) {
-        console.log( preference, limitingRight.preference );
         preference[ limitingRight.preference ] = false;
       }
     } )
@@ -354,6 +370,7 @@ export default function TasksIndex( props ) {
       setLocalProject={setProject}
       localMilestone = {localMilestone}
       setLocalMilestone={setMilestone}
+      scheduled={ !scheduledLoading ? scheduledData.scheduledTasks : [] }
       tasks={dataLoading ? [] : processTasks(tasks) }
       count={ tasksLoading ? null : tasksData.tasks.count }
       page={page}

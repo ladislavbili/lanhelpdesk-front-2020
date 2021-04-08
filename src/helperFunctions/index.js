@@ -56,7 +56,8 @@ export {
   timestampToInput,
   inputToTimestamp,
   toMillisec,
-  fromMillisec
+  fromMillisec,
+  getDateClock,
 }
 from './timeManipulations';
 
