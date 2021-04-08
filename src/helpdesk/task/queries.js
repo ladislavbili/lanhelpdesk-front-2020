@@ -253,6 +253,9 @@ tasks {
   pausal
   pendingChangable
   statusChange
+  rights{
+    ${groupRights}
+  }
   metadata{
     subtasksApproved
     subtasksPending
@@ -288,9 +291,6 @@ tasks {
     id
     title
     autoApproved
-    right{
-      ${groupRights}
-    }
   }
   requester{
     id
@@ -341,14 +341,7 @@ taskType
 overtime
 pausal
 tags
-subtasksApproved
-subtasksPending
-tripsApproved
-tripsPending
-materialsApproved
-materialsPending
-itemsApproved
-itemsPending
+statistics
 `
 
 export const ADD_TASK = gql `
@@ -630,6 +623,43 @@ mutation setTaskLayout($taskLayout: Int!) {
 `;
 
 //scheduled
+export const GET_SCHEDULED_TASKS = gql `
+query scheduledTasks(
+  $projectId: Int
+  $filter: FilterInput
+  $from: String
+  $to: String
+  $userId: Int
+){
+  scheduledTasks(
+    projectId: $projectId
+    filter: $filter
+    from: $from
+    to: $to
+    userId: $userId
+  )  {
+    id
+    from
+    to
+    canEdit
+    user {
+      name
+      surname
+      fullName
+    }
+    task {
+      id
+      title
+      status{
+        id
+        title
+        color
+      }
+    }
+  }
+}
+`;
+
 export const ADD_SCHEDULED_TASK = gql `
 mutation addScheduledTask($from: String!, $to: String!, $task: Int!, $UserId: Int!) {
   addScheduledTask(

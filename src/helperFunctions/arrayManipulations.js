@@ -48,8 +48,8 @@ export const splitArrayByFilter = ( array, filter ) => {
   ] );
 }
 
-export const updateArrayItem = ( array, item ) => {
-  const index = array.findIndex( ( item2 ) => item2.id === item.id );
+export const updateArrayItem = ( array, item, key = 'id' ) => {
+  const index = array.findIndex( ( item2 ) => item2[ key ] === item[ key ] );
   if ( index === -1 ) {
     return array;
   }
