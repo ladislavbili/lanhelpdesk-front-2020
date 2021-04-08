@@ -47,6 +47,7 @@ export default function TaskCalendar( props ) {
     tasks,
     statuses,
     allStatuses,
+    scheduled,
     link,
     localProject,
     localFilter,
@@ -138,6 +139,12 @@ export default function TaskCalendar( props ) {
     )
   }
 
+  const isAllDay = ( scheduled ) => {
+    const sFrom = moment( parseInt( scheduled.from ) );
+    const sTo = moment( parseInt( scheduled.to ) );
+    return Math.abs( sFrom.diff( sTo, 'days' ) ) > 0;
+  }
+
   return (
     <div>
       <CommandBar {...props} />
@@ -158,7 +165,13 @@ export default function TaskCalendar( props ) {
           </div>
           <DnDCalendar
             {...taskCalendarDefaults}
-            events = { fakeEvents }
+            events = { scheduled.map((scheduled) => ({
+              ...scheduled,
+              start: new Date( parseInt( scheduled.from ) ),
+              end: new Date( parseInt( scheduled.to ) ),
+              allDay: isAllDay(scheduled),
+              title: renderScheduled( scheduled.task, new Date( parseInt( scheduled.from ) ), new Date( parseInt( scheduled.to ) ) ),
+            })) }
             defaultView = { calendarLayout }
             onView={(viewType)=>{
               setCalendarLayout(viewType);

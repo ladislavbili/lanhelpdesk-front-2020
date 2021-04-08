@@ -358,12 +358,6 @@ export default function TasksIndex( props ) {
     return preference;
   }
 
-  const isAllDay = ( scheduled ) => {
-    const sFrom = moment( parseInt( scheduled.from ) );
-    const sTo = moment( parseInt( scheduled.to ) );
-    return Math.abs( sFrom.diff( sTo, 'days' ) ) > 0;
-  }
-
   return (
     <TasklistSwitch
       history={history}
@@ -376,10 +370,7 @@ export default function TasksIndex( props ) {
       setLocalProject={setProject}
       localMilestone = {localMilestone}
       setLocalMilestone={setMilestone}
-      scheduled={( !scheduledLoading ? scheduledData.scheduledTasks : [] ).map((scheduled) => ({
-        ...scheduled,
-        allDay: isAllDay(scheduled)
-      }))}
+      scheduled={ !scheduledLoading ? scheduledData.scheduledTasks : [] }
       tasks={dataLoading ? [] : processTasks(tasks) }
       count={ tasksLoading ? null : tasksData.tasks.count }
       page={page}

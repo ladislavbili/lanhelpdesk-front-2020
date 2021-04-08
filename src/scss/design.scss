@@ -2408,6 +2408,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     }
   }
   .rbc-calendar{
+    min-height: calc(100vh - 170px);
     background-color: white;
     flex: 1;
     .rbc-toolbar-label{
