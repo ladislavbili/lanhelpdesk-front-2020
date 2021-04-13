@@ -5,3 +5,4 @@ export * from './project/queries';
 export * from './reports/queries';
 
 export * from './tasklist/queries';
+export * from './calendar/queries';

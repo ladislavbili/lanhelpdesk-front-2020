@@ -50,6 +50,8 @@ import {
   GET_GLOBAL_TASK_SEARCH,
   GET_LOCAL_TASK_STRING_FILTER,
   GET_GLOBAL_TASK_STRING_FILTER,
+  GET_LOCAL_CALENDAR_USER_ID,
+  GET_LOCAL_CALENDAR_DATE_RANGE,
 } from 'apollo/localSchema/queries';
 
 import {
@@ -60,6 +62,8 @@ import {
   GET_TASKLIST_COLUMNS_PREFERENCES,
   GET_SCHEDULED_TASKS,
   ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES,
+  ADD_SCHEDULED_TASK,
+  UPDATE_SCHEDULED_TASK,
 } from '../queries';
 
 export default function TasksIndex( props ) {
@@ -108,6 +112,14 @@ export default function TasksIndex( props ) {
     data: globalStringFilter,
   } = useQuery( GET_GLOBAL_TASK_STRING_FILTER );
 
+  const {
+    data: localCalendarUserId,
+  } = useQuery( GET_LOCAL_CALENDAR_USER_ID );
+
+  const {
+    data: localCalendarDateRange,
+  } = useQuery( GET_LOCAL_CALENDAR_DATE_RANGE );
+
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
@@ -146,17 +158,23 @@ export default function TasksIndex( props ) {
   } );
 
   const {
-    data: scheduledData,
-    loading: scheduledLoading,
-    refetch: scheduledRefetch,
+    from: cFrom,
+    to: cTo,
+  } = localCalendarDateRange.localCalendarDateRange;
+
+  const {
+    data: scheduledTasksData,
+    loading: scheduledTasksLoading,
+    refetch: scheduledTasksRefetch,
   } = useQuery( GET_SCHEDULED_TASKS, {
     variables: {
       projectId: localProject.id,
       filter: filterVariables,
-      from: null,
-      to: null,
-      userId: null,
+      from: cFrom.toString(),
+      to: cTo.toString(),
+      userId: localCalendarUserId.localCalendarUserId,
     },
+    fetchPolicy: 'network-only',
   } );
 
   const [ deleteTask, {
@@ -165,6 +183,8 @@ export default function TasksIndex( props ) {
   const [ setUserStatuses ] = useMutation( SET_USER_STATUSES );
   const [ setTasklistLayout ] = useMutation( SET_TASKLIST_LAYOUT );
   const [ addOrUpdatePreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES );
+  const [ addScheduledTask ] = useMutation( ADD_SCHEDULED_TASK );
+  const [ updateScheduledTask ] = useMutation( UPDATE_SCHEDULED_TASK );
 
   //sync
   //refetch calendar and tasks
@@ -174,9 +194,23 @@ export default function TasksIndex( props ) {
     } );
   }, [ localFilter, localProject.id, tasksSort, globalSearchData, globalStringFilter ] );
 
+  const scheduledRefetch = () => {
+    scheduledTasksRefetch( {
+      projectId: localProject.id,
+      filter: filterVariables,
+      from: cFrom.toString(),
+      to: cTo.toString(),
+      userId: localCalendarUserId.localCalendarUserId,
+    } );
+  }
+
+  React.useEffect( () => {
+    scheduledRefetch();
+  }, [ cFrom, cTo ] );
+
   //monitor and log timings
   React.useEffect( () => {
-    if ( !tasksLoading ) {
+    if ( !tasksLoading && false ) {
       console.log( 'timings', [ tasksData.tasks.execTime, tasksData.tasks.secondaryTimes ] );
     }
   }, [ tasksLoading ] );
@@ -188,7 +222,7 @@ export default function TasksIndex( props ) {
     currentUserLoading ||
     tasksLoading ||
     preferencesLoading ||
-    scheduledLoading
+    scheduledTasksLoading
   );
 
   if ( currentUserLoading ) {
@@ -370,7 +404,11 @@ export default function TasksIndex( props ) {
       setLocalProject={setProject}
       localMilestone = {localMilestone}
       setLocalMilestone={setMilestone}
-      scheduled={ !scheduledLoading ? scheduledData.scheduledTasks : [] }
+      scheduledUserId={ localCalendarUserId.localCalendarUserId ? localCalendarUserId.localCalendarUserId : currentUser.id }
+      scheduled={ !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [] }
+      addScheduled={addScheduledTask}
+      updateScheduled={updateScheduledTask}
+      refetchScheduled={scheduledRefetch}
       tasks={dataLoading ? [] : processTasks(tasks) }
       count={ tasksLoading ? null : tasksData.tasks.count }
       page={page}

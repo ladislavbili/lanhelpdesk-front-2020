@@ -680,6 +680,25 @@ mutation addScheduledTask($from: String!, $to: String!, $task: Int!, $UserId: In
 }
 `;
 
+export const UPDATE_SCHEDULED_TASK = gql `
+mutation updateScheduledTask( $id: Int!, $from: String!, $to: String!) {
+  updateScheduledTask(
+    id: $id,
+    from: $from,
+    to: $to,
+  ){
+    id
+    from
+    to
+    user{
+      id
+      fullName
+      email
+    }
+  }
+}
+`;
+
 export const DELETE_SCHEDULED_TASK = gql `
 mutation deleteScheduledTask($id: Int!) {
   deleteScheduledTask(

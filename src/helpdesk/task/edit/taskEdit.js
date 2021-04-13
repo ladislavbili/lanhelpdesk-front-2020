@@ -273,11 +273,11 @@ export default function TaskEdit( props ) {
     return (
       compare.title === "" ||
       compare.status === null ||
-      compare.project === null ||
-      compare.assignedTo.length === 0 ||
+      ( compare.project === null && userRights.projectRead ) ||
+      ( compare.assignedTo.length === 0 && userRights.assignedRead ) ||
       compare.saving ||
-      ( defaultFields.tag.required && compare.tags.length === 0 ) ||
-      ( defaultFields.assignedTo.required && compare.assignedTo.length === 0 )
+      ( defaultFields.tag.required && compare.tags.length === 0 && userRights.tagsRead ) ||
+      ( defaultFields.assignedTo.required && compare.assignedTo.length === 0 && userRights.assignedRead )
     )
   }
 
@@ -997,13 +997,13 @@ export default function TaskEdit( props ) {
   const canCreateVykazyError = () => {
     if (
       ( !userRights.vykazRead && !userRights.rozpocetRead ) ||
-      getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company ) === ''
+      getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company, userRights ) === ''
     ) {
       return null;
     }
     return (
       <div className="center-hor" style={{color: "#FF4500", height: "20px"}}>
-        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
+        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company, userRights )}
       </div>
     )
   }
@@ -1614,7 +1614,7 @@ export default function TaskEdit( props ) {
           userRights.tagsRead && tags
           .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
           .map( ( tag ) => (
-            <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+            <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
               {tag.title}
             </span>
           ) )
@@ -2120,8 +2120,6 @@ export default function TaskEdit( props ) {
       </Modal>
     )
   }
-
-  console.log( layout, columns );
 
   return (
     <div

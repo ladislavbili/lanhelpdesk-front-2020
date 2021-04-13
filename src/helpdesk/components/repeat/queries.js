@@ -94,16 +94,6 @@ repeatTemplate{
     id
     title
   }
-  scheduled{
-    id
-    user{
-      id
-      fullName
-      email
-    }
-    from
-    to
-  }
   shortSubtasks{
     id
     title
@@ -355,37 +345,6 @@ query {
         vykazy
       }
     }
-  }
-}
-`;
-
-//scheduled
-export const ADD_SCHEDULED_TASK = gql `
-mutation addRepeatTemplateScheduledTask($from: String!, $to: String!, $repeatTemplate: Int!, $UserId: Int!) {
-  addRepeatTemplateScheduledTask(
-    from: $from,
-    to: $to,
-    repeatTemplate: $repeatTemplate,
-    UserId: $UserId
-  ){
-    id
-    from
-    to
-    user{
-      id
-      fullName
-      email
-    }
-  }
-}
-`;
-
-export const DELETE_SCHEDULED_TASK = gql `
-mutation deleteRepeatTemplateScheduledTask($id: Int!) {
-  deleteRepeatTemplateScheduledTask(
-    id: $id,
-  ){
-    id
   }
 }
 `;

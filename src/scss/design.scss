@@ -429,6 +429,14 @@ p-auto {
   cursor: pointer;
 }
 
+.not-allowed {
+  cursor: not-allowed;
+}
+
+.grabbable {
+  cursor: grab;
+}
+
 h1 {
   color: $main-font-color;
   font-size: 2.5rem;

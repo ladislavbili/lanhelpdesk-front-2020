@@ -16,6 +16,7 @@
     "chroma-js": "^2.1.0",
     "ckeditor4-react": "^0.1.0",
     "ckeditor5-custom-build": "file:src/components/ckeditor5",
+    "date-fns": "^2.20.0",
     "downloadjs": "^1.4.7",
     "exceljs": "^4.2.0",
     "file-saver": "^2.0.5",

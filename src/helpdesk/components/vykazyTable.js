@@ -1750,19 +1750,19 @@ export default function Rozpocet( props ) {
   );
 }
 
-export const getCreationError = ( newSubtaskType, newSubtaskAssigned, company ) => {
+export const getCreationError = ( newSubtaskType, newSubtaskAssigned, company, userRights ) => {
   //let noType = newSubtaskType.id === null;
   let noType = false;
   let noAssigned = newSubtaskAssigned.length === 0;
   let noCompany = company === null;
   let messages = [];
-  if ( noAssigned ) {
+  if ( noAssigned && userRights.assignedRead ) {
     messages.push( 'assign the task to someone' );
   }
-  if ( noType ) {
+  if ( noType && userRights.typeRead ) {
     messages.push( 'pick task type' );
   }
-  if ( noCompany ) {
+  if ( noCompany && userRights.companyRead ) {
     messages.push( 'pick company' );
   }
 

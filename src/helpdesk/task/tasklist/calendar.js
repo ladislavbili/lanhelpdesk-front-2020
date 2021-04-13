@@ -1,9 +1,4 @@
 import React from 'react';
-import {
-  useMutation,
-  useQuery,
-} from "@apollo/client";
-
 import Loading from 'components/loading';
 
 // http://intljusticemission.github.io/react-big-calendar/examples/index.html
@@ -35,10 +30,11 @@ import {
   updateArrayItem,
   getDateClock,
 } from 'helperFunctions';
-let fakeId = 0;
+import {
+  setCalendarTimeRange
+} from 'apollo/localSchema/actions';
 
 const DnDCalendar = withDragAndDrop( Calendar );
-
 
 export default function TaskCalendar( props ) {
   const {
@@ -52,75 +48,60 @@ export default function TaskCalendar( props ) {
     localProject,
     localFilter,
     calendarEvents,
+    scheduledUserId,
+    addScheduled,
+    updateScheduled,
+    refetchScheduled,
   } = props;
 
+  let path = `/helpdesk/taskList/i/${match.params.listID}`;
+  if ( match.params.page ) {
+    path = `${path}/p/${match.params.page}`
+  }
   const [ calendarLayout, setCalendarLayout ] = React.useState( 'week' );
   const [ draggedTask, setDraggedTask ] = React.useState( null );
-  const [ fakeEvents, setFakeEvents ] = React.useState( [] );
 
-  const onEventResize = ( item ) => {
+  const onDropFromOutside = ( eventData ) => {
+    const {
+      start,
+      end
+    } = eventData;
+
+    addScheduled( {
+        variables: {
+          from: start.valueOf()
+            .toString(),
+          to: end.valueOf()
+            .toString(),
+          task: draggedTask.task.id,
+          UserId: scheduledUserId,
+        }
+      } )
+      .then( refetchScheduled )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+  };
+
+  const onEventResizeOrDrop = ( eventData ) => {
     const {
       event,
       start,
       end
-    } = item;
-    setFakeEvents(
-      updateArrayItem(
-        fakeEvents, {
-          ...event,
-          start: start,
-          end: end,
-          allDay: false,
-          title: renderScheduled( event.task, start, end ),
-        },
-        'fakeId'
-      )
-    )
-  };
-
-  const onEventDrop = ( item ) => {
-    const {
-      event,
-      start,
-      end
-    } = item;
-    setFakeEvents(
-      updateArrayItem(
-        fakeEvents, {
-          ...event,
-          start: start,
-          end: end,
-          allDay: false,
-          title: renderScheduled( event.task, start, end ),
-        },
-        'fakeId'
-      )
-    )
-  };
-  const onDropFromOutside = ( item ) => {
-    let {
-      start,
-      end,
-    } = item;
-
-    if ( start.getDay() !== end.getDay() ) {
-      end = new Date( start );
-      start.setHours( 0 );
-      end.setHours( 23 );
-      end.setMinutes( 59 );
-    }
-
-    setFakeEvents( [
-      ...fakeEvents,
-      {
-        start,
-        end,
-        allDay: false,
-        title: renderScheduled( draggedTask, start, end ),
-        task: draggedTask,
-        id: fakeId--,
-      }
-    ] )
+    } = eventData;
+    updateScheduled( {
+        variables: {
+          id: event.id,
+          from: start.valueOf()
+            .toString(),
+          to: end.valueOf()
+            .toString(),
+        }
+      } )
+      .then( refetchScheduled )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
   };
 
   const renderScheduled = ( task, start, end ) => {
@@ -132,9 +113,11 @@ export default function TaskCalendar( props ) {
           </span>
           <span className="attribute-label m-l-3">{`#${ task.id } | ${ task.title }`}</span>
         </p>
-        <p className="m-l-3 m-t-5" style={{ color: 'white' }}>
-          { `${getDateClock(start)} - ${getDateClock(end)}` }
-        </p>
+        { start && end &&
+          <p className="m-l-3 m-t-5" style={{ color: 'white' }}>
+            { `${getDateClock(start)} - ${getDateClock(end)}` }
+          </p>
+        }
       </div>
     )
   }
@@ -142,7 +125,30 @@ export default function TaskCalendar( props ) {
   const isAllDay = ( scheduled ) => {
     const sFrom = moment( parseInt( scheduled.from ) );
     const sTo = moment( parseInt( scheduled.to ) );
-    return Math.abs( sFrom.diff( sTo, 'days' ) ) > 0;
+    return sFrom.diff( sTo, 'days' ) !== 0;
+  }
+
+  const onRangeChange = ( dates, type ) => {
+    if ( !type ) {
+      type = calendarLayout;
+    }
+    if ( [ 'month', 'agenda' ].includes( type ) ) {
+      setCalendarTimeRange( {
+        from: moment( dates.start )
+          .valueOf(),
+        to: moment( dates.end )
+          .valueOf(),
+      } )
+    } else {
+      const start = moment( dates[ 0 ] )
+        .startOf( 'isoWeek' );
+      const end = moment( dates[ 0 ] )
+        .endOf( 'isoWeek' );
+      setCalendarTimeRange( {
+        from: start.valueOf(),
+        to: end.valueOf(),
+      } )
+    }
   }
 
   return (
@@ -155,7 +161,7 @@ export default function TaskCalendar( props ) {
             <DndProvider backend={HTML5Backend}>
               <h1>Tasks stack</h1>
               { tasks.map( task =>
-                <StackItem task={task} key={task.id} setDraggedTask={setDraggedTask} />
+                <StackItem task={task} key={task.id} path={path} setDraggedTask={setDraggedTask} history={history} renderScheduled={renderScheduled} scheduledUserId={scheduledUserId} />
               )}
               <Pagination
                 {...props}
@@ -177,13 +183,14 @@ export default function TaskCalendar( props ) {
               setCalendarLayout(viewType);
             }}
             tooltipAccessor={ (event) => `${event.task.title}` }
-            onEventDrop = { onEventDrop }
-            onEventResize = { onEventResize }
+            onEventDrop = { onEventResizeOrDrop }
+            onEventResize = { onEventResizeOrDrop }
             onDropFromOutside = { onDropFromOutside }
             dragFromOutsideItem={ () => draggedTask }
             onDoubleClickEvent={(event)=>{
-              history.push(link+'/'+event.id);
+              history.push(`${ path }/${ event.task.id }`);
             }}
+            onRangeChange={onRangeChange}
             />
         </div>
       </div>

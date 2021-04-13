@@ -92,7 +92,7 @@ export default function Scheduled( props ) {
                 disabled={disabled}
                 onChange={date => {
                   setNewFrom(date);
-                  if(newTo === null){
+                  if(newTo === null || date.isAfter(newTo) ){
                     setNewTo(date);
                   }
                 }}
@@ -108,9 +108,6 @@ export default function Scheduled( props ) {
                 popperPlacement="auto-left"
                 onChange={date => {
                   setNewTo(date);
-                  if(newFrom === null){
-                    setNewFrom(date);
-                  }
                 }}
                 placeholderText="No end"
                 />

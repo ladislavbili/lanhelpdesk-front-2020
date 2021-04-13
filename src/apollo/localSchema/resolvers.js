@@ -6,3 +6,4 @@ export * from './project/resolvers';
 export * from './reports/resolvers';
 
 export * from './tasklist/resolvers';
+export * from './calendar/resolvers';

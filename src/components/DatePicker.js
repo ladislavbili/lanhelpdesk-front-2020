@@ -1,6 +1,5 @@
 import DatePicker from 'react-datepicker';
-import datePickerConfig from 'configs/components/datepicker';
-import datePickerNoTimeConfig from 'configs/components/datepickerNoTime';
+import createDateConfig from 'configs/components/datepicker';
 import moment from 'moment';
 import React from 'react';
 
@@ -12,17 +11,16 @@ export default function MomentDatePicker( props ) {
     ...rest
   } = props;
 
-  const configToUse = ( hideTime ? datePickerNoTimeConfig : datePickerConfig );
-
   const config = {
-    ...configToUse,
+    ...createDateConfig( !hideTime ),
     ...rest
   }
+
   return (
     <DatePicker
         {...config}
-        value = {
-          selected ? (config.showTimeSelect ? selected.format( 'DD.MM.YYYY HH:mm' ) : selected.format( 'DD.MM.YYYY' ) ) : null
+        selected = {
+          selected ? ( selected.toDate() ) : null
         }
         onChange = {( date ) => {
           if ( onChange ) {

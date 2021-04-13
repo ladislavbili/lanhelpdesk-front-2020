@@ -44,8 +44,6 @@ import {
 import {
   GET_MY_DATA,
   GET_REPEAT,
-  ADD_SCHEDULED_TASK,
-  DELETE_SCHEDULED_TASK,
   ADD_SHORT_SUBTASK,
   UPDATE_SHORT_SUBTASK,
   DELETE_SHORT_SUBTASK,
@@ -113,8 +111,6 @@ export default function RepeatFormLoader( props ) {
     loading: currentUserLoading
   } = useQuery( GET_MY_DATA );
 
-  const [ addScheduledTask ] = useMutation( ADD_SCHEDULED_TASK );
-  const [ deleteScheduledTask ] = useMutation( DELETE_SCHEDULED_TASK );
   const [ addShortSubtask ] = useMutation( ADD_SHORT_SUBTASK );
   const [ updateShortSubtask ] = useMutation( UPDATE_SHORT_SUBTASK );
   const [ deleteShortSubtask ] = useMutation( DELETE_SHORT_SUBTASK );
@@ -175,40 +171,6 @@ export default function RepeatFormLoader( props ) {
         }
       }
     } );
-  }
-
-  const addScheduledTaskFunc = ( scheduled, saveItem ) => {
-    setSaving( true );
-
-    addScheduledTask( {
-        variables: scheduled
-      } )
-      .then( ( response ) => {
-        saveItem( response.data.addRepeatTemplateScheduledTask.id );
-        updateCasheStorage( response.data.addRepeatTemplateScheduledTask, 'scheduled', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        console.log( err.message );
-      } );
-
-    setSaving( false );
-  }
-
-  const deleteScheduledTaskFunc = ( id ) => {
-    deleteScheduledTask( {
-        variables: {
-          id,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'scheduled', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
-      } );
   }
 
   const addShortSubtaskFunc = ( sub, saveItem ) => {
@@ -647,8 +609,6 @@ export default function RepeatFormLoader( props ) {
       directSaving={saving}
       taskID={taskID}
       duplicateTask={duplicateTask}
-      addScheduledTaskFunc={addScheduledTaskFunc}
-      deleteScheduledTaskFunc={deleteScheduledTaskFunc}
       addShortSubtaskFunc={addShortSubtaskFunc}
       updateShortSubtaskFunc={updateShortSubtaskFunc}
       deleteShortSubtaskFunc={deleteShortSubtaskFunc}

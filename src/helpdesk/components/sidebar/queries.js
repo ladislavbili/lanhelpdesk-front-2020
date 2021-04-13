@@ -9,6 +9,7 @@ import {
 export const GET_MY_DATA = gql `
 query {
   getMyData{
+    tasklistLayout
     id
     company{
       id

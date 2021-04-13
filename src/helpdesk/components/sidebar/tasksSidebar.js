@@ -20,8 +20,10 @@ import {
 import {
   NavLink as Link
 } from 'react-router-dom';
-import Loading from 'components/loading';
 import Select from "react-select";
+
+import Loading from 'components/loading';
+import Empty from 'components/Empty';
 import {
   sidebarSelectStyleNoIcon
 } from 'configs/components/select';
@@ -69,12 +71,14 @@ import {
   GET_FILTER,
   GET_PROJECT,
   GET_MILESTONE,
+  GET_LOCAL_CALENDAR_USER_ID,
 } from 'apollo/localSchema/queries';
 
 import {
   setFilter,
   setProject,
   setMilestone,
+  setCalendarUserId,
 } from 'apollo/localSchema/actions';
 import folderIcon from 'scss/icons/folder.svg';
 import filterIcon from 'scss/icons/filter.svg';
@@ -119,6 +123,10 @@ export default function TasksSidebar( props ) {
   } = useQuery( GET_PROJECT );
 
   const {
+    data: localCalendarUserId,
+  } = useQuery( GET_LOCAL_CALENDAR_USER_ID );
+
+  const {
     data: milestoneData,
     loading: milestoneLoading
   } = useQuery( GET_MILESTONE );
@@ -126,6 +134,7 @@ export default function TasksSidebar( props ) {
   //state
   const [ showFilters, setShowFilters ] = React.useState( true );
   const [ showProjects, setShowProjects ] = React.useState( true );
+  const [ showCalendarUsers, setShowCalendarUsers ] = React.useState( false );
   const [ showMilestones, setShowMilestones ] = React.useState( true );
   const [ showFilterAdd, setShowFilterAdd ] = React.useState( false );
   const [ openProjectAdd, setOpenProjectAdd ] = React.useState( false );
@@ -270,6 +279,51 @@ export default function TasksSidebar( props ) {
         </div>
         {showProjects && renderProjectsList()}
         {showProjects && renderProjectAddBtn()}
+      </div>
+    )
+  }
+
+  const renderCalendarUsersList = () => {
+    const myID = myData.getMyData.id;
+    const userID = localCalendarUserId.localCalendarUserId;
+    return (
+      <Nav vertical>
+        { projectData.localProject.usersWithRights.map( user =>
+            <NavItem
+              key={user.id}
+              className={classnames("row full-width sidebar-item", { "active": userID === user.id || userID === null && myID === user.id }) }
+              >
+              <span
+                className={ classnames("clickable sidebar-menu-item link", { "active": userID === user.id || userID === null && myID === user.id }) }
+                onClick={() => {
+                  setCalendarUserId(user.id)
+                }}
+                >
+                {user.fullName}
+              </span>
+            </NavItem>
+          )
+        }
+      </Nav>
+    )
+  }
+
+  const renderCalendarUsers = () => {
+    return (
+      <div>
+        <div className="sidebar-label row clickable" onClick={() => setShowCalendarUsers(!showCalendarUsers)}>
+          <div>
+            <i className="m-r-9 fa fa-user" />
+            <Label>
+              Calendar users
+            </Label>
+          </div>
+          <div className="ml-auto">
+            { showCalendarUsers && <i className="fas fa-chevron-up" /> }
+            { !showCalendarUsers && <i className="fas fa-chevron-down" /> }
+          </div>
+        </div>
+        {showCalendarUsers && renderCalendarUsersList()}
       </div>
     )
   }
@@ -571,6 +625,14 @@ export default function TasksSidebar( props ) {
     )
   }
 
+  const renderCalendarUsersPopover = () => {
+    return (
+      <div className="popover">
+        { renderCalendarUsers() }
+      </div>
+    )
+  }
+
   const renderMilestonesPopover = () => {
     return (
       <div className="popover">
@@ -591,6 +653,13 @@ export default function TasksSidebar( props ) {
         <hr className = "m-l-15 m-r-15 m-t-11" />
 
         { !showFilterAdd && renderProjects() }
+
+        { !showFilterAdd && projectData.localProject.id !== null && projectData.localProject.right.scheduledRead && myData.getMyData.tasklistLayout === 3 && (
+          <Empty>
+            <hr className = "m-l-15 m-r-15 m-t-11" />
+            {renderCalendarUsers()}
+          </Empty>
+        )}
 
         { !showFilterAdd && projectData.localProject.id !== null && <hr className="m-l-15 m-r-15 m-t-11" /> }
 
@@ -613,17 +682,16 @@ export default function TasksSidebar( props ) {
 
   return (
     <div>
-      {
-        !sidebarOpen &&
+      { !sidebarOpen &&
         <div>
-          <button
+          <span
             className='btn popover-toggler'
             >
             <i className="fa fa-plus"/>
             {renderAddButtons()}
-          </button>
+          </span>
 
-          <button
+          <span
             className='btn popover-toggler'
             >
             <img
@@ -636,9 +704,9 @@ export default function TasksSidebar( props ) {
               }}
               />
             {renderFilterContainer()}
-          </button>
+          </span>
 
-          <button
+          <span
             className='btn popover-toggler'
             >
             <img
@@ -651,7 +719,16 @@ export default function TasksSidebar( props ) {
               }}
               />
             {renderProjectsPopover()}
-          </button>
+          </span>
+
+          { projectData.localProject.id !== null && projectData.localProject.right.scheduledRead && myData.getMyData.tasklistLayout === 3 &&
+            <span
+              className='btn popover-toggler'
+              >
+                <i className="fa fa-user" style={{ color: "white", }} />
+              {renderCalendarUsersPopover()}
+            </span>
+          }
 
           {
             projectData.localProject.id !== null &&
@@ -666,8 +743,8 @@ export default function TasksSidebar( props ) {
         </div>
       }
 
-      {sidebarOpen && renderOpenSidebar()}
-            
+      { sidebarOpen && renderOpenSidebar()}
+
       {
         openProjectAdd &&
         <ProjectAdd
@@ -731,28 +808,5 @@ export default function TasksSidebar( props ) {
         </Modal>
       }
     </div>
-  ); {
-    /*
-    <ProjectEdit
-    closeModal={(editedProject, rights) => {
-    if(editedProject !== null){
-    const project = {
-    project: { ...projectData.localProject.project, ...editedProject },
-    right: rights,
-    id: editedProject.id,
-    value: editedProject.id,
-    title: editedProject.title,
-    label: editedProject.title,
-    }
-    setProject(project);
-    refetchMyProjects();
-    }
-    }}
-    projectDeleted={()=>{
-    setProject(dashboard);
-    refetchMyProjects();
-    }}
-    />
-    */
-  }
+  );
 }

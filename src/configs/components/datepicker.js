@@ -1,9 +1,10 @@
-const config = {
-  locale: "en-gb",
-  showTimeSelect: true,
-  todayButton: "Today",
-  timeFormat: "HH:mm",
-  timeIntervals: 15,
-  dateFormat: "HH:mm DD.MM.YYYY",
+export default function config( time ) {
+  return {
+    locale: "sk",
+    showTimeSelect: time,
+    todayButton: "Today",
+    timeIntervals: 15,
+    dateFormat: `dd.MM.yyyy${time ? ' HH:mm' : ''}`,
+  }
+
 }
-export default config;

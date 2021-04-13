@@ -9,7 +9,12 @@ import {
   timestampToHoursAndMinutes,
 } from 'helperFunctions';
 
-
+moment.locale( 'sk', {
+  week: {
+    dow: 1,
+    doy: 1,
+  },
+} )
 export const calendarLocalizer = momentLocalizer( moment );
 
 export const calendarDateFormats = {

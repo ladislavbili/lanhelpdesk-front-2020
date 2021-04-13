@@ -38,7 +38,6 @@ import {
 } from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect'
 import CheckboxList from 'helpdesk/components/checkboxList';
-import Scheduled from 'helpdesk/components/scheduled';
 import {
   getCreationError as getVykazyError
 } from 'helpdesk/components/vykazyTable';
@@ -102,8 +101,6 @@ export default function RepeatForm( props ) {
     closeModal,
     taskID,
     duplicateTask,
-    addScheduledTaskFunc,
-    deleteScheduledTaskFunc,
     addShortSubtaskFunc,
     updateShortSubtaskFunc,
     deleteShortSubtaskFunc,
@@ -176,7 +173,6 @@ export default function RepeatForm( props ) {
   const [ repeat, setRepeat ] = React.useState( null );
 
   const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
-  const [ scheduled, setScheduled ] = React.useState( [] );
 
 
   let counter = 0;
@@ -301,11 +297,6 @@ export default function RepeatForm( props ) {
     setProject( project );
     setTitle( data.title );
     setAttachments( data.repeatTemplateAttachments );
-    setScheduled( data.scheduled.map( ( item ) => ( {
-      ...item,
-      from: moment( parseInt( item.from ) ),
-      to: moment( parseInt( item.to ) ),
-    } ) ) );
     setSimpleSubtasks( data.shortSubtasks );
     setSubtasks( data.subtasks.map( item => ( {
       ...item,
@@ -340,14 +331,6 @@ export default function RepeatForm( props ) {
     setRequester( duplicateTask.requester );
     setProject( projects.find( ( project ) => duplicateTask.project.project.id === project.id ) );
     setTitle( duplicateTask.title );
-    setScheduled(
-      duplicateTask.scheduled.map( ( item ) => ( {
-        ...item,
-        from: moment( parseInt( item.from ) ),
-        to: moment( parseInt( item.to ) ),
-        id: fakeID--,
-      } ) )
-    )
     setSimpleSubtasks( duplicateTask.shortSubtasks.map( ( item ) => ( {
       ...item,
       id: fakeID--
@@ -507,13 +490,6 @@ export default function RepeatForm( props ) {
               shortSubtasks: simpleSubtasks.map( ( item ) => ( {
                 done: item.done,
                 title: item.title,
-              } ) ),
-              scheduled: scheduled.map( ( item ) => ( {
-                to: item.to.valueOf()
-                  .toString(),
-                from: item.from.valueOf()
-                  .toString(),
-                UserId: item.user.id,
               } ) ),
             }
           }
@@ -1256,48 +1232,6 @@ export default function RepeatForm( props ) {
             columns={true}
             addTask={true}
             vertical={true}
-            />
-        }
-        { userRights.scheduledRead &&
-          <Scheduled
-            items={ scheduled }
-            users={assignedTo}
-            disabled={!userRights.scheduledWrite}
-            submitItem = { (newScheduled) => {
-              if(editMode){
-                addScheduledTaskFunc(
-                  {
-                    repeatTemplate: originalRepeat.repeatTemplate.id,
-                    UserId: newScheduled.user.id,
-                    from: newScheduled.from.valueOf().toString() , to: newScheduled.to.valueOf().toString()
-                  },
-                  (id) => {
-                    setScheduled([
-                      ...scheduled,
-                      {
-                        ...newScheduled,
-                        id,
-                      }
-                    ])
-                  }
-                );
-              }else{
-                setScheduled([
-                  ...scheduled,
-                  {
-                    ...newScheduled,
-                    id: fakeID--,
-                  }
-                ])
-              }
-            }}
-            deleteItem = { (newScheduled) => {
-              if(editMode){
-                deleteScheduledTaskFunc(newScheduled.id);
-              }
-              setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
-            } }
-            layout={layout}
             />
         }
         { userRights.typeRead &&
