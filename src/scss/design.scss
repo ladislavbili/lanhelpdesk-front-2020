@@ -167,6 +167,10 @@ html {
   height: calc(#{$height-without-header} - #{$task-list-commandbar-height});
 }
 
+.fit-with-header-and-commandbar-5 {
+  height: calc(#{$height-without-header} - #{$commandbar-height} - 60px );
+}
+
 .overflow-x {
   overflow-x: auto;
 }
@@ -2908,7 +2912,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .form-selects-entry-column:last-child{
-  margin-bottom: 0px !important;
+  //  margin-bottom: 0px !important; - rusilo medzeru v pravom menu edit tasku
 }
 
 .scheduled {

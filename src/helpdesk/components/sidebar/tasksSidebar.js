@@ -446,7 +446,7 @@ export default function TasksSidebar( props ) {
             className={ classnames("clickable sidebar-menu-item link", { "active": repeatPage }) }
             onClick={() => history.push(`/helpdesk/repeats`)}
             >
-            Repeats
+            Repetitive Tasks
           </span>
         </NavItem>
       </Nav>

@@ -19,7 +19,6 @@ import {
 import CommandBar from './components/commandBar';
 import ListHeader from './components/listHeader';
 import TaskEdit from 'helpdesk/task/edit';
-import ItemRender from './components/calendarItemRender';
 import StackItem from './components/stackItem';
 import Pagination from './components/pagination';
 import moment from "moment";
@@ -29,6 +28,7 @@ import {
 import {
   updateArrayItem,
   getDateClock,
+  lightenDarkenColor,
 } from 'helperFunctions';
 import {
   setCalendarTimeRange
@@ -107,14 +107,11 @@ export default function TaskCalendar( props ) {
   const renderScheduled = ( task, start, end ) => {
     return (
       <div>
-        <p className="m-0">
-          <span className="label label-info" style={{backgroundColor: task.status && task.status.color ? task.status.color: 'white' }}>
-            { task.status ? task.status.title : 'Neznámy status' }
-          </span>
-          <span className="attribute-label m-l-3">{`#${ task.id } | ${ task.title }`}</span>
+        <p className="m-0" style={{ color: 'white' }}>
+          <span className="m-l-3">{`${ task.title } | #${ task.id }`}</span>
         </p>
         { start && end &&
-          <p className="m-l-3 m-t-5" style={{ color: 'white' }}>
+          <p className="m-l-3 m-t-5">
             { `${getDateClock(start)} - ${getDateClock(end)}` }
           </p>
         }
@@ -154,10 +151,10 @@ export default function TaskCalendar( props ) {
   return (
     <div>
       <CommandBar {...props} />
-      <div className="full-width scroll-visible fit-with-header-and-commandbar calendar-container">
+      <div className="full-width calendar-container">
         <ListHeader {...props} />
         <div className="row">
-          <div className="task-stack">
+          <div className="task-stack fit-with-header-and-commandbar-5 scroll-visible">
             <DndProvider backend={HTML5Backend}>
               <h1>Tasks stack</h1>
               { tasks.map( task =>
@@ -170,6 +167,7 @@ export default function TaskCalendar( props ) {
             </DndProvider>
           </div>
           <DnDCalendar
+            className="fit-with-header-and-commandbar-5"
             {...taskCalendarDefaults}
             events = { scheduled.map((scheduled) => ({
               ...scheduled,
@@ -182,8 +180,23 @@ export default function TaskCalendar( props ) {
             onView={(viewType)=>{
               setCalendarLayout(viewType);
             }}
-            tooltipAccessor={ (event) => `${event.task.title}` }
+            tooltipAccessor={ (event) => `${getDateClock(event.start)} - ${getDateClock(event.end)} ${event.task.title} ` }
             onEventDrop = { onEventResizeOrDrop }
+            eventPropGetter={
+              ( event ) => {
+                const status = event.task.status;
+                if(status){
+                  return {
+                    className: "",
+                    style: { backgroundColor: status.color, borderColor: lightenDarkenColor(-0.3, status.color ) }
+                  };
+                }
+                return {
+                  className: "",
+                  style: {}
+                };
+              }
+            }
             onEventResize = { onEventResizeOrDrop }
             onDropFromOutside = { onDropFromOutside }
             dragFromOutsideItem={ () => draggedTask }

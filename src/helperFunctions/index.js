@@ -5,6 +5,11 @@ export {
 from './select';
 
 export {
+  lightenDarkenColor,
+}
+from './color';
+
+export {
   isEmail,
   sameStringForms,
   textIncluded,

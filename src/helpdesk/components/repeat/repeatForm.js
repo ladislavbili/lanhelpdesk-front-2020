@@ -190,6 +190,7 @@ export default function RepeatForm( props ) {
       backendCleanRights()
     )
   );
+
   const REQUESTERS = ( project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users );
 
   const setDefaults = ( project, forced ) => {
@@ -778,11 +779,12 @@ export default function RepeatForm( props ) {
     directSaving ||
     title === "" ||
     status === null ||
-    project === null ||
-    assignedTo.length === 0 ||
+    ( project === null && userRights.projectRead ) ||
+    ( assignedTo.length === 0 && userRights.assignedRead ) ||
     repeat === null ||
     !company ||
-    ( project.def.tag.required && tags.length === 0 ) ||
+    ( project.def.assignedTo.required && assignedTo.length === 0 && userRights.assignedRead ) ||
+    ( project.def.tag.required && tags.length === 0 && userRights.tagsRead ) ||
     ( editMode && Object.keys( changes )
       .length === 0 )
   )
@@ -1089,7 +1091,7 @@ export default function RepeatForm( props ) {
                   </div>
                 </div>
               }
-              {console.log('repeat data', repeat)}
+              
               { userRights.repeatRead &&
                 <SimpleRepeat
                   taskID={null}
@@ -1297,7 +1299,7 @@ export default function RepeatForm( props ) {
           userRights.tagsRead && tags
           .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
           .map( ( tag ) => (
-            <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+            <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} key={tag.id} className="m-r-5 p-l-5 p-r-5">
               {tag.title}
             </span>
           ) )
@@ -1695,7 +1697,8 @@ export default function RepeatForm( props ) {
   }
 
   const canCreateVykazyError = () => {
-    if ( getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company ) === '' ) {
+    const error = getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company, userRights );
+    if ( error === '' ) {
       return (
         <span className="center-hor ml-auto">
         </span>
@@ -1703,7 +1706,7 @@ export default function RepeatForm( props ) {
     }
     return (
       <span className="message error-message center-hor ml-auto">
-        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company)}
+        {error}
       </span>
     );
   }

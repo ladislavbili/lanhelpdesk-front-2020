@@ -149,15 +149,18 @@ export default function CommandBar( props ) {
                     */
                   }
                   <label className={classnames({'active':tasklistLayout === 1 || tasklistLayout === 0}, "btn btn-link t-a-l")}>
-                    <input type="radio" name="options" checked={tasklistLayout === 1} onChange={() => setTasklistLayout(1)}/>
+                    <input type="radio" name="options" checked={tasklistLayout === 1 || ( tasklistLayout === 2 && localProject.id === null ) } onChange={() => setTasklistLayout(1)}/>
                     <i className="fa fa-list"/>
                     {` Zoznam`}
                   </label>
-                  <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link t-a-l")}>
-                    <input type="radio" name="options" onChange={() => setTasklistLayout(2)} checked={tasklistLayout === 2}/>
-                    <i className="fa fa-map"/>
-                    {` DnD`}
-                  </label>
+                  { localProject.id &&
+                    <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link t-a-l")}>
+                      <input type="radio" name="options" onChange={() => setTasklistLayout(2)} checked={tasklistLayout === 2}/>
+                      <i className="fa fa-map"/>
+                      {` DnD`}
+                    </label>
+                  }
+
                   <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link t-a-l")}>
                     <input type="radio" name="options" onChange={() => setTasklistLayout(3)} checked={tasklistLayout === 3}/>
                     <i className="fa fa-calendar-alt"/>

@@ -28,6 +28,7 @@ export default function TasklistSwitch( props ) {
     deleteTask,
     tasklistLayout,
     setTasklistLayout,
+    localProject,
   } = props;
 
   const displayValues = [
@@ -190,7 +191,7 @@ export default function TasklistSwitch( props ) {
             </div>
           }
 
-          {(tasklistLayout === 1 || tasklistLayout === 0) && !showStatistics &&
+          {(tasklistLayout === 1 || tasklistLayout === 0 || (tasklistLayout === 2 && localProject.id === null )) && !showStatistics &&
             <div className="flex" >
               { taskID && <TaskEdit match={match} columns={false} history={history} /> }
               { !taskID &&
@@ -199,7 +200,7 @@ export default function TasklistSwitch( props ) {
             </div>
           }
 
-          {tasklistLayout === 2 && !showStatistics &&
+          {tasklistLayout === 2 && localProject.id && !showStatistics &&
             <div className="col-xl-12" >
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
