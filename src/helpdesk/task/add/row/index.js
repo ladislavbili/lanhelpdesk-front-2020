@@ -123,7 +123,7 @@ export default function RowTaskAddContainer( props ) {
         toSelArr(projectsData.myProjects.map((myProject) => ({
           ...myProject.project,
           right: myProject.right,
-          users: myProject.usersWithRights.map((user) => user.id)
+          users: myProject.userWithRights.map((user) => userWithRights.user.id)
         }) ))
       }
       project={localProjectData.localProject}

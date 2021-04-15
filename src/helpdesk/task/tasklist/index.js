@@ -28,6 +28,9 @@ import {
 import {
   SET_TASKLIST_LAYOUT,
 } from 'helpdesk/settings/users/queries';
+import {
+  GET_MY_PROJECTS,
+} from 'helpdesk/settings/projects/queries';
 
 import {
   setFilter,
@@ -73,11 +76,6 @@ export default function TasksIndex( props ) {
   } = props;
   const page = match.params.page ? parseInt( match.params.page ) : 1;
   const limit = 30;
-  const {
-    data: currentUserData,
-    loading: currentUserLoading,
-    refetch: userDataRefetch
-  } = useQuery( GET_MY_DATA );
 
   //local
   const {
@@ -137,6 +135,18 @@ export default function TasksIndex( props ) {
     page,
     limit,
   }
+
+  const {
+    data: currentUserData,
+    loading: currentUserLoading,
+    refetch: userDataRefetch
+  } = useQuery( GET_MY_DATA );
+
+  const {
+    data: myProjectsData,
+    loading: myProjectsLoading,
+    refetch: refetchMyProjects,
+  } = useQuery( GET_MY_PROJECTS );
 
   const {
     data: preferencesData,
@@ -367,10 +377,20 @@ export default function TasksIndex( props ) {
   }
 
   const processTasks = ( tasks ) => {
-    return tasks.map( ( task ) => ( {
-      ...task,
-      checked: markedTasks.includes( task.id )
-    } ) )
+    return tasks.map( ( task ) => {
+      let usersWithRights = []
+      if ( !myProjectsLoading ) {
+        let myProject = myProjectsData.myProjects.find( ( myProject ) => myProject.project.id === task.project.id );
+        if ( myProject ) {
+          usersWithRights = myProject.usersWithRights;
+        }
+      }
+      return {
+        ...task,
+        usersWithRights,
+        checked: markedTasks.includes( task.id )
+      }
+    } )
   }
 
   const createPreferences = () => {
@@ -392,6 +412,8 @@ export default function TasksIndex( props ) {
     return preference;
   }
 
+  const canViewCalendar = localProject.id === null || localProject.right.assignedView;
+
   return (
     <TasklistSwitch
       history={history}
@@ -404,6 +426,7 @@ export default function TasksIndex( props ) {
       setLocalProject={setProject}
       localMilestone = {localMilestone}
       setLocalMilestone={setMilestone}
+      canViewCalendar={canViewCalendar}
       scheduledUserId={ localCalendarUserId.localCalendarUserId ? localCalendarUserId.localCalendarUserId : currentUser.id }
       scheduled={ !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [] }
       addScheduled={addScheduledTask}

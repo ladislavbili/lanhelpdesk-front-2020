@@ -8,6 +8,7 @@ import {
   attributeLimitingRights,
 } from 'configs/constants/tasks';
 
+//statuses, sort, column preferences
 export default function ListHeader( props ) {
   const {
     loading,

@@ -1,0 +1,10 @@
+--Sidebar
+*if in project show users if you can assignedEdit
+*if outside of project show users but filter only those where you have assignedEdit right
+
+--Calendar
+*hide if you cant even assignedView
+*hide stack if you can assignedView only
+*on drop test add assignedTo
+*can events be blocked from moving?
+*on drag events check rights to edit them

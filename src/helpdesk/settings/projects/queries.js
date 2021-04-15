@@ -154,8 +154,11 @@ query {
       ${groupRights}
     }
     usersWithRights {
-      id
-      fullName
+      user{
+        id
+        fullName
+      }
+      assignable
     }
   }
 }

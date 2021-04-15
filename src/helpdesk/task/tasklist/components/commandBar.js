@@ -20,6 +20,7 @@ import {
   DropdownToggle,
 } from 'reactstrap';
 
+// breadcrums, statistics switch, layout switch
 export default function CommandBar( props ) {
   const {
     currentUser,
@@ -33,6 +34,7 @@ export default function CommandBar( props ) {
     localProject,
     localMilestone,
     setMilestone,
+    canViewCalendar,
   } = props;
 
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
@@ -160,12 +162,13 @@ export default function CommandBar( props ) {
                       {` DnD`}
                     </label>
                   }
-
-                  <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link t-a-l")}>
-                    <input type="radio" name="options" onChange={() => setTasklistLayout(3)} checked={tasklistLayout === 3}/>
-                    <i className="fa fa-calendar-alt"/>
-                    {` Kalendár`}
-                  </label>
+                  { canViewCalendar &&
+                    <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link t-a-l")}>
+                      <input type="radio" name="options" onChange={() => setTasklistLayout(3)} checked={tasklistLayout === 3}/>
+                      <i className="fa fa-calendar-alt"/>
+                      {` Kalendár`}
+                    </label>
+                  }
                 </div>
               </DropdownMenu>
             </Dropdown>

@@ -11,7 +11,7 @@ export default function TaskStackItemRender( props ) {
     renderScheduled,
     scheduledUserId,
   } = props;
-  const cantBeAdded = ( !task.rights.scheduledWrite || !task.assignedTo.some( ( user ) => user.id === scheduledUserId ) );
+  const cantBeAdded = ( !task.rights.assignedWrite || !task.usersWithRights.some( ( userWithRights ) => userWithRights.user.id === scheduledUserId && userWithRights.assignable ) );
 
   return (
     <div
@@ -21,10 +21,12 @@ export default function TaskStackItemRender( props ) {
           'grabbable': !cantBeAdded
         },
         "stack-item"
-    )}
+      )}
       style={{ backgroundColor: task.status ? task.status.color : 'white' }}
-      draggable={task.rights.scheduledWrite}
-      onDragStart={() => setDraggedTask({ task, title: renderScheduled(task) }) }
+      draggable={!cantBeAdded}
+      onDragStart={() => {
+        setDraggedTask({ task, title: renderScheduled(task) })
+      }}
       >
       <button
         className="btn btn-link"
@@ -33,10 +35,10 @@ export default function TaskStackItemRender( props ) {
           history.push(`${ path }/${ task.id }`);
         }}
         >
-      <i
-        className="fa fa-external-link-alt"
-        />
-    </button>
+        <i
+          className="fa fa-external-link-alt"
+          />
+      </button>
       <span className="attribute-label m-l-3">
         {`#${task.id} | `}
         <span style={{ color: task.status?.color ? 'white' : '#BDBDBD' }}>

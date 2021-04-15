@@ -21,6 +21,7 @@ import ListHeader from './components/listHeader';
 import TaskEdit from 'helpdesk/task/edit';
 import StackItem from './components/stackItem';
 import Pagination from './components/pagination';
+import classnames from 'classnames';
 import moment from "moment";
 import {
   taskCalendarDefaults,
@@ -58,6 +59,7 @@ export default function TaskCalendar( props ) {
   if ( match.params.page ) {
     path = `${path}/p/${match.params.page}`
   }
+
   const [ calendarLayout, setCalendarLayout ] = React.useState( 'week' );
   const [ draggedTask, setDraggedTask ] = React.useState( null );
 
@@ -89,6 +91,10 @@ export default function TaskCalendar( props ) {
       start,
       end
     } = eventData;
+    if ( !event.canEdit ) {
+      return;
+    }
+
     updateScheduled( {
         variables: {
           id: event.id,
@@ -108,7 +114,7 @@ export default function TaskCalendar( props ) {
     return (
       <div>
         <p className="m-0" style={{ color: 'white' }}>
-          <span className="m-l-3">{`${ task.title } | #${ task.id }`}</span>
+          <span className="m-l-3" style={{lineHeight: 1.2 }}>{`${ task.title } | #${ task.id }`}</span>
         </p>
         { start && end &&
           <p className="m-l-3 m-t-5">
@@ -148,24 +154,29 @@ export default function TaskCalendar( props ) {
     }
   }
 
+  const canSeeStack = localProject.id === null || localProject.right.assignedWrite;
+
   return (
     <div>
       <CommandBar {...props} />
       <div className="full-width calendar-container">
         <ListHeader {...props} />
         <div className="row">
-          <div className="task-stack fit-with-header-and-commandbar-5 scroll-visible">
-            <DndProvider backend={HTML5Backend}>
-              <h1>Tasks stack</h1>
-              { tasks.map( task =>
-                <StackItem task={task} key={task.id} path={path} setDraggedTask={setDraggedTask} history={history} renderScheduled={renderScheduled} scheduledUserId={scheduledUserId} />
-              )}
-              <Pagination
-                {...props}
-                shortForm
-                />
-            </DndProvider>
-          </div>
+          { canSeeStack &&
+            <div className="task-stack fit-with-header-and-commandbar-5 scroll-visible">
+              <DndProvider backend={HTML5Backend}>
+                <h1>Tasks stack</h1>
+                { tasks.map( task =>
+                  <StackItem task={task} key={task.id} path={path} setDraggedTask={setDraggedTask} history={history} renderScheduled={renderScheduled} scheduledUserId={scheduledUserId} />
+                )}
+                <Pagination
+                  {...props}
+                  shortForm
+                  />
+              </DndProvider>
+            </div>
+          }
+
           <DnDCalendar
             className="fit-with-header-and-commandbar-5"
             {...taskCalendarDefaults}
@@ -197,6 +208,7 @@ export default function TaskCalendar( props ) {
                 };
               }
             }
+            draggableAccessor={ (e) => e.canEdit }
             onEventResize = { onEventResizeOrDrop }
             onDropFromOutside = { onDropFromOutside }
             dragFromOutsideItem={ () => draggedTask }

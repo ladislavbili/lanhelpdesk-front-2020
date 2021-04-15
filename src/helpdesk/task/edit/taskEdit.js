@@ -252,9 +252,9 @@ export default function TaskEdit( props ) {
   const canAddUser = accessRights.users;
   const canAddCompany = accessRights.companies;
   const availableProjects = projects.filter( ( project ) => project.right.projectWrite || currentUser.role.level === 0 );
-  const assignedTos = project ? toSelArr( project.usersWithRights, 'fullName' ) : [];
+  const assignedTos = project ? toSelArr( project.usersWithRights.map( ( userWithRights ) => userWithRights.user ), 'fullName' ) : [];
 
-  const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights, 'fullName' ) : users );
+  const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights.map( ( userWithRights ) => userWithRights.user ), 'fullName' ) : users );
   const milestones = [ noMilestone ].concat( ( project ? toSelArr( project.project.milestones ) : [] ) );
 
   const layout = 2; //currentUser.taskLayout
@@ -771,7 +771,7 @@ export default function TaskEdit( props ) {
 
   //Value Change
   const changeProject = ( project ) => {
-    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.id === user.id ) );
+    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.user.id === user.id ) );
     setProject( project );
     setAssignedTo( newAssignedTo );
     setMilestone( noMilestone );
@@ -1643,7 +1643,7 @@ export default function TaskEdit( props ) {
             onInit={(editor) => {
               editor.editing.view.document.on( 'keydown', ( evt, data ) => {
                 if ( data.keyCode === 27 ) {
-                  saveChange({ description  });
+                  autoUpdateTask({ description  })
                   setShowDescription(false);
                   data.preventDefault();
                   evt.stop();
@@ -2096,8 +2096,11 @@ export default function TaskEdit( props ) {
                 usersWithRights:[
                   ...project.usersWithRights,
                   {
-                    id: user.id,
-                    fullName: user.fullName
+                    user: {
+                      id: user.id,
+                      fullName: user.fullName
+                    },
+                    assignable: false
                   }
                 ]
               })
@@ -2160,7 +2163,7 @@ export default function TaskEdit( props ) {
             )}
             >
 
-            <div>
+            <div className="fit-with-header-and-commandbar-6" >
               { renderTitle() }
               { layout === 2 && <hr className="m-t-5 m-b-15"/> }
 

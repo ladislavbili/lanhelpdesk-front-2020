@@ -237,7 +237,7 @@ export default function Rozpocet( props ) {
   )
 
   return (
-    <div className="vykazyTable form-section m-b-0">
+    <div className="vykazyTable form-section">
       <table className="table form-section-rest">
         <thead>
           <tr>

@@ -171,6 +171,10 @@ html {
   height: calc(#{$height-without-header} - #{$commandbar-height} - 60px );
 }
 
+.fit-with-header-and-commandbar-6 {
+  height: calc(#{$height-without-header} - 90px );
+}
+
 .overflow-x {
   overflow-x: auto;
 }

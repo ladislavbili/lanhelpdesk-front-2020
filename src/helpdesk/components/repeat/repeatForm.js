@@ -684,7 +684,7 @@ export default function RepeatForm( props ) {
   //data functions
   const changeProject = ( project ) => {
     setProject( project );
-    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.id === user.id ) );
+    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( userWithRights ) => userWithRights.user.id === user.id ) );
     setAssignedTo( newAssignedTo );
     setMilestone( noMilestone );
     setTags( [] );
@@ -1091,7 +1091,7 @@ export default function RepeatForm( props ) {
                   </div>
                 </div>
               }
-              
+
               { userRights.repeatRead &&
                 <SimpleRepeat
                   taskID={null}
