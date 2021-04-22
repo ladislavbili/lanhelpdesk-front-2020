@@ -4,11 +4,9 @@ import {
   useMutation,
 } from "@apollo/client";
 import {
-  gql
-} from '@apollo/client';;
-import {
   toSelArr
 } from 'helperFunctions';
+import Empty from 'components/Empty';
 import {
   Modal,
   ModalBody,
@@ -230,10 +228,10 @@ export default function TaskAddContainer( props ) {
 
   if ( props.task ) {
     return (
-      <>
+      <Empty>
         {renderCopyButton()}
-      {renderModal()}
-    </>
+        {renderModal()}
+      </Empty>
     );
   }
   return (
@@ -246,5 +244,5 @@ export default function TaskAddContainer( props ) {
       { renderModal() }
 
     </div>
-    );
-  }
+  );
+}

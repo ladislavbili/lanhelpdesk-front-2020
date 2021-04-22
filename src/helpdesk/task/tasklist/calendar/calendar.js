@@ -16,11 +16,11 @@ import {
   HTML5Backend
 } from 'react-dnd-html5-backend';
 
-import CommandBar from './components/commandBar';
-import ListHeader from './components/listHeader';
+import CommandBar from '../components/commandBar';
+import ListHeader from '../components/listHeader';
+import Pagination from '../components/pagination';
 import TaskEdit from 'helpdesk/task/edit';
-import StackItem from './components/stackItem';
-import Pagination from './components/pagination';
+import StackItem from './stackItem';
 import classnames from 'classnames';
 import moment from "moment";
 import {
@@ -31,9 +31,6 @@ import {
   getDateClock,
   lightenDarkenColor,
 } from 'helperFunctions';
-import {
-  setCalendarTimeRange
-} from 'apollo/localSchema/actions';
 
 const DnDCalendar = withDragAndDrop( Calendar );
 
@@ -48,11 +45,11 @@ export default function TaskCalendar( props ) {
     link,
     localProject,
     localFilter,
-    calendarEvents,
     scheduledUserId,
     addScheduled,
     updateScheduled,
     refetchScheduled,
+    setCalendarTimeRange,
   } = props;
 
   let path = `/helpdesk/taskList/i/${match.params.listID}`;

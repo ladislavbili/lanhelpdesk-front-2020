@@ -2,7 +2,6 @@ import React from 'react';
 import {
   useQuery,
   useMutation,
-  useApolloClient,
 } from "@apollo/client";
 import moment from 'moment';
 
@@ -53,8 +52,6 @@ import {
   GET_GLOBAL_TASK_SEARCH,
   GET_LOCAL_TASK_STRING_FILTER,
   GET_GLOBAL_TASK_STRING_FILTER,
-  GET_LOCAL_CALENDAR_USER_ID,
-  GET_LOCAL_CALENDAR_DATE_RANGE,
 } from 'apollo/localSchema/queries';
 
 import {
@@ -63,13 +60,10 @@ import {
   GET_MY_DATA,
   GET_CALENDAR_EVENTS,
   GET_TASKLIST_COLUMNS_PREFERENCES,
-  GET_SCHEDULED_TASKS,
   ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES,
-  ADD_SCHEDULED_TASK,
-  UPDATE_SCHEDULED_TASK,
 } from '../queries';
 
-export default function TasksIndex( props ) {
+export default function TasksLoader( props ) {
   const {
     history,
     match,
@@ -109,14 +103,6 @@ export default function TasksIndex( props ) {
   const {
     data: globalStringFilter,
   } = useQuery( GET_GLOBAL_TASK_STRING_FILTER );
-
-  const {
-    data: localCalendarUserId,
-  } = useQuery( GET_LOCAL_CALENDAR_USER_ID );
-
-  const {
-    data: localCalendarDateRange,
-  } = useQuery( GET_LOCAL_CALENDAR_DATE_RANGE );
 
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
@@ -167,34 +153,12 @@ export default function TasksIndex( props ) {
     notifyOnNetworkStatusChange: true,
   } );
 
-  const {
-    from: cFrom,
-    to: cTo,
-  } = localCalendarDateRange.localCalendarDateRange;
-
-  const {
-    data: scheduledTasksData,
-    loading: scheduledTasksLoading,
-    refetch: scheduledTasksRefetch,
-  } = useQuery( GET_SCHEDULED_TASKS, {
-    variables: {
-      projectId: localProject.id,
-      filter: filterVariables,
-      from: cFrom.toString(),
-      to: cTo.toString(),
-      userId: localCalendarUserId.localCalendarUserId,
-    },
-    fetchPolicy: 'network-only',
-  } );
-
   const [ deleteTask, {
     client
   } ] = useMutation( DELETE_TASK );
   const [ setUserStatuses ] = useMutation( SET_USER_STATUSES );
   const [ setTasklistLayout ] = useMutation( SET_TASKLIST_LAYOUT );
   const [ addOrUpdatePreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES );
-  const [ addScheduledTask ] = useMutation( ADD_SCHEDULED_TASK );
-  const [ updateScheduledTask ] = useMutation( UPDATE_SCHEDULED_TASK );
 
   //sync
   //refetch calendar and tasks
@@ -203,20 +167,6 @@ export default function TasksIndex( props ) {
       variables: taskVariables,
     } );
   }, [ localFilter, localProject.id, tasksSort, globalSearchData, globalStringFilter ] );
-
-  const scheduledRefetch = () => {
-    scheduledTasksRefetch( {
-      projectId: localProject.id,
-      filter: filterVariables,
-      from: cFrom.toString(),
-      to: cTo.toString(),
-      userId: localCalendarUserId.localCalendarUserId,
-    } );
-  }
-
-  React.useEffect( () => {
-    scheduledRefetch();
-  }, [ cFrom, cTo ] );
 
   //monitor and log timings
   React.useEffect( () => {
@@ -231,8 +181,7 @@ export default function TasksIndex( props ) {
   const dataLoading = (
     currentUserLoading ||
     tasksLoading ||
-    preferencesLoading ||
-    scheduledTasksLoading
+    preferencesLoading
   );
 
   if ( currentUserLoading ) {
@@ -412,7 +361,7 @@ export default function TasksIndex( props ) {
     return preference;
   }
 
-  const canViewCalendar = localProject.id === null || localProject.right.assignedView;
+  const canViewCalendar = localProject.id === null || localProject.right.assignedRead;
 
   return (
     <TasklistSwitch
@@ -422,16 +371,12 @@ export default function TasksIndex( props ) {
       currentUser={currentUser}
       localFilter = {localFilter}
       setLocalFilter={setFilter}
+      filterVariables={filterVariables}
       localProject = {localProject}
       setLocalProject={setProject}
       localMilestone = {localMilestone}
       setLocalMilestone={setMilestone}
       canViewCalendar={canViewCalendar}
-      scheduledUserId={ localCalendarUserId.localCalendarUserId ? localCalendarUserId.localCalendarUserId : currentUser.id }
-      scheduled={ !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [] }
-      addScheduled={addScheduledTask}
-      updateScheduled={updateScheduledTask}
-      refetchScheduled={scheduledRefetch}
       tasks={dataLoading ? [] : processTasks(tasks) }
       count={ tasksLoading ? null : tasksData.tasks.count }
       page={page}

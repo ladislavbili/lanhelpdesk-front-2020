@@ -3,6 +3,7 @@ import {
   useQuery,
 } from "@apollo/client";
 import classnames from 'classnames';
+import Empty from 'components/Empty';
 import {
   GET_MY_DATA,
 } from '../queries';
@@ -35,7 +36,7 @@ export default function ErrorIcon( props ) {
   }
   const accessRights = userData.getMyData.role.accessRights;
   return (
-      <>
+    <Empty>
       {
         accessRights.viewErrors &&
         <i
@@ -51,7 +52,6 @@ export default function ErrorIcon( props ) {
           >
           {errorMessageCountData.errorMessageCount}
         </span>
-    } <
-    />
-);
+    } </Empty>
+  );
 }

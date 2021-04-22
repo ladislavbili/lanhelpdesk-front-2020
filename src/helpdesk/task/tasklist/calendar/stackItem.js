@@ -1,6 +1,10 @@
 import React from 'react';
 import classnames from 'classnames';
 
+import {
+  lightenDarkenColor,
+} from 'helperFunctions';
+
 export default function TaskStackItemRender( props ) {
   const {
     task,
@@ -13,6 +17,14 @@ export default function TaskStackItemRender( props ) {
   } = props;
   const cantBeAdded = ( !task.rights.assignedWrite || !task.usersWithRights.some( ( userWithRights ) => userWithRights.user.id === scheduledUserId && userWithRights.assignable ) );
 
+  const backgroundColor = (
+    !task.status ?
+    'white' :
+    ( cantBeAdded ? lightenDarkenColor( 0.3, task.status.color ) : task.status.color )
+  );
+
+  const secondaryTextColor = cantBeAdded ? lightenDarkenColor( -0.5, '#BDBDBD' ) : '#BDBDBD';
+
   return (
     <div
       className={classnames(
@@ -22,7 +34,7 @@ export default function TaskStackItemRender( props ) {
         },
         "stack-item"
       )}
-      style={{ backgroundColor: task.status ? task.status.color : 'white' }}
+      style={{ backgroundColor }}
       draggable={!cantBeAdded}
       onDragStart={() => {
         setDraggedTask({ task, title: renderScheduled(task) })
@@ -39,15 +51,15 @@ export default function TaskStackItemRender( props ) {
           className="fa fa-external-link-alt"
           />
       </button>
-      <span className="attribute-label m-l-3">
+      <span className="m-l-3" style={{ color: secondaryTextColor }}>
         {`#${task.id} | `}
-        <span style={{ color: task.status?.color ? 'white' : '#BDBDBD' }}>
+        <span style={{ color: task.status ? 'white' : secondaryTextColor }}>
           {task.title}
         </span>
       </span>
       { cantBeAdded &&
-        <div className="attribute-label m-l-3">
-          Can't add to calendar to current user
+        <div className="m-l-3" style={{ color: secondaryTextColor }} >
+          User can't be assigned!
         </div>
       }
     </div>

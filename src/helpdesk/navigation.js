@@ -75,7 +75,6 @@ export default function Navigation( props ) {
           <Route exact path="/helpdesk/project/:projectID" component={ProjectEdit} />
           <Route exact path="/helpdesk/repeats" component={RepeatsList} />
 
-
           { /* SETTINGS */ }
           { settings.map( (item) => {
             if (accessRights[item.value]){
