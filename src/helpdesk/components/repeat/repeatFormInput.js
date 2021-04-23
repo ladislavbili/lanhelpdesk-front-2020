@@ -7,15 +7,21 @@ import {
   intervals
 } from 'configs/constants/repeat';
 
+import {
+  timestampToString,
+} from 'helperFunctions';
+
 import RepeatFormModal from './repeatFormModal';
 
 export default function RepeatFormInput( props ) {
   const {
     disabled,
     repeat,
-    vertical
+    vertical,
+    repeatTime,
   } = props;
 
+  const triggeredAt = repeatTime ? repeatTime.triggersAt : null;
   //state
   const [ openModal, setOpenModal ] = React.useState( false );
   const interval = repeat ? intervals.find( ( interval ) => interval.value === repeat.repeatInterval ) : null;
@@ -37,6 +43,7 @@ export default function RepeatFormInput( props ) {
                   "No repeat"
                 }
               </button>
+              { triggeredAt && `Created at: ${timestampToString(parseInt(triggeredAt))}` }
             </div>
           </div>
         }
@@ -55,6 +62,7 @@ export default function RepeatFormInput( props ) {
                   "No repeat"
                 }
               </button>
+              { triggeredAt && `Created at: ${timestampToString(parseInt(triggeredAt))}` }
             </div>
           </div>
         }

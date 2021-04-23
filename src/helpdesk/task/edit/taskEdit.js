@@ -141,7 +141,6 @@ export default function TaskEdit( props ) {
   } = props;
 
   //state
-
   const [ assignedTo, setAssignedTo ] = React.useState( [] );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
@@ -1395,6 +1394,7 @@ export default function TaskEdit( props ) {
                   duplicateTask={ !task.repeat ? getTaskData() : null}
                   repeat={task.repeat}
                   layout={layout}
+                  repeatTime={task.repeatTime}
                   />
               }
               { userRights.overtimeRead &&
@@ -1533,6 +1533,7 @@ export default function TaskEdit( props ) {
               duplicateTask={ !task.repeat ? getTaskData() : null}
               taskID={id}
               repeat={task.repeat}
+              repeatTime={task.repeatTime}
               layout={layout}
               />
           }

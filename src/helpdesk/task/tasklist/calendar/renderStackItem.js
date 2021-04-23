@@ -1,18 +1,18 @@
 import React from 'react';
 import classnames from 'classnames';
+import renderScheduled from './renderScheduled';
 
 import {
   lightenDarkenColor,
 } from 'helperFunctions';
 
-export default function TaskStackItemRender( props ) {
+export default function RenderTaskStackItemRender( props ) {
   const {
     task,
     showEvent,
     setDraggedTask,
     path,
     history,
-    renderScheduled,
     scheduledUserId,
   } = props;
   const cantBeAdded = ( !task.rights.assignedWrite || !task.usersWithRights.some( ( userWithRights ) => userWithRights.user.id === scheduledUserId && userWithRights.assignable ) );

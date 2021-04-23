@@ -20,15 +20,18 @@ import CommandBar from '../components/commandBar';
 import ListHeader from '../components/listHeader';
 import Pagination from '../components/pagination';
 import TaskEdit from 'helpdesk/task/edit';
-import StackItem from './stackItem';
+import Repeat from 'helpdesk/components/repeat/repeatFormModal';
+import DragRepeatContextMenu from './dragRepeatContextMenu';
+import DragRepeatTimeContextMenu from './dragRepeatTimeContextMenu';
+import RepeatContextMenu from './repeatContextMenu';
+import RepeatTimeContextMenu from './repeatTimeContextMenu';
+import StackItem from './renderStackItem';
 import classnames from 'classnames';
 import moment from "moment";
 import {
   taskCalendarDefaults,
 } from 'configs/components/bigCalendar';
 import {
-  updateArrayItem,
-  getDateClock,
   lightenDarkenColor,
 } from 'helperFunctions';
 
@@ -39,6 +42,7 @@ export default function TaskCalendar( props ) {
     match,
     history,
     tasks,
+    tasksRefetch,
     statuses,
     allStatuses,
     scheduled,
@@ -50,8 +54,25 @@ export default function TaskCalendar( props ) {
     updateScheduled,
     refetchScheduled,
     setCalendarTimeRange,
+    repeats,
+    triggerRepeat,
+    repeatTimes,
+    repeatsRefetch,
+    repeatTimesRefetch,
+    addRepeatTime,
+    updateRepeatTime,
+    cFrom,
+    cTo,
+    canSeeStack,
   } = props;
 
+  let {
+    repeatEvents,
+    scheduledEvents,
+    repeatTimeEvents,
+  } = props;
+
+  //TODO: AK repeat nacita svoje repeatTimes, existuje dovod preco nacitavat zvlast repeattimes? nezabudnut na podmienku ak je v range zacaitok alebo novy zaciatok
   let path = `/helpdesk/taskList/i/${match.params.listID}`;
   if ( match.params.page ) {
     path = `${path}/p/${match.params.page}`
@@ -59,6 +80,12 @@ export default function TaskCalendar( props ) {
 
   const [ calendarLayout, setCalendarLayout ] = React.useState( 'week' );
   const [ draggedTask, setDraggedTask ] = React.useState( null );
+  const [ focusedRepeatEvent, setFocusedRepeatEvent ] = React.useState( null );
+
+  const [ draggedRepeatEvent, setDraggedRepeatEvent ] = React.useState( null );
+  const [ draggedRepeatTimeEvent, setDraggedRepeatTimeEvent ] = React.useState( null );
+  const [ openedRepeat, setOpenedRepeat ] = React.useState( null );
+  const [ focusedRepeatTimeEvent, setFocusedRepeatTimeEvent ] = React.useState( null );
 
   const onDropFromOutside = ( eventData ) => {
     const {
@@ -82,7 +109,7 @@ export default function TaskCalendar( props ) {
       } );
   };
 
-  const onEventResizeOrDrop = ( eventData ) => {
+  const onScheduledResizeOrDrop = ( eventData ) => {
     const {
       event,
       start,
@@ -107,27 +134,6 @@ export default function TaskCalendar( props ) {
       } );
   };
 
-  const renderScheduled = ( task, start, end ) => {
-    return (
-      <div>
-        <p className="m-0" style={{ color: 'white' }}>
-          <span className="m-l-3" style={{lineHeight: 1.2 }}>{`${ task.title } | #${ task.id }`}</span>
-        </p>
-        { start && end &&
-          <p className="m-l-3 m-t-5">
-            { `${getDateClock(start)} - ${getDateClock(end)}` }
-          </p>
-        }
-      </div>
-    )
-  }
-
-  const isAllDay = ( scheduled ) => {
-    const sFrom = moment( parseInt( scheduled.from ) );
-    const sTo = moment( parseInt( scheduled.to ) );
-    return sFrom.diff( sTo, 'days' ) !== 0;
-  }
-
   const onRangeChange = ( dates, type ) => {
     if ( !type ) {
       type = calendarLayout;
@@ -151,7 +157,92 @@ export default function TaskCalendar( props ) {
     }
   }
 
-  const canSeeStack = localProject.id === null || localProject.right.assignedWrite;
+  scheduledEvents = scheduledEvents.map( ( scheduledEvent ) => ( {
+    ...scheduledEvent,
+    onDoubleClick: () => history.push( `${ path }/${ scheduled.task.id }` ),
+    propsGetter: () => {
+      const status = scheduled.task.status;
+      if ( status ) {
+        return {
+          className: "",
+          style: {
+            backgroundColor: status.color,
+            borderColor: lightenDarkenColor( -0.3, status.color )
+          }
+        };
+      }
+      return {
+        className: "",
+        style: {}
+      };
+    },
+    onEventDrop: ( e ) => {
+      onScheduledResizeOrDrop( e );
+    },
+    onEventResize: ( e ) => {
+      onScheduledResizeOrDrop( e );
+    },
+
+  } ) )
+
+  repeatEvents = repeatEvents.map( ( repeatEvent ) => ( {
+    ...repeatEvent,
+    onDoubleClick: ( repeatEvent ) => {
+      setFocusedRepeatEvent( repeatEvent );
+    },
+    propsGetter: () => {
+      return {
+        className: "",
+        style: {}
+      };
+    },
+    onEventDrop: ( event ) => {
+      setDraggedRepeatEvent( {
+        ...event.event,
+        newDate: event.start.valueOf(),
+      } )
+    },
+    onEventResize: ( e ) => {},
+
+  } ) )
+
+  repeatTimeEvents = repeatTimeEvents.map( ( repeatTimeEvent ) => ( {
+    ...repeatTimeEvent,
+    onDoubleClick: ( repeatTimeEvent ) => {
+      setFocusedRepeatTimeEvent( repeatTimeEvent );
+    },
+    propsGetter: ( repeatTimeEvent ) => {
+      let task = repeatTimeEvent.repeatTime.task;
+      if ( task !== null && task.status ) {
+        return {
+          className: "",
+          style: {
+            backgroundColor: task.status.color,
+            borderColor: lightenDarkenColor( -0.3, task.status.color )
+          }
+        };
+      }
+      return {
+        className: "",
+        style: {}
+      };
+    },
+    onEventDrop: ( event ) => {
+      setDraggedRepeatTimeEvent( {
+        ...event.event,
+        newDate: event.start.valueOf(),
+      } )
+    },
+    onEventResize: ( e ) => {},
+
+  } ) )
+
+  const events = [
+    ...repeatEvents,
+    ...scheduledEvents,
+    ...repeatTimeEvents,
+
+  ]
 
   return (
     <div>
@@ -164,7 +255,7 @@ export default function TaskCalendar( props ) {
               <DndProvider backend={HTML5Backend}>
                 <h1>Tasks stack</h1>
                 { tasks.map( task =>
-                  <StackItem task={task} key={task.id} path={path} setDraggedTask={setDraggedTask} history={history} renderScheduled={renderScheduled} scheduledUserId={scheduledUserId} />
+                  <StackItem task={task} key={task.id} path={path} setDraggedTask={setDraggedTask} history={history} scheduledUserId={scheduledUserId} />
                 )}
                 <Pagination
                   {...props}
@@ -177,45 +268,69 @@ export default function TaskCalendar( props ) {
           <DnDCalendar
             className="fit-with-header-and-commandbar-5"
             {...taskCalendarDefaults}
-            events = { scheduled.map((scheduled) => ({
-              ...scheduled,
-              start: new Date( parseInt( scheduled.from ) ),
-              end: new Date( parseInt( scheduled.to ) ),
-              allDay: isAllDay(scheduled),
-              title: renderScheduled( scheduled.task, new Date( parseInt( scheduled.from ) ), new Date( parseInt( scheduled.to ) ) ),
-            })) }
+            events = { events }
             defaultView = { calendarLayout }
             onView={(viewType)=>{
               setCalendarLayout(viewType);
             }}
-            tooltipAccessor={ (event) => `${getDateClock(event.start)} - ${getDateClock(event.end)} ${event.task.title} ` }
-            onEventDrop = { onEventResizeOrDrop }
-            eventPropGetter={
-              ( event ) => {
-                const status = event.task.status;
-                if(status){
-                  return {
-                    className: "",
-                    style: { backgroundColor: status.color, borderColor: lightenDarkenColor(-0.3, status.color ) }
-                  };
-                }
-                return {
-                  className: "",
-                  style: {}
-                };
-              }
-            }
-            draggableAccessor={ (e) => e.canEdit }
-            onEventResize = { onEventResizeOrDrop }
-            onDropFromOutside = { onDropFromOutside }
             dragFromOutsideItem={ () => draggedTask }
-            onDoubleClickEvent={(event)=>{
-              history.push(`${ path }/${ event.task.id }`);
-            }}
+            onDropFromOutside = { onDropFromOutside }
             onRangeChange={onRangeChange}
+            tooltipAccessor={ (event) => event.tooltip }
+            draggableAccessor={ (event) => event.canEdit }
+            resizableAccessor={(event) => event.resizable }
+            onEventDrop = { (e) => e.event.onEventDrop(e) }
+            eventPropGetter={ (event) => event.propsGetter(event) }
+            onEventResize = { (event) => event.onEventResize(event) }
+            onDoubleClickEvent={(event) => event.onDoubleClick(event) }
             />
         </div>
       </div>
+
+      <DragRepeatContextMenu
+        repeatEvent={ draggedRepeatEvent }
+        openRepeat={ setOpenedRepeat }
+        closeContextMenu={ () => setDraggedRepeatEvent(null) }
+        addRepeatTime={ addRepeatTime }
+        repeatsRefetch={repeatsRefetch}
+        repeatTimesRefetch={repeatTimesRefetch}
+        />
+      <DragRepeatTimeContextMenu
+          repeatTimeEvent={ draggedRepeatTimeEvent }
+          openRepeat={ setOpenedRepeat }
+          closeContextMenu={ () => setDraggedRepeatTimeEvent(null) }
+          updateRepeatTime={ updateRepeatTime }
+          repeatTimesRefetch={repeatTimesRefetch}
+          />
+      <RepeatContextMenu
+        repeatEvent={ focusedRepeatEvent }
+        closeContextMenu={ () => setFocusedRepeatEvent(null) }
+        openCreatedTask={ (id) => history.push( `${ path }/${ id }` ) }
+        openRepeat={ setOpenedRepeat }
+        repeatsRefetch={repeatsRefetch}
+        repeatTimesRefetch={repeatTimesRefetch}
+        tasksRefetch={tasksRefetch}
+        triggerRepeat={triggerRepeat}
+        />
+      <RepeatTimeContextMenu
+        repeatTimeEvent={ focusedRepeatTimeEvent }
+        closeContextMenu={ () => setFocusedRepeatTimeEvent(null) }
+        openCreatedTask={ (id) => history.push( `${ path }/${ id }` ) }
+        openRepeat={ setOpenedRepeat }
+        repeatsRefetch={repeatsRefetch}
+        repeatTimesRefetch={repeatTimesRefetch}
+        tasksRefetch={tasksRefetch}
+        triggerRepeat={triggerRepeat}
+        />
+      <Repeat
+        isOpen={ openedRepeat !== null }
+        repeat={ openedRepeat }
+        newStartsAt={ openedRepeat ? openedRepeat.newDate : null }
+        closeModal={ (hasChanged) => {
+          setOpenedRepeat( null );
+        } }
+        />
+
     </div>
   );
 }

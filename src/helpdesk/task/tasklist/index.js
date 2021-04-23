@@ -147,7 +147,7 @@ export default function TasksLoader( props ) {
   const {
     data: tasksData,
     loading: tasksLoading,
-    refetch: tasksRefetch,
+    refetch: tasksRefetchFunc,
   } = useQuery( GET_TASKS, {
     variables: taskVariables,
     notifyOnNetworkStatusChange: true,
@@ -161,11 +161,15 @@ export default function TasksLoader( props ) {
   const [ addOrUpdatePreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES );
 
   //sync
-  //refetch calendar and tasks
-  React.useEffect( () => {
-    tasksRefetch( {
+
+  const tasksRefetch = () => {
+    tasksRefetchFunc( {
       variables: taskVariables,
     } );
+  }
+  //refetch calendar and tasks
+  React.useEffect( () => {
+    tasksRefetch();
   }, [ localFilter, localProject.id, tasksSort, globalSearchData, globalStringFilter ] );
 
   //monitor and log timings
@@ -395,6 +399,7 @@ export default function TasksLoader( props ) {
       selectedStatuses={currentUser.statuses.map((status) => status.id )}
       setSelectedStatuses={setUserStatusesFunc}
       deleteTask={deleteTaskFunc}
+      tasksRefetch={tasksRefetch}
       tasklistLayout={currentUser.tasklistLayout}
       setTasklistLayout={setTasklistLayoutFunc}
 

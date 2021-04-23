@@ -119,6 +119,7 @@ export default function RepeatForm( props ) {
     addAttachments,
     removeAttachment,
     directSaving,
+    newStartsAt,
   } = props;
 
   const client = useApolloClient();
@@ -141,7 +142,6 @@ export default function RepeatForm( props ) {
   const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
   const [ defaultFields, setDefaultFields ] = React.useState( noDef );
   const [ changes, setChanges ] = React.useState( {} );
-
   const [ important, setImportant ] = React.useState( false );
   const [ attachments, setAttachments ] = React.useState( [] );
   const [ assignedTo, setAssignedTo ] = React.useState( USERS_WITH_PERMISSIONS.filter( ( user ) => user.id === currentUser.id ) );
@@ -163,6 +163,7 @@ export default function RepeatForm( props ) {
     null
   );
   const [ saving, setSaving ] = React.useState( false );
+  const [ wasSaved, setWasSaved ] = React.useState( false );
   const [ status, setStatus ] = React.useState( null );
   const [ subtasks, setSubtasks ] = React.useState( [] );
   const [ tags, setTags ] = React.useState( [] );
@@ -261,7 +262,14 @@ export default function RepeatForm( props ) {
 
   const setOriginalRepeat = () => {
     const data = originalRepeat.repeatTemplate;
-    setChanges( {} );
+    setChanges( newStartsAt ? {
+      repeat: {
+        repeatEvery: originalRepeat.repeatEvery,
+        repeatInterval: originalRepeat.repeatInterval,
+        startsAt: newStartsAt.toString(),
+        active: originalRepeat.active,
+      }
+    } : {} );
     setAssignedTo( toSelArr( data.assignedTo, 'email' ) );
     setCloseDate( moment( parseInt( data.closeDate ) ) );
     setDeadline( data.deadline ? moment( parseInt( data.deadline ) ) : null );
@@ -270,7 +278,7 @@ export default function RepeatForm( props ) {
     setRepeat( {
       repeatEvery: originalRepeat.repeatEvery,
       repeatInterval: intervals.find( ( interval ) => interval.value === originalRepeat.repeatInterval ),
-      startsAt: moment( parseInt( originalRepeat.startsAt ) ),
+      startsAt: newStartsAt ? moment( newStartsAt ) : moment( parseInt( originalRepeat.startsAt ) ),
       active: originalRepeat.active,
     } )
     const project = projects.find( ( project ) => project.id === data.project.id );
@@ -379,7 +387,7 @@ export default function RepeatForm( props ) {
           .then( ( response ) => {
             updateTask( response, 'delete' );
             updateRepeatList( response, 'delete' );
-            closeModal();
+            closeModal( true );
           } )
           .catch( ( err ) => {
             console.log( err );
@@ -412,6 +420,7 @@ export default function RepeatForm( props ) {
           } : {}
         )
       }
+      setWasSaved( true );
       updateRepeat( {
           variables
         } )
@@ -511,7 +520,7 @@ export default function RepeatForm( props ) {
                 if ( response2.data.ok ) {
                   updateTask( response, 'add' );
                   setSaving( false );
-                  closeModal();
+                  closeModal( true );
                 } else {
                   setSaving( false );
                 }
@@ -523,7 +532,7 @@ export default function RepeatForm( props ) {
           } else {
             updateTask( response, 'add' );
             setSaving( false );
-            closeModal();
+            closeModal( true );
           }
         } )
         .catch( ( err ) => {
@@ -786,7 +795,7 @@ export default function RepeatForm( props ) {
     ( project.def.assignedTo.required && assignedTo.length === 0 && userRights.assignedRead ) ||
     ( project.def.tag.required && tags.length === 0 && userRights.tagsRead ) ||
     ( editMode && Object.keys( changes )
-      .length === 0 )
+      .length === 0 && !newStartsAt )
   )
 
   //RENDERS
@@ -1679,8 +1688,13 @@ export default function RepeatForm( props ) {
       <div className="form-section task-edit-buttons">
         <div className="row form-section-rest">
           {closeModal &&
-            <button className="btn-link-cancel m-l-20" onClick={() => closeModal()}>Cancel</button>
+            <button className="btn-link-cancel m-l-20" onClick={() => closeModal(wasSaved)}>Cancel</button>
           }
+            { newStartsAt &&
+              <span className="text-muted">
+                New Repeat time has been loaded, you can just save the changes or edit repeat!
+            </span>
+            }
           <div className="row pull-right">
           {canCreateVykazyError()}
           <button

@@ -108,6 +108,9 @@ repeat {
   startsAt
   active
 }
+repeatTime{
+  triggersAt
+}
 scheduled{
   id
   user{
