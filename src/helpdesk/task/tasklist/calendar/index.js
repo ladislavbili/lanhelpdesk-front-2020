@@ -10,6 +10,7 @@ import {
 import renderScheduled from './renderScheduled';
 import renderRepeatTime from './renderRepeatTime';
 import renderRepeat from './renderRepeat';
+import moment from 'moment';
 
 import {
   GET_SCHEDULED_TASKS,

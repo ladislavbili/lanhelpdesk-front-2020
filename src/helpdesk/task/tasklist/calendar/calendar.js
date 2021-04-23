@@ -159,9 +159,9 @@ export default function TaskCalendar( props ) {
 
   scheduledEvents = scheduledEvents.map( ( scheduledEvent ) => ( {
     ...scheduledEvent,
-    onDoubleClick: () => history.push( `${ path }/${ scheduled.task.id }` ),
+    onDoubleClick: () => history.push( `${ path }/${ scheduledEvent.task.id }` ),
     propsGetter: () => {
-      const status = scheduled.task.status;
+      const status = scheduledEvent.task.status;
       if ( status ) {
         return {
           className: "",
