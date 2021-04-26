@@ -2153,6 +2153,7 @@ export default function TaskEdit( props ) {
               "row":  layout === 2,
             },
           )}
+          style={{minHeight: "calc(100% - 70px)"}}
           >
           <div
             className={classnames(
@@ -2164,7 +2165,7 @@ export default function TaskEdit( props ) {
             )}
             >
 
-            <div className="fit-with-header-and-commandbar-6" >
+            <div className="" >
               { renderTitle() }
               { layout === 2 && <hr className="m-t-5 m-b-15"/> }
 
