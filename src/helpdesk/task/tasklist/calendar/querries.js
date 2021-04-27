@@ -2,14 +2,14 @@ import {
   gql
 } from '@apollo/client';
 
-export const GET_REPEATS = gql `
+export const GET_CALENDAR_REPEATS = gql `
 query (
   $projectId: Int
   $active: Boolean
-  $from: String
-  $to: String
+  $from: String!
+  $to: String!
 ) {
-  repeats(
+  calendarRepeats(
     projectId: $projectId
     active: $active
     from: $from
@@ -20,15 +20,6 @@ query (
     repeatEvery
     repeatInterval
     startsAt
-    repeatTimes{
-      id
-      originalTrigger
-      triggersAt
-      triggered
-      task{
-        id
-      }
-    }
     repeatTemplate{
       title
     }

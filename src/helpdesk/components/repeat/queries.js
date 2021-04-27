@@ -266,7 +266,7 @@ query (
 export const ADD_REPEAT = gql `
 mutation addRepeat(
   $taskId: Int
-  $repeatEvery: String!
+  $repeatEvery: Int!
   $repeatInterval: EnumRepeatInterval!
   $startsAt: String!
   $active: Boolean!
@@ -292,7 +292,7 @@ mutation addRepeat(
 export const UPDATE_REPEAT = gql `
 mutation updateRepeat(
   $id: Int!
-  $repeatEvery: String
+  $repeatEvery: Int
   $repeatInterval: EnumRepeatInterval
   $startsAt: String
   $active: Boolean

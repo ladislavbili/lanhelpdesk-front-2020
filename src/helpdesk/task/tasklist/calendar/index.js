@@ -19,7 +19,7 @@ import {
 } from '../../queries';
 
 import {
-  GET_REPEATS,
+  GET_CALENDAR_REPEATS,
   GET_REPEAT_TIMES,
   TRIGGER_REPEAT,
   ADD_REPEAT_TIME,
@@ -71,10 +71,10 @@ export default function CalendarLoader( props ) {
   } );
 
   const {
-    data: repeatsData,
-    loading: repeatsLoading,
-    refetch: repeatsRefetchFunc,
-  } = useQuery( GET_REPEATS, {
+    data: calendarRepeatsData,
+    loading: calendarRepeatsLoading,
+    refetch: calendarRepeatsRefetchFunc,
+  } = useQuery( GET_CALENDAR_REPEATS, {
     variables: {
       projectId: localProject.id,
       active: true,
@@ -115,7 +115,7 @@ export default function CalendarLoader( props ) {
   }
 
   const repeatsRefetch = () => {
-    repeatsRefetchFunc( {
+    calendarRepeatsRefetchFunc( {
       projectId: localProject.id,
       active: true,
       from: cFrom.toString(),
@@ -137,7 +137,8 @@ export default function CalendarLoader( props ) {
     repeatTimesRefetch();
   }, [ cFrom, cTo ] );
 
-  const repeats = !repeatsLoading ? repeatsData.repeats : [];
+  console.log( calendarRepeatsData );
+  const repeats = !calendarRepeatsLoading ? calendarRepeatsData.calendarRepeats : [];
   const scheduled = !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [];
   const repeatTimes = !repeatTimesLoading ? repeatTimesData.repeatTimes : [];
 
@@ -158,7 +159,7 @@ export default function CalendarLoader( props ) {
   }
 
   const getAllDatesInRange = ( repeat ) => {
-    const ignoredDates = repeat.repeatTimes.map( ( repeatTime ) => parseInt( repeatTime.originalTrigger ) );
+    const ignoredDates = repeatTimes.map( ( repeatTime ) => parseInt( repeatTime.originalTrigger ) );
     const startsAt = parseInt( repeat.startsAt );
     const everyMilisec = getRepeatMilisecs( repeat.repeatEvery, repeat.repeatInterval );
     let allDates = []
@@ -227,7 +228,7 @@ export default function CalendarLoader( props ) {
     loading: (
       props.loading ||
       scheduledTasksLoading ||
-      repeatsLoading ||
+      calendarRepeatsLoading ||
       repeatTimesLoading
     ),
     scheduled,

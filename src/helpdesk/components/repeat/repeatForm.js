@@ -444,7 +444,7 @@ export default function RepeatForm( props ) {
             repeatInterval: repeat.repeatInterval.value,
             startsAt: repeat.startsAt.valueOf()
               .toString(),
-            repeatEvery: repeat.repeatEvery.toString(),
+            repeatEvery: repeat.repeatEvery,
             repeatTemplate: {
               title,
               closeDate: closeDate ? closeDate.valueOf()
