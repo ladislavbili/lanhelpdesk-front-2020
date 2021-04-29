@@ -59,7 +59,7 @@ export default function RepeatTimeContextMenu( props ) {
             </button>
           </div>
         }
-        { !repeatTime.task && !repeatTime.triggered &&
+        { !repeatTime.task && !repeatTime.triggered && repeatTime.canCreateTask &&
           <div>
             <button
               className="btn btn-link"

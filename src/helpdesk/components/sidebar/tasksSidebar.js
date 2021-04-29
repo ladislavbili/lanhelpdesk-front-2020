@@ -591,6 +591,9 @@ export default function TasksSidebar( props ) {
   }
 
   const renderProjectAddBtn = () => {
+    if ( !myData.getMyData.role.accessRights.addProjects ) {
+      return null;
+    }
     return (
       <NavItem className="row full-width">
       <button

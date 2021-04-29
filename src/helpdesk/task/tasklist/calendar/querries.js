@@ -17,6 +17,7 @@ query (
   ) {
     id
     canEdit
+    canCreateTask
     repeatEvery
     repeatInterval
     startsAt
@@ -43,6 +44,7 @@ query (
     triggersAt
     triggered
     canEdit
+    canCreateTask
     task{
       id
       title

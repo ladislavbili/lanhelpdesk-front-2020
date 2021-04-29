@@ -43,26 +43,28 @@ export default function RepeatContextMenu( props ) {
           >
           Open repeat template
         </button>
-        <button
-          className="btn btn-link"
-          onClick={() => {
-            closeContextMenu();
-            triggerRepeat( {
-              variables: {
-                repeatId: repeat.id,
-                repeatTimeId: null,
-                originalTrigger: time.toString(),
-              }
-            }).then((response) => {
-              repeatsRefetch();
-              repeatTimesRefetch();
-              tasksRefetch();
-              openCreatedTask(response.data.triggerRepeat.id);
-            })
-          }}
-          >
-          Trigger repeat and create task
-        </button>
+        { repeat.canCreateTask &&
+          <button
+            className="btn btn-link"
+            onClick={() => {
+              closeContextMenu();
+              triggerRepeat( {
+                variables: {
+                  repeatId: repeat.id,
+                  repeatTimeId: null,
+                  originalTrigger: time.toString(),
+                }
+              }).then((response) => {
+                repeatsRefetch();
+                repeatTimesRefetch();
+                tasksRefetch();
+                openCreatedTask(response.data.triggerRepeat.id);
+              })
+            }}
+            >
+            Trigger repeat and create task
+          </button>
+        }
         <hr/>
         <div className="h5 bolder">
           Repeat details:

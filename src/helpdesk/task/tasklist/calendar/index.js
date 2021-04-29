@@ -137,7 +137,6 @@ export default function CalendarLoader( props ) {
     repeatTimesRefetch();
   }, [ cFrom, cTo ] );
 
-  console.log( calendarRepeatsData );
   const repeats = !calendarRepeatsLoading ? calendarRepeatsData.calendarRepeats : [];
   const scheduled = !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [];
   const repeatTimes = !repeatTimesLoading ? repeatTimesData.repeatTimes : [];

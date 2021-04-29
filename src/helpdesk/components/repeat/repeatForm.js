@@ -444,13 +444,13 @@ export default function RepeatForm( props ) {
             repeatInterval: repeat.repeatInterval.value,
             startsAt: repeat.startsAt.valueOf()
               .toString(),
-            repeatEvery: repeat.repeatEvery,
+            repeatEvery: parseInt( repeat.repeatEvery ),
             repeatTemplate: {
               title,
               closeDate: closeDate ? closeDate.valueOf()
                 .toString() : null,
               assignedTo: assignedTo.map( user => user.id ),
-              company: company.id,
+              company: company ? company.id : null,
               deadline: deadline ? deadline.valueOf()
                 .toString() : null,
               description,
@@ -778,7 +778,7 @@ export default function RepeatForm( props ) {
         repeatInterval: repeat.repeatInterval.value,
         startsAt: repeat.startsAt.valueOf()
           .toString(),
-        repeatEvery: repeat.repeatEvery.toString()
+        repeatEvery: repeat.repeatEvery
       }
     } )
   }
@@ -791,7 +791,7 @@ export default function RepeatForm( props ) {
     ( project === null && userRights.projectRead ) ||
     ( assignedTo.length === 0 && userRights.assignedRead ) ||
     repeat === null ||
-    !company ||
+    ( !company && userRights.companyRead ) ||
     ( project.def.assignedTo.required && assignedTo.length === 0 && userRights.assignedRead ) ||
     ( project.def.tag.required && tags.length === 0 && userRights.tagsRead ) ||
     ( editMode && Object.keys( changes )

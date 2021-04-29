@@ -280,8 +280,8 @@ export default function TaskCalendar( props ) {
             draggableAccessor={ (event) => event.canEdit }
             resizableAccessor={(event) => event.resizable }
             onEventDrop = { (e) => e.event.onEventDrop(e) }
+            onEventResize = { (e) => e.event.onEventResize(e) }
             eventPropGetter={ (event) => event.propsGetter(event) }
-            onEventResize = { (event) => event.onEventResize(event) }
             onDoubleClickEvent={(event) => event.onDoubleClick(event) }
             />
         </div>
