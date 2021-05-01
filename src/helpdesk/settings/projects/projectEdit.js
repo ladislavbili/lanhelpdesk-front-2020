@@ -147,20 +147,14 @@ export default function ProjectEdit( props ) {
   const [ updateTags, setUpdateTags ] = React.useState( [] );
   const [ deleteTags, setDeleteTags ] = React.useState( [] );
 
-  const [ assignedTo, setAssignedTo ] = React.useState( defList );
-  const [ company, setCompany ] = React.useState( defItem );
-  const [ overtime, setOvertime ] = React.useState( defBool );
-  const [ pausal, setPausal ] = React.useState( defBool );
-  const [ requester, setRequester ] = React.useState( defItem );
-  const [ type, setType ] = React.useState( {
-    ...defItem,
-    required: false
-  } );
-  const [ status, setStatus ] = React.useState( defItem );
-  const [ defTag, setDefTag ] = React.useState( {
-    ...defList,
-    required: noDef.tag.required
-  } );
+  const [ assignedTo, setAssignedTo ] = React.useState( defList( noDef.assignedTo.required ) );
+  const [ company, setCompany ] = React.useState( defItem( noDef.company.required ) );
+  const [ overtime, setOvertime ] = React.useState( defBool( noDef.overtime.required ) );
+  const [ pausal, setPausal ] = React.useState( defBool( noDef.pausal.required ) );
+  const [ requester, setRequester ] = React.useState( defItem( noDef.requester.required ) );
+  const [ type, setType ] = React.useState( defItem( noDef.type.required ) );
+  const [ status, setStatus ] = React.useState( defItem( noDef.status.required ) );
+  const [ defTag, setDefTag ] = React.useState( defList( noDef.tag.required ) );
 
   const [ addStatuses, setAddStatuses ] = React.useState( [] );
   const [ updateStatuses, setUpdateStatuses ] = React.useState( [] );
@@ -176,16 +170,30 @@ export default function ProjectEdit( props ) {
 
   // sync
   React.useEffect( () => {
-    if ( !projectLoading ) {
-      setTitle( projectData.project.title );
-      setDescription( projectData.project.description );
-      setLockedRequester( projectData.project.lockedRequester );
-      setAutoApproved( projectData.project.autoApproved );
+    if ( !projectLoading && !usersLoading && !companiesLoading && !taskTypesLoading ) {
+
+      //PROJECT
+      const project = projectData.project;
+      setTitle( project.title );
+      setDescription( project.description );
+      setLockedRequester( project.lockedRequester );
+      setAutoApproved( project.autoApproved );
+
+      //STATUS
+      let newStatus = {
+        def: true,
+        fixed: project.def.status.fixed,
+        required: true,
+        value: ( project.def.status.value ? project.statuses.find( c => c.id === project.def.status.value.id ) : null )
+      };
+      setStatus( newStatus );
+      setDataChanged( false );
+
       let newOvertime = {
-        def: projectData.project.def.overtime.def,
-        fixed: projectData.project.def.overtime.fixed,
-        required: projectData.project.def.overtime.required,
-        value: ( projectData.project.def.overtime.value ? {
+        def: true,
+        fixed: project.def.overtime.fixed,
+        required: true,
+        value: ( project.def.overtime.value ? {
           value: true,
           label: 'Yes'
         } : {
@@ -194,11 +202,12 @@ export default function ProjectEdit( props ) {
         } )
       };
       setOvertime( newOvertime );
+
       let newPausal = {
-        def: projectData.project.def.pausal.def,
-        fixed: projectData.project.def.pausal.fixed,
-        required: projectData.project.def.pausal.required,
-        value: ( projectData.project.def.pausal.value ? {
+        def: true,
+        fixed: project.def.pausal.fixed,
+        required: true,
+        value: ( project.def.pausal.value ? {
           value: true,
           label: 'Yes'
         } : {
@@ -207,23 +216,31 @@ export default function ProjectEdit( props ) {
         } )
       };
       setPausal( newPausal );
-      setDataChanged( false );
-    }
-  }, [ projectLoading ] );
 
-  React.useEffect( () => {
-    if ( !projectLoading && !usersLoading ) {
-      const project = projectData.project;
+      //TAGS
+      let tags = toSelArr( getAllTags() );
+      let tagIds = project.def.tag.value.map( v => v.id );
+      let newValue = tags.filter( t => tagIds.includes( t.id ) );
+      let newDefTag = {
+        def: project.def.tag.def || project.def.tag.required,
+        fixed: project.def.tag.fixed,
+        required: project.def.tag.required,
+        value: newValue
+      };
+      setDefTag( newDefTag );
+      setDataChanged( false );
+
+      //USERS
       let users = toSelArr( usersData.basicUsers, 'email' );
       let newAssignedTo = {
-        def: project.def.assignedTo.def,
+        def: true,
         fixed: project.def.assignedTo.fixed,
-        required: project.def.assignedTo.required,
+        required: true,
         value: project.def.assignedTo.value.map( user => users.find( u => u.id === user.id ) )
       };
       setAssignedTo( newAssignedTo );
       let newRequester = {
-        def: project.def.requester.def,
+        def: project.def.requester.def || project.def.requester.required,
         fixed: project.def.requester.fixed,
         required: project.def.requester.required,
         value: ( project.def.requester.value ? users.find( u => u.id === project.def.requester.value.id ) : null )
@@ -236,64 +253,48 @@ export default function ProjectEdit( props ) {
       setGroups( groups );
       setUserGroups( userGroups );
       setDataChanged( false );
-    }
-  }, [ projectLoading, usersLoading ] );
 
-  React.useEffect( () => {
-    if ( !projectLoading && !companiesLoading ) {
+      //COMPANY
       let companies = toSelArr( companiesData.basicCompanies );
       let newCompany = {
-        def: projectData.project.def.company.def,
-        fixed: projectData.project.def.company.fixed,
-        required: projectData.project.def.company.required,
-        value: ( projectData.project.def.company.value ? companies.find( c => c.id === projectData.project.def.company.value.id ) : null )
+        def: true,
+        fixed: project.def.company.fixed,
+        required: true,
+        value: ( project.def.company.value ? companies.find( c => c.id === project.def.company.value.id ) : null )
       };
       setCompany( newCompany );
-    }
-  }, [ projectLoading, companiesLoading ] );
 
-  React.useEffect( () => {
-    if ( !projectLoading && !taskTypesLoading ) {
+      //TASK TYPE
       let taskTypes = toSelArr( taskTypesData.taskTypes );
       let newType = {
-        def: projectData.project.def.type.def,
-        fixed: projectData.project.def.type.fixed,
-        required: projectData.project.def.type.required,
-        value: ( projectData.project.def.type.value ? taskTypes.find( type => type.id === projectData.project.def.type.value.id ) : null )
+        def: project.def.type.def || project.def.type.required,
+        fixed: project.def.type.fixed,
+        required: project.def.type.required,
+        value: ( project.def.type.value ? taskTypes.find( type => type.id === project.def.type.value.id ) : null )
       };
       setType( newType );
-    }
-  }, [ projectLoading, taskTypesLoading ] );
 
-  React.useEffect( () => {
-    if ( !projectLoading ) {
-      let newStatus = {
-        def: projectData.project.def.status.def,
-        fixed: projectData.project.def.status.fixed,
-        required: projectData.project.def.status.required,
-        value: ( projectData.project.def.status.value ? projectData.project.statuses.find( c => c.id === projectData.project.def.status.value.id ) : null )
-      };
-      setStatus( newStatus );
-      setDataChanged( false );
+      if ( ![
+        !project.def.type.required || project.def.type.def,
+        !project.def.tag.required || project.def.tag.def,
+        !project.def.requester.required || project.def.requester.def,
+        [
+          project.def.status.required,
+          project.def.status.def,
+          project.def.assignedTo.required,
+          project.def.assignedTo.def,
+          project.def.company.required,
+          project.def.company.def,
+          project.def.pausal.required,
+          project.def.pausal.def,
+          project.def.overtime.required,
+          project.def.overtime.def,
+        ].every( ( bool ) => bool )
+      ].every( ( bool ) => bool ) ) {
+        setDataChanged( true );
+      }
     }
-  }, [ projectLoading ] );
-
-  React.useEffect( () => {
-    if ( !projectLoading ) {
-      const project = projectData.project;
-      let tags = toSelArr( getAllTags() );
-      let ids = project.def.tag.value.map( v => v.id );
-      let newValue = tags.filter( t => ids.includes( t.id ) );
-      let newDefTag = {
-        def: project.def.tag.def,
-        fixed: project.def.tag.fixed,
-        required: project.def.tag.required,
-        value: newValue
-      };
-      setDefTag( newDefTag );
-      setDataChanged( false );
-    }
-  }, [ projectLoading ] );
+  }, [ projectLoading, usersLoading, companiesLoading, taskTypesLoading ] );
 
   React.useEffect( () => {
     setAddTags( [] );
@@ -572,6 +573,16 @@ export default function ProjectEdit( props ) {
   ) {
     return <Loading />
   }
+  const doesDefHasValue = () => {
+    return (
+    [
+      type,
+    ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
+      defTag,
+    ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
+    )
+  }
+
   const addTaskIssue = groups.filter( ( group ) => group.rights.addTasks )
     .some( ( group ) => (
       ( !group.rights.taskTitleEdit ) ||
@@ -585,6 +596,7 @@ export default function ProjectEdit( props ) {
   const cannotSave = (
     saving ||
     title === "" ||
+    !doesDefHasValue() ||
     ( company && company.value === null && company.fixed ) ||
     ( status && status.value === null && status.fixed ) ||
     ( assignedTo && assignedTo.value.length === 0 && assignedTo.fixed ) ||
@@ -631,332 +643,331 @@ export default function ProjectEdit( props ) {
           </div>
         }
       </div>
-    <div
-      className={ classnames(
-        "p-t-10 p-l-20 p-r-20 p-b-20",
-        "scroll-visible",
-        "fit-with-header-and-commandbar",
-      )}
-      >
+      <div
+        className={ classnames(
+          "p-t-10 p-l-20 p-r-20 p-b-20",
+          "scroll-visible",
+          "fit-with-header-and-commandbar",
+        )}
+        >
 
-      <h2 className="m-b-20" >
-        Edit project
-      </h2>
+        <h2 className="m-b-20" >
+          Edit project
+        </h2>
 
-      { myRights.projectPrimaryRead &&
-        <div>
-          <FormGroup>
-            <Label for="name">Project name<span className="warning-big">*</span></Label>
-            <Input
-              disabled={!myRights.projectPrimaryWrite}
-              type="text"
-              name="name"
-              id="name"
-              placeholder="Enter project name"
-              value={title}
-              onChange={(e)=>{
-                setTitle(e.target.value);
-                setDataChanged( true );
-              }}
-              />
-          </FormGroup>
+        { myRights.projectPrimaryRead &&
+          <div>
+            <FormGroup>
+              <Label for="name">Project name<span className="warning-big">*</span></Label>
+              <Input
+                disabled={!myRights.projectPrimaryWrite}
+                type="text"
+                name="name"
+                id="name"
+                placeholder="Enter project name"
+                value={title}
+                onChange={(e)=>{
+                  setTitle(e.target.value);
+                  setDataChanged( true );
+                }}
+                />
+            </FormGroup>
 
-          <FormGroup>
-            <Label htmlFor="description">Popis</Label>
-            <Input
-              disabled={!myRights.projectPrimaryWrite}
-              type="textarea"
-              className="form-control"
-              id="description"
-              placeholder="Zadajte text"
-              value={description}
-              onChange={(e) => {
-                setDescription( e.target.value );
-                setDataChanged( true );
-              }}
-              />
-          </FormGroup>
-        </div>
-      }
-      { myRights.projectSecondary &&
-        <div>
-          <div className="row">
-            <Checkbox
-              className = "m-l-5 m-r-5"
-              centerHor
-              disabled={false}
-              value = { autoApproved}
-              onChange={() => setAutoApproved( !autoApproved) }
-              />
-            <span className="clickable" onClick = { () => setAutoApproved( !autoApproved) }>
-              All subtasks, work trips, materials and custom items are automatically approved.
-            </span>
+            <FormGroup>
+              <Label htmlFor="description">Popis</Label>
+              <Input
+                disabled={!myRights.projectPrimaryWrite}
+                type="textarea"
+                className="form-control"
+                id="description"
+                placeholder="Zadajte text"
+                value={description}
+                onChange={(e) => {
+                  setDescription( e.target.value );
+                  setDataChanged( true );
+                }}
+                />
+            </FormGroup>
           </div>
-          <Statuses
-            statuses={allStatuses}
-            addStatus={(newStatus) => {
-              setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ]);
-              setDataChanged( true );
-            }}
-            deleteStatus={(id) => {
-              if(id > -1){
-                setUpdateStatuses(updateStatuses.filter((status) => status.id !== id ));
-                setDeleteStatuses([ ...deleteStatuses, id ]);
-              }else{
-                setAddStatuses(addStatuses.filter((status) => status.id !== id ));
-              }
-              setDataChanged( true );
-            }}
-            updateStatus={(newStatus) => {
-              if(newStatus.id > -1){
-                let newStatuses = [...updateStatuses];
-                let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-                if(index === -1){
-                  newStatuses = newStatuses.concat(newStatus);
+        }
+        { myRights.projectSecondary &&
+          <div>
+            <div className="row">
+              <Checkbox
+                className = "m-l-5 m-r-5"
+                centerHor
+                disabled={false}
+                value = { autoApproved}
+                onChange={() => setAutoApproved( !autoApproved) }
+                />
+              <span className="clickable" onClick = { () => setAutoApproved( !autoApproved) }>
+                All subtasks, work trips, materials and custom items are automatically approved.
+              </span>
+            </div>
+            <Statuses
+              statuses={allStatuses}
+              addStatus={(newStatus) => {
+                setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ]);
+                setDataChanged( true );
+              }}
+              deleteStatus={(id) => {
+                if(id > -1){
+                  setUpdateStatuses(updateStatuses.filter((status) => status.id !== id ));
+                  setDeleteStatuses([ ...deleteStatuses, id ]);
                 }else{
+                  setAddStatuses(addStatuses.filter((status) => status.id !== id ));
+                }
+                setDataChanged( true );
+              }}
+              updateStatus={(newStatus) => {
+                if(newStatus.id > -1){
+                  let newStatuses = [...updateStatuses];
+                  let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+                  if(index === -1){
+                    newStatuses = newStatuses.concat(newStatus);
+                  }else{
+                    newStatuses[index] = { ...newStatuses[index], ...newStatus }
+                  }
+                  setUpdateStatuses(newStatuses);
+                }else{
+                  let newStatuses = [...addStatuses];
+                  let index = newStatuses.findIndex((status) => status.id === newStatus.id );
                   newStatuses[index] = { ...newStatuses[index], ...newStatus }
+                  setAddStatuses(newStatuses);
                 }
-                setUpdateStatuses(newStatuses);
-              }else{
-                let newStatuses = [...addStatuses];
-                let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-                newStatuses[index] = { ...newStatuses[index], ...newStatus }
-                setAddStatuses(newStatuses);
-              }
-              setDataChanged( true );
-            }}
-            />
-
-          <Tags
-            tags={allTags}
-            addTag={(newTag) => {
-              setAddTags([ ...addTags, {...newTag, id: fakeID -- } ]);
-              setDataChanged( true );
-            }}
-            deleteTag={(id) => {
-              if(id > -1){
-                setUpdateTags(updateTags.filter((tag) => tag.id !== id ));
-                setDeleteTags([ ...deleteTags, id ]);
-              }else{
-                setAddTags(addTags.filter((tag) => tag.id !== id ));
-              }
-              setDataChanged( true );
-            }}
-            updateTag={(newTag) => {
-              if(newTag.id > -1){
-                let newTags = [...updateTags];
-                let index = newTags.findIndex((tag) => tag.id === newTag.id );
-                if(index === -1){
-                  newTags = newTags.concat(newTag);
-                }else{
-                  newTags[index] = { ...newTags[index], ...newTag }
-                }
-                setUpdateTags(newTags);
-              }else{
-                let newTags = [...addTags];
-                let index = newTags.findIndex((tag) => tag.id === newTag.id );
-                newTags[index] = { ...newTags[index], ...newTag }
-                setAddTags(newTags);
-              }
-              setDataChanged( true );
-            }}
-            />
-
-          <div className="row">
-            <Checkbox
-              className = "m-l-5 m-r-5"
-              centerHor
-              disabled={false}
-              value = { lockedRequester}
-              onChange={() => {
-                setLockedRequester( !lockedRequester);
                 setDataChanged( true );
               }}
               />
-            <span className="clickable" onClick = { () => {
-              setLockedRequester( !lockedRequester);
-              setDataChanged( true );
-            } }>
-              A requester can be only a user with rights to this project.
-            </span>
-          </div>
 
-          <Groups
-            addGroup={(newGroup) => {
-              setGroups([...groups, newGroup]);
-              setDataChanged( true );
-            }}
-            />
+            <Tags
+              tags={allTags}
+              addTag={(newTag) => {
+                setAddTags([ ...addTags, {...newTag, id: fakeID -- } ]);
+                setDataChanged( true );
+              }}
+              deleteTag={(id) => {
+                if(id > -1){
+                  setUpdateTags(updateTags.filter((tag) => tag.id !== id ));
+                  setDeleteTags([ ...deleteTags, id ]);
+                }else{
+                  setAddTags(addTags.filter((tag) => tag.id !== id ));
+                }
+                setDataChanged( true );
+              }}
+              updateTag={(newTag) => {
+                if(newTag.id > -1){
+                  let newTags = [...updateTags];
+                  let index = newTags.findIndex((tag) => tag.id === newTag.id );
+                  if(index === -1){
+                    newTags = newTags.concat(newTag);
+                  }else{
+                    newTags[index] = { ...newTags[index], ...newTag }
+                  }
+                  setUpdateTags(newTags);
+                }else{
+                  let newTags = [...addTags];
+                  let index = newTags.findIndex((tag) => tag.id === newTag.id );
+                  newTags[index] = { ...newTags[index], ...newTag }
+                  setAddTags(newTags);
+                }
+                setDataChanged( true );
+              }}
+              />
 
-          <UserGroups
-            addRight={ (userGroup) => {
-              setUserGroups([...userGroups, userGroup]);
-              setDataChanged( true );
-            }}
-            deleteRight={ (userGroup) => {
-              setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
-              setDataChanged( true );
-            }}
-            updateRight={ (userGroup) => {
-              let newUserGroups = [...userGroups];
-              let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
-              newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
-              setUserGroups(newUserGroups);
-              setDataChanged( true );
-            }}
-            users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-            permissions={ userGroups }
-            isAdmin={ true }
-            groups={ toSelArr(groups) }
-            />
+            <div className="row">
+              <Checkbox
+                className = "m-l-5 m-r-5"
+                centerHor
+                disabled={false}
+                value = { lockedRequester}
+                onChange={() => {
+                  setLockedRequester( !lockedRequester);
+                  setDataChanged( true );
+                }}
+                />
+              <span className="clickable" onClick = { () => {
+                  setLockedRequester( !lockedRequester);
+                  setDataChanged( true );
+                } }>
+                A requester can be only a user with rights to this project.
+              </span>
+            </div>
 
-          <ProjectAcl
-            groups={ groups }
-            updateGroupRight={ (groupID, acl, newVal) => {
-              let newGroups = [...groups];
-              let index = newGroups.findIndex((group) => group.id === groupID );
-              newGroups[index]['rights'][acl] = newVal;
-              setGroups(newGroups);
-              setDataChanged( true );
-            }}
-            updateGroup={(newGroup) => {
-              let newGroups = [...groups];
-              let index = newGroups.findIndex((group) => group.id === newGroup.id );
-              newGroups[index] = { ...newGroups[index], ...newGroup }
-              setGroups(newGroups);
-              setUserGroups(userGroups.map((userGroup) => (
-                (userGroup.group.id !== newGroup.id) ?
-                userGroup :
-                ({...userGroup, group: {...userGroup.group,...newGroup}})
-              ) ));
-              setDataChanged( true );
-            }}
-            deleteGroup={(id) => {
-              setGroups( groups.filter((group) => group.id !== id ) );
-              setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
-              setDataChanged( true );
-            }}
-            />
-          <ProjectDefaultValues
-            assignedTo={assignedTo}
-            setAssignedTo={setAssignedTo}
-            company={company}
-            setCompany={setCompany}
-            overtime={overtime}
-            setOvertime={setOvertime}
-            pausal={pausal}
-            setPausal={setPausal}
-            requester={requester}
-            setRequester={setRequester}
-            type={type}
-            setType={setType}
-            status={status}
-            setStatus={setStatus}
-            tag={defTag}
-            setTag={setDefTag}
-            statuses={toSelArr(allStatuses)}
-            companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
-            users={
-              lockedRequester ?
-              userGroups.map( (userGroup) => userGroup.user ) :
-              (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
+            <Groups
+              addGroup={(newGroup) => {
+                setGroups([...groups, newGroup]);
+                setDataChanged( true );
+              }}
+              />
+
+            <UserGroups
+              addRight={ (userGroup) => {
+                setUserGroups([...userGroups, userGroup]);
+                setDataChanged( true );
+              }}
+              deleteRight={ (userGroup) => {
+                setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+                setDataChanged( true );
+              }}
+              updateRight={ (userGroup) => {
+                let newUserGroups = [...userGroups];
+                let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+                newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+                setUserGroups(newUserGroups);
+                setDataChanged( true );
+              }}
+              users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+              permissions={ userGroups }
+              isAdmin={ true }
+              groups={ toSelArr(groups) }
+              />
+
+            <ProjectAcl
+              groups={ groups }
+              updateGroupRight={ (groupID, acl, newVal) => {
+                let newGroups = [...groups];
+                let index = newGroups.findIndex((group) => group.id === groupID );
+                newGroups[index]['rights'][acl] = newVal;
+                setGroups(newGroups);
+                setDataChanged( true );
+              }}
+              updateGroup={(newGroup) => {
+                let newGroups = [...groups];
+                let index = newGroups.findIndex((group) => group.id === newGroup.id );
+                newGroups[index] = { ...newGroups[index], ...newGroup }
+                setGroups(newGroups);
+                setUserGroups(userGroups.map((userGroup) => (
+                  (userGroup.group.id !== newGroup.id) ?
+                  userGroup :
+                  ({...userGroup, group: {...userGroup.group,...newGroup}})
+                ) ));
+                setDataChanged( true );
+              }}
+              deleteGroup={(id) => {
+                setGroups( groups.filter((group) => group.id !== id ) );
+                setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
+                setDataChanged( true );
+              }}
+              />
+            <ProjectDefaultValues
+              assignedTo={assignedTo}
+              setAssignedTo={setAssignedTo}
+              company={company}
+              setCompany={setCompany}
+              overtime={overtime}
+              setOvertime={setOvertime}
+              pausal={pausal}
+              setPausal={setPausal}
+              requester={requester}
+              setRequester={setRequester}
+              type={type}
+              setType={setType}
+              status={status}
+              setStatus={setStatus}
+              tag={defTag}
+              setTag={setDefTag}
+              statuses={toSelArr(allStatuses)}
+              companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
+              users={
+                lockedRequester ?
+                userGroups.map( (userGroup) => userGroup.user ) :
+                (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
+              }
+              assignableUsers={userGroups.map( (userGroup) => userGroup.user )}
+              allTags={toSelArr(allTags)}
+              taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
+              />
+
+            { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
+              <div className="red" style={{color:'red'}}>
+                Status, assigned to and company can't be empty if they are fixed!
+              </div>
             }
-            assignableUsers={userGroups.map( (userGroup) => userGroup.user )}
-            allTags={toSelArr(allTags)}
-            taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
-            />
 
-          { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
-            <div className="red" style={{color:'red'}}>
-              Status, assigned to and company can't be empty if they are fixed!
+            <CustomAttributes
+              disabled={false}
+              customAttributes={customAttributes}
+              addCustomAttribute={(newCustomAttribute) => {
+                setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
+                setDataChanged( true );
+              }}
+              updateCustomAttribute={(changedCustomAttribute) => {
+                let newCustomAttributes = [...customAttributes];
+                let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
+                newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
+                setCustomAttributes(newCustomAttributes);
+                setDataChanged( true );
+              }}
+              deleteCustomAttribute={(id) => {
+                setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
+                setDataChanged( true );
+              }}
+              />
+          </div>
+        }
+        { addTaskErrors && addTaskIssue &&
+          <ACLErrors
+            {
+              ...{
+                groups,
+                status,
+                defTag,
+                assignedTo,
+                requester,
+                type,
+                company
+              }
+            }
+            />
+        }
+        <div className="form-buttons-row">
+          {
+            closeModal &&
+            <button className="btn-link" onClick={() => closeModal(null, null)}>
+              Close
+            </button>
+          }
+          { myRights.projectPrimaryWrite &&
+            <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
+              Delete
+            </button>
+          }
+          { !numberOfTasksLoading && !numberOfTasksError &&
+            <div className="ml-auto center-hor p-r-5">
+              { `This project includes ${numberOfTasksData.getNumberOfTasks} tasks.` }
             </div>
           }
 
-          <CustomAttributes
-            disabled={false}
-            customAttributes={customAttributes}
-            addCustomAttribute={(newCustomAttribute) => {
-              setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
-              setDataChanged( true );
-            }}
-            updateCustomAttribute={(changedCustomAttribute) => {
-              let newCustomAttributes = [...customAttributes];
-              let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
-              newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
-              setCustomAttributes(newCustomAttributes);
-              setDataChanged( true );
-            }}
-            deleteCustomAttribute={(id) => {
-              setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
-              setDataChanged( true );
-            }}
-            />
-        </div>
-      }
-      { addTaskErrors && addTaskIssue &&
-        <ACLErrors
-          {
-            ...{
-              groups,
-              status,
-              defTag,
-              assignedTo,
-              requester,
-              type,
-              company
-            }
+          { (myRights.projectPrimaryWrite || myRights.projectSecondary) &&
+            <button
+              className={classnames(
+                {
+                  'ml-auto': false,
+                }
+                ,"btn"
+              )}
+              disabled={addTaskErrors && cannotSave}
+              onClick={() => {
+                if(cannotSave){
+                  setAddTaskErrors(true);
+                  return;
+                }else{
+                  updateProjectFunc();
+                }
+              }}
+              >
+              {(saving?'Saving...':'Save project')}
+            </button>
           }
-          />
-      }
-      <div className="form-buttons-row">
-        {
-          closeModal &&
-          <button className="btn-link" onClick={() => closeModal(null, null)}>
-            Close
-          </button>
-        }
-        { myRights.projectPrimaryWrite &&
-          <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
-            Delete
-          </button>
-        }
-        { !numberOfTasksLoading && !numberOfTasksError &&
-        <div className="ml-auto center-hor p-r-5">
-          { `This project includes ${numberOfTasksData.getNumberOfTasks} tasks.` }
         </div>
-        }
-
-        { (myRights.projectPrimaryWrite || myRights.projectSecondary) &&
-          <button
-            className={classnames(
-              {
-                'ml-auto': false,
-              }
-              ,"btn"
-            )}
-            disabled={addTaskErrors && cannotSave}
-            onClick={() => {
-              if(cannotSave){
-                setAddTaskErrors(true);
-                return;
-              }else{
-                updateProjectFunc();
-              }
-            }}
-            >
-            {(saving?'Saving...':'Save project')}
-          </button>
-        }
+        <DeleteReplacement
+          isOpen={deleteOpen}
+          label="project"
+          options={filteredProjects}
+          close={()=>setDeleteOpen(false)}
+          finishDelete={deleteProjectFunc}
+          />
       </div>
-      <DeleteReplacement
-        isOpen={deleteOpen}
-        label="project"
-        options={filteredProjects}
-        close={()=>setDeleteOpen(false)}
-        finishDelete={deleteProjectFunc}
-        />
     </div>
-</div>
-
   );
 }

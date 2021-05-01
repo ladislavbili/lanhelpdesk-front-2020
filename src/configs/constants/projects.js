@@ -282,7 +282,7 @@ export const defaultGroups = [ 'Admin', 'Manager', 'Agent', 'Customer' ].map( ( 
 
 export const noDef = {
   status: {
-    def: false,
+    def: true,
     fixed: false,
     value: null,
     required: true
@@ -294,19 +294,19 @@ export const noDef = {
     required: false
   },
   assignedTo: {
-    def: false,
+    def: true,
     fixed: false,
     value: [],
     required: true
   },
   requester: {
-    def: false,
+    def: true,
     fixed: false,
     value: null,
     required: true
   },
   company: {
-    def: false,
+    def: true,
     fixed: false,
     value: null,
     required: true
@@ -318,40 +318,42 @@ export const noDef = {
     required: false
   },
   pausal: {
-    def: false,
+    def: true,
     fixed: false,
     value: booleanSelects[ 0 ],
     required: true
   },
   overtime: {
-    def: false,
+    def: true,
     fixed: false,
     value: booleanSelects[ 0 ],
     required: true
   },
 }
 
-export const defList = {
+export const defList = ( required ) => ( {
+  def: required,
   fixed: false,
-  def: false,
-  required: true,
+  required,
   value: []
-}
-export const defBool = {
+} );
+
+export const defBool = ( required ) => ( {
+  def: required,
   fixed: false,
-  def: false,
-  required: true,
+  required,
   value: {
     value: false,
     label: 'No'
   }
-}
-export const defItem = {
+} );
+
+export const defItem = ( required ) => ( {
+  def: required,
   fixed: false,
-  def: false,
-  required: true,
+  required,
   value: null,
-}
+} );
 
 export const emptyUserValue = {
   id: null,

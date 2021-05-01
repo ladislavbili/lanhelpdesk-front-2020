@@ -32,7 +32,7 @@ export default function RepeatFormInput( props ) {
           <div className="form-selects-entry-column">
             <Label style={{display: "block"}}>Repeat</Label>
             <div className="form-selects-entry-column-rest">
-              <button type="button"className="btn-repeat" id={"repeatPopover"} onClick={() => {
+              <button type="button"className="btn-repeat full-width" id={"repeatPopover"} onClick={() => {
                   if(!disabled){
                     setOpenModal(true);
                   }
@@ -51,7 +51,7 @@ export default function RepeatFormInput( props ) {
           <div className="p-r-10">
             <Label className="col-3 col-form-label">Repeat</Label>
             <div className="col-9">
-              <button type="button" className="btn-repeat flex" id={"repeatPopover"} onClick={() => {
+              <button type="button" className="btn-repeat flex full-width" id={"repeatPopover"} onClick={() => {
                   if(!disabled){
                     setOpenModal(true);
                   }

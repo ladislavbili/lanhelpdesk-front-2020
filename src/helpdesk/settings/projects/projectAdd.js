@@ -102,21 +102,15 @@ export default function ProjectAdd( props ) {
   const [ groups, setGroups ] = React.useState( defaultGroups );
   const [ userGroups, setUserGroups ] = React.useState( [] );
 
-  const [ assignedTo, setAssignedTo ] = React.useState( defList );
-  const [ company, setCompany ] = React.useState( defItem );
-  const [ overtime, setOvertime ] = React.useState( defBool );
-  const [ pausal, setPausal ] = React.useState( defBool );
-  const [ requester, setRequester ] = React.useState( defItem );
-  const [ type, setType ] = React.useState( {
-    ...defItem,
-    required: false
-  } );
-  const [ status, setStatus ] = React.useState( defItem );
-  const [ defTag, setDefTag ] = React.useState( {
-    ...defList,
-    required: noDef.tag.required
-  } );
-  const [ taskType, setTaskType ] = React.useState( defItem );
+  const [ assignedTo, setAssignedTo ] = React.useState( defList( noDef.assignedTo.required ) );
+  const [ company, setCompany ] = React.useState( defItem( noDef.company.required ) );
+  const [ overtime, setOvertime ] = React.useState( defBool( noDef.overtime.required ) );
+  const [ pausal, setPausal ] = React.useState( defBool( noDef.pausal.required ) );
+  const [ requester, setRequester ] = React.useState( defItem( noDef.requester.required ) );
+  const [ type, setType ] = React.useState( defItem( noDef.type.required ) );
+  const [ status, setStatus ] = React.useState( defItem( noDef.status.required ) );
+  const [ defTag, setDefTag ] = React.useState( defList( noDef.tag.required ) );
+
   const [ tags, setTags ] = React.useState( [] );
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
@@ -251,7 +245,8 @@ export default function ProjectAdd( props ) {
     setSaving( false );
   }
 
-  const addTaskIssue = groups.filter( ( group ) => group.rights.addTasks )
+  const addTaskIssue = (
+    groups.filter( ( group ) => group.rights.addTasks )
     .some( ( group ) => (
       ( !group.rights.taskTitleEdit ) ||
       ( !group.rights.status.write && !status.def ) ||
@@ -261,9 +256,21 @@ export default function ProjectAdd( props ) {
       ( !group.rights.type.write && !type.def && type.required ) ||
       ( !group.rights.company.write && !company.def )
     ) )
+  )
+
+  const doesDefHasValue = () => {
+    return (
+    [
+      type,
+    ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
+      defTag,
+    ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
+    )
+  }
 
   const cannotSave = (
     saving ||
+    !doesDefHasValue() ||
     title === "" ||
     currentUser &&
     ( company.value === null && company.fixed ) ||
@@ -455,8 +462,6 @@ export default function ProjectAdd( props ) {
           setStatus={setStatus}
           tag={defTag}
           setTag={setDefTag}
-          taskType={taskType}
-          setTaskType={setTaskType}
           statuses={toSelArr(statuses)}
           companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
           users={

@@ -87,22 +87,31 @@ export default function TaskAdd( props ) {
     setTaskLayout
   } = props;
 
-  const userIfInProject = ( project ) => {
-    let USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
-    let user = USERS_WITH_PERMISSIONS.find( ( user ) => user.id === currentUser.id );
-    return user ? user : null;
+  const currentUserIfInProject = ( project ) => {
+    return project && project.users.some( ( userData ) => userData.user.id === currentUser.id ) ? users.find( ( user ) => user.id === currentUser.id ) : null;
   }
 
   const layout = 2; //currentUser.taskLayout
-
+  const initialProject = projectID ? projects.find( p => p.id === projectID ) : null
+  const userRights = (
+    currentUser.role.level === 0 ?
+    backendCleanRights( true ) :
+    (
+      initialProject ?
+      initialProject.right :
+      backendCleanRights()
+    )
+  );
+  const assignableUsers = users.filter( ( user ) => initialProject && initialProject.users.some( ( userData ) => userData.assignable && userData.user.id === user.id ) );
+  const projectUsers = users.filter( ( user ) => initialProject && initialProject.users.some( ( userData ) => userData.user.id === user.id ) );
+  const projectRequesters = initialProject && initialProject.lockedRequester ? projectUsers : users;
   //state
-  const [ project, setProject ] = React.useState( projectID ? projects.find( p => p.id === projectID ) : null );
-  const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
+  const [ project, setProject ] = React.useState( initialProject );
   const [ defaultFields, setDefaultFields ] = React.useState( noDef );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
 
   const [ attachments, setAttachments ] = React.useState( [] );
-  const [ assignedTo, setAssignedTo ] = React.useState( USERS_WITH_PERMISSIONS.filter( ( user ) => user.id === currentUser.id ) );
+  const [ assignedTo, setAssignedTo ] = React.useState( assignableUsers.filter( ( user ) => user.id === currentUser.id ) );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
   const [ customItems, setCustomItems ] = React.useState( [] );
@@ -114,13 +123,8 @@ export default function TaskAdd( props ) {
   const [ pausal, setPausal ] = React.useState( booleanSelects[ 0 ] );
   const [ pendingDate, setPendingDate ] = React.useState( null );
   const [ pendingChangable, setPendingChangable ] = React.useState( false );
-  //  const [ reminder, setReminder ] = React.useState(null);
   const [ repeat, setRepeat ] = React.useState( null );
-  const [ requester, setRequester ] = React.useState(
-    project !== null ?
-    userIfInProject( project ) :
-    null
-  );
+  const [ requester, setRequester ] = React.useState( currentUserIfInProject( project ) );
   const [ saving, setSaving ] = React.useState( false );
   const [ status, setStatus ] = React.useState( null );
   const [ subtasks, setSubtasks ] = React.useState( [] );
@@ -139,17 +143,6 @@ export default function TaskAdd( props ) {
     return fakeID--;
   }
 
-  const userRights = (
-    currentUser.role.level === 0 ?
-    backendCleanRights( true ) :
-    (
-      project ?
-      project.right :
-      backendCleanRights()
-    )
-  );
-  const REQUESTERS = ( project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users );
-
   const setDefaults = ( project, forced ) => {
     if ( project === null ) {
       setDefaultFields( noDef );
@@ -167,51 +160,83 @@ export default function TaskAdd( props ) {
       return;
     }
 
-    const potencialUser = userIfInProject( project );
+    const potencialUser = currentUserIfInProject( project );
 
     let maybeRequester = null;
     if ( users ) {
       if ( project.lockedRequester ) {
-        maybeRequester = USERS_WITH_PERMISSIONS.find( ( user ) => user.id === currentUser.id );
+        maybeRequester = potencialUser;
       } else {
         maybeRequester = users.find( ( user ) => user.id === currentUser.id );
       }
-      if ( maybeRequester === undefined ) {
-        maybeRequester = null;
+    }
+
+    const userRights = project.right;
+    const projectUsers = users.filter( ( user ) => project.users.some( ( userData ) => userData.user.id === user.id ) );
+    const assignableUsers = users.filter( ( user ) => project.users.some( ( userData ) => userData.assignable && userData.user.id === user.id ) );
+    const projectRequesters = ( project.lockedRequester ? projectUsers : users );
+
+    if ( def.assignedTo.fixed ) {
+      if ( def.assignedTo.value.length === 0 && userRights.assignedWrite ) {
+        setAssignedTo( [ potencialUser ] );
+      } else {
+        setAssignedTo( assignableUsers.filter( ( user ) => def.assignedTo.value.some( ( user2 ) => user.id === user2.id ) ) );
+      }
+    } else {
+      let newAssignedTo = assignedTo.filter( ( user ) => assignableUsers.some( ( user2 ) => user.id === user2.id ) );
+      if ( newAssignedTo.length === 0 && potencialUser && userRights.assignedWrite ) {
+        newAssignedTo = [ potencialUser ];
+      }
+      if ( def.assignedTo.def ) {
+        //add def values
+        newAssignedTo = [
+          ...newAssignedTo,
+          ...assignableUsers.filter( ( user1 ) => def.assignedTo.value.some( ( user2 ) => user1.id === user2.id ) && !newAssignedTo.some( ( user2 ) => user1.id === user2.id ) )
+        ]
+      }
+      setAssignedTo( newAssignedTo );
+    }
+
+    let newRequester = null;
+    if ( def.requester.def && def.requester.value !== null ) {
+      //has default value
+      newRequester = projectRequesters.find( ( user ) => user.id === def.requester.value.id );
+    } else if ( def.requester.required || userRights.requesterWrite ) {
+      //no default value but is required or can be recommened
+      newRequester = maybeRequester;
+    }
+    setRequester( newRequester );
+
+    let newType = def.type.def ? taskTypes.find( ( item ) => item.id === def.type.value.id ) : null;
+    setTaskType( newType );
+
+    if ( def.company.def && def.company.value ) {
+      setCompany( companies.find( ( company ) => company.id === def.company.value.id ) )
+    } else {
+      if ( newRequester ) {
+        setCompany( companies.find( ( company ) => company.id === newRequester.company.id ) )
+      } else {
+        setCompany( null );
       }
     }
 
-    let filteredAssignedTo = assignedTo.filter( ( user ) => project && project.users.includes( user.id ) );
-    if ( filteredAssignedTo.length === 0 && potencialUser ) {
-      filteredAssignedTo = [ potencialUser ];
+    //status
+    const statuses = toSelArr( project.statuses );
+    let potentialStatus = statuses.find( ( status ) => status.action.toLowerCase() === 'isnew' );
+    if ( !potentialStatus ) {
+      potentialStatus = statuses[ 0 ];
     }
-    let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.map( ( user ) => user.id )
-      .includes( item.id ) ) : filteredAssignedTo;
-    setAssignedTo( newAssignedTo );
-    let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
-    setRequester( newRequester );
-    let newType = def.type && ( def.type.fixed || def.type.def ) ? taskTypes.find( ( item ) => item.id === def.type.value.id ) : null;
-    setTaskType( newType );
-    let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value.id ) : ( companies && newRequester ? companies.find( ( company ) => company.id === newRequester.company.id ) : null );
-    setCompany( newCompany );
-
-    let potentialStatus = toSelArr( project.statuses )
-      .find( ( status ) => status.action.toLowerCase() === 'isnew' );
-    if ( ![ potentialStatus ] ) {
-      potentialStatus = toSelArr( project.statuses )[ 0 ];
-    }
-    let newStatus = def.status && ( def.status.fixed || def.status.def ) ? toSelArr( project.statuses )
-      .find( ( item ) => item.id === def.status.value.id ) : potentialStatus;
+    let newStatus = def.status.def && def.status.value ? statuses.find( ( item ) => item.id === def.status.value.id ) : potentialStatus;
     setStatus( newStatus );
 
-    let mappedTags = def.tag.value.map( t => t.id );
-    let newTags = def.tag && ( def.tag.fixed || def.tag.def ) ? project.tags.filter( ( item ) => mappedTags.includes( item.id ) ) : [];
+    let tagIds = def.tag.value.map( t => t.id );
+    let newTags = def.tag.def ? project.tags.filter( ( item ) => tagIds.includes( item.id ) ) : [];
     setTags( newTags );
 
-    let newOvertime = def.overtime && ( def.overtime.fixed || def.overtime.def ) ? booleanSelects.find( ( item ) => def.overtime.value === item.value ) : overtime;
+    let newOvertime = def.overtime.def ? booleanSelects.find( ( item ) => def.overtime.value === item.value ) : overtime;
     setOvertime( newOvertime );
 
-    let newPausal = def.pausal && ( def.pausal.fixed || def.pausal.def ) ? booleanSelects.find( ( item ) => def.pausal.value === item.value ) : pausal;
+    let newPausal = def.pausal.def ? booleanSelects.find( ( item ) => def.pausal.value === item.value ) : pausal;
     setPausal( newPausal );
 
     setDefaultFields( def );
@@ -237,7 +262,7 @@ export default function TaskAdd( props ) {
           closeDate: closeDate ? closeDate.valueOf()
             .toString() : null,
           assignedTo: assignedTo.map( user => user.id ),
-          company: company.id,
+          company: company ? company.id : null,
           deadline: deadline ? deadline.valueOf()
             .toString() : null,
           description,
@@ -438,10 +463,8 @@ export default function TaskAdd( props ) {
         onChange={(project)=>{
           setTags([]);
           setStatus(null);
-          setProject(project);
           setMilestone(noMilestone);
-          let newAssignedTo = assignedTo.filter((user) => project.users.includes(user.id));
-          setAssignedTo(newAssignedTo);
+          setProject(project);
         }}
         options={projects.filter((project) => currentUser.role.level === 0 || project.right.addTasks )}
         styles={selectStyleNoArrowRequired}
@@ -456,7 +479,7 @@ export default function TaskAdd( props ) {
         onChange={(users)=> {
           setAssignedTo(users);
         }}
-        options={USERS_WITH_PERMISSIONS}
+        options={assignableUsers}
         styles={showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired}
         />
     ),
@@ -532,7 +555,7 @@ export default function TaskAdd( props ) {
             setCompany(newCompany);
           }
         }}
-        options={REQUESTERS}
+        options={projectRequesters}
         styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
         />
     ),
@@ -1232,7 +1255,6 @@ export default function TaskAdd( props ) {
     );
   }
 
-
   return (
     <div style={{backgroundColor: "#f9f9f9"}}>
       <div
@@ -1264,14 +1286,13 @@ export default function TaskAdd( props ) {
 
           { renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
-<div className="task-add-layout-2"></div>
+          <div className="task-add-layout-2"></div>
           { renderButtons() }
         </div>
 
         { layout === 2 && renderSelectsLayout2Side() }
 
       </div>
-
 
     </div>
   );

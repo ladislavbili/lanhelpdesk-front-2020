@@ -176,8 +176,10 @@ export default function TaskEdit( props ) {
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
 
   const invoicedTask = task.invoiced ? task.invoicedTasks[ 0 ] : null;
+
   // sync
   React.useEffect( () => {
+    const project = task.project === null ? null : projects.find( ( project ) => project.id === task.project.id );
     setChanges( {} );
     setTagsOpen( false );
     setVykazyChanges( defaultVykazyChanges );
@@ -190,7 +192,6 @@ export default function TaskEdit( props ) {
     setDeadline( task.deadline ? moment( parseInt( task.deadline ) ) : null );
     setDescription( task.description );
     setImportant( task.important );
-    const project = task.project === null ? null : projects.find( ( project ) => project.id === task.project.id );
     const milestone = project && task.milestone ? toSelArr( project.project.milestones )
       .find( ( milestone ) => milestone.id === task.milestone.id ) : undefined;
     setOvertime( ( task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
@@ -233,6 +234,133 @@ export default function TaskEdit( props ) {
     setUsedSubtaskPausal( task.company ? task.company.usedSubtaskPausal : 0 );
     setUsedTripPausal( task.company ? task.company.usedTripPausal : 0 );
   }, [ id ] );
+
+  React.useEffect( () => {
+    updateToProjectRules( project );
+  }, [ project ] );
+
+  const updateToProjectRules = ( project ) => {
+    if ( !project ) {
+      return;
+    }
+
+    const userRights = project.right;
+    const projectUsers = users.filter( ( user ) => project.usersWithRights.some( ( userData ) => userData.user.id === user.id ) );
+    const assignableUsers = users.filter( ( user ) => project.usersWithRights.some( ( userData ) => userData.assignable && userData.user.id === user.id ) );
+    const projectRequesters = ( project.lockedRequester ? projectUsers : users );
+    const def = project.project.def;
+    const statuses = toSelArr( project.project.statuses );
+    //check def required and fixed and change is needed (CHECK IF IT ALREADY ISNT SET) and can see the attribute
+    let changes = {};
+    //Status
+    if ( userRights.statusRead ) {
+      if ( def.status.fixed ) {
+        if ( def.status.value && status.id !== def.status.value.id ) {
+          changeStatus( statuses.find( ( status ) => status.id === def.status.value.id ) );
+        }
+      } else if ( def.status.required && status === null ) {
+        let potentialStatus = statuses.find( ( status ) => status.action.toLowerCase() === 'isnew' );
+        if ( !potentialStatus ) {
+          potentialStatus = statuses[ 0 ];
+        }
+        changeStatus( potentialStatus );
+      }
+    }
+
+    //Tags
+    if ( userRights.tagsRead ) {
+      if ( def.tag.fixed || ( def.tag.required && tags.length === 0 ) ) {
+        let tagIds = def.tag.value.map( t => t.id );
+        if ( tags.length !== tagIds.length || tags.some( ( tag ) => !tagsIds.includes( tag.id ) ) ) {
+          setTags( project.tags.filter( ( item ) => tagIds.includes( item.id ) ) );
+          changes.tags = tagIds;
+        }
+      }
+    }
+
+    //Assigned to
+    if ( userRights.assignedRead ) {
+      if ( def.assignedTo.fixed || ( def.assignedTo.required && assignedTo.length === 0 ) ) {
+        let newAssignedTo = assignableUsers.filter( ( user1 ) => def.assignedTo.value.some( ( user2 ) => user1.id === user2.id ) );
+        if ( newAssignedTo.length === 0 && userRights.assignedWrite ) {
+          newAssignedTo.push( users.find( ( user ) => user.id === currentUser.id ) );
+        }
+        if ( newAssignedTo.length !== assignedTo.length || newAssignedTo.some( ( user1 ) => assignedTo.some( ( user2 ) => user1.id !== user2.id ) ) ) {
+          changes.assignedTo = newAssignedTo.map( ( user ) => user.id );
+          setAssignedTo( newAssignedTo );
+        }
+      }
+    }
+
+    //Requester
+    let potentialRequester = null;
+    if ( userRights.requesterRead ) {
+      if ( def.requester.fixed || ( def.requester.required && requester === null ) ) {
+        if ( def.requester.value ) {
+          potentialRequester = projectRequesters.find( ( user ) => user.id === def.requester.value.id );
+        } else {
+          potentialRequester = projectRequesters.find( ( user ) => user.id === currentUser.id );
+        }
+        if ( potentialRequester && ( requester === null || requester.id !== potentialRequester.id ) ) {
+          setRequester( potentialRequester );
+          changes.requester = potentialRequester.id;
+        }
+      }
+    }
+
+    //Company
+    let potentialCompany = null;
+    if ( userRights.companyRead ) {
+      if ( def.company.fixed || ( def.company.required && company === null ) ) {
+        if ( def.company.value ) {
+          potentialCompany = companies.find( ( company ) => company.id === def.company.value.id );
+        } else if ( potentialRequester ) {
+          potentialCompany = companies.find( ( company ) => company.id === potentialRequester.company.id );
+        }
+        if ( potentialCompany && ( company === null || company.id !== potentialCompany.id ) ) {
+          setCompany( potentialCompany );
+          changes.company = company.id;
+          if ( !def.pausal.fixed ) {
+            setPausal( parseInt( company.taskWorkPausal ) > 0 ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
+            changes.pausal = parseInt( company.taskWorkPausal ) > 0
+          }
+        }
+      }
+    }
+
+    //Task type
+    if ( userRights.typeRead ) {
+      if ( def.type.fixed || ( def.type.required && taskType === null ) ) {
+        const newTaskType = taskTypes.find( ( type ) => type.id === def.type.value.id );
+        if ( newTaskType && ( taskType === null || taskType.id !== newTaskType.id ) ) {
+          setTaskType( newTaskType );
+          changes.taskType = newTaskType.id;
+        }
+      }
+    }
+
+    //Pausal
+    if ( userRights.pausalRead ) {
+      if ( def.pausal.fixed && pausal.value !== def.pausal.value ) {
+        setPausal( booleanSelects.find( ( option ) => option.value === def.pausal.value ) );
+        changes.pausal = def.pausal.value;
+      }
+    }
+
+    //Overtime
+    if ( userRights.overtimeRead ) {
+      if ( def.overtime.fixed && overtime.value !== def.overtime.value ) {
+        setOvertime( booleanSelects.find( ( option ) => option.value === def.overtime.value ) );
+        changes.overtime = def.overtime.value;
+      }
+    }
+    //save all
+    if ( Object.keys( changes )
+      .length > 0 ) {
+      console.log( 'project changes', changes );
+      autoUpdateTask( changes );
+    }
+  }
 
   //constants
   const defaultFields = project === null ? noDef : {

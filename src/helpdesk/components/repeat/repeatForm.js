@@ -124,10 +124,8 @@ export default function RepeatForm( props ) {
 
   const client = useApolloClient();
 
-  const userIfInProject = ( project ) => {
-    let USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
-    let user = USERS_WITH_PERMISSIONS.find( ( user ) => user.id === currentUser.id );
-    return user ? user : null;
+  const currentUserIfInProject = ( project ) => {
+    return project && project.users.some( ( userData ) => userData.user.id === currentUser.id ) ? users.find( ( user ) => user.id === currentUser.id ) : null;
   }
 
   const [ addRepeat ] = useMutation( ADD_REPEAT );
@@ -139,12 +137,12 @@ export default function RepeatForm( props ) {
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
 
   const [ project, setProject ] = React.useState( null );
-  const USERS_WITH_PERMISSIONS = users.filter( ( user ) => project && project.users.includes( user.id ) );
+  const projectUsers = users.filter( ( user ) => project && project.users.some( ( user2 ) => user2.id === user.id ) );
   const [ defaultFields, setDefaultFields ] = React.useState( noDef );
   const [ changes, setChanges ] = React.useState( {} );
   const [ important, setImportant ] = React.useState( false );
   const [ attachments, setAttachments ] = React.useState( [] );
-  const [ assignedTo, setAssignedTo ] = React.useState( USERS_WITH_PERMISSIONS.filter( ( user ) => user.id === currentUser.id ) );
+  const [ assignedTo, setAssignedTo ] = React.useState( projectUsers.filter( ( user ) => user.id === currentUser.id ) );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
   const [ customItems, setCustomItems ] = React.useState( [] );
@@ -159,7 +157,7 @@ export default function RepeatForm( props ) {
   const [ pendingChangable, setPendingChangable ] = React.useState( false );
   const [ requester, setRequester ] = React.useState(
     project !== null ?
-    userIfInProject( project ) :
+    currentUserIfInProject( project ) :
     null
   );
   const [ saving, setSaving ] = React.useState( false );
@@ -192,9 +190,9 @@ export default function RepeatForm( props ) {
     )
   );
 
-  const REQUESTERS = ( project && project.lockedRequester ? USERS_WITH_PERMISSIONS : users );
+  const REQUESTERS = ( project && project.lockedRequester ? projectUsers : users );
 
-  const setDefaults = ( project, forced ) => {
+  const setDefaults = ( project ) => {
     if ( project === null ) {
       setDefaultFields( noDef );
       return;
@@ -205,59 +203,132 @@ export default function RepeatForm( props ) {
       setDefaultFields( noDef );
       return;
     }
+    setDefaultFields( def );
 
-    if ( props.task && !forced ) {
-      setDefaultFields( def );
+    updateToProjectRules( project );
+  }
+
+  const updateToProjectRules = ( project ) => {
+    if ( !project ) {
       return;
     }
 
-    const potencialUser = userIfInProject( project );
-
-    let maybeRequester = null;
-    if ( users ) {
-      if ( project.lockedRequester ) {
-        maybeRequester = USERS_WITH_PERMISSIONS.find( ( user ) => user.id === currentUser.id );
-      } else {
-        maybeRequester = users.find( ( user ) => user.id === currentUser.id );
+    const userRights = project.right;
+    const projectUsers = users.filter( ( user ) => project.users.some( ( userData ) => userData.user.id === user.id ) );
+    const assignableUsers = users.filter( ( user ) => project.users.some( ( userData ) => userData.assignable && userData.user.id === user.id ) );
+    const projectRequesters = ( project.lockedRequester ? projectUsers : users );
+    const def = project.def;
+    const statuses = toSelArr( project.statuses );
+    //check def required and fixed and change is needed (CHECK IF IT ALREADY ISNT SET) and can see the attribute
+    let changes = {};
+    //Status
+    if ( userRights.statusRead ) {
+      if ( def.status.fixed ) {
+        if ( def.status.value && status.id !== def.status.value.id ) {
+          changeStatus( statuses.find( ( status ) => status.id === def.status.value.id ) );
+        }
+      } else if ( def.status.required && status === null ) {
+        let potentialStatus = statuses.find( ( status ) => status.action.toLowerCase() === 'isnew' );
+        if ( !potentialStatus ) {
+          potentialStatus = statuses[ 0 ];
+        }
+        changeStatus( potentialStatus );
       }
-      if ( maybeRequester === undefined ) {
-        maybeRequester = null;
+    }
+
+    //Tags
+    if ( userRights.tagsRead ) {
+      if ( def.tag.fixed || ( def.tag.required && tags.length === 0 ) ) {
+        let tagIds = def.tag.value.map( t => t.id );
+        if ( tags.length !== tagIds.length || tags.some( ( tag ) => !tagsIds.includes( tag.id ) ) ) {
+          setTags( project.tags.filter( ( item ) => tagIds.includes( item.id ) ) );
+          changes.tags = tagIds;
+        }
       }
     }
 
-    let filteredAssignedTo = assignedTo.filter( ( user ) => project && project.users.includes( user.id ) );
-    if ( filteredAssignedTo.length === 0 && potencialUser ) {
-      filteredAssignedTo = [ potencialUser ];
+    //Assigned to
+    if ( userRights.assignedRead ) {
+      if ( def.assignedTo.fixed || ( def.assignedTo.required && assignedTo.length === 0 ) ) {
+        let newAssignedTo = assignableUsers.filter( ( user1 ) => def.assignedTo.value.some( ( user2 ) => user1.id === user2.id ) );
+        if ( newAssignedTo.length === 0 && userRights.assignedWrite ) {
+          newAssignedTo.push( users.find( ( user ) => user.id === currentUser.id ) );
+        }
+        if ( newAssignedTo.length !== assignedTo.length || newAssignedTo.some( ( user1 ) => assignedTo.some( ( user2 ) => user1.id !== user2.id ) ) ) {
+          changes.assignedTo = newAssignedTo.map( ( user ) => user.id );
+          setAssignedTo( newAssignedTo );
+        }
+      }
     }
-    let newAssignedTo = def.assignedTo && ( def.assignedTo.fixed || def.assignedTo.def ) ? users.filter( ( item ) => def.assignedTo.value.includes( item.id ) ) : filteredAssignedTo;
-    setAssignedTo( newAssignedTo );
-    let newRequester = def.requester && ( def.requester.fixed || def.requester.def ) ? users.find( ( item ) => item.id === def.requester.value.id ) : maybeRequester;
-    setRequester( newRequester );
-    let newType = def.type && ( def.type.fixed || def.type.def ) ? taskTypes.find( ( item ) => item.id === def.type.value.id ) : null;
-    setTaskType( newType );
-    let newCompany = def.company && ( def.company.fixed || def.company.def ) ? companies.find( ( item ) => item.id === def.company.value.id ) : ( companies && newRequester ? companies.find( ( company ) => company.id === newRequester.company.id ) : null );
-    setCompany( newCompany );
 
-    let potentialStatus = toSelArr( project.statuses )
-      .find( ( status ) => status.action.toLowerCase() === 'isnew' );
-    if ( ![ potentialStatus ] ) {
-      potentialStatus = toSelArr( project.statuses )[ 0 ];
+    //Requester
+    let potentialRequester = null;
+    if ( userRights.requesterRead ) {
+      if ( def.requester.fixed || ( def.requester.required && requester === null ) ) {
+        if ( def.requester.value ) {
+          potentialRequester = projectRequesters.find( ( user ) => user.id === def.requester.value.id );
+        } else {
+          potentialRequester = projectRequesters.find( ( user ) => user.id === currentUser.id );
+        }
+        if ( potentialRequester && ( requester === null || requester.id !== potentialRequester.id ) ) {
+          setRequester( potentialRequester );
+          changes.requester = potentialRequester.id;
+        }
+      }
     }
-    let newStatus = def.status && ( def.status.fixed || def.status.def ) ? toSelArr( project.statuses )
-      .find( ( item ) => item.id === def.status.value.id ) : potentialStatus;
-    setStatus( newStatus );
 
-    let mappedTags = def.tag.value.map( t => t.id );
-    let newTags = def.tag && ( def.tag.fixed || def.tag.def ) ? project.tags.filter( ( item ) => mappedTags.includes( item.id ) ) : [];
-    setTags( newTags );
+    //Company
+    let potentialCompany = null;
+    if ( userRights.companyRead ) {
+      if ( def.company.fixed || ( def.company.required && company === null ) ) {
+        if ( def.company.value ) {
+          potentialCompany = companies.find( ( company ) => company.id === def.company.value.id );
+        } else if ( potentialRequester ) {
+          potentialCompany = companies.find( ( company ) => company.id === potentialRequester.company.id );
+        }
+        if ( potentialCompany && ( company === null || company.id !== potentialCompany.id ) ) {
+          setCompany( potentialCompany );
+          changes.company = company.id;
+          if ( !def.pausal.fixed ) {
+            setPausal( parseInt( company.taskWorkPausal ) > 0 ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
+            changes.pausal = parseInt( company.taskWorkPausal ) > 0
+          }
+        }
+      }
+    }
 
-    let newOvertime = def.overtime && ( def.overtime.fixed || def.overtime.def ) ? booleanSelects.find( ( item ) => def.overtime.value === item.value ) : overtime;
-    setOvertime( newOvertime );
+    //Task type
+    if ( userRights.typeRead ) {
+      if ( def.type.fixed || ( def.type.required && taskType === null ) ) {
+        const newTaskType = taskTypes.find( ( type ) => type.id === def.type.value.id );
+        if ( newTaskType && ( taskType === null || taskType.id !== newTaskType.id ) ) {
+          setTaskType( newTaskType );
+          changes.taskType = newTaskType.id;
+        }
+      }
+    }
 
-    let newPausal = def.pausal && ( def.pausal.fixed || def.pausal.def ) ? booleanSelects.find( ( item ) => def.pausal.value === item.value ) : pausal;
-    setPausal( newPausal );
+    //Pausal
+    if ( userRights.pausalRead ) {
+      if ( def.pausal.fixed && pausal.value !== def.pausal.value ) {
+        setPausal( booleanSelects.find( ( option ) => option.value === def.pausal.value ) );
+        changes.pausal = def.pausal.value;
+      }
+    }
 
-    setDefaultFields( def );
+    //Overtime
+    if ( userRights.overtimeRead ) {
+      if ( def.overtime.fixed && overtime.value !== def.overtime.value ) {
+        setOvertime( booleanSelects.find( ( option ) => option.value === def.overtime.value ) );
+        changes.overtime = def.overtime.value;
+      }
+    }
+    //save all
+    if ( Object.keys( changes )
+      .length > 0 ) {
+      console.log( 'project changes', changes );
+      saveChange( changes );
+    }
   }
 
   const setOriginalRepeat = () => {
@@ -282,7 +353,7 @@ export default function RepeatForm( props ) {
       active: originalRepeat.active,
     } )
     const project = projects.find( ( project ) => project.id === data.project.id );
-    const milestone = project && data.milestone ? toSelArr( project.project.milestones )
+    const milestone = project && data.milestone ? toSelArr( project.milestones )
       .find( ( milestone ) => milestone.id === data.milestone.id ) : undefined;
     setOvertime( ( data.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPausal( ( data.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
@@ -363,9 +434,7 @@ export default function RepeatForm( props ) {
   }
 
   React.useEffect( () => {
-    if ( !editMode && !duplicateTask ) {
-      setDefaults( project );
-    }
+    setDefaults( project );
   }, [ project ] );
 
   React.useEffect( () => {
@@ -693,7 +762,8 @@ export default function RepeatForm( props ) {
   //data functions
   const changeProject = ( project ) => {
     setProject( project );
-    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( userWithRights ) => userWithRights.user.id === user.id ) );
+    console.log( project );
+    let newAssignedTo = assignedTo.filter( ( user ) => project.users.some( ( userData ) => userData.user.id === user.id ) );
     setAssignedTo( newAssignedTo );
     setMilestone( noMilestone );
     setTags( [] );
@@ -885,7 +955,7 @@ export default function RepeatForm( props ) {
           setAssignedTo(users);
           saveChange({ assignedTo: users.map((user) => user.id) })
         }}
-        options={USERS_WITH_PERMISSIONS}
+        options={projectUsers}
         styles={selectStyleNoArrowRequired}
         />
     ),
@@ -1106,8 +1176,6 @@ export default function RepeatForm( props ) {
                   taskID={null}
                   repeat={repeat}
                   submitRepeat={changeRepeat}
-                  deleteRepeat={()=>{
-                  }}
                   columns={true}
                   vertical={false}
                   addTask={true}
@@ -1238,8 +1306,6 @@ export default function RepeatForm( props ) {
             taskID={null}
             repeat={repeat}
             submitRepeat={changeRepeat}
-            deleteRepeat={()=>{
-            }}
             columns={true}
             addTask={true}
             vertical={true}
@@ -1757,13 +1823,14 @@ export default function RepeatForm( props ) {
 
           { renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
+          <div className="task-add-layout-2"></div>
+          { renderButtons() }
+
         </div>
 
         { layout === 2 && renderSelectsLayout2Side() }
 
       </div>
-
-      { renderButtons() }
 
     </div>
   );

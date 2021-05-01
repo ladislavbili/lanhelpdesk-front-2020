@@ -112,7 +112,7 @@ export default function TasklistSwitch( props ) {
       func: ( items ) => (
         <div>
           { items.map((item)=>(
-            <div style={{ background: item.color, color: 'white', borderRadius: 3 }} className="m-r-5 m-t-5 p-l-5 p-r-5">
+            <div key={item.id} style={{ background: item.color, color: 'white', borderRadius: 3 }} className="m-r-5 m-t-5 p-l-5 p-r-5">
               {item.title}
             </div>
           ) ) }

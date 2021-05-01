@@ -108,25 +108,32 @@ export default function TasksLoader( props ) {
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
   const tasksSort = tasksSortData.tasksSort;
+
   const filterVariables = deleteAttributes(
     localFilterToValues( localFilter ),
     unimplementedAttributes
   );
-  const taskVariables = {
-    projectId: localProject.id,
-    filter: filterVariables,
-    sort: tasksSort,
-    search: globalSearchData.globalTaskSearch,
-    stringFilter: globalStringFilter.globalTaskStringFilter,
-    page,
-    limit,
-  }
 
   const {
     data: currentUserData,
     loading: currentUserLoading,
     refetch: userDataRefetch
   } = useQuery( GET_MY_DATA );
+
+  const statusFilter = ( currentUserLoading ? [] : currentUserData.getMyData.statuses )
+    .filter( ( selectedStatus ) => ( localProject.id === null || !localProject.project.statuses ? [] : localProject.project.statuses )
+      .some( ( status ) => status.id === selectedStatus.id ) )
+    .map( ( status ) => status.id );
+  const taskVariables = {
+    projectId: localProject.id,
+    filter: filterVariables,
+    sort: tasksSort,
+    search: globalSearchData.globalTaskSearch,
+    stringFilter: globalStringFilter.globalTaskStringFilter,
+    statuses: statusFilter,
+    page,
+    limit,
+  }
 
   const {
     data: myProjectsData,

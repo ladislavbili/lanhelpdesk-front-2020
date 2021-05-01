@@ -596,7 +596,7 @@ export default function RepeatFormLoader( props ) {
         toSelArr(projectsData.myProjects.map((myProject) => ({
           ...myProject.project,
           right: myProject.right,
-          users: myProject.usersWithRights.map((userWithRights) => userWithRights.user.id)
+          users: myProject.usersWithRights
         }) ))
       }
       users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }

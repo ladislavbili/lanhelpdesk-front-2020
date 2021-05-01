@@ -1,6 +1,8 @@
 import React from 'react';
 import Select from 'react-select';
 import Checkbox from 'components/checkbox';
+import classnames from 'classnames';
+import Empty from 'components/Empty';
 import {
   Popover,
   PopoverHeader,
@@ -59,19 +61,43 @@ export default function SimpleRepeat( props ) {
     setOpen( true );
   }
 
+  const renderRepeatButton = () => {
+    return (
+      <Empty>
+        <button
+          type="button"
+          className={classnames("btn-repeat",{ "flex": !vertical })}
+          id={"repeatPopover"}
+          onClick={toggleRepeat}
+          style={{
+            width: ( repeat && deleteRepeat ? 'calc( 100% - 25px )' : '100%' )
+          }}
+          >
+          {
+            repeat ?
+            ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
+            "No repeat"
+          }
+        </button>
+        { repeat && deleteRepeat &&
+          <button className="btn btn-link m-l-5" onClick={() => {
+              deleteRepeat();
+              setOpen(false);
+            }}>
+            <i className="fa fa-times" />
+          </button>
+        }
+      </Empty>
+    )
+  }
+
   return (
     <div  className="display-inline">
       {vertical &&
         <div className="form-selects-entry-column">
           <Label style={{display: "block"}}>Repeat</Label>
           <div className="form-selects-entry-column-rest">
-            <button type="button"className="btn-repeat" id={"repeatPopover"} onClick={toggleRepeat}>
-              {
-                repeat ?
-                ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
-                "No repeat"
-              }
-            </button>
+            {renderRepeatButton()}
           </div>
         </div>
       }
@@ -79,13 +105,7 @@ export default function SimpleRepeat( props ) {
         <div className="row p-r-10">
           <Label className="col-3 col-form-label">Repeat</Label>
           <div className="col-9">
-            <button type="button" className="btn-repeat flex" id={"repeatPopover"} onClick={toggleRepeat}>
-              {
-                repeat ?
-                ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
-                "No repeat"
-              }
-            </button>
+            {renderRepeatButton()}
           </div>
         </div>
       }
@@ -129,13 +149,13 @@ export default function SimpleRepeat( props ) {
                 }
               </div>
             </FormGroup>
-              <Checkbox
-                className = "m-r-5"
-                disabled = {disabled}
-                label="Active"
-                value = { active }
-                onChange={() => setActive(!active )}
-                />
+            <Checkbox
+              className = "m-r-5"
+              disabled = {disabled}
+              label="Active"
+              value = { active }
+              onChange={() => setActive(!active )}
+              />
 
             <div className="row">
               <button

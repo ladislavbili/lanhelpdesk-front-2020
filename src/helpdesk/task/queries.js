@@ -432,6 +432,7 @@ query tasks(
   $stringFilter: StringFilterInput
   $limit: Int
   $page: Int
+  $statuses: [Int]
 ){
   tasks (
     projectId: $projectId
@@ -441,6 +442,7 @@ query tasks(
     stringFilter: $stringFilter
     limit: $limit
     page: $page
+    statuses: $statuses
   ){
     ${listTasks}
   }
@@ -574,14 +576,6 @@ mutation addOrUpdateTasklistColumnPerference(
   $overtime: Boolean
   $pausal: Boolean
   $tags: Boolean
-  $subtasksApproved: Boolean
-  $subtasksPending: Boolean
-  $tripsApproved: Boolean
-  $tripsPending: Boolean
-  $materialsApproved: Boolean
-  $materialsPending: Boolean
-  $itemsApproved: Boolean
-  $itemsPending: Boolean
 ) {
   addOrUpdateTasklistColumnPerference(
     projectId: $projectId
@@ -601,14 +595,6 @@ mutation addOrUpdateTasklistColumnPerference(
     overtime: $overtime
     pausal: $pausal
     tags: $tags
-    subtasksApproved: $subtasksApproved
-    subtasksPending: $subtasksPending
-    tripsApproved: $tripsApproved
-    tripsPending: $tripsPending
-    materialsApproved: $materialsApproved
-    materialsPending: $materialsPending
-    itemsApproved: $itemsApproved
-    itemsPending: $itemsPending
   ){
     ${tasklistPreferenceBody}
   }
