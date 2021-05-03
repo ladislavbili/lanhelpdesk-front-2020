@@ -264,6 +264,7 @@ export default function ProjectAdd( props ) {
       type,
     ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
       defTag,
+      assignedTo,
     ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
     )
   }
@@ -275,7 +276,7 @@ export default function ProjectAdd( props ) {
     currentUser &&
     ( company.value === null && company.fixed ) ||
     ( status.value === null && status.fixed ) ||
-    ( assignedTo.value.length === 0 && assignedTo.fixed ) ||
+    assignedTo.value.length === 0 ||
     !groups.some( ( group ) => (
       group.rights.projectPrimary.read &&
       group.rights.projectPrimary.write &&

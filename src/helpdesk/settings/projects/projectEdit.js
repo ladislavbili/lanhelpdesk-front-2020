@@ -579,6 +579,7 @@ export default function ProjectEdit( props ) {
       type,
     ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
       defTag,
+      assignedTo,
     ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
     )
   }

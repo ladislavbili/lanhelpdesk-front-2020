@@ -152,9 +152,9 @@ export default function ProjectDefaultValues( props ) {
                 <div className="col-9">
                   <Select
                     isMulti
-                    value={assignedTo.value.length === 0 ? [emptyUserValue] : assignedTo.value }
-                    onChange={(e)=>
-                      setAssignedTo({...assignedTo, value:e.filter((user) => user.id !== null)})
+                    value={assignedTo.value }
+                    onChange={(value) =>
+                      setAssignedTo({...assignedTo, value })
                     }
                     options={assignableUsers}
                     styles={invisibleSelectStyle}
