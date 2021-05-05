@@ -268,8 +268,8 @@ export default function TasksLoader( props ) {
   }
 
   const deleteTaskFunc = () => {
-    if ( window.confirm( "Are you sure?" ) ) {
-      let tasksForDelete = tasks.filter( ( task ) => markedTasks.includes( task.id ) );
+    if ( window.confirm( "Are you sure you want to delete checked tasks?" ) ) {
+      let tasksForDelete = tasks.filter( ( task ) => markedTasks.includes( task.id ) && task.rights.deleteTasks );
       const [ canDeleteTasks, cantDeleteTasks ] = splitArrayByFilter( tasksForDelete, ( task ) => currentUser.role.level === 0 || task.project.right.delete );
       Promise.all(
           canDeleteTasks.map( task => {
@@ -284,11 +284,7 @@ export default function TasksLoader( props ) {
           const queryFilter = localFilterToValues( filterData.localFilter );
           const existingTasks = client.readQuery( {
               query: GET_TASKS,
-              variables: {
-                filterId: localFilter.id,
-                filter: queryFilter,
-                projectId: localProject.id
-              }
+              variables: taskVariables
             } )
             .tasks;
 
@@ -300,11 +296,7 @@ export default function TasksLoader( props ) {
                 tasks: existingTasks.tasks.filter( ( existingTask ) => !canDeleteTasks.some( ( deletedTask ) => deletedTask.id === existingTask.id ) )
               }
             },
-            variables: {
-              filterId: localFilter.id,
-              filter: queryFilter,
-              projectId: localProject.id
-            }
+            variables: taskVariables
           } );
         } )
         .catch( ( err ) => {

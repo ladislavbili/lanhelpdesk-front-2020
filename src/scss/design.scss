@@ -2545,6 +2545,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     }
   }
 }
+
+.calendar {
+  width: calc( 100% - 300px )
+}
 //--------------------END-calendar-------------------------
 
 //----------------------taskEdit--------------------------

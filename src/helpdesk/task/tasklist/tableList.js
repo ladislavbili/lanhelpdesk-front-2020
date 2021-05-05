@@ -113,26 +113,26 @@ export default function TableList( props ) {
               window.alert('Please first pick tasks to delete!');
               return;
             }
-            if (window.confirm("Are you sure you want to delete checked tasks?")){
-              deleteTask()
-            }
+            deleteTask()
           }}>
-          <i className="far fa-trash-alt clickable"	/>
+          <i className="far fa-trash-alt clickable m-l-5"	/>
         </div>
-        <div
-          className="m-l-5"
-          onClick={() => {
-            if(loading){
-              return;
-            }
-            if( !tasks.some( (task) => task.checked ) ){
-              window.alert('Please first pick tasks to edit!');
-              return;
-            }
-            setEditOpen(true);
-          }}>
-          <i	className="fas fa-pen clickable"/>
-        </div>
+        { false &&
+          <div
+            className="m-l-5"
+            onClick={() => {
+              if(loading){
+                return;
+              }
+              if( !tasks.some( (task) => task.checked ) ){
+                window.alert('Please first pick tasks to edit!');
+                return;
+              }
+              setEditOpen(true);
+            }}>
+            <i	className="fas fa-pen clickable"/>
+          </div>
+        }
       </th>
     }
     return (
@@ -295,7 +295,7 @@ export default function TableList( props ) {
             { loading &&
               <tr>
                 <td colSpan="100">
-                <Loading />
+                  <Loading />
                 </td>
               </tr>
             }

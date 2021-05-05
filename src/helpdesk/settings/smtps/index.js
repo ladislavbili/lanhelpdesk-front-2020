@@ -17,15 +17,18 @@ export default function SMTPsList( props ) {
   // state
   const [ SMTPFilter, setSMTPFilter ] = React.useState( "" );
   const [ smtpTesting, setSmtpTesting ] = React.useState( false );
+  const [ wasRefetched, setWasRefetched ] = React.useState( false );
 
   //data
   const {
     history,
     match
   } = props;
+
   const {
     data,
-    loading
+    loading,
+    refetch
   } = useQuery( GET_SMTPS );
   const SMTPS = ( loading || !data ? [] : data.smtps );
   const [ testSmtps ] = useMutation( TEST_SMTPS );
@@ -37,7 +40,7 @@ export default function SMTPsList( props ) {
   const getStatusIcon = ( smtp ) => {
     let color = 'red';
     let iconName = 'far fa-times-circle';
-    if ( smtpTesting || smtp.currentlyTested ) {
+    if ( ( smtpTesting && !wasRefetched ) || smtp.currentlyTested ) {
       color = 'orange';
       iconName = 'fa fa-sync';
     } else if ( smtp.working ) {
@@ -83,18 +86,30 @@ export default function SMTPsList( props ) {
                 SMTPs
               </h2>
               { !smtpTesting &&
-                <Button
+                <button
                   disabled={ smtpTesting }
-                  className="btn-primary center-hor ml-auto"
+                  className="btn btn-primary center-hor ml-auto"
                   onClick={testSMTPs}
                   >
                   Test SMTPs
-                </Button>
+                </button>
               }
               { smtpTesting &&
                 <div className="center-hor ml-auto">
                   Testing SMTPs...
                 </div>
+              }
+              { smtpTesting &&
+                <button
+                  className="btn btn-primary center-hor ml-auto"
+                  onClick={() =>{
+                    refetch().then(() => {
+                      setWasRefetched(true)
+                    });
+                  }}
+                  >
+                  Refetch
+                </button>
               }
             </div>
             <table className="table table-hover">

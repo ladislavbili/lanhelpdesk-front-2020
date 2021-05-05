@@ -266,7 +266,7 @@ export default function TaskCalendar( props ) {
           }
 
           <DnDCalendar
-            className="fit-with-header-and-commandbar-5"
+            className="fit-with-header-and-commandbar-5 calendar"
             {...taskCalendarDefaults}
             events = { events }
             defaultView = { calendarLayout }

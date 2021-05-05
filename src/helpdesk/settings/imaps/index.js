@@ -17,15 +17,18 @@ export default function IMAPsList( props ) {
   // state
   const [ imapFilter, setImapFilter ] = React.useState( "" );
   const [ imapTesting, setImapTesting ] = React.useState( false );
+  const [ wasRefetched, setWasRefetched ] = React.useState( false );
 
   //data
   const {
     history,
     match
   } = props;
+
   const {
     data,
-    loading
+    loading,
+    refetch
   } = useQuery( GET_IMAPS );
   const IMAPS = ( loading || !data ? [] : data.imaps );
   const [ testImaps ] = useMutation( TEST_IMAPS );
@@ -39,7 +42,7 @@ export default function IMAPsList( props ) {
     let color = 'red';
     let iconName = 'far fa-times-circle';
     if ( imap.active ) {
-      if ( imapTesting || imap.currentlyTested ) {
+      if ( ( imapTesting && !wasRefetched ) || imap.currentlyTested ) {
         color = 'orange';
         iconName = 'fa fa-sync';
       } else if ( imap.working ) {
@@ -100,6 +103,18 @@ export default function IMAPsList( props ) {
                   <div className="center-hor ml-auto">
                     Testing IMAPs...
                   </div>
+                }
+                { imapTesting &&
+                  <button
+                    className="btn btn-primary center-hor ml-auto"
+                    onClick={() =>{
+                      refetch().then(() => {
+                        setWasRefetched(true)
+                      });
+                    }}
+                    >
+                    Refetch
+                  </button>
                 }
               </div>
               <table className="table table-hover">
