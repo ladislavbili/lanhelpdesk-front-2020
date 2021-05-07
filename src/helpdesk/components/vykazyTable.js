@@ -8,9 +8,7 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import {
-  selectStyle,
-  invisibleSelectStyle,
-  invisibleSelectStyleNoArrow
+  pickSelectStyle
 } from 'configs/components/select';
 import Checkbox from 'components/checkbox';
 import {
@@ -26,6 +24,7 @@ export default function Rozpocet( props ) {
     isInvoiced,
     company,
     defaultType,
+    canAddSubtasksAndTrips,
     taskAssigned,
     tripTypes,
     taskTypes,
@@ -278,7 +277,7 @@ export default function Rozpocet( props ) {
                 <td width="10" colSpan={2}>
                   <Checkbox
                     className="m-t-5"
-                    disabled= { disabled || isInvoiced }
+                    disabled= { disabled || !canAddSubtasksAndTrips || isInvoiced }
                     value={  isInvoiced || subtask.done }
                     onChange={()=>{
                       updateSubtask(subtask.id,{done:!subtask.done})
@@ -290,13 +289,13 @@ export default function Rozpocet( props ) {
               {showColumns.includes(3) && toggleTab !== "0" &&
                 <td colSpan={2}>
                   <Select
-                    isDisabled={disabled}
+                    isDisabled={disabled || !canAddSubtasksAndTrips}
                     value={ !isInvoiced ? subtask.type : subtask.invoicedData.type }
                     onChange={(type)=>{
                       updateSubtask(subtask.id,{type:type})
                     }}
                     options={taskTypes}
-                    styles={invisibleSelectStyle}
+                    styles={pickSelectStyle([ 'invisible', ])}
                     />
                 </td>
               }
@@ -304,7 +303,7 @@ export default function Rozpocet( props ) {
               {showColumns.includes(1) &&
                 <td className="" colSpan={1}>
                   <input
-                    disabled={disabled}
+                    disabled={disabled || !canAddSubtasksAndTrips}
                     className="form-control hidden-input"
                     placeholder="Add note"
                     value={
@@ -325,13 +324,13 @@ export default function Rozpocet( props ) {
               {showColumns.includes(2) && toggleTab !== "0" &&
                 <td>
                   <Select
-                    isDisabled={disabled}
+                    isDisabled={disabled || !canAddSubtasksAndTrips}
                     value={ !isInvoiced ? subtask.assignedTo : subtask.invoicedData.assignedTo }
                     onChange={(assignedTo)=>{
                       updateSubtask(subtask.id,{assignedTo:assignedTo})
                     }}
                     options={taskAssigned}
-                    styles={invisibleSelectStyle}
+                    styles={pickSelectStyle([ 'invisible', ])}
                     />
                 </td>
               }
@@ -340,7 +339,7 @@ export default function Rozpocet( props ) {
                 <div className="vykazy-approved">
                   <Switch
                     checked={subtask.approved}
-                    disabled={disabled}
+                    disabled={disabled || !canAddSubtasksAndTrips}
                     onChange={ () => { updateSubtask( subtask.id, { approved: !subtask.approved } ) } }
                     height={16}
                     width={30}
@@ -356,7 +355,7 @@ export default function Rozpocet( props ) {
               {showColumns.includes(4) &&
                 <td>
                   <input
-                    disabled={disabled}
+                    disabled={disabled || !canAddSubtasksAndTrips}
                     type="text"
                     pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                     className="form-control hidden-input h-30 t-a-r"
@@ -401,7 +400,7 @@ export default function Rozpocet( props ) {
                   <span className="text p-l-8">
                     -
                     <input
-                      disabled={disabled}
+                      disabled={disabled || !canAddSubtasksAndTrips}
                       style={{display: "inline", width: "60%"}}
                       type="number"
                       className="form-control hidden-input h-30"
@@ -442,7 +441,7 @@ export default function Rozpocet( props ) {
                 <td className="t-a-r">	{/* //akcie*/}
                   <button
                     className="btn-link btn-distance"
-                    disabled={ disabled || index === 0 }
+                    disabled={ disabled || !canAddSubtasksAndTrips || index === 0 }
                     onClick={()=>{
                       updateSubtasks([
                         //update below
@@ -456,7 +455,7 @@ export default function Rozpocet( props ) {
                   </button>
                   <button
                     className="btn-link btn-distance"
-                    disabled={ disabled || index === sortedWorks.length - 1 }
+                    disabled={ disabled || !canAddSubtasksAndTrips || index === sortedWorks.length - 1 }
                     onClick={()=>{
                       updateSubtasks([
                         //update below
@@ -468,7 +467,7 @@ export default function Rozpocet( props ) {
                     >
                     <i className="fa fa-arrow-down"  />
                   </button>
-                  <button className="btn-link" disabled={disabled}
+                  <button className="btn-link" disabled={disabled || !canAddSubtasksAndTrips}
                     onClick={()=>{
                       if(window.confirm('Are you sure?')){
                         removeSubtask(subtask.id);
@@ -489,7 +488,7 @@ export default function Rozpocet( props ) {
                   <td width="10" colSpan="2">
                     <Checkbox
                       className="m-t-5"
-                      disabled= { disabled || isInvoiced }
+                      disabled= { disabled || !canAddSubtasksAndTrips || isInvoiced }
                       value={ isInvoiced || trip.done }
                       onChange={()=>{
                         updateTrip(trip.id,{done:!trip.done})
@@ -501,13 +500,13 @@ export default function Rozpocet( props ) {
                 {showColumns.includes(1) &&
                   <td colSpan="2">
                     <Select
-                      isDisabled={disabled }
+                      isDisabled={disabled || !canAddSubtasksAndTrips }
                       value={ !isInvoiced ? trip.type : trip.invoicedData.type }
                       onChange={(type)=>{
                         updateTrip(trip.id,{type:type})
                       }}
                       options={tripTypes}
-                      styles={invisibleSelectStyle}
+                      styles={pickSelectStyle([ 'invisible', ])}
                       />
                   </td>
                 }
@@ -519,13 +518,13 @@ export default function Rozpocet( props ) {
                 {showColumns.includes(2) &&
                   <td>
                     <Select
-                      isDisabled={disabled}
+                      isDisabled={disabled || !canAddSubtasksAndTrips}
                       value={ !isInvoiced ? trip.assignedTo : trip.invoicedData.assignedTo }
                       onChange={(assignedTo)=>{
                         updateTrip(trip.id,{assignedTo:assignedTo})
                       }}
                       options={taskAssigned}
-                      styles={invisibleSelectStyle}
+                      styles={pickSelectStyle([ 'invisible', ])}
                       />
                   </td>
                 }
@@ -534,7 +533,7 @@ export default function Rozpocet( props ) {
                   <div className="vykazy-approved">
                   <Switch
                     checked={trip.approved}
-                    disabled={disabled}
+                    disabled={disabled || !canAddSubtasksAndTrips}
                     onChange={ () => { updateTrip( trip.id, { approved: !trip.approved } ) } }
                     height={16}
                     width={30}
@@ -550,7 +549,7 @@ export default function Rozpocet( props ) {
                 {showColumns.includes(4) &&
                   <td>
                     <input
-                      disabled={disabled}
+                      disabled={disabled || !canAddSubtasksAndTrips}
                       type="text"
                       pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                       className="form-control hidden-input h-30 t-a-r"
@@ -597,7 +596,7 @@ export default function Rozpocet( props ) {
                     <span className="text p-l-8">
                       -
                       <input
-                        disabled={disabled}
+                        disabled={disabled || !canAddSubtasksAndTrips}
                         type="number"
                         style={{display: "inline", width: "60%"}}
                         className="form-control hidden-input h-30"
@@ -638,7 +637,7 @@ export default function Rozpocet( props ) {
                   <td className="t-a-r">
                     <button
                       className="btn-link btn-distance"
-                      disabled={ disabled || index === 0 }
+                      disabled={ disabled || !canAddSubtasksAndTrips || index === 0 }
                       onClick={()=>{
                         updateTrips([
                           //update below
@@ -652,7 +651,7 @@ export default function Rozpocet( props ) {
                     </button>
                     <button
                       className="btn-link btn-distance"
-                      disabled={ disabled || index === sortedTrips.length - 1 }
+                      disabled={ disabled || !canAddSubtasksAndTrips || index === sortedTrips.length - 1 }
                       onClick={()=>{
                         updateTrips([
                           //update below
@@ -666,7 +665,7 @@ export default function Rozpocet( props ) {
                     </button>
                     <button
                       className="btn-link"
-                      disabled={disabled}
+                      disabled={disabled || !canAddSubtasksAndTrips}
                       onClick={()=>{
                         if(window.confirm('Are you sure?')){
                           removeTrip(trip.id);
@@ -1096,20 +1095,20 @@ export default function Rozpocet( props ) {
 
       <div className="add-buttons">
       {/* ADD Work */}
-      {showAddSubtask && !disabled &&
+      {showAddSubtask && !disabled && canAddSubtasksAndTrips &&
         <div className="row">
           <div className="m-r-10 center-hor add-title">Add subtask</div>
           {/*Type*/}
           {false && showColumns.includes(3) && toggleTab !== "0" &&
             <div className="w-20 m-r-10">{/*typ*/}
               <Select
-                isDisabled={disabled}
+                isDisabled={disabled || canAddSubtasksAndTrips}
                 value={newSubtaskType}
                 options={taskTypes}
                 onChange={(type)=>{
                   setNewSubtaskType(type)
                 }}
-                styles={selectStyle}
+                styles={pickSelectStyle()}
                 />
             </div>
           }
@@ -1117,7 +1116,7 @@ export default function Rozpocet( props ) {
           { false && showColumns.includes(1) &&
             <div className="p-r-8">
               <input
-                disabled={disabled}
+                disabled={disabled || !canAddSubtasksAndTrips}
                 type="text"
                 className="form-control"
                 id="inlineFormInput"
@@ -1158,13 +1157,13 @@ export default function Rozpocet( props ) {
           { false && showColumns.includes(2) && toggleTab !== "0" &&
             <div className="p-l-8">
               <Select
-                isDisabled={disabled}
+                isDisabled={disabled || !canAddSubtasksAndTrips}
                 value={newSubtaskAssigned}
                 onChange={(newSubtaskAssigned)=>{
                   setNewSubtaskAssigned(newSubtaskAssigned);
                 }}
                 options={taskAssigned}
-                styles={invisibleSelectStyleNoArrow}
+                styles={pickSelectStyle( [ 'invisible', 'noArrow', ] )}
                 />
             </div>
           }
@@ -1172,7 +1171,7 @@ export default function Rozpocet( props ) {
           {showColumns.includes(4) &&
             <div className="p-l-8 p-r-8 w-10">
               <input
-                disabled={disabled}
+                disabled={disabled || !canAddSubtasksAndTrips}
                 type="text"
                 pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                 value={newSubtaskQuantity.toString()}
@@ -1192,7 +1191,7 @@ export default function Rozpocet( props ) {
           {false && showColumns.includes(6) && toggleTab === "2" &&
             <div className="p-r-8 p-l-8">
               <input
-                disabled={disabled}
+                disabled={disabled || !canAddSubtasksAndTrips}
                 type="number"
                 value={newSubtaskDiscount}
                 onChange={(e)=>setNewSubtaskDiscount(e.target.value)}
@@ -1224,7 +1223,7 @@ export default function Rozpocet( props ) {
                 <i className="fa fa-times"  />
               </button>
               <button className="btn"
-                disabled={!newSubtaskType || newSubtaskType.id === null || disabled || newSubtaskAssigned===null}
+                disabled={!newSubtaskType || newSubtaskType.id === null || disabled || !canAddSubtasksAndTrips || newSubtaskAssigned===null}
                 onClick={()=>{
                   let body={
                     done:false,
@@ -1253,20 +1252,20 @@ export default function Rozpocet( props ) {
         </div>
       }
       {/* ADD Trip */}
-      {showAddTrip && !disabled &&
+      {showAddTrip && !disabled && canAddSubtasksAndTrips &&
         <div className="row">
           <div className="m-r-10 center-hor add-title">Add trip</div>
           {/*Name*/}
           {showColumns.includes(1) &&
             <div className="m-r-10 w-20">
               <Select
-                isDisabled={disabled}
+                isDisabled={disabled || !canAddSubtasksAndTrips}
                 value={newTripType}
                 onChange={(newTripType)=>{
                   setNewTripType(newTripType)
                 }}
                 options={tripTypes}
-                styles={selectStyle}
+                styles={pickSelectStyle()}
                 />
             </div>
           }
@@ -1274,13 +1273,13 @@ export default function Rozpocet( props ) {
           {false && showColumns.includes(2) &&
             <div className="p-l-8">
               <Select
-                isDisabled={disabled}
+                isDisabled={disabled || !canAddSubtasksAndTrips}
                 value={newTripAssigned}
                 onChange={(newTripAssigned)=>{
                   setNewTripAssigned(newTripAssigned)
                 }}
                 options={taskAssigned}
-                styles={invisibleSelectStyleNoArrow}
+                styles={pickSelectStyle( [ 'invisible', 'noArrow', ] )}
                 />
             </div>
           }
@@ -1288,7 +1287,7 @@ export default function Rozpocet( props ) {
           {showColumns.includes(4) &&
             <div className="p-l-8 m-r-8 w-10 row">
                 <input
-                  disabled={disabled}
+                  disabled={disabled || !canAddSubtasksAndTrips}
                   type="text"
                   pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
                   value={newTripQuantity.toString()}
@@ -1308,7 +1307,7 @@ export default function Rozpocet( props ) {
           {false && showColumns.includes(6) && toggleTab === "2" &&
             <div className="table-highlight-background p-l-8 p-r-8">
               <input
-                disabled={disabled}
+                disabled={disabled || !canAddSubtasksAndTrips}
                 type="number"
                 value={newTripDiscount}
                 onChange={(e)=>setNewTripDiscount(e.target.value)}
@@ -1340,7 +1339,7 @@ export default function Rozpocet( props ) {
                 <i className="fa fa-times"  />
               </button>
               <button className="btn"
-                disabled={newTripType===null||isNaN(parseInt(newTripQuantity))||disabled|| newTripAssigned===null}
+                disabled={newTripType===null||isNaN(parseInt(newTripQuantity))||disabled || !canAddSubtasksAndTrips|| newTripAssigned===null}
                 onClick={()=>{
                   let body={
                     type:newTripType,
@@ -1663,9 +1662,9 @@ export default function Rozpocet( props ) {
       {!showAddSubtask && !showAddTrip && !showAddMaterial && !showAddCustomItem && !disabled &&
         <div className="row">
           <div className="m-r-10 center-hor add-title">
-            {!showAddSubtask &&
+            {!showAddSubtask && canAddSubtasksAndTrips &&
               <button className="btn-link btn-distance"
-                disabled={disabled}
+                disabled={disabled || !canAddSubtasksAndTrips}
                 onClick={()=>{
                   setShowAddSubtask(true);
                 }}
@@ -1674,9 +1673,9 @@ export default function Rozpocet( props ) {
                 Práca
               </button>
             }
-            {!showAddTrip && !showSubtasks &&
+            { !showAddTrip && !showSubtasks && canAddSubtasksAndTrips &&
               <button className="btn-link btn-distance"
-                disabled={disabled}
+                disabled={disabled || !canAddSubtasksAndTrips}
                 onClick={()=>{
                   setShowAddTrip(true);
                 }}
@@ -1708,6 +1707,11 @@ export default function Rozpocet( props ) {
               </button>
             }
           </div>
+          { !canAddSubtasksAndTrips &&
+            <span className="message error-message">
+              Can't add subtasks and trips until you assign task to someone!
+            </span>
+          }
         </div>
       }
       </div>

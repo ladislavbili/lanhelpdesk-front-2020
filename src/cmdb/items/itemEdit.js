@@ -7,12 +7,8 @@ import {
   NavItem,
   NavLink
 } from 'reactstrap';
-import Select from 'react-select';
 import CKEditor from 'ckeditor4-react';
 import classnames from "classnames";
-import {
-  selectStyle
-} from "configs/components/select";
 import AttributesHandler from './attributesHandler';
 import IPList from './ipList';
 import Passwords from './passwords';

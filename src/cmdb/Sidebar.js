@@ -19,7 +19,7 @@ import Select from "react-select";
 //import CompanyEdit from './settings/companies/companyEdit';
 import {
   sidebarSelectStyle,
-  invisibleSelectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 
 import CompanyAdd from 'helpdesk/settings/companies/companyAdd';
@@ -73,7 +73,7 @@ export default function Sidebar( props ) {
 						<Select
 							options={companies}
 							value={company}
-							styles={invisibleSelectStyle}
+							styles={pickSelectStyle([ 'invisible', ])}
 							onChange={e => {}}
 							components={{
 								DropdownIndicator: ({ innerProps, isDisabled }) =>

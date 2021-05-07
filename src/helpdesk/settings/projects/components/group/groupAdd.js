@@ -56,6 +56,17 @@ export default function ProjectGroups( props ) {
             <Input placeholder="Set order" value={order} onChange={(e) => setOrder(e.target.value)}/>
           </FormGroup>
           <button
+            className="btn btn-link-cancel"
+            onClick={ () => {
+              setTitle('');
+              setOrder(0);
+              setOpen(false);
+            } }
+            >
+            Close
+          </button>
+          <button
+            className='btn'
             disabled={ title.length === 0 || isNaN(parseInt(order)) }
             onClick={ () => {
               addGroup({ title, id: fakeID--, order, rights: createCleanRights() })

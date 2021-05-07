@@ -3,7 +3,7 @@ import Select, {
   Creatable
 } from 'react-select';
 import {
-  selectStyle,
+  pickSelectStyle,
 } from 'configs/components/select';
 import {
   Modal,
@@ -97,7 +97,7 @@ export default function CustomAttributes( props ) {
         <FormGroup>
           <Label>Type</Label>
           <Select
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={types}
             value={type}
             onChange={type => {
@@ -197,7 +197,7 @@ export default function CustomAttributes( props ) {
                 setAllOptions(filterUnique([...allOptions, ...newOptions],'label'));
               }}
               options={allOptions ? allOptions: []}
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               />
           </FormGroup>
         }
@@ -205,7 +205,7 @@ export default function CustomAttributes( props ) {
           <FormGroup>
             <Label>Right to read</Label>
             <Select
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               options={toSelArr(rolesData.basicRoles)}
               value={read}
               isMulti
@@ -220,7 +220,7 @@ export default function CustomAttributes( props ) {
           <FormGroup>
             <Label>Right to write</Label>
             <Select
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               options={read}
               value={write}
               isMulti
@@ -234,7 +234,7 @@ export default function CustomAttributes( props ) {
           <FormGroup>
             <Label>Default option</Label>
             <Select
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               options={options}
               value={defaultValue}
               onChange={ (newDefault) => {

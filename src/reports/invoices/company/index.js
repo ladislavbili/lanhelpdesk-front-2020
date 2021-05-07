@@ -14,7 +14,7 @@ import {
   useLazyQuery,
 } from "@apollo/client";
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 import {
   COMPANIES_WITH_INVOICES,
@@ -114,7 +114,7 @@ export default function CompanyReports( props ) {
               fetchCompanyInvoices({variables: {id: company.id}})
             }}
             options={toSelArr(companiesData.companiesWithInvoices)}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
         </span>
         </FormGroup>

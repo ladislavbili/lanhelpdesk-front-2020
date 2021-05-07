@@ -11,6 +11,7 @@ import {
 } from 'reactstrap';
 import {
   toSelArr,
+  toSelItem,
   deleteAttributes
 } from 'helperFunctions';
 import {
@@ -308,7 +309,21 @@ export default function ProjectEdit( props ) {
     setDataChanged( false );
   }, [ id ] );
 
-  // functions
+  React.useEffect( () => {
+    if ( !dataLoading ) {
+      updateDefAssigned();
+    }
+  }, [ userGroups ] );
+
+  const updateDefAssigned = () => {
+    const assignableUsers = userGroups.filter( ( userGroup ) => userGroup.group.rights.assigned.write )
+      .map( ( userGroup ) => userGroup.user );
+    setAssignedTo( {
+      ...assignedTo,
+      value: assignedTo.value.filter( ( user1 ) => assignableUsers.some( ( user2 ) => user1.id === user2.id ) )
+    } )
+  }
+
   const getAllTags = () => {
     let allTags = projectData.project.tags.filter( ( tag ) => !deleteTags.includes( tag.id ) );
     updateTags.map( ( tagChange ) => {
@@ -321,20 +336,6 @@ export default function ProjectEdit( props ) {
       }
     } );
     return allTags.concat( addTags );
-  }
-
-  const getAllStatuses = () => {
-    let allStatuses = projectData.project.statuses.filter( ( status ) => !deleteStatuses.includes( status.id ) );
-    updateStatuses.map( ( statusChange ) => {
-      let index = allStatuses.findIndex( ( status ) => status.id === statusChange.id );
-      if ( index !== -1 ) {
-        allStatuses[ index ] = {
-          ...allStatuses[ index ],
-          ...statusChange
-        };
-      }
-    } );
-    return allStatuses.concat( addStatuses );
   }
 
   const getDefaultGroupData = () => {
@@ -353,6 +354,31 @@ export default function ProjectEdit( props ) {
       groups,
       userGroups
     }
+  }
+
+  const dataLoading = (
+    projectLoading ||
+    companiesLoading ||
+    usersLoading ||
+    myDataLoading
+  )
+  if ( dataLoading ) {
+    return <Loading />
+  }
+
+  // functions
+  const getAllStatuses = () => {
+    let allStatuses = projectData.project.statuses.filter( ( status ) => !deleteStatuses.includes( status.id ) );
+    updateStatuses.map( ( statusChange ) => {
+      let index = allStatuses.findIndex( ( status ) => status.id === statusChange.id );
+      if ( index !== -1 ) {
+        allStatuses[ index ] = {
+          ...allStatuses[ index ],
+          ...statusChange
+        };
+      }
+    } );
+    return allStatuses.concat( addStatuses );
   }
 
   const filterGroupChanges = () => {
@@ -565,21 +591,13 @@ export default function ProjectEdit( props ) {
     }
   };
 
-  if (
-    projectLoading ||
-    companiesLoading ||
-    usersLoading ||
-    myDataLoading
-  ) {
-    return <Loading />
-  }
   const doesDefHasValue = () => {
     return (
     [
       type,
     ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
       defTag,
-      assignedTo,
+      //assignedTo,
     ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
     )
   }
@@ -589,7 +607,7 @@ export default function ProjectEdit( props ) {
       ( !group.rights.taskTitleEdit ) ||
       ( !group.rights.status.write && !status.def ) ||
       ( !group.rights.tags.write && !defTag.def && defTag.required ) ||
-      ( !group.rights.assigned.write && !assignedTo.def ) ||
+      //( !group.rights.assigned.write && !assignedTo.def ) ||
       ( !group.rights.requester.write && !requester.def && requester.required ) ||
       ( !group.rights.type.write && !type.def && type.required ) ||
       ( !group.rights.company.write && !company.def )
@@ -829,6 +847,13 @@ export default function ProjectEdit( props ) {
                 let newGroups = [...groups];
                 let index = newGroups.findIndex((group) => group.id === groupID );
                 newGroups[index]['rights'][acl] = newVal;
+                setUserGroups(userGroups.map((userGroup) => {
+                  if(userGroup.group.id === groupID){
+                    return {...userGroup, group: toSelItem(newGroups[index])  }
+                  }else{
+                    return userGroup;
+                  }
+                } ));
                 setGroups(newGroups);
                 setDataChanged( true );
               }}
@@ -850,23 +875,24 @@ export default function ProjectEdit( props ) {
                 setDataChanged( true );
               }}
               />
+
             <ProjectDefaultValues
               assignedTo={assignedTo}
-              setAssignedTo={setAssignedTo}
+              setAssignedTo={(value) => {setAssignedTo(value); setDataChanged(true);}}
               company={company}
-              setCompany={setCompany}
+              setCompany={(value) => {setCompany(value); setDataChanged(true);}}
               overtime={overtime}
-              setOvertime={setOvertime}
+              setOvertime={(value) => {setOvertime(value); setDataChanged(true);}}
               pausal={pausal}
-              setPausal={setPausal}
+              setPausal={(value) => {setPausal(value); setDataChanged(true);}}
               requester={requester}
-              setRequester={setRequester}
+              setRequester={(value) => {setRequester(value); setDataChanged(true);}}
               type={type}
-              setType={setType}
+              setType={(value) => {setType(value); setDataChanged(true);}}
               status={status}
-              setStatus={setStatus}
+              setStatus={(value) => {setStatus(value); setDataChanged(true);}}
               tag={defTag}
-              setTag={setDefTag}
+              setTag={(value) => {setDefTag(value); setDataChanged(true);}}
               statuses={toSelArr(allStatuses)}
               companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
               users={
@@ -874,7 +900,7 @@ export default function ProjectEdit( props ) {
                 userGroups.map( (userGroup) => userGroup.user ) :
                 (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
               }
-              assignableUsers={userGroups.map( (userGroup) => userGroup.user )}
+              assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
               allTags={toSelArr(allTags)}
               taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
               />

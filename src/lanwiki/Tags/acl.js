@@ -7,7 +7,7 @@ import {
 } from 'reactstrap';
 import Select from "react-select";
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 import {
   objectToAtributeArray
@@ -32,7 +32,7 @@ export default function TagACL( props ) {
           <div className="f-1">
             <Select
               value={chosenUser}
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               onChange={ (e)=> setChosenUser(e) }
               options={users}
               />

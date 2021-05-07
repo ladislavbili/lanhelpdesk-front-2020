@@ -1,29 +1,38 @@
-import React, { Component } from 'react';
-import { Input } from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  Input
+} from 'reactstrap';
 import Select from 'react-select';
-import {selectStyle, invisibleSelectStyleNoArrow} from "configs/components/select";
-import { calculateTextAreaHeight, htmlFixNewLines} from '../../helperFunctions';
+import {
+  pickSelectStyle
+} from "configs/components/select";
+import {
+  calculateTextAreaHeight,
+  htmlFixNewLines
+} from '../../helperFunctions';
 
-export default class Links extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      note:'',
-      link:null,
-      noteHeight:29,
-      newItemID:0
+export default class Links extends Component {
+  constructor( props ) {
+    super( props );
+    this.state = {
+      note: '',
+      link: null,
+      noteHeight: 29,
+      newItemID: 0
     }
-    this.editItem.bind(this);
+    this.editItem.bind( this );
   }
 
-  editItem(item, target,value){
-    let newItems = [...this.props.items];
-    newItems.find((item2)=>item.id===item2.id)[target] = value;
-    this.props.onChange(newItems);
+  editItem( item, target, value ) {
+    let newItems = [ ...this.props.items ];
+    newItems.find( ( item2 ) => item.id === item2.id )[ target ] = value;
+    this.props.onChange( newItems );
   }
   //className="invisible-input"
 
-  render(){
+  render() {
     return (
       <table className="table">
         <thead>
@@ -38,7 +47,7 @@ export default class Links extends Component{
             <tr key={item.id}>
               <td>
                 {item.opened && <Select
-                  styles={invisibleSelectStyleNoArrow}
+                  styles={pickSelectStyle(['invisible','noArrow'])}
                   options={this.props.links}
                   value={item.link}
                   onChange={e =>{
@@ -109,7 +118,7 @@ export default class Links extends Component{
         <tr>
           <td>
             <Select
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               options={this.props.links}
               value={this.state.link}
               onChange={e =>{ this.setState({ link: e }); }}
@@ -157,6 +166,6 @@ export default class Links extends Component{
       </tbody>
 
     </table>
-  );
-}
+    );
+  }
 }

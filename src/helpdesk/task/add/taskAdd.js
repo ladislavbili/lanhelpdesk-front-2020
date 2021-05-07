@@ -26,18 +26,7 @@ import {
 
 import ck5config from 'configs/components/ck5config';
 import {
-  invisibleSelectStyleNoArrow,
-  selectStyleNoArrowNoPadding,
-  invisibleSelectStyleNoArrowNoPadding,
-  invisibleSelectStyleNoArrowColored,
-  selectStyleNoArrowColoredRequired,
-  selectStyleNoArrowColoredRequiredPlaceHolderHighlight,
-  invisibleSelectStyleNoArrowColoredRequired,
-  invisibleSelectStyleNoArrowColoredRequiredNoPadding,
-  selectStyleNoArrowRequired,
-  selectStyleNoArrowRequiredPlaceHolderHighlight,
-  invisibleSelectStyleNoArrowRequired,
-  invisibleSelectStyleNoArrowRequiredNoPadding,
+  pickSelectStyle,
 } from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect'
 import {
@@ -123,6 +112,7 @@ export default function TaskAdd( props ) {
   const [ pausal, setPausal ] = React.useState( booleanSelects[ 0 ] );
   const [ pendingDate, setPendingDate ] = React.useState( null );
   const [ pendingChangable, setPendingChangable ] = React.useState( false );
+  const [ important, setImportant ] = React.useState( false );
   const [ repeat, setRepeat ] = React.useState( null );
   const [ requester, setRequester ] = React.useState( currentUserIfInProject( project ) );
   const [ saving, setSaving ] = React.useState( false );
@@ -184,15 +174,15 @@ export default function TaskAdd( props ) {
       }
     } else {
       let newAssignedTo = assignedTo.filter( ( user ) => assignableUsers.some( ( user2 ) => user.id === user2.id ) );
-      if ( newAssignedTo.length === 0 && potencialUser && userRights.assignedWrite ) {
-        newAssignedTo = [ potencialUser ];
-      }
       if ( def.assignedTo.def ) {
         //add def values
         newAssignedTo = [
           ...newAssignedTo,
-          ...assignableUsers.filter( ( user1 ) => def.assignedTo.value.some( ( user2 ) => user1.id === user2.id ) && !newAssignedTo.some( ( user2 ) => user1.id === user2.id ) )
+          ...assignableUsers.filter( ( user1 ) => def.assignedTo.value.some( ( user2 ) => user1.id === user2.id ) && !newAssignedTo.some( ( user2 ) => user1.id === user2.id ) ),
         ]
+      }
+      if ( newAssignedTo.length === 0 && potencialUser && userRights.assignedWrite ) {
+        newAssignedTo = [ potencialUser ];
       }
       setAssignedTo( newAssignedTo );
     }
@@ -258,6 +248,7 @@ export default function TaskAdd( props ) {
     setSaving( true );
     addTask( {
         variables: {
+          important,
           title,
           closeDate: closeDate ? closeDate.valueOf()
             .toString() : null,
@@ -388,7 +379,7 @@ export default function TaskAdd( props ) {
     loading ||
     title.length === 0 ||
     ( project.def.status.required && !status ) ||
-    ( project.def.assignedTo.required && !assignedTo ) ||
+    ( project.def.assignedTo.fixed && assignedTo.length === 0 ) ||
     ( project.def.requester.required && !requester ) ||
     ( project.def.tag.required && tags.length === 0 ) ||
     ( project.def.pausal.required && !pausal ) ||
@@ -402,6 +393,20 @@ export default function TaskAdd( props ) {
     return (
       <div className="task-add-layout-2 row">
         <h2 className="center-hor">Create new task</h2>
+          { userRights.important &&
+            <button
+              type="button"
+              style={{color: important ? '#ffc107' : '#0078D4'}}
+              disabled={ !userRights.important }
+              className="btn-link task-add-layout-button btn-distance m-t-auto m-l-10"
+              onClick={()=>{
+                setImportant(!important);
+              }}
+              >
+              <i className="far fa-star" />
+              Important
+            </button>
+          }
         {false &&
         <div className="ml-auto m-r-20">
           <button
@@ -467,12 +472,12 @@ export default function TaskAdd( props ) {
           setProject(project);
         }}
         options={projects.filter((project) => currentUser.role.level === 0 || project.right.addTasks )}
-        styles={selectStyleNoArrowRequired}
+        styles={pickSelectStyle( [ 'noArrow', 'required', ] )}
         />
     ),
     Assigned: (
       <Select
-        placeholder="Select required"
+        placeholder="Select reccomended"
         value={assignedTo}
         isDisabled={ defaultFields.assignedTo.fixed || !userRights.assignedWrite }
         isMulti
@@ -480,7 +485,7 @@ export default function TaskAdd( props ) {
           setAssignedTo(users);
         }}
         options={assignableUsers}
-        styles={showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired}
+        styles={pickSelectStyle([ 'noArrow' ])}
         />
     ),
     Status: (
@@ -488,7 +493,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={status}
         isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
-        styles={showLocalCreationError ? selectStyleNoArrowColoredRequiredPlaceHolderHighlight : selectStyleNoArrowColoredRequired}
+        styles={showLocalCreationError ? pickSelectStyle( [ 'noArrow', 'colored', 'required', 'highlight', ] ) : pickSelectStyle([ 'noArrow', 'colored', 'required', ])}
         onChange={(status)=>{
           if(status.action==='PendingDate'){
             setStatus(status);
@@ -511,7 +516,7 @@ export default function TaskAdd( props ) {
             placeholder="Select task type"
             value={taskType}
             isDisabled={defaultFields.type.fixed || !userRights.typeWrite }
-            styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
+            styles={ (showLocalCreationError && defaultFields.type.required) ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', defaultFields.type.required ? 'required' : ''  ]) }
             onChange={(taskType)=> {
               setTaskType(taskType);
             }}
@@ -540,13 +545,13 @@ export default function TaskAdd( props ) {
           }
         }}
         options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={ selectStyleNoArrowNoPadding }
+        styles={ pickSelectStyle([ 'noArrow', 'noPadding', ]) }
         />
     ),
     Requester: (
       <Select
         value={requester}
-        placeholder="Select required"
+        placeholder="Select reccomended"
         isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
         onChange={(requester)=>{
           setRequester(requester);
@@ -556,7 +561,7 @@ export default function TaskAdd( props ) {
           }
         }}
         options={projectRequesters}
-        styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
+        styles={ pickSelectStyle([ 'noArrow', ]) }
         />
     ),
     Company: (
@@ -569,7 +574,7 @@ export default function TaskAdd( props ) {
           setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
         }}
         options={companies}
-        styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
+        styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle( ['noArrow', 'required' ] ) }
         />
     ),
     Pausal: (
@@ -577,7 +582,7 @@ export default function TaskAdd( props ) {
         value={pausal}
         placeholder="Select required"
         isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-        styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
+        styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', 'required', ]) }
         onChange={(pausal)=> setPausal(pausal)}
         options={booleanSelects}
         />
@@ -596,7 +601,7 @@ export default function TaskAdd( props ) {
         placeholder="Select required"
         value={overtime}
         isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={ showLocalCreationError ? selectStyleNoArrowRequiredPlaceHolderHighlight : selectStyleNoArrowRequired }
+        styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', 'required', ]) }
         onChange={(overtime) => setOvertime(overtime)}
         options={booleanSelects}
         />
@@ -616,7 +621,7 @@ export default function TaskAdd( props ) {
                 </div>
               </div>
             </div>
-            { userRights.assignedRead && !defaultFields.assignedTo.fixed && userRights.assignedWrite &&
+            { userRights.assignedRead &&
               <div className="col-8">
                 <div className="row p-r-10">
                   <Label className="col-1-45 col-form-label">Assigned {project.def.assignedTo.required && <span className="warning-big">*</span>}</Label>
@@ -723,7 +728,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
 
-          { userRights.scheduledRead && assignedTo.length !== 0 &&
+          { userRights.scheduledRead &&
             <Scheduled
               items={scheduled}
               users={assignedTo}
@@ -830,7 +835,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.assignedRead && !defaultFields.assignedTo.fixed && userRights.assignedWrite &&
+        { userRights.assignedRead &&
           <div className="form-selects-entry-column" >
             <Label>Assigned {project.def.assignedTo.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
@@ -865,11 +870,11 @@ export default function TaskAdd( props ) {
             vertical={true}
             />
         }
-        { userRights.scheduledRead && assignedTo.length !== 0 &&
+        { userRights.scheduledRead &&
           <Scheduled
             items={scheduled}
             users={assignedTo}
-            disabled={assignedTo.length === 0}
+            disabled={assignedTo.length === 0 }
             onChange={(item) => {
               let newScheduled = [...scheduled];
               newScheduled[newScheduled.findIndex((item2) => item2.id === item.id )] = item;
@@ -1083,6 +1088,7 @@ export default function TaskAdd( props ) {
         userRights={userRights}
         isInvoiced={false}
         canEditInvoiced={false}
+        canAddSubtasksAndTrips={ assignedTo.length !== 0 }
         company={company}
         taskAssigned={assignedTo}
 

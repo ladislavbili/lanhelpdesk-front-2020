@@ -6,8 +6,7 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import {
-  selectStyle,
-  invisibleSelectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 import {
   sameStringForms
@@ -242,7 +241,7 @@ export default class PraceWorkTrips extends Component {
 														this.props.updateSubtask(subtask.id,{assignedTo:assignedTo.id})
 													}}
 													options={this.props.taskAssigned}
-													styles={invisibleSelectStyle}
+													styles={pickSelectStyle([ 'invisible', ])}
 													/>
 											</td> }
 
@@ -254,7 +253,7 @@ export default class PraceWorkTrips extends Component {
 														this.props.updateSubtask(subtask.id,{type:type.id})
 													}}
 													options={this.props.workTypes}
-													styles={invisibleSelectStyle}
+													styles={pickSelectStyle([ 'invisible', ])}
 													/>
 											</td>}
 
@@ -361,7 +360,7 @@ export default class PraceWorkTrips extends Component {
 														this.props.updateTrip(trip.id,{type:type.id})
 													}}
 													options={this.props.tripTypes}
-													styles={invisibleSelectStyle}
+													styles={pickSelectStyle([ 'invisible', ])}
 													/>
 											</td>}
 											{ this.props.showColumns.includes(2) && <td>
@@ -372,7 +371,7 @@ export default class PraceWorkTrips extends Component {
 														this.props.updateTrip(trip.id,{assignedTo:assignedTo.id})
 													}}
 													options={this.props.taskAssigned}
-													styles={invisibleSelectStyle}
+													styles={pickSelectStyle([ 'invisible', ])}
 													/>
 											</td>}
 											{ this.props.showColumns.includes(3) && <td>Výjazd</td>}
@@ -474,7 +473,7 @@ export default class PraceWorkTrips extends Component {
 														}
 													}
 													options={this.props.taskAssigned}
-													styles={selectStyle}
+													styles={pickSelectStyle()}
 													/>
 											</td>}
 											{ this.props.showColumns.includes(3) && <td>
@@ -486,7 +485,7 @@ export default class PraceWorkTrips extends Component {
 														this.setState({newSubtaskType:type})
 														}
 													}
-													styles={selectStyle}
+													styles={pickSelectStyle()}
 													/>
 											</td>}
 											{ this.props.showColumns.includes(4) && <td>
@@ -572,7 +571,7 @@ export default class PraceWorkTrips extends Component {
 														}
 													}
 													options={this.props.tripTypes}
-													styles={selectStyle}
+													styles={pickSelectStyle()}
 													/>
 											</td>}
 											{ this.props.showColumns.includes(2) && <td>
@@ -584,7 +583,7 @@ export default class PraceWorkTrips extends Component {
 														}
 													}
 													options={this.props.taskAssigned}
-													styles={selectStyle}
+													styles={pickSelectStyle()}
 													/>
 											</td>}
 											{ this.props.showColumns.includes(3) && <td>Výjazd</td>}

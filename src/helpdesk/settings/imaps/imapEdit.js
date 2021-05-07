@@ -22,7 +22,7 @@ import Select, {
   Creatable
 } from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 import {
@@ -429,7 +429,7 @@ export default function IMAPEdit( props ) {
               setDataChanged( true );
             }}
             options={previousIgnoredRecievers}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
         </FormGroup>
 
@@ -459,7 +459,7 @@ export default function IMAPEdit( props ) {
         <FormGroup>
           <Label for="role">Users Role <span className="warning-big">*</span></Label>
           <Select
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={toSelArr(roleData.roles)}
             value={role}
             onChange={role => {
@@ -471,7 +471,7 @@ export default function IMAPEdit( props ) {
         <FormGroup>
           <Label for="project">Users Company <span className="warning-big">*</span></Label>
           <Select
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={toSelArr(companyData.basicCompanies)}
             value={company}
             onChange={company =>{
@@ -483,7 +483,7 @@ export default function IMAPEdit( props ) {
         <FormGroup>
           <Label for="project">Tasks Project <span className="warning-big">*</span></Label>
           <Select
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={toSelArr(projectData.projects)}
             value={project}
             onChange={project => {

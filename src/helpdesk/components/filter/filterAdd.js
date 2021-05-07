@@ -25,7 +25,7 @@ import {
 } from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 
 import {
@@ -256,7 +256,7 @@ export default function FilterAdd( props ) {
                   }
                 }}
                 options={toSelArr([{id: 'all', title: roleData.basicRoles.length === roles.length ? 'Clear' : 'All' }].concat(roleData.basicRoles))}
-                styles={selectStyle}
+                styles={pickSelectStyle()}
                 />
             </FormGroup>
           }

@@ -7,7 +7,7 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 export default function AttributesHandler( props ) {
@@ -25,7 +25,7 @@ export default function AttributesHandler( props ) {
         return <Input type="textarea" value={attribute.value} onChange={(e)=>{}}/>
       }
       case 'select': {
-        return <Select options={attribute.options}  value={attribute.value} styles={selectStyle} onChange={(item)=>{}} />
+        return <Select options={attribute.options}  value={attribute.value} styles={pickSelectStyle()} onChange={(item)=>{}} />
       }
       default:
         return <p>{attribute.type.id} of {attribute.title}</p>

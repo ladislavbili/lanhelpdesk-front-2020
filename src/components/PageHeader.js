@@ -39,6 +39,7 @@ export default function PageHeader( props ) {
     settings,
   } = props;
 
+
   const {
     data: myData
   } = useQuery( GET_MY_DATA );
@@ -53,6 +54,7 @@ export default function PageHeader( props ) {
 
   const currentUser = myData ? myData.getMyData : {};
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+  const filteredSettings = settings.filter( ( setting ) => accessRights[ setting.value ] );
 
   const URL = getLocation( history );
   return (
@@ -135,8 +137,8 @@ export default function PageHeader( props ) {
 
           {
             (currentUser) &&
-            settings &&
-            settings.length > 0 &&
+            filteredSettings &&
+            filteredSettings.length > 0 &&
             <Dropdown className="center-hor" isOpen={settingsOpen} toggle={() =>setSettingsOpen(!settingsOpen)}>
               <DropdownToggle className="header-dropdown">
                 <i className="header-icon fa fa-cog"/>
@@ -144,7 +146,7 @@ export default function PageHeader( props ) {
               <DropdownMenu right>
                 <DropdownItem header={true}>Settings</DropdownItem>
                 <DropdownItem divider={true} />
-                {settings.filter((setting) => accessRights[setting.value]).map((item, index) =>
+                {filteredSettings.map((item, index) =>
                   <DropdownItem
                     key={index}
                     onClick={() => history.push(getLocation(history) + '/settings/' + item.link)}

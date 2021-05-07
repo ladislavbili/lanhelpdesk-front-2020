@@ -1,43 +1,55 @@
-import React, { Component } from 'react';
-import { Button, Input } from 'reactstrap';
-import { } from '../../helperFunctions';
+import React, {
+  Component
+} from 'react';
+import {
+  Button,
+  Input
+} from 'reactstrap';
+import {} from '../../helperFunctions';
 import Select from 'react-select';
-import {selectStyle} from "configs/components/select";
+import {
+  pickSelectStyle
+} from "configs/components/select";
 
-export default class InputSelectList extends Component{
-  constructor(props){
-    super(props);
-    this.state={
-      editID:null,
-      editTitle:'',
-      editOptIndex:'',
-      editOptTitle:'',
+export default class InputSelectList extends Component {
+  constructor( props ) {
+    super( props );
+    this.state = {
+      editID: null,
+      editTitle: '',
+      editOptIndex: '',
+      editOptTitle: '',
     }
 
-    this.onFocus.bind(this);
+    this.onFocus.bind( this );
 
   }
 
-  onBlur(){
-    let body={
-      id:this.state.editID,
-      title:this.state.editTitle,
+  onBlur() {
+    let body = {
+      id: this.state.editID,
+      title: this.state.editTitle,
     }
-    let newData = [...this.props.items];
-    let index = newData.findIndex((item)=>item.id===body.id);
-    newData[index]={...newData[index],...body};
-    this.props.onChange(newData);
-    this.setState({ editID: null });
+    let newData = [ ...this.props.items ];
+    let index = newData.findIndex( ( item ) => item.id === body.id );
+    newData[ index ] = {
+      ...newData[ index ],
+      ...body
+    };
+    this.props.onChange( newData );
+    this.setState( {
+      editID: null
+    } );
   }
 
-  onFocus(item){
-    this.setState({
+  onFocus( item ) {
+    this.setState( {
       editID: item.id,
       editTitle: item.label,
-    });
+    } );
   }
 
-  render(){
+  render() {
     return (
       <div>
         {
@@ -62,7 +74,7 @@ export default class InputSelectList extends Component{
               <div style={{width: ( 555 + (item.type.id==='select' ? -156 : -70))}}>
                   <Select
                     value={item.type}
-                    styles={selectStyle}
+                    styles={pickSelectStyle()}
                     className="m-b-10"
                     onChange={(type)=>{
                       let newData = [...this.props.items];

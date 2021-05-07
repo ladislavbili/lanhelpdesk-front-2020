@@ -9,7 +9,7 @@ import {
 } from 'reactstrap';
 
 import {
-  selectStyleNoArrowRequired
+  pickSelectStyle
 } from 'configs/components/select';
 
 import Select from 'react-select';
@@ -41,7 +41,7 @@ export default function ProjectSelectModal( props ) {
                   setProject(project);
                 }}
                 options={projects}
-                styles={selectStyleNoArrowRequired}
+                styles={pickSelectStyle([ 'noArrow', 'required', ])}
                 />
             </FormGroup>
             <div className="task-add-layout-2 p-l-0 row ">

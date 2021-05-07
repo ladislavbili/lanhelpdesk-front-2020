@@ -36,20 +36,6 @@ export default function UserListContainer( props ) {
     loading: roleLoading
   } = useQuery( GET_ROLES );
 
-  const USERS = ( usersLoading ? [] : usersData.users );
-  const ROLES = ( roleLoading ? [] : toSelArr( roleData.roles ) );
-  const dataLoading = (
-    usersLoading ||
-    roleLoading
-  )
-  // state
-  const [ userFilter, setUserFilter ] = React.useState( "" );
-  const [ selectedRoles, setSelectedRoles ] = React.useState( ROLES );
-
-  //data
-  const FILTERED_USERS = USERS.filter( user => selectedRoles.some( sr => sr.id === user.role.id ) );
-
-  const allRolesSelected = selectedRoles.length === ROLES.length;
 
   // sync
   React.useEffect( () => {
@@ -57,6 +43,43 @@ export default function UserListContainer( props ) {
       setSelectedRoles( toSelArr( roleData.roles ) );
     }
   }, [ roleLoading ] );
+
+
+  const dataLoading = (
+    usersLoading ||
+    roleLoading
+  )
+
+  // state
+  const [ userFilter, setUserFilter ] = React.useState( "" );
+  const [ selectedRoles, setSelectedRoles ] = React.useState( [] );
+
+
+  if ( dataLoading ) {
+    return (
+      <div className="content">
+        <div className="row m-0 p-0 taskList-container">
+          <div className="col-lg-4">
+            <Loading />
+          </div>
+          <div className="col-lg-8">
+            {
+              match.params.id &&
+              <Loading />
+            }
+            { !match.params.id &&
+              <div className="commandbar"></div>
+            }
+          </div>
+        </div>
+      </div>
+    )
+  }
+  const users = usersData.users.filter( user => selectedRoles.some( sr => sr.id === user.role.id ) );
+  const roles = toSelArr( roleData.roles );
+
+  //data
+  const allRolesSelected = selectedRoles.length === roles.length;
 
   return (
     <div className="content">
@@ -91,13 +114,13 @@ export default function UserListContainer( props ) {
                 <div className="ml-auto">
                   <Multiselect
                     className="ml-auto m-r-10"
-                    options={ [{ id:'All', label: 'All'}, ...ROLES] }
-                    value={ allRolesSelected ? [{ id:'All', label: 'All'}, ...ROLES] : selectedRoles }
+                    options={ [{ id:'All', label: 'All'}, ...roles] }
+                    value={ allRolesSelected ? [{ id:'All', label: 'All'}, ...roles] : selectedRoles }
                     label={ "Filter users by roles" }
                     onChange={ ( role ) => {
                       let selected = [ ...selectedRoles ];
                       if (role.id === 'All' && !allRolesSelected ){
-                        selected = [...ROLES];
+                        selected = [...roles];
                       } else {
                         if ( selected.some(sr => sr.id === role.id) ){
                           selected = selected.filter( sr => sr.id !== role.id );
@@ -118,7 +141,7 @@ export default function UserListContainer( props ) {
                   </tr>
                 </thead>
                 <tbody>
-                  {FILTERED_USERS.filter((item)=>item.email.toLowerCase().includes(userFilter.toLowerCase())).sort((user1,user2)=>user1.email>user2.email?1:-1).map((user)=>
+                  {users.filter((item)=>item.email.toLowerCase().includes(userFilter.toLowerCase())).sort((user1,user2)=>user1.email>user2.email?1:-1).map((user)=>
                     <tr
                       key={user.id}
                       className={classnames (
@@ -144,20 +167,23 @@ export default function UserListContainer( props ) {
             </div>
           </div>
           <div className="col-lg-8">
+            { !dataLoading && match.params.id && match.params.id==='add' &&
+              <UserAdd  history={history}/>
+            }
             {
-              !dataLoading && match.params.id && match.params.id==='add' && <UserAdd  history={history}/>
-          }
-          {
-            usersLoading && match.params.id && match.params.id!=='add' && <Loading />
-        }
-        {
-          !dataLoading && match.params.id && match.params.id!=='add' && FILTERED_USERS.some((item)=>item.id.toString() === match.params.id) && <UserEdit {...{history, match}} />
-      }
-      {
-        !dataLoading && !match.params.id && match.params.id!=='add' && <div className="commandbar"></div>
-      }
-    </div>
-  </div>
-</div>
+              usersLoading && match.params.id && match.params.id!=='add' &&
+              <Loading />
+            }
+            {
+              !dataLoading && match.params.id && match.params.id!=='add' && users.some((item)=>item.id.toString() === match.params.id) &&
+              <UserEdit {...{history, match}} />
+            }
+            {
+              !dataLoading && !match.params.id && match.params.id!=='add' &&
+              <div className="commandbar"></div>
+            }
+          </div>
+        </div>
+      </div>
   )
 }

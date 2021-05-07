@@ -14,7 +14,7 @@ import {
 import Checkbox from '../../../components/checkbox';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 import wellKnownOptions from 'configs/constants/wellKnown';
@@ -125,7 +125,7 @@ export default function SMTPAdd( props ) {
         <FormGroup>
           <Label>Well known providers - requires only user and password</Label>
           <Select
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={wellKnownOptions}
             value={wellKnown}
             onChange={wellKnown => setWellKnown(wellKnown)}

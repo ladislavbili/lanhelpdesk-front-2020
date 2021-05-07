@@ -18,7 +18,7 @@ import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
 import Loading from 'components/loading';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 import {
   toSelArr,
@@ -463,7 +463,7 @@ export default function PublicFilterEdit( props ) {
               setDataChanged( true );
             }}
             options={toSelArr([{id: 'all', title: roles.length === rolesData.roles.length ? 'Clear' : 'All' }, ...rolesData.roles])}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
         </FormGroup>
 
@@ -493,7 +493,7 @@ export default function PublicFilterEdit( props ) {
               setDataChanged( true );
             }}
             options={toSelArr(projectsData.projects)}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
 
         </FormGroup>
@@ -526,7 +526,7 @@ export default function PublicFilterEdit( props ) {
               setDataChanged( true );
             }}
             value={requester}
-            styles={selectStyle} />
+            styles={pickSelectStyle()} />
         </FormGroup>
 
         <FormGroup>{/* Company */}
@@ -538,7 +538,7 @@ export default function PublicFilterEdit( props ) {
               setDataChanged( true );
             }}
             value={company}
-            styles={selectStyle} />
+            styles={pickSelectStyle()} />
         </FormGroup>
 
         <FormGroup>{/* Assigned */}
@@ -550,7 +550,7 @@ export default function PublicFilterEdit( props ) {
               setDataChanged( true );
             }}
             value={assigned}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
         </FormGroup>
 
@@ -663,7 +663,7 @@ export default function PublicFilterEdit( props ) {
               setDataChanged( true );
             }}
             value={taskType}
-            styles={selectStyle} />
+            styles={pickSelectStyle()} />
         </FormGroup>
 
         <FormGroup>{/* One Of */}
@@ -676,7 +676,7 @@ export default function PublicFilterEdit( props ) {
             }}
             value={oneOf}
             isMulti
-            styles={selectStyle} />
+            styles={pickSelectStyle()} />
         </FormGroup>
 
 

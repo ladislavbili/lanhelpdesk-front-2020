@@ -9,7 +9,7 @@ import {
 import moment from 'moment';
 
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 
 import {
@@ -58,7 +58,7 @@ export default function MonthSelector( props ) {
                 setMonth(mn);
               }}
               options={months}
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               />
           </div>
           <div className="w-50 p-r-20">
@@ -68,7 +68,7 @@ export default function MonthSelector( props ) {
                 setYear(yr);
               }}
               options={years}
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               />
           </div>
           <Button

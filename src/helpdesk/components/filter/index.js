@@ -22,7 +22,7 @@ import {
   setFilter,
 } from 'apollo/localSchema/actions';
 import {
-  invisibleSelectStyleBlueFont
+  pickSelectStyle
 } from 'configs/components/select';
 import {
   oneOfOptions,
@@ -491,7 +491,7 @@ export default function FilterForm( props ) {
                 setRequesters(newValues);
               }}
               value={requesters}
-              styles={invisibleSelectStyleBlueFont}
+              styles={pickSelectStyle(['invisible', 'blueFont', ])}
               />
           </div>
         </div>
@@ -506,7 +506,7 @@ export default function FilterForm( props ) {
                 setCompanies(companies);
               }}
               value={companies}
-              styles={invisibleSelectStyleBlueFont}
+              styles={pickSelectStyle([ 'invisible', 'blueFont' ] )}
               />
           </div>
         </div>
@@ -521,7 +521,7 @@ export default function FilterForm( props ) {
                 setAssignedTos(newValues);
               }}
               value={assignedTos}
-              styles={invisibleSelectStyleBlueFont}
+              styles={pickSelectStyle([ 'invisible', 'blueFont' ] )}
               />
           </div>
         </div>
@@ -537,7 +537,7 @@ export default function FilterForm( props ) {
                 setTaskTypes(newValues);
               }}
               value={taskTypes}
-              styles={invisibleSelectStyleBlueFont} />
+              styles={pickSelectStyle([ 'invisible', 'blueFont' ] )} />
           </div>
         </div>
 
@@ -633,7 +633,7 @@ export default function FilterForm( props ) {
                 setImportant(imp);
               }}
               value={important}
-              styles={invisibleSelectStyleBlueFont}
+              styles={pickSelectStyle([ 'invisible', 'blueFont' ] )}
               />
           </div>
         </div>
@@ -646,7 +646,7 @@ export default function FilterForm( props ) {
                 setInvoiced(invoiced);
               }}
               value={invoiced}
-              styles={invisibleSelectStyleBlueFont}
+              styles={pickSelectStyle([ 'invisible', 'blueFont' ] )}
               />
           </div>
         </div>
@@ -659,7 +659,7 @@ export default function FilterForm( props ) {
                 setPausal(pausal);
               }}
               value={pausal}
-              styles={invisibleSelectStyleBlueFont}
+              styles={pickSelectStyle([ 'invisible', 'blueFont' ] )}
               />
           </div>
         </div>
@@ -672,7 +672,7 @@ export default function FilterForm( props ) {
                 setOvertime(overtime);
               }}
               value={overtime}
-              styles={invisibleSelectStyleBlueFont}
+              styles={pickSelectStyle([ 'invisible', 'blueFont' ] )}
               />
           </div>
         </div>

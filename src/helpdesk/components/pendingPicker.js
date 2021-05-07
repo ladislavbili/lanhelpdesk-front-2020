@@ -12,7 +12,7 @@ import {
 } from 'reactstrap';
 import DatePicker from 'components/DatePicker';
 import {
-  invisibleSelectStyleNoArrow
+  pickSelectStyle
 } from 'configs/components/select';
 import moment from 'moment';
 
@@ -76,7 +76,7 @@ export default class PendingPicker extends Component {
                     this.setState( { milestone } );
                   }}
                   options={this.props.milestones}
-                  styles={invisibleSelectStyleNoArrow}
+                  styles={pickSelectStyle( [ 'invisible', 'noArrow', ] )}
                   />
                 </div>
                   { this.state.milestone !== null &&

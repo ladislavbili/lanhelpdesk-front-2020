@@ -11,7 +11,7 @@ import {
 import Loading from 'components/loading';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 import languages from "configs/constants/languages";
@@ -29,7 +29,7 @@ import {
   UPDATE_USER,
   DELETE_USER,
   GET_MY_DATA,
-  SET_USER_ACTIVE
+  SET_USER_ACTIVE,
 } from './queries';
 
 import {
@@ -63,8 +63,8 @@ export default function UserEdit( props ) {
     loading: rolesLoading
   } = useQuery( GET_ROLES );
   const {
-    data: myData,
-    loading: myDataLoading
+    data: currentUserData,
+    loading: currentUserLoading
   } = useQuery( GET_MY_DATA );
   const {
     data: companiesData,
@@ -212,12 +212,15 @@ export default function UserEdit( props ) {
   };
 
   const deactivateUser = ( active ) => {
-    const newUsers = client.readQuery( {
+    const newUsers = [ ...client.readQuery( {
         query: GET_USERS
       } )
-      .users;
+      .users ];
     let index = newUsers.findIndex( ( user ) => user.id === id );
-    newUsers[ index ].active = !active;
+    newUsers[ index ] = {
+      ...newUsers[ index ],
+      active: !active
+    };
     client.writeQuery( {
       query: GET_USERS,
       data: {
@@ -233,15 +236,15 @@ export default function UserEdit( props ) {
     setActive( !active );
   }
 
-  if ( userLoading || rolesLoading || companiesLoading || myDataLoading ) {
+  if ( userLoading || rolesLoading || companiesLoading || currentUserLoading ) {
     return <Loading />
   }
 
-  const USER = userData.user;
-  const ROLES = toSelArr( rolesData.roles );
-  const COMPANIES = toSelArr( companiesData.basicCompanies );
-  const myRoleLevel = myData === undefined ? null : myData.getMyData.role.level;
-  const isDisabled = myRoleLevel === null || ( myRoleLevel !== 0 && myRoleLevel >= role.level );
+  const currentUserLevel = currentUserData.getMyData.role.level;
+  const roles = toSelArr( rolesData.roles )
+    .filter( ( role ) => role.level > currentUserLevel || role.id === userData.user.role.id || ( currentUserLevel === 0 && role.level === 0 ) );
+  const companies = toSelArr( companiesData.basicCompanies );
+  const isDisabled = ( currentUserLevel !== 0 && currentUserLevel >= role.level );
 
   return (
     <div>
@@ -264,9 +267,9 @@ export default function UserEdit( props ) {
         <FormGroup>
           <Label for="role">Role <span className="warning-big">*</span></Label>
           <Select
-            styles={ selectStyle }
+            styles={ pickSelectStyle() }
             isDisabled={ isDisabled }
-            options={ ROLES.filter(( role ) => role.level > myRoleLevel || myRoleLevel === 0 ) }
+            options={ roles }
             value={ role }
             onChange={ role => {
               setRole(role);
@@ -334,7 +337,7 @@ export default function UserEdit( props ) {
         <FormGroup>
           <Label for="language">Language</Label>
           <Select
-            styles={ selectStyle }
+            styles={ pickSelectStyle() }
             options={ languages }
             value={ language }
             onChange={ lang => {
@@ -357,9 +360,9 @@ export default function UserEdit( props ) {
         <FormGroup>
           <Label for="company">Company <span className="warning-big">*</span></Label>
           <Select
-            styles={ selectStyle }
+            styles={ pickSelectStyle() }
             isDisabled={ isDisabled }
-            options={ COMPANIES }
+            options={ companies }
             value={ company }
             onChange={ e => {
               setCompany( e );
@@ -384,7 +387,7 @@ export default function UserEdit( props ) {
         </FormGroup>
 
         <div className="form-buttons-row">
-          { !isDisabled && myData !== undefined && id !== myData.getMyData.id &&
+          { !isDisabled && id !== currentUserData.getMyData.id &&
             <button
               className="btn-red btn-distance"
               disabled={deletingUser}
@@ -393,7 +396,7 @@ export default function UserEdit( props ) {
               Delete
             </button>
           }
-          { !isDisabled && myData !== undefined && id !== myData.getMyData.id &&
+          { !isDisabled && id !== currentUserData.getMyData.id &&
             <button
               className={ active ? "btn btn-grey" : "btn btn-green"}
               onClick={()=> deactivateUser(active)}

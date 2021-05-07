@@ -9,7 +9,7 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 export default function TaskTypeEdit( props ) {
@@ -22,7 +22,7 @@ export default function TaskTypeEdit( props ) {
       <ModalBody>
         <FormGroup>
           <Select
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={props.options}
             value={replacement}
             onChange={replacement => setReplacement(replacement)}

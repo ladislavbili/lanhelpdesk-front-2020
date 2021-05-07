@@ -349,6 +349,7 @@ statistics
 
 export const ADD_TASK = gql `
 mutation addTask(
+  $important: Boolean,
   $title: String!,
   $closeDate: String,
   $assignedTo: [Int]!,
@@ -374,6 +375,7 @@ mutation addTask(
   $scheduled: [ScheduledTaskInput],
 ){
   addTask(
+    important: $important,
     title: $title,
     closeDate: $closeDate,
     assignedTo: $assignedTo,

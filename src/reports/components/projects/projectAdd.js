@@ -1,24 +1,52 @@
-import React, { Component } from 'react';
+import React, {
+  Component
+} from 'react';
 import Select from 'react-select';
-import { connect } from "react-redux";
-import {invisibleSelectStyle} from 'configs/components/select';
-import {storageHelpStatusesStart, storageHelpTagsStart, storageUsersStart, storageHelpTaskTypesStart, storageCompaniesStart} from '../../../redux/actions';
-import { Button, FormGroup, Label,Input, Modal, ModalHeader, ModalBody, ModalFooter  } from 'reactstrap';
-import {toSelArr, sameStringForms} from '../../../helperFunctions';
-import {rebase} from '../../../index';
-import { noDef } from 'configs/constants/projects';
+import {
+  connect
+} from "react-redux";
+import {
+  pickSelectStyle
+} from 'configs/components/select';
+import {
+  storageHelpStatusesStart,
+  storageHelpTagsStart,
+  storageUsersStart,
+  storageHelpTaskTypesStart,
+  storageCompaniesStart
+} from '../../../redux/actions';
+import {
+  Button,
+  FormGroup,
+  Label,
+  Input,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
+} from 'reactstrap';
+import {
+  toSelArr,
+  sameStringForms
+} from '../../../helperFunctions';
+import {
+  rebase
+} from '../../../index';
+import {
+  noDef
+} from 'configs/constants/projects';
 
-class ProjectAdd extends Component{
-  constructor(props){
-    super(props);
-    this.state={
+class ProjectAdd extends Component {
+  constructor( props ) {
+    super( props );
+    this.state = {
       title: '',
       description: '',
-      statuses:[],
-      allTags:[],
-      users:[],
-      types:[],
-      companies:[],
+      statuses: [],
+      allTags: [],
+      users: [],
+      types: [],
+      companies: [],
 
       ...noDef,
       saving: false,
@@ -26,63 +54,85 @@ class ProjectAdd extends Component{
     }
   }
 
-	componentWillReceiveProps(props){
-		if(!sameStringForms(props.statuses,this.props.statuses)){
-			this.setState({statuses:toSelArr(props.statuses)})
-		}
-		if(!sameStringForms(props.tags,this.props.tags)){
-			this.setState({tags:toSelArr(props.tags)})
-		}
-		if(!sameStringForms(props.users,this.props.users)){
-			this.setState({users:toSelArr(props.users,'email')})
-		}
-		if(!sameStringForms(props.taskTypes,this.props.taskTypes)){
-			this.setState({taskTypes:toSelArr(props.taskTypes)})
-		}
-		if(!sameStringForms(props.companies,this.props.companies)){
-			this.setState({companies:toSelArr(props.companies)})
-		}
-	}
-
-	componentWillMount(){
-		if(!this.props.statusesActive){
-			this.props.storageHelpStatusesStart();
-		}
-		this.setState({statuses:toSelArr(this.props.statuses)});
-
-		if(!this.props.tagsActive){
-			this.props.storageHelpTagsStart();
-		}
-		this.setState({allTags:toSelArr(this.props.tags)});
-
-		if(!this.props.usersActive){
-			this.props.storageUsersStart();
-		}
-		this.setState({users:toSelArr(this.props.users,'email')});
-
-		if(!this.props.taskTypesActive){
-			this.props.storageHelpTaskTypesStart();
-		}
-		this.setState({types:toSelArr(this.props.taskTypes)});
-
-		if(!this.props.companiesActive){
-			this.props.storageCompaniesStart();
-		}
-		this.setState({companies:toSelArr(this.props.companies)});
-	}
-
-  toggle(){
-    if(!this.state.opened){
-			this.setState({
-				title:'',
-	      description:'',
-				...noDef,
-			})
+  componentWillReceiveProps( props ) {
+    if ( !sameStringForms( props.statuses, this.props.statuses ) ) {
+      this.setState( {
+        statuses: toSelArr( props.statuses )
+      } )
     }
-		this.props.close();
-    this.setState({opened:!this.state.opened});
+    if ( !sameStringForms( props.tags, this.props.tags ) ) {
+      this.setState( {
+        tags: toSelArr( props.tags )
+      } )
+    }
+    if ( !sameStringForms( props.users, this.props.users ) ) {
+      this.setState( {
+        users: toSelArr( props.users, 'email' )
+      } )
+    }
+    if ( !sameStringForms( props.taskTypes, this.props.taskTypes ) ) {
+      this.setState( {
+        taskTypes: toSelArr( props.taskTypes )
+      } )
+    }
+    if ( !sameStringForms( props.companies, this.props.companies ) ) {
+      this.setState( {
+        companies: toSelArr( props.companies )
+      } )
+    }
   }
-  render(){
+
+  componentWillMount() {
+    if ( !this.props.statusesActive ) {
+      this.props.storageHelpStatusesStart();
+    }
+    this.setState( {
+      statuses: toSelArr( this.props.statuses )
+    } );
+
+    if ( !this.props.tagsActive ) {
+      this.props.storageHelpTagsStart();
+    }
+    this.setState( {
+      allTags: toSelArr( this.props.tags )
+    } );
+
+    if ( !this.props.usersActive ) {
+      this.props.storageUsersStart();
+    }
+    this.setState( {
+      users: toSelArr( this.props.users, 'email' )
+    } );
+
+    if ( !this.props.taskTypesActive ) {
+      this.props.storageHelpTaskTypesStart();
+    }
+    this.setState( {
+      types: toSelArr( this.props.taskTypes )
+    } );
+
+    if ( !this.props.companiesActive ) {
+      this.props.storageCompaniesStart();
+    }
+    this.setState( {
+      companies: toSelArr( this.props.companies )
+    } );
+  }
+
+  toggle() {
+    if ( !this.state.opened ) {
+      this.setState( {
+        title: '',
+        description: '',
+        ...noDef,
+      } )
+    }
+    this.props.close();
+    this.setState( {
+      opened: !this.state.opened
+    } );
+  }
+  render() {
     return (
       <div>
           <Modal isOpen={this.state.opened}>
@@ -118,7 +168,7 @@ class ProjectAdd extends Component{
                               value={this.state.status.value}
                               onChange={(status)=>this.setState({status:{...this.state.status,value:status}})}
                               options={this.state.statuses}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -141,7 +191,7 @@ class ProjectAdd extends Component{
                               value={this.state.tags.value}
                               onChange={(tags)=>this.setState({tags:{...this.state.tags,value:tags}})}
                               options={this.state.allTags}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -164,7 +214,7 @@ class ProjectAdd extends Component{
                               value={this.state.assignedTo.value}
                               onChange={(assignedTo)=>this.setState({assignedTo:{...this.state.assignedTo,value:assignedTo}})}
                               options={this.state.users}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -186,7 +236,7 @@ class ProjectAdd extends Component{
                               value={this.state.type.value}
                               onChange={(type)=>this.setState({type:{...this.state.type,value:type}})}
                               options={this.state.types}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -208,7 +258,7 @@ class ProjectAdd extends Component{
                               value={this.state.requester.value}
                               onChange={(requester)=>this.setState({requester:{...this.state.requester,value:requester}})}
                               options={this.state.users}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -230,7 +280,7 @@ class ProjectAdd extends Component{
                               value={this.state.company.value}
                               onChange={(company)=>this.setState({company:{...this.state.company,value:company}})}
                               options={this.state.companies}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -291,17 +341,51 @@ class ProjectAdd extends Component{
   }
 }
 
-const mapStateToProps = ({ storageHelpStatuses, storageHelpTags, storageUsers, storageHelpTaskTypes, storageCompanies }) => {
-	const { statusesActive, statuses } = storageHelpStatuses;
-	const { tagsActive, tags } = storageHelpTags;
-	const { usersActive, users } = storageUsers;
-	const { taskTypesActive, taskTypes } = storageHelpTaskTypes;
-	const { companiesActive, companies } = storageCompanies;
-	return { statusesActive, statuses,
-		tagsActive, tags,
-		usersActive, users,
-		taskTypesActive, taskTypes,
-		companiesActive, companies };
+const mapStateToProps = ( {
+  storageHelpStatuses,
+  storageHelpTags,
+  storageUsers,
+  storageHelpTaskTypes,
+  storageCompanies
+} ) => {
+  const {
+    statusesActive,
+    statuses
+  } = storageHelpStatuses;
+  const {
+    tagsActive,
+    tags
+  } = storageHelpTags;
+  const {
+    usersActive,
+    users
+  } = storageUsers;
+  const {
+    taskTypesActive,
+    taskTypes
+  } = storageHelpTaskTypes;
+  const {
+    companiesActive,
+    companies
+  } = storageCompanies;
+  return {
+    statusesActive,
+    statuses,
+    tagsActive,
+    tags,
+    usersActive,
+    users,
+    taskTypesActive,
+    taskTypes,
+    companiesActive,
+    companies
+  };
 };
 
-export default connect(mapStateToProps, { storageHelpStatusesStart, storageHelpTagsStart, storageUsersStart, storageHelpTaskTypesStart, storageCompaniesStart })(ProjectAdd);
+export default connect( mapStateToProps, {
+  storageHelpStatusesStart,
+  storageHelpTagsStart,
+  storageUsersStart,
+  storageHelpTaskTypesStart,
+  storageCompaniesStart
+} )( ProjectAdd );

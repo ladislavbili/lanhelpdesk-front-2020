@@ -98,11 +98,16 @@ export default function TasklistSwitch( props ) {
       value: 'assignedTo',
       label: 'Assigned',
       type: 'list',
-      func: ( items ) => (
-        <div>
-          { items.map((item)=><div key={item.id}>{item.fullName}</div>) }
-        </div>
-      ),
+      func: ( items ) => {
+        if ( items.length === 0 ) {
+          return <div className="message error-message">Nepriradený</div>
+        }
+        return (
+          <div>
+            { items.map((item)=><div key={item.id}>{item.fullName}</div>) }
+          </div>
+        )
+      },
       show: preference[ 'assignedTo' ]
     },
     {

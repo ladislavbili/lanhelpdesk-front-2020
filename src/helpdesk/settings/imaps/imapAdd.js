@@ -22,7 +22,7 @@ import Select, {
   Creatable
 } from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 import {
@@ -228,7 +228,7 @@ export default function IMAPAdd( props ) {
               setPreviousIgnoredRecievers(filterUnique([...ignoredRecievers, ...previousIgnoredRecievers]));
             }}
             options={previousIgnoredRecievers}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
         </FormGroup>
 
@@ -248,7 +248,7 @@ export default function IMAPAdd( props ) {
         <FormGroup>
           <Label for="role">Users Role <span className="warning-big">*</span></Label>
           <Select
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={toSelArr(roleData.roles)}
             value={role}
             onChange={role => setRole(role)}
@@ -257,7 +257,7 @@ export default function IMAPAdd( props ) {
         <FormGroup>
           <Label for="project">Users Company <span className="warning-big">*</span></Label>
           <Select
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={toSelArr(companyData.basicCompanies)}
             value={company}
             onChange={company => setCompany(company)}
@@ -266,7 +266,7 @@ export default function IMAPAdd( props ) {
         <FormGroup>
           <Label for="project">Tasks Project <span className="warning-big">*</span></Label>
           <Select
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={toSelArr(projectData.projects)}
             value={project}
             onChange={project => setProject(project)}

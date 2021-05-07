@@ -12,7 +12,7 @@ import Select from 'react-select';
 import classnames from 'classnames';
 import Loading from 'components/loading';
 import {
-  invisibleSelectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 import ErrorInfo from './errorInfo';
 
@@ -260,7 +260,7 @@ export default function ErrorList( props ) {
                   value={type}
                   onChange={(type) => setType( type ) }
                   options={getTypes()}
-                  styles={invisibleSelectStyle}
+                  styles={pickSelectStyle([ 'invisible', ])}
                   />
               </span>
             </div>

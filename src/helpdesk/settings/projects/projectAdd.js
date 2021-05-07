@@ -9,7 +9,8 @@ import {
   Input
 } from 'reactstrap';
 import {
-  toSelArr
+  toSelArr,
+  toSelItem,
 } from 'helperFunctions';
 import {
   fetchNetOptions
@@ -19,7 +20,7 @@ import {
   defBool,
   defItem,
   defaultGroups,
-  noDef
+  noDef,
 } from 'configs/constants/projects';
 import classnames from 'classnames';
 import Loading from 'components/loading';
@@ -143,6 +144,29 @@ export default function ProjectAdd( props ) {
     }
   }, [ myDataLoading, usersLoading ] );
 
+  React.useEffect( () => {
+    updateDefAssigned();
+  }, [ userGroups ] );
+
+  const updateDefAssigned = () => {
+    const assignableUsers = userGroups.filter( ( userGroup ) => userGroup.group.rights.assigned.write )
+      .map( ( userGroup ) => userGroup.user );
+    setAssignedTo( {
+      ...assignedTo,
+      value: assignedTo.value.filter( ( user1 ) => assignableUsers.some( ( user2 ) => user1.id === user2.id ) )
+    } )
+  }
+
+  if (
+    statusesLoading ||
+    companiesLoading ||
+    usersLoading ||
+    taskTypesLoading ||
+    myDataLoading
+  ) {
+    return <Loading />
+  }
+
   //functions
   const addProjectFunc = () => {
     setSaving( true );
@@ -251,12 +275,15 @@ export default function ProjectAdd( props ) {
       ( !group.rights.taskTitleEdit ) ||
       ( !group.rights.status.write && !status.def ) ||
       ( !group.rights.tags.write && !defTag.def && defTag.required ) ||
-      ( !group.rights.assigned.write && !assignedTo.def ) ||
+      //( !group.rights.assigned.write && !assignedTo.def ) ||
       ( !group.rights.requester.write && !requester.def && requester.required ) ||
       ( !group.rights.type.write && !type.def && type.required ) ||
       ( !group.rights.company.write && !company.def )
     ) )
   )
+
+
+
 
   const doesDefHasValue = () => {
     return (
@@ -264,7 +291,7 @@ export default function ProjectAdd( props ) {
       type,
     ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
       defTag,
-      assignedTo,
+      //assignedTo,
     ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
     )
   }
@@ -276,7 +303,7 @@ export default function ProjectAdd( props ) {
     currentUser &&
     ( company.value === null && company.fixed ) ||
     ( status.value === null && status.fixed ) ||
-    assignedTo.value.length === 0 ||
+    ( assignedTo.value.length === 0 && assignedTo.fixed ) ||
     !groups.some( ( group ) => (
       group.rights.projectPrimary.read &&
       group.rights.projectPrimary.write &&
@@ -291,17 +318,7 @@ export default function ProjectAdd( props ) {
     !statuses.some( ( status ) => status.action === 'IsNew' ) ||
     !statuses.some( ( status ) => status.action === 'CloseDate' ) ||
     addTaskIssue
-
   )
-  if (
-    statusesLoading ||
-    companiesLoading ||
-    usersLoading ||
-    taskTypesLoading ||
-    myDataLoading
-  ) {
-    return <Loading />
-  }
 
   return (
     <div>
@@ -427,6 +444,13 @@ export default function ProjectAdd( props ) {
             let newGroups = [...groups];
             let index = newGroups.findIndex((group) => group.id === groupID );
             newGroups[index]['rights'][acl] = newVal;
+            setUserGroups(userGroups.map((userGroup) => {
+              if(userGroup.group.id === groupID){
+                return {...userGroup, group: toSelItem(newGroups[index])  }
+              }else{
+                return userGroup;
+              }
+            } ));
             setGroups(newGroups);
           }}
           updateGroup={(newGroup) => {
@@ -470,7 +494,7 @@ export default function ProjectAdd( props ) {
             userGroups.map( (userGroup) => userGroup.user ) :
             (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
           }
-          assignableUsers={userGroups.map( (userGroup) => userGroup.user )}
+          assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
           allTags={toSelArr(tags)}
           taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
           />

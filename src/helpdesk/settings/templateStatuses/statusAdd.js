@@ -12,7 +12,7 @@ import {
 } from "react-color";
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 import {
   actions
@@ -112,7 +112,7 @@ export default function StatusAdd( props ) {
           <Select
             id="actionIfSelected"
             name="Action"
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={actions}
             value={action}
             onChange={e => setAction(e) }

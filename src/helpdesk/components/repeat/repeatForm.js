@@ -25,16 +25,7 @@ import ck5config from 'configs/components/ck5config';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import axios from 'axios';
 import {
-  invisibleSelectStyleNoArrow,
-  selectStyleNoArrowNoPadding,
-  invisibleSelectStyleNoArrowNoPadding,
-  invisibleSelectStyleNoArrowColored,
-  selectStyleNoArrowColoredRequired,
-  invisibleSelectStyleNoArrowColoredRequired,
-  invisibleSelectStyleNoArrowColoredRequiredNoPadding,
-  selectStyleNoArrowRequired,
-  invisibleSelectStyleNoArrowRequired,
-  invisibleSelectStyleNoArrowRequiredNoPadding,
+  pickSelectStyle,
 } from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect'
 import CheckboxList from 'helpdesk/components/checkboxList';
@@ -249,13 +240,19 @@ export default function RepeatForm( props ) {
 
     //Assigned to
     if ( userRights.assignedRead ) {
-      if ( def.assignedTo.fixed || ( def.assignedTo.required && assignedTo.length === 0 ) ) {
+      if ( def.assignedTo.fixed ) {
         let newAssignedTo = assignableUsers.filter( ( user1 ) => def.assignedTo.value.some( ( user2 ) => user1.id === user2.id ) );
         if ( newAssignedTo.length === 0 && userRights.assignedWrite ) {
-          newAssignedTo.push( users.find( ( user ) => user.id === currentUser.id ) );
+          newAssignedTo = assignableUsers.filter( ( user ) => user.id === currentUser.id );
         }
         if ( newAssignedTo.length !== assignedTo.length || newAssignedTo.some( ( user1 ) => assignedTo.some( ( user2 ) => user1.id !== user2.id ) ) ) {
           changes.assignedTo = newAssignedTo.map( ( user ) => user.id );
+        }
+        setAssignedTo( newAssignedTo );
+      } else if ( def.assignedTo.required && assignedTo.length === 0 ) {
+        const newAssignedTo = assignableUsers.filter( ( user ) => user.id === currentUser.id );
+        if ( newAssignedTo > 1 ) {
+          changes.assignedTo = [ currentUser.id ];
           setAssignedTo( newAssignedTo );
         }
       }
@@ -762,8 +759,7 @@ export default function RepeatForm( props ) {
   //data functions
   const changeProject = ( project ) => {
     setProject( project );
-    console.log( project );
-    let newAssignedTo = assignedTo.filter( ( user ) => project.users.some( ( userData ) => userData.user.id === user.id ) );
+    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.assignable && projectUser.user.id === user.id ) );
     setAssignedTo( newAssignedTo );
     setMilestone( noMilestone );
     setTags( [] );
@@ -859,10 +855,9 @@ export default function RepeatForm( props ) {
     title === "" ||
     status === null ||
     ( project === null && userRights.projectRead ) ||
-    ( assignedTo.length === 0 && userRights.assignedRead ) ||
+    ( assignedTo.length === 0 && userRights.assignedRead && defaultFields.assignedTo.fixed ) ||
     repeat === null ||
     ( !company && userRights.companyRead ) ||
-    ( project.def.assignedTo.required && assignedTo.length === 0 && userRights.assignedRead ) ||
     ( project.def.tag.required && tags.length === 0 && userRights.tagsRead ) ||
     ( editMode && Object.keys( changes )
       .length === 0 && !newStartsAt )
@@ -942,7 +937,7 @@ export default function RepeatForm( props ) {
         value={project}
         onChange={changeProject}
         options={projects.filter((project) => currentUser.role.level === 0 || (project.right.addTasks && project.right.repeatWrite ) )}
-        styles={selectStyleNoArrowRequired}
+        styles={pickSelectStyle( [ 'invisible', 'required' ] )}
         />
     ),
     Assigned: (
@@ -956,7 +951,7 @@ export default function RepeatForm( props ) {
           saveChange({ assignedTo: users.map((user) => user.id) })
         }}
         options={projectUsers}
-        styles={selectStyleNoArrowRequired}
+        styles={pickSelectStyle( [ 'invisible', 'required' ] )}
         />
     ),
     Status: (
@@ -964,7 +959,7 @@ export default function RepeatForm( props ) {
         placeholder="Select required"
         value={status}
         isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
-        styles={selectStyleNoArrowColoredRequired}
+        styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
         onChange={changeStatus}
         options={project ? toSelArr(project.statuses.filter((status) => status.action.toLowerCase() !== 'invoiced' )) : []}
         />
@@ -974,7 +969,7 @@ export default function RepeatForm( props ) {
         placeholder="Select task type"
         value={taskType}
         isDisabled={ defaultFields.type.fixed || !userRights.typeWrite }
-        styles={ selectStyleNoArrowRequired }
+        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
         onChange={(taskType)=> {
           setTaskType(taskType);
           saveChange({ taskType: taskType.id })
@@ -989,7 +984,7 @@ export default function RepeatForm( props ) {
         value={milestone}
         onChange={changeMilestone}
         options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={ selectStyleNoArrowNoPadding }
+        styles={ pickSelectStyle( [ 'noArrow', 'noPadding', ] ) }
         />
     ),
     Requester: (
@@ -1008,7 +1003,7 @@ export default function RepeatForm( props ) {
           })
         }}
         options={REQUESTERS}
-        styles={ selectStyleNoArrowRequired }
+        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
         />
     ),
     Company: (
@@ -1025,7 +1020,7 @@ export default function RepeatForm( props ) {
           })
         }}
         options={companies}
-        styles={ selectStyleNoArrowRequired }
+        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
         />
     ),
     Pausal: (
@@ -1033,7 +1028,7 @@ export default function RepeatForm( props ) {
         value={pausal}
         placeholder="Select required"
         isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-        styles={ selectStyleNoArrowRequired }
+        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
         onChange={(pausal)=> { setPausal(pausal); saveChange({ pausal: pausal.value }) }}
         options={booleanSelects}
         />
@@ -1057,7 +1052,7 @@ export default function RepeatForm( props ) {
         placeholder="Select required"
         value={overtime}
         isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={ selectStyleNoArrowRequired }
+        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
         onChange={(overtime) => { setOvertime(overtime); saveChange({ overtime: pausal.value }); }}
         options={booleanSelects}
         />
@@ -1079,8 +1074,6 @@ export default function RepeatForm( props ) {
               </div>
             </div>
             { userRights.assignedRead &&
-              !defaultFields.assignedTo.fixed &&
-              userRights.assignedWrite &&
               <div className="col-8">
                 <div className="row p-r-10">
                   <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
@@ -1283,8 +1276,6 @@ export default function RepeatForm( props ) {
           </div>
         }
         { userRights.assignedRead &&
-          !defaultFields.assignedTo.fixed &&
-          userRights.assignedWrite &&
           <div className="form-selects-entry-column" >
             <Label>Assigned <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -1572,6 +1563,7 @@ export default function RepeatForm( props ) {
         isInvoiced={false}
         canEditInvoiced={false}
         company={company}
+        canAddSubtasksAndTrips={assignedTo.length !== 0}
         taskAssigned={assignedTo}
 
         showSubtasks={project ? project.showSubtasks : false}

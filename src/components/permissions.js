@@ -4,7 +4,7 @@ import React, {
 
 import Select from "react-select";
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 import {
@@ -91,7 +91,7 @@ export default class Permissions extends Component {
 					<div className="flex m-r-10">
 						<Select
 							value={this.state.chosenUser}
-							styles={selectStyle}
+							styles={pickSelectStyle()}
 							onChange={(e)=> this.setState({chosenUser: e})}
 							options={USERS_SELECT}
 							/>

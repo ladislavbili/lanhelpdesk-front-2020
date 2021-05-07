@@ -13,12 +13,10 @@ export default function EmailRender( props ) {
   const {
     getAttachment,
     comment,
-    reply,
     sendEmail,
     openedComments,
     setOpenedComments,
   } = props;
-
   return (
     <div>
       <div className="media m-b-30 m-t-20">
@@ -29,11 +27,11 @@ export default function EmailRender( props ) {
           alt="Generic placeholder XX"
           />
         <div className="flex" >
-          <p>
+          <div>
             <span className="media-meta pull-right text-muted">{timestampToString(comment.createdAt)}</span>
             <h2 className="font-13 m-0"><Label>From: {comment.user !== null ? `${comment.user.fullName} (${comment.user.email})` : 'Unknown user'}</Label></h2>
-            <h2 className="font-13 m-0"><Label>To: {comment.tos.toString()}</Label></h2>
-          </p>
+            { comment.tos.length !== 0 && <h2 className="font-13 m-0"><Label>To: {comment.tos.toString()}</Label></h2>}
+          </div>
           <Dropdown className="center-hor pull-right"
             isOpen={openedComments.includes(comment.id)}
             toggle={()=>{
@@ -54,20 +52,13 @@ export default function EmailRender( props ) {
                 >
                 <i className="fa fa-reply" />
               </label>
-              <label
-                className='btn btn-link btn-outline-blue waves-effect waves-light'
-                >
-                <i className="fa fa-share-square"
-                  onClick={reply}
-                  />
-              </label>
             </DropdownMenu>
           </Dropdown>
           <p className="m-b-0">Subject: <span className="text-muted">{comment.subject}</span></p>
           <div
             className="ignore-css"
             dangerouslySetInnerHTML={{
-              __html: comment.html ? comment.html : unescape(comment.message).replace(/(?:\r\n|\r|\n)/g, '<br>')
+              __html: (comment.html ? comment.html : unescape(comment.message).replace(/(?:\r\n|\r|\n)/g, '<br>')).replace(/(?:<p>)/g, '<div>').replace(/(?:<\/p>)/g, '</div>')
             }}
             >
           </div>

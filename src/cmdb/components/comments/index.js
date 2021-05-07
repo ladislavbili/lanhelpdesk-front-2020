@@ -20,7 +20,7 @@ import {
 } from 'react-select';
 import CKEditor from 'ckeditor4-react';
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 import axios from 'axios';
 
@@ -92,7 +92,7 @@ export default function Comments( props ) {
               value={tos}
               onChange={(newData) => setTos(newData)}
               options={users}
-              styles={selectStyle}/>
+              styles={pickSelectStyle()}/>
           </div>
         </FormGroup>
       }

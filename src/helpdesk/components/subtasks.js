@@ -8,8 +8,7 @@ import {
   Input
 } from 'reactstrap';
 import {
-  selectStyle,
-  invisibleSelectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 
 
@@ -128,7 +127,7 @@ export default class Subtasks extends Component {
 																			this.props.updateSubtask(subtask.id,{assignedTo:assignedTo.id})
 																		}}
 																		options={this.props.taskAssigned}
-																		styles={invisibleSelectStyle}
+																		styles={pickSelectStyle([ 'invisible', ])}
 																		/>
 																</td>}
 																<td className="t-a-r">
@@ -187,7 +186,7 @@ export default class Subtasks extends Component {
 																}
 															}
 															options={this.props.taskAssigned}
-															styles={selectStyle}
+															styles={pickSelectStyle()}
 															/>
 													</td>}
 													<div>

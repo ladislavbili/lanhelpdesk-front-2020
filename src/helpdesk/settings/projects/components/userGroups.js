@@ -2,7 +2,7 @@ import React from 'react';
 
 import Select from "react-select";
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 export default function ProjectPermissions( props ) {
@@ -31,7 +31,7 @@ export default function ProjectPermissions( props ) {
           <div className="flex m-r-10">
 						<Select
 							value={chosenUser}
-							styles={selectStyle}
+							styles={pickSelectStyle()}
 							onChange={(e)=> setChosenUser(e)}
 							options={users.filter((user)=> !permissions.map((permission)=>permission.user.id).includes(user.id))}
 							/>
@@ -39,7 +39,7 @@ export default function ProjectPermissions( props ) {
           <div className="flex m-r-10">
 						<Select
 							value={group}
-							styles={selectStyle}
+							styles={pickSelectStyle()}
 							onChange={(e)=> setGroup(e)}
 							options={groups}
 							/>
@@ -82,7 +82,7 @@ export default function ProjectPermissions( props ) {
 									<td>
                     <Select
                       value={permission.group}
-                      styles={selectStyle}
+                      styles={pickSelectStyle()}
                       onChange={(e)=> updateRight({ ...permission, group: e })}
                       options={groups}
                       />

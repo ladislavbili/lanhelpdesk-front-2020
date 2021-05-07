@@ -19,7 +19,7 @@ import {
 import DeleteReplacement from 'components/deleteReplacement';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 import {
   toSelArr
@@ -210,7 +210,7 @@ export default function StatusEdit( props ) {
           <Select
             id="actionIfSelected"
             name="Action"
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             options={actions}
             value={action}
             onChange={ e =>  {

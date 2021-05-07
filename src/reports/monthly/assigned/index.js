@@ -9,7 +9,7 @@ import {
 } from "@apollo/client";
 
 import {
-  selectStyleColored
+  pickSelectStyle
 } from 'configs/components/select';
 
 import {

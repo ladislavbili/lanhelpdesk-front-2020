@@ -10,7 +10,7 @@ import {
   FormGroup,
 } from 'reactstrap';
 import {
-  selectStyleNoArrowColoredRequired,
+  pickSelectStyle,
 } from 'configs/components/select';
 import Select from 'react-select';
 import DatePicker from 'components/DatePicker';
@@ -82,7 +82,7 @@ export default function StatusChangeModal( props ) {
                 placeholder="Status required"
                 className=""
                 value={status}
-                styles={selectStyleNoArrowColoredRequired}
+                styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
                 onChange={ changeStatus }
                 options={(statuses).filter((status)=>status.action!=='Invoiced')}
                 />

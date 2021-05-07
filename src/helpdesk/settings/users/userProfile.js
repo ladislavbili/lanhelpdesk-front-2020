@@ -13,7 +13,7 @@ import {
 import Loading from 'components/loading';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 import languages from "configs/constants/languages";
@@ -182,7 +182,7 @@ export default function UserProfile( props ) {
       <FormGroup>
         <Label for="language">Language</Label>
         <Select
-          styles={ selectStyle }
+          styles={ pickSelectStyle() }
           options={ languages }
           value={ language }
           onChange={ lang => setLanguage(lang) }

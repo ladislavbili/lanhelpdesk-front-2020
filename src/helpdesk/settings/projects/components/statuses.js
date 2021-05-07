@@ -16,7 +16,7 @@ import {
 } from 'configs/constants/statuses';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 const defaultTagColor = '#f759f2';
@@ -80,7 +80,7 @@ export default function Statuses( props ) {
                 <Select
                   id="actionIfSelected"
                   name="Action"
-                  styles={selectStyle}
+                  styles={pickSelectStyle()}
                   options={actions}
                   value={actions.find((action) => action.value === status.action )}
                   onChange={e => updateStatus({ id: status.id, action: e.value }) }
@@ -147,7 +147,7 @@ export default function Statuses( props ) {
               <Select
                 id="actionIfSelected"
                 name="Action"
-                styles={selectStyle}
+                styles={pickSelectStyle()}
                 options={actions}
                 value={action}
                 onChange={e => setAction( e ) }

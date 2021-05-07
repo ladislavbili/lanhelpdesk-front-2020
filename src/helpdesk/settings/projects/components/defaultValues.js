@@ -1,8 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 import {
-  invisibleSelectStyle,
-  invisibleSelectStyleNoArrowColored
+  pickSelectStyle
 } from 'configs/components/select';
 import {
   toSelItem
@@ -70,7 +69,7 @@ export default function ProjectDefaultValues( props ) {
                       }
                     }}
                     options={statuses.concat(emptyStatus)}
-                    styles={invisibleSelectStyleNoArrowColored}
+                    styles={pickSelectStyle( [ 'invisible', 'noArrow', 'colored', ] )}
                     />
                 </div>
               </div>
@@ -113,7 +112,7 @@ export default function ProjectDefaultValues( props ) {
                     value={tag.value}
                     onChange={(e)=>setTag({...tag,value:e})}
                     options={allTags}
-                    styles={invisibleSelectStyleNoArrowColored}
+                    styles={pickSelectStyle([ 'invisible', 'noArrow', 'colored', ])}
                     />
                 </div>
               </div>
@@ -152,12 +151,16 @@ export default function ProjectDefaultValues( props ) {
                 <div className="col-9">
                   <Select
                     isMulti
-                    value={assignedTo.value }
-                    onChange={(value) =>
-                      setAssignedTo({...assignedTo, value })
-                    }
-                    options={assignableUsers}
-                    styles={invisibleSelectStyle}
+                    value={ assignedTo.value.length !== 0 ? assignedTo.value : [ { label: 'Nepriradený/Zadávateľ má assigned edit právo', value: null } ] }
+                    onChange={(value) =>{
+                      if(value.some((user) => user.value === 'clear' )){
+                        setAssignedTo({...assignedTo, value: [] })
+                      }else{
+                        setAssignedTo({...assignedTo, value: value.filter((user) => user.value !== null ) })
+                      }
+                    }}
+                    options={[...(assignedTo.value.length > 0 ? [{ label: 'Nepriradený/Zadávateľ má assigned edit právo', value: 'clear' }]: []), ...assignableUsers ]}
+                    styles={pickSelectStyle([ 'invisible', ])}
                     />
                 </div>
               </div>
@@ -205,7 +208,7 @@ export default function ProjectDefaultValues( props ) {
                       }
                     }}
                     options={users.concat(emptyUserValue)}
-                    styles={invisibleSelectStyle}
+                    styles={pickSelectStyle([ 'invisible', ])}
                     />
                 </div>
               </div>
@@ -252,7 +255,7 @@ export default function ProjectDefaultValues( props ) {
                       }
                     }}
                     options={companies.concat(emptyCompanyValue)}
-                    styles={invisibleSelectStyle}
+                    styles={pickSelectStyle([ 'invisible', ])}
                     />
                 </div>
               </div>
@@ -296,7 +299,7 @@ export default function ProjectDefaultValues( props ) {
                         setType({...type,value:e})
                     }}
                     options={taskTypes}
-                    styles={invisibleSelectStyle}
+                    styles={pickSelectStyle([ 'invisible', ])}
                     />
                 </div>
               </div>
@@ -337,7 +340,7 @@ export default function ProjectDefaultValues( props ) {
                     value={pausal.value}
                     onChange={(e)=>setPausal({...pausal,value:e})}
                     options={booleanSelects}
-                    styles={invisibleSelectStyle}
+                    styles={pickSelectStyle([ 'invisible', ])}
                     />
                 </div>
               </div>
@@ -379,7 +382,7 @@ export default function ProjectDefaultValues( props ) {
                     value={overtime.value}
                     onChange={(e)=>setOvertime({...overtime,value:e})}
                     options={booleanSelects}
-                    styles={invisibleSelectStyle}
+                    styles={pickSelectStyle([ 'invisible', ])}
                     />
                 </div>
               </div>

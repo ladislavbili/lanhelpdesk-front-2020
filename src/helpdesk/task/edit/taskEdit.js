@@ -24,16 +24,7 @@ import Empty from 'components/Empty';
 
 import ck5config from 'configs/components/ck5config';
 import {
-  invisibleSelectStyleNoArrow,
-  selectStyleNoArrowNoPadding,
-  invisibleSelectStyleNoArrowNoPadding,
-  invisibleSelectStyleNoArrowColored,
-  selectStyleNoArrowColoredRequired,
-  invisibleSelectStyleNoArrowColoredRequired,
-  invisibleSelectStyleNoArrowColoredRequiredNoPadding,
-  selectStyleNoArrowRequired,
-  invisibleSelectStyleNoArrowRequired,
-  invisibleSelectStyleNoArrowRequiredNoPadding,
+  pickSelectStyle,
 } from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect';
 import {
@@ -280,13 +271,19 @@ export default function TaskEdit( props ) {
 
     //Assigned to
     if ( userRights.assignedRead ) {
-      if ( def.assignedTo.fixed || ( def.assignedTo.required && assignedTo.length === 0 ) ) {
+      if ( def.assignedTo.fixed ) {
         let newAssignedTo = assignableUsers.filter( ( user1 ) => def.assignedTo.value.some( ( user2 ) => user1.id === user2.id ) );
         if ( newAssignedTo.length === 0 && userRights.assignedWrite ) {
-          newAssignedTo.push( users.find( ( user ) => user.id === currentUser.id ) );
+          newAssignedTo = assignableUsers.filter( ( user ) => user.id === currentUser.id );
         }
         if ( newAssignedTo.length !== assignedTo.length || newAssignedTo.some( ( user1 ) => assignedTo.some( ( user2 ) => user1.id !== user2.id ) ) ) {
           changes.assignedTo = newAssignedTo.map( ( user ) => user.id );
+        }
+        setAssignedTo( newAssignedTo );
+      } else if ( def.assignedTo.required && assignedTo.length === 0 ) {
+        const newAssignedTo = assignableUsers.filter( ( user ) => user.id === currentUser.id );
+        if ( newAssignedTo > 1 ) {
+          changes.assignedTo = [ currentUser.id ];
           setAssignedTo( newAssignedTo );
         }
       }
@@ -379,7 +376,7 @@ export default function TaskEdit( props ) {
   const canAddUser = accessRights.users;
   const canAddCompany = accessRights.companies;
   const availableProjects = projects.filter( ( project ) => project.right.projectWrite || currentUser.role.level === 0 );
-  const assignedTos = project ? toSelArr( project.usersWithRights.map( ( userWithRights ) => userWithRights.user ), 'fullName' ) : [];
+  const assignedTos = project ? users.filter( ( user ) => project.usersWithRights.some( ( userData ) => userData.assignable && userData.user.id === user.id ) ) : [];
 
   const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights.map( ( userWithRights ) => userWithRights.user ), 'fullName' ) : users );
   const milestones = [ noMilestone ].concat( ( project ? toSelArr( project.project.milestones ) : [] ) );
@@ -401,10 +398,9 @@ export default function TaskEdit( props ) {
       compare.title === "" ||
       compare.status === null ||
       ( compare.project === null && userRights.projectRead ) ||
-      ( compare.assignedTo.length === 0 && userRights.assignedRead ) ||
+      ( compare.assignedTo.length === 0 && userRights.assignedRead && defaultFields.assignedTo.fixed ) ||
       compare.saving ||
-      ( defaultFields.tag.required && compare.tags.length === 0 && userRights.tagsRead ) ||
-      ( defaultFields.assignedTo.required && compare.assignedTo.length === 0 && userRights.assignedRead )
+      ( defaultFields.tag.required && compare.tags.length === 0 && userRights.tagsRead )
     )
   }
 
@@ -898,7 +894,7 @@ export default function TaskEdit( props ) {
 
   //Value Change
   const changeProject = ( project ) => {
-    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.user.id === user.id ) );
+    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.assignable && projectUser.user.id === user.id ) );
     setProject( project );
     setAssignedTo( newAssignedTo );
     setMilestone( noMilestone );
@@ -1086,15 +1082,15 @@ export default function TaskEdit( props ) {
               </button>
             }
             {false &&
-            <button
-              type="button"
-              className="btn-link task-add-layout-button btn-distance"
-              onClick={() => setTaskLayout(currentUser.taskLayout === 1 ? 2 : 1)}
-              >
-              <i className="fas fa-retweet "/>
-              Layout
-            </button>
-          }
+              <button
+                type="button"
+                className="btn-link task-add-layout-button btn-distance"
+                onClick={() => setTaskLayout(currentUser.taskLayout === 1 ? 2 : 1)}
+                >
+                <i className="fas fa-retweet "/>
+                Layout
+              </button>
+            }
 
             { !task.invoiced && userRights.statusWrite &&
               (project ? toSelArr(project.project.statuses) : [])
@@ -1250,20 +1246,23 @@ export default function TaskEdit( props ) {
         value={ project }
         onChange={ changeProject }
         options={ availableProjects }
-        styles={selectStyleNoArrowRequired}
+        styles={pickSelectStyle([ 'noArrow', 'required', ])}
         />
     ),
     Assigned: (
       <div>
         { (defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
-          <div className="disabled-info">{assignedTo ? assignedTo.label : "None"}</div>
+          <div> {assignedTo.map((user) =>
+              <div className="disabled-info">{ user.label}</div>
+            )}
+          </div>
         }
-        { !defaultFields.assignedTo.fixed && userRights.assignedWrite &&
+        { userRights.assignedWrite &&
           <Select
             value={assignedTo}
-            placeholder="Select"
+            placeholder="Select reccomended"
             isMulti
-            isDisabled={defaultFields.assignedTo.fixed||!userRights.assignedWrite}
+            isDisabled={defaultFields.assignedTo.fixed || !userRights.assignedWrite}
             onChange={(users)=> {
               if (users.some(u => u.id === -1)){
                 setOpenUserAdd(true);
@@ -1276,7 +1275,7 @@ export default function TaskEdit( props ) {
               ( canAddUser ? [{id:-1, title:'+ Add user',body:'add', label:'+ Add user',value:null}] : [])
               .concat(assignedTos)
             }
-            styles={selectStyleNoArrowRequired}
+            styles={pickSelectStyle( [ 'noArrow', ] )}
             />
         }
       </div>
@@ -1291,7 +1290,7 @@ export default function TaskEdit( props ) {
             placeholder="Status required"
             value={status}
             isDisabled={defaultFields.status.fixed || !userRights.statusWrite || task.invoiced}
-            styles={selectStyleNoArrowColoredRequired}
+            styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
             onChange={ changeStatus }
             options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action!=='Invoiced')}
             />
@@ -1303,7 +1302,7 @@ export default function TaskEdit( props ) {
         placeholder="Zadajte typ"
         value={taskType}
         isDisabled={ defaultFields.type.fixed || !userRights.typeWrite }
-        styles={selectStyleNoArrowRequired}
+        styles={pickSelectStyle( [ 'noArrow', defaultFields.type.required ? 'required' : ''] )}
         onChange={(type)=> {
           setTaskType(type);
           autoUpdateTask({ taskType: type.id })
@@ -1322,7 +1321,7 @@ export default function TaskEdit( props ) {
             value={milestone}
             onChange={changeMilestone}
             options={milestones}
-            styles={selectStyleNoArrowNoPadding}
+            styles={pickSelectStyle( [ 'noArrow', 'noPadding', ] )}
             />
         }
       </div>
@@ -1339,7 +1338,7 @@ export default function TaskEdit( props ) {
             isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
             onChange={changeRequester}
             options={(canAddUser?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(requesters)}
-            styles={ selectStyleNoArrowRequired}
+            styles={ pickSelectStyle([ 'noArrow', 'required', ])}
             />
         }
       </div>
@@ -1356,7 +1355,7 @@ export default function TaskEdit( props ) {
             isDisabled={defaultFields.company.fixed || !userRights.companyWrite || task.invoiced}
             onChange={changeCompany}
             options={(canAddCompany ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
-            styles={selectStyleNoArrowRequired}
+            styles={pickSelectStyle([ 'noArrow', 'required', ])}
             />
         }
       </div>
@@ -1370,7 +1369,7 @@ export default function TaskEdit( props ) {
           <Select
             value={company && parseInt(company.taskWorkPausal) === 0 && pausal.value === false ? {...pausal, label: pausal.label + " (nezmluvný)"} : pausal }
             isDisabled={!userRights.pausalWrite || !company || !company.monthly || parseInt(company.taskWorkPausal) < 0 || defaultFields.pausal.fixed}
-            styles={selectStyleNoArrowRequired }
+            styles={pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(pausal)=> {
               autoUpdateTask({ pausal: pausal.value })
               setPausal(pausal);
@@ -1410,7 +1409,7 @@ export default function TaskEdit( props ) {
           <Select
             value={overtime}
             isDisabled={!userRights.overtimeWrite || defaultFields.overtime.fixed}
-            styles={ selectStyleNoArrowRequired }
+            styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(overtime)=> {
               setOvertime(overtime);
               autoUpdateTask({ overtime: overtime.value })
@@ -1716,39 +1715,39 @@ export default function TaskEdit( props ) {
   const renderMultiSelectTags = () => {
     return (
       <Empty>
-      { userRights.tagsRead && userRights.tagsWrite &&
-        <div className="row mb-auto">
-          <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
-            <i className="fa fa-plus" />Tags
-            </button>
-            <MultiSelect
-              className="center-hor"
-              disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
-              direction="right"
-              style={{}}
-              header="Select tags for this task"
-              closeMultiSelect={() => { setTagsOpen(false) }}
-              open={tagsOpen}
-              items={toSelArr(project === null ? [] : project.project.tags)}
-              selected={tags}
-              onChange={(tags) => {
-                setTags(tags);
-                autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
-              }}
-              />
-          </div>
-        }
+        { userRights.tagsRead && userRights.tagsWrite &&
+          <div className="row mb-auto">
+            <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
+              <i className="fa fa-plus" />Tags
+              </button>
+              <MultiSelect
+                className="center-hor"
+                disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
+                direction="right"
+                style={{}}
+                header="Select tags for this task"
+                closeMultiSelect={() => { setTagsOpen(false) }}
+                open={tagsOpen}
+                items={toSelArr(project === null ? [] : project.project.tags)}
+                selected={tags}
+                onChange={(tags) => {
+                  setTags(tags);
+                  autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
+                }}
+                />
+            </div>
+          }
 
-        {
-          userRights.tagsRead && tags
-          .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
-          .map( ( tag ) => (
-            <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
-              {tag.title}
-            </span>
-          ) )
-        }
-      </Empty>
+          {
+            userRights.tagsRead && tags
+            .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+            .map( ( tag ) => (
+              <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+                {tag.title}
+              </span>
+            ) )
+          }
+        </Empty>
     )
   }
 
@@ -1766,25 +1765,25 @@ export default function TaskEdit( props ) {
     } else {
       if ( showDescription ) {
         RenderDescription = <div>
-          <CKEditor
-            editor={ ClassicEditor }
-            data={description}
-            onInit={(editor) => {
-              editor.editing.view.document.on( 'keydown', ( evt, data ) => {
-                if ( data.keyCode === 27 ) {
-                  autoUpdateTask({ description  })
-                  setShowDescription(false);
-                  data.preventDefault();
-                  evt.stop();
-                }
-              });
-            }}
-            onChange={(e,editor)=>{
-              setDescription(editor.getData());
-            }}
-            config={ck5config}
-            />
-        </div>
+            <CKEditor
+              editor={ ClassicEditor }
+              data={description}
+              onInit={(editor) => {
+                editor.editing.view.document.on( 'keydown', ( evt, data ) => {
+                  if ( data.keyCode === 27 ) {
+                    autoUpdateTask({ description  })
+                    setShowDescription(false);
+                    data.preventDefault();
+                    evt.stop();
+                  }
+                });
+              }}
+              onChange={(e,editor)=>{
+                setDescription(editor.getData());
+              }}
+              config={ck5config}
+              />
+          </div>
       } else {
         if ( description.length !== 0 ) {
           RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
@@ -1795,38 +1794,38 @@ export default function TaskEdit( props ) {
     }
     return (
       <div className="form-section">
-        <div className="row" style={{alignItems: "baseline"}}>
-          <Label className="m-r-10">
-            Popis úlohy
-          </Label>
-          { userRights.taskDescriptionWrite &&
-            <button
-              className="btn-link btn-distance"
-              style={{height: "20px"}}
-              onClick={()=>{
-                if(showDescription){
-                  autoUpdateTask({ description  })
-                }
-                setShowDescription(!showDescription);
-              }}
-              >
-              <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
-              { !showDescription ? 'edit' : 'save' }
-            </button>
-          }
-          { userRights.taskAttachmentsWrite &&
-            <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0" >
-              <i className="fa fa-plus" />
-              Attachment
-            </label>
-          }
-          { renderMultiSelectTags() }
+          <div className="row" style={{alignItems: "baseline"}}>
+            <Label className="m-r-10">
+              Popis úlohy
+            </Label>
+            { userRights.taskDescriptionWrite &&
+              <button
+                className="btn-link btn-distance"
+                style={{height: "20px"}}
+                onClick={()=>{
+                  if(showDescription){
+                    autoUpdateTask({ description  })
+                  }
+                  setShowDescription(!showDescription);
+                }}
+                >
+                <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
+                { !showDescription ? 'edit' : 'save' }
+              </button>
+            }
+            { userRights.taskAttachmentsWrite &&
+              <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0" >
+                <i className="fa fa-plus" />
+                Attachment
+              </label>
+            }
+            { renderMultiSelectTags() }
+          </div>
+          <div className="form-section-rest">
+            {RenderDescription}
+            {renderAttachments(false)}
+          </div>
         </div>
-        <div className="form-section-rest">
-          {RenderDescription}
-          {renderAttachments(false)}
-        </div>
-      </div>
     )
   }
 
@@ -1836,23 +1835,23 @@ export default function TaskEdit( props ) {
     }
     return (
       <div className="form-section">
-        <div className="form-section-rest">
-          <span className=" message success-message center-hor ml-auto">
-            { `Pausal ${company.title}  ` }
-            <span>
-              {`Pausal subtasks:`}
-              <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
-                {` ${usedSubtaskPausal}`}
+          <div className="form-section-rest">
+            <span className=" message success-message center-hor ml-auto">
+              { `Pausal ${company.title}  ` }
+              <span>
+                {`Pausal subtasks:`}
+                <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
+                  {` ${usedSubtaskPausal}`}
+                </span>
+                {` / ${taskWorkPausal} Pausal trips:`}
+                <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
+                  {` ${usedTripPausal}`}
+                </span>
+                {` / ${taskTripPausal}`}
               </span>
-              {` / ${taskWorkPausal} Pausal trips:`}
-              <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
-                {` ${usedTripPausal}`}
-              </span>
-              {` / ${taskTripPausal}`}
             </span>
-          </span>
+          </div>
         </div>
-      </div>
     )
   }
 
@@ -1862,21 +1861,21 @@ export default function TaskEdit( props ) {
     }
     return (
       <CheckboxList
-        disabled={!userRights.taskShortSubtasksWrite}
-        items={task.shortSubtasks}
-        onChange={(simpleSubtask) => {
-          updateShortSubtask(simpleSubtask);
-        }}
-        submitItem = { (newSimpleSubtask) => {
-          addShortSubtask({...newSimpleSubtask, task: id});
-        }}
-        deleteItem = { (simpleSubtask) => {
-          deleteShortSubtask(simpleSubtask.id)
-        } }
-        placeholder="Short subtask title"
-        newPlaceholder="New short subtask title"
-        label="Subtask"
-        />
+          disabled={!userRights.taskShortSubtasksWrite}
+          items={task.shortSubtasks}
+          onChange={(simpleSubtask) => {
+            updateShortSubtask(simpleSubtask);
+          }}
+          submitItem = { (newSimpleSubtask) => {
+            addShortSubtask({...newSimpleSubtask, task: id});
+          }}
+          deleteItem = { (simpleSubtask) => {
+            deleteShortSubtask(simpleSubtask.id)
+          } }
+          placeholder="Short subtask title"
+          newPlaceholder="New short subtask title"
+          label="Subtask"
+          />
     )
   }
 
@@ -1886,14 +1885,14 @@ export default function TaskEdit( props ) {
     }
     return (
       <Attachments
-        disabled={!userRights.taskAttachmentsWrite}
-        taskID={id}
-        type="task"
-        top={top}
-        attachments={task.taskAttachments}
-        addAttachments={addAttachments}
-        removeAttachment={removeAttachment}
-        />
+          disabled={!userRights.taskAttachmentsWrite}
+          taskID={id}
+          type="task"
+          top={top}
+          attachments={task.taskAttachments}
+          addAttachments={addAttachments}
+          removeAttachment={removeAttachment}
+          />
     )
   }
 
@@ -1903,39 +1902,39 @@ export default function TaskEdit( props ) {
     }
     return (
       <PendingPicker
-        open={pendingOpen}
-        prefferedMilestone={milestone}
-        milestonesBlocked={userRights.milestoneWrite}
-        milestones={ milestones }
-        closeModal={() => {
-          setPendingOpen(false);
-          setPotentialPendingStatus(null);
-        }}
-        savePending={(pending)=>{
-          if(pending.pendingDate === null){
-            setPendingDate( moment( parseInt(pending.milestone.endsAt) ) );
-            setMilestone( pending.milestone );
-            autoUpdateTask( {
-              status: potentialPendingStatus.id,
-              pendingChangable: false,
-              important: false,
-              milestone: pending.milestone.id,
-              pendingDate: pending.milestone.endsAt ? pending.milestone.endsAt : moment().add(1,'day').valueOf().toString()
-            } );
-          }else{
-            setPendingDate( pending.pendingDate );
-            autoUpdateTask( {
-              status: potentialPendingStatus.id,
-              pendingChangable: true,
-              important: false,
-              pendingDate: pending.pendingDate.valueOf().toString()
-            });
-          }
-          setStatus( potentialPendingStatus );
-          setPendingOpen(false);
-          setPotentialPendingStatus(null);
-        }}
-        />
+          open={pendingOpen}
+          prefferedMilestone={milestone}
+          milestonesBlocked={userRights.milestoneWrite}
+          milestones={ milestones }
+          closeModal={() => {
+            setPendingOpen(false);
+            setPotentialPendingStatus(null);
+          }}
+          savePending={(pending)=>{
+            if(pending.pendingDate === null){
+              setPendingDate( moment( parseInt(pending.milestone.endsAt) ) );
+              setMilestone( pending.milestone );
+              autoUpdateTask( {
+                status: potentialPendingStatus.id,
+                pendingChangable: false,
+                important: false,
+                milestone: pending.milestone.id,
+                pendingDate: pending.milestone.endsAt ? pending.milestone.endsAt : moment().add(1,'day').valueOf().toString()
+              } );
+            }else{
+              setPendingDate( pending.pendingDate );
+              autoUpdateTask( {
+                status: potentialPendingStatus.id,
+                pendingChangable: true,
+                important: false,
+                pendingDate: pending.pendingDate.valueOf().toString()
+              });
+            }
+            setStatus( potentialPendingStatus );
+            setPendingOpen(false);
+            setPotentialPendingStatus(null);
+          }}
+          />
     )
   }
 
@@ -1949,157 +1948,158 @@ export default function TaskEdit( props ) {
 
     return (
       <VykazyTable
-        showColumns={ ( (!userRights.vykazWrite && !userRights.rozpocetWrite ) ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
-        showTotals={false}
-        userID={currentUser.id}
-        autoApproved={project ? project.project.autoApproved : false}
-        userRights={userRights}
-        isInvoiced={task.invoiced}
-        canEditInvoiced={canEditInvoiced}
-        company={company}
-        taskAssigned={assignedTo.filter((user) => user.id !== null )}
+          showColumns={ ( (!userRights.vykazWrite && !userRights.rozpocetWrite ) ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
+          showTotals={false}
+          userID={currentUser.id}
+          autoApproved={project ? project.project.autoApproved : false}
+          userRights={userRights}
+          isInvoiced={task.invoiced}
+          canEditInvoiced={canEditInvoiced}
+          company={company}
+          canAddSubtasksAndTrips={assignedTo.length !== 0}
+          taskAssigned={assignedTo.filter((user) => user.id !== null )}
 
-        showSubtasks={project ? project.showSubtasks : false}
+          showSubtasks={project ? project.showSubtasks : false}
 
-        message={renderCompanyPausalInfo()}
+          message={renderCompanyPausalInfo()}
 
-        subtasks={ task.invoiced ? modifyInvoicedVykazy(subtasks, 'subtask') : subtasks }
-        defaultType={taskType}
-        taskTypes={taskTypes}
-        submitSubtask={(newSubtask, price) => {
-          if(task.invoiced){
-            saveVykazyChanges({...newSubtask, price}, 'subtask', 'ADD' );
-          }else{
-            addSubtaskFunc(newSubtask);
-          }
-        }}
-        updateSubtask={(id,newData)=>{
-          if(task.invoiced){
-            saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
-          }else{
-            updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
-          }
-        }}
-        updateSubtasks={(multipleSubtasks)=>{
-          if(task.invoiced){
-            multipleSubtasks.forEach(({id, newData}) => {
+          subtasks={ task.invoiced ? modifyInvoicedVykazy(subtasks, 'subtask') : subtasks }
+          defaultType={taskType}
+          taskTypes={taskTypes}
+          submitSubtask={(newSubtask, price) => {
+            if(task.invoiced){
+              saveVykazyChanges({...newSubtask, price}, 'subtask', 'ADD' );
+            }else{
+              addSubtaskFunc(newSubtask);
+            }
+          }}
+          updateSubtask={(id,newData)=>{
+            if(task.invoiced){
               saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
-            })
-          } else {
-            multipleSubtasks.forEach(({id, newData})=>{
+            }else{
               updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
-            });
-          }
-        }}
-        removeSubtask={(id)=>{
-          if(task.invoiced){
-            saveVykazyChanges( id, 'subtask', 'DELETE' );
-          }else{
-            deleteSubtaskFunc(id);
-          }
-        }}
-        workTrips={ task.invoiced ? modifyInvoicedVykazy(workTrips, 'trip') : workTrips }
-        tripTypes={tripTypes}
-        submitTrip={(newTrip, price)=>{
-          if(task.invoiced){
-            saveVykazyChanges( { ...newTrip, price }, 'trip', 'ADD' );
-          }else{
-            addWorkTripFunc(newTrip);
-          }
-        }}
-        updateTrip={(id,newData)=>{
-          if(task.invoiced){
-            saveVykazyChanges( {id, newData}, 'trip', 'EDIT' );
-          }else{
-            updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
-          }
-        }}
-        updateTrips={(multipleTrips)=>{
-          if(task.invoiced){
-            multipleTrips.forEach(({id, newData}) => {
-              saveVykazyChanges({id,newData}, 'trip', 'EDIT' );
-            })
-          } else {
-            multipleTrips.forEach(({id, newData})=>{
+            }
+          }}
+          updateSubtasks={(multipleSubtasks)=>{
+            if(task.invoiced){
+              multipleSubtasks.forEach(({id, newData}) => {
+                saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
+              })
+            } else {
+              multipleSubtasks.forEach(({id, newData})=>{
+                updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
+              });
+            }
+          }}
+          removeSubtask={(id)=>{
+            if(task.invoiced){
+              saveVykazyChanges( id, 'subtask', 'DELETE' );
+            }else{
+              deleteSubtaskFunc(id);
+            }
+          }}
+          workTrips={ task.invoiced ? modifyInvoicedVykazy(workTrips, 'trip') : workTrips }
+          tripTypes={tripTypes}
+          submitTrip={(newTrip, price)=>{
+            if(task.invoiced){
+              saveVykazyChanges( { ...newTrip, price }, 'trip', 'ADD' );
+            }else{
+              addWorkTripFunc(newTrip);
+            }
+          }}
+          updateTrip={(id,newData)=>{
+            if(task.invoiced){
+              saveVykazyChanges( {id, newData}, 'trip', 'EDIT' );
+            }else{
               updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
-            });
-          }
-        }}
-        removeTrip={(id)=>{
-          if(task.invoiced){
-            saveVykazyChanges( id, 'trip', 'DELETE' );
-          }else{
-            deleteWorkTripFunc(id);
-          }
-        }}
+            }
+          }}
+          updateTrips={(multipleTrips)=>{
+            if(task.invoiced){
+              multipleTrips.forEach(({id, newData}) => {
+                saveVykazyChanges({id,newData}, 'trip', 'EDIT' );
+              })
+            } else {
+              multipleTrips.forEach(({id, newData})=>{
+                updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
+              });
+            }
+          }}
+          removeTrip={(id)=>{
+            if(task.invoiced){
+              saveVykazyChanges( id, 'trip', 'DELETE' );
+            }else{
+              deleteWorkTripFunc(id);
+            }
+          }}
 
-        materials={ task.invoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
-        submitMaterial={(newMaterial)=>{
-          if(task.invoiced){
-            saveVykazyChanges( newMaterial, 'material', 'ADD' );
-          }else{
-            addMaterialFunc(newMaterial);
-          }
-        }}
-        updateMaterial={(id,newData)=>{
-          if(task.invoiced){
-            saveVykazyChanges( {id,newData}, 'material', 'EDIT' );
-          }else{
-            updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-          }
-        }}
-        updateMaterials={(multipleMaterials)=>{
-          if(task.invoiced){
-            multipleMaterials.forEach(({id, newData}) => {
-              saveVykazyChanges({id,newData}, 'material', 'EDIT' );
-            })
-          } else {
-            multipleMaterials.forEach(({id, newData})=>{
+          materials={ task.invoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
+          submitMaterial={(newMaterial)=>{
+            if(task.invoiced){
+              saveVykazyChanges( newMaterial, 'material', 'ADD' );
+            }else{
+              addMaterialFunc(newMaterial);
+            }
+          }}
+          updateMaterial={(id,newData)=>{
+            if(task.invoiced){
+              saveVykazyChanges( {id,newData}, 'material', 'EDIT' );
+            }else{
               updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-            });
-          }
-        }}
-        removeMaterial={(id)=>{
-          if(task.invoiced){
-            saveVykazyChanges( id, 'material', 'DELETE' );
-          }else{
-            deleteMaterialFunc(id);
-          }
-        }}
-        customItems={ task.invoiced ? modifyInvoicedVykazy(customItems, 'customItem') : customItems }
-        submitCustomItem={(customItem)=>{
-          if(task.invoiced){
-            saveVykazyChanges( customItem, 'customItem', 'ADD' );
-          }else{
-            addCustomItemFunc(customItem);
-          }
-        }}
-        updateCustomItem={(id,newData)=>{
-          if(task.invoiced){
-            saveVykazyChanges( {id,newData}, 'customItem', 'EDIT' );
-          }else{
-            updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id ),...newData});
-          }
-        }}
-        updateCustomItems={(multipleCustomItems)=>{
-          if(task.invoiced){
-            multipleCustomItems.forEach(({id, newData}) => {
-              saveVykazyChanges({id,newData}, 'customItem', 'EDIT' );
-            })
-          } else {
-            multipleCustomItems.forEach(({id, newData})=>{
-              updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id),...newData});
-            });
-          }
-        }}
-        removeCustomItem={(id)=>{
-          if(task.invoiced){
-            saveVykazyChanges( id, 'customItem', 'DELETE' );
-          }else{
-            deleteCustomItemFunc(id);
-          }
-        }}
-        />
+            }
+          }}
+          updateMaterials={(multipleMaterials)=>{
+            if(task.invoiced){
+              multipleMaterials.forEach(({id, newData}) => {
+                saveVykazyChanges({id,newData}, 'material', 'EDIT' );
+              })
+            } else {
+              multipleMaterials.forEach(({id, newData})=>{
+                updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+              });
+            }
+          }}
+          removeMaterial={(id)=>{
+            if(task.invoiced){
+              saveVykazyChanges( id, 'material', 'DELETE' );
+            }else{
+              deleteMaterialFunc(id);
+            }
+          }}
+          customItems={ task.invoiced ? modifyInvoicedVykazy(customItems, 'customItem') : customItems }
+          submitCustomItem={(customItem)=>{
+            if(task.invoiced){
+              saveVykazyChanges( customItem, 'customItem', 'ADD' );
+            }else{
+              addCustomItemFunc(customItem);
+            }
+          }}
+          updateCustomItem={(id,newData)=>{
+            if(task.invoiced){
+              saveVykazyChanges( {id,newData}, 'customItem', 'EDIT' );
+            }else{
+              updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id ),...newData});
+            }
+          }}
+          updateCustomItems={(multipleCustomItems)=>{
+            if(task.invoiced){
+              multipleCustomItems.forEach(({id, newData}) => {
+                saveVykazyChanges({id,newData}, 'customItem', 'EDIT' );
+              })
+            } else {
+              multipleCustomItems.forEach(({id, newData})=>{
+                updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id),...newData});
+              });
+            }
+          }}
+          removeCustomItem={(id)=>{
+            if(task.invoiced){
+              saveVykazyChanges( id, 'customItem', 'DELETE' );
+            }else{
+              deleteCustomItemFunc(id);
+            }
+          }}
+          />
     )
   }
 
@@ -2109,226 +2109,226 @@ export default function TaskEdit( props ) {
     }
     return (
       <div className="form-section">
-        <div className="form-section-rest">
-          <Nav tabs className="b-0 m-b-10">
-            { userRights.viewComments &&
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: toggleTab === 1}, "clickable", "")}
-                  onClick={() => setToggleTab(1) }
-                  >
-                  Komentáre
-                </NavLink>
-              </NavItem>
-            }
-            { userRights.history && userRights.viewComments &&
-              <NavItem>
-                <NavLink>
-                  |
-                </NavLink>
-              </NavItem>
-            }
-            { userRights.history &&
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: toggleTab === 2 }, "clickable", "")}
-                  onClick={() => setToggleTab(2) }
-                  >
-                  História
-                </NavLink>
-              </NavItem>
-            }
-          </Nav>
-          <TabContent activeTab={toggleTab}>
-            <TabPane tabId={1}>
-              <Comments
-                id={id}
-                submitComment={ submitComment }
-                submitEmail={ submitEmail }
-                userRights={ userRights }
-                users={users}
-                />
-            </TabPane>
-            {	userRights.history &&
-              <TabPane tabId={2}>
-                <TaskHistory task={task} />
+          <div className="form-section-rest">
+            <Nav tabs className="b-0 m-b-10">
+              { userRights.viewComments &&
+                <NavItem>
+                  <NavLink
+                    className={classnames({ active: toggleTab === 1}, "clickable", "")}
+                    onClick={() => setToggleTab(1) }
+                    >
+                    Komentáre
+                  </NavLink>
+                </NavItem>
+              }
+              { userRights.history && userRights.viewComments &&
+                <NavItem>
+                  <NavLink>
+                    |
+                  </NavLink>
+                </NavItem>
+              }
+              { userRights.history &&
+                <NavItem>
+                  <NavLink
+                    className={classnames({ active: toggleTab === 2 }, "clickable", "")}
+                    onClick={() => setToggleTab(2) }
+                    >
+                    História
+                  </NavLink>
+                </NavItem>
+              }
+            </Nav>
+            <TabContent activeTab={toggleTab}>
+              <TabPane tabId={1}>
+                <Comments
+                  id={id}
+                  submitComment={ submitComment }
+                  submitEmail={ submitEmail }
+                  userRights={ userRights }
+                  users={users}
+                  />
               </TabPane>
-            }
-          </TabContent>
+              {	userRights.history &&
+                <TabPane tabId={2}>
+                  <TaskHistory task={task} />
+                </TabPane>
+              }
+            </TabContent>
+          </div>
         </div>
-      </div>
     )
   }
 
   const renderStatusChangeModal = () => {
     return (
       <StatusChangeModal
-        open={possibleStatus !== null}
-        userRights={ userRights }
-        statuses={project ? toSelArr(project.project.statuses) : []}
-        newStatus={possibleStatus}
-        closeModal={ () => {
-          setPossibleStatus(null);
-        } }
-        submit={(status, comment, date ) => {
-          setPossibleStatus(null);
-          setStatus( status );
-          if ( status.action === 'PendingDate' ) {
-            setPendingDate( date );
-            autoUpdateTask( {
-              status: status.id,
-              pendingDate: date
-              .valueOf()
-              .toString(),
-              pendingChangable: true,
-            } );
-          } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
-            setCloseDate( date );
-            autoUpdateTask( {
-              status: status.id,
-              closeDate: date
-              .valueOf()
-              .toString(),
-            } );
-          } else {
-            autoUpdateTask( {
-              status: status.id
-            } );
-          }
-          if(comment.length > 0 ){
-            submitComment({
-              id,
-              message: comment,
-              attachments: [],
-              parentCommentId: null,
-              internal: false,
-            })
-          }
-        }}
-        />
+          open={possibleStatus !== null}
+          userRights={ userRights }
+          statuses={project ? toSelArr(project.project.statuses) : []}
+          newStatus={possibleStatus}
+          closeModal={ () => {
+            setPossibleStatus(null);
+          } }
+          submit={(status, comment, date ) => {
+            setPossibleStatus(null);
+            setStatus( status );
+            if ( status.action === 'PendingDate' ) {
+              setPendingDate( date );
+              autoUpdateTask( {
+                status: status.id,
+                pendingDate: date
+                .valueOf()
+                .toString(),
+                pendingChangable: true,
+              } );
+            } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
+              setCloseDate( date );
+              autoUpdateTask( {
+                status: status.id,
+                closeDate: date
+                .valueOf()
+                .toString(),
+              } );
+            } else {
+              autoUpdateTask( {
+                status: status.id
+              } );
+            }
+            if(comment.length > 0 ){
+              submitComment({
+                id,
+                message: comment,
+                attachments: [],
+                parentCommentId: null,
+                internal: false,
+              })
+            }
+          }}
+          />
     )
   }
 
   const renderModalUserAdd = () => {
     return (
       <Modal isOpen={openUserAdd} className="modal-without-borders" >
-        <ModalHeader>
-          Add user
-        </ModalHeader>
-        <ModalBody>
-          <UserAdd
-            closeModal={() => setOpenUserAdd(false)}
-            addUserToList={(user) => {
-              addUserToProject(user, project);
-              setProject({
-                ...project,
-                usersWithRights:[
-                  ...project.usersWithRights,
-                  {
-                    user: {
-                      id: user.id,
-                      fullName: user.fullName
-                    },
-                    assignable: false
-                  }
-                ]
-              })
-            } }
-            />
-        </ModalBody>
-      </Modal>
+          <ModalHeader>
+            Add user
+          </ModalHeader>
+          <ModalBody>
+            <UserAdd
+              closeModal={() => setOpenUserAdd(false)}
+              addUserToList={(user) => {
+                addUserToProject(user, project);
+                setProject({
+                  ...project,
+                  usersWithRights:[
+                    ...project.usersWithRights,
+                    {
+                      user: {
+                        id: user.id,
+                        fullName: user.fullName
+                      },
+                      assignable: false
+                    }
+                  ]
+                })
+              } }
+              />
+          </ModalBody>
+        </Modal>
     )
   }
 
   const renderModalCompanyAdd = () => {
     return (
       <Modal isOpen={openCompanyAdd} className="modal-without-borders">
-        <ModalBody>
-          <CompanyAdd
-            closeModal={() => setOpenCompanyAdd(false)}
-            addCompanyToList={addCompanyToList}
-            />
-        </ModalBody>
-      </Modal>
+          <ModalBody>
+            <CompanyAdd
+              closeModal={() => setOpenCompanyAdd(false)}
+              addCompanyToList={addCompanyToList}
+              />
+          </ModalBody>
+        </Modal>
     )
   }
 
   return (
     <div
-      className={classnames(
-        {
-          'task-edit-width': !inModal
-        },
-        "flex",
-        "min-height-400",
-        {
-          "basic-border-top": layout === 1
-        }
-      )}
-      >
-
-      <div
         className={classnames(
-          {"fit-with-header": !columns},
-          {"fit-with-header-and-commandbar": columns},
-          "scroll-visible",
+          {
+            'task-edit-width': !inModal
+          },
+          "flex",
+          "min-height-400",
+          {
+            "basic-border-top": layout === 1
+          }
         )}
         >
-        { renderCommandbar() }
+
         <div
           className={classnames(
-            {
-              "row":  layout === 2,
-            },
+            {"fit-with-header": !columns},
+            {"fit-with-header-and-commandbar": columns},
+            "scroll-visible",
           )}
-          style={{minHeight: "calc(100% - 70px)"}}
           >
+          { renderCommandbar() }
           <div
             className={classnames(
-              "bkg-white",
               {
-                "task-edit-left":  layout === 2 && !columns,
-                "task-edit-left-columns": (layout === 2 && columns) || layout === 1 || layout === 3,
+                "row":  layout === 2,
               },
             )}
+            style={{minHeight: "calc(100% - 70px)"}}
             >
+            <div
+              className={classnames(
+                "bkg-white",
+                {
+                  "task-edit-left":  layout === 2 && !columns,
+                  "task-edit-left-columns": (layout === 2 && columns) || layout === 1 || layout === 3,
+                },
+              )}
+              >
 
-            <div className="" >
-              { renderTitle() }
-              { layout === 2 && <hr className="m-t-5 m-b-15"/> }
+              <div className="" >
+                { renderTitle() }
+                { layout === 2 && <hr className="m-t-5 m-b-15"/> }
 
-              {canCreateVykazyError()}
+                {canCreateVykazyError()}
 
-              { layout === 1 ? renderSelectsLayout1() : null }
+                { layout === 1 ? renderSelectsLayout1() : null }
 
-              { renderDescription() }
+                { renderDescription() }
 
-              { renderSimpleSubtasks() }
+                { renderSimpleSubtasks() }
 
 
 
-              { renderPendingPicker() }
+                { renderPendingPicker() }
 
-              { renderVykazyTable() }
+                { renderVykazyTable() }
 
-              { renderComments() }
+                { renderComments() }
 
-              { renderModalUserAdd() }
+                { renderModalUserAdd() }
 
-              { renderModalCompanyAdd() }
+                { renderModalCompanyAdd() }
 
-              { renderStatusChangeModal() }
+                { renderStatusChangeModal() }
 
-              <div className="form-section"></div>
+                <div className="form-section"></div>
+
+              </div>
+
 
             </div>
 
-
+            { layout === 2 && renderSelectsLayout2Side() }
           </div>
-
-          { layout === 2 && renderSelectsLayout2Side() }
         </div>
       </div>
-    </div>
   );
 }

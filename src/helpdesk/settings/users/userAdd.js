@@ -12,8 +12,9 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
+import Loading from 'components/loading';
 
 import languages from "configs/constants/languages";
 import classnames from 'classnames';
@@ -27,7 +28,8 @@ import Checkbox from 'components/checkbox';
 import {
   GET_USERS,
   GET_BASIC_USERS,
-  ADD_USER
+  ADD_USER,
+  GET_MY_DATA,
 } from './queries';
 
 import {
@@ -39,7 +41,7 @@ import {
 } from '../companies/queries';
 
 
-export default function UserAddContainer( props ) {
+export default function UserAdd( props ) {
   // data & queries
   const {
     history,
@@ -55,10 +57,12 @@ export default function UserAddContainer( props ) {
     data: companiesData,
     loading: companiesLoading
   } = useQuery( GET_BASIC_COMPANIES );
-  const [ registerUser ] = useMutation( ADD_USER );
 
-  const ROLES = ( rolesLoading ? [] : toSelArr( rolesData.roles ) );
-  const COMPANIES = ( companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) );
+  const {
+    data: currentUserData,
+    loading: currentUserLoading
+  } = useQuery( GET_MY_DATA );
+  const [ registerUser ] = useMutation( ADD_USER );
 
   //state
   const [ active ] = React.useState( true );
@@ -75,6 +79,20 @@ export default function UserAddContainer( props ) {
   const [ language, setLanguage ] = React.useState( languages[ 0 ] );
   const [ saving, setSaving ] = React.useState( false );
 
+  const dataLoading = (
+    currentUserLoading ||
+    rolesLoading ||
+    companiesLoading
+  )
+
+  if ( dataLoading ) {
+    return <Loading />
+  }
+
+  const currentUserLevel = currentUserData.getMyData.role.level;
+  const roles = toSelArr( rolesData.roles )
+    .filter( ( role ) => role.level > currentUserLevel || ( currentUserLevel === 0 && role.level === 0 ) );
+  const companies = toSelArr( companiesData.basicCompanies );
 
   const addUserFunc = () => {
     setSaving( true );
@@ -135,9 +153,8 @@ export default function UserAddContainer( props ) {
       } );
     setSaving( false );
   }
-
   const cannotAddUser = () => {
-    let cond1 = saving || ( COMPANIES ? COMPANIES.length === 0 : false );
+    let cond1 = saving || companies.length === 0;
     let cond2 = !username || !name || !surname || !isEmail( email ) || password.length < 6 || !role || !company;
     return cond1 || cond2;
   }
@@ -155,9 +172,9 @@ export default function UserAddContainer( props ) {
       }
       <div
         className={classnames(
-        "p-t-10 p-l-20 p-r-20 p-b-20",
-        {" scroll-visible fit-with-header-and-commandbar": !closeModal},
-      )}
+          "p-t-10 p-l-20 p-r-20 p-b-20",
+          {" scroll-visible fit-with-header-and-commandbar": !closeModal},
+        )}
         >
         <h2 className="m-b-20" >
           Add user
@@ -165,8 +182,8 @@ export default function UserAddContainer( props ) {
         <FormGroup>
           <Label for="role">Role <span className="warning-big">*</span></Label>
           <Select
-            styles={ selectStyle }
-            options={ ROLES }
+            styles={ pickSelectStyle() }
+            options={ roles }
             value={ role }
             onChange={ role => setRole(role) }
             />
@@ -213,7 +230,7 @@ export default function UserAddContainer( props ) {
         <FormGroup>
           <Label for="role">Language</Label>
           <Select
-            styles={ selectStyle }
+            styles={ pickSelectStyle() }
             options={ languages }
             value={ language }
             onChange={ lang => setLanguage(lang) }
@@ -230,8 +247,8 @@ export default function UserAddContainer( props ) {
         <FormGroup>
           <Label for="company">Company <span className="warning-big">*</span></Label>
           <Select
-            styles={ selectStyle }
-            options={ COMPANIES }
+            styles={ pickSelectStyle() }
+            options={ companies }
             value={ company }
             onChange={ company => {
               if (signatureChanged){
@@ -275,9 +292,9 @@ export default function UserAddContainer( props ) {
           }
           <button
             className={classnames(
-                "btn",
-                {"ml-auto": !closeModal}
-              )}
+              "btn",
+              {"ml-auto": !closeModal}
+            )}
             disabled={ cannotAddUser() }
             onClick={ addUserFunc }
             >

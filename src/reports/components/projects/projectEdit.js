@@ -1,178 +1,277 @@
-import React, { Component } from 'react';
+import React, {
+  Component
+} from 'react';
 import Select from 'react-select';
-import { Modal, ModalBody, ModalFooter, ModalHeader, Button, FormGroup, Label, Input } from 'reactstrap';
-import { connect } from "react-redux";
-import {storageHelpStatusesStart, storageHelpTagsStart, storageUsersStart, storageHelpTaskTypesStart, storageCompaniesStart, storageHelpProjectsStart, setProject, storageHelpTasksStart} from '../../../redux/actions';
-import {rebase, database} from '../../../index';
+import {
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Button,
+  FormGroup,
+  Label,
+  Input
+} from 'reactstrap';
+import {
+  connect
+} from "react-redux";
+import {
+  storageHelpStatusesStart,
+  storageHelpTagsStart,
+  storageUsersStart,
+  storageHelpTaskTypesStart,
+  storageCompaniesStart,
+  storageHelpProjectsStart,
+  setProject,
+  storageHelpTasksStart
+} from '../../../redux/actions';
+import {
+  rebase,
+  database
+} from '../../../index';
 import firebase from 'firebase';
-import {toSelArr, sameStringForms, snapshotToArray} from '../../../helperFunctions';
-import {invisibleSelectStyle} from 'configs/components/select';
+import {
+  toSelArr,
+  sameStringForms,
+  snapshotToArray
+} from '../../../helperFunctions';
+import {
+  pickSelectStyle
+} from 'configs/components/select';
 import Permits from "../../../components/permissions";
-import { noDef } from 'configs/constants/projects';
+import {
+  noDef
+} from 'configs/constants/projects';
 
-class ProjectEdit extends Component{
-  constructor(props){
-    super(props);
-    this.state={
+class ProjectEdit extends Component {
+  constructor( props ) {
+    super( props );
+    this.state = {
       title: '',
       description: '',
-      statuses:[],
-      allTags:[],
-      users:[],
-      types:[],
-      companies:[],
+      statuses: [],
+      allTags: [],
+      users: [],
+      types: [],
+      companies: [],
 
       ...noDef,
       saving: false,
-			loaded: false,
+      loaded: false,
       opened: false
     }
   }
 
-	storageLoaded(props){
-		return props.statusesLoaded &&
-			props.tagsLoaded &&
-			props.usersLoaded &&
-			props.taskTypesLoaded &&
-			props.companiesLoaded &&
-			props.projectsLoaded &&
-			props.tasksLoaded
-	}
-
-  componentWillReceiveProps(props){
-    if (this.props.item.id !== props.item.id || (this.storageLoaded(props) && !this.storageLoaded(this.props))){
-			this.setProjectsData(props);
-    }
-		if(!sameStringForms(props.statuses,this.props.statuses) &&
-			!sameStringForms(props.tags,this.props.tags) &&
-			!sameStringForms(props.users,this.props.users) &&
-			!sameStringForms(props.taskTypes,this.props.taskTypes) &&
-			!sameStringForms(props.tasks,this.props.tasks) &&
-			!sameStringForms(props.companies,this.props.companies)){
-				this.setData(props);
-			}
+  storageLoaded( props ) {
+    return props.statusesLoaded &&
+      props.tagsLoaded &&
+      props.usersLoaded &&
+      props.taskTypesLoaded &&
+      props.companiesLoaded &&
+      props.projectsLoaded &&
+      props.tasksLoaded
   }
 
-	componentWillMount(){
-		if(!this.props.statusesActive){
-			this.props.storageHelpStatusesStart();
-		}
-
-		if(!this.props.tagsActive){
-			this.props.storageHelpTagsStart();
-		}
-
-		if(!this.props.usersActive){
-			this.props.storageUsersStart();
-		}
-
-		if(!this.props.taskTypesActive){
-			this.props.storageHelpTaskTypesStart();
-		}
-
-		if(!this.props.companiesActive){
-			this.props.storageCompaniesStart();
-		}
-
-		if(!this.props.tasksActive){
-			this.props.storageHelpTasksStart();
-		}
-
-		if(!this.props.projectsActive){
-			this.props.storageHelpProjectsStart();
-		}
-		this.setProjectsData(this.props);
-	}
-
-	setProjectsData(props){
-		if(!this.storageLoaded(props)){
-			return;
-		}
-
-		let project = props.projects.find((project)=>project.id===props.item.id);
-		let statuses = toSelArr(props.statuses);
-		let allTags = toSelArr(props.tags);
-		let users = toSelArr(props.users,'email');
-		let types = toSelArr(props.taskTypes);
-		let companies = toSelArr(props.companies);
-
-		let status = statuses.find(item=> project.def && item.id===project.def.status.value);
-		let tags = allTags.filter(item=> project.def && project.def.tags.value.includes(item.id));
-		let assignedTo = users.filter(item=> project.def && project.def.assignedTo.value.includes(item.id));
-		let type = types.find(item=> project.def && item.id===project.def.type.value);
-		let requester = users.find(item=> project.def && item.id===project.def.requester.value);
-		let company = companies.find(item=> project.def && item.id===project.def.company.value);
-
-		this.setState({
-			title:project.title,
-			description:project.description?project.description:'',
-
-			status:status?{value:status,def:project.def.status.def,fixed:project.def.status.fixed}:{def:false,fixed:false, value: null},
-			tags:project.def?{value:tags,def:project.def.tags.def,fixed:project.def.tags.fixed}:{def:false,fixed:false, value: []},
-			assignedTo:project.def?{value:assignedTo,def:project.def.assignedTo.def,fixed:project.def.assignedTo.fixed}:{def:false,fixed:false, value: []},
-			type:type?{value:type,def:project.def.type.def,fixed:project.def.type.fixed}:{def:false,fixed:false, value: null},
-			requester:requester?{value:requester,def:project.def.requester.def,fixed:project.def.requester.fixed}:{def:false,fixed:false, value: null},
-			company:company?{value:company,def:project.def.company.def,fixed:project.def.company.fixed}:{def:false,fixed:false, value: null},
-		});
-
-	}
-
-  setData(props){
-		if(!this.storageLoaded(props)){
-			return;
-		}
-
-    this.setState({
-      statuses:toSelArr(props.statuses),
-      allTags: toSelArr(props.tags),
-      users: toSelArr(props.users,'email'),
-      types: toSelArr(props.taskTypes),
-      companies: toSelArr(props.companies),
-    });
-	}
-
-  toggle(){
-    if(!this.state.opened){
-			this.setProjectsData(this.props);
+  componentWillReceiveProps( props ) {
+    if ( this.props.item.id !== props.item.id || ( this.storageLoaded( props ) && !this.storageLoaded( this.props ) ) ) {
+      this.setProjectsData( props );
     }
-    this.setState({opened: !this.state.opened})
+    if ( !sameStringForms( props.statuses, this.props.statuses ) &&
+      !sameStringForms( props.tags, this.props.tags ) &&
+      !sameStringForms( props.users, this.props.users ) &&
+      !sameStringForms( props.taskTypes, this.props.taskTypes ) &&
+      !sameStringForms( props.tasks, this.props.tasks ) &&
+      !sameStringForms( props.companies, this.props.companies ) ) {
+      this.setData( props );
+    }
   }
 
-	deleteProject(){
-		let projectID = this.props.item.id;
-		if(window.confirm("Are you sure?")){
-			this.props.tasks.filter((task)=>task.project===projectID).map((task)=>this.deleteTask(task));
-			rebase.removeDoc('/help-projects/'+projectID).then(()=>{
-				this.toggle();
-				this.props.setProject(null);
-			});
-		}
-	}
+  componentWillMount() {
+    if ( !this.props.statusesActive ) {
+      this.props.storageHelpStatusesStart();
+    }
 
-	deleteTask(task){
-		let taskID = task.id;
-		Promise.all(
+    if ( !this.props.tagsActive ) {
+      this.props.storageHelpTagsStart();
+    }
+
+    if ( !this.props.usersActive ) {
+      this.props.storageUsersStart();
+    }
+
+    if ( !this.props.taskTypesActive ) {
+      this.props.storageHelpTaskTypesStart();
+    }
+
+    if ( !this.props.companiesActive ) {
+      this.props.storageCompaniesStart();
+    }
+
+    if ( !this.props.tasksActive ) {
+      this.props.storageHelpTasksStart();
+    }
+
+    if ( !this.props.projectsActive ) {
+      this.props.storageHelpProjectsStart();
+    }
+    this.setProjectsData( this.props );
+  }
+
+  setProjectsData( props ) {
+    if ( !this.storageLoaded( props ) ) {
+      return;
+    }
+
+    let project = props.projects.find( ( project ) => project.id === props.item.id );
+    let statuses = toSelArr( props.statuses );
+    let allTags = toSelArr( props.tags );
+    let users = toSelArr( props.users, 'email' );
+    let types = toSelArr( props.taskTypes );
+    let companies = toSelArr( props.companies );
+
+    let status = statuses.find( item => project.def && item.id === project.def.status.value );
+    let tags = allTags.filter( item => project.def && project.def.tags.value.includes( item.id ) );
+    let assignedTo = users.filter( item => project.def && project.def.assignedTo.value.includes( item.id ) );
+    let type = types.find( item => project.def && item.id === project.def.type.value );
+    let requester = users.find( item => project.def && item.id === project.def.requester.value );
+    let company = companies.find( item => project.def && item.id === project.def.company.value );
+
+    this.setState( {
+      title: project.title,
+      description: project.description ? project.description : '',
+
+      status: status ? {
+        value: status,
+        def: project.def.status.def,
+        fixed: project.def.status.fixed
+      } : {
+        def: false,
+        fixed: false,
+        value: null
+      },
+      tags: project.def ? {
+        value: tags,
+        def: project.def.tags.def,
+        fixed: project.def.tags.fixed
+      } : {
+        def: false,
+        fixed: false,
+        value: []
+      },
+      assignedTo: project.def ? {
+        value: assignedTo,
+        def: project.def.assignedTo.def,
+        fixed: project.def.assignedTo.fixed
+      } : {
+        def: false,
+        fixed: false,
+        value: []
+      },
+      type: type ? {
+        value: type,
+        def: project.def.type.def,
+        fixed: project.def.type.fixed
+      } : {
+        def: false,
+        fixed: false,
+        value: null
+      },
+      requester: requester ? {
+        value: requester,
+        def: project.def.requester.def,
+        fixed: project.def.requester.fixed
+      } : {
+        def: false,
+        fixed: false,
+        value: null
+      },
+      company: company ? {
+        value: company,
+        def: project.def.company.def,
+        fixed: project.def.company.fixed
+      } : {
+        def: false,
+        fixed: false,
+        value: null
+      },
+    } );
+
+  }
+
+  setData( props ) {
+    if ( !this.storageLoaded( props ) ) {
+      return;
+    }
+
+    this.setState( {
+      statuses: toSelArr( props.statuses ),
+      allTags: toSelArr( props.tags ),
+      users: toSelArr( props.users, 'email' ),
+      types: toSelArr( props.taskTypes ),
+      companies: toSelArr( props.companies ),
+    } );
+  }
+
+  toggle() {
+    if ( !this.state.opened ) {
+      this.setProjectsData( this.props );
+    }
+    this.setState( {
+      opened: !this.state.opened
+    } )
+  }
+
+  deleteProject() {
+    let projectID = this.props.item.id;
+    if ( window.confirm( "Are you sure?" ) ) {
+      this.props.tasks.filter( ( task ) => task.project === projectID )
+        .map( ( task ) => this.deleteTask( task ) );
+      rebase.removeDoc( '/help-projects/' + projectID )
+        .then( () => {
+          this.toggle();
+          this.props.setProject( null );
+        } );
+    }
+  }
+
+  deleteTask( task ) {
+    let taskID = task.id;
+    Promise.all(
 			[
-				database.collection('help-task_materials').where("task", "==", taskID).get(),
-				database.collection('help-task_works').where("task", "==", taskID).get(),
-				database.collection('help-repeats').doc(taskID).get(),
-				database.collection('help-comments').where("task", "==", taskID).get()
-		]).then(([taskMaterials, taskWorks,repeat,comments])=>{
+				database.collection( 'help-task_materials' )
+          .where( "task", "==", taskID )
+          .get(),
+				database.collection( 'help-task_works' )
+          .where( "task", "==", taskID )
+          .get(),
+				database.collection( 'help-repeats' )
+          .doc( taskID )
+          .get(),
+				database.collection( 'help-comments' )
+          .where( "task", "==", taskID )
+          .get()
+		] )
+      .then( ( [ taskMaterials, taskWorks, repeat, comments ] ) => {
 
-			let storageRef = firebase.storage().ref();
-			task.attachments.map((attachment)=>storageRef.child(attachment.path).delete());
+        let storageRef = firebase.storage()
+          .ref();
+        task.attachments.map( ( attachment ) => storageRef.child( attachment.path )
+          .delete() );
 
-			rebase.removeDoc('/help-tasks/'+taskID);
-			snapshotToArray(taskMaterials).forEach((material)=>rebase.removeDoc('/help-task_materials/'+material.id))
-			snapshotToArray(taskWorks).forEach((work)=>rebase.removeDoc('/help-task_works/'+work.id))
-			if(repeat.exists){
-				rebase.removeDoc('/help-repeats/'+taskID);
-			}
-			snapshotToArray(comments).forEach((item)=>rebase.removeDoc('/help-comments/'+item.id));
-		});
-	}
+        rebase.removeDoc( '/help-tasks/' + taskID );
+        snapshotToArray( taskMaterials )
+          .forEach( ( material ) => rebase.removeDoc( '/help-task_materials/' + material.id ) )
+        snapshotToArray( taskWorks )
+          .forEach( ( work ) => rebase.removeDoc( '/help-task_works/' + work.id ) )
+        if ( repeat.exists ) {
+          rebase.removeDoc( '/help-repeats/' + taskID );
+        }
+        snapshotToArray( comments )
+          .forEach( ( item ) => rebase.removeDoc( '/help-comments/' + item.id ) );
+      } );
+  }
 
-  render(){
+  render() {
     return (
       <div className='sidebar-menu-item'>
         <Button
@@ -219,7 +318,7 @@ class ProjectEdit extends Component{
                               value={this.state.status.value}
                               onChange={(status)=>this.setState({status:{...this.state.status,value:status}})}
                               options={this.state.statuses}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -242,7 +341,7 @@ class ProjectEdit extends Component{
                               value={this.state.tags.value}
                               onChange={(tags)=>this.setState({tags:{...this.state.tags,value:tags}})}
                               options={this.state.allTags}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -265,7 +364,7 @@ class ProjectEdit extends Component{
                               value={this.state.assignedTo.value}
                               onChange={(assignedTo)=>this.setState({assignedTo:{...this.state.assignedTo,value:assignedTo}})}
                               options={this.state.users}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -287,7 +386,7 @@ class ProjectEdit extends Component{
                               value={this.state.type.value}
                               onChange={(type)=>this.setState({type:{...this.state.type,value:type}})}
                               options={this.state.types}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -309,7 +408,7 @@ class ProjectEdit extends Component{
                               value={this.state.requester.value}
                               onChange={(requester)=>this.setState({requester:{...this.state.requester,value:requester}})}
                               options={this.state.users}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -331,7 +430,7 @@ class ProjectEdit extends Component{
                               value={this.state.company.value}
                               onChange={(company)=>this.setState({company:{...this.state.company,value:company}})}
                               options={this.state.companies}
-                              styles={invisibleSelectStyle}
+                              styles={pickSelectStyle([ 'invisible', ])}
                               />
                           </div>
                         </div>
@@ -388,22 +487,82 @@ class ProjectEdit extends Component{
   }
 }
 
-const mapStateToProps = ({ storageHelpStatuses, storageHelpTags, storageUsers, storageHelpTaskTypes, storageCompanies, storageHelpProjects, storageHelpTasks }) => {
-	const { statusesActive, statuses, statusesLoaded } = storageHelpStatuses;
-	const { tagsActive, tags, tagsLoaded } = storageHelpTags;
-	const { usersActive, users, usersLoaded } = storageUsers;
-	const { taskTypesActive, taskTypes, taskTypesLoaded } = storageHelpTaskTypes;
-	const { companiesActive, companies, companiesLoaded } = storageCompanies;
-	const { projectsActive, projects, projectsLoaded } = storageHelpProjects;
-	const { tasksActive, tasks, tasksLoaded } = storageHelpTasks;
-	return { statusesActive, statuses, statusesLoaded,
-		tagsActive, tags, tagsLoaded,
-		usersActive, users, usersLoaded,
-		taskTypesActive, taskTypes, taskTypesLoaded,
-		companiesActive, companies, companiesLoaded,
-		projectsActive, projects, projectsLoaded,
-		tasksActive, tasks, tasksLoaded
-	 };
+const mapStateToProps = ( {
+  storageHelpStatuses,
+  storageHelpTags,
+  storageUsers,
+  storageHelpTaskTypes,
+  storageCompanies,
+  storageHelpProjects,
+  storageHelpTasks
+} ) => {
+  const {
+    statusesActive,
+    statuses,
+    statusesLoaded
+  } = storageHelpStatuses;
+  const {
+    tagsActive,
+    tags,
+    tagsLoaded
+  } = storageHelpTags;
+  const {
+    usersActive,
+    users,
+    usersLoaded
+  } = storageUsers;
+  const {
+    taskTypesActive,
+    taskTypes,
+    taskTypesLoaded
+  } = storageHelpTaskTypes;
+  const {
+    companiesActive,
+    companies,
+    companiesLoaded
+  } = storageCompanies;
+  const {
+    projectsActive,
+    projects,
+    projectsLoaded
+  } = storageHelpProjects;
+  const {
+    tasksActive,
+    tasks,
+    tasksLoaded
+  } = storageHelpTasks;
+  return {
+    statusesActive,
+    statuses,
+    statusesLoaded,
+    tagsActive,
+    tags,
+    tagsLoaded,
+    usersActive,
+    users,
+    usersLoaded,
+    taskTypesActive,
+    taskTypes,
+    taskTypesLoaded,
+    companiesActive,
+    companies,
+    companiesLoaded,
+    projectsActive,
+    projects,
+    projectsLoaded,
+    tasksActive,
+    tasks,
+    tasksLoaded
+  };
 };
 
-export default connect(mapStateToProps, { storageHelpStatusesStart, storageHelpTagsStart, storageUsersStart, storageHelpTaskTypesStart, storageCompaniesStart, storageHelpProjectsStart, setProject, storageHelpTasksStart })(ProjectEdit);
+export default connect( mapStateToProps, {
+  storageHelpStatusesStart,
+  storageHelpTagsStart,
+  storageUsersStart,
+  storageHelpTaskTypesStart,
+  storageCompaniesStart,
+  storageHelpProjectsStart,
+  setProject,
+  storageHelpTasksStart
+} )( ProjectEdit );

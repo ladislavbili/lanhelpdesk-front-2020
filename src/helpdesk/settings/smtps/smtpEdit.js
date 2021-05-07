@@ -24,7 +24,7 @@ import {
 } from 'helperFunctions';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 import wellKnownOptions from 'configs/constants/wellKnown';
@@ -291,7 +291,7 @@ export default function SMTPEdit( props ) {
       <FormGroup>
         <Label>Well known providers - requires only user and password</Label>
         <Select
-          styles={selectStyle}
+          styles={pickSelectStyle()}
           options={wellKnownOptions}
           value={wellKnown}
           onChange={wellKnown => {
@@ -395,7 +395,7 @@ export default function SMTPEdit( props ) {
           <FormGroup>
             { def && <Label>A replacement SMTP</Label> }
             <Select
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               options={filteredSMTPs}
               value={newSMTP}
               onChange={s => {
@@ -409,7 +409,7 @@ export default function SMTPEdit( props ) {
             <FormGroup>
               <Label>New default SMTP</Label>
               <Select
-                styles={selectStyle}
+                styles={pickSelectStyle()}
                 options={filteredSMTPs}
                 value={newDefSMTP}
                 onChange={s => {

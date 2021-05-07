@@ -33,7 +33,7 @@ import MonthSelector from 'reports/components/monthSelector';
 import Loading from 'components/loading';
 
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 
 import {
@@ -213,7 +213,7 @@ export default function MothlyReportsCompany( props ) {
     <div className="scrollable fit-with-header">
       <h2 className="m-l-20 m-t-20">Firmy</h2>
       <div style={{maxWidth:500}}>
-        
+
         <MonthSelector
           blockedShow={false}
           fromDate={fromDate}
@@ -236,7 +236,7 @@ export default function MothlyReportsCompany( props ) {
               setReportsType( newType );
             }}
             options={reportTypes}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
         </div>
       </div>

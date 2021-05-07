@@ -14,7 +14,7 @@ import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
 import Loading from 'components/loading';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 import {
   toSelArr,
@@ -278,7 +278,7 @@ export default function PublicFilterAdd( props ) {
             isDisabled={global}
             onChange={(project) => setProject(project)}
             options={toSelArr(projectsData.projects)}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
         </div>
 
@@ -308,7 +308,7 @@ export default function PublicFilterAdd( props ) {
               }
             }}
             options={toSelArr([{id: 'all', title: roles.length === rolesData.roles.length ? 'Clear' : 'All' }, ...rolesData.roles])}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
         </FormGroup>
 
@@ -323,7 +323,7 @@ export default function PublicFilterAdd( props ) {
             options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
             onChange={ (requester) => setRequester(requester) }
             value={requester}
-            styles={selectStyle} />
+            styles={pickSelectStyle()} />
         </FormGroup>
 
         <FormGroup>{/* Company */}
@@ -332,7 +332,7 @@ export default function PublicFilterAdd( props ) {
             options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
             onChange={ (company) => setCompany(company) }
             value={company}
-            styles={selectStyle} />
+            styles={pickSelectStyle()} />
         </FormGroup>
 
         <FormGroup>{/* Assigned */}
@@ -341,7 +341,7 @@ export default function PublicFilterAdd( props ) {
             options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
             onChange={(newValue)=>setAssigned(newValue)}
             value={assigned}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
             />
         </FormGroup>
 
@@ -403,7 +403,7 @@ export default function PublicFilterAdd( props ) {
             options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypesData.taskTypes))}
             onChange={(taskType)=>setTaskType(taskType)}
             value={taskType}
-            styles={selectStyle} />
+            styles={pickSelectStyle()} />
         </FormGroup>
 
         <FormGroup>{/* One Of */}
@@ -413,7 +413,7 @@ export default function PublicFilterAdd( props ) {
             onChange={(oneOf)=>setOneOf(oneOf)}
             value={oneOf}
             isMulti
-            styles={selectStyle} />
+            styles={pickSelectStyle()} />
         </FormGroup>
 
         <div className="form-buttons-row">

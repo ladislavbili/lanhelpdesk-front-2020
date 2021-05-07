@@ -11,7 +11,7 @@ import Select from 'react-select';
 import DatePicker from 'components/DatePicker';
 import classnames from "classnames";
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 
 export default function Scheduled( props ) {
@@ -119,7 +119,7 @@ export default function Scheduled( props ) {
                 isDisabled={disabled}
                 onChange={(user)=> setNewUser(user)}
                 options={users}
-                styles={selectStyle}
+                styles={pickSelectStyle()}
                 />
             </FormGroup>
             <div className="p-t-5 row">

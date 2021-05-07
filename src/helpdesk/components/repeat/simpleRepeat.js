@@ -14,7 +14,7 @@ import {
 import DatePicker from 'components/DatePicker';
 
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 import {
   toMomentInput,
@@ -140,7 +140,7 @@ export default function SimpleRepeat( props ) {
                     value={repeatInterval}
                     onChange={setRepeatInterval}
                     options={intervals}
-                    styles={selectStyle}
+                    styles={pickSelectStyle()}
                     />
                 </div>
                 {

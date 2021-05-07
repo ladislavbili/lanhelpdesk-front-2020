@@ -6,7 +6,7 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 import Switch from "react-switch";
 import PriceEdit from "../prices/priceEdit";
@@ -59,7 +59,7 @@ export default function CompanyPriceList( props ) {
             <Select
               id="pricelist"
               name="pricelist"
-              styles={selectStyle}
+              styles={pickSelectStyle()}
               options={pricelists}
               value={pricelist}
               onChange={e => {

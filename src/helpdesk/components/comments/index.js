@@ -23,7 +23,7 @@ import {
 } from 'react-select';
 import CKEditor from 'ckeditor4-react';
 import {
-  selectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 import axios from 'axios';
 
@@ -72,7 +72,6 @@ export default function Comments( props ) {
   const [ subject, setSubject ] = React.useState( "" );
   const [ tos, setTos ] = React.useState( [] );
   const [ openedComments, setOpenedComments ] = React.useState( [] );
-
   React.useEffect( () => {
     setOpenedComments( [] )
     setIsEmail( !userRights.addComments );
@@ -126,7 +125,7 @@ export default function Comments( props ) {
                 value={tos}
                 onChange={(newData) => setTos(newData)}
                 options={users}
-                styles={selectStyle}/>
+                styles={pickSelectStyle()}/>
             </div>
           </FormGroup>
         }
@@ -271,6 +270,7 @@ export default function Comments( props ) {
           </div>
         </div>
       }
+
       { !isMulti && commentsData.comments.filter((comment)=> userRights.internal || !comment.isInternal).sort((item1,item2)=>item2.createdAt-item1.createdAt).map((comment)=>
         <div key={comment.id} >
           { comment.isEmail &&
@@ -279,25 +279,15 @@ export default function Comments( props ) {
           setOpenedComments={setOpenedComments}
               getAttachment={getAttachment}
               comment={comment}
-              reply={() => {
-                setSubject(comment.subject);
-                setIsEmail(true);
-                setEmailBody(comment.html?comment.html:unescape(comment.text).replace(/(?:\r\n|\r|\n)/g, '<br>'));
-              }}
               sendEmail={() => {
-                setTos(comment.tos.map((to)=>{
-                  return {
-                    label:to,
-                    value:to
-                  }
-                }));
+                setTos( users.filter((user) => user.id === comment.user.id ) );
                 setSubject(comment.subject);
                 setIsEmail(true);
                 setEmailBody(('<body><br><blockquote><p>'+(comment.html?comment.html:unescape(comment.text).replace(/(?:\r\n|\r|\n)/g, '<br>'))+'</p></blockquote><body>'));
               }}
               />
           }
-          { !comment.isMail &&
+          { !comment.isEmail &&
             <Comment getAttachment={getAttachment} comment={comment} />
           }
         </div>

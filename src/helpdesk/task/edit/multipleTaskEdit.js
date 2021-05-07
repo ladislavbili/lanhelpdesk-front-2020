@@ -23,9 +23,7 @@ import {
   sameStringForms
 } from 'helperFunctions';
 import {
-  invisibleSelectStyleNoArrow,
-  invisibleSelectStyleNoArrowColoredRequired,
-  invisibleSelectStyleNoArrowRequired
+  pickSelectStyle
 } from 'configs/components/select';
 import {
   REST_URL
@@ -452,7 +450,7 @@ export default class MultipleTaskEdit extends Component {
                       let permission = project.permissions.find((permission)=>permission.user===curr.id);
                       return permission && permission.read;
                     })}
-                    styles={invisibleSelectStyleNoArrowRequired}
+                    styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                     />
                 </div>
               </div>
@@ -470,7 +468,7 @@ export default class MultipleTaskEdit extends Component {
                       isMulti
                       onChange={(users)=>this.setState({assignedTo:users})}
                       options={USERS_WITH_PERMISSIONS}
-                      styles={invisibleSelectStyleNoArrowRequired}
+                      styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                       />
                   </div>
                 </div>
@@ -486,7 +484,7 @@ export default class MultipleTaskEdit extends Component {
                     placeholder="Select required"
                     value={this.state.status}
                     isDisabled={this.state.defaultFields.status.fixed}
-                    styles={invisibleSelectStyleNoArrowColoredRequired}
+                    styles={pickSelectStyle( [ 'invisible', 'noArrow', 'colored', 'required', ] )}
                     onChange={(status)=>{
                       if(status.action==='pending'){
                         this.setState({
@@ -521,7 +519,7 @@ export default class MultipleTaskEdit extends Component {
                     placeholder="Select required"
                     value={this.state.type}
                     isDisabled={this.state.defaultFields.type.fixed}
-                    styles={invisibleSelectStyleNoArrowRequired}
+                    styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                     onChange={(type)=>this.setState({type})}
                     options={this.state.taskTypes}
                     />
@@ -546,7 +544,7 @@ export default class MultipleTaskEdit extends Component {
                     }
                   }}
                   options={this.state.milestones.filter((milestone)=>milestone.id===null || (this.state.project!== null && milestone.project===this.state.project.id))}
-                  styles={invisibleSelectStyleNoArrow}
+                  styles={pickSelectStyle( [ 'invisible', 'noArrow', ] )}
                   />
               </div>
             </div>
@@ -563,7 +561,7 @@ export default class MultipleTaskEdit extends Component {
                     onChange={(requester)=>this.setState({requester})}
                     isDisabled={this.state.defaultFields.requester.fixed}
                     options={REQUESTERS}
-                    styles={invisibleSelectStyleNoArrowRequired}
+                    styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                     />
                 </div>
               </div>
@@ -578,7 +576,7 @@ export default class MultipleTaskEdit extends Component {
                     isDisabled={this.state.defaultFields.company.fixed}
                     onChange={(company)=>this.setState({company, pausal:parseInt(company.workPausal)>0?booleanSelects[1]:booleanSelects[0]})}
                     options={this.state.companies}
-                    styles={invisibleSelectStyleNoArrowRequired}
+                    styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                     />
                 </div>
               </div>
@@ -591,7 +589,7 @@ export default class MultipleTaskEdit extends Component {
                     value={this.state.pausal}
                     placeholder="Select required"
                     isDisabled={!this.state.company || parseInt(this.state.company.workPausal)===0||this.state.defaultFields.pausal.fixed}
-                    styles={invisibleSelectStyleNoArrowRequired}
+                    styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                     onChange={(pausal)=>this.setState({pausal})}
                     options={booleanSelects}
                     />
@@ -641,7 +639,7 @@ export default class MultipleTaskEdit extends Component {
                 <Select
                   placeholder="Select required"
                   value={this.state.overtime}
-                  styles={invisibleSelectStyleNoArrowRequired}
+                  styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                   onChange={(overtime)=>this.setState({overtime})}
                   options={booleanSelects}
                   />
@@ -681,7 +679,7 @@ export default class MultipleTaskEdit extends Component {
                 let permission = project.permissions.find((permission)=>permission.user===curr.id);
                 return permission && permission.read;
               })}
-              styles={invisibleSelectStyleNoArrowRequired}
+              styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
               />
           </div>
         </div>
@@ -697,7 +695,7 @@ export default class MultipleTaskEdit extends Component {
                 isMulti
                 onChange={(users)=>this.setState({assignedTo:users})}
                 options={USERS_WITH_PERMISSIONS}
-                styles={invisibleSelectStyleNoArrowRequired}
+                styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                 />
             </div>
           </div>}
@@ -711,7 +709,7 @@ export default class MultipleTaskEdit extends Component {
                   placeholder="Select required"
                   value={this.state.status}
                   isDisabled={this.state.defaultFields.status.fixed}
-                  styles={invisibleSelectStyleNoArrowColoredRequired}
+                  styles={pickSelectStyle( [ 'invisible', 'noArrow', 'colored', 'required', ] )}
                   onChange={(status)=>{
                     if(status.action==='pending'){
                       this.setState({
@@ -748,7 +746,7 @@ export default class MultipleTaskEdit extends Component {
                     placeholder="Select required"
                     value={this.state.type}
                     isDisabled={this.state.defaultFields.type.fixed}
-                    styles={invisibleSelectStyleNoArrowRequired}
+                    styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                     onChange={(type)=>this.setState({type})}
                     options={this.state.taskTypes}
                     />
@@ -773,7 +771,7 @@ export default class MultipleTaskEdit extends Component {
                       }
                     }}
                     options={this.state.milestones.filter((milestone)=>milestone.id===null || (this.state.project!== null && milestone.project===this.state.project.id))}
-                    styles={invisibleSelectStyleNoArrow}
+                    styles={pickSelectStyle( [ 'invisible', 'noArrow', ] )}
                     />
                 </div>
               </div>
@@ -788,7 +786,7 @@ export default class MultipleTaskEdit extends Component {
                       onChange={(requester)=>this.setState({requester})}
                       isDisabled={this.state.defaultFields.requester.fixed}
                       options={REQUESTERS}
-                      styles={invisibleSelectStyleNoArrowRequired}
+                      styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                       />
                   </div>
                 </div> }
@@ -803,7 +801,7 @@ export default class MultipleTaskEdit extends Component {
                         isDisabled={this.state.defaultFields.company.fixed}
                         onChange={(company)=>this.setState({company, pausal:parseInt(company.workPausal)>0?booleanSelects[1]:booleanSelects[0]})}
                         options={this.state.companies}
-                        styles={invisibleSelectStyleNoArrowRequired}
+                        styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                         />
                     </div>
                   </div>}
@@ -816,7 +814,7 @@ export default class MultipleTaskEdit extends Component {
                           value={this.state.pausal}
                           placeholder="Select required"
                           isDisabled={!this.state.company || parseInt(this.state.company.workPausal)===0||this.state.defaultFields.pausal.fixed}
-                          styles={invisibleSelectStyleNoArrowRequired}
+                          styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                           onChange={(pausal)=>this.setState({pausal})}
                           options={booleanSelects}
                           />
@@ -861,7 +859,7 @@ export default class MultipleTaskEdit extends Component {
                             <Select
                               placeholder="Select required"
                               value={this.state.overtime}
-                              styles={invisibleSelectStyleNoArrowRequired}
+                              styles={pickSelectStyle( [ 'invisible', 'noArrow', 'required', ] )}
                               onChange={(overtime)=>this.setState({overtime})}
                               options={booleanSelects}
                               />

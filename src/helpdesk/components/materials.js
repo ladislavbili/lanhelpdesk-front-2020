@@ -3,8 +3,7 @@ import React, {
 } from 'react';
 import Select from 'react-select';
 import {
-  selectStyle,
-  invisibleSelectStyle
+  pickSelectStyle
 } from 'configs/components/select';
 
 export default class Rozpocet extends Component {
@@ -165,7 +164,7 @@ export default class Rozpocet extends Component {
 														this.props.updateMaterial(material.id,{unit})
 													}}
 													options={this.props.units}
-													styles={invisibleSelectStyle}
+													styles={pickSelectStyle([ 'invisible', ])}
 													/>
 											</td>}
 											{ this.props.showColumns.includes(3) && <td>
@@ -317,7 +316,7 @@ export default class Rozpocet extends Component {
 												}
 											}
 											options={this.props.units}
-											styles={selectStyle}
+											styles={pickSelectStyle()}
 											/>
 									</td>}
 										{ this.props.showColumns.includes(3) && <td>

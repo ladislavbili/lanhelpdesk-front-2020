@@ -1,186 +1,210 @@
-import React, { Component } from 'react';
-import {Input, Nav, NavItem, NavLink} from 'reactstrap';
+import React, {
+  Component
+} from 'react';
+import {
+  Input,
+  Nav,
+  NavItem,
+  NavLink
+} from 'reactstrap';
 import Select from 'react-select';
-import {invisibleSelectStyle} from 'configs/components/select';
-import {sameStringForms} from '../../helperFunctions';
+import {
+  pickSelectStyle
+} from 'configs/components/select';
+import {
+  sameStringForms
+} from '../../helperFunctions';
 
 export default class Rozpocet extends Component {
-	constructor(props){
-		super(props);
-		const newMargin= this.props.company && this.props.company.pricelist ? this.props.company.pricelist.materialMargin : 0;
-		const newUnit= this.props.units.find((item)=>item.id===this.props.defaultUnit);
+  constructor( props ) {
+    super( props );
+    const newMargin = this.props.company && this.props.company.pricelist ? this.props.company.pricelist.materialMargin : 0;
+    const newUnit = this.props.units.find( ( item ) => item.id === this.props.defaultUnit );
 
-		this.state={
-			toggleTab: "1",
+    this.state = {
+      toggleTab: "1",
 
-			//prace
-			showAddSubtask:false,
+      //prace
+      showAddSubtask: false,
 
-			editedSubtaskTitle: "",
-			editedSubtaskType:null,
-			editedSubtaskQuantity: 0,
-			editedSubtaskDiscount:0,
-			focusedSubtask: null,
-			selectedIDs:[],
+      editedSubtaskTitle: "",
+      editedSubtaskType: null,
+      editedSubtaskQuantity: 0,
+      editedSubtaskDiscount: 0,
+      focusedSubtask: null,
+      selectedIDs: [],
 
-			newSubtaskTitle:'',
-			newSubtaskType:this.props.defaultType,
-			newSubtaskAssigned:this.props.taskAssigned.length>0?this.props.taskAssigned[0]:null,
-			newSubtaskQuantity:0,
-			newSubtaskDiscount:0,
+      newSubtaskTitle: '',
+      newSubtaskType: this.props.defaultType,
+      newSubtaskAssigned: this.props.taskAssigned.length > 0 ? this.props.taskAssigned[ 0 ] : null,
+      newSubtaskQuantity: 0,
+      newSubtaskDiscount: 0,
 
-			//trips
-			showAddTrip:false,
+      //trips
+      showAddTrip: false,
 
-			focusedTrip:null,
-			editedTripQuantity:0,
-			editedTripDiscount:0,
+      focusedTrip: null,
+      editedTripQuantity: 0,
+      editedTripDiscount: 0,
 
-			newTripType:this.props.tripTypes.length>0?this.props.tripTypes[0]:null,
-			newTripAssignedTo:this.props.taskAssigned.length>0?this.props.taskAssigned[0]:null,
-			newTripQuantity:1,
-			newTripDiscount:0,
+      newTripType: this.props.tripTypes.length > 0 ? this.props.tripTypes[ 0 ] : null,
+      newTripAssignedTo: this.props.taskAssigned.length > 0 ? this.props.taskAssigned[ 0 ] : null,
+      newTripQuantity: 1,
+      newTripDiscount: 0,
 
-			//Materials
-			showAddMaterial: false,
+      //Materials
+      showAddMaterial: false,
 
-			editedMaterialTitle: "",
-			editedMaterialQuantity: "0",
-			editedMaterialUnit:null,
-			editedMaterialMargin:null,
-			editedMaterialPrice:null,
-			focusedMaterial: null,
-		//	selectedIDs:[],
+      editedMaterialTitle: "",
+      editedMaterialQuantity: "0",
+      editedMaterialUnit: null,
+      editedMaterialMargin: null,
+      editedMaterialPrice: null,
+      focusedMaterial: null,
+      //	selectedIDs:[],
 
-			newTitle:'',
-			newQuantity:1,
-			newUnit:newUnit?newUnit:null,
-			newMargin,
-			newPrice:0,
-			marginChanged:false,
-		}
-		this.onFocusWorkTrip.bind(this);
-		this.onFocusSubtask.bind(this);
-		this.getPrice.bind(this);
-		this.getTotalPrice.bind(this);
-		this.getTotalDiscountedPrice.bind(this);
-		this.getDPH.bind(this);
-	}
+      newTitle: '',
+      newQuantity: 1,
+      newUnit: newUnit ? newUnit : null,
+      newMargin,
+      newPrice: 0,
+      marginChanged: false,
+    }
+    this.onFocusWorkTrip.bind( this );
+    this.onFocusSubtask.bind( this );
+    this.getPrice.bind( this );
+    this.getTotalPrice.bind( this );
+    this.getTotalDiscountedPrice.bind( this );
+    this.getDPH.bind( this );
+  }
 
-	componentWillReceiveProps(props){
-		if(this.props.taskID!==props.taskID){
-			let newUnit= props.units[0];
-			if(props.defaultUnit!==null){
-				newUnit=props.units.find((item)=>item.id===props.defaultUnit)
-			}
-			this.setState({
-				focusedSubtask:null,
-				showAddSubtask:false,
-				newSubtaskTitle:'',
-				newSubtaskType:props.defaultType,
-				newSubtaskQuantity:0,
-				newSubtaskDiscount:0,
-				newSubtaskAssigned:props.taskAssigned.length>0?props.taskAssigned[0]:null,
+  componentWillReceiveProps( props ) {
+    if ( this.props.taskID !== props.taskID ) {
+      let newUnit = props.units[ 0 ];
+      if ( props.defaultUnit !== null ) {
+        newUnit = props.units.find( ( item ) => item.id === props.defaultUnit )
+      }
+      this.setState( {
+        focusedSubtask: null,
+        showAddSubtask: false,
+        newSubtaskTitle: '',
+        newSubtaskType: props.defaultType,
+        newSubtaskQuantity: 0,
+        newSubtaskDiscount: 0,
+        newSubtaskAssigned: props.taskAssigned.length > 0 ? props.taskAssigned[ 0 ] : null,
 
-				focusedTrip:null,
-				showAddTrip:false,
-				newTripType:props.tripTypes.length>0?props.tripTypes[0]:null,
-				newTripAssignedTo:props.taskAssigned.length>0?props.taskAssigned[0]:null,
-				newTripQuantity:1,
-				newTripDiscount:0,
+        focusedTrip: null,
+        showAddTrip: false,
+        newTripType: props.tripTypes.length > 0 ? props.tripTypes[ 0 ] : null,
+        newTripAssignedTo: props.taskAssigned.length > 0 ? props.taskAssigned[ 0 ] : null,
+        newTripQuantity: 1,
+        newTripDiscount: 0,
 
-				newTitle:'',
-				newQuantity:1,
-				newUnit,
-				newMargin: props.company && props.company.pricelist ? props.company.pricelist.materialMargin : 0,
-				newPrice:0,
-				marginChanged:false,
-			})
-		}else if(!sameStringForms(this.props.defaultType,props.defaultType)){
-			this.setState({
-				newSubtaskType:props.defaultType,
-			})
-		}
+        newTitle: '',
+        newQuantity: 1,
+        newUnit,
+        newMargin: props.company && props.company.pricelist ? props.company.pricelist.materialMargin : 0,
+        newPrice: 0,
+        marginChanged: false,
+      } )
+    } else if ( !sameStringForms( this.props.defaultType, props.defaultType ) ) {
+      this.setState( {
+        newSubtaskType: props.defaultType,
+      } )
+    }
 
-		if(!sameStringForms(this.props.taskAssigned,props.taskAssigned)){
-			if(!props.taskAssigned.some((item)=>item.id===(this.state.newSubtaskAssigned?this.state.newSubtaskAssigned.id:null))){
-				if(props.taskAssigned.length>0){
-					this.setState({newSubtaskAssigned:props.taskAssigned[0],newTripAssignedTo:props.taskAssigned[0] });
-				}else{
-					this.setState({newSubtaskAssigned:null, newTripAssignedTo:null });
-				}
-			}
-		}
+    if ( !sameStringForms( this.props.taskAssigned, props.taskAssigned ) ) {
+      if ( !props.taskAssigned.some( ( item ) => item.id === ( this.state.newSubtaskAssigned ? this.state.newSubtaskAssigned.id : null ) ) ) {
+        if ( props.taskAssigned.length > 0 ) {
+          this.setState( {
+            newSubtaskAssigned: props.taskAssigned[ 0 ],
+            newTripAssignedTo: props.taskAssigned[ 0 ]
+          } );
+        } else {
+          this.setState( {
+            newSubtaskAssigned: null,
+            newTripAssignedTo: null
+          } );
+        }
+      }
+    }
 
-		if((this.props.company===null && props.company!==null) ||
-		(this.props.company && props.company && props.company.id!==this.props.company.id)){
-			this.setState({newMargin: (props.company && props.company.pricelist ? props.company.pricelist.materialMargin : 0)});
-		}
+    if ( ( this.props.company === null && props.company !== null ) ||
+      ( this.props.company && props.company && props.company.id !== this.props.company.id ) ) {
+      this.setState( {
+        newMargin: ( props.company && props.company.pricelist ? props.company.pricelist.materialMargin : 0 )
+      } );
+    }
 
-		if(this.props.units && props.units && this.props.units.length!==props.units.length){
-			let newUnit= props.units[0];
-			if(props.defaultUnit!==null){
-				newUnit=props.units.find((item)=>item.id===props.defaultUnit)
-			}
-			this.setState({newUnit});
-		}
-	}
+    if ( this.props.units && props.units && this.props.units.length !== props.units.length ) {
+      let newUnit = props.units[ 0 ];
+      if ( props.defaultUnit !== null ) {
+        newUnit = props.units.find( ( item ) => item.id === props.defaultUnit )
+      }
+      this.setState( {
+        newUnit
+      } );
+    }
+  }
 
-	onFocusWorkTrip(trip){
-		this.setState({
-			editedTripQuantity:trip.quantity,
-			editedTripDiscount:trip.discount,
-			focusedTrip:trip.id
-		})
-	}
+  onFocusWorkTrip( trip ) {
+    this.setState( {
+      editedTripQuantity: trip.quantity,
+      editedTripDiscount: trip.discount,
+      focusedTrip: trip.id
+    } )
+  }
 
-	onFocusSubtask(subtask){
-		this.setState({
-			editedSubtaskTitle: subtask.title,
-			editedSubtaskQuantity: subtask.quantity?subtask.quantity:'',
-			editedSubtaskType: subtask.type,
-			editedSubtaskDiscount: subtask.discount,
-			focusedSubtask: subtask.id
-		});
-	}
+  onFocusSubtask( subtask ) {
+    this.setState( {
+      editedSubtaskTitle: subtask.title,
+      editedSubtaskQuantity: subtask.quantity ? subtask.quantity : '',
+      editedSubtaskType: subtask.type,
+      editedSubtaskDiscount: subtask.discount,
+      focusedSubtask: subtask.id
+    } );
+  }
 
-	getPrice(type){
-		if(!type){
-			return NaN;
-		}
-		let price = (this.props.company.pricelist ? type.prices.find((price)=>price.pricelist===this.props.company.pricelist.id) : undefined);
-		if(price === undefined){
-			price = NaN;
-		}else{
-			price = price.price;
-		}
-		return parseFloat(parseFloat(price).toFixed(2));
-	}
+  getPrice( type ) {
+    if ( !type ) {
+      return NaN;
+    }
+    let price = ( this.props.company.pricelist ? type.prices.find( ( price ) => price.pricelist === this.props.company.pricelist.id ) : undefined );
+    if ( price === undefined ) {
+      price = NaN;
+    } else {
+      price = price.price;
+    }
+    return parseFloat( parseFloat( price )
+      .toFixed( 2 ) );
+  }
 
-	getTotalPrice(item){
-		return parseFloat(this.getPrice(item.type)*parseInt(item.quantity).toFixed(2))
-	}
+  getTotalPrice( item ) {
+    return parseFloat( this.getPrice( item.type ) * parseInt( item.quantity )
+      .toFixed( 2 ) )
+  }
 
-	getTotalDiscountedPrice(item){
-		return parseFloat(parseFloat(this.getTotalPrice(item)*(100-parseInt(item.discount))/100).toFixed(2))
-	}
+  getTotalDiscountedPrice( item ) {
+    return parseFloat( parseFloat( this.getTotalPrice( item ) * ( 100 - parseInt( item.discount ) ) / 100 )
+      .toFixed( 2 ) )
+  }
 
-	getDPH(){
-		let dph = 20;
-		if(this.props.company && this.props.company.dph > 0){
-			dph = this.props.company.dph;
-		}
-		return (100+dph)/100;
-	}
+  getDPH() {
+    let dph = 20;
+    if ( this.props.company && this.props.company.dph > 0 ) {
+      dph = this.props.company.dph;
+    }
+    return ( 100 + dph ) / 100;
+  }
 
-	render() {
-		let editedFinalUnitPrice = 0;
-		if(this.state.focusedMaterial!==null){
-			editedFinalUnitPrice = (parseFloat(this.state.editedMaterialPrice)*(1+parseFloat(this.state.editedMaterialMargin)/100))
-		}
+  render() {
+    let editedFinalUnitPrice = 0;
+    if ( this.state.focusedMaterial !== null ) {
+      editedFinalUnitPrice = ( parseFloat( this.state.editedMaterialPrice ) * ( 1 + parseFloat( this.state.editedMaterialMargin ) / 100 ) )
+    }
 
-		return (
-			<div className="vykazyTable">
+    return (
+      <div className="vykazyTable">
 					<table className="table">
 						<thead>
 							<tr>
@@ -285,7 +309,7 @@ export default class Rozpocet extends Component {
 												this.props.updateTrip(trip.id,{type:type.id})
 											}}
 											options={this.props.tripTypes}
-											styles={invisibleSelectStyle}
+											styles={pickSelectStyle([ 'invisible', ])}
 											/>
 									</td>}
 
@@ -495,6 +519,6 @@ export default class Rozpocet extends Component {
 							</div>
 						</div>}
 				</div>
-			);
-		}
-	}
+    );
+  }
+}

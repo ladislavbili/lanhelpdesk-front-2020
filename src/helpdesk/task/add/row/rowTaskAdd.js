@@ -25,7 +25,7 @@ import ck5config from 'configs/components/ck5config';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import axios from 'axios';
 import {
-  selectStyleNoArrow
+  pickSelectStyle
 } from 'configs/components/select';
 import {
   localFilterToValues,
@@ -301,7 +301,7 @@ export default function RowTaskAdd( props ) {
           placeholder="Select required"
           value={status}
           isDisabled={defaultFields.status.fixed || viewOnly}
-          styles={selectStyleNoArrow}
+          styles={pickSelectStyle( [ 'noArrow', ] )}
           onChange={(status)=>{
             if(status.action==='PendingDate'){
               setStatus(status);
@@ -329,7 +329,7 @@ export default function RowTaskAdd( props ) {
             setCompany(companies.find((company) => company.id === requester.id ))
           }}
           options={REQUESTERS}
-          styles={selectStyleNoArrow}
+          styles={pickSelectStyle(  [ 'noArrow', ] )}
           />
       </div>
 
@@ -345,7 +345,7 @@ export default function RowTaskAdd( props ) {
               setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
             }}
             options={companies}
-            styles={selectStyleNoArrow}
+            styles={pickSelectStyle(  [ 'noArrow', ] )}
             />
         </div>
       }
@@ -359,7 +359,7 @@ export default function RowTaskAdd( props ) {
           isDisabled={defaultFields.assignedTo.fixed || viewOnly}
           onChange={(users)=> setAssignedTo(users)}
           options={USERS_WITH_PERMISSIONS}
-          styles={selectStyleNoArrow}
+          styles={pickSelectStyle(  [ 'noArrow', ] )}
           />
       </div>
 

@@ -16,10 +16,6 @@ import {
   getAttributeDefaultValue,
   htmlFixNewLines
 } from '../../helperFunctions';
-import Select from 'react-select';
-import {
-  selectStyle
-} from "configs/components/select";
 import IPList from './ipList';
 import Passwords from './passwords';
 import AttributesHandler from './attributesHandler';

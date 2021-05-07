@@ -55,6 +55,16 @@ export default function ProjectGroups( props ) {
             <Input placeholder="Set order" value={order} onChange={(e) => setOrder(e.target.value)}/>
           </FormGroup>
           <button
+            className="btn btn-link-cancel"
+            onClick={ () => {
+              setTitle(group.title);
+              setOrder(group.order);
+              setOpen(false);
+            } }
+            >
+            Close
+          </button>
+          <button
             className="btn btn-distance"
             onClick={ () => {
               setTitle(group.title);

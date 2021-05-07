@@ -19,7 +19,7 @@ import {
 } from 'helperFunctions';
 import Select from 'react-select';
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 import Loading from 'components/loading';
 import Switch from "react-switch";
@@ -374,7 +374,7 @@ export default function PricelistEdit( props ) {
             <FormGroup>
               { def && <Label>A replacement pricelist</Label> }
               <Select
-                styles={selectStyle}
+                styles={pickSelectStyle()}
                 options={filteredPricelists}
                 value={newPricelist}
                 onChange={s => {
@@ -388,7 +388,7 @@ export default function PricelistEdit( props ) {
               <FormGroup>
                 <Label>New default pricelist</Label>
                 <Select
-                  styles={selectStyle}
+                  styles={pickSelectStyle()}
                   options={filteredPricelists}
                   value={newDefPricelist}
                   onChange={s => {

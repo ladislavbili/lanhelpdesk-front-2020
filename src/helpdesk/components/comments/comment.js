@@ -24,7 +24,7 @@ export default function CommentRender( props ) {
           <h2 className="font-13 m-0"><Label>{comment.user !== null ? (comment.user.fullName) : 'Unknown sender'}</Label></h2>
         </div>
       </div>
-      <div className="m-l-40 m-b-15 font-13" style={{marginTop: "-40px"}} dangerouslySetInnerHTML={{__html: comment.isEmail? comment.message : comment.message.replace(/(?:\r\n|\r|\n)/g, '<br>') }}>
+      <div className="m-l-40 m-b-15 font-13" style={{marginTop: "-40px"}} dangerouslySetInnerHTML={{__html: comment.message.replace(/(?:\r\n|\r|\n)/g, '<br>').replace(/(?:<p>)/g, '<div>').replace(/(?:<\/p>)/g, '</div>') }}>
       </div>
       <div className="m-l-40 m-b-30">
         {comment.commentAttachments && comment.commentAttachments.map( (attachment) =>

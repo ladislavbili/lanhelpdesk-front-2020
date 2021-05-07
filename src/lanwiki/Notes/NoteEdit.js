@@ -17,7 +17,7 @@ import {
   toSelArr
 } from "../../helperFunctions";
 import {
-  selectStyle
+  pickSelectStyle
 } from "configs/components/select";
 
 import CKEditor from "ckeditor4-react";
@@ -105,7 +105,7 @@ export default function NoteEdit( props ) {
             isMulti
             onChange={(tags) => setTags(tags)}
             options={allTags}
-            styles={selectStyle}
+            styles={pickSelectStyle()}
           />
         </div>
       </div>

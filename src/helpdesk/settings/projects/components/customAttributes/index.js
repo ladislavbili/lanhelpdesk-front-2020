@@ -1,10 +1,4 @@
 import React from 'react';
-import Select, {
-  Creatable
-} from 'react-select';
-import {
-  selectStyle,
-} from 'configs/components/select';
 import {
   Modal,
   ModalBody,
