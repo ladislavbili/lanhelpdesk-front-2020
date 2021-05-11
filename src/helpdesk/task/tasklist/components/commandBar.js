@@ -23,7 +23,6 @@ import {
 // breadcrums, statistics switch, layout switch
 export default function CommandBar( props ) {
   const {
-    currentUser,
     loading,
     showStatistics,
     setShowStatistics,
@@ -37,6 +36,7 @@ export default function CommandBar( props ) {
     canViewCalendar,
   } = props;
 
+  const canSeeStatistics = localProject.id !== null && localProject.right.statistics;
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
 
   const getLayoutIcon = () => {
@@ -113,24 +113,26 @@ export default function CommandBar( props ) {
               "d-flex flex-row align-items-center ml-auto"
             )}
             >
-            <div className="m-r-5">
-              <label className="center-hor">
-                <Switch
-                  checked={showStatistics}
-                  disabled={loading}
-                  onChange={() => {
-                    setShowStatistics(!showStatistics);
-                  }}
-                  height={22}
-                  width={100}
-                  checkedIcon={<span className="switchLabel p-l-20">Tasks</span>}
-                  uncheckedIcon={<span className="switchLabel-right m-l--40">Statistics</span>}
-                  onColor={"#0078D4"}
-                  offColor={"#0078D4"}
-                  />
-                <span className="m-l-10"></span>
-              </label>
-            </div>
+            { canSeeStatistics &&
+              <div className="m-r-5">
+                <label className="center-hor">
+                  <Switch
+                    checked={showStatistics}
+                    disabled={loading}
+                    onChange={() => {
+                      setShowStatistics(!showStatistics);
+                    }}
+                    height={22}
+                    width={100}
+                    checkedIcon={<span className="switchLabel p-l-20">Tasks</span>}
+                    uncheckedIcon={<span className="switchLabel-right m-l--40">Statistics</span>}
+                    onColor={"#0078D4"}
+                    offColor={"#0078D4"}
+                    />
+                  <span className="m-l-10"></span>
+                </label>
+              </div>
+            }
 
             <Dropdown className="center-hor"
               isOpen={layoutOpen}

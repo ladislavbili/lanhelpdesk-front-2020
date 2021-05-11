@@ -126,7 +126,7 @@ export default function CompanyAdd( props ) {
           city,
           street,
           zip,
-          email,
+          email: email.length > 0 ? email : null,
           phone,
           description,
           pricelistId: pricelist.id,
@@ -217,8 +217,8 @@ export default function CompanyAdd( props ) {
     setPricelistName( "" );
   }
 
-  const attributes = [ title, ico, email ];
-  const cannotSave = saving || attributes.some( attr => attr === "" ) || ( pricelist.value === "0" && pricelistName === "" ) || !isEmail( email );
+  const attributes = [ title, ico ];
+  const cannotSave = saving || attributes.some( attr => attr === "" ) || ( pricelist.value === "0" && pricelistName === "" ) || ( !isEmail( email ) && email.length !== 0 );
 
   if ( pricelistsLoading ) {
     return <Loading />
@@ -427,7 +427,7 @@ export default function CompanyAdd( props ) {
 
         <FormGroup className="row m-b-10 p-l-20 p-r-20">
           <div className="m-r-10 w-20">
-            <Label for="mail">E-mail <span className="warning-big">*</span></Label>
+            <Label for="mail">E-mail</Label>
           </div>
           <div className="flex">
             <Input
@@ -435,7 +435,7 @@ export default function CompanyAdd( props ) {
               id="mail"
               className={(email.length > 0 && !isEmail(email)) ? "form-control-warning" : ""}
               type="text"
-              placeholder="Enter e-mail"
+              placeholder="Enter e-mail (must be email or empty)"
               value={email}
               onChange={(e)=>{
                 setEmail(e.target.value);

@@ -1007,7 +1007,7 @@ export default function TaskAdd( props ) {
   }
 
   const renderSimpleSubtasks = () => {
-    if ( !userRights.taskShortSubtasksRead ) {
+    if ( !userRights.taskShortSubtasksWrite ) {
       return null;
     }
     return (

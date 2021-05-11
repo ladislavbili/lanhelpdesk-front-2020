@@ -54,6 +54,7 @@ export const groupRights = `
   pausalInfo
   taskTitleEdit
   viewComments
+  statistics
 `;
 
 const def = `

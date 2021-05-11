@@ -20,7 +20,6 @@ export default function CheckboxList( props ) {
   const [ title, setTitle ] = React.useState( '' );
   const [ done, setDone ] = React.useState( false );
   const [ editedItem, setEditedItem ] = React.useState( null );
-
   return (
     <div className="form-section">
           <Label>Subtasks</Label>
@@ -101,7 +100,7 @@ export default function CheckboxList( props ) {
           </button>
         </div>
       }
-      { !addItem &&
+      { !addItem && !disabled &&
         <button
           className="btn-link"
           disabled={disabled}

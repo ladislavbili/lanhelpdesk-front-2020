@@ -66,6 +66,11 @@ export const allACLs = [
     both: false
   },
   {
+    id: 'statistics',
+    title: 'View statistics',
+    both: false,
+  },
+  {
     id: 'sepAdd',
     title: 'ADD TASK',
     separator: true,

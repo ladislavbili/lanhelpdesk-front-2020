@@ -116,49 +116,50 @@ export default function Comments( props ) {
     <div>
       { (userRights.addComments || userRights.emails) &&
         <div>
-          {
-            isEmail && <FormGroup className="row m-b-10">
-            <Label className="m-r-10 center-hor" style={{width:50}}>To:</Label>
-            <div className="flex">
-              <Creatable
-                isMulti
-                value={tos}
-                onChange={(newData) => setTos(newData)}
-                options={users}
-                styles={pickSelectStyle()}/>
+          { isEmail &&
+            <FormGroup className="row m-b-10">
+              <Label className="m-r-10 center-hor" style={{width:50}}>To:</Label>
+              <div className="flex">
+                <Creatable
+                  isMulti
+                  value={tos}
+                  onChange={(newData) => setTos(newData)}
+                  options={users}
+                  styles={pickSelectStyle()}/>
+              </div>
+            </FormGroup>
+          }
+          {isEmail &&
+            <FormGroup className="row m-b-10">
+              <Label className="m-r-10 center-hor" style={{width:50}}>Subject:</Label>
+              <Input className="form-control-secondary flex" type="text" placeholder="Enter subject" value={subject} onChange={(e)=>setSubject(e.target.value)}/>
+            </FormGroup>
+          }
+          {isEmail &&
+            <FormGroup>
+              <Label className="">Message</Label>
+              <CKEditor
+                data={emailBody}
+                onChange={(evt)=>setEmailBody(evt.editor.getData()) }
+                />
+            </FormGroup>
+          }
+          {!isEmail &&
+            <FormGroup>
+              <Input type="textarea" placeholder="Enter comment" style={{ border: '1px solid #c4c4c4' }} value={newComment} onChange={(e)=>setNewComment(e.target.value)}/>
+            </FormGroup>
+          }
+          {isEmail && hasError &&
+            <div style={{color:'red'}}>
+              E-mail failed to send! Check console for more information
             </div>
-          </FormGroup>
-        }
-        {isEmail && <FormGroup className="row m-b-10">
-          <Label className="m-r-10 center-hor" style={{width:50}}>Subject:</Label>
-          <Input className="form-control-secondary flex" type="text" placeholder="Enter subject" value={subject} onChange={(e)=>setSubject(e.target.value)}/>
-        </FormGroup>}
-        {isEmail &&
-          <FormGroup>
-            <Label className="">Message</Label>
-            <CKEditor
-              data={emailBody}
-              onChange={(evt)=>setEmailBody(evt.editor.getData()) }
-              />
-          </FormGroup>
-        }
-        {!isEmail &&
-          <FormGroup>
-            <Input type="textarea" placeholder="Enter comment" style={{ border: '1px solid #c4c4c4' }} value={newComment} onChange={(e)=>setNewComment(e.target.value)}/>
-          </FormGroup>
-        }
-        {isEmail && hasError &&
-          <div style={{color:'red'}}>
-            E-mail failed to send! Check console for more information
-          </div>
-        }
+          }
 
-        <div className="row m-b-30">
+          <div className="row m-b-30">
 
-          <button
-            className="btn center-hor m-t-0 btn-distance"
-            disabled={(!isEmail && newComment==='')||
-              (isEmail&&(tos.length < 1 ||subject===''||emailBody===''))||saving}
+            <button
+              className="btn center-hor m-t-0 btn-distance"
+              disabled={(!isEmail && newComment==='')|| (isEmail&&(tos.length < 1 ||subject===''||emailBody===''))||saving}
               onClick={() => {
                 if(isEmail){
                   submitEmail(
@@ -203,7 +204,8 @@ export default function Comments( props ) {
                 setNewComment( '' );
                 setSubject( '' );
                 setTos( [] );
-              }}>
+              }}
+              >
               Submit
             </button>
             { userRights.emails && userRights.addComments &&
@@ -231,9 +233,14 @@ export default function Comments( props ) {
                 className="btn-link v-a-m"
                 htmlFor="uploadCommentAttachments"
                 >
-                  <i className="fa fa-plus" /> Attachement
-                </button>
-              <input type="file" id="uploadCommentAttachments" multiple={true} style={{display:'none'}}
+                <i className="fa fa-plus" />
+                Attachement
+              </button>
+              <input
+                type="file"
+                id="uploadCommentAttachments"
+                multiple={true}
+                style={{display:'none'}}
                 onChange={(e)=>{
                   if(e.target.files.length>0){
                     let files = [...e.target.files];
@@ -242,31 +249,33 @@ export default function Comments( props ) {
                 }}
                 />
             </div>
-            {
-              attachments.map((attachment,index)=>
+            { attachments.map((attachment,index) =>
               <div className="comment-attachment"
                 style={{    height: "25px", marginTop: "11px", marginRight:"5px"}}
                 >
                 <span style={{color: "#0078D4"}}>
                   {`${attachment.name} (${Math.round(parseInt(attachment.size)/1024)}kB)`}
                 </span>
-                <button className="btn-link"
-                  style={{height: "15px",
+                <button
+                  className="btn-link"
+                  style={{
+                    height: "15px",
                     marginTop: "-8px",
                     marginLeft: "5px",
-                    padding: "0px"}}
-                    onClick={()=>{
-                      if(window.confirm('Are you sure?')){
-                        let newAttachments=[...attachments];
-                        newAttachments.splice(index,1);
-                        setAttachments(newAttachments)
-                      }
-                    }}>
-                    <i className="fa fa-times"  />
-                  </button>
-                </div>
-              )
-            }
+                    padding: "0px"
+                  }}
+                  onClick={()=>{
+                    if(window.confirm('Are you sure?')){
+                      let newAttachments=[...attachments];
+                      newAttachments.splice(index,1);
+                      setAttachments(newAttachments)
+                    }
+                  }}
+                  >
+                  <i className="fa fa-times"  />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       }
@@ -276,7 +285,7 @@ export default function Comments( props ) {
           { comment.isEmail &&
             <Email
               openedComments={openedComments}
-          setOpenedComments={setOpenedComments}
+              setOpenedComments={setOpenedComments}
               getAttachment={getAttachment}
               comment={comment}
               sendEmail={() => {

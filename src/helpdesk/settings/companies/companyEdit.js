@@ -11,12 +11,9 @@ import {
 } from 'reactstrap';
 import Switch from "react-switch";
 import {
-  toSelArr
-} from '../../../helperFunctions';
-
-import {
+  toSelArr,
   isEmail
-} from '../../../helperFunctions';
+} from 'helperFunctions';
 import CompanyRents from './companyRents';
 import CompanyPriceList from './companyPriceList';
 import DeleteReplacement from 'components/deleteReplacement';
@@ -157,46 +154,47 @@ export default function CompanyEdit( props ) {
 
   React.useEffect( () => {
     if ( !loading ) {
-      setTitle( data.company.title );
-      setOldTitle( data.company.title );
-      setDph( data.company.dph );
-      setOldDph( data.company.dph );
-      setIco( data.company.ico );
-      setOldIco( data.company.ico );
-      setDic( data.company.dic );
-      setOldDic( data.company.dic );
-      setIcDph( data.company.ic_dph );
-      setOldIcDph( data.company.ic_dph );
-      setCountry( data.company.country );
-      setOldCountry( data.company.country );
-      setCity( data.company.city );
-      setOldCity( data.company.city );
-      setStreet( data.company.street );
-      setOldStreet( data.company.street );
-      setZip( data.company.zip );
-      setOldZip( data.company.zip );
-      setEmail( data.company.email );
-      setOldEmail( data.company.email );
-      setPhone( data.company.phone );
-      setOldPhone( data.company.phone );
-      setDescription( data.company.description );
-      setOldDescription( data.company.description );
-      setMonthly( data.company.monthly );
-      setOldMonthly( data.company.monthly );
-      setMonthlyPausal( data.company.monthlyPausal );
-      setOldMonthlyPausal( data.company.monthlyPausal );
-      setTaskWorkPausal( data.company.taskWorkPausal );
-      setOldTaskWorkPausal( data.company.taskWorkPausal );
-      setTaskTripPausal( data.company.taskTripPausal );
-      setOldTaskTripPausal( data.company.taskTripPausal );
+      const company = data.company;
+      setTitle( company.title );
+      setOldTitle( company.title );
+      setDph( company.dph );
+      setOldDph( company.dph );
+      setIco( company.ico );
+      setOldIco( company.ico );
+      setDic( company.dic );
+      setOldDic( company.dic );
+      setIcDph( company.ic_dph );
+      setOldIcDph( company.ic_dph );
+      setCountry( company.country );
+      setOldCountry( company.country );
+      setCity( company.city );
+      setOldCity( company.city );
+      setStreet( company.street );
+      setOldStreet( company.street );
+      setZip( company.zip );
+      setOldZip( company.zip );
+      setEmail( company.email ? company.email : '' );
+      setOldEmail( company.email );
+      setPhone( company.phone );
+      setOldPhone( company.phone );
+      setDescription( company.description );
+      setOldDescription( company.description );
+      setMonthly( company.monthly );
+      setOldMonthly( company.monthly );
+      setMonthlyPausal( company.monthlyPausal );
+      setOldMonthlyPausal( company.monthlyPausal );
+      setTaskWorkPausal( company.taskWorkPausal );
+      setOldTaskWorkPausal( company.taskWorkPausal );
+      setTaskTripPausal( company.taskTripPausal );
+      setOldTaskTripPausal( company.taskTripPausal );
       let pl = {
-        ...data.company.pricelist,
-        value: data.company.pricelist.id,
-        label: data.company.pricelist.title
+        ...company.pricelist,
+        value: company.pricelist.id,
+        label: company.pricelist.title
       };
       setPricelist( pl );
       setOldPricelist( pl );
-      let r = data.company.companyRents.map( re => {
+      let r = company.companyRents.map( re => {
         return {
           id: re.id,
           title: re.title,
@@ -249,7 +247,7 @@ export default function CompanyEdit( props ) {
           city,
           street,
           zip,
-          email,
+          email: email.length > 0 ? email : null,
           phone,
           description,
           pricelistId: pricelistId ? pricelistId : pricelist.id,
@@ -360,8 +358,8 @@ export default function CompanyEdit( props ) {
     setPricelistName( "" );
   }
 
-  const attributes = [ title, ico, email ];
-  const cannotSave = saving || attributes.some( attr => attr === "" ) || ( pricelist.value === "0" && pricelistName === "" );
+  const attributes = [ title, ico ];
+  const cannotSave = saving || attributes.some( attr => attr === "" ) || ( pricelist.value === "0" && pricelistName === "" || ( email.length !== 0 && isEmail( email ) ) );
 
   if ( loading ) {
     return <Loading />
@@ -571,7 +569,7 @@ export default function CompanyEdit( props ) {
 
             <FormGroup className="row m-b-10 p-l-20 p-r-20">
               <div className="m-r-10 w-20">
-                <Label for="mail">E-mail<span className="warning-big">*</span></Label>
+                <Label for="mail">E-mail</Label>
               </div>
               <div className="flex">
                 <Input
@@ -579,7 +577,7 @@ export default function CompanyEdit( props ) {
                   id="mail"
                   className={(email.length > 0 && !isEmail(email)) ? "form-control-warning" : ""}
                   type="text"
-                  placeholder="Enter e-mail"
+                  placeholder="Enter e-mail (must be email or empty)"
                   value={email}
                   onChange={(e)=>{
                     setEmail(e.target.value);

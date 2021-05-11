@@ -1255,6 +1255,9 @@ export default function TaskEdit( props ) {
           <div> {assignedTo.map((user) =>
               <div className="disabled-info">{ user.label}</div>
             )}
+            { assignedTo.length === 0 &&
+              <div className="message error-message">Úloha nepriradená</div>              
+            }
           </div>
         }
         { userRights.assignedWrite &&
@@ -1859,6 +1862,7 @@ export default function TaskEdit( props ) {
     if ( !userRights.taskShortSubtasksRead ) {
       return null;
     }
+
     return (
       <CheckboxList
           disabled={!userRights.taskShortSubtasksWrite}
