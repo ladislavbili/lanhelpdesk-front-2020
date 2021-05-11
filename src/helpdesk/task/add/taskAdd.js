@@ -963,16 +963,6 @@ export default function TaskAdd( props ) {
   }
 
   const renderDescription = () => {
-    if ( !userRights.taskDescriptionRead && userRights.tagsRead ) {
-      return (
-        <div className="form-section">
-        {renderMultiSelectTags()}
-      </div>
-      )
-    }
-    if ( !userRights.taskDescriptionRead ) {
-      return null;
-    }
     return (
       <div className="form-section">
         <div className="row" style={{alignItems: "baseline"}}>

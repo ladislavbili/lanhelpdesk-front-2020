@@ -272,7 +272,6 @@ export default function ProjectAdd( props ) {
   const addTaskIssue = (
     groups.filter( ( group ) => group.rights.addTasks )
     .some( ( group ) => (
-      ( !group.rights.taskTitleEdit ) ||
       ( !group.rights.status.write && !status.def ) ||
       ( !group.rights.tags.write && !defTag.def && defTag.required ) ||
       //( !group.rights.assigned.write && !assignedTo.def ) ||

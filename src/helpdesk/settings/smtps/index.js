@@ -29,7 +29,9 @@ export default function SMTPsList( props ) {
     data,
     loading,
     refetch
-  } = useQuery( GET_SMTPS );
+  } = useQuery( GET_SMTPS, {
+    fetchPolicy: 'network-only'
+  } );
   const SMTPS = ( loading || !data ? [] : data.smtps );
   const [ testSmtps ] = useMutation( TEST_SMTPS );
   const testSMTPs = () => {

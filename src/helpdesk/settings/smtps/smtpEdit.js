@@ -53,6 +53,7 @@ export default function SMTPEdit( props ) {
     variables: {
       id: parseInt( props.match.params.id )
     },
+    fetchPolicy: 'network-only',
     notifyOnNetworkStatusChange: true,
   } );
   const [ updateSmtp ] = useMutation( UPDATE_SMTP );
