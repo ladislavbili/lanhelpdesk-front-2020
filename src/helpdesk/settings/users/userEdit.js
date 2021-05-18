@@ -56,27 +56,32 @@ export default function UserEdit( props ) {
     variables: {
       id
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   } );
   const {
     data: rolesData,
     loading: rolesLoading
-  } = useQuery( GET_ROLES );
+  } = useQuery( GET_ROLES, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: currentUserData,
     loading: currentUserLoading
-  } = useQuery( GET_MY_DATA );
+  } = useQuery( GET_MY_DATA, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_BASIC_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES, {
+    fetchPolicy: 'network-only'
+  } );
   const [ updateUser ] = useMutation( UPDATE_USER );
   const [ deleteUser, {
     client
   } ] = useMutation( DELETE_USER );
 
   const [ setUserActive ] = useMutation( SET_USER_ACTIVE );
-
 
   //state
   const [ active, setActive ] = React.useState( true );
@@ -96,43 +101,47 @@ export default function UserEdit( props ) {
 
   const [ dataChanged, setDataChanged ] = React.useState( false );
 
-
   // sync
   React.useEffect( () => {
-    if ( !userLoading ) {
-      const user = userData.user;
-      setActive( user.active );
-      setUsername( user.username );
-      setEmail( user.email );
-      setName( user.name );
-      setSurname( user.surname );
-      setReceiveNotifications( user.receiveNotifications );
-      setSignature( ( user.signature ? user.signature : `${user.name} ${user.surname}, ${user.company.title}` ) );
-      setRole( {
-        ...user.role,
-        label: user.role.title,
-        value: user.role.id
-      } );
-      setCompany( {
-        ...user.company,
-        label: user.company.title,
-        value: user.company.id
-      } );
-      setLanguage( languages.find( language => language.value === user.language ) );
-
-      setDataChanged( false );
-    }
+    setData();
   }, [ userLoading ] );
 
   React.useEffect( () => {
     userRefetch( {
-      variables: {
-        id
-      }
-    } );
+        variables: {
+          id
+        }
+      } )
+      .then( setData );
   }, [ id ] );
 
   // functions
+  const setData = () => {
+    if ( userLoading ) {
+      return;
+    }
+    const user = userData.user;
+    setActive( user.active );
+    setUsername( user.username );
+    setEmail( user.email );
+    setName( user.name );
+    setSurname( user.surname );
+    setReceiveNotifications( user.receiveNotifications );
+    setSignature( ( user.signature ? user.signature : `${user.name} ${user.surname}, ${user.company.title}` ) );
+    setRole( {
+      ...user.role,
+      label: user.role.title,
+      value: user.role.id
+    } );
+    setCompany( {
+      ...user.company,
+      label: user.company.title,
+      value: user.company.id
+    } );
+    setLanguage( languages.find( language => language.value === user.language ) );
+    setDataChanged( false );
+  }
+
   const updateUserFunc = () => {
     setSaving( true );
     let data = {
@@ -153,28 +162,6 @@ export default function UserEdit( props ) {
     updateUser( {
         variables: data
       } )
-      .then( ( response ) => {
-        const allUsers = client.readQuery( {
-            query: GET_USERS
-          } )
-          .users;
-        let newUser = {
-          id,
-          username,
-          email,
-          role,
-          company,
-          __typename: "User"
-        }
-        client.writeQuery( {
-          query: GET_USERS,
-          data: {
-            users: allUsers.map( user => ( user.id !== id ? user : {
-              ...newUser
-            } ) )
-          }
-        } );
-      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -192,19 +179,6 @@ export default function UserEdit( props ) {
             workTripPairs: [],
           }
         } )
-        .then( ( response ) => {
-          const allUsers = client.readQuery( {
-              query: GET_USERS
-            } )
-            .users;
-          client.writeQuery( {
-            query: GET_USERS,
-            data: {
-              users: allUsers.filter( user => user.id !== id )
-            }
-          } );
-          history.goBack();
-        } )
         .catch( ( err ) => {
           console.log( err.message );
         } );
@@ -212,21 +186,6 @@ export default function UserEdit( props ) {
   };
 
   const deactivateUser = ( active ) => {
-    const newUsers = [ ...client.readQuery( {
-        query: GET_USERS
-      } )
-      .users ];
-    let index = newUsers.findIndex( ( user ) => user.id === id );
-    newUsers[ index ] = {
-      ...newUsers[ index ],
-      active: !active
-    };
-    client.writeQuery( {
-      query: GET_USERS,
-      data: {
-        users: newUsers
-      }
-    } );
     setUserActive( {
       variables: {
         id,

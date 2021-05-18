@@ -38,21 +38,7 @@ export default function TaskTypeAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        const allTaskTypes = client.readQuery( {
-            query: GET_TASK_TYPES
-          } )
-          .taskTypes;
-        const newTaskType = {
-          ...response.data.addTaskType,
-          __typename: "TaskType"
-        };
-        client.writeQuery( {
-          query: GET_TASK_TYPES,
-          data: {
-            taskTypes: [ ...allTaskTypes, newTaskType ]
-          }
-        } );
-        history.push( '/helpdesk/settings/taskTypes/' + newTaskType.id )
+        history.push( '/helpdesk/settings/taskTypes/' + response.data.addTaskType.id )
       } )
       .catch( ( err ) => {
         console.log( err.message );

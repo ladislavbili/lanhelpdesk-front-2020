@@ -115,3 +115,9 @@ mutation setUserStatuses($ids: [Int]!) {
   }
 }
 `;
+
+export const STATUS_TEMPLATE_SUBSCRIPTION = gql `
+  subscription statusTemplateSubscription {
+    statusTemplateSubscription
+  }
+`;

@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';;
+import { gql } from '@apollo/client';
 
 export const ADD_MILESTONE = gql `
 mutation addMilestone($title: String!, $description: String!, $startsAt: String, $endsAt: String, $projectId: Int!) {

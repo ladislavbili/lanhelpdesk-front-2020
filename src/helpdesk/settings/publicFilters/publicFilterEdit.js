@@ -22,7 +22,8 @@ import {
 } from 'configs/components/select';
 import {
   toSelArr,
-  fromObjectToState
+  fromObjectToState,
+  setDefaultFromObject
 } from 'helperFunctions';
 import moment from 'moment';
 import {
@@ -31,6 +32,9 @@ import {
   UPDATE_PUBLIC_FILTER,
   DELETE_FILTER,
 } from './queries';
+import {
+  GET_PROJECT,
+} from 'apollo/localSchema/queries';
 import {
   GET_TASK_TYPES,
 } from '../taskTypes/queries';
@@ -52,6 +56,7 @@ import {
   getEmptyGeneralFilter,
   emptyFilter,
   ofCurrentUser,
+  booleanSelectOptions
 } from 'configs/constants/filter';
 export default function PublicFilterEdit( props ) {
   const {
@@ -68,14 +73,16 @@ export default function PublicFilterEdit( props ) {
   const [ saving, setSaving ] = React.useState( null );
   const [ dataChanged, setDataChanged ] = React.useState( false );
   const {
-    requester,
-    setRequester,
-    company,
-    setCompany,
-    assigned,
-    setAssigned,
-    taskType,
-    setTaskType,
+    requesters,
+    setRequesters,
+    companies,
+    setCompanies,
+    assignedTos,
+    setAssignedTos,
+    taskTypes,
+    setTaskTypes,
+    tags,
+    setTags,
     statusDateFrom,
     setStatusDateFrom,
     statusDateFromNow,
@@ -108,6 +115,30 @@ export default function PublicFilterEdit( props ) {
     setDeadlineTo,
     deadlineToNow,
     setDeadlineToNow,
+    scheduledFrom,
+    setScheduledFrom,
+    scheduledFromNow,
+    setScheduledFromNow,
+    scheduledTo,
+    setScheduledTo,
+    scheduledToNow,
+    setScheduledToNow,
+    createdAtFrom,
+    setCreatedAtFrom,
+    createdAtFromNow,
+    setCreatedAtFromNow,
+    createdAtTo,
+    setCreatedAtTo,
+    createdAtToNow,
+    setCreatedAtToNow,
+    important,
+    setImportant,
+    invoiced,
+    setInvoiced,
+    pausal,
+    setPausal,
+    overtime,
+    setOvertime,
     oneOf,
     setOneOf,
   } = fromObjectToState( emptyFilter );
@@ -140,6 +171,11 @@ export default function PublicFilterEdit( props ) {
   } = useQuery( GET_ROLES );
 
   const {
+    data: localProjectData,
+  } = useQuery( GET_PROJECT );
+  const projectId = localProjectData.localProject.id;
+
+  const {
     data: publicFilterData,
     loading: publicFilterLoading,
     refetch: refetchPublicFilter,
@@ -147,7 +183,7 @@ export default function PublicFilterEdit( props ) {
     variables: {
       id
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   } );
   const [ updatePublicFilter, {
     client
@@ -183,13 +219,17 @@ export default function PublicFilterEdit( props ) {
       roles: roles.map( ( role ) => role.id ),
       projectId: global ? null : project.id,
       filter: {
-        assignedToCur: assigned.id === 'cur',
-        assignedTo: assigned.id === 'cur' ? null : assigned.id,
-        requesterCur: requester.id === 'cur',
-        requester: requester.id === 'cur' ? null : requester.id,
-        companyCur: company.id === 'cur',
-        company: company.id === 'cur' ? null : company.id,
-        taskType: taskType.id,
+        assignedToCur: assignedTos.some( ( assignedTo ) => assignedTo.id === 'cur' ),
+        assignedTos: assignedTos.filter( ( assignedTo ) => assignedTo.id !== 'cur' )
+          .map( ( item ) => item.id ),
+        requesterCur: requesters.some( ( requester ) => requester.id === 'cur' ),
+        requesters: requesters.filter( ( requester ) => requester.id !== 'cur' )
+          .map( ( item ) => item.id ),
+        companyCur: companies.some( ( company ) => company.id === 'cur' ),
+        companies: companies.filter( ( company ) => company.id !== 'cur' )
+          .map( ( item ) => item.id ),
+        taskTypes: taskTypes.map( ( item ) => item.id ),
+        tags: tags.map( ( item ) => item.id ),
         oneOf: oneOf.map( ( oneOf ) => oneOf.value ),
 
         statusDateFrom: statusDateFrom === null ? null : statusDateFrom.valueOf()
@@ -216,35 +256,35 @@ export default function PublicFilterEdit( props ) {
         deadlineTo: deadlineTo === null ? null : deadlineTo.valueOf()
           .toString(),
         deadlineToNow,
+        scheduledFrom: scheduledFrom === null ? null : scheduledFrom.valueOf()
+          .toString(),
+        scheduledFromNow,
+        scheduledTo: scheduledTo === null ? null : scheduledTo.valueOf()
+          .toString(),
+        scheduledToNow,
+        createdAtFrom: createdAtFrom === null ? null : createdAtFrom.valueOf()
+          .toString(),
+        createdAtFromNow,
+        createdAtTo: createdAtTo === null ? null : createdAtTo.valueOf()
+          .toString(),
+        createdAtToNow,
+        important: important.value,
+        invoiced: invoiced.value,
+        pausal: pausal.value,
+        overtime: overtime.value,
       },
     }
     updatePublicFilter( {
         variables
       } )
       .then( ( response ) => {
-        const newPublicFilter = {
-          ...response.data.updatePublicFilter,
-          __typename: "Filter"
-        };
-        let publicFilters = client.readQuery( {
-            query: GET_PUBLIC_FILTERS
-          } )
-          .publicFilters;
-        let index = publicFilters.findIndex( ( publicFilter ) => publicFilter.id === id );
-        publicFilters[ index ] = newPublicFilter;
-        client.writeQuery( {
-          query: GET_PUBLIC_FILTERS,
-          data: {
-            publicFilters
-          }
-        } )
         setSaving( false );
+        setDataChanged( false );
       } )
       .catch( ( err ) => {
         console.log( err.message );
         setSaving( false );
       } )
-    setDataChanged( false );
   }
 
   const deletePublicFilter = () => {
@@ -255,53 +295,8 @@ export default function PublicFilterEdit( props ) {
           }
         } )
         .then( ( response ) => {
-          try {
-            const allFilters = client.readQuery( {
-                query: GET_MY_FILTERS
-              } )
-              .myFilters;
-            const newFilters = [ ...allFilters ].filter( item => item.id !== id );
-            client.writeQuery( {
-              query: GET_MY_FILTERS,
-              data: {
-                myFilters: [ ...newFilters ]
-              }
-            } );
-          } catch ( err ) {
-
-          }
-          try {
-            const allFilters = client.readQuery( {
-                query: GET_MY_FILTERS
-              } )
-              .myFilters;
-            const newFilters = [ ...allFilters ].filter( item => item.id !== id );
-            client.writeQuery( {
-              query: GET_MY_FILTERS,
-              data: {
-                myFilters: [ ...newFilters ]
-              }
-            } );
-          } catch ( err ) {
-
-          }
-          try {
-            const allFilters = client.readQuery( {
-                query: GET_PUBLIC_FILTERS
-              } )
-              .publicFilters;
-            const newFilters = [ ...allFilters ].filter( item => item.id !== id );
-            client.writeQuery( {
-              query: GET_PUBLIC_FILTERS,
-              data: {
-                publicFilters: [ ...newFilters ]
-              }
-            } );
-          } catch ( err ) {
-
-          }
-          history.back();
           setFilter( getEmptyGeneralFilter() );
+          history.back();
           close();
         } )
         .catch( ( err ) => {
@@ -313,85 +308,92 @@ export default function PublicFilterEdit( props ) {
 
   React.useEffect( () => {
     refetchPublicFilter( {
-      variables: {
-        id
-      }
-    } )
-  }, [ id ] )
+        variables: {
+          id
+        }
+      } )
+      .then( setData );
+  }, [ id ] );
+
   React.useEffect( () => {
-    if ( !dataLoading ) {
-      let filter = publicFilterData.filter;
-      //filter information
-      setGlobal( filter.global );
-      setDashboard( filter.dashboard );
-      setOrder( filter.order );
-      setRoles( toSelArr( rolesData.roles )
-        .filter( ( role ) => filter.roles.some( ( filterRole ) => filterRole.id === role.id ) ) );
-      setTitle( filter.title );
-      if ( filter.project !== null ) {
-        setProject( toSelArr( projectsData.projects )
-          .find( ( project ) => project.id === filter.project.id ) );
-      } else {
-        setProject( emptyFilter.project );
-      }
-      //filter data
-      filter = filter.filter;
-
-      if ( filter.companyCur ) {
-        setCompany( ofCurrentUser );
-      } else if ( filter.company === null ) {
-        setCompany( emptyFilter.company );
-      } else {
-        setCompany( toSelArr( companiesData.basicCompanies )
-          .find( ( company ) => company.id === filter.company.id ) );
-      }
-
-      if ( filter.requesterCur ) {
-        setRequester( ofCurrentUser );
-      } else if ( filter.requester === null ) {
-        setRequester( emptyFilter.requester );
-      } else {
-        setRequester( toSelArr( usersData.basicUsers )
-          .find( ( user ) => user.id === filter.requester.id ) );
-      }
-
-      if ( filter.assignedToCur ) {
-        setAssigned( emptyFilter.assigned );
-      } else if ( filter.assignedTo === null ) {
-        setAssigned( emptyFilter.assigned );
-      } else {
-        setAssigned( toSelArr( usersData.basicUsers )
-          .find( ( user ) => user.id === filter.assigned.id ) );
-      }
-
-      if ( filter.taskType !== null ) {
-        setTaskType( toSelArr( taskTypesData.taskTypes )
-          .find( ( taskType ) => taskType.id === filter.taskType.id ) );
-      } else {
-        setTaskType( emptyFilter.taskType );
-      }
-
-      setStatusDateFromNow( filter.statusDateFromNow );
-      setStatusDateFrom( filter.statusDateFrom === null ? null : moment( parseInt( filter.statusDateFrom ) ) );
-      setStatusDateToNow( filter.statusDateToNow );
-      setStatusDateTo( filter.statusDateTo === null ? null : moment( parseInt( filter.statusDateTo ) ) );
-      setCloseDateFromNow( filter.closeDateFromNow );
-      setCloseDateFrom( filter.closeDateFrom === null ? null : moment( parseInt( filter.closeDateFrom ) ) );
-      setCloseDateToNow( filter.closeDateToNow );
-      setCloseDateTo( filter.closeDateTo === null ? null : moment( parseInt( filter.closeDateTo ) ) );
-      setPendingDateFromNow( filter.pendingDateFromNow );
-      setPendingDateFrom( filter.pendingDateFrom === null ? null : moment( parseInt( filter.pendingDateFrom ) ) );
-      setPendingDateToNow( filter.pendingDateToNow );
-      setPendingDateTo( filter.pendingDateTo === null ? null : moment( parseInt( filter.pendingDateTo ) ) );
-      setDeadlineFromNow( filter.deadlineFromNow );
-      setDeadlineFrom( filter.deadlineFrom === null ? null : moment( parseInt( filter.deadlineFrom ) ) );
-      setDeadlineToNow( filter.deadlineToNow );
-      setDeadlineTo( filter.deadlineTo === null ? null : moment( parseInt( filter.deadlineTo ) ) );
-      setOneOf( oneOfOptions.filter( ( oneOf ) => filter.oneOf.includes( oneOf.value ) ) );
-
-      setDataChanged( false );
-    }
+    setData()
   }, [ dataLoading ] );
+
+  const setData = () => {
+    if ( dataLoading ) {
+      return;
+    }
+    let filter = publicFilterData.filter;
+    setGlobal( filter.global );
+    setDashboard( filter.dashboard );
+    setRoles( filter.roles ? toSelArr( filter.roles ) : [] );
+    setTitle( filter.title )
+
+    filter = filter.filter;
+
+    setCompanies( [
+      ...( filter.companyCur ? [ ofCurrentUser ] : [] ),
+      ...toSelArr( companiesData.basicCompanies )
+      .filter( ( company ) => filter.companies.some( ( company2 ) => company.id === company2.id ) )
+    ] );
+
+    setRequesters( [
+      ...( filter.requesterCur ? [ ofCurrentUser ] : [] ),
+      ...toSelArr( usersData.basicUsers, "fullName" )
+      .filter( ( user ) => filter.requesters.some( ( user2 ) => user.id === user2.id ) )
+    ] );
+
+    setRequesters( [
+      ...( filter.assignedToCur ? [ ofCurrentUser ] : [] ),
+      ...toSelArr( usersData.basicUsers, "fullName" )
+      .filter( ( user ) => filter.assignedTos.some( ( user2 ) => user.id === user2.id ) )
+    ] );
+
+    setTaskTypes(
+      toSelArr( taskTypesData.taskTypes )
+      .filter( ( taskType ) => filter.taskTypes.some( ( taskType2 ) => taskType.id === taskType2.id ) )
+    );
+    if ( projectId ) {
+      setTags(
+        toSelArr( localProjectData.localProject.project.tags )
+        .filter( ( tag1 ) => filter.tags.some( ( tag2 ) => tag1.id === tag2.id ) )
+      );
+    } else {
+      setTags( [] );
+    }
+
+    setStatusDateFromNow( filter.statusDateFromNow );
+    setStatusDateFrom( filter.statusDateFrom === null ? null : moment( parseInt( filter.statusDateFrom ) ) );
+    setStatusDateToNow( filter.statusDateToNow );
+    setStatusDateTo( filter.statusDateTo === null ? null : moment( parseInt( filter.statusDateTo ) ) );
+    setCloseDateFromNow( filter.closeDateFromNow );
+    setCloseDateFrom( filter.closeDateFrom === null ? null : moment( parseInt( filter.closeDateFrom ) ) );
+    setCloseDateToNow( filter.closeDateToNow );
+    setCloseDateTo( filter.closeDateTo === null ? null : moment( parseInt( filter.closeDateTo ) ) );
+    setPendingDateFromNow( filter.pendingDateFromNow );
+    setPendingDateFrom( filter.pendingDateFrom === null ? null : moment( parseInt( filter.pendingDateFrom ) ) );
+    setPendingDateToNow( filter.pendingDateToNow );
+    setPendingDateTo( filter.pendingDateTo === null ? null : moment( parseInt( filter.pendingDateTo ) ) );
+    setDeadlineFromNow( filter.deadlineFromNow );
+    setDeadlineFrom( filter.deadlineFrom === null ? null : moment( parseInt( filter.deadlineFrom ) ) );
+    setDeadlineToNow( filter.deadlineToNow );
+    setDeadlineTo( filter.deadlineTo === null ? null : moment( parseInt( filter.deadlineTo ) ) );
+    setScheduledFromNow( filter.scheduledFromNow );
+    setScheduledFrom( filter.scheduledFrom === null ? null : moment( parseInt( filter.scheduledFrom ) ) );
+    setScheduledToNow( filter.scheduledToNow );
+    setScheduledTo( filter.scheduledTo === null ? null : moment( parseInt( filter.scheduledTo ) ) );
+    setCreatedAtFromNow( filter.createdAtFromNow );
+    setCreatedAtFrom( filter.createdAtFrom === null ? null : moment( parseInt( filter.createdAtFrom ) ) );
+    setCreatedAtToNow( filter.createdAtToNow );
+    setCreatedAtTo( filter.createdAtTo === null ? null : moment( parseInt( filter.createdAtTo ) ) );
+    setOneOf( oneOfOptions.filter( ( oneOf ) => filter.oneOf.includes( oneOf.value ) ) );
+    setImportant( booleanSelectOptions.find( ( option ) => option.id === filter.important ) );
+    setInvoiced( booleanSelectOptions.find( ( option ) => option.id === filter.invoiced ) );
+    setPausal( booleanSelectOptions.find( ( option ) => option.id === filter.pausal ) );
+    setOvertime( booleanSelectOptions.find( ( option ) => option.id === filter.overtime ) );
+
+    setDataChanged( false );
+  }
 
   if ( dataLoading ) {
     return <Loading />
@@ -415,7 +417,9 @@ export default function PublicFilterEdit( props ) {
         <h2 className="m-b-20" >
           Edit public filter
         </h2>
-        <FormGroup> {/* Title */}
+
+        {/* Title */}
+        <FormGroup>
           <Label htmlFor="title">Filter name <span className="warning-big">*</span></Label>
           <Input
             id="title"
@@ -429,7 +433,8 @@ export default function PublicFilterEdit( props ) {
             />
         </FormGroup>
 
-        <FormGroup>{/* Order */}
+        {/* Order */}
+        <FormGroup>
           <Label for="order">Filter order <span className="warning-big">*</span></Label>
           <Input
             id="order"
@@ -443,8 +448,8 @@ export default function PublicFilterEdit( props ) {
             />
         </FormGroup>
 
-
-        <FormGroup>{/* Roles */}
+        {/* Roles */}
+        <FormGroup>
           <Label className="">Roles</Label>
           <Select
             placeholder="Choose roles"
@@ -471,19 +476,20 @@ export default function PublicFilterEdit( props ) {
         <hr className="m-t-5 m-b-10"/>
         {/* Global */}
         <FormGroup className="m-t-5">
-        <Checkbox
-          className = "m-l-5 m-r-5 "
-          label = "Global (shown in all projects) or choose project"
-          value = { global }
-          onChange={(e) => {
-            setGlobal(!global);
-            setDataChanged( true );
-          }}
-          addition={ <span className="one-of-big">*</span>}
-          />
-      </FormGroup>
-        <FormGroup>{/* Project */}
-        {/*   <Label className="form-label">Projekt <span className="one-of-big">*</span></Label>*/}
+          <Checkbox
+            className = "m-l-5 m-r-5 "
+            label = "Global (shown in all projects) or choose project"
+            value = { global }
+            onChange={(e) => {
+              setGlobal(!global);
+              setDataChanged( true );
+            }}
+            addition={ <span className="one-of-big">*</span>}
+            />
+        </FormGroup>
+
+        {/* Project */}
+        <FormGroup>
           <Select
             placeholder="Vyberte projekt"
             value={project}
@@ -500,56 +506,78 @@ export default function PublicFilterEdit( props ) {
 
         {/* Dashboard */}
         <FormGroup className="m-t-5">
-        <Checkbox
-          className = "m-l-5 m-r-5 "
-          label = "Dashboard (shown in dashboard)"
-          value = { dashboard }
-          onChange={(e) => {
-            setDashboard(!dashboard);
-            setDataChanged( true );
-          }}
-          />
-      </FormGroup>
+          <Checkbox
+            className = "m-l-5 m-r-5 "
+            label = "Dashboard (shown in dashboard)"
+            value = { dashboard }
+            onChange={(e) => {
+              setDashboard(!dashboard);
+              setDataChanged( true );
+            }}
+            />
+        </FormGroup>
 
 
 
         <Label className="m-t-15">Filter attributes</Label>
         <hr className="m-t-5 m-b-10"/>
 
-        <FormGroup>{/* Requester */}
+        {/* Requester */}
+        <FormGroup>
           <label>Zadal</label>
           <Select
             id="select-requester"
-            options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
-            onChange={ (requester) => {
-              setRequester(requester) ;
+            isMulti
+            options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+            onChange={ (requesters) => {
+              setRequesters(requesters) ;
               setDataChanged( true );
             }}
-            value={requester}
-            styles={pickSelectStyle()} />
+            value={requesters}
+            styles={pickSelectStyle()}
+            />
         </FormGroup>
 
-        <FormGroup>{/* Company */}
+        {/* Company */}
+        <FormGroup>
           <label>Firma</label>
           <Select
-            options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
-            onChange={ (company) => {
-              setCompany(company);
+            isMulti
+            options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
+            onChange={ (companies) => {
+              setCompanies(companies);
               setDataChanged( true );
             }}
-            value={company}
+            value={companies}
             styles={pickSelectStyle()} />
         </FormGroup>
 
-        <FormGroup>{/* Assigned */}
+        {/* Assigned */}
+        <FormGroup>
           <label>Riesi</label>
           <Select
-            options={[{label:'Žiadny',value:null,id:null},{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+            options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(usersData.basicUsers, 'email'))}
+            isMulti
             onChange={(newValue)=>{
-              setAssigned(newValue);
+              setAssignedTos(newValue);
               setDataChanged( true );
             }}
-            value={assigned}
+            value={assignedTos}
+            styles={pickSelectStyle()}
+            />
+        </FormGroup>
+
+        {/* Task type */}
+        <FormGroup>
+          <label>Typ práce</label>
+          <Select
+            options={toSelArr(taskTypesData.taskTypes)}
+            isMulti
+            onChange={(newValue)=>{
+              setTaskTypes(newValue);
+              setDataChanged( true );
+            }}
+            value={taskTypes}
             styles={pickSelectStyle()}
             />
         </FormGroup>
@@ -654,30 +682,123 @@ export default function PublicFilterEdit( props ) {
           }}
           />
 
-        <FormGroup>{/* Work Type */}
-          <label htmlFor="example-input-small">Typ práce</label>
-          <Select
-            options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(taskTypesData.taskTypes))}
-            onChange={(taskType)=>{
-              setTaskType(taskType);
-              setDataChanged( true );
-            }}
-            value={taskType}
-            styles={pickSelectStyle()} />
-        </FormGroup>
+        {/* Scheduled */}
+        <FilterDatePickerInCalendar
+          label="Scheduled date"
+          showNowFrom={scheduledFromNow}
+          dateFrom={scheduledFrom}
+          showNowTo={scheduledToNow}
+          dateTo={scheduledTo}
+          setShowNowFrom={(e) => {
+            setScheduledFromNow(e);
+            setDataChanged( true );
+          }}
+          setDateFrom={(e) => {
+            setScheduledFrom(e);
+            setDataChanged( true );
+          }}
+          setShowNowTo={(e) => {
+            setScheduledToNow(e);
+            setDataChanged( true );
+          }}
+          setDateTo={(e) => {
+            setScheduledTo(e);
+            setDataChanged( true );
+          }}
+          />
 
-        <FormGroup>{/* One Of */}
-          <label htmlFor="example-input-small">Alebo - jedna splnená stačí</label>
-          <Select
-            options={oneOfOptions}
-            onChange={(oneOf)=>{
-              setOneOf(oneOf);
-              setDataChanged( true );
-            }}
-            value={oneOf}
-            isMulti
-            styles={pickSelectStyle()} />
-        </FormGroup>
+        {/* Created at */}
+        <FilterDatePickerInCalendar
+          label="Created at"
+          showNowFrom={createdAtFromNow}
+          dateFrom={createdAtFrom}
+          showNowTo={createdAtToNow}
+          dateTo={createdAtTo}
+          setShowNowFrom={(e) => {
+            setCreatedAtFromNow(e);
+            setDataChanged( true );
+          }}
+          setDateFrom={(e) => {
+            setCreatedAtFrom(e);
+            setDataChanged( true );
+          }}
+          setShowNowTo={(e) => {
+            setCreatedAtToNow(e);
+            setDataChanged( true );
+          }}
+          setDateTo={(e) => {
+            setCreatedAtTo(e);
+            setDataChanged( true );
+          }}
+          />
+
+        {/* Important */}
+        <div className="sidebar-filter-row">
+          <label htmlFor="filter-Important">Important</label>
+          <div className="flex">
+            <Select
+              id="filter-Important"
+              options={booleanSelectOptions}
+              onChange={(imp) => {
+                setImportant(imp);
+                setDataChanged( true );
+              }}
+              value={important}
+              styles={pickSelectStyle()}
+              />
+          </div>
+        </div>
+
+        {/* Invoiced */}
+        <div className="sidebar-filter-row">
+          <label htmlFor="filter-Invoiced">Invoiced</label>
+          <div className="flex">
+            <Select
+              id="filter-Invoiced"
+              options={booleanSelectOptions}
+              onChange={(invoiced) => {
+                setInvoiced(invoiced);
+                setDataChanged( true );
+              }}
+              value={invoiced}
+              styles={pickSelectStyle()}
+              />
+          </div>
+        </div>
+
+        {/* Pausal */}
+        <div className="sidebar-filter-row">
+          <label htmlFor="filter-Paušál">Paušál</label>
+          <div className="flex">
+            <Select
+              id="filter-Paušál"
+              options={booleanSelectOptions}
+              onChange={(pausal) => {
+                setPausal(pausal);
+                setDataChanged( true );
+              }}
+              value={pausal}
+              styles={pickSelectStyle()}
+              />
+          </div>
+        </div>
+
+        {/* Overtime */}
+        <div className="sidebar-filter-row">
+          <label htmlFor="filter-Overtime">Overtime</label>
+          <div className="flex">
+            <Select
+              id="filter-Overtime"
+              options={booleanSelectOptions}
+              onChange={(overtime) => {
+                setOvertime(overtime);
+                setDataChanged( true );
+              }}
+              value={overtime}
+              styles={pickSelectStyle()}
+              />
+          </div>
+        </div>
 
 
         <div className="form-buttons-row">

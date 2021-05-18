@@ -35,7 +35,7 @@ export default function TripTypeEdit( props ) {
     variables: {
       id: parseInt( match.params.id )
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   } );
   const [ updateTripType ] = useMutation( UPDATE_TRIP_TYPE );
   const [ deleteTripType, {
@@ -58,21 +58,29 @@ export default function TripTypeEdit( props ) {
   // sync
   React.useEffect( () => {
     if ( !loading ) {
-      setTitle( data.tripType.title );
-      setOrder( data.tripType.order );
-      setDataChanged( false );
+      setData();
     }
   }, [ loading ] );
 
   React.useEffect( () => {
     refetch( {
-      variables: {
-        id: parseInt( match.params.id )
-      }
-    } );
+        variables: {
+          id: parseInt( match.params.id )
+        }
+      } )
+      .then( setData );
   }, [ match.params.id ] );
 
   // functions
+  const setData = () => {
+    if ( loading ) {
+      return;
+    }
+    setTitle( data.tripType.title );
+    setOrder( data.tripType.order );
+    setDataChanged( false );
+  }
+
   const updateTripTypeFunc = () => {
     setSaving( true );
 
@@ -83,7 +91,6 @@ export default function TripTypeEdit( props ) {
           order: ( order !== '' ? parseInt( order ) : 0 ),
         }
       } )
-      .then( ( response ) => {} )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -100,12 +107,6 @@ export default function TripTypeEdit( props ) {
           }
         } )
         .then( ( response ) => {
-          client.writeQuery( {
-            query: GET_TRIP_TYPES,
-            data: {
-              tripTypes: filteredTripTypes
-            }
-          } );
           history.goBack();
         } )
         .catch( ( err ) => {

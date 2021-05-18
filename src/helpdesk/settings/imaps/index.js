@@ -29,7 +29,9 @@ export default function IMAPsList( props ) {
     data,
     loading,
     refetch
-  } = useQuery( GET_IMAPS );
+  } = useQuery( GET_IMAPS, {
+    fetchPolicy: 'network-only'
+  } );
   const IMAPS = ( loading || !data ? [] : data.imaps );
   const [ testImaps ] = useMutation( TEST_IMAPS );
 

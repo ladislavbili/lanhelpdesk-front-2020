@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription
 } from "@apollo/client";
 
 import StatusAdd from './statusAdd';
@@ -11,7 +12,8 @@ import {
 import classnames from 'classnames';
 
 import {
-  GET_STATUS_TEMPLATES
+  GET_STATUS_TEMPLATES,
+  STATUS_TEMPLATE_SUBSCRIPTION
 } from './queries';
 
 export default function StatusesList( props ) {
@@ -25,8 +27,16 @@ export default function StatusesList( props ) {
   } = props;
   const {
     data,
-    loading
-  } = useQuery( GET_STATUS_TEMPLATES );
+    loading,
+    refetch,
+  } = useQuery( GET_STATUS_TEMPLATES, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( STATUS_TEMPLATE_SUBSCRIPTION, {
+    onSubscriptionData: () => refetch()
+  } );
+
   const statuses = ( loading || !data ? [] : orderArr( data.statusTemplates ) );
 
   return (

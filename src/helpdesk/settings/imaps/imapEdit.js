@@ -58,6 +58,7 @@ export default function IMAPEdit( props ) {
     variables: {
       id: parseInt( match.params.id )
     },
+    fetchPolicy: 'network-only',
     notifyOnNetworkStatusChange: true,
   } );
   const {

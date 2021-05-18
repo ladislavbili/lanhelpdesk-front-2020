@@ -1,6 +1,6 @@
 import {
   gql
-} from '@apollo/client';;
+} from '@apollo/client';
 
 export const GET_COMPANIES = gql `
 query {
@@ -181,4 +181,10 @@ mutation deleteCompany($id: Int!, $newId: Int!) {
     id
   }
 }
+`;
+
+export const COMPANIES_SUBSCRIPTION = gql `
+  subscription companiesSubscription {
+    companiesSubscription
+  }
 `;

@@ -1,6 +1,6 @@
 import {
   gql
-} from '@apollo/client';;
+} from '@apollo/client';
 
 export const GET_ROLES = gql `
 query {
@@ -109,4 +109,10 @@ query {
     }
   }
 }
+`;
+
+export const ROLES_SUBSCRIPTION = gql `
+  subscription rolesSubscription {
+    rolesSubscription
+  }
 `;

@@ -38,21 +38,7 @@ export default function TripTypeAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        const allTripTypes = client.readQuery( {
-            query: GET_TRIP_TYPES
-          } )
-          .tripTypes;
-        const newTripType = {
-          ...response.data.addTripType,
-          __typename: "TripType"
-        };
-        client.writeQuery( {
-          query: GET_TRIP_TYPES,
-          data: {
-            tripTypes: [ ...allTripTypes, newTripType ]
-          }
-        } );
-        history.push( '/helpdesk/settings/tripTypes/' + newTripType.id )
+        history.push( '/helpdesk/settings/tripTypes/' + response.data.addTripType.id )
       } )
       .catch( ( err ) => {
         console.log( err.message );

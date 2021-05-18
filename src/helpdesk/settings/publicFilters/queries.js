@@ -1,6 +1,6 @@
 import {
   gql
-} from '@apollo/client';;
+} from '@apollo/client';
 
 export const GET_PUBLIC_FILTERS = gql `
 query {
@@ -32,25 +32,29 @@ query filter($id: Int!) {
     }
     filter {
       assignedToCur
-      assignedTo {
+      assignedTos {
         id
         fullName
       }
       requesterCur
-      requester {
+      requesters {
         id
         fullName
       }
       companyCur
-      company {
+      companies {
         id
         title
       }
-      taskType {
+      taskTypes {
         id
         title
       }
       oneOf
+      important
+      invoiced
+      pausal
+      overtime
       statusDateFrom
       statusDateFromNow
       statusDateTo
@@ -67,6 +71,14 @@ query filter($id: Int!) {
       deadlineFromNow
       deadlineTo
       deadlineToNow
+      scheduledFrom
+      scheduledFromNow
+      scheduledTo
+      scheduledToNow
+      createdAtFrom
+      createdAtFromNow
+      createdAtTo
+      createdAtToNow
     }
     project {
       id
@@ -145,4 +157,11 @@ mutation deleteFilter($id: Int!) {
     id
   }
 }
+`;
+
+
+export const FILTERS_SUBSCRIPTION = gql `
+  subscription filtersSubscription {
+    filtersSubscription
+  }
 `;

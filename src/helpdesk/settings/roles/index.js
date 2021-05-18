@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import RoleAdd from './roleAdd';
@@ -12,7 +13,8 @@ import {
 import classnames from 'classnames';
 
 import {
-  GET_ROLES
+  GET_ROLES,
+  ROLES_SUBSCRIPTION,
 } from './queries';
 
 export default function RolesList( props ) {
@@ -26,8 +28,18 @@ export default function RolesList( props ) {
   } = props;
   const {
     data,
-    loading
-  } = useQuery( GET_ROLES );
+    loading,
+    refetch,
+  } = useQuery( GET_ROLES, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( ROLES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      refetch();
+    }
+  } );
+
   const ROLES = ( loading || !data ? [] : orderArr( data.roles ) );
 
   return (

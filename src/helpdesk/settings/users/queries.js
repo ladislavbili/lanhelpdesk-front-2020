@@ -239,3 +239,9 @@ query {
   }
 }
 `;
+
+export const USERS_SUBSCRIPTION = gql `
+  subscription usersSubscription {
+    usersSubscription
+  }
+`;

@@ -176,7 +176,6 @@ export default function FilterForm( props ) {
     oneOf,
     setOneOf,
   } = fromObjectToState( emptyFilter );
-  //createdAt important invoiced pausal overtime
 
   const dataLoading = (
     myDataLoading ||
@@ -447,39 +446,38 @@ export default function FilterForm( props ) {
         </div>
       }
 
-
       <div className="sidebar-filter">
         { projectId && localProjectData.localProject.right.tagsRead &&
-        <div className="sidebar-filter-row">
-          <Empty>
-            <div className="row mb-auto">
-              <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
-                <i className="fa fa-plus" />
-                Tags
-              </button>
-              <MultiSelect
-                className="center-hor"
-                direction="right"
-                header="Select tags for this task"
-                closeMultiSelect={() => { setTagsOpen(false) }}
-                open={tagsOpen}
-                items={toSelArr(localProjectData.localProject.project.tags)}
-                selected={tags}
-                onChange={(tags) => { setTags(tags) }}
-                />
-            </div>
+          <div className="sidebar-filter-row">
+            <Empty>
+              <div className="row mb-auto">
+                <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
+                  <i className="fa fa-plus" />
+                  Tags
+                </button>
+                <MultiSelect
+                  className="center-hor"
+                  direction="right"
+                  header="Select tags for this task"
+                  closeMultiSelect={() => { setTagsOpen(false) }}
+                  open={tagsOpen}
+                  items={toSelArr(localProjectData.localProject.project.tags)}
+                  selected={tags}
+                  onChange={(tags) => { setTags(tags) }}
+                  />
+              </div>
 
-            { tags
-              .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
-              .map( ( tag ) => (
-                <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
-                  {tag.title}
-                </span>
-              ) )
-            }
-          </Empty>
-        </div>
-      }
+              { tags
+                .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+                .map( ( tag ) => (
+                  <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+                    {tag.title}
+                  </span>
+                ) )
+              }
+            </Empty>
+          </div>
+        }
 
         <div className="sidebar-filter-row">
           <label htmlFor="example-input-small">Zadal</label>
@@ -541,6 +539,7 @@ export default function FilterForm( props ) {
           </div>
         </div>
 
+        {/* Status Date */}
         <FilterDatePickerPopover
           label="Status date"
           minimal

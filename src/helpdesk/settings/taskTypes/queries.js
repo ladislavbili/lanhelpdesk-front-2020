@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';;
+import {
+  gql
+} from '@apollo/client';
 
 export const GET_TASK_TYPE = gql `
 query taskType($id: Int!) {
@@ -58,4 +60,10 @@ query {
     order
   }
 }
+`;
+
+export const TASK_TYPES_SUBSCRIPTION = gql `
+  subscription taskTypesSubscription {
+    taskTypesSubscription
+  }
 `;

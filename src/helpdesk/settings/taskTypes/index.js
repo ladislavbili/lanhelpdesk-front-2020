@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import TaskTypeAdd from './taskTypeAdd';
@@ -13,6 +14,7 @@ import classnames from 'classnames';
 
 import {
   GET_TASK_TYPES,
+  TASK_TYPES_SUBSCRIPTION,
 } from './queries';
 
 
@@ -25,10 +27,20 @@ export default function TaskTypeList( props ) {
     history,
     match
   } = props;
+
   const {
     data,
-    loading
-  } = useQuery( GET_TASK_TYPES );
+    loading,
+    refetch,
+  } = useQuery( GET_TASK_TYPES, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( TASK_TYPES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      refetch();
+    }
+  } );
 
   return (
     <div className="content">

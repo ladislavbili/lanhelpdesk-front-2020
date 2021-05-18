@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription
 } from "@apollo/client";
 
 import Multiselect from 'components/multiselect';
@@ -14,10 +15,15 @@ import Loading from 'components/loading';
 import classnames from 'classnames';
 import {
   GET_USERS,
+  USERS_SUBSCRIPTION,
 } from './queries';
+import {
+  COMPANIES_SUBSCRIPTION,
+} from '../companies/queries';
 
 import {
   GET_ROLES,
+  ROLES_SUBSCRIPTION
 } from '../roles/queries';
 
 export default function UserListContainer( props ) {
@@ -30,25 +36,48 @@ export default function UserListContainer( props ) {
     data: usersData,
     loading: usersLoading,
     refetch: usersRefetch
-  } = useQuery( GET_USERS );
+  } = useQuery( GET_USERS, {
+    fetchPolicy: 'network-only'
+  } );
   const {
-    data: roleData,
-    loading: roleLoading
-  } = useQuery( GET_ROLES );
+    data: rolesData,
+    loading: rolesLoading,
+    refetch: rolesRefetch
+  } = useQuery( GET_ROLES, {
+    fetchPolicy: 'network-only'
+  } );
 
 
   // sync
   React.useEffect( () => {
-    if ( !roleLoading ) {
-      setSelectedRoles( toSelArr( roleData.roles ) );
+    if ( !rolesLoading ) {
+      setSelectedRoles( toSelArr( rolesData.roles ) );
     }
-  }, [ roleLoading ] );
+  }, [ rolesLoading ] );
 
 
   const dataLoading = (
     usersLoading ||
-    roleLoading
+    rolesLoading
   )
+
+  useSubscription( USERS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      usersRefetch()
+    }
+  } );
+
+  useSubscription( COMPANIES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      usersRefetch()
+    }
+  } );
+
+  useSubscription( ROLES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      rolesRefetch()
+    }
+  } );
 
   // state
   const [ userFilter, setUserFilter ] = React.useState( "" );
@@ -76,7 +105,7 @@ export default function UserListContainer( props ) {
     )
   }
   const users = usersData.users.filter( user => selectedRoles.some( sr => sr.id === user.role.id ) );
-  const roles = toSelArr( roleData.roles );
+  const roles = toSelArr( rolesData.roles );
 
   //data
   const allRolesSelected = selectedRoles.length === roles.length;

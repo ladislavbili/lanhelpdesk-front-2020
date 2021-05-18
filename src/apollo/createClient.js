@@ -1,29 +1,21 @@
 import {
   ApolloClient,
   InMemoryCache,
-  HttpLink,
   from as ApolloFrom,
   Observable,
 } from "@apollo/client";
 import {
   onError
 } from "@apollo/client/link/error";
-import {
-  setContext
-} from '@apollo/client/link/context';
-import jwtDecode from 'jwt-decode';
-import {
-  afterNow
-} from '../helperFunctions';
-import axios from 'axios';
 import * as resolvers from './localSchema/resolvers';
 import {
   setIsLoggedIn
 } from './localSchema/actions';
-
 import {
-  REST_URL
-} from 'configs/restAPI';
+  authLink,
+  connectionLink,
+} from './links';
+import refreshToken from 'apollo/refreshToken';
 
 //Apollo cashe
 export const cache = new InMemoryCache( {
@@ -35,20 +27,6 @@ export const cache = new InMemoryCache( {
     }
   }
 } );
-
-const link = new HttpLink( {
-  uri: `${REST_URL}/graphql`,
-  credentials: "include"
-} );
-
-//refreshne access a refresh token
-export async function refreshToken() {
-  return axios.request( {
-    url: `${REST_URL}/refresh_token`,
-    method: 'post',
-    withCredentials: true
-  }, )
-}
 
 //pomaha spracovat opakovaný request v pripade zlyhania
 const promiseToObservable = promise => (
@@ -75,39 +53,10 @@ const promiseToObservable = promise => (
   } )
 )
 
-const authLink = setContext( async ( _, {
-  headers
-} ) => {
-  let token = sessionStorage.getItem( 'acctok' );
-  if ( !token ) {
-    return headers;
-  }
-  if ( !afterNow( jwtDecode( token ).exp ) ) {
-    const {
-      ok,
-      accessToken
-    } = ( await refreshToken() ).data;
-    if ( ok ) {
-      token = accessToken;
-      sessionStorage.setItem( "acctok", accessToken );
-    } else {
-      sessionStorage.removeItem( "acctok" )
-      setIsLoggedIn( false );
-    }
-  }
-  return {
-    headers: {
-      ...headers,
-      authorization: `Bearer ${token}`,
-    }
-  }
-} );
-
 function processErrors( {
   graphQLErrors,
   operation,
-  forward,
-  ...rest
+  forward
 } ) {
   if ( !graphQLErrors ) {
     return;
@@ -125,7 +74,7 @@ function processErrors( {
 export default function createClient() {
   const client = new ApolloClient( {
     cache,
-    link: ApolloFrom( [ onError( processErrors ), authLink, link ] ),
+    link: ApolloFrom( [ onError( processErrors ), authLink, connectionLink ] ),
   } );
   return client;
 }

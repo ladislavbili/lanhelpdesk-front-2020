@@ -5,7 +5,7 @@ import {
 } from "@apollo/client";
 import {
   gql
-} from '@apollo/client';;
+} from '@apollo/client';
 
 import {
   Modal,

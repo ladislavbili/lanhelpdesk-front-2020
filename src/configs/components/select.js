@@ -180,7 +180,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
     },
     valueContainer: ( base ) => {
       let newStyle = {
-        ...newStyle,
+        ...base,
         padding: '0px 5px',
         borderRadius: 0,
       }

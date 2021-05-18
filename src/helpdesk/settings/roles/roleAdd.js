@@ -17,8 +17,6 @@ import {
   GET_MY_DATA
 } from './queries';
 
-
-
 export default function RoleAdd( props ) {
   //data
   const {
@@ -147,24 +145,7 @@ export default function RoleAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        const allRoles = client.readQuery( {
-            query: GET_ROLES
-          } )
-          .roles;
-        const newRole = {
-          ...response.data.addRole,
-          __typename: "Role"
-        };
-        client.writeQuery( {
-          query: GET_ROLES,
-          data: {
-            roles: [
-              ...allRoles.filter( role => role.id !== parseInt( match.params.id ) ),
-              newRole
-            ]
-          }
-        } );
-        history.push( '/helpdesk/settings/roles/' + newRole.id )
+        history.push( '/helpdesk/settings/roles/' + response.data.addRole.id )
       } )
       .catch( ( err ) => {
         console.log( err.message );

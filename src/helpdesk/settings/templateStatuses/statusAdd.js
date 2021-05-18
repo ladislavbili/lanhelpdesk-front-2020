@@ -53,26 +53,13 @@ export default function StatusAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        const allStatuses = client.readQuery( {
-            query: GET_STATUS_TEMPLATES
-          } )
-          .statusTemplates;
-        const newStatus = {
-          ...response.data.addStatusTemplate,
-          __typename: "Status"
-        };
-        client.writeQuery( {
-          query: GET_STATUS_TEMPLATES,
-          data: {
-            statusTemplates: [ ...allStatuses, newStatus ]
-          }
-        } );
-        history.push( '/helpdesk/settings/statuses/' + newStatus.id )
+        setSaving( false );
+        history.push( '/helpdesk/settings/statuses/' + response.data.addStatusTemplate.id )
       } )
       .catch( ( err ) => {
+        setSaving( false );
         console.log( err.message );
       } );
-    setSaving( false );
   }
 
   const cannotSave = () => {

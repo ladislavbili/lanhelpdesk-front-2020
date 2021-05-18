@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import TripTypeAdd from './tripTypeAdd';
@@ -11,7 +12,8 @@ import {
 } from 'helperFunctions';
 import classnames from 'classnames';
 import {
-  GET_TRIP_TYPES
+  GET_TRIP_TYPES,
+  TRIP_TYPES_SUBSCRIPTION,
 } from './queries';
 
 export default function TripTypeListContainer( props ) {
@@ -25,8 +27,17 @@ export default function TripTypeListContainer( props ) {
   } = props;
   const {
     data,
-    loading
-  } = useQuery( GET_TRIP_TYPES );
+    loading,
+    refetch,
+  } = useQuery( GET_TRIP_TYPES, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( TRIP_TYPES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      refetch();
+    }
+  } );
 
   return (
     <div className="content">

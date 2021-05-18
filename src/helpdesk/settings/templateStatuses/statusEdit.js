@@ -46,12 +46,13 @@ export default function StatusEdit( props ) {
     variables: {
       id: parseInt( props.match.params.id )
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   } );
   const [ updateStatus ] = useMutation( UPDATE_STATUS_TEMPLATE );
   const [ deleteStatus, {
     client
   } ] = useMutation( DELETE_STATUS_TEMPLATE );
+
   const allStatuses = toSelArr( client.readQuery( {
       query: GET_STATUS_TEMPLATES
     } )
@@ -72,26 +73,32 @@ export default function StatusEdit( props ) {
 
   // sync
   React.useEffect( () => {
-    if ( !loading ) {
-      setTitle( data.statusTemplate.title );
-      setColor( data.statusTemplate.color );
-      setOrder( data.statusTemplate.order );
-      setIcon( data.statusTemplate.icon );
-      setAction( actions.find( a => a.value === data.statusTemplate.action ) );
-
-      setDataChanged( false );
-    }
+    setData();
   }, [ loading ] );
 
   React.useEffect( () => {
     refetch( {
-      variables: {
-        id: parseInt( match.params.id )
-      }
-    } );
+        variables: {
+          id: parseInt( match.params.id )
+        }
+      } )
+      .then( setData );
   }, [ match.params.id ] );
 
   // functions
+  const setData = () => {
+    if ( loading ) {
+      return;
+    }
+    setTitle( data.statusTemplate.title );
+    setColor( data.statusTemplate.color );
+    setOrder( data.statusTemplate.order );
+    setIcon( data.statusTemplate.icon );
+    setAction( actions.find( a => a.value === data.statusTemplate.action ) );
+
+    setDataChanged( false );
+  }
+
   const updateStatusFunc = () => {
     setSaving( true );
     updateStatus( {
@@ -104,7 +111,6 @@ export default function StatusEdit( props ) {
           action: action.value,
         }
       } )
-      .then( ( response ) => {} )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -121,15 +127,6 @@ export default function StatusEdit( props ) {
           variables: {
             id: parseInt( match.params.id ),
           }
-        } )
-        .then( ( response ) => {
-          client.writeQuery( {
-            query: GET_STATUS_TEMPLATES,
-            data: {
-              statusTemplates: filteredStatuses
-            }
-          } );
-          history.goBack();
         } )
         .catch( ( err ) => {
           console.log( err.message );

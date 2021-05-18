@@ -52,16 +52,22 @@ export default function UserAdd( props ) {
   const {
     data: rolesData,
     loading: rolesLoading
-  } = useQuery( GET_ROLES );
+  } = useQuery( GET_ROLES, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_BASIC_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES, {
+    fetchPolicy: 'network-only'
+  } );
 
   const {
     data: currentUserData,
     loading: currentUserLoading
-  } = useQuery( GET_MY_DATA );
+  } = useQuery( GET_MY_DATA, {
+    fetchPolicy: 'network-only'
+  } );
   const [ registerUser ] = useMutation( ADD_USER );
 
   //state
@@ -112,41 +118,16 @@ export default function UserAdd( props ) {
         }
       } )
       .then( ( response ) => {
+        let newUser = {
+          ...response.data.registerUser,
+          __typename: "BasicUser"
+        }
         if ( addUserToList ) {
-          let newUser = {
-            ...response.data.registerUser,
-            __typename: "BasicUser"
-          }
-          const allUsers = client.readQuery( {
-              query: GET_BASIC_USERS
-            } )
-            .basicUsers;
-          client.writeQuery( {
-            query: GET_BASIC_USERS,
-            data: {
-              basicUsers: [ ...allUsers, newUser ]
-            }
-          } );
           addUserToList( newUser );
           closeModal();
         } else {
-          let newUser = {
-            ...response.data.registerUser,
-            __typename: "User"
-          }
-          const allUsers = client.readQuery( {
-              query: GET_USERS
-            } )
-            .users;
-          client.writeQuery( {
-            query: GET_USERS,
-            data: {
-              users: [ ...allUsers, newUser ]
-            }
-          } );
           history.push( '/helpdesk/settings/users/' + newUser.id );
         }
-
       } )
       .catch( ( err ) => {
         console.log( err.message );

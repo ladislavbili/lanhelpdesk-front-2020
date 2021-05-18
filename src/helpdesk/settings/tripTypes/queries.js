@@ -61,3 +61,9 @@ mutation deleteTripType($id: Int!, $newId: Int!) {
   }
 }
 `;
+
+export const TRIP_TYPES_SUBSCRIPTION = gql `
+  subscription tripTypesSubscription {
+    tripTypesSubscription
+  }
+`;

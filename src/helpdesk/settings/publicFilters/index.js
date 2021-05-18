@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import PublicFilterAdd from './publicFilterAdd';
@@ -14,11 +15,13 @@ import Loading from 'components/loading';
 import classnames from 'classnames';
 
 import {
-  GET_BASIC_ROLES
+  GET_BASIC_ROLES,
+  ROLES_SUBSCRIPTION,
 } from 'helpdesk/settings/roles/queries';
 
 import {
-  GET_PUBLIC_FILTERS
+  GET_PUBLIC_FILTERS,
+  FILTERS_SUBSCRIPTION,
 } from './queries';
 
 export default function PublicFilterList( props ) {
@@ -31,14 +34,35 @@ export default function PublicFilterList( props ) {
     history,
     match
   } = props;
+
   const {
     data: publicFiltersData,
-    loading: publicFilterLoading
-  } = useQuery( GET_PUBLIC_FILTERS );
+    loading: publicFilterLoading,
+    refetch: publicFilterRefetch,
+  } = useQuery( GET_PUBLIC_FILTERS, {
+    fetchPolicy: 'network-only',
+  } );
+
   const {
     data: rolesData,
-    loading: rolesLoading
-  } = useQuery( GET_BASIC_ROLES );
+    loading: rolesLoading,
+    refetch: rolesRefetch,
+  } = useQuery( GET_BASIC_ROLES, {
+    fetchPolicy: 'network-only',
+  } );
+
+  useSubscription( ROLES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      rolesRefetch();
+    }
+  } );
+
+  useSubscription( FILTERS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      publicFilterRefetch();
+    }
+  } );
+
 
   const getFilteredFilters = () => {
     if ( publicFilterLoading ) {

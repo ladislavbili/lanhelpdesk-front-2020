@@ -34,7 +34,7 @@ export default function TaskTypeEdit( props ) {
     variables: {
       id: parseInt( props.match.params.id )
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   } );
   const [ updateTaskType ] = useMutation( UPDATE_TASK_TYPE );
   const [ deleteTaskType, {
@@ -58,21 +58,29 @@ export default function TaskTypeEdit( props ) {
   // sync
   React.useEffect( () => {
     if ( !loading ) {
-      setTitle( data.taskType.title );
-      setOrder( data.taskType.order );
-      setDataChanged( false );
+      setData();
     }
   }, [ loading ] );
 
   React.useEffect( () => {
     refetch( {
-      variables: {
-        id: parseInt( match.params.id )
-      }
-    } );
+        variables: {
+          id: parseInt( match.params.id )
+        }
+      } )
+      .then( setData );
   }, [ match.params.id ] );
 
   // functions
+  const setData = () => {
+    if ( loading ) {
+      return;
+    }
+    setTitle( data.taskType.title );
+    setOrder( data.taskType.order );
+    setDataChanged( false );
+  }
+
   const updateTaskTypeFunc = () => {
     setSaving( true );
 
@@ -83,7 +91,6 @@ export default function TaskTypeEdit( props ) {
           order: ( order !== '' ? parseInt( order ) : 0 ),
         }
       } )
-      .then( ( response ) => {} )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -103,12 +110,6 @@ export default function TaskTypeEdit( props ) {
           }
         } )
         .then( ( response ) => {
-          client.writeQuery( {
-            query: GET_TASK_TYPES,
-            data: {
-              taskTypes: filteredTaskTypes
-            }
-          } );
           history.goBack();
         } )
         .catch( ( err ) => {

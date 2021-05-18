@@ -11,12 +11,13 @@ import {
 import {
   useQuery,
 } from "@apollo/client";
-import {
-  refreshToken,
-} from 'apollo/createClient';
+import refreshToken from 'apollo/refreshToken';
 import {
   GET_TESTED_TOKEN,
 } from 'apollo/localSchema/queries';
+import {
+  socketLink
+} from 'apollo/links';
 
 
 export default function Login( props ) {
@@ -56,7 +57,7 @@ export default function Login( props ) {
   }
 
   React.useEffect( () => {
-    if ( !testedTokenLoading && !testedTokenData.testedToken ) {
+    if ( !testedTokenData.testedToken ) {
       setTestedToken( true )
       tryLogin();
     }

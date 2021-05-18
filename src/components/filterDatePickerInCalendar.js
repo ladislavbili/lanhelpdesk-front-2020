@@ -18,15 +18,14 @@ export default class FilterDatePickerInCalendar extends Component {
       showNowFrom,
       dateFrom,
       showNowTo,
-      dateTo
-    } = this.props;
-    const {
+      dateTo,
       setShowNowFrom,
       setDateFrom,
       setShowNowTo,
       setDateTo,
       minimal
     } = this.props;
+
     const DateInputFrom = forwardRef(
       ( {
         value,

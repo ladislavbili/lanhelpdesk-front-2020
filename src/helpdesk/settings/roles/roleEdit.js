@@ -38,7 +38,7 @@ export default function RoleEdit( props ) {
     variables: {
       id: parseInt( props.match.params.id )
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   } );
 
   const [ updateRole ] = useMutation( UPDATE_ROLE );
@@ -158,23 +158,32 @@ export default function RoleEdit( props ) {
   // sync
   React.useEffect( () => {
     if ( !loading ) {
-      setTitle( data.role.title );
-      setOrder( data.role.order );
-      setLevel( data.role.level );
-      [ ...generalRights, ...settings ].forEach( ( right ) => right.state[ 1 ]( data.role.accessRights[ right.key ] ) );
-      setDataChanged( false );
+      setData();
     }
   }, [ loading ] );
 
   React.useEffect( () => {
     refetch( {
-      variables: {
-        id: parseInt( match.params.id )
-      }
-    } );
+        variables: {
+          id: parseInt( match.params.id )
+        }
+      } )
+      .then( setData );
   }, [ match.params.id ] );
 
   // functions
+  const setData = () => {
+    if ( loading ) {
+      return;
+    }
+
+    setTitle( data.role.title );
+    setOrder( data.role.order );
+    setLevel( data.role.level );
+    [ ...generalRights, ...settings ].forEach( ( right ) => right.state[ 1 ]( data.role.accessRights[ right.key ] ) );
+    setDataChanged( false );
+  }
+
   const updateRoleFunc = () => {
     setSaving( true );
     let accessRights = {};
@@ -187,18 +196,6 @@ export default function RoleEdit( props ) {
           order: ( order !== '' ? parseInt( order ) : 0 ),
           accessRights
         }
-      } )
-      .then( ( response ) => {
-        let updatedRole = {
-          ...response.data.updateRole,
-          __typename: "Role"
-        };
-        client.writeQuery( {
-          query: GET_ROLES,
-          data: {
-            roles: [ ...allRoles.filter( role => role.id !== parseInt( match.params.id ) ), updatedRole ]
-          }
-        } );
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -217,15 +214,6 @@ export default function RoleEdit( props ) {
             id: parseInt( match.params.id ),
             newId: parseInt( replacement.id ),
           }
-        } )
-        .then( ( response ) => {
-          client.writeQuery( {
-            query: GET_ROLES,
-            data: {
-              roles: filteredRoles
-            }
-          } );
-          history.push( '/helpdesk/settings/roles/add' );
         } )
         .catch( ( err ) => {
           console.log( err.message );

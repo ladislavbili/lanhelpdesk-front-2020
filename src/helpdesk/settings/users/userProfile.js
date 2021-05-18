@@ -45,7 +45,9 @@ export default function UserProfile( props ) {
   const {
     data: myData,
     loading: myDataLoading
-  } = useQuery( GET_MY_DATA );
+  } = useQuery( GET_MY_DATA, {
+    fetchPolicy: 'network-only',
+  } );
 
   const [ updateProfile, {
     client
@@ -98,52 +100,6 @@ export default function UserProfile( props ) {
       .then( ( response ) => {
         if ( password !== null && password.length >= 6 ) {
           sessionStorage.setItem( "acctok", response.data.updateProfile.accessToken );
-        }
-        try {
-          const allUsers = client.readQuery( {
-              query: GET_USERS
-            } )
-            .users;
-          client.writeQuery( {
-            query: GET_USERS,
-            data: {
-              users: allUsers.map( user => ( user.id !== response.data.updateProfile.user.id ? user : {
-                ...user,
-                username,
-                email,
-                name,
-                surname,
-                receiveNotifications,
-                signature,
-                language
-              } ) )
-            }
-          } );
-        } catch ( err ) {
-          console.log( "Users are not yet in the cache." );
-        }
-        try {
-          let allBasicUsers = client.readQuery( {
-              query: GET_BASIC_USERS
-            } )
-            .basicUsers;
-          client.writeQuery( {
-            query: GET_BASIC_USERS,
-            data: {
-              basicUsers: allBasicUsers.map( user => ( user.id !== response.data.updateProfile.user.id ? user : {
-                ...user,
-                username,
-                email,
-                name,
-                surname,
-                receiveNotifications,
-                signature,
-                language
-              } ) )
-            }
-          } );
-        } catch ( err ) {
-          console.log( "BasicUsers are not yet in the cache." );
         }
       } )
       .catch( ( err ) => {
