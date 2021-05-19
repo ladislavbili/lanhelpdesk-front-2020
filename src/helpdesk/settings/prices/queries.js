@@ -1,4 +1,6 @@
-import { gql } from '@apollo/client';
+import {
+  gql
+} from '@apollo/client';
 
 export const GET_PRICELISTS = gql `
 query {
@@ -89,4 +91,10 @@ mutation deletePricelist($id: Int!, $newDefId: Int, $newId: Int) {
     id
   }
 }
+`;
+
+export const PRICELISTS_SUBSCRIPTION = gql `
+  subscription pricelistsSubscription {
+    pricelistsSubscription
+  }
 `;

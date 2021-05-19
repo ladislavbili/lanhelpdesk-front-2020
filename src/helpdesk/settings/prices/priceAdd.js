@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import {
@@ -13,9 +14,11 @@ import Switch from "react-switch";
 import Loading from 'components/loading';
 import {
   GET_TASK_TYPES,
+  TASK_TYPES_SUBSCRIPTION,
 } from '../taskTypes/queries';
 import {
   GET_TRIP_TYPES,
+  TRIP_TYPES_SUBSCRIPTION,
 } from '../tripTypes/queries';
 import {
   GET_PRICELISTS,
@@ -31,18 +34,39 @@ export default function PricelistAdd( props ) {
   } = props;
   const {
     data: taskTypesData,
-    loading: taskTypesLoading
-  } = useQuery( GET_TASK_TYPES );
+    loading: taskTypesLoading,
+    refetch: taskTypesRefetch,
+  } = useQuery( GET_TASK_TYPES, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: tripTypesData,
-    loading: tripTypesLoading
-  } = useQuery( GET_TRIP_TYPES );
+    loading: tripTypesLoading,
+    refetch: tripTypesRefetch,
+  } = useQuery( GET_TRIP_TYPES, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( TASK_TYPES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      taskTypesRefetch()
+        .then( setData );
+    }
+  } );
+
+  useSubscription( TRIP_TYPES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      tripTypesRefetch()
+        .then( setData );
+    }
+  } );
+
   const [ addPricelist, {
     client
   } ] = useMutation( ADD_PRICELIST );
 
-  const TASK_TYPES = ( taskTypesLoading ? [] : taskTypesData.taskTypes );
-  const TRIP_TYPES = ( tripTypesLoading ? [] : tripTypesData.tripTypes );
+  const taskTypes = ( taskTypesLoading ? [] : taskTypesData.taskTypes );
+  const tripTypes = ( tripTypesLoading ? [] : tripTypesData.tripTypes );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -52,26 +76,69 @@ export default function PricelistAdd( props ) {
   const [ materialMargin, setMaterialMargin ] = React.useState( 0 );
   const [ materialMarginExtra, setMaterialMarginExtra ] = React.useState( 0 );
 
-  const [ prices, setPrices ] = React.useState( [] );
+  const [ taskTypePrices, setTaskTypePrices ] = React.useState( [] );
+  const [ tripTypePrices, setTripTypePrices ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
   // sync
   React.useEffect( () => {
     if ( !taskTypesLoading && !tripTypesLoading ) {
-      setPrices( taskTypesData.taskTypes.concat( tripTypesData.tripTypes ) );
+      setData();
     }
   }, [ taskTypesLoading, tripTypesLoading ] );
 
   //functions
-  const addPricelistFunc = () => {
+  const setData = () => {
+    if ( taskTypesLoading || tripTypesLoading ) {
+      return;
+    };
+    setTaskTypePrices(
+      taskTypesData.taskTypes.map( ( type ) => {
+        const existingPrice = taskTypePrices.find( ( price ) => price.id === type.id );
+        if ( existingPrice ) {
+          return existingPrice;
+        }
+        return {
+          id: type.id
+        }
+      } )
+    );
+    setTripTypePrices(
+      tripTypesData.tripTypes.map( ( type ) => {
+        const existingPrice = tripTypePrices.find( ( price ) => price.id === type.id );
+        if ( existingPrice ) {
+          return existingPrice;
+        }
+        return {
+          id: type.id
+        }
+      } )
+    );
+  }
+
+  const addPricelistFunc = async () => {
     setSaving( true );
-    let newPrices = prices.map( p => {
-      return {
-        type: p.__typename,
-        typeId: p.id,
-        price: ( p.price === "" || p.price === undefined ? 0 : parseFloat( p.price ) )
+    let prices = [
+      ...taskTypes,
+      ...tripTypes
+    ].map( ( type ) => {
+      if ( type.__typename === "TripType" ) {
+        const existingPrice = tripTypePrices.find( ( price ) => price.id === type.id );
+        return {
+          type: type.__typename,
+          typeId: type.id,
+          price: ( !existingPrice || existingPrice.price === "" || existingPrice.price === undefined || isNaN( parseFloat( existingPrice.price ) ) ? 0 : parseFloat( existingPrice.price ) )
+        }
+      } else {
+        const existingPrice = taskTypePrices.find( ( price ) => price.id === type.id );
+        return {
+          type: type.__typename,
+          typeId: type.id,
+          price: ( !existingPrice || existingPrice.price === "" || existingPrice.price === undefined || isNaN( parseFloat( existingPrice.price ) ) ? 0 : parseFloat( existingPrice.price ) )
+        }
       }
     } );
+
     addPricelist( {
         variables: {
           title,
@@ -80,25 +147,11 @@ export default function PricelistAdd( props ) {
           def,
           materialMargin: ( materialMargin !== '' ? parseFloat( materialMargin ) : 0 ),
           materialMarginExtra: ( materialMarginExtra !== '' ? parseFloat( materialMarginExtra ) : 0 ),
-          prices: newPrices,
+          prices,
         }
       } )
       .then( ( response ) => {
-        const allPricelists = client.readQuery( {
-            query: GET_PRICELISTS
-          } )
-          .pricelists;
-        const newPricelist = {
-          ...response.data.addPricelist,
-          __typename: "Pricelist"
-        };
-        client.writeQuery( {
-          query: GET_PRICELISTS,
-          data: {
-            pricelists: [ ...allPricelists, newPricelist ]
-          }
-        } );
-        history.push( '/helpdesk/settings/pricelists/' + newPricelist.id )
+        history.push( '/helpdesk/settings/pricelists/' + response.data.addPricelist.id )
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -116,27 +169,27 @@ export default function PricelistAdd( props ) {
 
   return (
     <div>
-      <div className="commandbar a-i-c p-l-20">
-        { cannotSave() &&
-          <div className="message error-message">
-            Fill in all the required information!
-          </div>
-        }
-      </div>
-      <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
-        <h2 className="m-b-20" >
-          Add price list
-        </h2>
-        <label className="m-b-20">
-          <Switch
-            checked={def}
-            onChange={ () => setDef(!def) }
-            height={22}
-            checkedIcon={<span className="switchLabel">YES</span>}
-            uncheckedIcon={<span className="switchLabel">NO</span>}
-            onColor={"#0078D4"} />
-          <span className="m-l-10">Default</span>
-        </label>
+        <div className="commandbar a-i-c p-l-20">
+          { cannotSave() &&
+            <div className="message error-message">
+              Fill in all the required information!
+            </div>
+          }
+        </div>
+        <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
+          <h2 className="m-b-20" >
+            Add price list
+          </h2>
+          <label className="m-b-20">
+            <Switch
+              checked={def}
+              onChange={ () => setDef(!def) }
+              height={22}
+              checkedIcon={<span className="switchLabel">YES</span>}
+              uncheckedIcon={<span className="switchLabel">NO</span>}
+              onColor={"#0078D4"} />
+            <span className="m-l-10">Default</span>
+          </label>
 
           <FormGroup className="row m-b-10">
             <div className="m-r-10 w-20">
@@ -150,7 +203,7 @@ export default function PricelistAdd( props ) {
           <h3>Ceny úloh</h3>
           <div className="p-t-10 p-b-10">
             {
-              TASK_TYPES.map((item,index)=>
+              taskTypes.map((item,index)=>
               <FormGroup key={index} className="row m-b-10">
                 <div className="m-r-10 w-20">
                   <Label for={item.title}>{item.title}</Label>
@@ -161,88 +214,90 @@ export default function PricelistAdd( props ) {
                     name={item.title}
                     id={item.title}
                     placeholder="Enter price"
-                    value={item.price}
+                    value={taskTypePrices.find( (price) => price.id === item.id ) ? taskTypePrices.find( (price) => price.id === item.id ).price : undefined}
                     onChange={(e)=>{
-                      let newPrices = prices.map(p => {
-                        if (p.__typename === "TaskType" && p.id === item.id){
-                          return ({...p, price: e.target.value.replace(",", ".")});
+                      let newPrices = taskTypePrices.map(p => {
+                        if (p.id === item.id){
+                          return ({id: p.id, price: e.target.value.replace(",", ".")});
                         } else {
                           return p;
                         }
                       });
-                      setPrices(newPrices);
-                    }} />
+                      setTaskTypePrices(newPrices);
+                    }}
+                    />
                 </div>
               </FormGroup>
-              )
-            }
-          </div>
+            )
+          }
+        </div>
 
-          <h3>Ceny Výjazdov</h3>
-            <div className="p-t-10 p-b-10">
-              {
-                TRIP_TYPES.map((item,index)=>
-                <FormGroup key={index} className="row m-b-10">
-                  <div className="m-r-10 w-20">
-                    <Label for={item.title}>{item.title}</Label>
-                  </div>
-                  <div className="flex">
-                    <Input
-                      type="text"
-                      name={item.title}
-                      id={item.title}
-                      placeholder="Enter price"
-                      value={item.price}
-                      onChange={(e)=>{
-                        let newPrices = prices.map(p => {
-                          if (p.__typename === "TripType" && p.id === item.id){
-                            return ({...p, price: e.target.value.replace(",", ".")});
-                          } else {
-                            return p;
-                          }
-                        });
-                        setPrices(newPrices);
-                      }} />
-                  </div>
-                </FormGroup>
-                )
-              }
-            </div>
-
-          <h3>Všeobecné prirážky</h3>
-          <div className="p-t-10 p-b-10">
-            <FormGroup className="row m-b-10">
+        <h3>Ceny Výjazdov</h3>
+        <div className="p-t-10 p-b-10">
+          {
+            tripTypes.map((item,index)=>
+            <FormGroup key={index} className="row m-b-10">
               <div className="m-r-10 w-20">
-                <Label for="afterPer">After hours percentage</Label>
+                <Label for={item.title}>{item.title}</Label>
               </div>
               <div className="flex">
-                <Input type="text" name="afterPer" id="afterPer" placeholder="Enter after hours percentage" value={afterHours} onChange={(e)=>setAfterHours(e.target.value.replace(",", "."))} />
+                <Input
+                  type="text"
+                  name={item.title}
+                  id={item.title}
+                  placeholder="Enter price"
+                  value={tripTypePrices.find( (price) => price.id === item.id ) ? tripTypePrices.find( (price) => price.id === item.id ).price : undefined}
+                  onChange={(e)=>{
+                    let newPrices = tripTypePrices.map(p => {
+                      if (p.id === item.id){
+                        return ({id: p.id, price: e.target.value.replace(",", ".")});
+                      } else {
+                        return p;
+                      }
+                    });
+                    setTripTypePrices(newPrices);
+                  }}
+                  />
               </div>
             </FormGroup>
-            <FormGroup className="row m-b-10">
-              <div className="m-r-10 w-20">
-                <Label for="materMarg">Materials margin percentage 50-</Label>
-              </div>
-              <div className="flex">
-                <Input type="text" name="materMarg" id="materMarg" placeholder="Enter materials margin percentage" value={materialMargin} onChange={(e)=>setMaterialMargin(e.target.value.replace(",", "."))} />
-              </div>
-            </FormGroup>
-            <FormGroup className="row m-b-10">
-              <div className="m-r-10 w-20">
-                <Label for="materMarg+">Materials margin percentage 50+</Label>
-              </div>
-              <div className="flex">
-                <Input type="text" name="materMarg+" id="materMarg+" placeholder="Enter materials margin percentage" value={materialMarginExtra} onChange={(e)=>setMaterialMarginExtra(e.target.value.replace(",", "."))}/>
-              </div>
-            </FormGroup>
-          </div>
-
-          <div className="form-buttons-row">
-            <button className="btn ml-auto" disabled={cannotSave()} onClick={addPricelistFunc}>
-              {saving?'Saving prices...':'Save prices'}
-            </button>
-          </div>
+          )
+        }
       </div>
+
+      <h3>Všeobecné prirážky</h3>
+      <div className="p-t-10 p-b-10">
+        <FormGroup className="row m-b-10">
+          <div className="m-r-10 w-20">
+            <Label for="afterPer">After hours percentage</Label>
+          </div>
+          <div className="flex">
+            <Input type="text" name="afterPer" id="afterPer" placeholder="Enter after hours percentage" value={afterHours} onChange={(e)=>setAfterHours(e.target.value.replace(",", "."))} />
+          </div>
+        </FormGroup>
+        <FormGroup className="row m-b-10">
+          <div className="m-r-10 w-20">
+            <Label for="materMarg">Materials margin percentage 50-</Label>
+          </div>
+          <div className="flex">
+            <Input type="text" name="materMarg" id="materMarg" placeholder="Enter materials margin percentage" value={materialMargin} onChange={(e)=>setMaterialMargin(e.target.value.replace(",", "."))} />
+          </div>
+        </FormGroup>
+        <FormGroup className="row m-b-10">
+          <div className="m-r-10 w-20">
+            <Label for="materMarg+">Materials margin percentage 50+</Label>
+          </div>
+          <div className="flex">
+            <Input type="text" name="materMarg+" id="materMarg+" placeholder="Enter materials margin percentage" value={materialMarginExtra} onChange={(e)=>setMaterialMarginExtra(e.target.value.replace(",", "."))}/>
+          </div>
+        </FormGroup>
+      </div>
+
+      <div className="form-buttons-row">
+        <button className="btn ml-auto" disabled={cannotSave()} onClick={addPricelistFunc}>
+          {saving?'Saving prices...':'Save prices'}
+        </button>
+      </div>
+    </div>
   </div>
   );
 }

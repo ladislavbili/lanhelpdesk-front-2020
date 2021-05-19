@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import {
@@ -22,7 +23,8 @@ import classnames from 'classnames';
 
 import {
   GET_PRICELISTS,
-  ADD_PRICELIST
+  ADD_PRICELIST,
+  PRICELISTS_SUBSCRIPTION,
 } from '../prices/queries';
 
 import {
@@ -31,6 +33,10 @@ import {
   DELETE_COMPANY,
   GET_COMPANIES,
 } from './queries';
+const newPricelist = {
+  label: "Nový cenník",
+  value: "0"
+};
 
 export default function CompanyEdit( props ) {
   //data
@@ -46,7 +52,7 @@ export default function CompanyEdit( props ) {
     variables: {
       id: parseInt( match.params.id )
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   } );
   const [ updateCompany ] = useMutation( UPDATE_COMPANY );
   const [ deleteCompany, {
@@ -57,20 +63,23 @@ export default function CompanyEdit( props ) {
   const {
     data: pricelistsData,
     loading: pricelistsLoading
-  } = useQuery( GET_PRICELISTS );
-  let pl = ( pricelistsLoading || !pricelistsData ? [] : pricelistsData.pricelists );
-  pl = [ {
-    label: "Nový cenník",
-    value: "0"
-  }, ...toSelArr( pl ) ];
-  const [ pricelists, setPricelists ] = React.useState( pl );
+  } = useQuery( GET_PRICELISTS, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( PRICELISTS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      pricelistsRefetch()
+        .then( () => setData( false ) );
+    }
+  } );
 
   const allCompanies = toSelArr( client.readQuery( {
       query: GET_COMPANIES
     } )
     .companies );
   const filteredCompanies = allCompanies.filter( comp => comp.id !== parseInt( match.params.id ) );
-  const theOnlyOneLeft = allCompanies.length === 0;
+  const theOnlyOneLeft = allCompanies.length < 2;
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -143,82 +152,78 @@ export default function CompanyEdit( props ) {
 
   //sync
   React.useEffect( () => {
-    if ( !pricelistsLoading ) {
-      let pl = [ {
-        label: "Nový cenník",
-        value: "0"
-      }, ...toSelArr( pricelistsData.pricelists ) ];
-      setPricelists( pl );
-    }
-  }, [ pricelistsLoading ] );
-
-  React.useEffect( () => {
-    if ( !loading ) {
-      const company = data.company;
-      setTitle( company.title );
-      setOldTitle( company.title );
-      setDph( company.dph );
-      setOldDph( company.dph );
-      setIco( company.ico );
-      setOldIco( company.ico );
-      setDic( company.dic );
-      setOldDic( company.dic );
-      setIcDph( company.ic_dph );
-      setOldIcDph( company.ic_dph );
-      setCountry( company.country );
-      setOldCountry( company.country );
-      setCity( company.city );
-      setOldCity( company.city );
-      setStreet( company.street );
-      setOldStreet( company.street );
-      setZip( company.zip );
-      setOldZip( company.zip );
-      setEmail( company.email ? company.email : '' );
-      setOldEmail( company.email );
-      setPhone( company.phone );
-      setOldPhone( company.phone );
-      setDescription( company.description );
-      setOldDescription( company.description );
-      setMonthly( company.monthly );
-      setOldMonthly( company.monthly );
-      setMonthlyPausal( company.monthlyPausal );
-      setOldMonthlyPausal( company.monthlyPausal );
-      setTaskWorkPausal( company.taskWorkPausal );
-      setOldTaskWorkPausal( company.taskWorkPausal );
-      setTaskTripPausal( company.taskTripPausal );
-      setOldTaskTripPausal( company.taskTripPausal );
-      let pl = {
-        ...company.pricelist,
-        value: company.pricelist.id,
-        label: company.pricelist.title
-      };
-      setPricelist( pl );
-      setOldPricelist( pl );
-      let r = company.companyRents.map( re => {
-        return {
-          id: re.id,
-          title: re.title,
-          quantity: re.quantity,
-          unitPrice: re.price,
-          unitCost: re.cost,
-          totalPrice: parseInt( re.quantity ) * parseFloat( re.price ),
-        }
-      } )
-      setRents( r );
-
-      setDataChanged( false );
-    }
+    setData()
   }, [ loading ] );
 
   React.useEffect( () => {
     refetch( {
-      variables: {
-        id: parseInt( match.params.id )
-      }
-    } );
+        variables: {
+          id: parseInt( match.params.id )
+        }
+      } )
+      .then( setData );
   }, [ match.params.id ] );
 
   // functions
+  const setData = () => {
+    if ( loading ) {
+      return;
+    }
+    const company = data.company;
+    setTitle( company.title );
+    setOldTitle( company.title );
+    setDph( company.dph );
+    setOldDph( company.dph );
+    setIco( company.ico );
+    setOldIco( company.ico );
+    setDic( company.dic );
+    setOldDic( company.dic );
+    setIcDph( company.ic_dph );
+    setOldIcDph( company.ic_dph );
+    setCountry( company.country );
+    setOldCountry( company.country );
+    setCity( company.city );
+    setOldCity( company.city );
+    setStreet( company.street );
+    setOldStreet( company.street );
+    setZip( company.zip );
+    setOldZip( company.zip );
+    setEmail( company.email ? company.email : '' );
+    setOldEmail( company.email );
+    setPhone( company.phone );
+    setOldPhone( company.phone );
+    setDescription( company.description );
+    setOldDescription( company.description );
+    setMonthly( company.monthly );
+    setOldMonthly( company.monthly );
+    setMonthlyPausal( company.monthlyPausal );
+    setOldMonthlyPausal( company.monthlyPausal );
+    setTaskWorkPausal( company.taskWorkPausal );
+    setOldTaskWorkPausal( company.taskWorkPausal );
+    setTaskTripPausal( company.taskTripPausal );
+    setOldTaskTripPausal( company.taskTripPausal );
+    let pl = {
+      ...company.pricelist,
+      value: company.pricelist.id,
+      label: company.pricelist.title
+    };
+    setPricelist( pl );
+    setOldPricelist( pl );
+    let r = company.companyRents.map( re => {
+      return {
+        id: re.id,
+        title: re.title,
+        quantity: re.quantity,
+        unitPrice: re.price,
+        unitCost: re.cost,
+        totalPrice: parseInt( re.quantity ) * parseFloat( re.price ),
+      }
+    } )
+    setRents( r );
+
+    setDataChanged( false );
+  }
+
   const updateCompanyFunc = ( pricelistId = null ) => {
     setSaving( true );
 
@@ -258,9 +263,6 @@ export default function CompanyEdit( props ) {
           rents: newRents,
         }
       } )
-      .then( ( response ) => {
-        //TODO update company list
-      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -280,12 +282,6 @@ export default function CompanyEdit( props ) {
           }
         } )
         .then( ( response ) => {
-          client.writeQuery( {
-            query: GET_COMPANIES,
-            data: {
-              companies: filteredCompanies
-            }
-          } );
           history.push( '/helpdesk/settings/companies/add' );
         } )
         .catch( ( err ) => {
@@ -315,16 +311,7 @@ export default function CompanyEdit( props ) {
           __typename: "Pricelist"
         };
         setPricelist( newPricelist );
-        const newPricelists = pricelists.concat( [ newPricelist ] );
-        setPricelists( newPricelists );
         setPricelistName( "" );
-
-        client.writeQuery( {
-          query: GET_PRICELISTS,
-          data: {
-            pricelists: [ ...pricelistsData.pricelists, newPricelist ]
-          }
-        } );
 
         updateCompanyFunc( newPricelist.id );
       } )
@@ -364,6 +351,11 @@ export default function CompanyEdit( props ) {
   if ( loading ) {
     return <Loading />
   }
+
+  const pricelists = [
+  newPricelist,
+  ...toSelArr( pricelistsData.pricelists )
+];
 
   return (
     <div>

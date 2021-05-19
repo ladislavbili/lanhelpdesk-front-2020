@@ -107,7 +107,7 @@ export default function TripTypeEdit( props ) {
           }
         } )
         .then( ( response ) => {
-          history.goBack();
+          history.push( '/helpdesk/settings/tripTypes/add' );
         } )
         .catch( ( err ) => {
           console.log( err.message );

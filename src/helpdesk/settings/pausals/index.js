@@ -1,13 +1,15 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import PausalEdit from './pausalEdit';
 import classnames from 'classnames';
 
 import {
-  GET_COMPANIES
+  GET_COMPANIES,
+  COMPANIES_SUBSCRIPTION,
 } from '../companies/queries';
 
 export default function CompaniesList( props ) {
@@ -19,10 +21,21 @@ export default function CompaniesList( props ) {
     history,
     match
   } = props;
+
   const {
     data,
-    loading
-  } = useQuery( GET_COMPANIES );
+    loading,
+    refetch,
+  } = useQuery( GET_COMPANIES, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( COMPANIES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      refetch();
+    }
+  } );
+
   const COMPANIES = ( loading || !data ? [] : data.companies );
 
   return (

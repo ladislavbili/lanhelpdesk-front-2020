@@ -327,3 +327,9 @@ query getNumberOfTasks($projectId: Int!) {
   )
 }
 `;
+
+export const PROJECTS_SUBSCRIPTION = gql `
+  subscription projectsSubscription {
+    projectsSubscription
+  }
+`;

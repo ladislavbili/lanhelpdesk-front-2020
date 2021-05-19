@@ -52,8 +52,6 @@ import {
   GET_TASK_TYPES,
 } from '../taskTypes/queries';
 import {
-  GET_PROJECTS,
-  GET_MY_PROJECTS,
   ADD_PROJECT,
   GET_MY_DATA
 } from './queries';
@@ -89,9 +87,6 @@ export default function ProjectAdd( props ) {
     data: taskTypesData,
     loading: taskTypesLoading
   } = useQuery( GET_TASK_TYPES, fetchNetOptions );
-  const {
-    refetch: refetchMyProjects,
-  } = useQuery( GET_MY_PROJECTS );
 
   const currentUser = myData ? myData.getMyData : {};
 
@@ -119,30 +114,19 @@ export default function ProjectAdd( props ) {
   const [ addTaskErrors, setAddTaskErrors ] = React.useState( false );
   const [ statuses, setStatuses ] = React.useState( [] );
 
+
+  const dataLoading = (
+    statusesLoading ||
+    companiesLoading ||
+    usersLoading ||
+    taskTypesLoading ||
+    myDataLoading
+  );
+
   //events
   React.useEffect( () => {
-    if ( !statusesLoading ) {
-      setStatuses( statusesData.statusTemplates.map( ( statusTemplate ) => ( {
-        id: fakeID--,
-        title: statusTemplate.title,
-        color: statusTemplate.color,
-        icon: statusTemplate.icon,
-        action: statusTemplate.action,
-        order: statusTemplate.order,
-      } ) ) )
-    }
-  }, [ statusesLoading ] );
-
-  React.useEffect( () => {
-    if ( !myDataLoading && !usersLoading ) {
-      setUserGroups( [ {
-        group: toSelArr( groups )
-          .find( ( group ) => group.order === 0 ),
-        user: toSelArr( usersData.basicUsers, 'email' )
-          .find( ( user ) => user.id === myData.getMyData.id )
-      } ] )
-    }
-  }, [ myDataLoading, usersLoading ] );
+    setData();
+  }, [ statusesLoading, myDataLoading, usersLoading ] );
 
   React.useEffect( () => {
     updateDefAssigned();
@@ -157,12 +141,28 @@ export default function ProjectAdd( props ) {
     } )
   }
 
+  const setData = () => {
+    if ( dataLoading ) {
+      return;
+    }
+    setStatuses( statusesData.statusTemplates.map( ( statusTemplate ) => ( {
+      id: fakeID--,
+      title: statusTemplate.title,
+      color: statusTemplate.color,
+      icon: statusTemplate.icon,
+      action: statusTemplate.action,
+      order: statusTemplate.order,
+    } ) ) );
+    setUserGroups( [ {
+      group: toSelArr( groups )
+        .find( ( group ) => group.order === 0 ),
+      user: toSelArr( usersData.basicUsers, 'email' )
+        .find( ( user ) => user.id === myData.getMyData.id )
+        } ] );
+  }
+
   if (
-    statusesLoading ||
-    companiesLoading ||
-    usersLoading ||
-    taskTypesLoading ||
-    myDataLoading
+    dataLoading
   ) {
     return <Loading />
   }
@@ -225,42 +225,22 @@ export default function ProjectAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        const newProject = {
-          ...response.data.addProject,
-          __typename: "Project"
-        };
         if ( closeModal ) {
           const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
           const myRights = myUserGroup === undefined ? createCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
             .rights;
           if ( myUserGroup ) {
-            const allProjects = client.readQuery( {
-                query: GET_MY_PROJECTS
-              } )
-              .myProjects;
-            client.writeQuery( {
-              query: GET_MY_PROJECTS,
-              data: {
-                myProjects: [ ...allProjects, newProject ]
-              }
-            } );
-            closeModal( newProject, myRights );
+            closeModal( {
+                ...response.data.addProject,
+                __typename: "Project"
+              },
+              myRights
+            );
           } else {
             closeModal( null, null );
           }
         } else {
-          refetchMyProjects();
-          const allProjects = client.readQuery( {
-              query: GET_PROJECTS
-            } )
-            .projects;
-          client.writeQuery( {
-            query: GET_PROJECTS,
-            data: {
-              projects: [ ...allProjects, newProject ]
-            }
-          } );
-          history.push( '/helpdesk/settings/projects/' + newProject.id );
+          history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
         }
       } )
       .catch( ( err ) => {
@@ -280,9 +260,6 @@ export default function ProjectAdd( props ) {
       ( !group.rights.company.write && !company.def )
     ) )
   )
-
-
-
 
   const doesDefHasValue = () => {
     return (

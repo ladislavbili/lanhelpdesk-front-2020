@@ -110,7 +110,7 @@ export default function TaskTypeEdit( props ) {
           }
         } )
         .then( ( response ) => {
-          history.goBack();
+          history.push( '/helpdesk/settings/taskTypes/add' );
         } )
         .catch( ( err ) => {
           console.log( err.message );

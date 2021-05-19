@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import {
@@ -24,14 +25,17 @@ import classnames from "classnames";
 
 import {
   GET_PRICELISTS,
-  ADD_PRICELIST
+  ADD_PRICELIST,
+  PRICELISTS_SUBSCRIPTION,
 } from '../prices/queries';
 
 import {
-  GET_COMPANIES,
   ADD_COMPANY,
-  GET_BASIC_COMPANIES,
 } from './queries';
+const newPricelist = {
+  label: "Nový cenník",
+  value: "0"
+};
 
 export default function CompanyAdd( props ) {
   //data
@@ -46,15 +50,19 @@ export default function CompanyAdd( props ) {
   } ] = useMutation( ADD_COMPANY );
   const [ addPricelist ] = useMutation( ADD_PRICELIST );
   const {
-    data,
-    loading: pricelistsLoading
-  } = useQuery( GET_PRICELISTS );
-  const PRICELISTS = ( pricelistsLoading || !data ? [] : data.pricelists );
-  let pl = [ {
-    label: "Nový cenník",
-    value: "0"
-  }, ...toSelArr( PRICELISTS ) ];
-  const [ pricelists, setPricelists ] = React.useState( pl );
+    data: pricelistsData,
+    loading: pricelistsLoading,
+    refetch: pricelistsRefetch,
+  } = useQuery( GET_PRICELISTS, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( PRICELISTS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      pricelistsRefetch()
+        .then( () => setData( false ) );
+    }
+  } );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -92,19 +100,22 @@ export default function CompanyAdd( props ) {
 
   //sync
   React.useEffect( () => {
-    if ( !pricelistsLoading ) {
-      let pl = [ {
-        label: "Nový cenník",
-        value: "0"
-      }, ...toSelArr( data.pricelists ) ];
-      setPricelists( pl );
-      let def = pl.find( ( p ) => p.def );
-      setPricelist( def );
-      setOldPricelist( def );
-    }
+    setData( true );
   }, [ pricelistsLoading ] );
 
   //functions
+  const setData = ( initial ) => {
+    if ( pricelistsLoading ) {
+      return;
+    }
+    let pl = [ newPricelist, ...toSelArr( pricelistsData.pricelists ) ];
+    let def = pl.find( ( p ) => p.def );
+    if ( initial ) {
+      setPricelist( def );
+    }
+    setOldPricelist( def );
+  }
+
   const addCompanyFunc = () => {
     setSaving( true );
 
@@ -138,43 +149,14 @@ export default function CompanyAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        const newBasicCompany = {
-          ...response.data.addCompany,
-          __typename: "BasicCompany"
-        };
-        const newCompany = {
-          ...response.data.addCompany,
-          __typename: "Company"
-        };
-        try {
-          const allBasicCompanies = client.readQuery( {
-              query: GET_BASIC_COMPANIES
-            } )
-            .basicCompanies;
-          client.writeQuery( {
-            query: GET_BASIC_COMPANIES,
-            data: {
-              basicCompanies: [ ...allBasicCompanies, newBasicCompany ]
-            }
-          } );
-        } catch ( err ) {}
-        try {
-          const allCompanies = client.readQuery( {
-              query: GET_COMPANIES
-            } )
-            .companies;
-          client.writeQuery( {
-            query: GET_COMPANIES,
-            data: {
-              companies: [ ...allCompanies, newCompany ]
-            }
-          } );
-        } catch ( err ) {}
         if ( closeModal ) {
-          addCompanyToList( toSelItem( newBasicCompany ) );
+          addCompanyToList( toSelItem( {
+            ...response.data.addCompany,
+            __typename: "BasicCompany"
+          } ) );
           closeModal();
         } else {
-          history.push( '/helpdesk/settings/companies/' + newCompany.id );
+          history.push( '/helpdesk/settings/companies/' + response.data.addCompany.id );
         }
       } )
       .catch( ( err ) => {
@@ -195,14 +177,11 @@ export default function CompanyAdd( props ) {
           materialMargin: 0,
           materialMarginExtra: 0,
           prices: [],
-        }
-      } )
+        },
+      }, )
       .then( ( response ) => {
         let newPricelist = response.data.addPricelist;
         setPricelist( newPricelist );
-        let newPricelists = pricelists.concat( [ newPricelist ] );
-        setPricelists( newPricelists );
-
         addCompanyFunc();
       } )
       .catch( ( err ) => {
@@ -223,6 +202,11 @@ export default function CompanyAdd( props ) {
   if ( pricelistsLoading ) {
     return <Loading />
   }
+
+  const pricelists = [
+  newPricelist,
+  ...toSelArr( pricelistsData.pricelists )
+];
 
   return (
     <div>

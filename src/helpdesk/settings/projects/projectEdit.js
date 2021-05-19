@@ -91,29 +91,41 @@ export default function ProjectEdit( props ) {
     variables: {
       id
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only',
   } );
   const [ updateProject ] = useMutation( UPDATE_PROJECT );
+
   const [ deleteProject, {
     client
   } ] = useMutation( DELETE_PROJECT );
+
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_BASIC_COMPANIES, fetchNetOptions );
+  } = useQuery( GET_BASIC_COMPANIES, {
+    fetchPolicy: 'network-only',
+  } );
+
   const {
     data: usersData,
     loading: usersLoading
-  } = useQuery( GET_BASIC_USERS, fetchNetOptions );
+  } = useQuery( GET_BASIC_USERS, {
+    fetchPolicy: 'network-only',
+  } );
+
   const {
     data: taskTypesData,
     loading: taskTypesLoading
-  } = useQuery( GET_TASK_TYPES, fetchNetOptions );
+  } = useQuery( GET_TASK_TYPES, {
+    fetchPolicy: 'network-only',
+  } );
+
   const {
     data: numberOfTasksData,
     loading: numberOfTasksLoading,
     error: numberOfTasksError,
   } = useQuery( GET_NUMBER_OF_TASKS, {
+    fetchPolicy: 'network-only',
     variables: {
       projectId: id
     }
@@ -169,132 +181,16 @@ export default function ProjectEdit( props ) {
 
   const [ dataChanged, setDataChanged ] = React.useState( false );
 
+  const dataLoading = (
+    projectLoading ||
+    companiesLoading ||
+    usersLoading ||
+    myDataLoading
+  )
+
   // sync
   React.useEffect( () => {
-    if ( !projectLoading && !usersLoading && !companiesLoading && !taskTypesLoading ) {
-
-      //PROJECT
-      const project = projectData.project;
-      setTitle( project.title );
-      setDescription( project.description );
-      setLockedRequester( project.lockedRequester );
-      setAutoApproved( project.autoApproved );
-
-      //STATUS
-      let newStatus = {
-        def: true,
-        fixed: project.def.status.fixed,
-        required: true,
-        value: ( project.def.status.value ? project.statuses.find( c => c.id === project.def.status.value.id ) : null )
-      };
-      setStatus( newStatus );
-      setDataChanged( false );
-
-      let newOvertime = {
-        def: true,
-        fixed: project.def.overtime.fixed,
-        required: true,
-        value: ( project.def.overtime.value ? {
-          value: true,
-          label: 'Yes'
-        } : {
-          value: false,
-          label: 'No'
-        } )
-      };
-      setOvertime( newOvertime );
-
-      let newPausal = {
-        def: true,
-        fixed: project.def.pausal.fixed,
-        required: true,
-        value: ( project.def.pausal.value ? {
-          value: true,
-          label: 'Yes'
-        } : {
-          value: false,
-          label: 'No'
-        } )
-      };
-      setPausal( newPausal );
-
-      //TAGS
-      let tags = toSelArr( getAllTags() );
-      let tagIds = project.def.tag.value.map( v => v.id );
-      let newValue = tags.filter( t => tagIds.includes( t.id ) );
-      let newDefTag = {
-        def: project.def.tag.def || project.def.tag.required,
-        fixed: project.def.tag.fixed,
-        required: project.def.tag.required,
-        value: newValue
-      };
-      setDefTag( newDefTag );
-      setDataChanged( false );
-
-      //USERS
-      let users = toSelArr( usersData.basicUsers, 'email' );
-      let newAssignedTo = {
-        def: true,
-        fixed: project.def.assignedTo.fixed,
-        required: true,
-        value: project.def.assignedTo.value.map( user => users.find( u => u.id === user.id ) )
-      };
-      setAssignedTo( newAssignedTo );
-      let newRequester = {
-        def: project.def.requester.def || project.def.requester.required,
-        fixed: project.def.requester.fixed,
-        required: project.def.requester.required,
-        value: ( project.def.requester.value ? users.find( u => u.id === project.def.requester.value.id ) : null )
-      };
-      setRequester( newRequester );
-      const {
-        groups,
-        userGroups
-      } = getDefaultGroupData();
-      setGroups( groups );
-      setUserGroups( userGroups );
-      setDataChanged( false );
-
-      //COMPANY
-      let companies = toSelArr( companiesData.basicCompanies );
-      let newCompany = {
-        def: true,
-        fixed: project.def.company.fixed,
-        required: true,
-        value: ( project.def.company.value ? companies.find( c => c.id === project.def.company.value.id ) : null )
-      };
-      setCompany( newCompany );
-
-      //TASK TYPE
-      let taskTypes = toSelArr( taskTypesData.taskTypes );
-      let newType = {
-        def: project.def.type.def || project.def.type.required,
-        fixed: project.def.type.fixed,
-        required: project.def.type.required,
-        value: ( project.def.type.value ? taskTypes.find( type => type.id === project.def.type.value.id ) : null )
-      };
-      setType( newType );
-
-      if ( ![
-        !project.def.type.required || project.def.type.def,
-        !project.def.tag.required || project.def.tag.def,
-        !project.def.requester.required || project.def.requester.def,
-        [
-          project.def.status.required,
-          project.def.status.def,
-          project.def.assignedTo.required,
-          project.def.assignedTo.def,
-          project.def.company.required,
-          project.def.company.def,
-          project.def.pausal.required,
-          project.def.pausal.def,
-          project.def.overtime.required,
-          project.def.overtime.def,
-        ].every( ( bool ) => bool )
-      ].every( ( bool ) => bool ) ) {
-        setDataChanged( true );
-      }
-    }
+    setData();
   }, [ projectLoading, usersLoading, companiesLoading, taskTypesLoading ] );
 
   React.useEffect( () => {
@@ -302,10 +198,11 @@ export default function ProjectEdit( props ) {
     setUpdateTags( [] );
     setDeleteTags( [] );
     refetch( {
-      variables: {
-        id
-      }
-    } );
+        variables: {
+          id
+        }
+      } )
+      .then( setData );
     setDataChanged( false );
   }, [ id ] );
 
@@ -314,6 +211,133 @@ export default function ProjectEdit( props ) {
       updateDefAssigned();
     }
   }, [ userGroups ] );
+
+  const setData = () => {
+    if ( dataLoading ) {
+      return;
+    }
+    //PROJECT
+    const project = projectData.project;
+    setTitle( project.title );
+    setDescription( project.description );
+    setLockedRequester( project.lockedRequester );
+    setAutoApproved( project.autoApproved );
+
+    //STATUS
+    let newStatus = {
+      def: true,
+      fixed: project.def.status.fixed,
+      required: true,
+      value: ( project.def.status.value ? project.statuses.find( c => c.id === project.def.status.value.id ) : null )
+    };
+    setStatus( newStatus );
+    setDataChanged( false );
+
+    let newOvertime = {
+      def: true,
+      fixed: project.def.overtime.fixed,
+      required: true,
+      value: ( project.def.overtime.value ? {
+        value: true,
+        label: 'Yes'
+      } : {
+        value: false,
+        label: 'No'
+      } )
+    };
+    setOvertime( newOvertime );
+
+    let newPausal = {
+      def: true,
+      fixed: project.def.pausal.fixed,
+      required: true,
+      value: ( project.def.pausal.value ? {
+        value: true,
+        label: 'Yes'
+      } : {
+        value: false,
+        label: 'No'
+      } )
+    };
+    setPausal( newPausal );
+
+    //TAGS
+    let tags = toSelArr( getAllTags() );
+    let tagIds = project.def.tag.value.map( v => v.id );
+    let newValue = tags.filter( t => tagIds.includes( t.id ) );
+    let newDefTag = {
+      def: project.def.tag.def || project.def.tag.required,
+      fixed: project.def.tag.fixed,
+      required: project.def.tag.required,
+      value: newValue
+    };
+    setDefTag( newDefTag );
+    setDataChanged( false );
+
+    //USERS
+    let users = toSelArr( usersData.basicUsers, 'email' );
+    let newAssignedTo = {
+      def: true,
+      fixed: project.def.assignedTo.fixed,
+      required: true,
+      value: project.def.assignedTo.value.map( user => users.find( u => u.id === user.id ) )
+    };
+    setAssignedTo( newAssignedTo );
+    let newRequester = {
+      def: project.def.requester.def || project.def.requester.required,
+      fixed: project.def.requester.fixed,
+      required: project.def.requester.required,
+      value: ( project.def.requester.value ? users.find( u => u.id === project.def.requester.value.id ) : null )
+    };
+    setRequester( newRequester );
+    const {
+      groups,
+      userGroups
+    } = getDefaultGroupData();
+    setGroups( groups );
+    setUserGroups( userGroups );
+    setDataChanged( false );
+
+    //COMPANY
+    let companies = toSelArr( companiesData.basicCompanies );
+    let newCompany = {
+      def: true,
+      fixed: project.def.company.fixed,
+      required: true,
+      value: ( project.def.company.value ? companies.find( c => c.id === project.def.company.value.id ) : null )
+    };
+    setCompany( newCompany );
+
+    //TASK TYPE
+    let taskTypes = toSelArr( taskTypesData.taskTypes );
+    let newType = {
+      def: project.def.type.def || project.def.type.required,
+      fixed: project.def.type.fixed,
+      required: project.def.type.required,
+      value: ( project.def.type.value ? taskTypes.find( type => type.id === project.def.type.value.id ) : null )
+    };
+    setType( newType );
+
+    if ( ![
+      !project.def.type.required || project.def.type.def,
+      !project.def.tag.required || project.def.tag.def,
+      !project.def.requester.required || project.def.requester.def,
+      [
+        project.def.status.required,
+        project.def.status.def,
+        project.def.assignedTo.required,
+        project.def.assignedTo.def,
+        project.def.company.required,
+        project.def.company.def,
+        project.def.pausal.required,
+        project.def.pausal.def,
+        project.def.overtime.required,
+        project.def.overtime.def,
+      ].every( ( bool ) => bool )
+    ].every( ( bool ) => bool ) ) {
+      setDataChanged( true );
+    }
+  }
 
   const updateDefAssigned = () => {
     const assignableUsers = userGroups.filter( ( userGroup ) => userGroup.group.rights.assigned.write )
@@ -356,12 +380,6 @@ export default function ProjectEdit( props ) {
     }
   }
 
-  const dataLoading = (
-    projectLoading ||
-    companiesLoading ||
-    usersLoading ||
-    myDataLoading
-  )
   if ( dataLoading ) {
     return <Loading />
   }
@@ -499,52 +517,18 @@ export default function ProjectEdit( props ) {
         }
       } )
       .then( ( response ) => {
-        const updatedProject = {
-          ...response.data.updateProject
-        };
         setAddTags( [] );
         setUpdateTags( [] );
         setDeleteTags( [] );
-        client.writeQuery( {
-          query: GET_PROJECT,
-          variables: {
-            id
-          },
-          data: {
-            project: updatedProject
-          },
-        } );
         if ( closeModal ) {
           const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
           const myRights = myUserGroup === undefined ? backendCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
             .rights;
           if ( myUserGroup ) {
-            client.writeQuery( {
-              query: GET_MY_PROJECTS,
-              data: {
-                projects: [ ...allProjects.filter( project => project.id !== id ), updatedProject ]
-              }
-            } );
-            closeModal( updatedProject, myRights );
+            closeModal( response.data.updateProject, myRights );
           } else {
-            client.writeQuery( {
-              query: GET_MY_PROJECTS,
-              data: {
-                projects: [ ...allProjects.filter( project => project.id !== id ) ]
-              }
-            } );
             closeModal( null, null );
           }
-        } else {
-          let newProjects = [ ...allProjects ]
-          newProjects[ newProjects.findIndex( ( project ) => project.id === id ) ] = updatedProject;
-          client.writeQuery( {
-            query: GET_PROJECTS,
-            data: {
-              projects: newProjects
-            }
-          } );
-
         }
       } )
       .catch( ( err ) => {
@@ -566,21 +550,9 @@ export default function ProjectEdit( props ) {
         } )
         .then( ( response ) => {
           if ( closeModal ) {
-            client.writeQuery( {
-              query: GET_MY_PROJECTS,
-              data: {
-                projects: filteredProjects
-              }
-            } );
             projectDeleted();
             closeModal( null, null );
           } else {
-            client.writeQuery( {
-              query: GET_PROJECTS,
-              data: {
-                projects: filteredProjects
-              }
-            } );
             history.push( '/helpdesk/settings/projects/add' );
           }
         } )

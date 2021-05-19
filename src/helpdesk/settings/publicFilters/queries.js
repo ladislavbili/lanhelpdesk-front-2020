@@ -159,7 +159,6 @@ mutation deleteFilter($id: Int!) {
 }
 `;
 
-
 export const FILTERS_SUBSCRIPTION = gql `
   subscription filtersSubscription {
     filtersSubscription

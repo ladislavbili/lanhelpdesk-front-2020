@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   useQuery,
-  useMutation
+  useMutation,
+  useSubscription
 } from "@apollo/client";
 
 import {
@@ -20,12 +21,17 @@ import Loading from 'components/loading';
 
 import {
   GET_PRICELISTS,
-  ADD_PRICELIST
+  ADD_PRICELIST,
+  PRICELISTS_SUBSCRIPTION
 } from '../prices/queries';
 import {
   GET_COMPANY,
   UPDATE_COMPANY
 } from '../companies/queries';
+const newPricelist = {
+  label: "Nový cenník",
+  value: "0"
+};
 
 export default function PausalEdit( props ) {
   //data
@@ -47,17 +53,19 @@ export default function PausalEdit( props ) {
   const [ addPricelist ] = useMutation( ADD_PRICELIST );
   const {
     data: pricelistsData,
-    loading: pricelistsLoading
-  } = useQuery( GET_PRICELISTS );
-  let pl = ( pricelistsLoading || !pricelistsData ? [] : pricelistsData.pricelists );
-  pl = [ {
-    label: "Nový cenník",
-    value: "0"
-  }, ...toSelArr( pl ) ];
-  const [ pricelists, setPricelists ] = React.useState( pl );
+    loading: pricelistsLoading,
+    refetch: pricelistsRefetch,
+  } = useQuery( GET_PRICELISTS, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( PRICELISTS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      pricelistsRefetch();
+    }
+  } );
 
   //state
-  const [ title, setTitle ] = React.useState( "" );
   const [ monthlyPausal, setMonthlyPausal ] = React.useState( 0 );
   const [ taskWorkPausal, setTaskWorkPausal ] = React.useState( 0 );
   const [ taskTripPausal, setTaskTripPausal ] = React.useState( 0 );
@@ -82,53 +90,50 @@ export default function PausalEdit( props ) {
 
   //sync
   React.useEffect( () => {
-    if ( !pricelistsLoading ) {
-      let pl = [ {
-        label: "Nový cenník",
-        value: "0"
-      }, ...toSelArr( pricelistsData.pricelists ) ];
-      setPricelists( pl );
-    }
-  }, [ pricelistsLoading ] );
-
-  React.useEffect( () => {
     if ( !loading ) {
-      setTitle( data.company.title );
-      setMonthlyPausal( data.company.monthlyPausal );
-      setTaskWorkPausal( data.company.taskWorkPausal );
-      setTaskTripPausal( data.company.taskTripPausal );
-      let pl = {
-        ...data.company.pricelist,
-        value: data.company.pricelist.id,
-        label: data.company.pricelist.title
-      };
-      setPricelist( pl );
-      setOldPricelist( pl );
-      let r = data.company.companyRents.map( re => {
-        return {
-          id: re.id,
-          title: re.title,
-          quantity: re.quantity,
-          unitPrice: re.price,
-          unitCost: re.cost,
-          totalPrice: parseInt( re.quantity ) * parseFloat( re.price ),
-        }
-      } )
-      setRents( r );
-
-      setDataChanged( false );
+      setData();
     }
   }, [ loading ] );
 
   React.useEffect( () => {
     refetch( {
-      variables: {
-        id: parseInt( match.params.id )
-      }
-    } );
+        variables: {
+          id: parseInt( match.params.id )
+        }
+      } )
+      .then( setData );
   }, [ match.params.id ] );
 
   // functions
+  const setData = () => {
+    if ( loading ) {
+      return;
+    }
+    setMonthlyPausal( data.company.monthlyPausal );
+    setTaskWorkPausal( data.company.taskWorkPausal );
+    setTaskTripPausal( data.company.taskTripPausal );
+    let pl = {
+      ...data.company.pricelist,
+      value: data.company.pricelist.id,
+      label: data.company.pricelist.title
+    };
+    setPricelist( pl );
+    setOldPricelist( pl );
+    let r = data.company.companyRents.map( re => {
+      return {
+        id: re.id,
+        title: re.title,
+        quantity: re.quantity,
+        unitPrice: re.price,
+        unitCost: re.cost,
+        totalPrice: parseInt( re.quantity ) * parseFloat( re.price ),
+      }
+    } )
+    setRents( r );
+
+    setDataChanged( false );
+  }
+
   const updateCompanyFunc = () => {
     setSaving( true );
 
@@ -155,10 +160,6 @@ export default function PausalEdit( props ) {
           rents: newRents,
         }
       } )
-      .then( ( response ) => {
-        /*  let updatedRole = {...response.data.updateRole, __typename: "Role"};
-          client.writeQuery({ query: GET_ROLES, data: {roles: [...allRoles.filter( role => role.id !== parseInt(match.params.id) ), updatedRole ] } });*/
-      } )
       .catch( ( err ) => {
         console.log( err.message );
       } );
@@ -166,7 +167,6 @@ export default function PausalEdit( props ) {
     setSaving( false );
     setDataChanged( false );
   };
-
 
   const savePriceList = () => {
     setSaving( true );
@@ -185,9 +185,6 @@ export default function PausalEdit( props ) {
       .then( ( response ) => {
         let newPricelist = response.data.addPricelist;
         setPricelist( newPricelist );
-        let newPricelists = pricelists.concat( [ newPricelist ] );
-        setPricelists( newPricelists );
-
         updateCompanyFunc();
       } )
       .catch( ( err ) => {
@@ -197,30 +194,6 @@ export default function PausalEdit( props ) {
     setDataChanged( false );
   }
 
-  /*
-  submit(){
-      this.setState({saving:true});
-      rebase.updateDoc('/companies/'+this.props.match.params.id,
-      {
-        workPausal:this.state.workPausal,
-        drivePausal:this.state.drivePausal,
-        pricelist: this.state.pricelist.id,
-        rented:this.state.rented.map((rent)=>{
-          return{
-            id:rent.id,
-            title:rent.title,
-            quantity:isNaN(parseInt(rent.quantity))?0:rent.quantity,
-            unitCost:isNaN(parseFloat(rent.unitCost))?0:rent.unitCost,
-            unitPrice:isNaN(parseFloat(rent.unitPrice))?0:rent.unitPrice,
-            totalPrice:isNaN(parseFloat(rent.totalPrice))?0:rent.totalPrice,
-          }
-        }),
-      })
-        .then(()=>this.setState({
-          saving:false,
-        }));
-  }
-*/
   const cancel = () => {
     setClearCompanyRents( true );
   }
@@ -230,6 +203,11 @@ export default function PausalEdit( props ) {
   if ( loading ) {
     return <Loading />
   }
+
+  const pricelists = [
+    newPricelist,
+    ...toSelArr( pricelistsData.pricelists )
+  ];
 
   return (
     <div>
@@ -247,7 +225,7 @@ export default function PausalEdit( props ) {
       </div>
     <div className="fit-with-header-and-commandbar scroll-visible">
 
-      <h2 className="p-t-10 p-l-20">Edit service level agreement - {title}</h2>
+      <h2 className="p-t-10 p-l-20">Edit service level agreement - {data.company.title}</h2>
 
       <div className="p-20">
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import PriceAdd from './priceAdd';
@@ -9,7 +10,8 @@ import Loading from 'components/loading';
 import classnames from 'classnames';
 
 import {
-  GET_PRICELISTS
+  GET_PRICELISTS,
+  PRICELISTS_SUBSCRIPTION
 } from './queries';
 
 export default function PricelistsList( props ) {
@@ -23,8 +25,18 @@ export default function PricelistsList( props ) {
   } = props;
   const {
     data,
-    loading
-  } = useQuery( GET_PRICELISTS );
+    loading,
+    refetch
+  } = useQuery( GET_PRICELISTS, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( PRICELISTS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      refetch();
+    }
+  } );
+
   const PRICELISTS = ( loading || !data ? [] : data.pricelists );
 
   return (

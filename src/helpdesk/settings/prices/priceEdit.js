@@ -46,7 +46,7 @@ export default function PricelistEdit( props ) {
     variables: {
       id: ( props.listId ? props.listId : parseInt( props.match.params.id ) )
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only'
   } );
   const [ updatePricelist ] = useMutation( UPDATE_PRICELIST );
   const [ deletePricelist, {
@@ -77,28 +77,33 @@ export default function PricelistEdit( props ) {
 
   // sync
   React.useEffect( () => {
-    if ( !loading ) {
-      setTitle( data.pricelist.title );
-      setOrder( data.pricelist.order );
-      setAfterHours( data.pricelist.afterHours );
-      setDef( data.pricelist.def );
-      setMaterialMargin( data.pricelist.materialMargin );
-      setMaterialMarginExtra( data.pricelist.materialMarginExtra );
-      setPrices( data.pricelist.prices );
-      setDataChanged( false );
-    }
+    setData()
   }, [ loading ] );
 
   React.useEffect( () => {
     refetch( {
-      variables: {
-        id: ( props.listId ? props.listId : parseInt( props.match.params.id ) )
-      }
-    } );
+        variables: {
+          id: ( props.listId ? props.listId : parseInt( props.match.params.id ) )
+        }
+      } )
+      .then( setData );
   }, [ ( props.listId ? props.listId : parseInt( props.match.params.id ) ) ] );
 
-
   // functions
+  const setData = () => {
+    if ( loading ) {
+      return;
+    }
+    setTitle( data.pricelist.title );
+    setOrder( data.pricelist.order );
+    setAfterHours( data.pricelist.afterHours );
+    setDef( data.pricelist.def );
+    setMaterialMargin( data.pricelist.materialMargin );
+    setMaterialMarginExtra( data.pricelist.materialMarginExtra );
+    setPrices( data.pricelist.prices );
+    setDataChanged( false );
+  }
+
   const updatePricelistFunc = () => {
     setSaving( true );
     let newPrices = prices.map( p => {
@@ -118,25 +123,6 @@ export default function PricelistEdit( props ) {
           materialMarginExtra: ( materialMarginExtra !== '' ? parseInt( materialMarginExtra ) : 0 ),
           prices: newPrices,
         }
-      } )
-      .then( ( response ) => {
-        let updatedPricelist = {
-          ...response.data.updatePricelist,
-          __typename: "Pricelist"
-        };
-        let newPL = filteredPricelists;
-        if ( def ) {
-          newPL = newPL.map( pl => ( {
-            ...pl,
-            def: false
-          } ) );
-        }
-        client.writeQuery( {
-          query: GET_PRICELISTS,
-          data: {
-            pricelists: [ ...newPL, updatedPricelist ]
-          }
-        } );
       } )
       .catch( ( err ) => {
         console.log( err.message );
@@ -158,26 +144,6 @@ export default function PricelistEdit( props ) {
           }
         } )
         .then( ( response ) => {
-          if ( def ) {
-            client.writeQuery( {
-              query: GET_PRICELISTS,
-              data: {
-                pricelists: filteredPricelists.map( pl => {
-                  return {
-                    ...pl,
-                    def: ( pl.id === parseInt( newDefPricelist.id ) )
-                  }
-                } )
-              }
-            } );
-          } else {
-            client.writeQuery( {
-              query: GET_PRICELISTS,
-              data: {
-                pricelists: filteredPricelists
-              }
-            } );
-          }
           history.push( '/helpdesk/settings/pricelists/add' );
         } )
         .catch( ( err ) => {

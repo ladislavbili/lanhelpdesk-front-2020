@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import ProjectAdd from './projectAdd';
@@ -9,7 +10,7 @@ import Loading from 'components/loading';
 import classnames from 'classnames';
 import {
   GET_PROJECTS,
-  GET_MY_DATA
+  PROJECTS_SUBSCRIPTION,
 } from './queries';
 
 export default function ProjectsList( props ) {
@@ -23,17 +24,19 @@ export default function ProjectsList( props ) {
   } = props;
   const {
     data,
-    loading
-  } = useQuery( GET_PROJECTS );
-  const {
-    data: myData,
-    loading: myDataLoading
-  } = useQuery( GET_MY_DATA );
+    loading,
+    refetch,
+  } = useQuery( GET_PROJECTS, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( PROJECTS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      refetch();
+    }
+  } );
 
   const PROJECTS = ( loading ? [] : data.projects );
-  const currentUser = myDataLoading ? {
-    id: null
-  } : myData.getMyData;
 
   const getProjectStat = ( project ) => {
     let color = 'red';

@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import CompanyAdd from './companyAdd';
@@ -8,7 +9,8 @@ import CompanyEdit from './companyEdit';
 import Loading from 'components/loading';
 import classnames from 'classnames';
 import {
-  GET_COMPANIES
+  GET_COMPANIES,
+  COMPANIES_SUBSCRIPTION,
 } from './queries';
 
 export default function CompanysList( props ) {
@@ -21,11 +23,22 @@ export default function CompanysList( props ) {
     history,
     match
   } = props;
+
   const {
     data,
-    loading
-  } = useQuery( GET_COMPANIES );
-  const COMPANIES = ( loading || !data ? [] : data.companies );
+    loading,
+    refetch
+  } = useQuery( GET_COMPANIES, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( COMPANIES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      refetch();
+    }
+  } );
+
+  const companies = ( loading || !data ? [] : data.companies );
 
   return (
     <div className="content">
@@ -81,7 +94,7 @@ export default function CompanysList( props ) {
                 </thead>
                 <tbody>
                     {
-                      COMPANIES.filter((item) => {
+                      companies.filter((item) => {
                         let cond = true;
                         if (sortBy === "1"){
                           cond = item.monthly;
@@ -122,7 +135,7 @@ export default function CompanysList( props ) {
               loading && match.params.id && match.params.id!=='add' && <Loading />
             }
             {
-              match.params.id && match.params.id!=='add' && COMPANIES.some((item)=>item.id===parseInt(match.params.id)) && <CompanyEdit {...{history, match}} />
+              match.params.id && match.params.id!=='add' && companies.some((item)=>item.id===parseInt(match.params.id)) && <CompanyEdit {...{history, match}} />
             }
             {
               !loading && !match.params.id && <div className="commandbar"></div>
