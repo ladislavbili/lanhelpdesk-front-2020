@@ -1661,6 +1661,11 @@ td {
   padding: 3px 0px 7px 0px;
 }
 
+.header-with-text, .header-with-text:hover, .header-with-text:focus{
+  margin-right: 5px !important;
+}
+
+
 .header-icon,
 .header-icon:active,
 .header-icon:focus {

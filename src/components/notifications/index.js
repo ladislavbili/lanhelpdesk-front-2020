@@ -2,7 +2,7 @@ import React from 'react';
 import {
   useMutation,
   useQuery,
-  useApolloClient
+  useSubscription,
 } from "@apollo/client";
 import {
   ListGroupItem,
@@ -26,7 +26,7 @@ import {
   SET_ALL_USER_NOTIFICATIONS_READ,
   DELETE_ALL_USER_NOTIFICATIONS,
   DELETE_SELECTED_USER_NOTIFICATIONS,
-  GET_USER_NOTIFICATIONS_COUNT,
+  USER_NOTIFICATIONS_SUBSCRIPTION,
 } from './queries';
 
 const noTypeFilter = {
@@ -50,12 +50,16 @@ export default function NotificationList( props ) {
   const {
     data: notificationsData,
     loading: notificationsLoading,
-  } = useQuery( GET_USER_NOTIFICATIONS );
+    refetch: notificationsRefetch,
+  } = useQuery( GET_USER_NOTIFICATIONS, {
+    fetchPolicy: 'network-only'
+  } );
 
-  const {
-    data: notificationCountData,
-    loading: notificationCountLoading
-  } = useQuery( GET_USER_NOTIFICATIONS_COUNT );
+  useSubscription( USER_NOTIFICATIONS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      notificationsRefetch();
+    }
+  } );
 
   const [ setUserNotificationRead ] = useMutation( SET_USER_NOTIFICATION_READ );
   const [ setAllUserNotificationsRead ] = useMutation( SET_ALL_USER_NOTIFICATIONS_READ );
@@ -67,17 +71,6 @@ export default function NotificationList( props ) {
   const [ selectedNotificationID, setSelectedNotificationID ] = React.useState( null );
   const [ type, setType ] = React.useState( noTypeFilter );
 
-  const client = useApolloClient();
-
-  const writeDataToCache = ( newData ) => {
-    client.writeQuery( {
-      query: GET_USER_NOTIFICATIONS,
-      data: {
-        userNotifications: newData,
-      }
-    } );
-  }
-
   const setNotificationReadFunc = ( notification ) => {
     setSelectedNotificationID( notification.id );
 
@@ -87,25 +80,6 @@ export default function NotificationList( props ) {
             id: notification.id,
             read: true,
           }
-        } )
-        .then( ( response ) => {
-          const allNotifications = client.readQuery( {
-              query: GET_USER_NOTIFICATIONS
-            } )
-            .userNotifications;
-          const newData = allNotifications.map( originalNotification => originalNotification.id !== notification.id ? ( {
-            ...originalNotification
-          } ) : ( {
-            ...originalNotification,
-            read: true
-          } ) );
-          writeDataToCache( newData );
-          client.writeQuery( {
-            query: GET_USER_NOTIFICATIONS_COUNT,
-            data: {
-              userNotificationsCount: notificationCountData.userNotificationsCount - 1,
-            }
-          } );
         } )
         .catch( ( err ) => {
           console.log( err.message );
@@ -120,23 +94,6 @@ export default function NotificationList( props ) {
             read: true,
           }
         } )
-        .then( ( response ) => {
-          const userNotifications = client.readQuery( {
-              query: GET_USER_NOTIFICATIONS
-            } )
-            .userNotifications;
-          const newData = userNotifications.map( notification => ( {
-            ...notification,
-            read: true
-          } ) );
-          writeDataToCache( newData );
-          client.writeQuery( {
-            query: GET_USER_NOTIFICATIONS_COUNT,
-            data: {
-              userNotificationsCount: 0,
-            }
-          } );
-        } )
         .catch( ( err ) => {
           console.log( err.message );
         } );
@@ -146,16 +103,6 @@ export default function NotificationList( props ) {
   const deleteAll = () => {
     if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
       deleteAllUserNotifications()
-        .then( ( response ) => {
-          writeDataToCache( [] );
-          setSelectedNotificationID( null );
-          client.writeQuery( {
-            query: GET_USER_NOTIFICATIONS_COUNT,
-            data: {
-              userNotificationsCount: 0,
-            }
-          } );
-        } )
         .catch( ( err ) => {
           console.log( err.message );
         } );
@@ -170,15 +117,6 @@ export default function NotificationList( props ) {
           variables: {
             ids: userNotifications,
           }
-        } )
-        .then( ( response ) => {
-          const allNotifications = client.readQuery( {
-              query: GET_USER_NOTIFICATIONS
-            } )
-            .userNotifications;
-          const newData = allNotifications.filter( notification => !notification.read );
-          writeDataToCache( newData );
-          setSelectedNotificationID( null );
         } )
         .catch( ( err ) => {
           console.log( err.message );
@@ -288,7 +226,7 @@ export default function NotificationList( props ) {
                         >
                         <div className={(selectedNotificationID === notification.id ? "text-highlight":"")}>
                           <i className={classnames({ 'far fa-envelope-open': notification.read, 'fas fa-envelope': !notification.read })} />
-                          {`${notification.task.id}:${notification.task.title}`}
+                          {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
                           <div className="row">
                             <div>
                               <Label className="p-r-5">User:</Label>

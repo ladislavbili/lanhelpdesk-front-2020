@@ -66,3 +66,16 @@ query {
   userNotificationsCount
 }
 `;
+
+export const USER_NOTIFICATIONS_SUBSCRIPTION = gql `
+  subscription errorMessagesSubscription {
+    userNotificationsSubscription
+  }
+`;
+
+
+export const USER_NOTIFICATIONS_COUNT_SUBSCRIPTION = gql `
+  subscription errorMessageCountSubscription {
+    userNotificationsCountSubscription
+  }
+`;

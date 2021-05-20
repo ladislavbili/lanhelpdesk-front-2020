@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   useQuery,
+  useSubscription,
 } from "@apollo/client";
 import classnames from 'classnames';
 import Empty from 'components/Empty';
@@ -8,7 +9,8 @@ import {
   GET_MY_DATA,
 } from '../queries';
 import {
-  GET_ERROR_MESSAGES_COUNT
+  GET_ERROR_MESSAGES_COUNT,
+  ERROR_MESSAGE_COUNT_SUBSCRIPTION,
 } from './queries';
 
 export default function ErrorIcon( props ) {
@@ -25,8 +27,15 @@ export default function ErrorIcon( props ) {
 
   const {
     data: errorMessageCountData,
-    loading: errorMessageCountLoading
+    loading: errorMessageCountLoading,
+    refetch: errorMessageCountRefetch,
   } = useQuery( GET_ERROR_MESSAGES_COUNT );
+
+  useSubscription( ERROR_MESSAGE_COUNT_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      errorMessageCountRefetch();
+    }
+  } );
 
   if (
     userDataLoading ||

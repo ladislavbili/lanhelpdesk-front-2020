@@ -2,7 +2,7 @@ import React from 'react';
 import {
   useMutation,
   useQuery,
-  useApolloClient
+  useSubscription
 } from "@apollo/client";
 import {
   ListGroupItem,
@@ -14,7 +14,7 @@ import Loading from 'components/loading';
 import {
   pickSelectStyle
 } from 'configs/components/select';
-import ErrorInfo from './errorInfo';
+import ErrorDetails from './errorDetails';
 
 import {
   timestampToString
@@ -26,7 +26,7 @@ import {
   SET_ALL_ERROR_MESSAGES_READ,
   DELETE_ALL_ERROR_MESSAGES,
   DELETE_SELECTED_ERROR_MESSAGES,
-  GET_ERROR_MESSAGES_COUNT,
+  ERROR_MESSAGES_SUBSCRIPTION,
 } from './queries';
 
 const noTypeFilter = {
@@ -44,18 +44,23 @@ const unreadTypeFilter = {
 
 export default function ErrorList( props ) {
   const {
-    history
+    history,
+    match,
   } = props;
 
   const {
     data: errorMessagesData,
     loading: errorMessagesLoading,
-  } = useQuery( GET_ERROR_MESSAGES );
+    refetch: errorMessagesRefetch,
+  } = useQuery( GET_ERROR_MESSAGES, {
+    fetchPolicy: 'network-only'
+  } );
 
-  const {
-    data: errorMessageCountData,
-    loading: errorMessageCountLoading
-  } = useQuery( GET_ERROR_MESSAGES_COUNT );
+  useSubscription( ERROR_MESSAGES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      errorMessagesRefetch();
+    }
+  } );
 
   const [ setErrorMessageRead ] = useMutation( SET_ERROR_MESSAGE_READ );
   const [ setAllErrorMessagesRead ] = useMutation( SET_ALL_ERROR_MESSAGES_READ );
@@ -67,17 +72,6 @@ export default function ErrorList( props ) {
   const [ selectedErrorID, setSelectedErrorID ] = React.useState( null );
   const [ type, setType ] = React.useState( noTypeFilter );
 
-  const client = useApolloClient();
-
-  const writeDataToCache = ( newData ) => {
-    client.writeQuery( {
-      query: GET_ERROR_MESSAGES,
-      data: {
-        errorMessages: newData,
-      }
-    } );
-  }
-
   const setErrorMessageReadFunc = ( error ) => {
     setSelectedErrorID( error.id );
 
@@ -88,25 +82,6 @@ export default function ErrorList( props ) {
             read: true,
           }
         } )
-        .then( ( response ) => {
-          const allErrorMessages = client.readQuery( {
-              query: GET_ERROR_MESSAGES
-            } )
-            .errorMessages;
-          const newData = allErrorMessages.map( message => message.id !== error.id ? ( {
-            ...message
-          } ) : ( {
-            ...message,
-            read: true
-          } ) );
-          writeDataToCache( newData );
-          client.writeQuery( {
-            query: GET_ERROR_MESSAGES_COUNT,
-            data: {
-              errorMessageCount: errorMessageCountData.errorMessageCount - 1,
-            }
-          } );
-        } )
         .catch( ( err ) => {
           console.log( err.message );
         } );
@@ -115,27 +90,11 @@ export default function ErrorList( props ) {
 
   const markAllAsRead = () => {
     if ( window.confirm( 'Ste si istý že chcete všetky správy označiť ako prečítané?' ) ) {
+      setSelectedErrorID( null );
       setAllErrorMessagesRead( {
           variables: {
             read: true,
           }
-        } )
-        .then( ( response ) => {
-          const allErrorMessages = client.readQuery( {
-              query: GET_ERROR_MESSAGES
-            } )
-            .errorMessages;
-          const newData = allErrorMessages.map( message => ( {
-            ...message,
-            read: true
-          } ) );
-          writeDataToCache( newData );
-          client.writeQuery( {
-            query: GET_ERROR_MESSAGES_COUNT,
-            data: {
-              errorMessageCount: 0,
-            }
-          } );
         } )
         .catch( ( err ) => {
           console.log( err.message );
@@ -145,17 +104,8 @@ export default function ErrorList( props ) {
 
   const deleteAll = () => {
     if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
+      setSelectedErrorID( null );
       deleteAllErrorMessages()
-        .then( ( response ) => {
-          writeDataToCache( [] );
-          setSelectedErrorID( null );
-          client.writeQuery( {
-            query: GET_ERROR_MESSAGES_COUNT,
-            data: {
-              errorMessageCount: 0,
-            }
-          } );
-        } )
         .catch( ( err ) => {
           console.log( err.message );
         } );
@@ -164,21 +114,13 @@ export default function ErrorList( props ) {
 
   const deleteRead = () => {
     if ( window.confirm( 'Ste si istý že chcete všetky prečítané správy vymazať?' ) ) {
+      setSelectedErrorID( null );
       const readErrorMessages = errorMessages.filter( errorMessage => errorMessage.read )
         .map( errorMessage => errorMessage.id );
       deleteSelectedErrorMessages( {
           variables: {
             ids: readErrorMessages,
           }
-        } )
-        .then( ( response ) => {
-          const allErrorMessages = client.readQuery( {
-              query: GET_ERROR_MESSAGES
-            } )
-            .errorMessages;
-          const newData = allErrorMessages.filter( message => !message.read );
-          writeDataToCache( newData );
-          setSelectedErrorID( null );
         } )
         .catch( ( err ) => {
           console.log( err.message );
@@ -234,105 +176,101 @@ export default function ErrorList( props ) {
 
   return (
     <div className="lanwiki-content row">
-        <div className="col-lg-4">
+      <div className="col-lg-4">
 
-          <div className="scroll-visible fit-with-header lanwiki-list">
+        <div className="scroll-visible fit-with-header lanwiki-list">
 
-            <h1>Error messages</h1>
+          <h1>Error messages</h1>
 
-            <div className="row">
-              <div className="search-row" style={{width: "60%"}}>
-                <div className="search">
-                  <input
-                    type="text"
-                    className="form-control search-text"
-                    value={searchFilter}
-                    onChange={(e) => setSearchFilter( e.target.value )}
-                    placeholder="Search"
-                    />
-                  <button className="search-btn" type="button">
-                    <i className="fa fa-search" />
-                  </button>
-                </div>
-              </div>
-              <span className="center-hor ml-auto" style={{width: "30%", backgroundColor: "white"}}>
-                <Select
-                  value={type}
-                  onChange={(type) => setType( type ) }
-                  options={getTypes()}
-                  styles={pickSelectStyle([ 'invisible', ])}
+          <div className="row">
+            <div className="search-row" style={{width: "60%"}}>
+              <div className="search">
+                <input
+                  type="text"
+                  className="form-control search-text"
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter( e.target.value )}
+                  placeholder="Search"
                   />
-              </span>
+                <button className="search-btn" type="button">
+                  <i className="fa fa-search" />
+                </button>
+              </div>
             </div>
-
-            <div>
-              <button
-                type="button"
-                className="btn-link btn-distance"
-                onClick={markAllAsRead}
-                disabled={errors.every((error)=>error.read)}>
-                Označit všetky ako prečítané
-              </button>
-              <button
-                type="button"
-                className="btn-link btn-distance"
-                onClick={deleteAll}
-                disabled={errors.length === 0}>
-                Vymazať všetky
-              </button>
-              <button
-                type="button"
-                className="btn-link"
-                onClick={deleteRead}
-                disabled={errors.filter((error)=>error.read).length === 0}>
-                Vymazať prečítané
-              </button>
-            </div>
-            <div>
-                  {
-                    errors.map((error) =>
-                    <li
-                      key={error.id}
-                      className={classnames({ 'notification-read': error.read,
-                        'notification-not-read': !error.read,
-                        'sidebar-item-active': selectedErrorID === error.id },
-                        "clickable")}
-                        onClick={() => setErrorMessageReadFunc(error)}
-                        >
-                        <div className={(selectedErrorID === error.id ? "text-highlight":"")}>
-                          <i className={classnames({ 'far fa-envelope-open': error.read, 'fas fa-envelope': !error.read })} />
-                          {error.source}
-                          <div className="row">
-                            <div>
-                              {error.user ? error.user.email : "no user"}
-                            </div>
-                            <div className="ml-auto">
-                              {timestampToString(parseInt(error.createdAt))}
-                            </div>
-                          </div>
-                          <div style={{overflowX:'hidden'}}>{error.errorMessage.substring(0, 150)}...</div>
-                        </div>
-                      </li>
-                    )
-                  }
-              {
-                errorMessages.length === 0 &&
-                <ListGroupItem>There are no errors!</ListGroupItem>
-              }
-            </div>
-
+            <span className="center-hor ml-auto" style={{width: "30%", backgroundColor: "white"}}>
+              <Select
+                value={type}
+                onChange={(type) => setType( type ) }
+                options={getTypes()}
+                styles={pickSelectStyle([ 'invisible', ])}
+                />
+            </span>
           </div>
+
+          <div>
+            <button
+              type="button"
+              className="btn-link btn-distance"
+              onClick={markAllAsRead}
+              disabled={errors.every((error)=>error.read)}>
+              Označit všetky ako prečítané
+            </button>
+            <button
+              type="button"
+              className="btn-link btn-distance"
+              onClick={deleteAll}
+              disabled={errors.length === 0}>
+              Vymazať všetky
+            </button>
+            <button
+              type="button"
+              className="btn-link"
+              onClick={deleteRead}
+              disabled={errors.filter((error)=>error.read).length === 0}>
+              Vymazať prečítané
+            </button>
+          </div>
+          <div>
+            { errors.map((error) =>
+              <li
+                key={error.id}
+                className={classnames({ 'notification-read': error.read,
+                  'notification-not-read': !error.read,
+                  'sidebar-item-active': selectedErrorID === error.id },
+                  "clickable")}
+                  onClick={() => setErrorMessageReadFunc(error)}
+                  >
+                  <div className={(selectedErrorID === error.id ? "text-highlight":"")}>
+                    <i className={classnames({ 'far fa-envelope-open': error.read, 'fas fa-envelope': !error.read })} />
+                    {error.source}
+                    <div className="row">
+                      <div>
+                        {error.user ? error.user.email : "no user"}
+                      </div>
+                      <div className="ml-auto">
+                        {timestampToString(parseInt(error.createdAt))}
+                      </div>
+                    </div>
+                    <div style={{overflowX:'hidden'}}>{error.errorMessage.substring(0, 150)}...</div>
+                  </div>
+                </li>
+              )
+            }
+            { errorMessages.length === 0 &&
+              <ListGroupItem>There are no errors!</ListGroupItem>
+            }
+          </div>
+
         </div>
-        <div className="col-lg-8">
-          {
-            selectedErrorID !== null &&
-            <ErrorInfo errorMessage={ errorMessages.find((errorMessage) => errorMessage.id === selectedErrorID )} history={history} />
-          }
-          {
-            selectedErrorID === null &&
-            <div className="fit-with-header" style={{backgroundColor: "white"}}></div>
-          }
-        </div>
+      </div>
+      <div className="col-lg-8">
+        { selectedErrorID !== null &&
+          <ErrorDetails errorMessage={ errorMessages.find((errorMessage) => errorMessage.id === selectedErrorID )} history={history} />
+        }
+        { selectedErrorID === null &&
+          <div className="fit-with-header" style={{backgroundColor: "white"}}></div>
+        }
+      </div>
     </div>
   );
 }

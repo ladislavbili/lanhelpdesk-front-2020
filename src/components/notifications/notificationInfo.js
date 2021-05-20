@@ -18,7 +18,7 @@ export default function NotificationInfo( props ) {
       <div className="p-20 scroll-visible fit-with-header">
         <div>
           <Label className="m-r-5">User:</Label>
-          {` ${notification.fromUser.fullName}`}
+          {` ${notification.fromUser ? notification.fromUser.fullName : 'System message'}`}
         </div>
         <div>
           <Label className="m-r-5">Subject:</Label>
@@ -33,7 +33,7 @@ export default function NotificationInfo( props ) {
         </div>
         <div className="clickable" onClick={() => history.push(`/helpdesk/taskList/i/all/${notification.task.id}`) }>
           <Label className="m-r-5">Task:</Label>
-          {`${notification.task.id}:${notification.task.title}`}
+          {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
         </div>
         <button className="btn-link" onClick={() => {}}>
           Cancel notifications

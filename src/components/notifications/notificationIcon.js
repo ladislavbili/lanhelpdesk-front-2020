@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   useQuery,
-  useMutation
+  useMutation,
+  useSubscription,
 } from "@apollo/client";
 import {
   Dropdown,
@@ -15,6 +16,8 @@ import {
   GET_USER_NOTIFICATIONS_COUNT,
   GET_USER_NOTIFICATIONS,
   SET_USER_NOTIFICATION_READ,
+  USER_NOTIFICATIONS_SUBSCRIPTION,
+  USER_NOTIFICATIONS_COUNT_SUBSCRIPTION,
 } from './queries';
 
 export default function NotificationIcon( props ) {
@@ -26,17 +29,32 @@ export default function NotificationIcon( props ) {
 
   const {
     data: userNotificationsCountData,
-    loading: userNotificationsCountLoading
+    loading: userNotificationsCountLoading,
+    refetch: userNotificationsCountRefetch,
   } = useQuery( GET_USER_NOTIFICATIONS_COUNT );
 
   const {
     data: userNotificationsData,
-    loading: userNotificationsLoading
+    loading: userNotificationsLoading,
+    refetch: userNotificationsRefetch,
   } = useQuery( GET_USER_NOTIFICATIONS, {
     variables: {
       limit: 5
     }
   } );
+
+  useSubscription( USER_NOTIFICATIONS_COUNT_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      userNotificationsCountRefetch();
+    }
+  } );
+
+  useSubscription( USER_NOTIFICATIONS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      userNotificationsRefetch();
+    }
+  } );
+
   const [ setUserNotificationRead ] = useMutation( SET_USER_NOTIFICATION_READ );
 
   const [ notificationsOpen, setNotificationsOpen ] = React.useState( false );
@@ -54,9 +72,9 @@ export default function NotificationIcon( props ) {
   return (
     <Empty>
       <Dropdown className="center-hor" isOpen={notificationsOpen} toggle={() => setNotificationsOpen(!notificationsOpen)}>
-        <DropdownToggle className="header-dropdown">
+        <DropdownToggle className="header-dropdown header-with-text">
           <i className="header-icon-with-text fa fa fa-envelope"/>
-          <span className="m-l-8 header-icon-text clickable">{count}</span>
+          <span className="m-l-2 header-icon-text clickable">{count > 99 ? '99+' : count }</span>
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header={true}>Notifications</DropdownItem>
@@ -99,7 +117,7 @@ export default function NotificationIcon( props ) {
                     maxWidth: 250
                   }}
                   >
-                  {notification.task.id}: {notification.task.title}
+                  {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
                 </div>
               </DropdownItem>
             )
@@ -107,7 +125,7 @@ export default function NotificationIcon( props ) {
           <DropdownItem divider={true}/>
           <DropdownItem onClick={() => history.push('/helpdesk/notifications/')}>
             <span style={{ fontWeight: 'bold' }} >Go to notifications</span>
-            { (count && count > 5) ? <span className='p-l-3'> ` ${count - 5} more unread...`</span> : null }
+            { (count && count > 5) ? <span className='p-l-3'>{` ${count - 5} more unread...`}</span> : null }
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>

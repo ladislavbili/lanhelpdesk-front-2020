@@ -59,3 +59,16 @@ query {
   errorMessageCount
 }
 `;
+
+export const ERROR_MESSAGES_SUBSCRIPTION = gql `
+  subscription errorMessagesSubscription {
+    errorMessagesSubscription
+  }
+`;
+
+
+export const ERROR_MESSAGE_COUNT_SUBSCRIPTION = gql `
+  subscription errorMessageCountSubscription {
+    errorMessageCountSubscription
+  }
+`;

@@ -17,6 +17,7 @@ import {
 import {
   Link
 } from 'react-router-dom';
+import Empty from 'components/Empty';
 import ErrorIcon from 'components/errorMessages/errorIcon';
 import NotificationIcon from 'components/notifications/notificationIcon';
 import classnames from 'classnames';
@@ -74,53 +75,48 @@ export default function PageHeader( props ) {
             >
             Úlohy
           </Link>
-          {
-            accessRights.vykazy &&
-            <Link
-              to={{ pathname: `/reports` }}
-              className={
-                "header-link" +
-                (
-                  URL.includes("reports") ?
-                  " header-link-active" :
-                  ""
-                )
-              }
-              >
-              Vykazy
-            </Link>
-          }
-          {
-            accessRights.testSections &&
-            <Link
-              to={{ pathname: `/lanwiki` }}
-              className={
-                "header-link" +
-                (
-                  URL.includes("lanwiki") ?
-                  " header-link-active" :
-                  ""
-                )
-              }
-              >
-              LanWiki
-            </Link>
-          }
-          {
-            accessRights.testSections &&
-            <Link
-              to={{ pathname: `/cmdb` }}
-              className={
-                "header-link" +
-                (
-                  URL.includes("cmdb") ?
-                  " header-link-active" :
-                  ""
-                )
-              }
-              >
-              CMDB
-            </Link>
+          { accessRights.vykazy &&
+            <Empty>
+              <Link
+                to={{ pathname: `/reports` }}
+                className={
+                  "header-link" +
+                  (
+                    URL.includes("reports") ?
+                    " header-link-active" :
+                    ""
+                  )
+                }
+                >
+                Vykazy
+              </Link>
+              <Link
+                to={{ pathname: `/lanwiki` }}
+                className={
+                  "header-link" +
+                  (
+                    URL.includes("lanwiki") ?
+                    " header-link-active" :
+                    ""
+                  )
+                }
+                >
+                LanWiki
+              </Link>
+              <Link
+                to={{ pathname: `/cmdb` }}
+                className={
+                  "header-link" +
+                  (
+                    URL.includes("cmdb") ?
+                    " header-link-active" :
+                    ""
+                  )
+                }
+                >
+                CMDB
+              </Link>
+            </Empty>
           }
         </div>
         <div className="ml-auto center-hor row">

@@ -27,8 +27,6 @@ import Checkbox from 'components/checkbox';
 import {
   UPDATE_PROFILE,
   GET_MY_DATA,
-  GET_BASIC_USERS,
-  GET_USERS
 } from './queries';
 
 import PasswordChange from './passChange';
@@ -47,6 +45,7 @@ export default function UserProfile( props ) {
     loading: myDataLoading
   } = useQuery( GET_MY_DATA, {
     fetchPolicy: 'network-only',
+    notifyOnNetworkStatusChange: true,
   } );
 
   const [ updateProfile, {
