@@ -314,8 +314,42 @@ query getNumberOfTasks($projectId: Int!) {
 }
 `;
 
+export const ADD_USER_TO_PROJECT_GROUP = gql `
+mutation addUserToProjectGroup(
+  $id: Int!,
+  $userId: Int!
+) {
+  addUserToProjectGroup(
+    id: $id
+    userId: $userId
+  ){
+    id
+  }
+}
+`;
+
 export const PROJECTS_SUBSCRIPTION = gql `
   subscription projectsSubscription {
     projectsSubscription
+  }
+`;
+
+export const GET_PROJECT_GROUPS = gql `
+query projectGroups($id: Int!) {
+  projectGroups(
+    id: $id,
+  ){
+    id
+    title
+    order
+  }
+}
+`;
+
+
+
+export const PROJECT_GROUPS_SUBSCRIPTION = gql `
+  subscription projectGroupsSubscription($projectId: Int!) {
+    projectGroupsSubscription(projectId: $projectId)
   }
 `;

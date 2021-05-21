@@ -82,7 +82,7 @@ export default function UserAdd( props ) {
   const currentUser = getMyData();
 
   const dataLoading = (
-    currentUser ||
+    !currentUser ||
     rolesLoading ||
     companiesLoading
   )

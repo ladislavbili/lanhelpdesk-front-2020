@@ -888,25 +888,27 @@ export default function Rozpocet( props ) {
           ))}
           {/* Add buttons*/}
           { !showAddSubtask && !showAddTrip && !disabled &&
-            <tr key='addButton' colSpan={(shownColumns.length - 1).toString()}>
-              <button className="btn-link btn-distance"
-                disabled={disabled || !canAddSubtasksAndTrips}
-                onClick={()=>{
-                  setShowAddSubtask(true);
-                }}
-                >
-                <i className="fa fa-plus" />
-                Práca
-              </button>
-              <button className="btn-link btn-distance"
-                disabled={disabled || !canAddSubtasksAndTrips}
-                onClick={()=>{
-                  setShowAddTrip(true);
-                }}
-                >
-                <i className="fa fa-plus" />
-                Výjazd
-              </button>
+            <tr key='addButton'>
+              <td colSpan={(shownColumns.length - 1).toString()}>
+                <button className="btn-link btn-distance"
+                  disabled={disabled || !canAddSubtasksAndTrips}
+                  onClick={()=>{
+                    setShowAddSubtask(true);
+                  }}
+                  >
+                  <i className="fa fa-plus" />
+                  Práca
+                </button>
+                <button className="btn-link btn-distance"
+                  disabled={disabled || !canAddSubtasksAndTrips}
+                  onClick={()=>{
+                    setShowAddTrip(true);
+                  }}
+                  >
+                  <i className="fa fa-plus" />
+                  Výjazd
+                </button>
+              </td>
             </tr>
           }
           {/* Add subtask row*/}

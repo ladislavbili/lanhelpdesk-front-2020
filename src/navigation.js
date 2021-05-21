@@ -23,6 +23,7 @@ import LanwikiNavigation from 'lanwiki/navigation';
 import CMDBNavigation from 'cmdb/navigation';
 
 export default function Navigation( props ) {
+
   const {
     data: userDataData,
     loading: userDataLoading,
@@ -37,7 +38,8 @@ export default function Navigation( props ) {
     }
   } );
 
-  if ( !userDataLoading && getMyData() === null ) {
+  const currentUser = getMyData();
+  if ( !userDataLoading && currentUser === null ) {
     location.reload( false );
   }
 

@@ -44,7 +44,6 @@ import {
   GET_TASK,
   GET_TASKS,
 
-  ADD_USER_TO_PROJECT,
   DELETE_TASK,
   UPDATE_TASK,
   UPDATE_INVOICED_TASK,
@@ -158,7 +157,6 @@ export default function TaskEditContainer( props ) {
   const [ addCustomItem ] = useMutation( ADD_CUSTOM_ITEM );
   const [ updateCustomItem ] = useMutation( UPDATE_CUSTOM_ITEM );
   const [ deleteCustomItem ] = useMutation( DELETE_CUSTOM_ITEM );
-  const [ addUserToProject ] = useMutation( ADD_USER_TO_PROJECT );
   const [ deleteTaskAttachment ] = useMutation( DELETE_TASK_ATTACHMENT );
 
   React.useEffect( () => {
@@ -610,22 +608,6 @@ export default function TaskEditContainer( props ) {
     }
   }
 
-  const addUserToProjectFunc = ( user, project ) => {
-    addUserToProject( {
-        variables: {
-          userId: user.id,
-          projectId: project.id,
-        }
-      } )
-      .then( ( response ) => {
-        refetchMyProjects()
-      } )
-      .catch( ( err ) => {
-        console.log( err.message );
-      } );
-    basicUsersRefetch();
-  }
-
   const addCompanyToList = ( company ) => {
     basicCompaniesRefetch();
   }
@@ -817,7 +799,6 @@ export default function TaskEditContainer( props ) {
       filterValues={localFilterToValues(filterData.localFilter)}
       originalProjectId={projectData.localProject.id}
       filterId={filterData.localFilter.id}
-      addUserToProject={addUserToProjectFunc}
       addCompanyToList={addCompanyToList}
       submitComment={submitComment}
       submitEmail={submitEmail}

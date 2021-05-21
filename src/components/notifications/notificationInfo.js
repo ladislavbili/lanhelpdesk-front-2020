@@ -31,7 +31,14 @@ export default function NotificationInfo( props ) {
             dangerouslySetInnerHTML={{__html: notification.message.replace(/(?:\r\n|\r|\n)/g, '<br>') }}
             />
         </div>
-        <div className="clickable" onClick={() => history.push(`/helpdesk/taskList/i/all/${notification.task.id}`) }>
+        <div
+          className="clickable"
+          onClick={() => {
+            if(notification.task){
+              history.push(`/helpdesk/taskList/i/all/${notification.task.id}`);
+            }
+           } }
+             >
           <Label className="m-r-5">Task:</Label>
           {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
         </div>

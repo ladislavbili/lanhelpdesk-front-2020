@@ -47,6 +47,7 @@ import CheckboxList from 'helpdesk/components/checkboxList';
 import Scheduled from 'helpdesk/components/scheduled';
 import StatusChangeModal from 'helpdesk/components/statusChangeModal';
 import PendingPicker from 'helpdesk/components/pendingPicker';
+import AddUserToGroup from 'helpdesk/settings/projects/addUserToGroup';
 
 import TaskAdd from '../add';
 import TaskPrint from './taskPrint';
@@ -107,7 +108,6 @@ export default function TaskEdit( props ) {
     addScheduledTaskFunc,
     deleteScheduledTaskFunc,
     deleteTaskFunc,
-    addUserToProject,
     addCompanyToList,
     addAttachments,
     removeAttachment,
@@ -164,6 +164,7 @@ export default function TaskEdit( props ) {
   const [ usedSubtaskPausal, setUsedSubtaskPausal ] = React.useState( 0 );
   const [ usedTripPausal, setUsedTripPausal ] = React.useState( 0 );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
+  const [ newAddedUser, setNewAddedUser ] = React.useState( null );
 
   const [ changes, setChanges ] = React.useState( {} );
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
@@ -1723,36 +1724,36 @@ export default function TaskEdit( props ) {
         { userRights.tagsRead && userRights.tagsWrite &&
           <div className="row mb-auto">
             <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
-              <i className="fa fa-plus" />Tags
-              </button>
-              <MultiSelect
-                className="center-hor"
-                disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
-                direction="right"
-                style={{}}
-                header="Select tags for this task"
-                closeMultiSelect={() => { setTagsOpen(false) }}
-                open={tagsOpen}
-                items={toSelArr(project === null ? [] : project.project.tags)}
-                selected={tags}
-                onChange={(tags) => {
-                  setTags(tags);
-                  autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
-                }}
-                />
-            </div>
-          }
+              <i className="fa fa-plus" />
+              Tags
+            </button>
+            <MultiSelect
+              className="center-hor"
+              disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
+              direction="right"
+              style={{}}
+              header="Select tags for this task"
+              closeMultiSelect={() => { setTagsOpen(false) }}
+              open={tagsOpen}
+              items={toSelArr(project === null ? [] : project.project.tags)}
+              selected={tags}
+              onChange={(tags) => {
+                setTags(tags);
+                autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
+              }}
+              />
+          </div>
+        }
 
-          {
-            userRights.tagsRead && tags
-            .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
-            .map( ( tag ) => (
-              <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
-                {tag.title}
-              </span>
-            ) )
-          }
-        </Empty>
+        { userRights.tagsRead && tags
+          .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+          .map( ( tag ) => (
+            <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+              {tag.title}
+            </span>
+          ) )
+        }
+      </Empty>
     )
   }
 
@@ -1770,25 +1771,25 @@ export default function TaskEdit( props ) {
     } else {
       if ( showDescription ) {
         RenderDescription = <div>
-            <CKEditor
-              editor={ ClassicEditor }
-              data={description}
-              onInit={(editor) => {
-                editor.editing.view.document.on( 'keydown', ( evt, data ) => {
-                  if ( data.keyCode === 27 ) {
-                    autoUpdateTask({ description  })
-                    setShowDescription(false);
-                    data.preventDefault();
-                    evt.stop();
-                  }
-                });
-              }}
-              onChange={(e,editor)=>{
-                setDescription(editor.getData());
-              }}
-              config={ck5config}
-              />
-          </div>
+          <CKEditor
+            editor={ ClassicEditor }
+            data={description}
+            onInit={(editor) => {
+              editor.editing.view.document.on( 'keydown', ( evt, data ) => {
+                if ( data.keyCode === 27 ) {
+                  autoUpdateTask({ description  })
+                  setShowDescription(false);
+                  data.preventDefault();
+                  evt.stop();
+                }
+              });
+            }}
+            onChange={(e,editor)=>{
+              setDescription(editor.getData());
+            }}
+            config={ck5config}
+            />
+        </div>
       } else {
         if ( description.length !== 0 ) {
           RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
@@ -1799,38 +1800,38 @@ export default function TaskEdit( props ) {
     }
     return (
       <div className="form-section">
-          <div className="row" style={{alignItems: "baseline"}}>
-            <Label className="m-r-10">
-              Popis úlohy
-            </Label>
-            { userRights.taskDescriptionWrite &&
-              <button
-                className="btn-link btn-distance"
-                style={{height: "20px"}}
-                onClick={()=>{
-                  if(showDescription){
-                    autoUpdateTask({ description  })
-                  }
-                  setShowDescription(!showDescription);
-                }}
-                >
-                <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
-                { !showDescription ? 'edit' : 'save' }
-              </button>
-            }
-            { userRights.taskAttachmentsWrite &&
-              <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0" >
-                <i className="fa fa-plus" />
-                Attachment
-              </label>
-            }
-            { renderMultiSelectTags() }
-          </div>
-          <div className="form-section-rest">
-            {RenderDescription}
-            {renderAttachments(false)}
-          </div>
+        <div className="row" style={{alignItems: "baseline"}}>
+          <Label className="m-r-10">
+            Popis úlohy
+          </Label>
+          { userRights.taskDescriptionWrite &&
+            <button
+              className="btn-link btn-distance"
+              style={{height: "20px"}}
+              onClick={()=>{
+                if(showDescription){
+                  autoUpdateTask({ description  })
+                }
+                setShowDescription(!showDescription);
+              }}
+              >
+              <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
+              { !showDescription ? 'edit' : 'save' }
+            </button>
+          }
+          { userRights.taskAttachmentsWrite &&
+            <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0" >
+              <i className="fa fa-plus" />
+              Attachment
+            </label>
+          }
+          { renderMultiSelectTags() }
         </div>
+        <div className="form-section-rest">
+          {RenderDescription}
+          {renderAttachments(false)}
+        </div>
+      </div>
     )
   }
 
@@ -1840,23 +1841,23 @@ export default function TaskEdit( props ) {
     }
     return (
       <div className="form-section">
-          <div className="form-section-rest">
-            <span className=" message success-message center-hor ml-auto">
-              { `Pausal ${company.title}  ` }
-              <span>
-                {`Pausal subtasks:`}
-                <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
-                  {` ${usedSubtaskPausal}`}
-                </span>
-                {` / ${taskWorkPausal} Pausal trips:`}
-                <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
-                  {` ${usedTripPausal}`}
-                </span>
-                {` / ${taskTripPausal}`}
+        <div className="form-section-rest">
+          <span className=" message success-message center-hor ml-auto">
+            { `Pausal ${company.title}  ` }
+            <span>
+              {`Pausal subtasks:`}
+              <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
+                {` ${usedSubtaskPausal}`}
               </span>
+              {` / ${taskWorkPausal} Pausal trips:`}
+              <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
+                {` ${usedTripPausal}`}
+              </span>
+              {` / ${taskTripPausal}`}
             </span>
-          </div>
+          </span>
         </div>
+      </div>
     )
   }
 
@@ -1867,21 +1868,21 @@ export default function TaskEdit( props ) {
 
     return (
       <CheckboxList
-          disabled={!userRights.taskShortSubtasksWrite}
-          items={task.shortSubtasks}
-          onChange={(simpleSubtask) => {
-            updateShortSubtask(simpleSubtask);
-          }}
-          submitItem = { (newSimpleSubtask) => {
-            addShortSubtask({...newSimpleSubtask, task: id});
-          }}
-          deleteItem = { (simpleSubtask) => {
-            deleteShortSubtask(simpleSubtask.id)
-          } }
-          placeholder="Short subtask title"
-          newPlaceholder="New short subtask title"
-          label="Subtask"
-          />
+        disabled={!userRights.taskShortSubtasksWrite}
+        items={task.shortSubtasks}
+        onChange={(simpleSubtask) => {
+          updateShortSubtask(simpleSubtask);
+        }}
+        submitItem = { (newSimpleSubtask) => {
+          addShortSubtask({...newSimpleSubtask, task: id});
+        }}
+        deleteItem = { (simpleSubtask) => {
+          deleteShortSubtask(simpleSubtask.id)
+        } }
+        placeholder="Short subtask title"
+        newPlaceholder="New short subtask title"
+        label="Subtask"
+        />
     )
   }
 
@@ -1891,14 +1892,14 @@ export default function TaskEdit( props ) {
     }
     return (
       <Attachments
-          disabled={!userRights.taskAttachmentsWrite}
-          taskID={id}
-          type="task"
-          top={top}
-          attachments={task.taskAttachments}
-          addAttachments={addAttachments}
-          removeAttachment={removeAttachment}
-          />
+        disabled={!userRights.taskAttachmentsWrite}
+        taskID={id}
+        type="task"
+        top={top}
+        attachments={task.taskAttachments}
+        addAttachments={addAttachments}
+        removeAttachment={removeAttachment}
+        />
     )
   }
 
@@ -1908,39 +1909,39 @@ export default function TaskEdit( props ) {
     }
     return (
       <PendingPicker
-          open={pendingOpen}
-          prefferedMilestone={milestone}
-          milestonesBlocked={userRights.milestoneWrite}
-          milestones={ milestones }
-          closeModal={() => {
-            setPendingOpen(false);
-            setPotentialPendingStatus(null);
-          }}
-          savePending={(pending)=>{
-            if(pending.pendingDate === null){
-              setPendingDate( moment( parseInt(pending.milestone.endsAt) ) );
-              setMilestone( pending.milestone );
-              autoUpdateTask( {
-                status: potentialPendingStatus.id,
-                pendingChangable: false,
-                important: false,
-                milestone: pending.milestone.id,
-                pendingDate: pending.milestone.endsAt ? pending.milestone.endsAt : moment().add(1,'day').valueOf().toString()
-              } );
-            }else{
-              setPendingDate( pending.pendingDate );
-              autoUpdateTask( {
-                status: potentialPendingStatus.id,
-                pendingChangable: true,
-                important: false,
-                pendingDate: pending.pendingDate.valueOf().toString()
-              });
-            }
-            setStatus( potentialPendingStatus );
-            setPendingOpen(false);
-            setPotentialPendingStatus(null);
-          }}
-          />
+        open={pendingOpen}
+        prefferedMilestone={milestone}
+        milestonesBlocked={userRights.milestoneWrite}
+        milestones={ milestones }
+        closeModal={() => {
+          setPendingOpen(false);
+          setPotentialPendingStatus(null);
+        }}
+        savePending={(pending)=>{
+          if(pending.pendingDate === null){
+            setPendingDate( moment( parseInt(pending.milestone.endsAt) ) );
+            setMilestone( pending.milestone );
+            autoUpdateTask( {
+              status: potentialPendingStatus.id,
+              pendingChangable: false,
+              important: false,
+              milestone: pending.milestone.id,
+              pendingDate: pending.milestone.endsAt ? pending.milestone.endsAt : moment().add(1,'day').valueOf().toString()
+            } );
+          }else{
+            setPendingDate( pending.pendingDate );
+            autoUpdateTask( {
+              status: potentialPendingStatus.id,
+              pendingChangable: true,
+              important: false,
+              pendingDate: pending.pendingDate.valueOf().toString()
+            });
+          }
+          setStatus( potentialPendingStatus );
+          setPendingOpen(false);
+          setPotentialPendingStatus(null);
+        }}
+        />
     )
   }
 
@@ -2037,46 +2038,46 @@ export default function TaskEdit( props ) {
           />
         {renderCompanyPausalInfo()}
         <Materials
-            showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
-            showTotals={true}
-            autoApproved={project ? project.project.autoApproved : false}
-            userRights={userRights}
-            currentUser={currentUser}
-            company={company}
-            materials={ task.invoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
-            addMaterial={(newMaterial)=>{
-              if(task.invoiced){
-                saveVykazyChanges( newMaterial, 'material', 'ADD' );
-              }else{
-                addMaterialFunc(newMaterial);
-              }
-            }}
-            updateMaterial={(id,newData)=>{
-              if(task.invoiced){
-                saveVykazyChanges( {id,newData}, 'material', 'EDIT' );
-              }else{
+          showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
+          showTotals={true}
+          autoApproved={project ? project.project.autoApproved : false}
+          userRights={userRights}
+          currentUser={currentUser}
+          company={company}
+          materials={ task.invoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
+          addMaterial={(newMaterial)=>{
+            if(task.invoiced){
+              saveVykazyChanges( newMaterial, 'material', 'ADD' );
+            }else{
+              addMaterialFunc(newMaterial);
+            }
+          }}
+          updateMaterial={(id,newData)=>{
+            if(task.invoiced){
+              saveVykazyChanges( {id,newData}, 'material', 'EDIT' );
+            }else{
+              updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+            }
+          }}
+          updateMaterials={(multipleMaterials)=>{
+            if(task.invoiced){
+              multipleMaterials.forEach(({id, newData}) => {
+                saveVykazyChanges({id,newData}, 'material', 'EDIT' );
+              })
+            } else {
+              multipleMaterials.forEach(({id, newData})=>{
                 updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-              }
-            }}
-            updateMaterials={(multipleMaterials)=>{
-              if(task.invoiced){
-                multipleMaterials.forEach(({id, newData}) => {
-                  saveVykazyChanges({id,newData}, 'material', 'EDIT' );
-                })
-              } else {
-                multipleMaterials.forEach(({id, newData})=>{
-                  updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-                });
-              }
-            }}
-            removeMaterial={(id)=>{
-              if(task.invoiced){
-                saveVykazyChanges( id, 'material', 'DELETE' );
-              }else{
-                deleteMaterialFunc(id);
-              }
-            }}
-            />
+              });
+            }
+          }}
+          removeMaterial={(id)=>{
+            if(task.invoiced){
+              saveVykazyChanges( id, 'material', 'DELETE' );
+            }else{
+              deleteMaterialFunc(id);
+            }
+          }}
+          />
       </Empty>
     )
   }
@@ -2087,109 +2088,110 @@ export default function TaskEdit( props ) {
     }
     return (
       <div className="form-section">
-          <div className="form-section-rest">
-            <Nav tabs className="b-0 m-b-10">
-              { userRights.viewComments &&
-                <NavItem>
-                  <NavLink
-                    className={classnames({ active: toggleTab === 1}, "clickable", "")}
-                    onClick={() => setToggleTab(1) }
-                    >
-                    Komentáre
-                  </NavLink>
-                </NavItem>
-              }
-              { userRights.history && userRights.viewComments &&
-                <NavItem>
-                  <NavLink>
-                    |
-                  </NavLink>
-                </NavItem>
-              }
-              { userRights.history &&
-                <NavItem>
-                  <NavLink
-                    className={classnames({ active: toggleTab === 2 }, "clickable", "")}
-                    onClick={() => setToggleTab(2) }
-                    >
-                    História
-                  </NavLink>
-                </NavItem>
-              }
-            </Nav>
-            <TabContent activeTab={toggleTab}>
-              <TabPane tabId={1}>
-                <Comments
-                  id={id}
-                  submitComment={ submitComment }
-                  submitEmail={ submitEmail }
-                  userRights={ userRights }
-                  users={users}
-                  />
+        <div className="form-section-rest">
+          <Nav tabs className="b-0 m-b-10">
+            { userRights.viewComments &&
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: toggleTab === 1}, "clickable", "")}
+                  onClick={() => setToggleTab(1) }
+                  >
+                  Komentáre
+                </NavLink>
+              </NavItem>
+            }
+            { userRights.history && userRights.viewComments &&
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
+            }
+            { userRights.history &&
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: toggleTab === 2 }, "clickable", "")}
+                  onClick={() => setToggleTab(2) }
+                  >
+                  História
+                </NavLink>
+              </NavItem>
+            }
+          </Nav>
+          <TabContent activeTab={toggleTab}>
+            <TabPane tabId={1}>
+              <Comments
+                id={id}
+                submitComment={ submitComment }
+                submitEmail={ submitEmail }
+                userRights={ userRights }
+                users={users}
+                />
+            </TabPane>
+            {	userRights.history &&
+              <TabPane tabId={2}>
+                <TaskHistory task={task} />
               </TabPane>
-              {	userRights.history &&
-                <TabPane tabId={2}>
-                  <TaskHistory task={task} />
-                </TabPane>
-              }
-            </TabContent>
-          </div>
+            }
+          </TabContent>
         </div>
+      </div>
     )
   }
 
   const renderStatusChangeModal = () => {
     return (
       <StatusChangeModal
-          open={possibleStatus !== null}
-          userRights={ userRights }
-          statuses={project ? toSelArr(project.project.statuses) : []}
-          newStatus={possibleStatus}
-          closeModal={ () => {
-            setPossibleStatus(null);
-          } }
-          submit={(status, comment, date ) => {
-            setPossibleStatus(null);
-            setStatus( status );
-            if ( status.action === 'PendingDate' ) {
-              setPendingDate( date );
-              autoUpdateTask( {
-                status: status.id,
-                pendingDate: date
-                .valueOf()
-                .toString(),
-                pendingChangable: true,
-              } );
-            } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
-              setCloseDate( date );
-              autoUpdateTask( {
-                status: status.id,
-                closeDate: date
-                .valueOf()
-                .toString(),
-              } );
-            } else {
-              autoUpdateTask( {
-                status: status.id
-              } );
-            }
-            if(comment.length > 0 ){
-              submitComment({
-                id,
-                message: comment,
-                attachments: [],
-                parentCommentId: null,
-                internal: false,
-              })
-            }
-          }}
-          />
+        open={possibleStatus !== null}
+        userRights={ userRights }
+        statuses={project ? toSelArr(project.project.statuses) : []}
+        newStatus={possibleStatus}
+        closeModal={ () => {
+          setPossibleStatus(null);
+        } }
+        submit={(status, comment, date ) => {
+          setPossibleStatus(null);
+          setStatus( status );
+          if ( status.action === 'PendingDate' ) {
+            setPendingDate( date );
+            autoUpdateTask( {
+              status: status.id,
+              pendingDate: date
+              .valueOf()
+              .toString(),
+              pendingChangable: true,
+            } );
+          } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
+            setCloseDate( date );
+            autoUpdateTask( {
+              status: status.id,
+              closeDate: date
+              .valueOf()
+              .toString(),
+            } );
+          } else {
+            autoUpdateTask( {
+              status: status.id
+            } );
+          }
+          if(comment.length > 0 ){
+            submitComment({
+              id,
+              message: comment,
+              attachments: [],
+              parentCommentId: null,
+              internal: false,
+            })
+          }
+        }}
+        />
     )
   }
 
   const renderModalUserAdd = () => {
     return (
-      <Modal isOpen={openUserAdd} className="modal-without-borders" >
+      <Empty>
+        <Modal isOpen={openUserAdd} className="modal-without-borders" >
           <ModalHeader>
             Add user
           </ModalHeader>
@@ -2197,116 +2199,112 @@ export default function TaskEdit( props ) {
             <UserAdd
               closeModal={() => setOpenUserAdd(false)}
               addUserToList={(user) => {
-                addUserToProject(user, project);
-                setProject({
-                  ...project,
-                  usersWithRights:[
-                    ...project.usersWithRights,
-                    {
-                      user: {
-                        id: user.id,
-                        fullName: user.fullName
-                      },
-                      assignable: false
-                    }
-                  ]
-                })
-              } }
+                setNewAddedUser(user);
+              }}
               />
           </ModalBody>
         </Modal>
+        { project && project.id &&
+          <AddUserToGroup
+            user={newAddedUser}
+            disabled={ !userRights.projectSecondary }
+            projectID={project.id}
+            finish={() => setNewAddedUser(null)}
+            />
+        }
+      </Empty>
     )
   }
 
   const renderModalCompanyAdd = () => {
     return (
       <Modal isOpen={openCompanyAdd} className="modal-without-borders">
-          <ModalBody>
-            <CompanyAdd
-              closeModal={() => setOpenCompanyAdd(false)}
-              addCompanyToList={addCompanyToList}
-              />
-          </ModalBody>
-        </Modal>
+        <ModalBody>
+          <CompanyAdd
+            closeModal={() => setOpenCompanyAdd(false)}
+            addCompanyToList={addCompanyToList}
+            />
+        </ModalBody>
+      </Modal>
     )
   }
 
   return (
     <div
+      className={classnames(
+        {
+          'task-edit-width': !inModal
+        },
+        "flex",
+        "min-height-400",
+        {
+          "basic-border-top": layout === 1
+        }
+      )}
+      >
+
+      <div
         className={classnames(
-          {
-            'task-edit-width': !inModal
-          },
-          "flex",
-          "min-height-400",
-          {
-            "basic-border-top": layout === 1
-          }
+          {"fit-with-header": !columns},
+          {"fit-with-header-and-commandbar": columns},
+          "scroll-visible",
         )}
         >
-
+        { renderCommandbar() }
         <div
           className={classnames(
-            {"fit-with-header": !columns},
-            {"fit-with-header-and-commandbar": columns},
-            "scroll-visible",
+            {
+              "row":  layout === 2,
+            },
           )}
+          style={{minHeight: "calc(100% - 70px)"}}
           >
-          { renderCommandbar() }
           <div
             className={classnames(
+              "bkg-white",
               {
-                "row":  layout === 2,
+                "task-edit-left":  layout === 2 && !columns,
+                "task-edit-left-columns": (layout === 2 && columns) || layout === 1 || layout === 3,
               },
             )}
-            style={{minHeight: "calc(100% - 70px)"}}
             >
-            <div
-              className={classnames(
-                "bkg-white",
-                {
-                  "task-edit-left":  layout === 2 && !columns,
-                  "task-edit-left-columns": (layout === 2 && columns) || layout === 1 || layout === 3,
-                },
-              )}
-              >
 
-              <div className="" >
-                { renderTitle() }
-                { layout === 2 && <hr className="m-t-5 m-b-15"/> }
+            <div className="" >
+              { renderTitle() }
+              { layout === 2 && <hr className="m-t-5 m-b-15"/> }
 
-                {canCreateVykazyError()}
+              {canCreateVykazyError()}
 
-                { layout === 1 ? renderSelectsLayout1() : null }
+              { layout === 1 ? renderSelectsLayout1() : null }
 
-                { renderDescription() }
+              { renderDescription() }
 
-                { renderSimpleSubtasks() }
+              { renderSimpleSubtasks() }
 
 
 
-                { renderPendingPicker() }
+              { renderPendingPicker() }
 
-                { renderVykazyTable() }
+              { renderVykazyTable() }
 
-                { renderComments() }
+              { renderComments() }
 
-                { renderModalUserAdd() }
+              { renderModalUserAdd() }
 
-                { renderModalCompanyAdd() }
+              { renderModalCompanyAdd() }
 
-                { renderStatusChangeModal() }
+              { renderStatusChangeModal() }
 
-                <div className="form-section"></div>
-
-              </div>
-
+              <div className="form-section"></div>
 
             </div>
 
-            { layout === 2 && renderSelectsLayout2Side() }
+
           </div>
+
+          { layout === 2 && renderSelectsLayout2Side() }
         </div>
       </div>
+    </div>
   );
 }

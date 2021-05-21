@@ -36,15 +36,15 @@ const defaultCols = [
     header: 'Cena/ks',
     key: 'price',
     width: "8%",
-    headerClassnames: "table-highlight-background t-a-r",
-    columnClassnames: "table-highlight-background p-l-8",
+    headerClassnames: "t-a-r",
+    columnClassnames: "p-l-8",
   },
   {
     header: 'Spolu',
     key: 'total',
     width: "8%",
-    headerClassnames: "table-highlight-background t-a-r",
-    columnClassnames: "table-highlight-background p-l-8",
+    headerClassnames: "t-a-r",
+    columnClassnames: "p-l-8",
   },
   {
     header: 'Faktúrovať',
@@ -247,80 +247,83 @@ export default function Rozpocet( props ) {
       case 'total': {
         return (
           <div className="p-t-7 p-r-8 t-a-r font-14">
-            { material.id === focusedMaterial ?
+            {  material.id === focusedMaterial
+              ?
               (
                 (  getMaterialPrice( { price: editedMaterialPrice } ) *
                 parseFloat(editedMaterialQuantity)
               ).toFixed( 2 ) + " €"
-            ) :
+            )
+            :
             (
-              ( getMaterialPrice( material ) *
-              parseFloat( material.quantity )
-            ).toFixed( 2 ) + " €"
-          )
-        }
-      </div>
-        )
+              (
+                getMaterialPrice( material ) *
+                parseFloat( material.quantity )
+              ).toFixed( 2 ) + " €"
+            )
+          }
+        </div>
+        );
       }
       case 'approved': {
         return (
           <div className="vykazy-approved">
-        <Switch
-          checked={material.approved}
-          disabled={disabled}
-          onChange={ () => { updateMaterial( material.id, { approved: !material.approved } ) } }
-          height={16}
-          width={30}
-          handleDiameter={12}
-          checkedIcon={<span className="switchLabel"></span>}
-          uncheckedIcon={<span className="switchLabel"></span>}
-          onColor={"#0078D4"}
-          />
-        <span className="m-l-10">{ material.approved ? material.approvedBy.fullName : 'Neschválené' }</span>
-      </div>
+          <Switch
+            checked={material.approved}
+            disabled={disabled}
+            onChange={ () => { updateMaterial( material.id, { approved: !material.approved } ) } }
+            height={16}
+            width={30}
+            handleDiameter={12}
+            checkedIcon={<span className="switchLabel"></span>}
+            uncheckedIcon={<span className="switchLabel"></span>}
+            onColor={"#0078D4"}
+            />
+          <span className="m-l-10">{ material.approved ? material.approvedBy.fullName : 'Neschválené' }</span>
+        </div>
         )
       }
       case 'actions': {
         return (
           <Empty>
-        <button
-          className="btn-link btn-distance"
-          disabled={ disabled || index === 0 }
-          onClick={()=>{
-            updateMaterials([
-              //update below
-              { id: sortedMaterials[ index - 1 ].id, newData: { order: index } },
-              //update current
-              { id: material.id, newData: { order: index - 1 } }
-            ]);
-          }}
-          >
-          <i className="fa fa-arrow-up"  />
-        </button>
-        <button
-          className="btn-link btn-distance"
-          disabled={ disabled || index === sortedMaterials.length - 1 }
-          onClick={()=>{
-            updateMaterials([
-              //update above
-              { id: sortedMaterials[ index + 1 ].id, newData: { order: index } },
-              //update current
-              { id: material.id, newData: { order: index + 1 } }
-            ]);
-          }}
-          >
-          <i className="fa fa-arrow-down"  />
-        </button>
-        <button className="btn-link"
-          disabled={disabled}
-          onClick={()=>{
-            if(window.confirm('Are you sure?')){
-              removeMaterial(material.id);
-            }
-          }}>
-          <i className="fa fa-times" />
-        </button>
-      </Empty>
+          <button
+            className="btn-link btn-distance"
+            disabled={ disabled || index === 0 }
+            onClick={()=>{
+              updateMaterials([
+                //update below
+                { id: sortedMaterials[ index - 1 ].id, newData: { order: index } },
+                //update current
+                { id: material.id, newData: { order: index - 1 } }
+              ]);
+            }}
+            >
+            <i className="fa fa-arrow-up"  />
+          </button>
+          <button
+            className="btn-link btn-distance"
+            disabled={ disabled || index === sortedMaterials.length - 1 }
+            onClick={()=>{
+              updateMaterials([
+                //update above
+                { id: sortedMaterials[ index + 1 ].id, newData: { order: index } },
+                //update current
+                { id: material.id, newData: { order: index + 1 } }
+              ]);
+            }}
+            >
+            <i className="fa fa-arrow-down"  />
+          </button>
+          <button className="btn-link"
+            disabled={disabled}
+            onClick={()=>{
+              if(window.confirm('Are you sure?')){
+                removeMaterial(material.id);
+              }
+            }}>
+            <i className="fa fa-times" />
+          </button>
+        </Empty>
         )
       }
       default: {
@@ -499,42 +502,43 @@ export default function Rozpocet( props ) {
       <tbody>
         {/* Materials render*/}
         { sortedMaterials.map((material, order) => (
-            <tr key={material.id}>
-              { shownColumns.map((colData, index) => {
-                if(index < 1){
-                  return null;
-                }
-                const extraData = index === 1;
-                const extraColData = shownColumns[0];
-                return (
-                  <td className={`${colData.columnClassnames} ${extraData ? ('row ' + extraColData.columnClassnames) : '' }`} colSpan={extraData ? "2" : "1"  } key={colData.key} >
-                    { extraData &&
-                      <div>
-                        {getColRender(extraColData.key, material, index)}
-                      </div>
-                    }
-                    <div className={extraData ? 'm-l-5 flex' : ''} >
-                      { getColRender(colData.key, material, order) }
+          <tr key={material.id}>
+            { shownColumns.map((colData, index) => {
+              if(index < 1){
+                return null;
+              }
+              const extraData = index === 1;
+              const extraColData = shownColumns[0];
+              return (
+                <td className={`${colData.columnClassnames} ${extraData ? ('row ' + extraColData.columnClassnames) : '' }`} colSpan={extraData ? "2" : "1"  } key={colData.key} >
+                  { extraData &&
+                    <div>
+                      {getColRender(extraColData.key, material, index)}
                     </div>
-                  </td>
-                )
-              })}
-            </tr>
-          ))
-        }
+                  }
+                  <div className={extraData ? 'm-l-5 flex' : ''} >
+                    { getColRender(colData.key, material, order) }
+                  </div>
+                </td>
+              )
+            })}
+          </tr>
+        ))}
 
         {/* Add button*/}
         { !showAddMaterial && !disabled &&
-          <tr key='addButton' colSpan={(shownColumns.length - 1).toString()}>
-            <button className="btn-link btn-distance"
-              disabled={disabled}
-              onClick={()=>{
-                setShowAddMaterial(true);
-              }}
-              >
-              <i className="fa fa-plus" />
-              Materiál
-            </button>
+          <tr key='addButton'>
+            <td colSpan={(shownColumns.length - 1).toString()}>
+              <button className="btn-link btn-distance"
+                disabled={disabled}
+                onClick={()=>{
+                  setShowAddMaterial(true);
+                }}
+                >
+                <i className="fa fa-plus" />
+                Materiál
+              </button>
+            </td>
           </tr>
         }
 

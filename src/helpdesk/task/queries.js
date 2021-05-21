@@ -411,20 +411,6 @@ mutation addTask(
 }
 `;
 
-export const ADD_USER_TO_PROJECT = gql `
-mutation addUserToProject(
-  $userId: Int!,
-  $projectId: Int!,
-){
-  addUserToProject(
-    userId: $userId
-    projectId: $projectId,
-  ){
-    id
-  }
-}
-`;
-
 export const GET_TASKS = gql `
 query tasks(
   $projectId: Int
