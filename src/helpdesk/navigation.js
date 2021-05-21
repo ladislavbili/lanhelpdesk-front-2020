@@ -30,21 +30,17 @@ import Loading from 'components/loading';
 import RepeatsList from 'helpdesk/components/repeat/repeatsList';
 
 import {
-  GET_MY_DATA,
-} from 'helpdesk/settings/users/queries';
+  getMyData,
+} from 'helperFunctions';
 
 export default function Navigation( props ) {
   //data & queries
-  const {
-    data: myData,
-    refetch: myDataRefetch
-  } = useQuery( GET_MY_DATA );
 
   const [ sidebarOpen, setSidebarOpen ] = React.useState( true );
 
   const client = useApolloClient();
 
-  const currentUser = myData ? myData.getMyData : {};
+  const currentUser = getMyData();
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   return (

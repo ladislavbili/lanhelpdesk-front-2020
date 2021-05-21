@@ -100,17 +100,6 @@ mutation deleteRole($id: Int!, $newId: Int!) {
 }
 `;
 
-export const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    role {
-      level
-    }
-  }
-}
-`;
-
 export const ROLES_SUBSCRIPTION = gql `
   subscription rolesSubscription {
     rolesSubscription

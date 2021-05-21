@@ -38,9 +38,11 @@ import Attachments from 'helpdesk/components/attachments';
 import Comments from 'helpdesk/components/comments';
 import Repeat from 'helpdesk/components/repeat/repeatFormInput';
 import TaskHistory from 'helpdesk/components/taskHistory';
-import VykazyTable, {
-  getCreationError as getVykazyError
-} from 'helpdesk/components/vykazyTable';
+import {
+  getCreationError as getVykazyError,
+} from 'helpdesk/components/vykazy/errors';
+import Materials from 'helpdesk/components/vykazy/materialsTable';
+import WorksTable from 'helpdesk/components/vykazy/worksTable';
 import CheckboxList from 'helpdesk/components/checkboxList';
 import Scheduled from 'helpdesk/components/scheduled';
 import StatusChangeModal from 'helpdesk/components/statusChangeModal';
@@ -1256,7 +1258,7 @@ export default function TaskEdit( props ) {
               <div className="disabled-info">{ user.label}</div>
             )}
             { assignedTo.length === 0 &&
-              <div className="message error-message">Úloha nepriradená</div>              
+              <div className="message error-message">Úloha nepriradená</div>
             }
           </div>
         }
@@ -1546,7 +1548,7 @@ export default function TaskEdit( props ) {
                 to: moment(parseInt(item.to)),
               }))}
               users={assignedTo}
-              disabled={ assignedTo.length === 0 }
+              disabled={ assignedTo.length === 0 || !userRights.assignedWrite }
               submitItem = { (newScheduled) => {
                 addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from , to: newScheduled.to });
               }}
@@ -1951,26 +1953,21 @@ export default function TaskEdit( props ) {
     }
 
     return (
-      <VykazyTable
-          showColumns={ ( (!userRights.vykazWrite && !userRights.rozpocetWrite ) ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
-          showTotals={false}
+      <Empty>
+        <WorksTable
           userID={currentUser.id}
-          autoApproved={project ? project.project.autoApproved : false}
           userRights={userRights}
-          isInvoiced={task.invoiced}
-          canEditInvoiced={canEditInvoiced}
-          company={company}
+          currentUser={currentUser}
+          showColumns={ [ 'done', 'title', 'scheduled', 'quantity', 'type', 'assigned', 'approved', 'actions' ] }
+          autoApproved={project ? project.project.autoApproved : false}
           canAddSubtasksAndTrips={assignedTo.length !== 0}
+          canEditInvoiced={canEditInvoiced}
           taskAssigned={assignedTo.filter((user) => user.id !== null )}
 
-          showSubtasks={project ? project.showSubtasks : false}
-
-          message={renderCompanyPausalInfo()}
-
-          subtasks={ task.invoiced ? modifyInvoicedVykazy(subtasks, 'subtask') : subtasks }
-          defaultType={taskType}
           taskTypes={taskTypes}
-          submitSubtask={(newSubtask, price) => {
+          defaultType={taskType}
+          subtasks={ task.invoiced ? modifyInvoicedVykazy(subtasks, 'subtask') : subtasks }
+          addSubtask={(newSubtask, price) => {
             if(task.invoiced){
               saveVykazyChanges({...newSubtask, price}, 'subtask', 'ADD' );
             }else{
@@ -2002,9 +1999,10 @@ export default function TaskEdit( props ) {
               deleteSubtaskFunc(id);
             }
           }}
+
           workTrips={ task.invoiced ? modifyInvoicedVykazy(workTrips, 'trip') : workTrips }
           tripTypes={tripTypes}
-          submitTrip={(newTrip, price)=>{
+          addTrip={(newTrip, price)=>{
             if(task.invoiced){
               saveVykazyChanges( { ...newTrip, price }, 'trip', 'ADD' );
             }else{
@@ -2036,74 +2034,50 @@ export default function TaskEdit( props ) {
               deleteWorkTripFunc(id);
             }
           }}
-
-          materials={ task.invoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
-          submitMaterial={(newMaterial)=>{
-            if(task.invoiced){
-              saveVykazyChanges( newMaterial, 'material', 'ADD' );
-            }else{
-              addMaterialFunc(newMaterial);
-            }
-          }}
-          updateMaterial={(id,newData)=>{
-            if(task.invoiced){
-              saveVykazyChanges( {id,newData}, 'material', 'EDIT' );
-            }else{
-              updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-            }
-          }}
-          updateMaterials={(multipleMaterials)=>{
-            if(task.invoiced){
-              multipleMaterials.forEach(({id, newData}) => {
-                saveVykazyChanges({id,newData}, 'material', 'EDIT' );
-              })
-            } else {
-              multipleMaterials.forEach(({id, newData})=>{
-                updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-              });
-            }
-          }}
-          removeMaterial={(id)=>{
-            if(task.invoiced){
-              saveVykazyChanges( id, 'material', 'DELETE' );
-            }else{
-              deleteMaterialFunc(id);
-            }
-          }}
-          customItems={ task.invoiced ? modifyInvoicedVykazy(customItems, 'customItem') : customItems }
-          submitCustomItem={(customItem)=>{
-            if(task.invoiced){
-              saveVykazyChanges( customItem, 'customItem', 'ADD' );
-            }else{
-              addCustomItemFunc(customItem);
-            }
-          }}
-          updateCustomItem={(id,newData)=>{
-            if(task.invoiced){
-              saveVykazyChanges( {id,newData}, 'customItem', 'EDIT' );
-            }else{
-              updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id ),...newData});
-            }
-          }}
-          updateCustomItems={(multipleCustomItems)=>{
-            if(task.invoiced){
-              multipleCustomItems.forEach(({id, newData}) => {
-                saveVykazyChanges({id,newData}, 'customItem', 'EDIT' );
-              })
-            } else {
-              multipleCustomItems.forEach(({id, newData})=>{
-                updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id),...newData});
-              });
-            }
-          }}
-          removeCustomItem={(id)=>{
-            if(task.invoiced){
-              saveVykazyChanges( id, 'customItem', 'DELETE' );
-            }else{
-              deleteCustomItemFunc(id);
-            }
-          }}
           />
+        {renderCompanyPausalInfo()}
+        <Materials
+            showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
+            showTotals={true}
+            autoApproved={project ? project.project.autoApproved : false}
+            userRights={userRights}
+            currentUser={currentUser}
+            company={company}
+            materials={ task.invoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
+            addMaterial={(newMaterial)=>{
+              if(task.invoiced){
+                saveVykazyChanges( newMaterial, 'material', 'ADD' );
+              }else{
+                addMaterialFunc(newMaterial);
+              }
+            }}
+            updateMaterial={(id,newData)=>{
+              if(task.invoiced){
+                saveVykazyChanges( {id,newData}, 'material', 'EDIT' );
+              }else{
+                updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+              }
+            }}
+            updateMaterials={(multipleMaterials)=>{
+              if(task.invoiced){
+                multipleMaterials.forEach(({id, newData}) => {
+                  saveVykazyChanges({id,newData}, 'material', 'EDIT' );
+                })
+              } else {
+                multipleMaterials.forEach(({id, newData})=>{
+                  updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+                });
+              }
+            }}
+            removeMaterial={(id)=>{
+              if(task.invoiced){
+                saveVykazyChanges( id, 'material', 'DELETE' );
+              }else{
+                deleteMaterialFunc(id);
+              }
+            }}
+            />
+      </Empty>
     )
   }
 

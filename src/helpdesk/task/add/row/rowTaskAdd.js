@@ -16,7 +16,7 @@ import Attachments from 'helpdesk/components/attachments';
 
 import VykazyTable, {
   getCreationError as getVykazyError
-} from 'helpdesk/components/vykazyTable';
+} from 'helpdesk/components/vykazy/vykazyTable';
 
 import classnames from "classnames";
 

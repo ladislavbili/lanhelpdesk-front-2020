@@ -20,13 +20,13 @@ import languages from "configs/constants/languages";
 
 import {
   isEmail,
-  toSelArr
+  toSelArr,
+  getMyData,
 } from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 
 import {
   UPDATE_PROFILE,
-  GET_MY_DATA,
 } from './queries';
 
 import PasswordChange from './passChange';
@@ -40,13 +40,7 @@ export default function UserProfile( props ) {
     closeModal
   } = props;
 
-  const {
-    data: myData,
-    loading: myDataLoading
-  } = useQuery( GET_MY_DATA, {
-    fetchPolicy: 'network-only',
-    notifyOnNetworkStatusChange: true,
-  } );
+  const currentUser = getMyData();
 
   const [ updateProfile, {
     client
@@ -66,8 +60,8 @@ export default function UserProfile( props ) {
 
   // sync
   React.useEffect( () => {
-    if ( !myDataLoading ) {
-      const user = myData.getMyData;
+    if ( currentUser ) {
+      const user = currentUser;
       setUsername( user.username );
       setEmail( user.email );
       setName( user.name );
@@ -76,7 +70,7 @@ export default function UserProfile( props ) {
       setSignature( ( user.signature ? user.signature : `${user.name} ${user.surname}, ${user.company.title}` ) );
       setLanguage( languages.find( language => language.value === user.language ) );
     }
-  }, [ myDataLoading ] );
+  }, [ currentUser ] );
 
   // functions
   const updateProfileFunc = () => {
@@ -109,11 +103,9 @@ export default function UserProfile( props ) {
     closeModal();
   };
 
-  if ( myDataLoading ) {
+  if ( !currentUser ) {
     return <Loading />
   }
-
-  const USER = myData.getMyData;
 
   return (
     <div className="p-t-10 p-b-20">

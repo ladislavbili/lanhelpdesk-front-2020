@@ -23,12 +23,12 @@ import NotificationIcon from 'components/notifications/notificationIcon';
 import classnames from 'classnames';
 import {
   getLocation,
+  getMyData,
 } from 'helperFunctions';
 
 import UserProfile from 'helpdesk/settings/users/userProfile';
 
 import {
-  GET_MY_DATA,
   LOGOUT_USER
 } from './queries';
 
@@ -40,11 +40,6 @@ export default function PageHeader( props ) {
     settings,
   } = props;
 
-
-  const {
-    data: myData
-  } = useQuery( GET_MY_DATA );
-
   const [ logoutUser ] = useMutation( LOGOUT_USER );
 
   const client = useApolloClient();
@@ -53,7 +48,7 @@ export default function PageHeader( props ) {
   const [ settingsOpen, setSettingsOpen ] = React.useState( false );
   const [ modalUserProfileOpen, setModalUserProfileOpen ] = React.useState( false );
 
-  const currentUser = myData ? myData.getMyData : {};
+  const currentUser = getMyData();
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
   const filteredSettings = settings.filter( ( setting ) => accessRights[ setting.value ] );
 
@@ -121,7 +116,7 @@ export default function PageHeader( props ) {
         </div>
         <div className="ml-auto center-hor row">
           <div className=" header-icon center-hor clickable" onClick={() => setModalUserProfileOpen(true)}>
-            {`${currentUser.name} ${currentUser.surname}`}
+            { !currentUser ? `Loading...` : `${currentUser.name} ${currentUser.surname}`}
             <i className="fas fa-user m-l-5"/>
           </div>
 
@@ -132,7 +127,7 @@ export default function PageHeader( props ) {
           <NotificationIcon history={history} location={URL} />
 
           {
-            (currentUser) &&
+            currentUser &&
             filteredSettings &&
             filteredSettings.length > 0 &&
             <Dropdown className="center-hor" isOpen={settingsOpen} toggle={() =>setSettingsOpen(!settingsOpen)}>

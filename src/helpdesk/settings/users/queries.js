@@ -205,41 +205,6 @@ mutation setTasklistLayout($tasklistLayout: Int!) {
 }
 `;
 
-export const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    tasklistLayout
-    username
-    name
-    surname
-    email
-    receiveNotifications
-    signature
-    language
-    role {
-      id
-      level
-      accessRights {
-        viewErrors
-        publicFilters
-        users
-        companies
-        pausals
-        projects
-        statuses
-        prices
-        roles
-        taskTypes
-        tripTypes
-        imaps
-        smtps
-      }
-    }
-  }
-}
-`;
-
 export const USERS_SUBSCRIPTION = gql `
   subscription usersSubscription {
     usersSubscription

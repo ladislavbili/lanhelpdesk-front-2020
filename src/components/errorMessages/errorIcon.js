@@ -6,8 +6,8 @@ import {
 import classnames from 'classnames';
 import Empty from 'components/Empty';
 import {
-  GET_MY_DATA,
-} from '../queries';
+  getMyData,
+} from 'helperFunctions';
 import {
   GET_ERROR_MESSAGES_COUNT,
   ERROR_MESSAGE_COUNT_SUBSCRIPTION,
@@ -21,11 +21,6 @@ export default function ErrorIcon( props ) {
   } = props;
 
   const {
-    data: userData,
-    loading: userDataLoading
-  } = useQuery( GET_MY_DATA );
-
-  const {
     data: errorMessageCountData,
     loading: errorMessageCountLoading,
     refetch: errorMessageCountRefetch,
@@ -36,14 +31,14 @@ export default function ErrorIcon( props ) {
       errorMessageCountRefetch();
     }
   } );
-
+  const currentUser = getMyData();
   if (
-    userDataLoading ||
+    !currentUser ||
     errorMessageCountLoading
   ) {
     return null;
   }
-  const accessRights = userData.getMyData.role.accessRights;
+  const accessRights = currentUser.role.accessRights;
   return (
     <Empty>
       {

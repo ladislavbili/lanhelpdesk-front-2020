@@ -11,7 +11,8 @@ import {
 import ErrorMessage from 'components/errorMessage';
 import DeleteReplacement from 'components/deleteReplacement';
 import {
-  toSelArr
+  toSelArr,
+  getMyData,
 } from 'helperFunctions';
 import Loading from 'components/loading';
 import RightRow from './rightRow';
@@ -21,7 +22,6 @@ import {
   GET_ROLE,
   UPDATE_ROLE,
   DELETE_ROLE,
-  GET_MY_DATA
 } from './queries';
 
 export default function RoleEdit( props ) {
@@ -50,8 +50,8 @@ export default function RoleEdit( props ) {
     } )
     .roles );
 
-  const userDataQuery = useQuery( GET_MY_DATA );
-  const currentUserLevel = ( userDataQuery.loading ? null : userDataQuery.data.getMyData.role.level );
+  const currentUser = getMyData();
+  const currentUserLevel = currentUser ? currentUser.role.level : null;
   const filteredRoles = allRoles.filter( role => role.id !== parseInt( match.params.id ) );
   const theOnlyOneLeft = allRoles.length === 0;
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   useQuery,
-  //  useApolloClient
 } from "@apollo/client";
 
 import SettingsSidebar from './settingsSidebar';
@@ -9,8 +8,8 @@ import TasksSidebar from './tasksSidebar';
 import settings from 'configs/constants/settings';
 import classnames from 'classnames';
 import {
-  GET_MY_DATA
-} from './queries';
+  getMyData
+} from 'helperFunctions';
 
 export default function Sidebar( props ) {
   //data & queries
@@ -19,16 +18,9 @@ export default function Sidebar( props ) {
     sidebarOpen,
     setSidebarOpen
   } = props;
-  const {
-    data
-  } = useQuery( GET_MY_DATA );
 
 
-  let currentUser = {};
-
-  if ( data ) {
-    currentUser = data.getMyData;
-  }
+  const currentUser = getMyData();
 
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 

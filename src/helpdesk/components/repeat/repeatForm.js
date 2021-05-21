@@ -16,7 +16,7 @@ import moment from 'moment';
 
 import Attachments from 'helpdesk/components/attachments';
 
-import VykazyTable from 'helpdesk/components/vykazyTable';
+import VykazyTable from 'helpdesk/components/vykazy/vykazyTable';
 
 import classnames from "classnames";
 
@@ -31,7 +31,7 @@ import booleanSelects from 'configs/constants/boolSelect'
 import CheckboxList from 'helpdesk/components/checkboxList';
 import {
   getCreationError as getVykazyError
-} from 'helpdesk/components/vykazyTable';
+} from 'helpdesk/components/vykazy/vykazyTable';
 import {
   noMilestone
 } from 'configs/constants/sidebar';

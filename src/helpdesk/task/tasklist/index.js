@@ -8,7 +8,8 @@ import moment from 'moment';
 import {
   splitArrayByFilter,
   localFilterToValues,
-  deleteAttributes
+  deleteAttributes,
+  getMyData,
 } from 'helperFunctions';
 
 import {
@@ -57,7 +58,6 @@ import {
 import {
   GET_TASKS,
   DELETE_TASK,
-  GET_MY_DATA,
   GET_CALENDAR_EVENTS,
   GET_TASKLIST_COLUMNS_PREFERENCES,
   ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES,
@@ -114,13 +114,9 @@ export default function TasksLoader( props ) {
     unimplementedAttributes
   );
 
-  const {
-    data: currentUserData,
-    loading: currentUserLoading,
-    refetch: userDataRefetch
-  } = useQuery( GET_MY_DATA );
+  const currentUser = getMyData();
 
-  const statusFilter = ( currentUserLoading ? [] : currentUserData.getMyData.statuses )
+  const statusFilter = ( currentUser ? currentUser.statuses : [] )
     .filter( ( selectedStatus ) => ( localProject.id === null || !localProject.project.statuses ? [] : localProject.project.statuses )
       .some( ( status ) => status.id === selectedStatus.id ) )
     .map( ( status ) => status.id );
@@ -190,17 +186,11 @@ export default function TasksLoader( props ) {
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
 
   const dataLoading = (
-    currentUserLoading ||
     tasksLoading ||
     preferencesLoading
   );
 
-  if ( currentUserLoading ) {
-    return ( <Loading /> );
-  }
-
   const tasks = dataLoading ? [] : tasksData.tasks.tasks;
-  const currentUser = currentUserData.getMyData;
 
   const setTasklistLayoutFunc = ( value ) => {
     setTasklistLayout( {
@@ -365,6 +355,12 @@ export default function TasksLoader( props ) {
   }
 
   const canViewCalendar = localProject.id === null || localProject.right.assignedRead;
+
+  if ( !currentUser ) {
+    return (
+      <Loading />
+    )
+  }
 
   return (
     <TasklistSwitch

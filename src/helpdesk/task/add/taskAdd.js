@@ -17,12 +17,12 @@ import Empty from 'components/Empty';
 
 import Repeat from 'helpdesk/components/repeat/simpleRepeat';
 import Attachments from 'helpdesk/components/attachments';
-import VykazyTable from 'helpdesk/components/vykazyTable';
+import VykazyTable from 'helpdesk/components/vykazy/vykazyTable';
 import CheckboxList from 'helpdesk/components/checkboxList';
 import Scheduled from 'helpdesk/components/scheduled';
 import {
   getCreationError as getVykazyError
-} from 'helpdesk/components/vykazyTable';
+} from 'helpdesk/components/vykazy/vykazyTable';
 
 import ck5config from 'configs/components/ck5config';
 import {

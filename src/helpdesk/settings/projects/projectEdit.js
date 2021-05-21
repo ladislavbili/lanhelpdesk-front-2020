@@ -12,7 +12,8 @@ import {
 import {
   toSelArr,
   toSelItem,
-  deleteAttributes
+  deleteAttributes,
+  getMyData,
 } from 'helperFunctions';
 import {
   fetchNetOptions
@@ -61,7 +62,6 @@ import {
   GET_PROJECT,
   UPDATE_PROJECT,
   DELETE_PROJECT,
-  GET_MY_DATA,
   GET_NUMBER_OF_TASKS,
 } from './queries';
 let fakeID = -1;
@@ -77,11 +77,6 @@ export default function ProjectEdit( props ) {
   } = props;
 
   const id = closeModal ? projectID : parseInt( match.params.id );
-
-  const {
-    data: myData,
-    loading: myDataLoading
-  } = useQuery( GET_MY_DATA );
 
   const {
     data: projectData,
@@ -147,7 +142,7 @@ export default function ProjectEdit( props ) {
   const filteredProjects = allProjects.filter( project => project.id !== id );
   const theOnlyOneLeft = allProjects.length === 1;
 
-  const currentUser = myData ? myData.getMyData : {};
+  const currentUser = getMyData();
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -185,7 +180,7 @@ export default function ProjectEdit( props ) {
     projectLoading ||
     companiesLoading ||
     usersLoading ||
-    myDataLoading
+    !currentUser
   )
 
   // sync

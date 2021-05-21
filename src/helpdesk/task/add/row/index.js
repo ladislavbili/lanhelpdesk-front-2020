@@ -4,7 +4,8 @@ import {
   gql
 } from "@apollo/client";
 import {
-  toSelArr
+  toSelArr,
+  getMyData,
 } from 'helperFunctions';
 import {
   Modal,
@@ -34,10 +35,6 @@ import {
 import {
   GET_MY_PROJECTS
 } from 'helpdesk/settings/projects/queries';
-
-import {
-  GET_MY_DATA
-} from '../../queries';
 
 import {
   GET_PROJECT,
@@ -86,22 +83,15 @@ export default function RowTaskAddContainer( props ) {
       fetchPolicy: 'network-only'
     }
   } );
-  const {
-    data: currentUserData,
-    loading: currentUserLoading
-  } = useQuery( GET_MY_DATA, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
 
   const {
     data: localProjectData,
     loading: localProjectLoading
   } = useQuery( GET_PROJECT );
 
-  //state
+  const currentUser = getMyData();
 
+  //state
   const loading = (
     companiesLoading ||
     usersLoading ||
@@ -109,7 +99,7 @@ export default function RowTaskAddContainer( props ) {
     tripTypesLoading ||
     projectsLoading ||
     localProjectLoading ||
-    currentUserLoading
+    !currentUser
   );
   if ( !localProjectData.localProject.id || loading ) {
     return null;
@@ -132,7 +122,7 @@ export default function RowTaskAddContainer( props ) {
       companies={ toSelArr(companiesData.basicCompanies) }
       taskTypes={ toSelArr(taskTypesData.taskTypes) }
       tripTypes={ toSelArr(tripTypesData.tripTypes) }
-      currentUser={ currentUserData.getMyData }
+      currentUser={ currentUser }
       milestones={[noMilestone]}
       defaultUnit={null}
       closeModal={ () => setOpenAddTaskModal(false)}

@@ -12,8 +12,8 @@ import {
   pickSelectStyle
 } from 'configs/components/select';
 import {
-  sameStringForms
-} from '../../helperFunctions';
+  sameStringForms,
+} from 'helperFunctions';
 
 export default class Rozpocet extends Component {
   constructor( props ) {

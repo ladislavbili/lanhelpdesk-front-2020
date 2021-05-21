@@ -7,7 +7,9 @@ import {
 import {
   Route
 } from 'react-router-dom';
-
+import {
+  getMyData,
+} from 'helperFunctions';
 import RerouteToMonthlyCompany from './rerouteToMonthlyCompany';
 
 import Sidebar from './Sidebar';
@@ -21,17 +23,10 @@ import AccessDenied from 'components/accessDenied';
 
 import settings from 'configs/constants/settings';
 
-import {
-  GET_MY_DATA
-} from './queries';
-
 export default function Navigation( props ) {
-  const {
-    data
-  } = useQuery( GET_MY_DATA );
 
-  const currentUser = data ? data.getMyData : {};
-  const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
+  const currentUser = getMyData();
+  const accessRights = currentUser ? currentUser.role.accessRights : {};
   return (
     <div>
       <div className="page-header">

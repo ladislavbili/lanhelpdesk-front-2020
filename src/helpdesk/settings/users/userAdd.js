@@ -21,7 +21,8 @@ import classnames from 'classnames';
 
 import {
   isEmail,
-  toSelArr
+  toSelArr,
+  getMyData,
 } from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 
@@ -29,7 +30,6 @@ import {
   GET_USERS,
   GET_BASIC_USERS,
   ADD_USER,
-  GET_MY_DATA,
 } from './queries';
 
 import {
@@ -62,12 +62,6 @@ export default function UserAdd( props ) {
     fetchPolicy: 'network-only'
   } );
 
-  const {
-    data: currentUserData,
-    loading: currentUserLoading
-  } = useQuery( GET_MY_DATA, {
-    fetchPolicy: 'network-only'
-  } );
   const [ registerUser ] = useMutation( ADD_USER );
 
   //state
@@ -85,8 +79,10 @@ export default function UserAdd( props ) {
   const [ language, setLanguage ] = React.useState( languages[ 0 ] );
   const [ saving, setSaving ] = React.useState( false );
 
+  const currentUser = getMyData();
+
   const dataLoading = (
-    currentUserLoading ||
+    currentUser ||
     rolesLoading ||
     companiesLoading
   )
@@ -95,7 +91,7 @@ export default function UserAdd( props ) {
     return <Loading />
   }
 
-  const currentUserLevel = currentUserData.getMyData.role.level;
+  const currentUserLevel = currentUser.role.level;
   const roles = toSelArr( rolesData.roles )
     .filter( ( role ) => role.level > currentUserLevel || ( currentUserLevel === 0 && role.level === 0 ) );
   const companies = toSelArr( companiesData.basicCompanies );

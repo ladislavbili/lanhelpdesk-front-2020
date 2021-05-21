@@ -306,20 +306,6 @@ mutation deleteProject($id: Int!, $newId: Int!) {
 }
 `;
 
-export const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    role {
-      accessRights {
-        addProjects
-        projects
-      }
-    }
-  }
-}
-`;
-
 export const GET_NUMBER_OF_TASKS = gql `
 query getNumberOfTasks($projectId: Int!) {
   getNumberOfTasks(

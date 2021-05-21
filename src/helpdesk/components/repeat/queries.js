@@ -321,34 +321,6 @@ mutation deleteRepeat($id: Int!) {
 }
 `;
 
-export const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    statuses {
-      id
-      title
-      color
-      action
-    }
-    company {
-      id
-      title
-    }
-    role {
-      level
-      accessRights {
-        projects
-        publicFilters
-        users
-        companies
-        vykazy
-      }
-    }
-  }
-}
-`;
-
 //short subtasks
 export const ADD_SHORT_SUBTASK = gql `
 mutation addRepeatTemplateShortSubtask($title: String!, $done: Boolean!, $repeatTemplate: Int!) {

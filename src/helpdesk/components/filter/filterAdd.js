@@ -21,7 +21,8 @@ import {
 import Loading from 'components/loading';
 import {
   toSelArr,
-  toSelItem
+  toSelItem,
+  getMyData,
 } from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 import {
@@ -42,8 +43,7 @@ import {
 import {
   GET_MY_FILTERS,
   ADD_FILTER,
-  UPDATE_FILTER,
-  GET_MY_DATA
+  UPDATE_FILTER
 } from './queries';
 
 import {
@@ -64,10 +64,6 @@ export default function FilterAdd( props ) {
   const [ addFilter, {
     client
   } ] = useMutation( ADD_FILTER );
-
-  const {
-    data: currentUserData
-  } = useQuery( GET_MY_DATA );
 
   const {
     data: roleData,
@@ -196,11 +192,12 @@ export default function FilterAdd( props ) {
     setSaving( false );
   }
 
+  const currentUser = getMyData();
   if ( dataLoading ) {
     return <Loading />
   }
 
-  const canCreatePublicFilters = currentUserData.getMyData.role.accessRights.publicFilters;
+  const canCreatePublicFilters = currentUser.role.accessRights.publicFilters;
 
   return (
     <div className="filter-add-btn">

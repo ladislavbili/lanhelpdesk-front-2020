@@ -4,7 +4,8 @@ import {
   useMutation,
 } from "@apollo/client";
 import {
-  toSelArr
+  toSelArr,
+  getMyData,
 } from 'helperFunctions';
 import Empty from 'components/Empty';
 import {
@@ -40,7 +41,6 @@ import {
 } from 'helpdesk/settings/projects/queries';
 
 import {
-  GET_MY_DATA,
   SET_TASK_LAYOUT,
   ADD_TASK,
 } from '../queries';
@@ -96,15 +96,6 @@ export default function TaskAddContainer( props ) {
       fetchPolicy: 'network-only'
     }
   } );
-  const {
-    data: currentUserData,
-    loading: currentUserLoading,
-    refetch: currentUserRefetch,
-  } = useQuery( GET_MY_DATA, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
-  } );
 
   //state
   const [ openAddTaskModal, setOpenAddTaskModal ] = React.useState( false );
@@ -120,11 +111,10 @@ export default function TaskAddContainer( props ) {
           taskLayout: value,
         }
       } )
-      .then( ( response ) => {
-        currentUserRefetch();
-      } )
       .catch( ( err ) => console.log( err ) );
   }
+
+  const currentUser = getMyData();
 
   const loading = (
     companiesLoading ||
@@ -132,7 +122,7 @@ export default function TaskAddContainer( props ) {
     taskTypesLoading ||
     tripTypesLoading ||
     projectsLoading ||
-    currentUserLoading
+    !currentUser
   );
 
   const renderCopyButton = () => {
@@ -208,7 +198,7 @@ export default function TaskAddContainer( props ) {
               companies={ toSelArr(companiesData.basicCompanies) }
               taskTypes={ toSelArr(taskTypesData.taskTypes) }
               tripTypes={ toSelArr(tripTypesData.tripTypes) }
-              currentUser={ currentUserData.getMyData }
+              currentUser={ currentUser }
               milestones={[noMilestone]}
               defaultUnit={null}
               closeModal={ () => {

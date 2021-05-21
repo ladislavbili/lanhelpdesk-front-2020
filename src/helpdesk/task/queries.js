@@ -517,36 +517,6 @@ mutation updateTask(
 }
 `;
 
-export const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    tasklistLayout
-    taskLayout
-    statuses {
-      id
-      title
-      color
-      action
-    }
-    company {
-      id
-      title
-    }
-    role {
-      level
-      accessRights {
-        projects
-        publicFilters
-        users
-        companies
-        vykazy
-      }
-    }
-  }
-}
-`;
-
 export const GET_TASKLIST_COLUMNS_PREFERENCES = gql `
 query tasklistColumnPreference(
   $projectId: Int

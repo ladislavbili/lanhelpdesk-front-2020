@@ -16,7 +16,8 @@ import axios from 'axios';
 
 import {
   toSelArr,
-  localFilterToValues
+  localFilterToValues,
+  getMyData,
 } from 'helperFunctions';
 
 import {
@@ -40,7 +41,6 @@ import {
 } from 'helpdesk/settings/users/queries';
 
 import {
-  GET_MY_DATA,
   GET_TASK,
   GET_TASKS,
 
@@ -93,11 +93,6 @@ export default function TaskEditContainer( props ) {
   const id = inModal ? taskID : parseInt( match.params.taskID );
   const client = useApolloClient();
 
-  const {
-    data: myData,
-    loading: myDataLoading,
-    refetch: myDataRefetch,
-  } = useQuery( GET_MY_DATA );
   const {
     data: basicCompaniesData,
     loading: basicCompaniesLoading,
@@ -777,14 +772,12 @@ export default function TaskEditContainer( props ) {
           taskLayout: value,
         }
       } )
-      .then( ( response ) => {
-        myDataRefetch();
-      } )
       .catch( ( err ) => console.log( err ) );
   }
 
+  const currentUser = getMyData();
   const dataLoading = (
-    myDataLoading ||
+    !currentUser ||
     basicCompaniesLoading ||
     basicUsersLoading ||
     taskTypesLoading ||
@@ -813,8 +806,8 @@ export default function TaskEditContainer( props ) {
       task={taskData.task}
       inModal={inModal}
       closeModal={closeModal}
-      currentUser={myData.getMyData}
-      accessRights={myData.getMyData.role.accessRights}
+      currentUser={currentUser}
+      accessRights={currentUser.role.accessRights}
       companies={toSelArr(basicCompaniesData.basicCompanies)}
       users={toSelArr(basicUsersData.basicUsers, 'fullName')}
       taskTypes={toSelArr(taskTypesData.taskTypes)}

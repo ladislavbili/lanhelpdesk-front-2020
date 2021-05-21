@@ -20,6 +20,7 @@ import {
   isEmail,
   toSelArr,
   compareObjectAttributes,
+  getMyData,
 } from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 
@@ -28,7 +29,6 @@ import {
   GET_USER,
   UPDATE_USER,
   DELETE_USER,
-  GET_MY_DATA,
   SET_USER_ACTIVE,
 } from './queries';
 
@@ -62,12 +62,6 @@ export default function UserEdit( props ) {
     data: rolesData,
     loading: rolesLoading
   } = useQuery( GET_ROLES, {
-    fetchPolicy: 'network-only'
-  } );
-  const {
-    data: currentUserData,
-    loading: currentUserLoading
-  } = useQuery( GET_MY_DATA, {
     fetchPolicy: 'network-only'
   } );
   const {
@@ -195,11 +189,11 @@ export default function UserEdit( props ) {
     setActive( !active );
   }
 
-  if ( userLoading || rolesLoading || companiesLoading || currentUserLoading ) {
+  const currentUser = getMyData();
+  if ( userLoading || rolesLoading || companiesLoading || !currentUser ) {
     return <Loading />
   }
-
-  const currentUserLevel = currentUserData.getMyData.role.level;
+  const currentUserLevel = currentUser.role.level;
   const roles = toSelArr( rolesData.roles )
     .filter( ( role ) => role.level > currentUserLevel || role.id === userData.user.role.id || ( currentUserLevel === 0 && role.level === 0 ) );
   const companies = toSelArr( companiesData.basicCompanies );
@@ -346,7 +340,7 @@ export default function UserEdit( props ) {
         </FormGroup>
 
         <div className="form-buttons-row">
-          { !isDisabled && id !== currentUserData.getMyData.id &&
+          { !isDisabled && id !== currentUser.id &&
             <button
               className="btn-red btn-distance"
               disabled={deletingUser}
@@ -355,7 +349,7 @@ export default function UserEdit( props ) {
               Delete
             </button>
           }
-          { !isDisabled && id !== currentUserData.getMyData.id &&
+          { !isDisabled && id !== currentUser.id &&
             <button
               className={ active ? "btn btn-grey" : "btn btn-green"}
               onClick={()=> deactivateUser(active)}

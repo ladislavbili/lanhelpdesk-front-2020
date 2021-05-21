@@ -85,21 +85,6 @@ query {
 }
 `;
 
-export const GET_MY_DATA = gql `
-query {
-  getMyData{
-    id
-    email
-    role {
-      id
-      accessRights {
-        publicFilters
-      }
-    }
-  }
-}
-`;
-
 export const DELETE_FILTER = gql `
 mutation deleteFilter($id: Int!) {
   deleteFilter(

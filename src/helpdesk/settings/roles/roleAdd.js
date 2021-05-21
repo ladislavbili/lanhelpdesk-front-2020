@@ -10,11 +10,13 @@ import {
   Input
 } from 'reactstrap';
 import RightRow from './rightRow';
+import {
+  getMyData,
+} from 'helperFunctions';
 
 import {
   GET_ROLES,
-  ADD_ROLE,
-  GET_MY_DATA
+  ADD_ROLE
 } from './queries';
 
 export default function RoleAdd( props ) {
@@ -26,8 +28,8 @@ export default function RoleAdd( props ) {
   const [ addRole, {
     client
   } ] = useMutation( ADD_ROLE );
-  const userDataQuery = useQuery( GET_MY_DATA );
-  const currentUserLevel = ( userDataQuery.loading ? null : userDataQuery.data.getMyData.role.level );
+  const currentUser = getMyData();
+  const currentUserLevel = currentUser ? currentUser.role.level : null;
   //state
   const [ title, setTitle ] = React.useState( "" );
   const [ order, setOrder ] = React.useState( 0 );

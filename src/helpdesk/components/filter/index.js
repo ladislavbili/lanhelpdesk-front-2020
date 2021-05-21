@@ -10,7 +10,8 @@ import Select from 'react-select';
 import {
   toSelArr,
   fromObjectToState,
-  setDefaultFromObject
+  setDefaultFromObject,
+  getMyData,
 } from 'helperFunctions';
 import AddFilter from './filterAdd';
 import Loading from 'components/loading';
@@ -33,7 +34,6 @@ import {
 } from 'configs/constants/filter';
 
 import {
-  GET_MY_DATA,
   GET_MY_FILTERS,
   DELETE_FILTER,
 } from './queries';
@@ -60,10 +60,6 @@ export default function FilterForm( props ) {
   } = props;
 
   //apollo
-  const {
-    data: myData,
-    loading: myDataLoading,
-  } = useQuery( GET_MY_DATA );
 
   const {
     data: usersData,
@@ -177,8 +173,10 @@ export default function FilterForm( props ) {
     setOneOf,
   } = fromObjectToState( emptyFilter );
 
+  const currentUser = getMyData();
+
   const dataLoading = (
-    myDataLoading ||
+    !currentUser ||
     usersLoading ||
     companiesLoading ||
     taskTypesLoading ||

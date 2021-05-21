@@ -5,7 +5,8 @@ import {
   useApolloClient,
 } from "@apollo/client";
 import {
-  toSelArr
+  toSelArr,
+  getMyData,
 } from 'helperFunctions';
 import {
   Modal,
@@ -42,7 +43,6 @@ import {
 } from 'helpdesk/settings/projects/queries';
 
 import {
-  GET_MY_DATA,
   GET_REPEAT,
   ADD_SHORT_SUBTASK,
   UPDATE_SHORT_SUBTASK,
@@ -106,10 +106,6 @@ export default function RepeatFormLoader( props ) {
     data: projectsData,
     loading: projectsLoading
   } = useQuery( GET_MY_PROJECTS );
-  const {
-    data: currentUserData,
-    loading: currentUserLoading
-  } = useQuery( GET_MY_DATA );
 
   const [ addShortSubtask ] = useMutation( ADD_SHORT_SUBTASK );
   const [ updateShortSubtask ] = useMutation( UPDATE_SHORT_SUBTASK );
@@ -573,13 +569,15 @@ export default function RepeatFormLoader( props ) {
     }
   }
 
+  const currentUser = getMyData();
+
   const loading = (
     companiesLoading ||
     usersLoading ||
     taskTypesLoading ||
     tripTypesLoading ||
     projectsLoading ||
-    currentUserLoading ||
+    !currentUser ||
     repeatLoading
   );
 
@@ -603,7 +601,7 @@ export default function RepeatFormLoader( props ) {
       companies={ toSelArr(companiesData.basicCompanies) }
       taskTypes={ toSelArr(taskTypesData.taskTypes) }
       tripTypes={ toSelArr(tripTypesData.tripTypes) }
-      currentUser={ currentUserData.getMyData }
+      currentUser={ currentUser }
       milestones={[noMilestone]}
       defaultUnit={null}
       directSaving={saving}

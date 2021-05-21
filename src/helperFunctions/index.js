@@ -101,3 +101,8 @@ export {
   getLocation
 }
 from './navigationFunctions';
+
+export {
+  getMyData
+}
+from './userData';

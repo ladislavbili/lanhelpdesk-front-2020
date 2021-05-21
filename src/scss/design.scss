@@ -2665,7 +2665,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .vykazyTable > .table > thead > tr > th {
   padding-left: 8px;
   padding-right: 8px;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom-width: 0px;
+  //border-bottom: 1px solid #dee2e6;
 }
 
 .vykazyTable > .table > thead > tr > th:first-child {
@@ -2927,9 +2928,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   //  margin-bottom: 0px !important; - rusilo medzeru v pravom menu edit tasku
 }
 
-.scheduled {
+.scheduled-in-table {
   width: 320px;
-  background-color: #eaeaea;
   border: none;
   .popover-header,
   h2 {
@@ -2946,6 +2946,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   .react-datepicker-wrapper {
     width: 100%;
   }
+}
+
+.scheduled {
+  @extend .scheduled-in-table;
+  background-color: #eaeaea;
 }
 
 .col-9 {

@@ -11,6 +11,7 @@ import {
 import {
   toSelArr,
   toSelItem,
+  getMyData,
 } from 'helperFunctions';
 import {
   fetchNetOptions
@@ -53,7 +54,6 @@ import {
 } from '../taskTypes/queries';
 import {
   ADD_PROJECT,
-  GET_MY_DATA
 } from './queries';
 
 let fakeID = -1;
@@ -64,10 +64,6 @@ export default function ProjectAdd( props ) {
     history,
     closeModal
   } = props;
-  const {
-    data: myData,
-    loading: myDataLoading
-  } = useQuery( GET_MY_DATA );
   const [ addProject, {
     client
   } ] = useMutation( ADD_PROJECT );
@@ -88,7 +84,7 @@ export default function ProjectAdd( props ) {
     loading: taskTypesLoading
   } = useQuery( GET_TASK_TYPES, fetchNetOptions );
 
-  const currentUser = myData ? myData.getMyData : {};
+  const currentUser = getMyData();
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -120,13 +116,13 @@ export default function ProjectAdd( props ) {
     companiesLoading ||
     usersLoading ||
     taskTypesLoading ||
-    myDataLoading
+    !currentUser
   );
 
   //events
   React.useEffect( () => {
     setData();
-  }, [ statusesLoading, myDataLoading, usersLoading ] );
+  }, [ statusesLoading, usersLoading ] );
 
   React.useEffect( () => {
     updateDefAssigned();
@@ -157,7 +153,7 @@ export default function ProjectAdd( props ) {
       group: toSelArr( groups )
         .find( ( group ) => group.order === 0 ),
       user: toSelArr( usersData.basicUsers, 'email' )
-        .find( ( user ) => user.id === myData.getMyData.id )
+        .find( ( user ) => user.id === currentUser.id )
         } ] );
   }
 

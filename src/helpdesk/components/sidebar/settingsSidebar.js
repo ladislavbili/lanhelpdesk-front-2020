@@ -12,19 +12,16 @@ import {
 import classnames from 'classnames';
 import settings from 'configs/constants/settings';
 import {
-  GET_MY_DATA
-} from './queries';
+  getMyData,
+} from 'helperFunctions';
 
 export default function SettingsSidebar( props ) {
   //data & queries
   const {
     location
   } = props;
-  const {
-    data
-  } = useQuery( GET_MY_DATA );
 
-  const currentUser = data ? data.getMyData : {};
+  const currentUser = getMyData();
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
 
   return (

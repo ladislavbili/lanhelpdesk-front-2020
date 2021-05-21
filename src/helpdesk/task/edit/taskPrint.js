@@ -2,7 +2,7 @@ import React, {
   Component
 } from 'react';
 import ReactToPrint from 'react-to-print';
-import VykazyTablePrint from 'helpdesk/components/vykazyTablePrint';
+import VykazyTablePrint from 'helpdesk/components/vykazy/vykazyTablePrint';
 import {
   intervals
 } from 'configs/constants/repeat';

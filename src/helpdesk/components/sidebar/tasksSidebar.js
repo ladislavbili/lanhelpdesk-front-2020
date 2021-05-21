@@ -47,6 +47,7 @@ import {
   toSelItem,
   sortBy,
   filterUnique,
+  getMyData,
 } from 'helperFunctions';
 
 import {
@@ -59,9 +60,6 @@ import {
 } from 'configs/constants/sidebar';
 import moment from 'moment';
 
-import {
-  GET_MY_DATA,
-} from './queries';
 import {
   GET_MY_PROJECTS,
 } from 'helpdesk/settings/projects/queries';
@@ -96,10 +94,6 @@ export default function TasksSidebar( props ) {
   } = props;
 
   //network
-  const {
-    data: myData,
-    loading: myDataLoading
-  } = useQuery( GET_MY_DATA );
 
   const {
     data: myProjectsData,
@@ -161,8 +155,9 @@ export default function TasksSidebar( props ) {
     }
   }, [ myFiltersLoading, match.params.filterID ] );
 
+  const currentUser = getMyData();
   const dataLoading = (
-    myDataLoading ||
+    !currentUser ||
     myProjectsLoading ||
     myFiltersLoading ||
     filterLoading ||
@@ -185,7 +180,7 @@ export default function TasksSidebar( props ) {
   const canEditProject = (
     localProject.id !== null &&
     (
-      myData.getMyData.role.accessRights.projects ||
+      currentUser.role.accessRights.projects ||
       (
         localProject.right !== undefined &&
         localProject.right.projectPrimaryRead
@@ -294,7 +289,7 @@ export default function TasksSidebar( props ) {
   }
 
   const renderCalendarUsersList = () => {
-    const myID = myData.getMyData.id;
+    const myID = currentUser.id;
     const userID = localCalendarUserId.localCalendarUserId;
     let usersToRender = [];
     if ( localProject.id !== null ) {
@@ -591,7 +586,7 @@ export default function TasksSidebar( props ) {
   }
 
   const renderProjectAddBtn = () => {
-    if ( !myData.getMyData.role.accessRights.addProjects ) {
+    if ( !currentUser.role.accessRights.addProjects ) {
       return null;
     }
     return (
@@ -681,7 +676,7 @@ export default function TasksSidebar( props ) {
 
           { renderProjects() }
 
-          {  (localProject.id === null || localProject.right.assignedRead) && myData.getMyData.tasklistLayout === 3 && (
+          {  (localProject.id === null || localProject.right.assignedRead) && currentUser.tasklistLayout === 3 && (
             <Empty>
               <hr className = "m-l-15 m-r-15 m-t-11" />
               {renderCalendarUsers()}
@@ -704,8 +699,8 @@ export default function TasksSidebar( props ) {
       {
         !showFilterAdd &&
         <div className='p-l-15 p-r-15'>
-          { myData.getMyData.role.accessRights.companies && renderCompanyAddBtn() }
-          { myData.getMyData.role.accessRights.users && renderUserAddBtn() }
+          { currentUser.role.accessRights.companies && renderCompanyAddBtn() }
+          { currentUser.role.accessRights.users && renderUserAddBtn() }
         </div>
       }
     </div>
@@ -753,7 +748,7 @@ export default function TasksSidebar( props ) {
           {renderProjectsPopover()}
         </span>
 
-        { ( localProject.id === null || localProject.right.assignedRead) && myData.getMyData.tasklistLayout === 3 &&
+        { ( localProject.id === null || localProject.right.assignedRead) && currentUser.tasklistLayout === 3 &&
           <span
             className='btn popover-toggler'
             >
