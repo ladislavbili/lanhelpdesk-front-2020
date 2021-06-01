@@ -285,6 +285,7 @@ tasks {
   company {
     id
     title
+    dph
   }
   createdBy {
     id
@@ -326,6 +327,9 @@ tasks {
     id
     title
   }
+  subtasksQuantity
+  workTripsQuantity
+  materialsPrice
 }
 count
 execTime
@@ -353,6 +357,10 @@ overtime
 pausal
 tags
 statistics
+works
+trips
+materialsWithoutDPH
+materialsWithDPH
 `
 
 export const ADD_TASK = gql `
@@ -542,6 +550,10 @@ mutation addOrUpdateTasklistColumnPerference(
   $overtime: Boolean
   $pausal: Boolean
   $tags: Boolean
+  $works: Boolean
+  $trips: Boolean
+  $materialsWithoutDPH: Boolean
+  $materialsWithDPH: Boolean
 ) {
   addOrUpdateTasklistColumnPerference(
     projectId: $projectId
@@ -561,6 +573,10 @@ mutation addOrUpdateTasklistColumnPerference(
     overtime: $overtime
     pausal: $pausal
     tags: $tags
+    works: $works
+    trips: $trips
+    materialsWithoutDPH: $materialsWithoutDPH
+    materialsWithDPH: $materialsWithDPH
   ){
     ${tasklistPreferenceBody}
   }

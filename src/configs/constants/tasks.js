@@ -43,6 +43,10 @@ export const defaultTasklistColumnPreference = {
   materialsPending: false,
   itemsApproved: false,
   itemsPending: false,
+  works: false,
+  trips: false,
+  materialsWithoutDPH: false,
+  materialsWithDPH: false,
 }
 export const orderByValues = [
   {
@@ -116,6 +120,22 @@ export const attributeLimitingRights = [
   {
     right: 'typeRead',
     preference: 'taskType'
+  },
+  {
+    right: 'vykazRead',
+    preference: 'works'
+  },
+  {
+    right: 'vykazRead',
+    preference: 'trips'
+  },
+  {
+    right: 'vykazRead',
+    preference: 'materialsWithoutDPH'
+  },
+  {
+    right: 'vykazRead',
+    preference: 'materialsWithDPH'
   },
 ]
 export const unimplementedAttributes = [

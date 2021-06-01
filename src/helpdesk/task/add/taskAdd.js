@@ -800,7 +800,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
 
-          { userRights.scheduledRead && false &&
+          { userRights.scheduledRead &&
             <Scheduled
               items={scheduled}
               users={assignedTo}
@@ -942,7 +942,7 @@ export default function TaskAdd( props ) {
             vertical={true}
             />
         }
-        { userRights.scheduledRead && false &&
+        { userRights.scheduledRead &&
           <Scheduled
             items={scheduled}
             users={assignedTo}

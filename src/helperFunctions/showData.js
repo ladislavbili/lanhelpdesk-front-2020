@@ -40,7 +40,7 @@ export const getItemDisplayValue = ( item, value ) => {
   if ( !item[ value.value ] && ( value.type === 'important' || value.type === 'invoiced' || value.type === 'checkbox' ) ) {
     return null;
   }
-  if ( !item[ value.value ] && ![ 'boolean', 'attribute' ].includes( value.type ) ) {
+  if ( !item[ value.value ] && ![ 'boolean', 'attribute', 'custom' ].includes( value.type ) ) {
     return '---';
   }
   if ( value.type === 'object' ) {

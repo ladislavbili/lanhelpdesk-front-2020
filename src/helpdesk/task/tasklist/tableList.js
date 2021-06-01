@@ -57,6 +57,9 @@ export default function TableList( props ) {
   const filterTaskByAttributes = ( task ) => {
     return filteredDisplayValues
       .every( ( display ) => {
+        if ( [ 'important', 'invoiced', 'checked', 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
+          return true;
+        }
         let value = getItemDisplayValue( task, display );
         if ( display.value === "assignedTo" ) {
           value = task[ "assignedTo" ].map( user => `${user.fullName} (${user.email})` )
@@ -74,18 +77,6 @@ export default function TableList( props ) {
         }
         if ( display.value === "password" ) {
           value = task[ "password" ];
-        }
-        if ( display.value === 'important' ) {
-          return true;
-        }
-        if ( display.value === 'invoiced' ) {
-          return true;
-        }
-        if ( display.value === 'invoiced' ) {
-          return true;
-        }
-        if ( display.value === 'checked' ) {
-          return true;
         }
         let result = value.toString()
           .toLowerCase()
@@ -147,6 +138,8 @@ export default function TableList( props ) {
   const renderAttributeFilter = ( display, index ) => {
     if ( display.type === 'important' || display.type === 'invoiced' ) {
       return null;
+    } else if ( [ 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
+      return ( <th key={display.value} width="40" /> );
     } else if ( display.type === 'checkbox' ) {
       return <th key={display.value} width="40" >
         <Checkbox

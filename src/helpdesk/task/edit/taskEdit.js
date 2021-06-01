@@ -1540,7 +1540,7 @@ export default function TaskEdit( props ) {
             </div>
           </div>
 
-          { userRights.scheduledRead && false &&
+          { userRights.scheduledRead &&
             <Scheduled
               items={task.scheduled.map((item) => ({
                 ...item,
@@ -1669,7 +1669,7 @@ export default function TaskEdit( props ) {
               layout={layout}
               />
           }
-          { userRights.scheduledRead && false &&
+          { userRights.scheduledRead &&
             <Scheduled
               items={task.scheduled.map((item) => ({
                 ...item,

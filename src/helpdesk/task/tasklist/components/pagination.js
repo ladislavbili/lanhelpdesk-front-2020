@@ -36,7 +36,7 @@ export default function Pagination( props ) {
   return (
     <div className={classnames("row m-b-10 ml-auto", {"m-r-30": taskList})}>
       <div className="message ml-auto m-t-1">
-        { `${ tasksFrom }-${ tasksTo } ${!shortForm ? 'from total': ''} of ${count}${!shortForm ? 'tasks' : ''}` }
+        { `${ tasksFrom }-${ tasksTo } ${!shortForm ? 'from total': ''} of ${count}${!shortForm ? ' tasks' : ''}` }
       </div>
       <Button
         disabled={  page === 1 }

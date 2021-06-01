@@ -156,6 +156,54 @@ export default function TasklistSwitch( props ) {
       type: 'boolean',
       show: preference[ 'overtime' ]
     },
+    {
+      value: 'works',
+      label: 'Works',
+      type: 'custom',
+      func: ( task ) => {
+        if ( task.subtasksQuantity !== undefined && task.subtasksQuantity !== null ) {
+          return task.subtasksQuantity;
+        }
+        return '---';
+      },
+      show: preference[ 'works' ],
+    },
+    {
+      value: 'trips',
+      label: 'Trips',
+      type: 'custom',
+      func: ( task ) => {
+        if ( task.workTripsQuantity !== undefined && task.workTripsQuantity !== null ) {
+          return task.workTripsQuantity;
+        }
+        return '---';
+      },
+      show: preference[ 'trips' ],
+    },
+    {
+      value: 'materialsWithoutDPH',
+      label: 'Materials without DPH',
+      type: 'custom',
+      func: ( task ) => {
+        if ( task.materialsPrice !== undefined && task.materialsPrice !== null ) {
+          return task.materialsPrice;
+        }
+        return '---';
+      },
+      show: preference[ 'materialsWithoutDPH' ],
+    },
+    {
+      value: 'materialsWithDPH',
+      label: 'Materials with DPH',
+      type: 'custom',
+      func: ( task ) => {
+        if ( task.materialsPrice !== undefined && task.materialsPrice !== null ) {
+          return task.materialsPrice * ( 1 + ( task.company ? task.company.dph : 20 ) / 100 );
+        }
+        return '---';
+      },
+      show: preference[ 'materialsWithDPH' ],
+    },
   ];
   const taskID = match.params.taskID;
 
@@ -197,7 +245,7 @@ export default function TasklistSwitch( props ) {
             </div>
           }
 
-          {( [0,1,3].includes(tasklistLayout)  || (tasklistLayout === 2 && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) && !showStatistics &&
+          {( [0,1 ].includes(tasklistLayout)  || (tasklistLayout === 2 && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) && !showStatistics &&
             <div className="flex" >
               { taskID && <TaskEdit match={match} columns={false} history={history} /> }
               { !taskID &&
@@ -214,7 +262,7 @@ export default function TasklistSwitch( props ) {
               }
             </div>
           }
-          {tasklistLayout === 'povodne 3' && canViewCalendar && !showStatistics &&
+          {tasklistLayout === 3 && canViewCalendar && !showStatistics &&
             <div className='col-xl-12'>
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
