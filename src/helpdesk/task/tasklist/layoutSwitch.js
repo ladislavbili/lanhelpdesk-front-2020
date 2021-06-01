@@ -197,7 +197,7 @@ export default function TasklistSwitch( props ) {
             </div>
           }
 
-          {( [0,1].includes(tasklistLayout)  || (tasklistLayout === 2 && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) && !showStatistics &&
+          {( [0,1,3].includes(tasklistLayout)  || (tasklistLayout === 2 && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) && !showStatistics &&
             <div className="flex" >
               { taskID && <TaskEdit match={match} columns={false} history={history} /> }
               { !taskID &&
@@ -214,7 +214,7 @@ export default function TasklistSwitch( props ) {
               }
             </div>
           }
-          {tasklistLayout === 3 && canViewCalendar && !showStatistics &&
+          {tasklistLayout === 'povodne 3' && canViewCalendar && !showStatistics &&
             <div className='col-xl-12'>
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&

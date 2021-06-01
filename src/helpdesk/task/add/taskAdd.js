@@ -17,12 +17,13 @@ import Empty from 'components/Empty';
 
 import Repeat from 'helpdesk/components/repeat/simpleRepeat';
 import Attachments from 'helpdesk/components/attachments';
-import VykazyTable from 'helpdesk/components/vykazy/vykazyTable';
 import CheckboxList from 'helpdesk/components/checkboxList';
 import Scheduled from 'helpdesk/components/scheduled';
 import {
   getCreationError as getVykazyError
 } from 'helpdesk/components/vykazy/vykazyTable';
+import Materials from 'helpdesk/components/vykazy/materialsTable';
+import WorksTable from 'helpdesk/components/vykazy/worksTable';
 
 import ck5config from 'configs/components/ck5config';
 import {
@@ -129,10 +130,97 @@ export default function TaskAdd( props ) {
 
   const [ showLocalCreationError, setShowLocalCreationError ] = React.useState( false );
 
+
+  //constants
   const getNewID = () => {
     return fakeID--;
   }
 
+  const cannotSave = (
+    saving ||
+    loading ||
+    title.length === 0 ||
+    ( project.def.status.required && !status ) ||
+    ( project.def.assignedTo.fixed && assignedTo.length === 0 ) ||
+    ( project.def.requester.required && !requester ) ||
+    ( project.def.tag.required && tags.length === 0 ) ||
+    ( project.def.pausal.required && !pausal ) ||
+    ( project.def.overtime.required && !overtime ) ||
+    ( project.def.company.required && !company ) ||
+    ( project.def.type.required && !taskType )
+  );
+
+  //reactions
+  React.useEffect( () => {
+    setDefaults( project );
+  }, [ project.id ] );
+
+  React.useEffect( () => {
+    if ( project ) {
+      const updatedProject = projects.find( ( project2 ) => project2.id === project.id )
+      if ( updatedProject ) {
+        setProject( updatedProject );
+      } else {
+        setTags( [] );
+        setStatus( null );
+        setMilestone( noMilestone );
+        setProject( projects[ 0 ] );
+        if ( closeModal ) {
+          closeModal( true );
+        }
+      }
+    }
+  }, [ projects ] );
+
+  React.useEffect( () => {
+    if ( company ) {
+      const updatedCompany = companies.find( ( company2 ) => company2.id === company.id )
+      if ( updatedCompany ) {
+        setCompany( updatedCompany );
+        setPausal( updatedCompany.monthly ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
+      } else {
+        setCompany( null );
+        setPausal( booleanSelects[ 0 ] );
+      }
+    }
+  }, [ companies ] );
+
+  React.useEffect( () => {
+    if ( subtasks.length > 0 ) {
+      setSubtasks( subtasks.map( ( subtask ) => {
+        const updatedUser = users.find( ( user2 ) => user2.id === subtask.assignedTo.id )
+        return {
+          ...subtask,
+          assignedTo: updatedUser ? updatedUser : null,
+        }
+      } ) );
+    }
+    if ( workTrips.length > 0 ) {
+      setSubtasks( workTrips.map( ( trip ) => {
+        const updatedUser = users.find( ( user2 ) => user2.id === trip.assignedTo.id )
+        return {
+          ...trip,
+          assignedTo: updatedUser ? updatedUser : null,
+        }
+      } ) );
+    }
+
+    if ( assignedTo.length > 0 ) {
+      const updatedAssignedTos = users.filter( ( user ) => assignedTo.some( ( user2 ) => user2.id === user.id ) );
+      setAssignedTo( updatedAssignedTos );
+    }
+
+    if ( requester ) {
+      const updatedRequester = users.find( ( user2 ) => user2.id === requester.id )
+      if ( updatedRequester ) {
+        setRequester( updatedRequester );
+      } else {
+        setRequester( null );
+      }
+    }
+  }, [ users ] );
+
+  //functions
   const setDefaults = ( project, forced ) => {
     if ( project === null ) {
       setDefaultFields( noDef );
@@ -232,10 +320,6 @@ export default function TaskAdd( props ) {
     setDefaultFields( def );
   }
 
-  React.useEffect( () => {
-    setDefaults( project );
-  }, [ project ] );
-
   const addTaskFunc = () => {
     let link = '';
     if ( match.params.hasOwnProperty( 'listID' ) ) {
@@ -283,7 +367,8 @@ export default function TaskAdd( props ) {
             quantity: item.quantity,
             discount: item.discount,
             type: item.type.id,
-            assignedTo: item.assignedTo.id
+            assignedTo: item.assignedTo.id,
+            scheduled: item.scheduled,
           } ) ),
           workTrips: workTrips.map( item => ( {
             order: item.order,
@@ -292,7 +377,8 @@ export default function TaskAdd( props ) {
             quantity: item.quantity,
             discount: item.discount,
             type: item.type.id,
-            assignedTo: item.assignedTo.id
+            assignedTo: item.assignedTo.id,
+            scheduled: item.scheduled,
           } ) ),
           materials: materials.map( item => ( {
             title: item.title,
@@ -373,20 +459,6 @@ export default function TaskAdd( props ) {
         setSaving( false );
       } );
   }
-
-  const cannotSave = (
-    saving ||
-    loading ||
-    title.length === 0 ||
-    ( project.def.status.required && !status ) ||
-    ( project.def.assignedTo.fixed && assignedTo.length === 0 ) ||
-    ( project.def.requester.required && !requester ) ||
-    ( project.def.tag.required && tags.length === 0 ) ||
-    ( project.def.pausal.required && !pausal ) ||
-    ( project.def.overtime.required && !overtime ) ||
-    ( project.def.company.required && !company ) ||
-    ( project.def.type.required && !taskType )
-  );
 
   //RENDERS
   const renderHeader = () => {
@@ -545,7 +617,7 @@ export default function TaskAdd( props ) {
           }
         }}
         options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={ pickSelectStyle([ 'noArrow', 'noPadding', ]) }
+        styles={ pickSelectStyle([ 'noArrow', ]) }
         />
     ),
     Requester: (
@@ -728,7 +800,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
 
-          { userRights.scheduledRead &&
+          { userRights.scheduledRead && false &&
             <Scheduled
               items={scheduled}
               users={assignedTo}
@@ -870,7 +942,7 @@ export default function TaskAdd( props ) {
             vertical={true}
             />
         }
-        { userRights.scheduledRead &&
+        { userRights.scheduledRead && false &&
           <Scheduled
             items={scheduled}
             users={assignedTo}
@@ -997,6 +1069,7 @@ export default function TaskAdd( props ) {
   }
 
   const renderSimpleSubtasks = () => {
+    //hidden
     if ( !userRights.taskShortSubtasksWrite ) {
       return null;
     }
@@ -1068,132 +1141,118 @@ export default function TaskAdd( props ) {
     ) {
       return null
     }
+
     return (
-      <VykazyTable
-        id={company ? company.id : 0}
-        showColumns={ [0,1,2,3,4,5,6,7,8] }
-        showTotals={false}
-        userID={currentUser.id}
-        autoApproved={project ? project.autoApproved : false}
-        userRights={userRights}
-        isInvoiced={false}
-        canEditInvoiced={false}
-        canAddSubtasksAndTrips={ assignedTo.length !== 0 }
-        company={company}
-        taskAssigned={assignedTo}
+      <Empty>
+        <WorksTable
+          userID={currentUser.id}
+          userRights={userRights}
+          currentUser={currentUser}
+          company={company}
+          showTotals={true}
+          showColumns={ [ 'done', 'title', 'scheduled', 'quantity', 'assigned', 'approved', 'actions' ] }
+          showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
+          autoApproved={project ? project.autoApproved : false}
+          canAddSubtasksAndTrips={assignedTo.length !== 0}
+          canEditInvoiced={false}
+          taskAssigned={assignedTo}
 
-        showSubtasks={project ? project.showSubtasks : false}
+          taskTypes={taskTypes}
+          defaultType={taskType}
+          subtasks={subtasks}
+          addSubtask={(newSubtask)=>{
+            setSubtasks([...subtasks,{id:getNewID(), ...newSubtask}]);
+          }}
+          updateSubtask={(id,newData)=>{
+            let newSubtasks=[...subtasks];
+            let index = newSubtasks.findIndex((subtask)=>subtask.id===id);
+            if(newData.approved && newSubtasks[index].approved !== newData.approved ){
+              newSubtasks[index]={...newSubtasks[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+            }else{
+              newSubtasks[index]={...newSubtasks[index],...newData };
+            }
+            setSubtasks(newSubtasks);
+          }}
+          updateSubtasks={(multipleSubtasks)=>{
+            let newSubtasks=[...subtasks];
+            multipleSubtasks.forEach(({id, newData})=>{
+              newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
+            });
+            setSubtasks(newSubtasks);
+          }}
+          removeSubtask={(id)=>{
+            let newSubtasks=[...subtasks];
+            newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
+            setSubtasks(newSubtasks);
+          }}
 
-        submitSubtask={(newSubtask)=>{
-          setSubtasks([...subtasks,{id:getNewID(), ...newSubtask}]);
-        }}
-        subtasks={subtasks}
-        defaultType={taskType}
-        taskTypes={taskTypes}
-        updateSubtask={(id,newData)=>{
-          let newSubtasks=[...subtasks];
-          let index = newSubtasks.findIndex((subtask)=>subtask.id===id);
-          if(newData.approved && newSubtasks[index].approved !== newData.approved ){
-            newSubtasks[index]={...newSubtasks[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-          }else{
-            newSubtasks[index]={...newSubtasks[index],...newData };
-          }
-          setSubtasks(newSubtasks);
-        }}
-        updateSubtasks={(multipleSubtasks)=>{
-          let newSubtasks=[...subtasks];
-          multipleSubtasks.forEach(({id, newData})=>{
-            newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
-          });
-          setSubtasks(newSubtasks);
-        }}
-        removeSubtask={(id)=>{
-          let newSubtasks=[...subtasks];
-          newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
-          setSubtasks(newSubtasks);
-        }}
-        workTrips={workTrips}
-        tripTypes={tripTypes}
-        submitTrip={(newTrip)=>{
-          setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
-        }}
-        updateTrip={(id,newData)=>{
-          let newTrips=[...workTrips];
-          let index = newTrips.findIndex((trip)=>trip.id===id);
-          if(newData.approved && newTrips[index].approved !== newData.approved ){
-            newTrips[index]={...newTrips[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-          }else{
-            newTrips[index]={...newTrips[index],...newData };
-          }
-          setWorkTrips(newTrips);
-        }}
-        updateTrips={(multipleTrips)=>{
-          let newTrips=[...workTrips];
-          multipleTrips.forEach(({id, newData})=>{
-            newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-          });
-          setWorkTrips(newTrips);
-        }}
-        removeTrip={(id)=>{
-          let newTrips=[...workTrips];
-          newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
-          setWorkTrips(newTrips);
-        }}
 
-        materials={materials}
-        submitMaterial={(newMaterial)=>{
-          setMaterials([...materials,{id:getNewID(),...newMaterial}]);
-        }}
-        updateMaterial={(id,newData)=>{
-          let newMaterials=[...materials];
-          let index = newMaterials.findIndex((material)=>material.id===id);
-          if(newData.approved && newMaterials[index].approved !== newData.approved ){
-            newMaterials[index]={...newMaterials[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-          }else{
-            newMaterials[index]={...newMaterials[index],...newData };
-          }
-          setMaterials(newMaterials);
-        }}
-        updateMaterials={(multipleMaterials)=>{
-          let newMaterials=[...materials];
-          multipleMaterials.forEach(({id, newData})=>{
-            newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-          });
-          setMaterials(newMaterials);
-        }}
-        removeMaterial={(id)=>{
-          let newMaterials=[...materials];
-          newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-          setMaterials(newMaterials);
-        }}
+          workTrips={ workTrips }
+          tripTypes={tripTypes}
+          workTrips={workTrips}
+          tripTypes={tripTypes}
+          addTrip={(newTrip)=>{
+            setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
+          }}
+          updateTrip={(id,newData)=>{
+            let newTrips=[...workTrips];
+            let index = newTrips.findIndex((trip)=>trip.id===id);
+            if(newData.approved && newTrips[index].approved !== newData.approved ){
+              newTrips[index]={...newTrips[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+            }else{
+              newTrips[index]={...newTrips[index],...newData };
+            }
+            setWorkTrips(newTrips);
+          }}
+          updateTrips={(multipleTrips)=>{
+            let newTrips=[...workTrips];
+            multipleTrips.forEach(({id, newData})=>{
+              newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
+            });
+            setWorkTrips(newTrips);
+          }}
+          removeTrip={(id)=>{
+            let newTrips=[...workTrips];
+            newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
+            setWorkTrips(newTrips);
+          }}
+          />
 
-        customItems={customItems}
-        submitCustomItem={(customItem)=>{
-          setCustomItems([...customItems,{id:getNewID(),...customItem}]);
-        }}
-        updateCustomItem={(id,newData)=>{
-          let newCustomItems=[...customItems];
-          let index = newCustomItems.findIndex((item)=>item.id===id);
-          if(newData.approved && newCustomItems[index].approved !== newData.approved ){
-            newCustomItems[index]={...newCustomItems[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-          }else{
-            newCustomItems[index]={...newCustomItems[index],...newData };
-          }
-          setCustomItems(newCustomItems);
-        }}
-        updateCustomItems={(multipleCustomItems)=>{
-          let newCustomItems=[...customItems];
-          multipleCustomItems.forEach(({id, newData})=>{
-            newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
-          });
-          setCustomItems(newCustomItems);
-        }}
-        removeCustomItem={(id)=>{
-          let newCustomItems=[...customItems];
-          newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
-          setCustomItems(newCustomItems);
-        }}
-        />
+        <Materials
+          showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
+          showTotals={true}
+          autoApproved={project ? project.autoApproved : false}
+          userRights={userRights}
+          currentUser={currentUser}
+          company={company}
+          materials={ materials }
+          addMaterial={(newMaterial)=>{
+            setMaterials([...materials,{id:getNewID(),...newMaterial}]);
+          }}
+          updateMaterial={(id,newData)=>{
+            let newMaterials=[...materials];
+            let index = newMaterials.findIndex((material)=>material.id===id);
+            if(newData.approved && newMaterials[index].approved !== newData.approved ){
+              newMaterials[index]={...newMaterials[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+            }else{
+              newMaterials[index]={...newMaterials[index],...newData };
+            }
+            setMaterials(newMaterials);
+          }}
+          updateMaterials={(multipleMaterials)=>{
+            let newMaterials=[...materials];
+            multipleMaterials.forEach(({id, newData})=>{
+              newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
+            });
+            setMaterials(newMaterials);
+          }}
+          removeMaterial={(id)=>{
+            let newMaterials=[...materials];
+            newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
+            setMaterials(newMaterials);
+          }}
+          />
+      </Empty>
     )
   }
 

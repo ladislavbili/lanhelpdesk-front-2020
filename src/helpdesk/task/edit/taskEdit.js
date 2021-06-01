@@ -155,7 +155,7 @@ export default function TaskEdit( props ) {
   const [ status, setStatus ] = React.useState( null );
   const [ showDescription, setShowDescription ] = React.useState( false );
   const [ tags, setTags ] = React.useState( [] );
-  const [ taskType, setTaskType ] = React.useState( null );
+  const [ taskType, setTaskType ] = React.useState( noTaskType );
   const [ taskTripPausal, setTaskTripPausal ] = React.useState( 0 );
   const [ taskWorkPausal, setTaskWorkPausal ] = React.useState( 0 );
   const [ title, setTitle ] = React.useState( "" );
@@ -856,7 +856,6 @@ export default function TaskEdit( props ) {
     ...item,
     invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
   } ) );
-
   const canCopy = userRights.addTasks && !getCantSave();
 
   const getTaskData = () => ( {
@@ -1327,7 +1326,7 @@ export default function TaskEdit( props ) {
             value={milestone}
             onChange={changeMilestone}
             options={milestones}
-            styles={pickSelectStyle( [ 'noArrow', 'noPadding', ] )}
+            styles={pickSelectStyle( [ 'noArrow', ] )}
             />
         }
       </div>
@@ -1541,7 +1540,7 @@ export default function TaskEdit( props ) {
             </div>
           </div>
 
-          { userRights.scheduledRead &&
+          { userRights.scheduledRead && false &&
             <Scheduled
               items={task.scheduled.map((item) => ({
                 ...item,
@@ -1670,7 +1669,7 @@ export default function TaskEdit( props ) {
               layout={layout}
               />
           }
-          { userRights.scheduledRead &&
+          { userRights.scheduledRead && false &&
             <Scheduled
               items={task.scheduled.map((item) => ({
                 ...item,
@@ -1862,6 +1861,7 @@ export default function TaskEdit( props ) {
   }
 
   const renderSimpleSubtasks = () => {
+    //hidden
     if ( !userRights.taskShortSubtasksRead ) {
       return null;
     }
@@ -1959,7 +1959,10 @@ export default function TaskEdit( props ) {
           userID={currentUser.id}
           userRights={userRights}
           currentUser={currentUser}
-          showColumns={ [ 'done', 'title', 'scheduled', 'quantity', 'type', 'assigned', 'approved', 'actions' ] }
+          company={company}
+          showTotals={true}
+          showColumns={ [ 'done', 'title', 'scheduled', 'quantity', 'assigned', 'approved', 'actions' ] }
+          showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
           autoApproved={project ? project.project.autoApproved : false}
           canAddSubtasksAndTrips={assignedTo.length !== 0}
           canEditInvoiced={canEditInvoiced}

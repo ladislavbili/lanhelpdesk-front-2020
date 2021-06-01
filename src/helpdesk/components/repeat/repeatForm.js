@@ -16,7 +16,8 @@ import moment from 'moment';
 
 import Attachments from 'helpdesk/components/attachments';
 
-import VykazyTable from 'helpdesk/components/vykazy/vykazyTable';
+import Materials from 'helpdesk/components/vykazy/materialsTable';
+import WorksTable from 'helpdesk/components/vykazy/worksTable';
 
 import classnames from "classnames";
 
@@ -984,7 +985,7 @@ export default function RepeatForm( props ) {
         value={milestone}
         onChange={changeMilestone}
         options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={ pickSelectStyle( [ 'noArrow', 'noPadding', ] ) }
+        styles={ pickSelectStyle( [ 'noArrow', ] ) }
         />
     ),
     Requester: (
@@ -1553,191 +1554,161 @@ export default function RepeatForm( props ) {
     ) {
       return null
     }
+
     return (
-      <VykazyTable
-        showColumns={ ( (!userRights.vykazWrite && !userRights.rozpocetWrite ) ? [0,1,2,3,4,5,6,7] : [0,1,2,3,4,5,6,7,8]) }
-        showTotals={false}
-        userID={currentUser.id}
-        userRights={userRights}
-        autoApproved={false}
-        isInvoiced={false}
-        canEditInvoiced={false}
-        company={company}
-        canAddSubtasksAndTrips={assignedTo.length !== 0}
-        taskAssigned={assignedTo}
+      <Empty>
+        <WorksTable
+          userID={currentUser.id}
+          userRights={userRights}
+          currentUser={currentUser}
+          company={company}
+          showTotals={true}
+          showColumns={ [ 'done', 'title', 'scheduled', 'quantity', 'assigned', 'approved', 'actions' ] }
+          showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
+          autoApproved={project ? project.autoApproved : false}
+          canAddSubtasksAndTrips={assignedTo.length !== 0}
+          canEditInvoiced={false}
+          taskAssigned={assignedTo}
 
-        showSubtasks={project ? project.showSubtasks : false}
-
-        subtasks={subtasks}
-        defaultType={taskType}
-        taskTypes={taskTypes}
-        submitSubtask={(newSubtask)=>{
-          if(editMode){
-            addSubtaskFunc( newSubtask, (id) => setSubtasks([...subtasks,{id, ...newSubtask}]) );
-          }else{
-            setSubtasks([...subtasks,{id:getNewID(), ...newSubtask}]);
-          }
-        }}
-        updateSubtask={(id,newData)=>{
-          if(editMode){
-            updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
-          }
-          let newSubtasks=[...subtasks];
-          let index = newSubtasks.findIndex((subtask)=>subtask.id===id);
-          if(newData.approved && newSubtasks[index].approved !== newData.approved ){
-            newSubtasks[index]={...newSubtasks[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-          }else{
-            newSubtasks[index]={...newSubtasks[index],...newData };
-          }
-          setSubtasks(newSubtasks);
-        }}
-        updateSubtasks={(multipleSubtasks)=>{
-          if(editMode){
-            multipleSubtasks.forEach(({id, newData})=>{
+          taskTypes={ taskTypes }
+          defaultType={ taskType }
+          subtasks={ subtasks }
+          addSubtask={(newSubtask)=>{
+            if(editMode){
+              addSubtaskFunc( newSubtask, (id) => setSubtasks([...subtasks,{id, ...newSubtask}]) );
+            }else{
+              setSubtasks([...subtasks,{id:getNewID(), ...newSubtask}]);
+            }
+          }}
+          updateSubtask={(id,newData)=>{
+            console.log(id,newData);
+            if(editMode){
               updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
+            }
+            let newSubtasks=[...subtasks];
+            let index = newSubtasks.findIndex((subtask)=>subtask.id===id);
+            if(newData.approved && newSubtasks[index].approved !== newData.approved ){
+              newSubtasks[index]={...newSubtasks[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+            }else{
+              newSubtasks[index]={...newSubtasks[index],...newData };
+            }
+            setSubtasks(newSubtasks);
+          }}
+          updateSubtasks={(multipleSubtasks)=>{
+            if(editMode){
+              multipleSubtasks.forEach(({id, newData})=>{
+                updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
+              });
+            }
+            let newSubtasks=[...subtasks];
+            multipleSubtasks.forEach(({id, newData})=>{
+              newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
             });
-          }
-          let newSubtasks=[...subtasks];
-          multipleSubtasks.forEach(({id, newData})=>{
-            newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
-          });
-          setSubtasks(newSubtasks);
-        }}
-        removeSubtask={(id)=>{
-          if(editMode){
-            deleteSubtaskFunc(id);
-          }
-          let newSubtasks=[...subtasks];
-          newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
-          setSubtasks(newSubtasks);
-        }}
-        workTrips={workTrips}
-        tripTypes={tripTypes}
-        submitTrip={(newTrip)=>{
-          if(editMode){
-            addWorkTripFunc(newTrip, (id) => setWorkTrips([...workTrips,{id,...newTrip}]));
-          }else{
-            setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
-          }
-        }}
-        updateTrip={(id,newData)=>{
-          if(editMode){
-            updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
-          }
-          let newTrips=[...workTrips];
-          let index = newTrips.findIndex((trip)=>trip.id===id);
-          if(newData.approved && newTrips[index].approved !== newData.approved ){
-            newTrips[index]={...newTrips[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-          }else{
-            newTrips[index]={...newTrips[index],...newData };
-          }
-          setWorkTrips(newTrips);
-        }}
-        updateTrips={(multipleTrips)=>{
-          if(editMode){
-            multipleTrips.forEach(({id, newData})=>{
+            setSubtasks(newSubtasks);
+          }}
+          removeSubtask={(id)=>{
+            if(editMode){
+              deleteSubtaskFunc(id);
+            }
+            let newSubtasks=[...subtasks];
+            newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
+            setSubtasks(newSubtasks);
+          }}
+
+          workTrips={ workTrips }
+          tripTypes={tripTypes}
+          addTrip={(newTrip)=>{
+            if(editMode){
+              addWorkTripFunc(newTrip, (id) => setWorkTrips([...workTrips,{id,...newTrip}]));
+            }else{
+              setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
+            }
+          }}
+          updateTrip={(id,newData)=>{
+            if(editMode){
               updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
+            }
+            let newTrips=[...workTrips];
+            let index = newTrips.findIndex((trip)=>trip.id===id);
+            if(newData.approved && newTrips[index].approved !== newData.approved ){
+              newTrips[index]={...newTrips[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+            }else{
+              newTrips[index]={...newTrips[index],...newData };
+            }
+            setWorkTrips(newTrips);
+          }}
+          updateTrips={(multipleTrips)=>{
+            if(editMode){
+              multipleTrips.forEach(({id, newData})=>{
+                updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
+              });
+            }
+            let newTrips=[...workTrips];
+            multipleTrips.forEach(({id, newData})=>{
+              newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
             });
-          }
-          let newTrips=[...workTrips];
-          multipleTrips.forEach(({id, newData})=>{
-            newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-          });
-          setWorkTrips(newTrips);
-        }}
-        removeTrip={(id)=>{
-          if(editMode){
-            deleteWorkTripFunc(id);
-          }
-          let newTrips=[...workTrips];
-          newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
-          setWorkTrips(newTrips);
-        }}
+            setWorkTrips(newTrips);
+          }}
+          removeTrip={(id)=>{
+            if(editMode){
+              deleteWorkTripFunc(id);
+            }
+            let newTrips=[...workTrips];
+            newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
+            setWorkTrips(newTrips);
+          }}
+          />
 
-        materials={materials}
-        submitMaterial={(newMaterial)=>{
-          if(editMode){
-            addMaterialFunc(newMaterial, (id) => setMaterials([...materials,{ id, ...newMaterial }]) );
-          }else{
-            setMaterials([...materials,{id:getNewID(),...newMaterial}]);
-          }
-        }}
-        updateMaterial={(id,newData)=>{
-          if(editMode){
-            updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-          }
-          let newMaterials=[...materials];
-          let index = newMaterials.findIndex((material)=>material.id===id);
-          if(newData.approved && newMaterials[index].approved !== newData.approved ){
-            newMaterials[index]={...newMaterials[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-          }else{
-            newMaterials[index]={...newMaterials[index],...newData };
-          }
-          setMaterials(newMaterials);
-        }}
-        updateMaterials={(multipleMaterials)=>{
-          if(editMode){
-            multipleMaterials.forEach(({id, newData})=>{
+        <Materials
+          showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
+          showTotals={true}
+          autoApproved={project ? project.autoApproved : false}
+          userRights={userRights}
+          currentUser={currentUser}
+          company={company}
+          materials={ materials }
+          addMaterial={(newMaterial)=>{
+            if(editMode){
+              addMaterialFunc(newMaterial, (id) => setMaterials([...materials,{ id, ...newMaterial }]) );
+            }else{
+              setMaterials([...materials,{id:getNewID(),...newMaterial}]);
+            }
+          }}
+          updateMaterial={(id,newData)=>{
+            if(editMode){
               updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+            }
+            let newMaterials=[...materials];
+            let index = newMaterials.findIndex((material)=>material.id===id);
+            if(newData.approved && newMaterials[index].approved !== newData.approved ){
+              newMaterials[index]={...newMaterials[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
+            }else{
+              newMaterials[index]={...newMaterials[index],...newData };
+            }
+            setMaterials(newMaterials);
+          }}
+          updateMaterials={(multipleMaterials)=>{
+            if(editMode){
+              multipleMaterials.forEach(({id, newData})=>{
+                updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+              });
+            }
+            let newMaterials=[...materials];
+            multipleMaterials.forEach(({id, newData})=>{
+              newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
             });
-          }
-          let newMaterials=[...materials];
-          multipleMaterials.forEach(({id, newData})=>{
-            newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-          });
-          setMaterials(newMaterials);
-        }}
-        removeMaterial={(id)=>{
-          if(editMode){
-            deleteMaterialFunc(id);
-          }
-          let newMaterials=[...materials];
-          newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-          setMaterials(newMaterials);
-        }}
-
-        customItems={customItems}
-        submitCustomItem={(customItem)=>{
-          if(editMode){
-            addCustomItemFunc(customItem, (id) => setCustomItems([...customItems,{ id, ...customItem }]) );
-          }else{
-            setCustomItems([...customItems,{id:getNewID(),...customItem}]);
-          }
-        }}
-        updateCustomItem={(id,newData)=>{
-          if(editMode){
-            updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id ),...newData});
-          }
-          let newCustomItems=[...customItems];
-          let index = newCustomItems.findIndex((item)=>item.id===id);
-          if(newData.approved && newCustomItems[index].approved !== newData.approved ){
-            newCustomItems[index]={...newCustomItems[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-          }else{
-            newCustomItems[index]={...newCustomItems[index],...newData };
-          }
-          setCustomItems(newCustomItems);
-        }}
-        updateCustomItems={(multipleCustomItems)=>{
-          if(editMode){
-            multipleCustomItems.forEach(({id, newData})=>{
-              updateCustomItemFunc({...customItems.find( (customItem) => customItem.id === id),...newData});
-            });
-          }
-          let newCustomItems=[...customItems];
-          multipleCustomItems.forEach(({id, newData})=>{
-            newCustomItems[newCustomItems.findIndex((customItem)=>customItem.id===id)]={...newCustomItems.find((customItem)=>customItem.id===id),...newData};
-          });
-          setCustomItems(newCustomItems);
-        }}
-        removeCustomItem={(id)=>{
-          if(editMode){
-            deleteCustomItemFunc(id);
-          }
-          let newCustomItems=[...customItems];
-          newCustomItems.splice(newCustomItems.findIndex((customItem)=>customItem.id===id),1);
-          setCustomItems(newCustomItems);
-        }}
-        />
+            setMaterials(newMaterials);
+          }}
+          removeMaterial={(id)=>{
+            if(editMode){
+              deleteMaterialFunc(id);
+            }
+            let newMaterials=[...materials];
+            newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
+            setMaterials(newMaterials);
+          }}
+          />
+      </Empty>
     )
   }
 

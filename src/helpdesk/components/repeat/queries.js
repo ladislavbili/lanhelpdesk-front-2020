@@ -105,6 +105,10 @@ repeatTemplate{
     order
     done
     approved
+    scheduled {
+      from
+      to
+    }
     approvedBy{
       id
       fullName
@@ -131,6 +135,11 @@ repeatTemplate{
     approvedBy{
       id
       fullName
+    }
+
+    scheduled {
+      from
+      to
     }
     quantity
     discount
@@ -188,10 +197,10 @@ query repeat($id: Int){
 
 export const GET_REPEATS = gql `
 query (
-    $projectId: Int
+  $projectId: Int
 ) {
   repeats(
-      projectId: $projectId
+    projectId: $projectId
   ) {
     id
     repeatEvery
@@ -363,7 +372,7 @@ mutation deleteRepeatTemplateShortSubtask($id: Int!) {
 
 //table
 export const ADD_SUBTASK = gql `
-mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $repeatTemplate: Int!, $assignedTo: Int!) {
+mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $repeatTemplate: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput) {
   addRepeatTemplateSubtask(
     title: $title,
     order: $order,
@@ -374,6 +383,7 @@ mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!
     type: $type,
     repeatTemplate: $repeatTemplate,
     assignedTo: $assignedTo,
+    scheduled: $scheduled,
   ){
     id
     title
@@ -397,12 +407,16 @@ mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!
         id
       }
     }
+    scheduled {
+      from
+      to
+    }
   }
 }
 `;
 
 export const UPDATE_SUBTASK = gql `
-mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
   updateRepeatTemplateSubtask(
     id: $id,
     title: $title,
@@ -413,6 +427,7 @@ mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $do
     discount: $discount,
     type: $type,
     assignedTo: $assignedTo,
+    scheduled: $scheduled,
   ){
     id
     title
@@ -435,6 +450,10 @@ mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $do
       company {
         id
       }
+    }
+    scheduled {
+      from
+      to
     }
   }
 }
@@ -451,7 +470,7 @@ mutation deleteRepeatTemplateSubtask($id: Int!) {
 `;
 
 export const ADD_WORKTRIP = gql `
-mutation addWorkRepeatTemplateTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $repeatTemplate: Int!, $assignedTo: Int!) {
+mutation addWorkRepeatTemplateTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $repeatTemplate: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput) {
   addRepeatTemplateWorkTrip(
     order: $order,
     done: $done,
@@ -461,6 +480,7 @@ mutation addWorkRepeatTemplateTrip($order: Int!, $done: Boolean!, $approved: Boo
     type: $type,
     repeatTemplate: $repeatTemplate,
     assignedTo: $assignedTo,
+    scheduled: $scheduled,
   ){
     id
     order
@@ -483,12 +503,16 @@ mutation addWorkRepeatTemplateTrip($order: Int!, $done: Boolean!, $approved: Boo
         id
       }
     }
+    scheduled {
+      from
+      to
+    }
   }
 }
 `;
 
 export const UPDATE_WORKTRIP = gql `
-mutation updateRepeatTemplateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+mutation updateRepeatTemplateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
   updateRepeatTemplateWorkTrip(
     id: $id,
     order: $order,
@@ -498,6 +522,7 @@ mutation updateRepeatTemplateWorkTrip($id: Int!, $order: Int, $done: Boolean, $a
     discount: $discount,
     type: $type,
     assignedTo: $assignedTo,
+    scheduled: $scheduled,
   ){
     id
     order
@@ -519,6 +544,10 @@ mutation updateRepeatTemplateWorkTrip($id: Int!, $order: Int, $done: Boolean, $a
       company {
         id
       }
+    }
+    scheduled {
+      from
+      to
     }
   }
 }

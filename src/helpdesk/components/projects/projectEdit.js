@@ -5,11 +5,12 @@ import {
   ModalBody,
   ModalHeader,
 } from 'reactstrap';
-import Loading from 'components/loading';
 import {
   useQuery
 } from "@apollo/client";
+import Loading from 'components/loading';
 import ProjectEdit from 'helpdesk/settings/projects/projectEdit';
+import AccessDenied from 'components/accessDenied';
 import {
   setProject,
 } from 'apollo/localSchema/actions';
@@ -47,6 +48,10 @@ export default function ProjectEditFull( props ) {
     } ) ) )
     .find( ( projectData ) => projectData.id === parseInt( match.params.projectID ) )
   //state
+
+  if ( !currentProject ) {
+    return ( <AccessDenied /> );
+  }
 
   return (
     <ProjectEdit

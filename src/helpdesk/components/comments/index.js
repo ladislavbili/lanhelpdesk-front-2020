@@ -1,6 +1,8 @@
 import React from 'react';
 import {
-  useMutation
+  useMutation,
+  useSubscription,
+  useQuery,
 } from "@apollo/client";
 import {
   Input,
@@ -11,9 +13,6 @@ import {
   DropdownMenu,
   DropdownToggle
 } from 'reactstrap';
-import {
-  useQuery,
-} from "@apollo/client";
 import Checkbox from 'components/checkbox';
 import {
   timestampToString
@@ -31,7 +30,8 @@ import {
   REST_URL,
 } from 'configs/restAPI';
 import {
-  GET_COMMENTS
+  GET_COMMENTS,
+  COMMENTS_SUBSCRIPTION,
 } from './queries';
 import Loading from 'components/loading';
 
@@ -59,7 +59,20 @@ export default function Comments( props ) {
     variables: {
       task: id
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( COMMENTS_SUBSCRIPTION, {
+    variables: {
+      taskId: id,
+    },
+    onSubscriptionData: () => {
+      commentsRefetch( {
+        variables: {
+          task: id
+        }
+      } );
+    }
   } );
 
   const [ attachments, setAttachments ] = React.useState( [] );
@@ -172,11 +185,6 @@ export default function Comments( props ) {
                     },
                     setSaving,
                     () => {
-                      commentsRefetch( {
-                        variables: {
-                          task: id
-                        }
-                      } );
                     }
                   )
                 }else{
@@ -190,11 +198,6 @@ export default function Comments( props ) {
                     },
                     setSaving,
                     () => {
-                      commentsRefetch( {
-                        variables: {
-                          task: id
-                        }
-                      } );
                     }
                   );
                 }

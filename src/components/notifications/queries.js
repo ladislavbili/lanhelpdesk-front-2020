@@ -68,14 +68,14 @@ query {
 `;
 
 export const USER_NOTIFICATIONS_SUBSCRIPTION = gql `
-  subscription errorMessagesSubscription {
+  subscription userNotificationsSubscription {
     userNotificationsSubscription
   }
 `;
 
 
 export const USER_NOTIFICATIONS_COUNT_SUBSCRIPTION = gql `
-  subscription errorMessageCountSubscription {
+  subscription userNotificationsCountSubscription {
     userNotificationsCountSubscription
   }
 `;

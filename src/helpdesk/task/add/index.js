@@ -2,6 +2,7 @@ import React from 'react';
 import {
   useQuery,
   useMutation,
+  useSubscription,
 } from "@apollo/client";
 import {
   toSelArr,
@@ -22,22 +23,27 @@ import {
 } from 'configs/constants/sidebar';
 
 import {
-  GET_TASK_TYPES
+  GET_TASK_TYPES,
+  TASK_TYPES_SUBSCRIPTION,
 } from 'helpdesk/settings/taskTypes/queries';
 import {
-  GET_TRIP_TYPES
+  GET_TRIP_TYPES,
+  TRIP_TYPES_SUBSCRIPTION,
 } from 'helpdesk/settings/tripTypes/queries';
 
 import {
-  GET_BASIC_USERS
+  GET_BASIC_USERS,
+  USERS_SUBSCRIPTION,
 } from 'helpdesk/settings/users/queries';
 
 import {
-  GET_BASIC_COMPANIES
+  GET_BASIC_COMPANIES,
+  COMPANIES_SUBSCRIPTION,
 } from 'helpdesk/settings/companies/queries';
 
 import {
-  GET_MY_PROJECTS
+  GET_MY_PROJECTS,
+  PROJECTS_SUBSCRIPTION,
 } from 'helpdesk/settings/projects/queries';
 
 import {
@@ -51,13 +57,11 @@ export default function TaskAddContainer( props ) {
     projectID: sidebarProjectID,
   } = props;
 
-  const [ addTask ] = useMutation( ADD_TASK );
-  const [ setTaskLayout ] = useMutation( SET_TASK_LAYOUT );
-
   //data & queries
   const {
     data: companiesData,
-    loading: companiesLoading
+    loading: companiesLoading,
+    refetch: companiesRefetch,
   } = useQuery( GET_BASIC_COMPANIES, {
     options: {
       fetchPolicy: 'network-only'
@@ -65,7 +69,8 @@ export default function TaskAddContainer( props ) {
   } );
   const {
     data: usersData,
-    loading: usersLoading
+    loading: usersLoading,
+    refetch: usersRefetch,
   } = useQuery( GET_BASIC_USERS, {
     options: {
       fetchPolicy: 'network-only'
@@ -73,7 +78,8 @@ export default function TaskAddContainer( props ) {
   } );
   const {
     data: taskTypesData,
-    loading: taskTypesLoading
+    loading: taskTypesLoading,
+    refetch: taskTypesRefetch,
   } = useQuery( GET_TASK_TYPES, {
     options: {
       fetchPolicy: 'network-only'
@@ -81,7 +87,8 @@ export default function TaskAddContainer( props ) {
   } );
   const {
     data: tripTypesData,
-    loading: tripTypesLoading
+    loading: tripTypesLoading,
+    refetch: tripTypesRefetch,
   } = useQuery( GET_TRIP_TYPES, {
     options: {
       fetchPolicy: 'network-only'
@@ -90,10 +97,46 @@ export default function TaskAddContainer( props ) {
 
   const {
     data: projectsData,
-    loading: projectsLoading
+    loading: projectsLoading,
+    refetch: projectsRefetch,
   } = useQuery( GET_MY_PROJECTS, {
     options: {
       fetchPolicy: 'network-only'
+    }
+  } );
+
+  //mutations
+  const [ addTask ] = useMutation( ADD_TASK );
+  const [ setTaskLayout ] = useMutation( SET_TASK_LAYOUT );
+
+  //subscriptions
+  useSubscription( TASK_TYPES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      taskTypesRefetch();
+    }
+  } );
+
+  useSubscription( TRIP_TYPES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      tripTypesRefetch();
+    }
+  } );
+
+  useSubscription( PROJECTS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      projectsRefetch();
+    }
+  } );
+
+  useSubscription( COMPANIES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      companiesRefetch();
+    }
+  } );
+
+  useSubscription( USERS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      usersRefetch();
     }
   } );
 
@@ -201,9 +244,9 @@ export default function TaskAddContainer( props ) {
               currentUser={ currentUser }
               milestones={[noMilestone]}
               defaultUnit={null}
-              closeModal={ () => {
+              closeModal={ (clearProject = false) => {
                 setOpenAddTaskModal(false);
-                if(!sidebarProjectID){
+                if(!sidebarProjectID || clearProject){
                   setProjectID(null);
                 }
               }}

@@ -3,7 +3,7 @@ import {
   useQuery,
   useMutation,
   useApolloClient,
-  gql,
+  useSubscription,
 } from "@apollo/client";
 
 import moment from 'moment';
@@ -21,23 +21,28 @@ import {
 } from 'helperFunctions';
 
 import {
-  GET_TASK_TYPES
+  GET_TASK_TYPES,
+  TASK_TYPES_SUBSCRIPTION,
 } from 'helpdesk/settings/taskTypes/queries';
 
 import {
-  GET_TRIP_TYPES
+  GET_TRIP_TYPES,
+  TRIP_TYPES_SUBSCRIPTION,
 } from 'helpdesk/settings/tripTypes/queries';
 
 import {
-  GET_MY_PROJECTS
+  GET_MY_PROJECTS,
+  PROJECTS_SUBSCRIPTION,
 } from 'helpdesk/settings/projects/queries';
 
 import {
-  GET_BASIC_COMPANIES
+  GET_BASIC_COMPANIES,
+  COMPANIES_SUBSCRIPTION,
 } from 'helpdesk/settings/companies/queries';
 
 import {
-  GET_BASIC_USERS
+  GET_BASIC_USERS,
+  USERS_SUBSCRIPTION,
 } from 'helpdesk/settings/users/queries';
 
 import {
@@ -45,6 +50,7 @@ import {
   GET_TASKS,
 
   DELETE_TASK,
+  TASK_DELETE_SUBSCRIPTION,
   UPDATE_TASK,
   UPDATE_INVOICED_TASK,
   SET_TASK_LAYOUT,
@@ -96,25 +102,37 @@ export default function TaskEditContainer( props ) {
     data: basicCompaniesData,
     loading: basicCompaniesLoading,
     refetch: basicCompaniesRefetch,
-  } = useQuery( GET_BASIC_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: basicUsersData,
     loading: basicUsersLoading,
     refetch: basicUsersRefetch,
-  } = useQuery( GET_BASIC_USERS );
+  } = useQuery( GET_BASIC_USERS, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: taskTypesData,
     loading: taskTypesLoading,
-  } = useQuery( GET_TASK_TYPES );
+    refetch: taskTypesRefetch,
+  } = useQuery( GET_TASK_TYPES, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: tripTypesData,
     loading: tripTypesLoading,
-  } = useQuery( GET_TRIP_TYPES );
+    refetch: tripTypesRefetch,
+  } = useQuery( GET_TRIP_TYPES, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: myProjectsData,
     loading: myProjectsLoading,
-    refetch: refetchMyProjects,
-  } = useQuery( GET_MY_PROJECTS );
+    refetch: myProjectsRefetch,
+  } = useQuery( GET_MY_PROJECTS, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: taskData,
     loading: taskLoading,
@@ -124,7 +142,6 @@ export default function TaskEditContainer( props ) {
     variables: {
       id
     },
-    //notifyOnNetworkStatusChange: true,
   } );
   //local
   const {
@@ -158,6 +175,49 @@ export default function TaskEditContainer( props ) {
   const [ updateCustomItem ] = useMutation( UPDATE_CUSTOM_ITEM );
   const [ deleteCustomItem ] = useMutation( DELETE_CUSTOM_ITEM );
   const [ deleteTaskAttachment ] = useMutation( DELETE_TASK_ATTACHMENT );
+
+  useSubscription( TASK_TYPES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      taskTypesRefetch();
+    }
+  } );
+
+  useSubscription( TRIP_TYPES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      tripTypesRefetch();
+    }
+  } );
+
+  useSubscription( TASK_DELETE_SUBSCRIPTION, {
+    variables: {
+      taskId: id
+    },
+    onSubscriptionData: () => {
+      if ( inModal ) {
+        closeModal();
+      } else {
+        history.push( match.url.substring( 0, match.url.length - match.params.taskID.length ) );
+      }
+    }
+  } );
+
+  useSubscription( PROJECTS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      myProjectsRefetch();
+    }
+  } );
+
+  useSubscription( COMPANIES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      basicCompaniesRefetch();
+    }
+  } );
+
+  useSubscription( USERS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      basicUsersRefetch();
+    }
+  } );
 
   React.useEffect( () => {
     taskRefetch( {
@@ -312,6 +372,7 @@ export default function TaskEditContainer( props ) {
           type: sub.type.id,
           task: parseInt( match.params.taskID ),
           assignedTo: sub.assignedTo.id,
+          scheduled: sub.scheduled,
         }
       } )
       .then( ( response ) => {
@@ -338,6 +399,7 @@ export default function TaskEditContainer( props ) {
           quantity: sub.quantity,
           type: sub.type.id,
           assignedTo: sub.assignedTo.id,
+          scheduled: sub.scheduled,
         }
       } )
       .then( ( response ) => {
@@ -380,6 +442,7 @@ export default function TaskEditContainer( props ) {
           type: wt.type.id,
           task: parseInt( match.params.taskID ),
           assignedTo: wt.assignedTo.id,
+          scheduled: wt.scheduled,
         }
       } )
       .then( ( response ) => {
@@ -405,6 +468,7 @@ export default function TaskEditContainer( props ) {
           quantity: item.quantity,
           type: item.type.id,
           assignedTo: item.assignedTo.id,
+          scheduled: item.scheduled,
         }
       } )
       .then( ( response ) => {
@@ -571,35 +635,31 @@ export default function TaskEditContainer( props ) {
           }
         } )
         .then( ( response ) => {
-          let tasks = client.readQuery( {
+          try {
+            let tasks = client.readQuery( {
+                query: GET_TASKS,
+                variables: {
+                  filterId: filterData.localFilter.id,
+                  filter: localFilterToValues( filterData.localFilter ),
+                  projectId: projectData.localProject.id,
+                  sort: null
+                }
+              } )
+              .tasks;
+            client.writeQuery( {
               query: GET_TASKS,
               variables: {
                 filterId: filterData.localFilter.id,
                 filter: localFilterToValues( filterData.localFilter ),
                 projectId: projectData.localProject.id,
                 sort: null
+              },
+              data: {
+                ...tasks,
+                tasks: tasks.tasks.filter( ( task ) => task.id !== id )
               }
-            } )
-            .tasks;
-          client.writeQuery( {
-            query: GET_TASKS,
-            variables: {
-              filterId: filterData.localFilter.id,
-              filter: localFilterToValues( filterData.localFilter ),
-              projectId: projectData.localProject.id,
-              sort: null
-            },
-            data: {
-              ...tasks,
-              tasks: tasks.tasks.filter( ( task ) => task.id !== id )
-            }
-          } );
-          if ( inModal ) {
-            closeModal();
-          } else {
-            history.goBack();
-            history.push( match.url.substring( 0, match.url.length - match.params.taskID.length ) );
-          }
+            } );
+          } catch ( err ) {}
         } )
         .catch( ( err ) => {
           console.log( err.message );

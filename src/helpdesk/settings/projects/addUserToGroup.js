@@ -49,6 +49,9 @@ export default function AddUserToGroup( props ) {
   const [ addUserToProjectGroup ] = useMutation( ADD_USER_TO_PROJECT_GROUP );
 
   useSubscription( PROJECT_GROUPS_SUBSCRIPTION, {
+    variables: {
+      projectId: projectID
+    },
     onSubscriptionData: () => {
       projectGroupsRefetch();
     }

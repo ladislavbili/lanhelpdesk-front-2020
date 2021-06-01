@@ -214,9 +214,9 @@ export default function UserEdit( props ) {
         }
       </div>
       <div className="scroll-visible p-l-20 p-r-20 p-b-20 p-t-10 fit-with-header-and-commandbar">
-      <h2 className="m-b-20" >
-        Edit user
-      </h2>
+        <h2 className="m-b-20" >
+          Edit user
+        </h2>
         <FormGroup>
           <Label for="role">Role <span className="warning-big">*</span></Label>
           <Select
@@ -237,6 +237,7 @@ export default function UserEdit( props ) {
             name="username"
             id="username"
             placeholder="Enter username"
+            disabled={ isDisabled }
             value={ username }
             onChange={ (e) => {
               setUsername(e.target.value);
@@ -251,6 +252,7 @@ export default function UserEdit( props ) {
             name="name"
             id="name"
             placeholder="Enter name"
+            disabled={ isDisabled }
             value={ name }
             onChange={ (e) => {
               setName(e.target.value);
@@ -265,6 +267,7 @@ export default function UserEdit( props ) {
             name="surname"
             id="surname"
             placeholder="Enter surname"
+            disabled={ isDisabled }
             value={ surname }
             onChange={ (e) => {
               setSurname(e.target.value);
@@ -280,6 +283,7 @@ export default function UserEdit( props ) {
             id="email"
             placeholder="Enter email"
             value={ email }
+            disabled={ isDisabled }
             onChange={ (e) => {
               setEmail(e.target.value);
               setDataChanged( true );
@@ -293,6 +297,7 @@ export default function UserEdit( props ) {
             styles={ pickSelectStyle() }
             options={ languages }
             value={ language }
+            isDisabled={ isDisabled }
             onChange={ lang => {
               setLanguage(lang);
               setDataChanged( true );
@@ -304,6 +309,7 @@ export default function UserEdit( props ) {
           className = "m-b-5 p-l-0"
           value = { receiveNotifications }
           label = "Receive e-mail notifications"
+          disabled={isDisabled}
           onChange={()=> {
             setReceiveNotifications(!receiveNotifications);
             setDataChanged( true );
@@ -331,6 +337,7 @@ export default function UserEdit( props ) {
             name="signature"
             id="signature"
             placeholder="Enter signature"
+            disabled={isDisabled}
             value={ signature }
             onChange={ (e) => {
               setSignature(e.target.value);
@@ -339,39 +346,43 @@ export default function UserEdit( props ) {
             />
         </FormGroup>
 
-        <div className="form-buttons-row">
-          { !isDisabled && id !== currentUser.id &&
+        { !isDisabled &&
+          <div className="form-buttons-row">
+            { id !== currentUser.id &&
+              <button
+                className="btn-red btn-distance"
+                disabled={deletingUser}
+                onClick={deleteUserFunc}
+                >
+                Delete
+              </button>
+            }
+            { id !== currentUser.id &&
+              <button
+                className={ active ? "btn btn-grey" : "btn btn-green"}
+                onClick={()=> deactivateUser(active)}
+                >
+                {active ? 'Deactivate user' : 'Activate user'}
+              </button>
+            }
             <button
-              className="btn-red btn-distance"
-              disabled={deletingUser}
-              onClick={deleteUserFunc}
+              className="btn-link ml-auto btn-distance"
+              disabled={ saving || isDisabled }
+              onClick={ ()=>{
+                setPasswordChangeOpen(true);
+              }}
               >
-              Delete
+              { password === null ? 'Change password' : 'Password change edit' }
             </button>
-          }
-          { !isDisabled && id !== currentUser.id &&
             <button
-              className={ active ? "btn btn-grey" : "btn btn-green"}
-              onClick={()=> deactivateUser(active)}
+              className="btn"
+              disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
+              onClick={ updateUserFunc }
               >
-              {active ? 'Deactivate user' : 'Activate user'}
+              { saving ? 'Saving user...' : 'Save user' }
             </button>
-          }
-          <button
-            className="btn-link ml-auto btn-distance"
-            disabled={ saving || isDisabled }
-            onClick={ ()=>{
-              setPasswordChangeOpen(true);
-            }}
-            >{ password === null ? 'Change password' : 'Password change edit' }</button>
-          <button
-            className="btn"
-            disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
-            onClick={ updateUserFunc }
-            >
-            { saving ? 'Saving user...' : 'Save user' }
-          </button>
-        </div>
+          </div>
+        }
         <PasswordChange
           submitPass={(pass) => {
             setPassword(pass);

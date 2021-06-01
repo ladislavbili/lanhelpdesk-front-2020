@@ -17,6 +17,7 @@ import {
   objectToAtributeArray
 } from 'helperFunctions';
 import Switch from "react-switch";
+import moment from 'moment';
 
 const defaultCols = [
   {
@@ -38,7 +39,7 @@ const defaultCols = [
     key: 'scheduled',
     width: "15%",
     headerClassnames: "",
-    columnClassnames: "p-l-8",
+    columnClassnames: "p-l-8 center-hor",
   },
   {
     header: 'Mn.',
@@ -64,16 +65,38 @@ const defaultCols = [
   {
     header: 'Faktúrovať',
     key: 'approved',
-    width: "12%",
+    width: "2%",
     headerClassnames: "",
-    columnClassnames: "",
+    columnClassnames: "p-l-8",
   },
   {
     header: 'Akcie',
     key: 'actions',
-    width: "8%",
+    width: "93",
     headerClassnames: "t-a-c",
     columnClassnames: "t-a-r",
+  },
+  //advanced
+  {
+    header: 'Cenník/ks',
+    key: 'price',
+    width: "93",
+    headerClassnames: "t-a-r",
+    columnClassnames: "p-l-8",
+  },
+  {
+    header: 'Zľava',
+    key: 'discount',
+    width: "93",
+    headerClassnames: "t-a-r",
+    columnClassnames: "p-l-8",
+  },
+  {
+    header: 'Cena',
+    key: 'priceAfterDiscount',
+    width: "93",
+    headerClassnames: "t-a-r",
+    columnClassnames: "p-l-8",
   },
 ]
 
@@ -89,13 +112,16 @@ const getShownData = ( cols, autoApproved, newDefs = [] ) => {
   return shownData;
 }
 
-export default function Rozpocet( props ) {
+export default function WorksTable( props ) {
   //data & queries
   const {
     userID,
     userRights,
     currentUser,
+    company,
+    showTotals,
     showColumns,
+    showAdvancedColumns,
     newColumnDefinitions,
     autoApproved,
     canAddSubtasksAndTrips,
@@ -115,7 +141,6 @@ export default function Rozpocet( props ) {
     removeTrip,
   } = props;
 
-  const shownColumns = getShownData( showColumns, autoApproved, newColumnDefinitions ? newColumnDefinitions : [] );
 
   let defaultTab = '0';
 
@@ -134,30 +159,38 @@ export default function Rozpocet( props ) {
 
 
   const [ toggleTab, setToggleTab ] = React.useState( defaultTab );
-  const [ fakeScheduledFrom, setFakeScheduledFrom ] = React.useState( null );
-  const [ fakeScheduledTo, setFakeScheduledTo ] = React.useState( null );
 
   //subtasks
   const [ showAddSubtask, setShowAddSubtask ] = React.useState( false );
   const [ editedSubtaskTitle, setEditedSubtaskTitle ] = React.useState( "" );
   const [ editedSubtaskQuantity, setEditedSubtaskQuantity ] = React.useState( 0 );
+  const [ editedSubtaskDiscount, setEditedSubtaskDiscount ] = React.useState( 0 );
   const [ focusedSubtask, setFocusedSubtask ] = React.useState( null );
   const [ newSubtaskTitle, setNewSubtaskTitle ] = React.useState( "" );
   const [ newSubtaskType, setNewSubtaskType ] = React.useState( defaultType );
   const [ newSubtaskAssigned, setNewSubtaskAssigned ] = React.useState( defaultAssigned );
   const [ newSubtaskQuantity, setNewSubtaskQuantity ] = React.useState( 0 );
   const [ newSubtaskApproved, setNewSubtaskApproved ] = React.useState( false );
+  const [ newSubtaskDiscount, setNewSubtaskDiscount ] = React.useState( 0 );
+  const [ newSubtaskScheduledFrom, setNewSubtaskScheduledFrom ] = React.useState( null );
+  const [ newSubtaskScheduledTo, setNewSubtaskScheduledTo ] = React.useState( null );
 
   //trips
   const [ showAddTrip, setShowAddTrip ] = React.useState( false );
 
   const [ editedTripQuantity, setEditedTripQuantity ] = React.useState( 0 );
+  const [ editedTripDiscount, setEditedTripDiscount ] = React.useState( 0 );
   const [ focusedTrip, setFocusedTrip ] = React.useState( null );
 
   const [ newTripType, setNewTripType ] = React.useState( tripTypes.length > 0 ? tripTypes[ 0 ] : null );
   const [ newTripAssigned, setNewTripAssigned ] = React.useState( defaultAssigned );
   const [ newTripQuantity, setNewTripQuantity ] = React.useState( 1 );
   const [ newTripApproved, setNewTripApproved ] = React.useState( false );
+  const [ newTripDiscount, setNewTripDiscount ] = React.useState( 0 );
+  const [ newTripScheduledFrom, setNewTripScheduledFrom ] = React.useState( null );
+  const [ newTripScheduledTo, setNewTripScheduledTo ] = React.useState( null );
+
+  const shownColumns = getShownData( toggleTab === "2" && userRights.rozpocetRead ? showAdvancedColumns : showColumns, autoApproved, newColumnDefinitions ? newColumnDefinitions : [] );
 
   React.useEffect( () => {
     let defaultAssigned = taskAssigned.length > 0 ? taskAssigned[ 0 ] : null;
@@ -182,11 +215,13 @@ export default function Rozpocet( props ) {
   const onFocusSubtask = ( subtask ) => {
     setEditedSubtaskTitle( subtask.title );
     setEditedSubtaskQuantity( subtask.quantity ? subtask.quantity : '' );
+    setEditedSubtaskDiscount( subtask.discount );
     setFocusedSubtask( subtask.id );
   }
 
   const onFocusWorkTrip = ( trip ) => {
     setEditedTripQuantity( trip.quantity );
+    setEditedTripDiscount( trip.discount );
     setFocusedTrip( trip.id );
   }
 
@@ -197,6 +232,14 @@ export default function Rozpocet( props ) {
     ( userRights.vykazWrite && toggleTab === '1' ) ||
     ( userRights.rozpocetWrite && toggleTab === '2' )
   )
+
+  const getDPH = () => {
+    let dph = 20;
+    if ( company && company.dph > 0 ) {
+      dph = company.dph;
+    }
+    return ( 100 + dph ) / 100;
+  }
 
   const getSubColRender = ( key, subtask, index ) => {
     switch ( key ) {
@@ -235,13 +278,17 @@ export default function Rozpocet( props ) {
       case 'scheduled': {
         return (
           <Scheduled
-            dateFrom={fakeScheduledFrom}
-            dateTo={fakeScheduledTo}
+            dateFrom={subtask.scheduled ? moment( parseInt( subtask.scheduled.from ) ) : null}
+            dateTo={subtask.scheduled ? moment( parseInt( subtask.scheduled.to ) ) : null}
             disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
             needsSubmit={true}
-            submit={(fromDate, toDate ) => {
-              setFakeScheduledFrom(fromDate);
-              setFakeScheduledTo(toDate);
+            quantity={subtask.quantity}
+            submit={(fromDate, toDate, quantity ) => {
+              if(fromDate === null ){
+                updateSubtask( subtask.id, { scheduled: null } )
+              }else{
+                updateSubtask( subtask.id, { quantity, scheduled: { from: fromDate.valueOf().toString(), to: toDate.valueOf().toString() } } )
+              }
             } }
             id={`sub-${subtask.id}`}
             />
@@ -260,7 +307,21 @@ export default function Rozpocet( props ) {
               : subtask.quantity.toString()
             }
             onBlur={() => {
-              updateSubtask(subtask.id,{quantity:isNaN(parseFloat(editedSubtaskQuantity))?0:parseFloat(editedSubtaskQuantity)})
+              const quantity = isNaN(parseFloat(editedSubtaskQuantity)) ? 0 : parseFloat(editedSubtaskQuantity);
+              if(subtask.scheduled){
+                updateSubtask(
+                  subtask.id,
+                  {
+                    quantity,
+                    scheduled: {
+                      from: subtask.scheduled.from,
+                      to: moment(parseInt(subtask.scheduled.from)).add(quantity, 'hours').valueOf().toString(),
+                    }
+                  }
+                )
+              }else{
+                updateSubtask(subtask.id,{quantity})
+              }
               setFocusedSubtask(null);
             }}
             onFocus={() => onFocusSubtask(subtask)}
@@ -307,7 +368,6 @@ export default function Rozpocet( props ) {
               checkedIcon={<span className="switchLabel"></span>}
               uncheckedIcon={<span className="switchLabel"></span>}
               onColor={"#0078D4"} />
-            <span className="m-l-10">{ subtask.approved ? subtask.approvedBy.fullName : 'Neschválené' }</span>
           </div>
         )
       }
@@ -353,6 +413,65 @@ export default function Rozpocet( props ) {
           </Empty>
         )
       }
+      case 'price': {
+        return (
+          <span className="text" style={{float: "right"}}>
+            <div style={{float: "right"}} className="p-t-8 p-r-8">
+              €
+            </div>
+            <input
+              disabled={true}
+              type="number"
+              style={{display: "inline", width: "70%", float: "right"}}
+              className="form-control hidden-input h-30"
+              value={ getPrice(subtask.type) }
+              />
+          </span>
+        )
+      }
+      case 'discount': {
+        return (
+          <span className="text p-l-8">
+            -
+            <input
+              disabled={disabled || !canAddSubtasksAndTrips}
+              style={{display: "inline", width: "60%"}}
+              type="number"
+              className="form-control hidden-input h-30"
+              value={ parseInt(
+                subtask.id === focusedSubtask ?
+                editedSubtaskDiscount :
+                subtask.discount
+              )}
+              onBlur={() => {
+                updateSubtask(subtask.id,{discount:isNaN(parseInt(editedSubtaskDiscount))?0:parseInt(editedSubtaskDiscount)})
+                setFocusedSubtask(null);
+              }}
+              onFocus={() => {
+                onFocusSubtask(subtask);
+              }}
+              onChange={e => setEditedSubtaskDiscount(e.target.value)}
+              />
+            %
+          </span>
+        )
+      }
+      case 'priceAfterDiscount': {
+        return (
+          <span className="text" style={{float: "right"}}>
+            <div style={{float: "right"}} className="p-t-8 p-r-8">
+              €
+            </div>
+            <input
+              disabled={true}
+              type="number"
+              style={{display: "inline", width: "70%", float: "right"}}
+              className="form-control hidden-input h-30"
+              value={ getDiscountPrice(subtask) }
+              />
+          </span>
+        )
+      }
       default: {
         return null;
       }
@@ -389,13 +508,17 @@ export default function Rozpocet( props ) {
       case 'scheduled': {
         return (
           <Scheduled
-            dateFrom={fakeScheduledFrom}
-            dateTo={fakeScheduledTo}
+            dateFrom={trip.scheduled ? moment( parseInt( trip.scheduled.from ) ) : null}
+            dateTo={trip.scheduled ? moment( parseInt( trip.scheduled.to ) ) : null}
             disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
             needsSubmit={true}
-            submit={(fromDate, toDate ) => {
-              setFakeScheduledFrom(fromDate);
-              setFakeScheduledTo(toDate);
+            quantity={trip.quantity}
+            submit={(fromDate, toDate, quantity ) => {
+              if(fromDate === null ){
+                updateTrip( trip.id, { scheduled: null } )
+              }else{
+                updateTrip( trip.id, { quantity, scheduled: { from: fromDate.valueOf().toString(), to: toDate.valueOf().toString() } } )
+              }
             } }
             id={`trip-${trip.id}`}
             />
@@ -414,7 +537,21 @@ export default function Rozpocet( props ) {
               trip.quantity.toString()
             }
             onBlur={() => {
-              updateTrip(trip.id,{quantity:isNaN(parseFloat(editedTripQuantity))?0:parseFloat(editedTripQuantity)})
+              const quantity = isNaN(parseFloat(editedTripQuantity)) ? 0 : parseFloat(editedTripQuantity);
+              if(trip.scheduled){
+                updateTrip(
+                  trip.id,
+                  {
+                    quantity,
+                    scheduled: {
+                      from: trip.scheduled.from,
+                      to: moment(parseInt(trip.scheduled.from)).add(quantity, 'hours').valueOf().toString(),
+                    }
+                  }
+                )
+              }else{
+                updateTrip(trip.id,{quantity})
+              }
               setFocusedTrip(null);
             }}
             onFocus={() => {
@@ -463,7 +600,6 @@ export default function Rozpocet( props ) {
               checkedIcon={<span className="switchLabel"></span>}
               uncheckedIcon={<span className="switchLabel"></span>}
               onColor={"#0078D4"} />
-            <span className="m-l-10">{ trip.approved ? trip.approvedBy.fullName : 'Neschválené' }</span>
           </div>
         )
       }
@@ -512,6 +648,65 @@ export default function Rozpocet( props ) {
           </Empty>
         )
       }
+      case 'price': {
+        return (
+          <span className="text" style={{float: "right"}}>
+            <div style={{float: "right"}} className="p-t-8 p-r-8">
+              €
+            </div>
+            <input
+              disabled={true}
+              type="number"
+              style={{display: "inline", width: "70%", float: "right"}}
+              className="form-control hidden-input h-30"
+              value={ getPrice(trip.type) }
+              />
+          </span>
+        )
+      }
+      case 'discount': {
+        return (
+          <span className="text p-l-8">
+            -
+            <input
+              disabled={disabled || !canAddSubtasksAndTrips}
+              style={{display: "inline", width: "60%"}}
+              type="number"
+              className="form-control hidden-input h-30"
+              value={ parseInt(
+                trip.id === focusedTrip ?
+                editedTripDiscount :
+                trip.discount
+              )}
+              onBlur={() => {
+                updateTrip(trip.id,{discount:isNaN(parseInt(editedTripDiscount))?0:parseInt(editedTripDiscount)})
+                setFocusedTrip(null);
+              }}
+              onFocus={() => {
+                onFocusWorkTrip(trip);
+              }}
+              onChange={e => setEditedTripDiscount(e.target.value)}
+              />
+            %
+          </span>
+        )
+      }
+      case 'priceAfterDiscount': {
+        return (
+          <span className="text" style={{float: "right"}}>
+            <div style={{float: "right"}} className="p-t-8 p-r-8">
+              €
+            </div>
+            <input
+              disabled={true}
+              type="number"
+              style={{display: "inline", width: "70%", float: "right"}}
+              className="form-control hidden-input h-30"
+              value={ getDiscountPrice(trip) }
+              />
+          </span>
+        )
+      }
       default: {
         return null;
       }
@@ -542,15 +737,19 @@ export default function Rozpocet( props ) {
                   title:newSubtaskTitle,
                   type: newSubtaskType,
                   quantity:newSubtaskQuantity!==''?parseInt(newSubtaskQuantity):0,
-                  discount: 0,
+                  discount: isNaN(parseFloat(newSubtaskDiscount)) ? 0 : parseFloat(newSubtaskDiscount),
                   assignedTo: newSubtaskAssigned,
                   order:subtasks.length,
+                  scheduled: newSubtaskScheduledFrom === null || newSubtaskScheduledTo === null ? null : { from: newSubtaskScheduledFrom.valueOf().toString(), to: newSubtaskScheduledTo.valueOf().toString() },
                 }
 
                 setNewSubtaskTitle('');
                 setNewSubtaskQuantity(0);
                 setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
+                setNewSubtaskDiscount(0);
                 setShowAddSubtask( false);
+                setNewSubtaskScheduledTo(null);
+                setNewSubtaskScheduledFrom(null);
 
                 addSubtask(body);
               }
@@ -562,15 +761,17 @@ export default function Rozpocet( props ) {
       case 'scheduled': {
         return (
           <Scheduled
-            dateFrom={fakeScheduledFrom}
-            dateTo={fakeScheduledTo}
+            dateFrom={newSubtaskScheduledFrom}
+            dateTo={newSubtaskScheduledTo}
             disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
             needsSubmit={false}
-            submit={(fromDate, toDate ) => {
-              setFakeScheduledFrom(fromDate);
-              setFakeScheduledTo(toDate);
+            quantity={newSubtaskQuantity}
+            submit={(fromDate, toDate, quantity ) => {
+              setNewSubtaskScheduledFrom(fromDate);
+              setNewSubtaskScheduledTo(toDate);
+              setNewSubtaskQuantity(quantity.toString());
             } }
-            id={'newSubScheduled'}
+            id={`newSubScheduled`}
             />
         );
       }
@@ -581,7 +782,12 @@ export default function Rozpocet( props ) {
             type="text"
             pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
             value={newSubtaskQuantity.toString()}
-            onChange={(e)=>setNewSubtaskQuantity(e.target.value.replace(',', '.'))}
+            onChange={(e)=>{
+              setNewSubtaskQuantity(e.target.value.replace(',', '.'));
+              if(newSubtaskScheduledFrom !== null && !isNaN(parseFloat(e.target.value.replace(',', '.'))) ){
+                setNewSubtaskScheduledTo(moment(newSubtaskScheduledFrom).add( parseFloat(e.target.value.replace(',', '.')) ,'hours'))
+              }
+            }}
             className="form-control h-30 t-a-r"
             id="inlineFormInput"
             placeholder=""
@@ -628,7 +834,6 @@ export default function Rozpocet( props ) {
               uncheckedIcon={<span className="switchLabel"></span>}
               onColor={"#0078D4"}
               />
-            <span className="m-l-10">{ newSubtaskApproved ? currentUser.fullName : 'Neschválené' }</span>
           </div>
         )
       }
@@ -652,16 +857,20 @@ export default function Rozpocet( props ) {
                   title:newSubtaskTitle,
                   type: newSubtaskType,
                   quantity: newSubtaskQuantity !== '' ? parseFloat(newSubtaskQuantity) : 0,
-                  discount: 0,
+                  discount: isNaN(parseFloat(newSubtaskDiscount)) ? 0 : parseFloat(newSubtaskDiscount),
                   assignedTo:newSubtaskAssigned,
                   order:subtasks.length,
+                  scheduled: newSubtaskScheduledFrom === null || newSubtaskScheduledTo === null ? null : { from: newSubtaskScheduledFrom.valueOf().toString(), to: newSubtaskScheduledTo.valueOf().toString() },
                 }
 
                 setNewSubtaskTitle('');
                 setNewSubtaskQuantity(0);
                 setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
+                setNewSubtaskDiscount(0);
                 setNewSubtaskApproved(false);
                 setShowAddSubtask( false);
+                setNewSubtaskScheduledTo(null);
+                setNewSubtaskScheduledFrom(null);
 
                 addSubtask(body);
               }}
@@ -671,6 +880,55 @@ export default function Rozpocet( props ) {
           </Empty>
         )
       }
+      case 'price': {
+        return (
+          <span className="text" style={{float: "right"}}>
+            <div style={{float: "right"}} className="p-t-8 p-r-8">
+              €
+            </div>
+            <input
+              disabled={true}
+              type="number"
+              style={{display: "inline", width: "70%", float: "right"}}
+              className="form-control h-30"
+              value={ newSubtaskType ? getPrice(newSubtaskType) : 0 }
+              />
+          </span>
+        )
+      }
+      case 'discount': {
+        return (
+          <span className="text p-l-8">
+            -
+            <input
+              disabled={disabled || !canAddSubtasksAndTrips}
+              style={{display: "inline", width: "60%"}}
+              type="number"
+              className="form-control m-l-5 m-r-5 input h-30"
+              value={newSubtaskDiscount}
+              onChange={(e)=>setNewSubtaskDiscount(e.target.value)}
+              />
+            %
+          </span>
+        )
+      }
+      case 'priceAfterDiscount': {
+        return (
+          <span className="text" style={{float: "right"}}>
+            <div style={{float: "right"}} className="p-t-8 p-r-8">
+              €
+            </div>
+            <input
+              disabled={true}
+              type="number"
+              style={{display: "inline", width: "70%", float: "right"}}
+              className="form-control hidden-input h-30"
+              value={ newSubtaskType ? getDiscountPrice({type: newSubtaskType, discount: newSubtaskDiscount }) : 0 }
+              />
+          </span>
+        )
+      }
+
       default: {
         return null;
       }
@@ -695,15 +953,17 @@ export default function Rozpocet( props ) {
       case 'scheduled': {
         return (
           <Scheduled
-            dateFrom={fakeScheduledFrom}
-            dateTo={fakeScheduledTo}
+            dateFrom={newTripScheduledFrom}
+            dateTo={newTripScheduledTo}
             disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
             needsSubmit={false}
-            submit={(fromDate, toDate ) => {
-              setFakeScheduledFrom(fromDate);
-              setFakeScheduledTo(toDate);
+            quantity={newTripQuantity}
+            submit={(fromDate, toDate, quantity ) => {
+              setNewTripScheduledFrom(fromDate);
+              setNewTripScheduledTo(toDate);
+              setNewTripQuantity(quantity);
             } }
-            id={"newTripScheduled"}
+            id={`newTripScheduled`}
             />
         );
       }
@@ -714,10 +974,15 @@ export default function Rozpocet( props ) {
             type="text"
             pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
             value={newTripQuantity.toString()}
-            onChange={(e)=>setNewTripQuantity(e.target.value.replace(',', '.'))}
+            onChange={(e)=>{
+              setNewTripQuantity(e.target.value.replace(',', '.'));
+              if(newTripScheduledFrom !== null && !isNaN(parseFloat(e.target.value.replace(',', '.'))) ){
+                setNewTripScheduledTo(moment(newTripScheduledFrom).add( parseFloat(e.target.value.replace(',', '.')) ,'hours'))
+              }
+            }}
             className="form-control h-30 t-a-r"
             id="inlineFormInput"
-            placeholder="Quantity"
+            placeholder=""
             />
         )
       }
@@ -761,7 +1026,6 @@ export default function Rozpocet( props ) {
               uncheckedIcon={<span className="switchLabel"></span>}
               onColor={"#0078D4"}
               />
-            <span className="m-l-10">{ newTripApproved ? currentUser.fullName : 'Neschválené' }</span>
           </div>
         )
       }
@@ -783,16 +1047,19 @@ export default function Rozpocet( props ) {
                   type:newTripType,
                   assignedTo: newTripAssigned,
                   quantity: newTripQuantity !== '' ? parseFloat(newTripQuantity) : 0,
-                  discount: 0,
+                  discount: newTripDiscount,
                   done: false,
                   approved: false,
                   order: workTrips.length,
+                  scheduled: newTripScheduledFrom === null || newTripScheduledTo === null ? null : { from: newTripScheduledFrom.valueOf().toString(), to: newTripScheduledTo.valueOf().toString() },
                 }
 
                 setNewTripAssigned(taskAssigned.length>0?taskAssigned[0]:null);
                 setNewTripQuantity(1);
                 setShowAddTrip(false);
-
+                setNewTripDiscount(0);
+                setNewTripScheduledTo(null);
+                setNewTripScheduledFrom(null);
                 addTrip(body);
               }}
               >
@@ -801,11 +1068,90 @@ export default function Rozpocet( props ) {
           </Empty>
         )
       }
+      case 'price': {
+        return (
+          <span className="text" style={{float: "right"}}>
+            <div style={{float: "right"}} className="p-t-8 p-r-8">
+              €
+            </div>
+            <input
+              disabled={true}
+              type="number"
+              style={{display: "inline", width: "70%", float: "right"}}
+              className="form-control h-30"
+              value={ newTripType ? getPrice(newTripType) : 0 }
+              />
+          </span>
+        )
+      }
+      case 'discount': {
+        return (
+          <span className="text p-l-8">
+            -
+            <input
+              disabled={disabled || !canAddSubtasksAndTrips}
+              style={{display: "inline", width: "60%"}}
+              type="number"
+              className="form-control m-l-5 m-r-5 input h-30"
+              value={newTripDiscount}
+              onChange={(e)=>setNewTripDiscount(e.target.value)}
+              />
+            %
+          </span>
+        )
+      }
+      case 'priceAfterDiscount': {
+        return (
+          <span className="text" style={{float: "right"}}>
+            <div style={{float: "right"}} className="p-t-8 p-r-8">
+              €
+            </div>
+            <input
+              disabled={true}
+              type="number"
+              style={{display: "inline", width: "70%", float: "right"}}
+              className="form-control hidden-input h-30"
+              value={ newTripType ? getDiscountPrice({type: newTripType, discount: newTripDiscount }) : 0 }
+              />
+          </span>
+        )
+      }
       default: {
         return null;
       }
     };
   }
+
+  const getPrice = ( type ) => {
+    if ( !type ) {
+      return NaN;
+    }
+    let price = ( company && company.pricelist && company.pricelist.prices ? company.pricelist.prices.find( price => {
+      if ( type.__typename === "TaskType" && price.type === "TaskType" ) {
+        return price.taskType.id === type.id;
+      } else if ( type.__typename === "TripType" && price.type === "TripType" ) {
+        return price.tripType.id === type.id;
+      }
+      return false;
+    } ) : undefined );
+    if ( price === undefined ) {
+      price = NaN;
+    } else {
+      price = price.price;
+    }
+    return parseFloat( parseFloat( price )
+      .toFixed( 2 ) );
+  }
+
+  const getDiscountPrice = ( item ) => {
+    return getPrice( item.type ) * ( 1 - item.discount / 100 );
+  }
+
+  const getTotalPrice = ( item ) => {
+    const quantity = isNaN( parseFloat( item.quantity ) ) ? 0 : parseFloat( item.quantity );
+    return getDiscountPrice( item ) * quantity;
+  }
+
 
   return (
     <div className="vykazyTable form-section">
@@ -891,7 +1237,7 @@ export default function Rozpocet( props ) {
             <tr key='addButton'>
               <td colSpan={(shownColumns.length - 1).toString()}>
                 <button className="btn-link btn-distance"
-                  disabled={disabled || !canAddSubtasksAndTrips}
+                  disabled={disabled || !canAddSubtasksAndTrips || !defaultType || defaultType.id === null}
                   onClick={()=>{
                     setShowAddSubtask(true);
                   }}
@@ -908,6 +1254,9 @@ export default function Rozpocet( props ) {
                   <i className="fa fa-plus" />
                   Výjazd
                 </button>
+                { ( !defaultType || defaultType.id === null ) &&
+                  <span className="message error-message">Can't add work without assigning task type!</span>
+                }
               </td>
             </tr>
           }
@@ -945,6 +1294,36 @@ export default function Rozpocet( props ) {
           }
         </tbody>
       </table>
+
+      {/* Statistics */}
+      { showTotals &&  subtasks.length > 0 && workTrips.length > 0 && toggleTab === '2' &&
+        <div className="row">
+          <div className="ml-auto row m-r-10">
+            <div className="text-right ml-auto m-r-5">
+              <b>Cena bez DPH: </b>
+              {
+                (
+                  [...subtasks, ...workTrips ].reduce((acc, cur) => acc + getTotalPrice(cur), 0 )
+                ).toFixed(2)
+              }
+            </div>
+            <div className="text-right m-r-5">
+              <b>DPH: </b>
+              {((getDPH()-1)*100).toFixed(2) + ' %' }
+            </div>
+            <div className="text-right">
+              <b>Cena s DPH: </b>
+              {
+                (
+                  (
+                    [...subtasks, ...workTrips ].reduce((acc, cur) => acc + getTotalPrice(cur), 0 )
+                  )*getDPH()
+                ).toFixed(2)
+              }
+            </div>
+          </div>
+        </div>
+      }
 
     </div>
   );

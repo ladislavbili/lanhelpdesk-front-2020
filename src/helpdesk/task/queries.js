@@ -127,6 +127,10 @@ shortSubtasks{
   done
 }
 subtasks {
+  scheduled {
+    from
+    to
+  }
   invoicedData{
     price
     quantity
@@ -157,6 +161,10 @@ subtasks {
   }
 }
 workTrips {
+  scheduled {
+    from
+    to
+  }
   invoicedData{
     price
     quantity
@@ -698,7 +706,7 @@ mutation deleteShortSubtask($id: Int!) {
 
 //table
 export const ADD_SUBTASK = gql `
-mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
+mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput ) {
   addSubtask(
     title: $title,
     order: $order,
@@ -709,6 +717,7 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: B
     type: $type,
     task: $task,
     assignedTo: $assignedTo,
+    scheduled: $scheduled,
   ){
     id
     title
@@ -732,12 +741,16 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: B
         id
       }
     }
+    scheduled {
+      from
+      to
+    }
   }
 }
 `;
 
 export const UPDATE_SUBTASK = gql `
-mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
   updateSubtask(
     id: $id,
     title: $title,
@@ -748,6 +761,7 @@ mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $
     discount: $discount,
     type: $type,
     assignedTo: $assignedTo,
+    scheduled: $scheduled,
   ){
     id
     title
@@ -770,6 +784,10 @@ mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $
       company {
         id
       }
+    }
+    scheduled {
+      from
+      to
     }
   }
 }
@@ -786,7 +804,7 @@ mutation deleteSubtask($id: Int!) {
 `;
 
 export const ADD_WORKTRIP = gql `
-mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!) {
+mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput) {
   addWorkTrip(
     order: $order,
     done: $done,
@@ -796,6 +814,7 @@ mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantit
     type: $type,
     task: $task,
     assignedTo: $assignedTo,
+    scheduled: $scheduled,
   ){
     id
     order
@@ -818,12 +837,16 @@ mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantit
         id
       }
     }
+    scheduled {
+      from
+      to
+    }
   }
 }
 `;
 
 export const UPDATE_WORKTRIP = gql `
-mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int) {
+mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
   updateWorkTrip(
     id: $id,
     order: $order,
@@ -833,6 +856,7 @@ mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boole
     discount: $discount,
     type: $type,
     assignedTo: $assignedTo,
+    scheduled: $scheduled,
   ){
     id
     order
@@ -854,6 +878,10 @@ mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boole
       company {
         id
       }
+    }
+    scheduled {
+      from
+      to
     }
   }
 }
@@ -1018,4 +1046,10 @@ mutation updateInvoicedTask($id: Int!, $taskChanges: TaskChangeInput, $stmcChang
     ${responseTask}
   }
 }
+`;
+
+export const TASK_DELETE_SUBSCRIPTION = gql `
+  subscription taskDeleteSubscription( $taskId: Int! ) {
+    taskDeleteSubscription( taskId: $taskId )
+  }
 `;

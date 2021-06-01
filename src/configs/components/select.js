@@ -327,6 +327,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           ...newStyle,
           color: '#FFF',
           padding: '0px 5px',
+          minHeight: '19px', //potencially breaking
           backgroundColor: data.color
         };
       }

@@ -24,6 +24,17 @@ export default function ProjectSelectModal( props ) {
 
   const [ project, setProject ] = React.useState( null );
 
+  React.useEffect( () => {
+    if ( project ) {
+      const updatedProject = projects.find( ( project2 ) => project2.id === project.id )
+      if ( updatedProject ) {
+        setProject( updatedProject );
+      } else {
+        setProject( null );
+      }
+    }
+  }, [ projects ] );
+
   return (
     <Modal isOpen={true} className="small-modal" >
       <ModalBody>

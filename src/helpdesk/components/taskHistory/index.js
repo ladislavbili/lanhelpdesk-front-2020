@@ -5,12 +5,14 @@ import {
 } from 'reactstrap';
 import {
   useQuery,
+  useSubscription,
 } from "@apollo/client";
 import {
   timestampToString
 } from 'helperFunctions';
 import {
-  GET_TASK_CHANGES
+  GET_TASK_CHANGES,
+  TASK_HISTORY_SUBSCRIPTION,
 } from './queries';
 import Loading from 'components/loading';
 
@@ -27,8 +29,22 @@ export default function TaskHistory( props ) {
     variables: {
       taskId: task.id
     },
-    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'network-only'
   } );
+
+  useSubscription( TASK_HISTORY_SUBSCRIPTION, {
+    variables: {
+      taskId: task.id,
+    },
+    onSubscriptionData: () => {
+      taskChangesRefetch( {
+        variables: {
+          task: task.id
+        }
+      } );
+    }
+  } );
+
 
   React.useEffect( () => {
     taskChangesRefetch( {

@@ -56,3 +56,9 @@ query comments($task: Int!){
   }
 }
 `;
+
+export const COMMENTS_SUBSCRIPTION = gql `
+  subscription commentsSubscription( $taskId: Int! ) {
+    commentsSubscription( taskId: $taskId )
+  }
+`;

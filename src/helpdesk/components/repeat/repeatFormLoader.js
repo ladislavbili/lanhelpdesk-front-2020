@@ -237,6 +237,7 @@ export default function RepeatFormLoader( props ) {
           type: sub.type.id,
           repeatTemplate: repeatTemplateId,
           assignedTo: sub.assignedTo.id,
+          scheduled: sub.scheduled,
         }
       } )
       .then( ( response ) => {
@@ -264,6 +265,7 @@ export default function RepeatFormLoader( props ) {
           quantity: sub.quantity,
           type: sub.type.id,
           assignedTo: sub.assignedTo.id,
+          scheduled: sub.scheduled,
         }
       } )
       .then( ( response ) => {
@@ -306,6 +308,7 @@ export default function RepeatFormLoader( props ) {
           type: wt.type.id,
           repeatTemplate: repeatTemplateId,
           assignedTo: wt.assignedTo.id,
+          scheduled: wt.scheduled,
         }
       } )
       .then( ( response ) => {
@@ -332,6 +335,7 @@ export default function RepeatFormLoader( props ) {
           quantity: item.quantity,
           type: item.type.id,
           assignedTo: item.assignedTo.id,
+          scheduled: item.scheduled,
         }
       } )
       .then( ( response ) => {

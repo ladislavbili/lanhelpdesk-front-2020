@@ -49,9 +49,9 @@ const defaultCols = [
   {
     header: 'Faktúrovať',
     key: 'approved',
-    width: "12%",
+    width: "2%",
     headerClassnames: "",
-    columnClassnames: "",
+    columnClassnames: "p-l-8",
   },
   {
     header: 'Akcie',
@@ -95,7 +95,7 @@ export default function Rozpocet( props ) {
 
   let defaultTab = '0';
 
-  if ( userRights.vykazRead ) {
+  if ( userRights.vykazRead || userRights.rozpocetRead ) {
     defaultTab = '1';
   } else if ( userRights.rozpocetRead ) {
     defaultTab = '2';
@@ -279,7 +279,6 @@ export default function Rozpocet( props ) {
             uncheckedIcon={<span className="switchLabel"></span>}
             onColor={"#0078D4"}
             />
-          <span className="m-l-10">{ material.approved ? material.approvedBy.fullName : 'Neschválené' }</span>
         </div>
         )
       }
@@ -421,7 +420,6 @@ export default function Rozpocet( props ) {
             uncheckedIcon={<span className="switchLabel"></span>}
             onColor={"#0078D4"}
             />
-          <span className="m-l-10">{ newMaterialApproved ? currentUser.fullName : 'Neschválené' }</span>
         </div>
         )
       }
@@ -480,15 +478,6 @@ export default function Rozpocet( props ) {
               className={classnames("clickable vykazyTableNav", {active: toggleTab === '1'})}
               >
               Materiál
-            </span>
-            <span className='m-l-7 m-r-7'>
-              |
-            </span>
-            <span
-              onClick={() => setToggleTab('2')}
-              className={classnames("clickable vykazyTableNav", {active: toggleTab === '2'})}
-              >
-              Rozpočet
             </span>
           </th>
           { shownColumns.map((colData, index) => {

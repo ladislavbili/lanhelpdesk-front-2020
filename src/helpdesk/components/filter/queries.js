@@ -194,3 +194,10 @@ mutation updateFilter( $id: Int!, $title: String, $pub: Boolean!, $global: Boole
 }
 }
 `;
+
+
+export const FILTERS_SUBSCRIPTION = gql `
+  subscription filtersSubscription {
+    filtersSubscription
+  }
+`;

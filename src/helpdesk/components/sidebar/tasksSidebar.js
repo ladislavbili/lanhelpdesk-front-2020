@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import {
@@ -62,9 +63,14 @@ import moment from 'moment';
 
 import {
   GET_MY_PROJECTS,
+  PROJECTS_SUBSCRIPTION,
 } from 'helpdesk/settings/projects/queries';
 import {
+  MILESTONES_SUBSCRIPTION,
+} from './queries';
+import {
   GET_MY_FILTERS,
+  FILTERS_SUBSCRIPTION,
 } from '../filter/queries';
 
 import {
@@ -93,18 +99,25 @@ export default function TasksSidebar( props ) {
     sidebarOpen
   } = props;
 
+  //ziskaj len z networku data
+  //prichystaj refresg ak sa nieco zmeni
+  //listener zmien updatne lokalny projekt/filter/milestone
   //network
-
   const {
     data: myProjectsData,
     loading: myProjectsLoading,
-    refetch: refetchMyProjects,
-  } = useQuery( GET_MY_PROJECTS );
+    refetch: myProjectsRefetch,
+  } = useQuery( GET_MY_PROJECTS, {
+    fetchPolicy: 'network-only'
+  } );
 
   const {
     data: myFiltersData,
-    loading: myFiltersLoading
-  } = useQuery( GET_MY_FILTERS );
+    loading: myFiltersLoading,
+    refetch: myFiltersRefetch,
+  } = useQuery( GET_MY_FILTERS, {
+    fetchPolicy: 'network-only'
+  } );
 
   //local
   const {
@@ -115,7 +128,6 @@ export default function TasksSidebar( props ) {
   const {
     data: projectData,
     loading: projectLoading,
-    refetch: reloadProject
   } = useQuery( GET_PROJECT );
 
   const {
@@ -126,6 +138,24 @@ export default function TasksSidebar( props ) {
     data: milestoneData,
     loading: milestoneLoading
   } = useQuery( GET_MILESTONE );
+
+  useSubscription( PROJECTS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      myProjectsRefetch();
+    }
+  } );
+
+  useSubscription( MILESTONES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      myProjectsRefetch();
+    }
+  } );
+
+  useSubscription( FILTERS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      myFiltersRefetch();
+    }
+  } );
 
   //state
   const [ showFilters, setShowFilters ] = React.useState( true );
@@ -144,18 +174,39 @@ export default function TasksSidebar( props ) {
   // sync
   React.useEffect( () => {
     if ( !myFiltersLoading ) {
-      if ( location.pathname.length > 12 ) {
-        const newFilter = myFiltersData.myFilters.find( item => item.id === parseInt( match.params.filterID ) );
-        if ( newFilter ) {
-          setFilter( newFilter )
-        } else {
-          setFilter( getEmptyGeneralFilter() )
+      setLocalFilter();
+    }
+  }, [ myFiltersData, myFiltersLoading, match.params.filterID ] );
+
+  React.useEffect( () => {
+    if ( !myProjectsLoading ) {
+      if ( myProjectsData.myProjects ) {
+        const currentProject = myProjectsData.myProjects.find( ( project ) => project.project.id === projectData.localProject.id );
+        if ( currentProject ) {
+          setProject( {
+            ...currentProject,
+            id: currentProject.project.id,
+            title: currentProject.project.title
+          } );
         }
       }
     }
-  }, [ myFiltersLoading, match.params.filterID ] );
+  }, [ myProjectsData ] );
+
+
 
   const currentUser = getMyData();
+  const setLocalFilter = () => {
+    if ( location.pathname.length > 12 ) {
+      const newFilter = myFiltersData.myFilters.find( item => item.id === parseInt( match.params.filterID ) );
+      if ( newFilter ) {
+        setFilter( newFilter )
+      } else {
+        setFilter( getEmptyGeneralFilter() )
+      }
+    }
+  }
+
   const dataLoading = (
     !currentUser ||
     myProjectsLoading ||
@@ -232,8 +283,7 @@ export default function TasksSidebar( props ) {
     const URLprefix = `/helpdesk/taskList/i/${ filterData.localFilter.id ? filterData.localFilter.id :'all'}`
     return (
       <Nav vertical>
-        {
-          projects.map((project) => ({...project, id: project.project.id, title: project.project.title}) ).map(project =>
+        { projects.map((project) => ({...project, id: project.project.id, title: project.project.title}) ).map(project =>
             <NavItem key={project.id} className={classnames("row full-width sidebar-item", { "active": localProject.id === project.id }) }>
               <span
                 className={ classnames("clickable sidebar-menu-item link", { "active": localProject.id === project.id }) }
@@ -372,25 +422,9 @@ export default function TasksSidebar( props ) {
                       label: editedMilestone.title,
                     }
                     setMilestone(milestone);
-                    setProject({
-                      ...localProject,
-                      project:{
-                        ...localProject.project,
-                        milestones: [...localProject.project.milestones.filter((milest => milest.id !== milestone.id)), milestone],
-                      }
-                    })
-                    refetchMyProjects();
                   }
                 }}
                 milestoneDeleted={()=>{
-                  refetchMyProjects();
-                  setProject({
-                    ...localProject,
-                    project:{
-                      ...localProject.project,
-                      milestones: localProject.project.milestones.filter((milest => milest.id !== milestoneData.localMilestone.id)),
-                    }
-                  });
                   setMilestone(allMilestones);
                 }}
                 />
@@ -803,7 +837,6 @@ export default function TasksSidebar( props ) {
         closeModal={(newMilestone) => {
           if(newMilestone){
             setMilestone(toSelItem(newMilestone));
-            refetchMyProjects();
           }
           setOpenMilestoneAdd(false);
         }}

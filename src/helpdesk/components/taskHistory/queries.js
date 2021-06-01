@@ -21,3 +21,9 @@ query taskChanges($taskId: Int!){
 	}
 }
 `;
+
+export const TASK_HISTORY_SUBSCRIPTION = gql `
+  subscription taskHistorySubscription( $taskId: Int! ) {
+    taskHistorySubscription( taskId: $taskId )
+  }
+`;
