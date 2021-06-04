@@ -720,6 +720,43 @@ mutation deleteShortSubtask($id: Int!) {
 `;
 
 
+//create subtask from scheduled
+export const CREATE_SUBTASK_FROM_SCHEDULED = gql `
+mutation createSubtaskFromScheduled($id: Int!) {
+  createSubtaskFromScheduled(
+    id: $id,
+  ){
+    id
+    title
+    order
+    done
+    approved
+    approvedBy{
+      id
+      fullName
+    }
+    quantity
+    discount
+    type {
+      id
+      title
+    }
+    assignedTo {
+      id
+      email
+      company {
+        id
+      }
+    }
+    scheduled {
+      from
+      to
+    }
+  }
+}
+`;
+
+
 //table
 export const ADD_SUBTASK = gql `
 mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput ) {

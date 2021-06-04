@@ -110,9 +110,10 @@ export default function Scheduled( props ) {
                 selected={newTo}
                 disabled={disabled}
                 popperPlacement="auto-left"
+                minDate={ newFrom }
                 onChange={date => {
                   setNewTo(date);
-                  if(newFrom === null || date.isAfter(newFrom) ){
+                  if(newFrom === null || !date.isAfter(newFrom) ){
                     if(floatQuantity !== null){
                       setNewFrom(moment(date).add( -1 * floatQuantity, 'hours' ))
                     }else{

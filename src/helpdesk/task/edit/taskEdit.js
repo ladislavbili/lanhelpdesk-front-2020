@@ -111,6 +111,7 @@ export default function TaskEdit( props ) {
     addCompanyToList,
     addAttachments,
     removeAttachment,
+    createSubtaskFromScheduled,
     addSubtaskFunc,
     updateSubtaskFunc,
     deleteSubtaskFunc,
@@ -174,13 +175,16 @@ export default function TaskEdit( props ) {
   // sync
   React.useEffect( () => {
     const project = task.project === null ? null : projects.find( ( project ) => project.id === task.project.id );
+    const assignableUserIds = users.filter( ( user ) => project && project.usersWithRights.some( ( userData ) => userData.assignable && userData.user.id === user.id ) )
+      .map( ( user ) => user.id );
     setChanges( {} );
     setTagsOpen( false );
     setVykazyChanges( defaultVykazyChanges );
     if ( task.invoiced ) {
       setAssignedTo( toSelArr( invoicedTask.assignedTo ) );
     } else {
-      setAssignedTo( toSelArr( task.assignedTo, 'email' ) );
+      setAssignedTo( toSelArr( task.assignedTo, 'email' )
+        .filter( ( user ) => assignableUserIds.includes( user.id ) ) );
     }
     setCloseDate( task.closeDate ? moment( parseInt( task.closeDate ) ) : null );
     setDeadline( task.deadline ? moment( parseInt( task.deadline ) ) : null );
@@ -840,7 +844,7 @@ export default function TaskEdit( props ) {
     ...item,
     invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
     assignedTo: toSelItem( item.assignedTo, 'email' ),
-    type: toSelItem( item.type )
+    type: item.type ? toSelItem( item.type ) : null,
   } ) );
   const workTrips = task.workTrips.map( item => ( {
     ...item,
@@ -864,7 +868,7 @@ export default function TaskEdit( props ) {
     subtasks: task.subtasks.map( item => ( {
       ...item,
       assignedTo: toSelItem( item.assignedTo, 'email' ),
-      type: toSelItem( item.type )
+      type: item.type ? toSelItem( item.type ) : null,
     } ) ),
     workTrips: task.workTrips.map( item => ( {
       ...item,
@@ -1542,6 +1546,8 @@ export default function TaskEdit( props ) {
 
           { userRights.scheduledRead &&
             <Scheduled
+              canTransfer={ userRights.assignedWrite && userRights.vykazWrite && taskType }
+              onTransfer={createSubtaskFromScheduled}
               items={task.scheduled.map((item) => ({
                 ...item,
                 from: moment(parseInt(item.from)),
@@ -1671,6 +1677,8 @@ export default function TaskEdit( props ) {
           }
           { userRights.scheduledRead &&
             <Scheduled
+              canTransfer={ userRights.assignedWrite && userRights.vykazWrite && taskType }
+              onTransfer={createSubtaskFromScheduled}
               items={task.scheduled.map((item) => ({
                 ...item,
                 from: moment(parseInt(item.from)),

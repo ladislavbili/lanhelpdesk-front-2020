@@ -163,13 +163,13 @@ export default function WorksTable( props ) {
   //subtasks
   const [ showAddSubtask, setShowAddSubtask ] = React.useState( false );
   const [ editedSubtaskTitle, setEditedSubtaskTitle ] = React.useState( "" );
-  const [ editedSubtaskQuantity, setEditedSubtaskQuantity ] = React.useState( 0 );
+  const [ editedSubtaskQuantity, setEditedSubtaskQuantity ] = React.useState( 1 );
   const [ editedSubtaskDiscount, setEditedSubtaskDiscount ] = React.useState( 0 );
   const [ focusedSubtask, setFocusedSubtask ] = React.useState( null );
   const [ newSubtaskTitle, setNewSubtaskTitle ] = React.useState( "" );
   const [ newSubtaskType, setNewSubtaskType ] = React.useState( defaultType );
   const [ newSubtaskAssigned, setNewSubtaskAssigned ] = React.useState( defaultAssigned );
-  const [ newSubtaskQuantity, setNewSubtaskQuantity ] = React.useState( 0 );
+  const [ newSubtaskQuantity, setNewSubtaskQuantity ] = React.useState( 1 );
   const [ newSubtaskApproved, setNewSubtaskApproved ] = React.useState( false );
   const [ newSubtaskDiscount, setNewSubtaskDiscount ] = React.useState( 0 );
   const [ newSubtaskScheduledFrom, setNewSubtaskScheduledFrom ] = React.useState( null );
@@ -178,7 +178,7 @@ export default function WorksTable( props ) {
   //trips
   const [ showAddTrip, setShowAddTrip ] = React.useState( false );
 
-  const [ editedTripQuantity, setEditedTripQuantity ] = React.useState( 0 );
+  const [ editedTripQuantity, setEditedTripQuantity ] = React.useState( 1 );
   const [ editedTripDiscount, setEditedTripDiscount ] = React.useState( 0 );
   const [ focusedTrip, setFocusedTrip ] = React.useState( null );
 
@@ -843,7 +843,14 @@ export default function WorksTable( props ) {
             <button className="btn-link-red"
               disabled={disabled}
               onClick={()=>{
-                setShowAddSubtask(false)
+                setNewSubtaskTitle('');
+                setNewSubtaskQuantity(0);
+                setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
+                setNewSubtaskDiscount(0);
+                setNewSubtaskApproved(false);
+                setNewSubtaskScheduledTo(null);
+                setNewSubtaskScheduledFrom(null);
+                setShowAddSubtask( false);
               }}
               >
               <i className="fa fa-times"  />
@@ -868,9 +875,9 @@ export default function WorksTable( props ) {
                 setNewSubtaskAssigned(taskAssigned.length>0?taskAssigned[0]:null);
                 setNewSubtaskDiscount(0);
                 setNewSubtaskApproved(false);
-                setShowAddSubtask( false);
                 setNewSubtaskScheduledTo(null);
                 setNewSubtaskScheduledFrom(null);
+                setShowAddSubtask( false);
 
                 addSubtask(body);
               }}
@@ -1035,8 +1042,12 @@ export default function WorksTable( props ) {
             <button className="btn-link-red"
               disabled={disabled}
               onClick={()=>{
+                setNewTripAssigned(taskAssigned.length>0?taskAssigned[0]:null);
+                setNewTripQuantity(1);
+                setNewTripDiscount(0);
+                setNewTripScheduledTo(null);
+                setNewTripScheduledFrom(null);
                 setShowAddTrip(false);
-                setShowAddSubtask(false);
               }}>
               <i className="fa fa-times"  />
             </button>
@@ -1056,10 +1067,10 @@ export default function WorksTable( props ) {
 
                 setNewTripAssigned(taskAssigned.length>0?taskAssigned[0]:null);
                 setNewTripQuantity(1);
-                setShowAddTrip(false);
                 setNewTripDiscount(0);
                 setNewTripScheduledTo(null);
                 setNewTripScheduledFrom(null);
+                setShowAddTrip(false);
                 addTrip(body);
               }}
               >

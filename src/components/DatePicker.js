@@ -8,6 +8,8 @@ export default function MomentDatePicker( props ) {
     onChange,
     selected,
     hideTime,
+    minDate,
+    maxDate,
     ...rest
   } = props;
 
@@ -22,6 +24,8 @@ export default function MomentDatePicker( props ) {
         selected = {
           selected ? ( selected.toDate() ) : null
         }
+        minDate={ minDate ? minDate.toDate() : null }
+        maxDate={ maxDate ? maxDate.toDate() : null }
         onChange = {( date ) => {
           if ( onChange ) {
             onChange( moment( date ) )

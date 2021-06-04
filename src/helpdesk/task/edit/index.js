@@ -60,6 +60,7 @@ import {
   ADD_SHORT_SUBTASK,
   UPDATE_SHORT_SUBTASK,
   DELETE_SHORT_SUBTASK,
+  CREATE_SUBTASK_FROM_SCHEDULED,
   ADD_SUBTASK,
   UPDATE_SUBTASK,
   DELETE_SUBTASK,
@@ -162,6 +163,7 @@ export default function TaskEditContainer( props ) {
   const [ updateShortSubtask ] = useMutation( UPDATE_SHORT_SUBTASK );
   const [ deleteShortSubtask ] = useMutation( DELETE_SHORT_SUBTASK );
   const [ deleteTask ] = useMutation( DELETE_TASK );
+  const [ createSubtaskFromScheduled ] = useMutation( CREATE_SUBTASK_FROM_SCHEDULED );
   const [ addSubtask ] = useMutation( ADD_SUBTASK );
   const [ updateSubtask ] = useMutation( UPDATE_SUBTASK );
   const [ deleteSubtask ] = useMutation( DELETE_SUBTASK );
@@ -356,6 +358,24 @@ export default function TaskEditContainer( props ) {
         console.log( err.message );
         console.log( err );
       } );
+  }
+
+  const createSubtaskFromScheduledFunc = ( id ) => {
+    setSaving( true );
+
+    createSubtaskFromScheduled( {
+        variables: {
+          id
+        }
+      } )
+      .then( ( response ) => {
+        updateCasheStorage( response.data.createSubtaskFromScheduled, 'subtasks', 'ADD' );
+      } )
+      .catch( ( err ) => {
+        console.log( err.message );
+      } );
+
+    setSaving( false );
   }
 
   const addSubtaskFunc = ( sub ) => {
@@ -867,6 +887,7 @@ export default function TaskEditContainer( props ) {
       addScheduledTaskFunc={addScheduledTaskFunc}
       deleteScheduledTaskFunc={deleteScheduledTaskFunc}
       deleteTaskFunc={deleteTaskFunc}
+      createSubtaskFromScheduled={createSubtaskFromScheduledFunc}
       addSubtaskFunc={addSubtaskFunc}
       updateSubtaskFunc={updateSubtaskFunc}
       deleteSubtaskFunc={deleteSubtaskFunc}

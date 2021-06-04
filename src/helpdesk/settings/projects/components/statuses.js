@@ -107,6 +107,12 @@ export default function Statuses( props ) {
                       color={status.color}
                       onChangeComplete={value => updateStatus({ id: status.id, color: value.hex })}
                       />
+                    <button
+                      className="btn btn-link-cancel"
+                      onClick={() => setEditColorID(null) }
+                      >
+                      Close
+                    </button>
                   </PopoverBody>
                 </Popover>
               </td>

@@ -92,26 +92,6 @@ mutation setUserStatuses($ids: [Int]!) {
     ids: $ids
   ){
     id
-		statuses {
-			id
-			title
-			color
-			action
-		}
-		company {
-			id
-			title
-		}
-    role {
-			level
-      accessRights {
-        projects
-        publicFilters
-        users
-        companies
-        vykazy
-      }
-    }
   }
 }
 `;

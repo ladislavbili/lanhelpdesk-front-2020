@@ -312,7 +312,6 @@ export default function TasksLoader( props ) {
           ]
         }
       } )
-      .then( ( response ) => {} )
       .catch( ( err ) => {
         console.log( err.message );
       } );

@@ -429,7 +429,12 @@ export default function Rozpocet( props ) {
           <button className="btn-link-red"
             disabled={disabled}
             onClick={()=>{
-              setShowAddMaterial(false)
+              setShowAddMaterial( false);
+              setNewMaterialTitle('');
+              setNewMaterialQuantity(1);
+              setNewMaterialPrice(0);
+              setNewMaterialTotalPrice(0);
+              setNewMaterialApproved(false);
             }}
             >
             <i className="fa fa-times"  />

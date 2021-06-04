@@ -1,5 +1,4 @@
 import React from 'react';
-import Checkbox from 'components/checkbox';
 import {
   Popover,
   PopoverHeader,
@@ -9,6 +8,7 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import DatePicker from 'components/DatePicker';
+import Checkbox from 'components/checkbox';
 import classnames from "classnames";
 import {
   pickSelectStyle
@@ -23,12 +23,15 @@ export default function Scheduled( props ) {
     submitItem,
     deleteItem,
     layout,
+    canTransfer,
+    onTransfer,
   } = props;
 
   const [ addItem, setAddItem ] = React.useState( null );
   const [ newUser, setNewUser ] = React.useState( null );
   const [ newFrom, setNewFrom ] = React.useState( null );
   const [ newTo, setNewTo ] = React.useState( null );
+  const [ trasfered, setTransfered ] = React.useState( [] );
 
   React.useEffect( () => {
     if ( users.length > 0 && newUser === null ) {
@@ -54,6 +57,21 @@ export default function Scheduled( props ) {
       <div className={classnames("form-selects-entry-column-rest", "scheduled-items-container", {"row": layout === 1})}>
         { items.map((item) =>
           <div className={classnames("row", {"m-r-10": layout === 1})} key={item.id}>
+            { onTransfer && canTransfer &&
+                <Checkbox
+                  className="m-t-5"
+                  disabled= { !canTransfer }
+                  value={ trasfered.some((id) => id === item.id ) }
+                  onChange={()=>{
+                    if(trasfered.some((id) => id === item.id )){
+                      setTransfered(trasfered.filter((id) => id !== item.id ))
+                    }else{
+                      setTransfered([...trasfered, item.id])
+                      onTransfer(item.id);
+                    }
+                  }}
+                  />
+          }
             <span className={classnames({"m-r-10": layout === 1})}>
               {
                 `

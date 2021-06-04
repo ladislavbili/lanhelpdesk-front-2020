@@ -17,7 +17,8 @@ import {
 import NotificationInfo from './notificationInfo';
 
 import {
-  timestampToString
+  timestampToString,
+  getLocation,
 } from 'helperFunctions';
 
 import {
@@ -44,9 +45,12 @@ const unreadTypeFilter = {
 
 export default function NotificationList( props ) {
   const {
-    history
+    history,
+    match
   } = props;
 
+  const notificationID = match.params.notificationID ? parseInt( match.params.notificationID ) : null;
+  const URL = getLocation( history );
   const {
     data: notificationsData,
     loading: notificationsLoading,
@@ -68,12 +72,9 @@ export default function NotificationList( props ) {
 
 
   const [ searchFilter, setSearchFilter ] = React.useState( '' );
-  const [ selectedNotificationID, setSelectedNotificationID ] = React.useState( null );
   const [ type, setType ] = React.useState( noTypeFilter );
 
   const setNotificationReadFunc = ( notification ) => {
-    setSelectedNotificationID( notification.id );
-
     if ( !notification.read ) {
       setUserNotificationRead( {
           variables: {
@@ -158,108 +159,108 @@ export default function NotificationList( props ) {
   const notifications = filterNotifications();
   return (
     <div className="lanwiki-content row">
-        <div className="col-lg-4">
+      <div className="col-lg-4">
 
-          <div className="scroll-visible fit-with-header lanwiki-list">
-              <h1>
-                Notifications
-              </h1>
+        <div className="scroll-visible fit-with-header lanwiki-list">
+          <h1>
+            Notifications
+          </h1>
 
-            <div className="row">
-              <div className="search-row" style={{width: "60%"}}>
-                <div className="search">
-                  <input
-                    type="text"
-                    className="form-control search-text"
-                    value={searchFilter}
-                    onChange={(e) => setSearchFilter( e.target.value )}
-                    placeholder="Search"
-                    />
-                  <button className="search-btn" type="button">
-                    <i className="fa fa-search" />
-                  </button>
-                </div>
-              </div>
-              <span className="center-hor ml-auto" style={{width: "30%", backgroundColor: "white"}}>
-                <Select
-                  value={type}
-                  onChange={(type) => setType( type ) }
-                  options={getTypes()}
-                  styles={pickSelectStyle([ 'invisible', ])}
+          <div className="row">
+            <div className="search-row" style={{width: "60%"}}>
+              <div className="search">
+                <input
+                  type="text"
+                  className="form-control search-text"
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter( e.target.value )}
+                  placeholder="Search"
                   />
-              </span>
+                <button className="search-btn" type="button">
+                  <i className="fa fa-search" />
+                </button>
+              </div>
             </div>
-
-            <div>
-              <button
-                type="button"
-                className="btn-link btn-distance"
-                onClick={markAllAsRead}
-                disabled={notifications.every((notification)=>notification.read)}>
-                Označit všetky ako prečítané
-              </button>
-              <button
-                type="button"
-                className="btn-link btn-distance"
-                onClick={deleteAll}
-                disabled={notifications.length === 0}>
-                Vymazať všetky
-              </button>
-              <button
-                type="button"
-                className="btn-link"
-                onClick={deleteRead}
-                disabled={ !notifications.some( (notification) => notification.read) }>
-                Vymazať prečítané
-              </button>
-            </div>
-            <div>
-                  {
-                    notifications.map((notification) =>
-                    <li
-                      key={notification.id}
-                      className={classnames({ 'notification-read': notification.read,
-                        'notification-not-read': !notification.read,
-                        'sidebar-item-active': selectedNotificationID === notification.id },
-                        "clickable")}
-                        onClick={() => setNotificationReadFunc(notification)}
-                        >
-                        <div className={(selectedNotificationID === notification.id ? "text-highlight":"")}>
-                          <i className={classnames({ 'far fa-envelope-open': notification.read, 'fas fa-envelope': !notification.read })} />
-                          {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
-                          <div className="row">
-                            <div>
-                              <Label className="p-r-5">User:</Label>
-                              {notification.fromUser ? notification.fromUser.fullName : "no user"}
-                            </div>
-                            <div className="ml-auto">
-                              {timestampToString(parseInt(notification.createdAt))}
-                            </div>
-                          </div>
-                          <Label className="p-r-5">Subject:</Label>
-                          {notification.subject}
-                        </div>
-                      </li>
-                    )
-                  }
-              {
-                notifications.length === 0 &&
-                <ListGroupItem>There are no notifications!</ListGroupItem>
-              }
-            </div>
-
+            <span className="center-hor ml-auto" style={{width: "30%", backgroundColor: "white"}}>
+              <Select
+                value={type}
+                onChange={(type) => setType( type ) }
+                options={getTypes()}
+                styles={pickSelectStyle([ 'invisible', ])}
+                />
+            </span>
           </div>
+
+          <div>
+            <button
+              type="button"
+              className="btn-link btn-distance"
+              onClick={markAllAsRead}
+              disabled={notifications.every((notification)=>notification.read)}>
+              Označit všetky ako prečítané
+            </button>
+            <button
+              type="button"
+              className="btn-link btn-distance"
+              onClick={deleteAll}
+              disabled={notifications.length === 0}>
+              Vymazať všetky
+            </button>
+            <button
+              type="button"
+              className="btn-link"
+              onClick={deleteRead}
+              disabled={ !notifications.some( (notification) => notification.read) }>
+              Vymazať prečítané
+            </button>
+          </div>
+          <div>
+            { notifications.map((notification) =>
+              <li
+                key={notification.id}
+                className={classnames({ 'notification-read': notification.read,
+                  'notification-not-read': !notification.read,
+                  'sidebar-item-active': notificationID === notification.id },
+                  "clickable")}
+                  onClick={() => {
+                    setNotificationReadFunc(notification);
+                    history.push(`${URL}/notifications/${notification.id}`);
+                   }}
+                  >
+                  <div className={(notificationID === notification.id ? "text-highlight":"")}>
+                    <i className={classnames({ 'far fa-envelope-open': notification.read, 'fas fa-envelope': !notification.read })} />
+                    {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
+                    <div className="row">
+                      <div>
+                        <Label className="p-r-5">User:</Label>
+                        {notification.fromUser ? notification.fromUser.fullName : "no user"}
+                      </div>
+                      <div className="ml-auto">
+                        {timestampToString(parseInt(notification.createdAt))}
+                      </div>
+                    </div>
+                    <Label className="p-r-5">Subject:</Label>
+                    {notification.subject}
+                  </div>
+                </li>
+              )
+            }
+            {
+              notifications.length === 0 &&
+              <ListGroupItem>There are no notifications!</ListGroupItem>
+            }
+          </div>
+
         </div>
-        <div className="col-lg-8">
-          {
-            selectedNotificationID !== null &&
-            <NotificationInfo notification={ notifications.find((notification) => notification.id === selectedNotificationID )} history={history} />
-          }
-          {
-            selectedNotificationID === null &&
-            <div className="fit-with-header" style={{backgroundColor: "white"}}></div>
-          }
-        </div>
+      </div>
+      <div className="col-lg-8">
+        { notificationID !== null && notifications.some((notification) => notification.id === notificationID ) &&
+          <NotificationInfo notification={ notifications.find((notification) => notification.id === notificationID )} history={history} />
+        }
+        { notificationID === null &&
+          <div className="fit-with-header" style={{backgroundColor: "white"}}></div>
+        }
+      </div>
     </div>
   );
 }

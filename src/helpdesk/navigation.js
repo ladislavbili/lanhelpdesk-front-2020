@@ -67,7 +67,7 @@ export default function Navigation( props ) {
           <Route exact path="/helpdesk/taskList/i/:listID/:taskID" component={TaskList} />
           <Route exact path="/helpdesk/taskList/i/:listID/p/:page/:taskID" component={TaskList} />
           <Route exact path="/helpdesk/notifications" component={NotificationList} />
-          <Route exact path="/helpdesk/notifications/:notificationID/:taskID" component={NotificationList} />
+          <Route exact path="/helpdesk/notifications/:notificationID" component={NotificationList} />
           <Route exact path="/helpdesk/project/:projectID" component={ProjectEdit} />
           <Route exact path="/helpdesk/repeats" component={RepeatsList} />
 
