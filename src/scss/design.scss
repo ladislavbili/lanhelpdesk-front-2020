@@ -105,7 +105,7 @@ display: block;
 
 .modal-without-borders {
   .modal-content {
-    background-color: #eaeaea; //$main-background-color;
+    background-color: $content-background-color;
     padding: 0px;
     .modal-body {
       padding: 0px;
@@ -132,7 +132,7 @@ body {
 }
 
 .main {
-  background-color: #eaeaea; //$main-background-color;
+  background-color: $content-background-color;
   width: calc(100% - #{$sidebar-width} - 2px);
   flex: 1 1;
 }
@@ -1007,7 +1007,7 @@ Label {
 }
 
 .modal-content {
-  background-color: #eaeaea; //white;
+  background-color: $content-background-color; //white;
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -1345,6 +1345,9 @@ td {
 .error-message {
   background-color: #fcece6;
   color: #da460f;
+  height: auto;
+  padding: 4px 4px;
+  font-size: 14px;
 }
 
 //----------------END-všeobecné-elementy----------------
@@ -1358,7 +1361,7 @@ td {
 
   .sidebar {
     background-color: #f6f6f6;
-    border-right: 1px solid #eaeaea;
+    border-right: 1px solid $content-background-color;
     .sidebar-label {
       label {
         font: $font-info-text;
@@ -1733,7 +1736,7 @@ td {
   border: none;
   border-right: $main-border;
   list-style-type: none;
-  background: #f2f1f1; //$sidebar-background-color;
+  background: $sidebar-background-color;
   position: relative;
   z-index: 999;
 }
@@ -1774,14 +1777,12 @@ td {
 
 .popover-toggler:hover{
     .popover{
-
       padding: 15px 0px;
       display: block;
       position: absolute;
       background-color: white;
       width: 270px;
       left: 55px;
-      top: 0px;
 
       i, img{
         height: 1.5em;
@@ -2010,7 +2011,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .filter-date-picker-popover {
-  background-color: #eaeaea;
+  background-color: $content-background-color;
   padding: 10px 15px;
   input {
     background-color: white;
@@ -2067,7 +2068,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   padding: 0px 1px 0px 1px;
   height: $task-list-commandbar-height;
   white-space: pre-wrap;
-  background-color: #eaeaea; //#f4f8fb;
+  background-color: $content-background-color; //#f4f8fb;
   border-bottom: $main-border;
 }
 
@@ -2242,7 +2243,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .small-modal {
   width: 600px !important;
   .modal-content {
-    background-color: #eaeaea; //$form-background-color;
+    background-color: $content-background-color;
     padding: 0px;
     .modal-body {
       padding: 0px;
@@ -2251,7 +2252,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-add-container {
-  width: 1300px !important;
+  width: 1200px !important;
   .modal-content {
     background-color: $form-background-color;
     padding: 0px;
@@ -2310,7 +2311,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
 
   .table > tbody > tr {
-    border-bottom: 1px solid #eaeaea;
+    border-bottom: 1px solid $content-background-color;
   }
 /*
   .table > tbody > tr:last-child,
@@ -2394,7 +2395,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .dnd-column {
-  background-color: #eaeaea;
+  background-color: $content-background-color;
   min-width: 400px;
   max-width: 401px;
   border-radius: 0px;
@@ -2408,7 +2409,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .dnd-header {
-  background-color: #eaeaea;
+  background-color: $content-background-color;
   border-bottom: 1px solid rgba(0,0,0,.1);
 
   font-family: $main-font;
@@ -2422,7 +2423,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .dnd-body {
-  background-color: #eaeaea;
+  background-color: $content-background-color;
   border-right: 1px solid rgba(0,0,0,.1);
 }
 
@@ -2719,7 +2720,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .task-add-left-half {
   flex: 1;
   padding-right: 20px;
-  border-right: 1px solid #eaeaea;
+  border-right: 1px solid $content-background-color;
 }
 
 .task-edit-align-select-labels {
@@ -2738,7 +2739,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   max-width: 300px;
   margin: 0px 0px 0px 0px;
   padding: 20px 20px 20px 13px;
-  background-color: #eaeaea; //$task-right-background-color;
+  background-color: $content-background-color;
   border-left: $main-border;
 }
 .task-edit-right-columns {
@@ -2746,7 +2747,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   max-width: 200px;
   margin: 0px 0px 0px 10px;
   padding: 20px 20px 20px 13px;
-  background-color: #eaeaea; //$task-right-background-color;
+  background-color: $content-background-color;
 }
 
 .task-edit-left {
@@ -2820,7 +2821,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .comment-attachment {
-  background-color: #eaeaea;
+  background-color: $content-background-color;
   padding: 2px 5px;
   //  display: inline;
 }
@@ -2951,7 +2952,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .scheduled {
   @extend .scheduled-in-table;
-  background-color: #eaeaea;
+  background-color: $content-background-color;
 }
 
 .col-9 {
@@ -2973,7 +2974,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .form-selects-entries {
-  background-color: #eaeaea;
+  background-color: $content-background-color;
   padding-top: 5px;
   padding-bottom: 5px;
   .col-9,
@@ -3098,16 +3099,18 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   min-width: 0;
   background-clip: border-box;
   border: 1px solid rgba(0, 0, 0, 0.125);
-  background-color: white;
+  background-color: $content-background-color;
   border-radius: 4px;
   width: 350px;
   margin: auto;
   .login-item {
-    margin: 5px 20px;
+    margin: 10px 20px;
   }
   .btn {
     border-radius: 4px;
-    margin-bottom: 10px;
+  }
+  .btn:active:focus {
+    margin: 10px 20px;
   }
 }
 .login-header {

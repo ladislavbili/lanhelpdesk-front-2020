@@ -4,6 +4,7 @@ import {
   Label,
   Input
 } from 'reactstrap';
+import ErrorMessage from 'components/errorMessage';
 import {
   setIsLoggedIn,
   setTestedToken,
@@ -124,11 +125,7 @@ export default function Login( props ) {
           >
           Login
         </button>
-        {error !== null &&
-          <div style={{color:'red'}}>
-            {error}
-          </div>
-        }
+        <ErrorMessage show={error !== null} message={error} className="m-l-10 m-r-10 m-b-5" />
       </div>
     </div>
   )

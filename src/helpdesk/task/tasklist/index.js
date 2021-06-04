@@ -259,8 +259,8 @@ export default function TasksLoader( props ) {
 
   const deleteTaskFunc = () => {
     if ( window.confirm( "Are you sure you want to delete checked tasks?" ) ) {
-      let tasksForDelete = tasks.filter( ( task ) => markedTasks.includes( task.id ) && task.rights.deleteTasks );
-      const [ canDeleteTasks, cantDeleteTasks ] = splitArrayByFilter( tasksForDelete, ( task ) => currentUser.role.level === 0 || task.project.right.delete );
+      let tasksForDelete = tasks.filter( ( task ) => markedTasks.includes( task.id ) );
+      const [ canDeleteTasks, cantDeleteTasks ] = splitArrayByFilter( tasksForDelete, ( task ) => currentUser.role.level === 0 || task.rights.deleteTasks );
       Promise.all(
           canDeleteTasks.map( task => {
             deleteTask( {
@@ -295,7 +295,7 @@ export default function TasksLoader( props ) {
         } );
 
       if ( cantDeleteTasks.length > 0 ) {
-        window.alert( `${tasksToDelete.length} were deleted. Some tasks couln't be deleted. This includes: \n` + cantDeleteTasks.reduce( ( acc, task ) => acc + `${task.id} ${task.title} \n`, '' ) )
+        window.alert( `${canDeleteTasks.length} were deleted. Some tasks couln't be deleted. This includes: \n` + cantDeleteTasks.reduce( ( acc, task ) => acc + `${task.id} ${task.title} \n`, '' ) )
       }
     }
   }

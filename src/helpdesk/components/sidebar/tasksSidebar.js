@@ -284,56 +284,57 @@ export default function TasksSidebar( props ) {
     return (
       <Nav vertical>
         { projects.map((project) => ({...project, id: project.project.id, title: project.project.title}) ).map(project =>
-            <NavItem key={project.id} className={classnames("row full-width sidebar-item", { "active": localProject.id === project.id }) }>
-              <span
-                className={ classnames("clickable sidebar-menu-item link", { "active": localProject.id === project.id }) }
-                onClick={() => {
-                  setProject(project);
-                  if(!repeatPage){
-                    history.push(URLprefix);
-                  }else{
-                    history.push(`/helpdesk/repeats`)
-                  }
-                }}
+          <NavItem key={project.id} className={classnames("row full-width sidebar-item", { "active": localProject.id === project.id }) }>
+            <span
+              className={ classnames("clickable sidebar-menu-item link", { "active": localProject.id === project.id }) }
+              onClick={() => {
+                setProject(project);
+                if(!repeatPage){
+                  history.push(URLprefix);
+                }else{
+                  history.push(`/helpdesk/repeats`)
+                }
+              }}
+              >
+              {project.title}
+            </span>
+            { canEditProject &&  localProject.id !== null &&  localProject.id === project.id &&
+              <Button
+                className='btn btn-link ml-auto m-r-15'
+                onClick={() => history.push( `/helpdesk/project/${localProject.id}` )}
                 >
-                {project.title}
-              </span>
-              { canEditProject &&  localProject.id !== null &&  localProject.id === project.id &&
-                <Button
-                  className='btn btn-link ml-auto m-r-15'
-                  onClick={() => history.push( `/helpdesk/project/${localProject.id}` )}
-                  >
-                  <i className="fa fa-cog"/>
-                </Button>
-              }
-            </NavItem>
-          )
-        }
+                <i className="fa fa-cog"/>
+              </Button>
+            }
+          </NavItem>
+        )}
       </Nav>
     )
   }
 
-  const renderProjects = () => {
+  const renderProjects = ( alwaysShow ) => {
     return (
-      <div>
-        <div className="sidebar-label row" onClick={() => setShowProjects(!showProjects)}>
+      <div className={classnames({ clickable: !alwaysShow })} >
+        <div className="sidebar-label row" onClick={() => setShowProjects( alwaysShow ? showProjects : !showProjects)}>
           <div>
             <img
               className="m-r-9"
               src={folderIcon}
               alt="Folder icon not found"
               />
-            <Label>
+            <Label className={classnames({ clickable: !alwaysShow })}>
               Project
             </Label>
           </div>
-          <div className="ml-auto">
-            { showProjects && <i className="fas fa-chevron-up" /> }
-            { !showProjects && <i className="fas fa-chevron-down" /> }
-          </div>
+          { !alwaysShow &&
+            <div className="ml-auto">
+              { showProjects && <i className="fas fa-chevron-up" /> }
+              { !showProjects && <i className="fas fa-chevron-down" /> }
+            </div>
+          }
         </div>
-        {showProjects && renderProjectsList()}
-        {showProjects && renderProjectAddBtn()}
+        {( showProjects || alwaysShow ) && renderProjectsList()}
+        {( showProjects || alwaysShow ) && renderProjectAddBtn()}
       </div>
     )
   }
@@ -370,252 +371,256 @@ export default function TasksSidebar( props ) {
               {user.fullName}
             </span>
           </NavItem>
-        )
-      }
-    </Nav>
+        )}
+      </Nav>
     )
   }
 
-  const renderCalendarUsers = () => {
+  const renderCalendarUsers = ( alwaysShow ) => {
     return (
-      <div>
-      <div className="sidebar-label row clickable" onClick={() => setShowCalendarUsers(!showCalendarUsers)}>
-        <div>
-          <i className="m-r-9 fa fa-user" />
-          <Label>
-            Calendar users
-          </Label>
+      <div className={classnames({ clickable: !alwaysShow })} >
+        <div className="sidebar-label row clickable" onClick={() => setShowCalendarUsers( alwaysShow ? showCalendarUsers : !showCalendarUsers)}>
+          <div>
+            <i className="m-r-9 fa fa-user" />
+            <Label className={classnames({ clickable: !alwaysShow })}>
+              Calendar users
+            </Label>
+          </div>
+          { !alwaysShow &&
+            <div className="ml-auto">
+              { showCalendarUsers && <i className="fas fa-chevron-up" /> }
+              { !showCalendarUsers && <i className="fas fa-chevron-down" /> }
+            </div>
+          }
         </div>
-        <div className="ml-auto">
-          { showCalendarUsers && <i className="fas fa-chevron-up" /> }
-          { !showCalendarUsers && <i className="fas fa-chevron-down" /> }
-        </div>
+        {( showCalendarUsers || alwaysShow ) && renderCalendarUsersList()}
       </div>
-      {showCalendarUsers && renderCalendarUsersList()}
-    </div>
     )
   }
 
   const renderMilestonesList = () => {
     return (
       <Nav vertical>
-      {
-        milestones.map(milestone =>
-          <NavItem key={milestone.id} className={classnames("row full-width sidebar-item", { "active": milestoneData.localMilestone.id === milestone.id }) }>
-            <span
-              className={ classnames("clickable sidebar-menu-item link", { "active": milestoneData.localMilestone.id === milestone.id }) }
-              onClick={() => {
-                setMilestone(milestone);
-                history.push(`${match.url}`);
-              }}
-              >
-              {milestone.title}
-            </span>
-            { canEditProject && milestoneData.localMilestone.id !== null && milestoneData.localMilestone.id === milestone.id &&
-              <MilestoneEdit
-                closeModal={(editedMilestone) => {
-                  if(editedMilestone !== null){
-                    const milestone = {
-                      id: editedMilestone.id,
-                      value: editedMilestone.id,
-                      title: editedMilestone.title,
-                      label: editedMilestone.title,
+        {
+          milestones.map(milestone =>
+            <NavItem key={milestone.id} className={classnames("row full-width sidebar-item", { "active": milestoneData.localMilestone.id === milestone.id }) }>
+              <span
+                className={ classnames("clickable sidebar-menu-item link", { "active": milestoneData.localMilestone.id === milestone.id }) }
+                onClick={() => {
+                  setMilestone(milestone);
+                  history.push(`${match.url}`);
+                }}
+                >
+                {milestone.title}
+              </span>
+              { canEditProject && milestoneData.localMilestone.id !== null && milestoneData.localMilestone.id === milestone.id &&
+                <MilestoneEdit
+                  closeModal={(editedMilestone) => {
+                    if(editedMilestone !== null){
+                      const milestone = {
+                        id: editedMilestone.id,
+                        value: editedMilestone.id,
+                        title: editedMilestone.title,
+                        label: editedMilestone.title,
+                      }
+                      setMilestone(milestone);
                     }
-                    setMilestone(milestone);
-                  }
-                }}
-                milestoneDeleted={()=>{
-                  setMilestone(allMilestones);
-                }}
-                />
-            }
-          </NavItem>
-        )
-      }
-    </Nav>
+                  }}
+                  milestoneDeleted={()=>{
+                    setMilestone(allMilestones);
+                  }}
+                  />
+              }
+            </NavItem>
+          )
+        }
+      </Nav>
     )
   }
 
-  const renderMilestones = () => {
+  const renderMilestones = ( alwaysShow ) => {
     return (
-      <div className="">
-      <div className="sidebar-label row"  onClick={() => setShowMilestones(!showMilestones)}>
-        <div>
-          <i className="fas fa-retweet "/>
-          <Label>
-            Milestone
-          </Label>
+      <div className={classnames({ clickable: !alwaysShow })} >
+        <div className="sidebar-label row"  onClick={() => setShowMilestones( alwaysShow ? showMilestones : !showMilestones)}>
+          <div>
+            <i className="fas fa-retweet "/>
+            <Label className={classnames({ clickable: !alwaysShow })}>
+              Milestone
+            </Label>
+          </div>
+          { !alwaysShow &&
+            <div className="ml-auto">
+              { showMilestones && <i className="fas fa-chevron-up" /> }
+              { !showMilestones && <i className="fas fa-chevron-down" /> }
+            </div>
+          }
         </div>
-        <div className="ml-auto">
-          { showMilestones && <i className="fas fa-chevron-up" /> }
-          { !showMilestones && <i className="fas fa-chevron-down" /> }
-        </div>
+        { ( showMilestones || alwaysShow ) && renderMilestonesList() }
+        { ( showMilestones || alwaysShow ) &&
+          localProject.project.id !== null &&
+          canEditProject &&
+          renderMilestoneAddBtn()
+        }
       </div>
-      { showMilestones && renderMilestonesList() }
-      {
-        showMilestones &&
-        localProject.project.id !== null &&
-        canEditProject &&
-        renderMilestoneAddBtn()
-      }
-    </div>
     )
   }
 
   const renderFiltersList = () => {
     return (
       <Nav vertical>
-      <NavItem key='all' className={classnames("row full-width sidebar-item", { "active": 'all' === match.params.filterID }) }>
-        <span
-          className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
-          onClick={() => history.push(`/helpdesk/taskList/i/all`)}
-          >
-          All tasks
-        </span>
-      </NavItem>
-      { myFiltersData.myFilters.map((filter) => (
-        <NavItem key={filter.id} className={classnames("row full-width sidebar-item", { "active": filter.id === parseInt(match.params.filterID) }) }>
+        <NavItem key='all' className={classnames("row full-width sidebar-item", { "active": 'all' === match.params.filterID }) }>
           <span
-            className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === parseInt(match.params.filterID) }) }
-            onClick={() => history.push(`/helpdesk/taskList/i/${filter.id}`)}
+            className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
+            onClick={() => history.push(`/helpdesk/taskList/i/all`)}
             >
-            {filter.title}
+            All tasks
           </span>
-
-          <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === parseInt(match.params.filterID) })}
-            onClick={() => {
-              if (filter.id === parseInt(match.params.filterID)) {
-                setShowFilterAdd(true);
-              }
-            }}
-            >
-            <i className="fa fa-cog"/>
-          </div>
         </NavItem>
-      )) }
-      <NavItem key='repeats' className={classnames("row full-width sidebar-item", { "active": repeatPage }) }>
-        <span
-          className={ classnames("clickable sidebar-menu-item link", { "active": repeatPage }) }
-          onClick={() => history.push(`/helpdesk/repeats`)}
-          >
-          Repetitive Tasks
-        </span>
-      </NavItem>
-    </Nav>
+        { myFiltersData.myFilters.map((filter) => (
+          <NavItem key={filter.id} className={classnames("row full-width sidebar-item", { "active": filter.id === parseInt(match.params.filterID) }) }>
+            <span
+              className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === parseInt(match.params.filterID) }) }
+              onClick={() => history.push(`/helpdesk/taskList/i/${filter.id}`)}
+              >
+              {filter.title}
+            </span>
+
+            <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === parseInt(match.params.filterID) })}
+              onClick={() => {
+                if (filter.id === parseInt(match.params.filterID)) {
+                  setShowFilterAdd(true);
+                }
+              }}
+              >
+              <i className="fa fa-cog"/>
+            </div>
+          </NavItem>
+        )) }
+        <NavItem key='repeats' className={classnames("row full-width sidebar-item", { "active": repeatPage }) }>
+          <span
+            className={ classnames("clickable sidebar-menu-item link", { "active": repeatPage }) }
+            onClick={() => history.push(`/helpdesk/repeats`)}
+            >
+            Repetitive Tasks
+          </span>
+        </NavItem>
+      </Nav>
     )
   }
 
-  const renderFilters = () => {
+  const renderFilters = ( alwaysShow ) => {
     return (
-      <div>
-      <div className="sidebar-label row" onClick={() => setShowFilters(!showFilters)}>
-        <div>
-          <img
-            className="m-r-5"
-            style={{
-              color: "#212121",
-              height: "17px",
-              marginBottom: "3px"
-            }}
-            src={filterIcon}
-            alt="Filter icon not found"
-            />
-          <Label>
-            Filters
-          </Label>
+      <div className={classnames({ clickable: !alwaysShow })} >
+        <div className="sidebar-label row" onClick={() => setShowFilters( alwaysShow ? showFilters : !showFilters)}>
+          <div>
+            <img
+              className="m-r-5"
+              style={{
+                color: "#212121",
+                height: "17px",
+                marginBottom: "3px"
+              }}
+              src={filterIcon}
+              alt="Filter icon not found"
+              />
+            <Label className={classnames({ clickable: !alwaysShow })}>
+              Filters
+            </Label>
+          </div>
+          { !alwaysShow &&
+            <div className="ml-auto">
+              { showFilters && <i className="fas fa-chevron-up" /> }
+              { !showFilters && <i className="fas fa-chevron-down" /> }
+            </div>
+          }
         </div>
-        <div className="ml-auto">
-          { showFilters && <i className="fas fa-chevron-up" /> }
-          { !showFilters && <i className="fas fa-chevron-down" /> }
-        </div>
+        { (showFilters || alwaysShow) && renderFiltersList() }
+        { (showFilters || alwaysShow) && renderFilterAddBtn() }
       </div>
-      { showFilters && renderFiltersList() }
-      { showFilters && renderFilterAddBtn() }
-    </div>
     )
   }
 
   const renderFilterAdd = () => {
     return (
       <div>
-      <div className="sidebar-label row" onClick={() => setShowFilters(!showFilters)}>
-        <div>
-          <img
-            className="m-r-5"
-            style={{
-              color: "#212121",
-              height: "17px",
-              marginBottom: "3px"
-            }}
-            src={filterIcon}
-            alt="Filter icon not found"
-            />
-          <Label>
-            { parseInt(match.params.filterID) ? "Edit filter" : "Add filter" }
-          </Label>
+        <div className="sidebar-label row" onClick={() => setShowFilters(!showFilters)}>
+          <div>
+            <img
+              className="m-r-5"
+              style={{
+                color: "#212121",
+                height: "17px",
+                marginBottom: "3px"
+              }}
+              src={filterIcon}
+              alt="Filter icon not found"
+              />
+            <Label>
+              { parseInt(match.params.filterID) ? "Edit filter" : "Add filter" }
+            </Label>
+          </div>
         </div>
+        <Filter
+          history={history}
+          close={ () => {
+            setShowFilterAdd(false);
+          }}
+          />
       </div>
-      <Filter
-        history={history}
-        close={ () => {
-          setShowFilterAdd(false);
-        }}
-        />
-    </div>
     )
   }
 
   const renderTaskAddBtn = () => {
     return (
       <TaskAdd
-      history={history}
-      match={match}
-      disabled={ !canAddTask }
-      projectID={ localProject.id }
-      />
+        history={history}
+        match={match}
+        disabled={ !canAddTask }
+        projectID={ localProject.id }
+        />
     )
   }
 
   const renderFilterAddBtn = () => {
     return (
       <button
-      className='btn-link p-l-15'
-      onClick={() => {
-        setFilter( getEmptyGeneralFilter() );
-        setShowFilterAdd(true);
-      }}
-      >
-      <i className="fa fa-plus"/>
-      Filter
-    </button>
+        className='btn-link p-l-15'
+        onClick={() => {
+          setFilter( getEmptyGeneralFilter() );
+          setShowFilterAdd(true);
+        }}
+        >
+        <i className="fa fa-plus"/>
+        Filter
+      </button>
     )
   }
 
   const renderMilestoneAddBtn = () => {
     return (
       <NavItem className="row full-width">
-      <button
-        className='btn-link p-l-15'
-        onClick={() => setOpenMilestoneAdd(true)}
-        >
-        <i className="fa fa-plus" />
-        { addMilestone.title }
-      </button>
-    </NavItem>
+        <button
+          className='btn-link p-l-15'
+          onClick={() => setOpenMilestoneAdd(true)}
+          >
+          <i className="fa fa-plus" />
+          { addMilestone.title }
+        </button>
+      </NavItem>
     )
   }
 
   const renderCompanyAddBtn = () => {
     return (
       <NavItem className="row full-width">
-      <button
-        className='btn-link'
-        onClick={() => setOpenCompanyAdd(true)}
-        >
-        <i className="fa fa-plus" />
-        { addCompany.title }
-      </button>
-    </NavItem>
+        <button
+          className='btn-link'
+          onClick={() => setOpenCompanyAdd(true)}
+          >
+          <i className="fa fa-plus" />
+          { addCompany.title }
+        </button>
+      </NavItem>
     )
   }
 
@@ -625,247 +630,247 @@ export default function TasksSidebar( props ) {
     }
     return (
       <NavItem className="row full-width">
-      <button
-        className='btn-link'
-        onClick={() => setOpenProjectAdd(true)}
-        >
-        <i className="fa fa-plus p-l-15" />
-        { addProject.project.title }
-      </button>
-    </NavItem>
+        <button
+          className='btn-link'
+          onClick={() => setOpenProjectAdd(true)}
+          >
+          <i className="fa fa-plus p-l-15" />
+          { addProject.project.title }
+        </button>
+      </NavItem>
     )
   }
 
   const renderUserAddBtn = () => {
     return (
       <NavItem className="row full-width">
-      <button
-        className='btn-link'
-        onClick={() => setOpenUserAdd(true)}
-        >
-        <i className="fa fa-plus" />
-        { addUser.title }
-      </button>
-    </NavItem>
+        <button
+          className='btn-link'
+          onClick={() => setOpenUserAdd(true)}
+          >
+          <i className="fa fa-plus" />
+          { addUser.title }
+        </button>
+      </NavItem>
     )
   }
 
   const renderAddButtons = () => {
     return (
       <div className="popover">
-      {  renderTaskAddBtn() }
-      { renderFilterAddBtn() }
-      { renderProjectAddBtn() }
-      { renderMilestoneAddBtn() }
-      { renderCompanyAddBtn() }
-      { renderUserAddBtn() }
-    </div>
+        {  renderTaskAddBtn() }
+        { renderFilterAddBtn() }
+        { renderProjectAddBtn() }
+        { renderMilestoneAddBtn() }
+        { renderCompanyAddBtn() }
+        { renderUserAddBtn() }
+      </div>
     )
   }
 
   const renderFilterContainer = () => {
     return (
-      <div className="popover">
-      { showFilterAdd && renderFilterAdd() }
-      { !showFilterAdd && renderFilters() }
-    </div>
+      <div className="popover"  style={{top: 'calc( 0.5em + ( 4.5em * 1 ) )'}}>
+        { showFilterAdd && renderFilterAdd() }
+        { !showFilterAdd && renderFilters(true) }
+      </div>
     )
   }
 
   const renderProjectsPopover = () => {
     return (
-      <div className="popover">
-      { renderProjects() }
-    </div>
+      <div className="popover"  style={{top: 'calc( 0.5em + ( 4.5em * 2 ) )'}}>
+        { renderProjects(true) }
+      </div>
     )
   }
 
   const renderCalendarUsersPopover = () => {
     return (
-      <div className="popover">
-      { renderCalendarUsers() }
-    </div>
+      <div className="popover"  style={{top: 'calc( 0.5em + ( 4.5em * 3 ) )'}}>
+        { renderCalendarUsers(true) }
+      </div>
     )
   }
 
   const renderMilestonesPopover = () => {
     return (
-      <div className="popover">
-      { renderMilestones() }
-    </div>
+      <div className="popover"  style={{top: 'calc( 0.5em + ( 4.5em * 4 ) )'}}>
+        { renderMilestones(true) }
+      </div>
     )
   }
 
   const renderOpenSidebar = () => {
     return (
       <div>
-      { renderTaskAddBtn() }
+        { renderTaskAddBtn() }
 
-      <hr className = "m-l-15 m-r-15 m-t-15" />
-      { !showFilterAdd &&
-        <Empty>
-          { renderFilters() }
+        <hr className = "m-l-15 m-r-15 m-t-15" />
+        { !showFilterAdd &&
+          <Empty>
+            { renderFilters() }
 
-          <hr className = "m-l-15 m-r-15 m-t-11" />
+            <hr className = "m-l-15 m-r-15 m-t-11" />
 
-          { renderProjects() }
+            { renderProjects() }
 
-          {  (localProject.id === null || localProject.right.assignedRead) && currentUser.tasklistLayout === 3 && (
-            <Empty>
-              <hr className = "m-l-15 m-r-15 m-t-11" />
-              {renderCalendarUsers()}
-            </Empty>
-          )}
+            {  (localProject.id === null || localProject.right.assignedRead) && currentUser.tasklistLayout === 3 && (
+              <Empty>
+                <hr className = "m-l-15 m-r-15 m-t-11" />
+                {renderCalendarUsers()}
+              </Empty>
+            )}
 
-          { localProject.id !== null &&
-            <Empty>
-              <hr className="m-l-15 m-r-15 m-t-11" />
-              { renderMilestones() }
-            </Empty>
-          }
-        </Empty>
-      }
+            { localProject.id !== null &&
+              <Empty>
+                <hr className="m-l-15 m-r-15 m-t-11" />
+                { renderMilestones() }
+              </Empty>
+            }
+          </Empty>
+        }
 
-      { showFilterAdd && renderFilterAdd() }
+        { showFilterAdd && renderFilterAdd() }
 
-      <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" />
+        <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" />
 
-      {
-        !showFilterAdd &&
-        <div className='p-l-15 p-r-15'>
-          { currentUser.role.accessRights.companies && renderCompanyAddBtn() }
-          { currentUser.role.accessRights.users && renderUserAddBtn() }
-        </div>
-      }
-    </div>
+        {
+          !showFilterAdd &&
+          <div className='p-l-15 p-r-15'>
+            { currentUser.role.accessRights.companies && renderCompanyAddBtn() }
+            { currentUser.role.accessRights.users && renderUserAddBtn() }
+          </div>
+        }
+      </div>
     )
   }
 
   return (
     <div>
-    { !sidebarOpen &&
-      <div>
-        <span
-          className='btn popover-toggler'
-          >
-          <i className="fa fa-plus"/>
-          {renderAddButtons()}
-        </span>
-
-        <span
-          className='btn popover-toggler'
-          >
-          <img
-            src={filterIcon}
-            className="invert"
-            id="filter-icon"
-            alt="Filter icon not found"
-            style={{
-              color: "white",
-            }}
-            />
-          {renderFilterContainer()}
-        </span>
-
-        <span
-          className='btn popover-toggler'
-          >
-          <img
-            src={folderIcon}
-            className="invert"
-            id="folder-icon"
-            alt="Folder icon not found"
-            style={{
-              color: "white",
-            }}
-            />
-          {renderProjectsPopover()}
-        </span>
-
-        { ( localProject.id === null || localProject.right.assignedRead) && currentUser.tasklistLayout === 3 &&
+      { !sidebarOpen &&
+        <div>
           <span
             className='btn popover-toggler'
             >
-            <i className="fa fa-user" style={{ color: "white", }} />
-            {renderCalendarUsersPopover()}
+            <i className="fa fa-plus"/>
+            {renderAddButtons()}
           </span>
-        }
 
-        { localProject.id !== null &&
-          <button
+          <span
             className='btn popover-toggler'
             >
-            <i className="fas fa-retweet "/>
+            <img
+              src={filterIcon}
+              className="invert"
+              id="filter-icon"
+              alt="Filter icon not found"
+              style={{
+                color: "white",
+              }}
+              />
+            {renderFilterContainer()}
+          </span>
 
-            {renderMilestonesPopover()}
-          </button>
-        }
-      </div>
-    }
+          <span
+            className='btn popover-toggler'
+            >
+            <img
+              src={folderIcon}
+              className="invert"
+              id="folder-icon"
+              alt="Folder icon not found"
+              style={{
+                color: "white",
+              }}
+              />
+            {renderProjectsPopover()}
+          </span>
 
-    { sidebarOpen && renderOpenSidebar()}
+          { ( localProject.id === null || localProject.right.assignedRead) && currentUser.tasklistLayout === 3 &&
+            <span
+              className='btn popover-toggler'
+              >
+              <i className="fa fa-user" style={{ color: "white", }} />
+              {renderCalendarUsersPopover()}
+            </span>
+          }
 
-    {
-      openProjectAdd &&
-      <ProjectAdd
-        open={openProjectAdd}
-        closeModal={(newProject, rights) => {
-          setOpenProjectAdd(false);
-          if(newProject!==null){
-            const project = {
-              project: {
-                ...newProject,
-                milestones: [],
-              },
-              right: rights,
-              id: newProject.id,
-              value: newProject.id,
-              title: newProject.title,
-              label: newProject.title,
+          { localProject.id !== null &&
+            <button
+              className='btn popover-toggler'
+              >
+              <i className="fas fa-retweet "/>
+
+              {renderMilestonesPopover()}
+            </button>
+          }
+        </div>
+      }
+
+      { sidebarOpen && renderOpenSidebar()}
+
+      {
+        openProjectAdd &&
+        <ProjectAdd
+          open={openProjectAdd}
+          closeModal={(newProject, rights) => {
+            setOpenProjectAdd(false);
+            if(newProject!==null){
+              const project = {
+                project: {
+                  ...newProject,
+                  milestones: [],
+                },
+                right: rights,
+                id: newProject.id,
+                value: newProject.id,
+                title: newProject.title,
+                label: newProject.title,
+              }
+              setProject(project);
             }
-            setProject(project);
-          }
-        }}
-        />
-    }
+          }}
+          />
+      }
 
-    {
-      canEditProject &&
-      openMilestoneAdd &&
-      <MilestoneAdd
-        open={openMilestoneAdd}
-        closeModal={(newMilestone) => {
-          if(newMilestone){
-            setMilestone(toSelItem(newMilestone));
-          }
-          setOpenMilestoneAdd(false);
-        }}
-        />
-    }
+      {
+        canEditProject &&
+        openMilestoneAdd &&
+        <MilestoneAdd
+          open={openMilestoneAdd}
+          closeModal={(newMilestone) => {
+            if(newMilestone){
+              setMilestone(toSelItem(newMilestone));
+            }
+            setOpenMilestoneAdd(false);
+          }}
+          />
+      }
 
-    {
-      openUserAdd &&
-      <Modal isOpen={openUserAdd} className="modal-without-borders">
-        <ModalBody>
-          <UserAdd
-            closeModal={() => setOpenUserAdd(false)}
-            addUserToList={() => {}}
-            />
-        </ModalBody>
-      </Modal>
-    }
+      {
+        openUserAdd &&
+        <Modal isOpen={openUserAdd} className="modal-without-borders">
+          <ModalBody>
+            <UserAdd
+              closeModal={() => setOpenUserAdd(false)}
+              addUserToList={() => {}}
+              />
+          </ModalBody>
+        </Modal>
+      }
 
-    {
-      openCompanyAdd &&
-      <Modal isOpen={openCompanyAdd} className="modal-without-borders">
-        <ModalBody>
-          <CompanyAdd
-            closeModal={() => setOpenCompanyAdd(false)}
-            addCompanyToList={() => {}}
-            />
-        </ModalBody>
-      </Modal>
-    }
-  </div>
+      {
+        openCompanyAdd &&
+        <Modal isOpen={openCompanyAdd} className="modal-without-borders">
+          <ModalBody>
+            <CompanyAdd
+              closeModal={() => setOpenCompanyAdd(false)}
+              addCompanyToList={() => {}}
+              />
+          </ModalBody>
+        </Modal>
+      }
+    </div>
   );
 }

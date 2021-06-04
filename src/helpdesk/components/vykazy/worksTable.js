@@ -1176,15 +1176,19 @@ export default function WorksTable( props ) {
                 >
                 Práca
               </span>
-              <span className='m-l-7 m-r-7'>
-                |
-              </span>
-              <span
-                onClick={() => setToggleTab('2')}
-                className={classnames("clickable vykazyTableNav", {active: toggleTab === '2'})}
-                >
-                Rozpočet
-              </span>
+              { userRights.vykazyRead &&
+                <Empty>
+                  <span className='m-l-7 m-r-7'>
+                    |
+                  </span>
+                  <span
+                    onClick={() => setToggleTab('2')}
+                    className={classnames("clickable vykazyTableNav", {active: toggleTab === '2'})}
+                    >
+                    Rozpočet
+                  </span>
+                </Empty>
+              }
             </th>
             { shownColumns.map((colData, index) => {
               if(index < 2 ){

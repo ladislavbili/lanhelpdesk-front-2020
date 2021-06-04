@@ -37,7 +37,26 @@ export default function RenderTaskStackItemRender( props ) {
       style={{ backgroundColor }}
       draggable={!cantBeAdded}
       onDragStart={() => {
-        setDraggedTask({ task, title: renderScheduled(task) })
+        setDraggedTask({
+          task,
+          title: renderScheduled(task),
+          propsGetter: () => {
+            const status = task.status;
+            if ( status ) {
+              return {
+                className: "",
+                style: {
+                  backgroundColor: status.color,
+                  borderColor: lightenDarkenColor( -0.3, status.color )
+                }
+              };
+            }
+            return {
+              className: "",
+              style: {}
+            };
+          },
+         })
       }}
       >
       <button
