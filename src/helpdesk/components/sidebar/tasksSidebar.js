@@ -279,6 +279,16 @@ export default function TasksSidebar( props ) {
 
   const repeatPage = window.location.pathname === '/helpdesk/repeats';
 
+  const getApplicableFilters = () => {
+    if ( localProject.id === null ) {
+      return myFiltersData.myFilters.filter( ( myFilter ) => myFilter.dashboard );
+    }
+    if ( localProject.id ) {
+      return myFiltersData.myFilters.filter( ( myFilter ) => myFilter.global || ( myFilter.project && myFilter.project.id === localProject.id ) );
+    }
+    return [];
+  }
+
   const renderProjectsList = () => {
     const URLprefix = `/helpdesk/taskList/i/${ filterData.localFilter.id ? filterData.localFilter.id :'all'}`
     return (
@@ -476,7 +486,7 @@ export default function TasksSidebar( props ) {
             All tasks
           </span>
         </NavItem>
-        { myFiltersData.myFilters.map((filter) => (
+        { getApplicableFilters().map((filter) => (
           <NavItem key={filter.id} className={classnames("row full-width sidebar-item", { "active": filter.id === parseInt(match.params.filterID) }) }>
             <span
               className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === parseInt(match.params.filterID) }) }

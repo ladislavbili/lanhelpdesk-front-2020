@@ -456,7 +456,6 @@ export default function TaskEdit( props ) {
           ...originalTask,
           ...response.data.updateTask
         }
-
         client.writeQuery( {
           query: GET_TASK,
           variables: {
@@ -466,49 +465,52 @@ export default function TaskEdit( props ) {
             task: updatedTask
           }
         } );
-
-        //update tasks if project changed or not
-        let execTasks = client.readQuery( {
-            query: GET_TASKS,
-            variables: {
-              filterId,
-              filter: filterValues,
-              projectId: originalProjectId
-            }
-          } )
-          .tasks;
-
-        if ( project.id !== originalProjectId && originalProjectId !== null ) {
-          client.writeQuery( {
-            query: GET_TASKS,
-            variables: {
-              filterId,
-              filter: filterValues,
-              projectId: originalProjectId
-            },
-            data: {
-              tasks: {
-                ...execTasks,
-                tasks: execTasks.tasks.filter( ( task ) => task.id !== id )
+        try {
+          //update tasks if project changed or not
+          let execTasks = client.readQuery( {
+              query: GET_TASKS,
+              variables: {
+                filterId,
+                filter: filterValues,
+                projectId: originalProjectId
               }
-            }
-          } );
-        } else {
-          client.writeQuery( {
-            query: GET_TASKS,
-            variables: {
-              filterId,
-              filter: filterValues,
-              projectId: originalProjectId
-            },
-            data: {
-              tasks: {
-                ...execTasks,
-                tasks: updateArrayItem( execTasks.tasks, updatedTask )
+            } )
+            .tasks;
+
+          if ( project.id !== originalProjectId && originalProjectId !== null ) {
+            client.writeQuery( {
+              query: GET_TASKS,
+              variables: {
+                filterId,
+                filter: filterValues,
+                projectId: originalProjectId
+              },
+              data: {
+                tasks: {
+                  ...execTasks,
+                  tasks: execTasks.tasks.filter( ( task ) => task.id !== id )
+                }
               }
-            }
-          } );
-        }
+            } );
+          } else {
+            client.writeQuery( {
+              query: GET_TASKS,
+              variables: {
+                filterId,
+                filter: filterValues,
+                projectId: originalProjectId
+              },
+              data: {
+                tasks: {
+                  ...execTasks,
+                  tasks: updateArrayItem( execTasks.tasks, updatedTask )
+                }
+              }
+            } );
+          }
+
+        } catch {}
+
       } )
       .catch( ( err ) => {
         setChanges( {

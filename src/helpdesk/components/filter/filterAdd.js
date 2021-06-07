@@ -56,10 +56,10 @@ export default function FilterAdd( props ) {
   const {
     filter,
     projectId,
+    global,
     close,
     history
   } = props;
-
   //queries
 
   const [ addFilter, {
@@ -91,19 +91,25 @@ export default function FilterAdd( props ) {
 
   //state
   const [ pub, setPub ] = React.useState( false );
-  const [ global, setGlobal ] = React.useState( false );
   const [ dashboard, setDashboard ] = React.useState( false );
   const [ roles, setRoles ] = React.useState( [] );
   const [ saving, setSaving ] = React.useState( false );
   const [ opened, setOpened ] = React.useState( false );
   const [ title, setTitle ] = React.useState( id ? filterData.localFilter.title : '' );
 
+  React.useEffect( () => {
+    if ( !global && projectId === null ) {
+      setDashboard( true );
+    } else {
+      setDashboard( filterData.localFilter.dashboard );
+    }
+  }, [ global, projectId ] );
+
 
   React.useEffect( () => {
     if ( !dataLoading ) {
       let filter = filterData.localFilter;
       setPub( filter.pub );
-      setGlobal( filter.global );
       setDashboard( filter.dashboard );
       setRoles( filter.roles ? toSelArr( filter.roles ) : [] );
       setTitle( id ? filter.title : '' )
@@ -258,24 +264,14 @@ export default function FilterAdd( props ) {
                 />
             </FormGroup>
           }
-          {/* In all projects - FILTER ONLY */}
-          { !projectId &&
-            <Checkbox
-              className = "m-l-5 m-r-5"
-              label = "Global (shown in all projects)"
-              value = { global }
-              onChange={(e)=> setGlobal(!global)}
-              />
-          }
           {/* In DASHBOARD - FILTER ONLY */}
-          { !projectId &&
             <Checkbox
               className = "m-l-5 m-r-5"
-              label = "Dashboard (shown in dashboard)"
+              label = "Dashboard (shown in All Projects)"
+              disabled = { !global && projectId === null }
               value = { dashboard }
               onChange={(e)=>setDashboard(!dashboard)}
               />
-          }
 
         </ModalBody>
         <ModalFooter>

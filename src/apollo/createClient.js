@@ -9,7 +9,8 @@ import {
 } from "@apollo/client/link/error";
 import * as resolvers from './localSchema/resolvers';
 import {
-  setIsLoggedIn
+  setIsLoggedIn,
+  addApolloErrors,
 } from './localSchema/actions';
 import {
   authLink,
@@ -62,12 +63,14 @@ function processErrors( {
     return;
   }
   let error = graphQLErrors[ 0 ];
-  if ( 'INVALID_OR_OUTDATED_TOKEN' ) {
+  if ( error && error.extensions && error.extensions.code === 'INVALID_OR_OUTDATED_TOKEN' ) {
     return promiseToObservable( refreshToken() ).flatMap( () => forward( operation ) );
   }
   if ( error.extensions.code === "NO_ACC_TOKEN" ) {
     sessionStorage.removeItem( "acctok" )
     setIsLoggedIn( false );
+  } else {
+    addApolloErrors( graphQLErrors );
   }
 }
 

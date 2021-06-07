@@ -151,6 +151,10 @@ html {
   overflow-x: hidden;
 }
 
+.scroll-x-auto {
+  overflow-x: auto !important;
+}
+
 .fit-with-header {
   height: $height-without-header;
 }
@@ -1839,6 +1843,7 @@ td {
   width: calc(100% - 30px);
   margin: 10px 15px 0px calc(15px - #{$input-padding});
   label,
+  .listed-tags,
   .btn-link {
     margin-left: $input-padding;
   }
@@ -2886,7 +2891,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   .pull-right {
     width: 500px;
     position: absolute;
-    left: 450px;
+    left: 350px;
   }
 }
 

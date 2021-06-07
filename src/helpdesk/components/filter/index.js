@@ -39,6 +39,9 @@ import {
   DELETE_FILTER,
 } from './queries';
 import {
+  GET_MY_PROJECTS,
+} from 'helpdesk/settings/projects/queries';
+import {
   GET_FILTER,
   GET_PROJECT,
 } from 'apollo/localSchema/queries';
@@ -52,6 +55,18 @@ import {
   GET_TASK_TYPES
 } from 'helpdesk/settings/taskTypes/queries';
 import moment from 'moment';
+
+const globalProject = {
+  id: 'global',
+  value: 'global',
+  label: 'Global (shown in every project)'
+};
+
+const noProject = {
+  id: null,
+  value: null,
+  label: 'No project (only Dashboard)'
+};
 
 export default function FilterForm( props ) {
   //data & queries
@@ -84,6 +99,11 @@ export default function FilterForm( props ) {
   } = useQuery( GET_MY_FILTERS );
 
   const {
+    data: myProjectsData,
+    loading: myProjectsLoading,
+  } = useQuery( GET_MY_PROJECTS );
+
+  const {
     data: filterData,
     loading: filterLoading
   } = useQuery( GET_FILTER );
@@ -92,7 +112,8 @@ export default function FilterForm( props ) {
     data: localProjectData,
   } = useQuery( GET_PROJECT );
 
-  const projectId = localProjectData.localProject.id;
+  console.log( filterData );
+  const originalProjectId = filterData.localFilter.id ? ( filterData.localFilter.project ? filterData.localFilter.project.id : null ) : localProjectData.localProject.id;
   const id = filterData.localFilter.id;
 
   //state
@@ -102,6 +123,7 @@ export default function FilterForm( props ) {
 
   const [ saving, setSaving ] = React.useState( null );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
+  const [ project, setProject ] = React.useState( noProject );
 
   const {
     requesters,
@@ -182,7 +204,19 @@ export default function FilterForm( props ) {
     companiesLoading ||
     taskTypesLoading ||
     filterLoading ||
-    myFiltersLoading
+    myFiltersLoading ||
+    myProjectsLoading
+  );
+
+  const myProjects = (
+    myProjectsLoading ? [] :
+    myProjectsData.myProjects.map( ( myProject ) => ( {
+      ...myProject,
+      id: myProject.project.id,
+      value: myProject.project.id,
+      title: myProject.project.title,
+      label: myProject.project.title
+    } ) )
   );
 
   React.useEffect( () => {
@@ -338,9 +372,9 @@ export default function FilterForm( props ) {
       tags: filter.tags.map( ( item ) => item.id ),
     } )
   }
-  const setFilterState = ( filter ) => {
+  const setFilterState = ( filterData ) => {
     //filter data
-    filter = filter.filter;
+    const filter = filterData.filter;
     setCompanies( [
       ...( filter.companyCur ? [ ofCurrentUser ] : [] ),
       ...toSelArr( companiesData.basicCompanies )
@@ -353,7 +387,7 @@ export default function FilterForm( props ) {
       .filter( ( user ) => filter.requesters.some( ( user2 ) => user.id === user2.id ) )
     ] );
 
-    setRequesters( [
+    setAssignedTos( [
       ...( filter.assignedToCur ? [ ofCurrentUser ] : [] ),
       ...toSelArr( usersData.basicUsers, "fullName" )
       .filter( ( user ) => filter.assignedTos.some( ( user2 ) => user.id === user2.id ) )
@@ -363,12 +397,18 @@ export default function FilterForm( props ) {
       toSelArr( taskTypesData.taskTypes )
       .filter( ( taskType ) => filter.taskTypes.some( ( taskType2 ) => taskType.id === taskType2.id ) )
     );
-    if ( projectId ) {
+    if ( originalProjectId ) {
+      const project = myProjects.find( ( project ) => project.id === originalProjectId );
+      setProject( project );
       setTags(
-        toSelArr( localProjectData.localProject.project.tags )
+        toSelArr( project.project.tags )
         .filter( ( tag1 ) => filter.tags.some( ( tag2 ) => tag1.id === tag2.id ) )
       );
+    } else if ( filterData.global ) {
+      setProject( globalProject );
+      setTags( [] );
     } else {
+      setProject( noProject );
       setTags( [] );
     }
 
@@ -418,7 +458,8 @@ export default function FilterForm( props ) {
         <button type="button" className="btn-link" onClick={applyFilter}><i className="fa fa-check icon-M p-r-0 m-r-0"/></button>
         <AddFilter
           filter={getCleanCurrentFilter()}
-          projectId={projectId}
+          projectId={project.id !== 'global' ? project.id : null}
+          global={ project.id === 'global' }
           originalFilter={filterData.localFilter}
           {...props}
           />
@@ -442,40 +483,55 @@ export default function FilterForm( props ) {
       }
 
       <div className="sidebar-filter">
-        { projectId && localProjectData.localProject.right.tagsRead &&
-          <div className="sidebar-filter-row">
-            <Empty>
-              <div className="row mb-auto">
-                <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
-                  <i className="fa fa-plus" />
-                  Tags
-                </button>
-                <MultiSelect
-                  className="center-hor"
-                  direction="right"
-                  header="Select tags for this task"
-                  closeMultiSelect={() => { setTagsOpen(false) }}
-                  open={tagsOpen}
-                  items={toSelArr(localProjectData.localProject.project.tags)}
-                  selected={tags}
-                  onChange={(tags) => { setTags(tags) }}
-                  />
-              </div>
 
+        <div className="sidebar-filter-row">
+          <label>Project</label>
+          <div className="flex">
+            <Select
+              options={[ noProject, globalProject, ...myProjects]}
+              onChange={(project)=> {
+                setTags([]);
+                setProject(project);
+              }}
+              value={project}
+              styles={pickSelectStyle(['invisible', 'blueFont', ])}
+              />
+          </div>
+        </div>
+        { project.id !== 'global' && project.id !== null && project.right.tagsRead &&
+          <div className="sidebar-filter-row">
+            <label>Tags</label>
+            <div className="row mb-auto">
+              <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
+                <i className="fa fa-plus" />
+                Tag
+              </button>
+              <MultiSelect
+                className="center-hor"
+                direction="right"
+                header="Select tags for this task"
+                closeMultiSelect={() => { setTagsOpen(false) }}
+                open={tagsOpen}
+                items={toSelArr(project.project.tags)}
+                selected={tags}
+                onChange={(tags) => { setTags(tags) }}
+                />
+            </div>
+            <div className="listed-tags" >
               { tags
                 .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
                 .map( ( tag ) => (
-                  <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+                  <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} key={tag.id} className="m-r-5 p-l-5 p-r-5">
                     {tag.title}
                   </span>
                 ) )
               }
-            </Empty>
+            </div>
           </div>
         }
 
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Zadal</label>
+          <label>Zadal</label>
           <div className="flex">
             <Select
               options={[{label:'Current',value:'cur',id:'cur'}].concat(users)}
@@ -490,7 +546,7 @@ export default function FilterForm( props ) {
         </div>
 
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Firma</label>
+          <label>Firma</label>
           <div className="flex">
             <Select
               options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(allCompanies))}
@@ -505,7 +561,7 @@ export default function FilterForm( props ) {
         </div>
 
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Rieši</label>
+          <label>Rieši</label>
           <div className="flex">
             <Select
               options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(users, 'email'))}
@@ -521,7 +577,7 @@ export default function FilterForm( props ) {
 
         {/*Task type*/}
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Typ práce</label>
+          <label>Typ práce</label>
           <div className="flex">
             <Select
               options={toSelArr(allTaskTypes)}
@@ -619,7 +675,7 @@ export default function FilterForm( props ) {
           />
 
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Important</label>
+          <label>Important</label>
           <div className="flex">
             <Select
               options={booleanSelectOptions}
@@ -632,7 +688,7 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Invoiced</label>
+          <label>Invoiced</label>
           <div className="flex">
             <Select
               options={booleanSelectOptions}
@@ -645,7 +701,7 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Paušál</label>
+          <label>Paušál</label>
           <div className="flex">
             <Select
               options={booleanSelectOptions}
@@ -658,7 +714,7 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label htmlFor="example-input-small">Overtime</label>
+          <label>Overtime</label>
           <div className="flex">
             <Select
               options={booleanSelectOptions}

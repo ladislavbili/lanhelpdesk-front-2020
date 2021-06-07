@@ -8,6 +8,7 @@ import {
   DropdownMenu,
   DropdownToggle,
 } from 'reactstrap';
+import ModalError from './modalError';
 import classnames from 'classnames';
 import {
   GET_LOCAL_ERRORS,
@@ -28,6 +29,7 @@ export default function LocalErrors( props ) {
     data: localErrorsData,
   } = useQuery( GET_LOCAL_ERRORS );
   const [ open, setOpen ] = React.useState( false );
+  const [ openedError, setOpenedError ] = React.useState( null );
   const count = localErrorsData.localErrors.length;
   if ( count === 0 ) {
     return null;
@@ -41,18 +43,38 @@ export default function LocalErrors( props ) {
         </DropdownToggle>
         <DropdownMenu right>
           <DropdownItem header={true}>Local Errors</DropdownItem>
-          { localErrorsData.localErrors.slice(0,10).map( (localError) =>
-            <DropdownItem
-              key={localError.id}
-              onClick={ () => {
-              }}
-              className='notification-read-small'
-              >
-              <div>
-                {localError.message}
-              </div>
-            </DropdownItem>
-          )}
+          { localErrorsData.localErrors.slice(0,10).map( (localError, index) => {
+            if(localError.apollo){
+              const errors = localError.errors;
+              return (
+                <DropdownItem
+                  key={index}
+                  onClick={ () => setOpenedError( localError ) }
+                  className='notification-read-small'
+                  >
+                  <div>
+                    {errors.map((error, index) => (
+                      <div key={index}>
+                        {error.message}
+                      </div>
+                    ) )}
+                  </div>
+                </DropdownItem>
+              )
+            }
+            const error = localError.error;
+            return (
+              <DropdownItem
+                key={index}
+                onClick={ () => setOpenedError( localError ) }
+                className='notification-read-small'
+                >
+                <div>
+                  {error.message}
+                </div>
+              </DropdownItem>
+            )
+          } )}
           <DropdownItem divider={true}/>
           <DropdownItem onClick={() => {
               if(window.confirm('Are you sure?')){
@@ -63,6 +85,7 @@ export default function LocalErrors( props ) {
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
+      <ModalError opened={openedError !== null} close={() => setOpenedError(null)} localError={openedError} />
     </Empty>
   )
 }
