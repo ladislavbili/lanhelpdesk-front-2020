@@ -45,6 +45,9 @@ import {
   emptyFilter,
   booleanSelectOptions,
 } from 'configs/constants/filter';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 export default function PublicFilterAdd( props ) {
   const {
@@ -248,7 +251,7 @@ export default function PublicFilterAdd( props ) {
         history.push( `./${response.data.addPublicFilter.id}` );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
         setSaving( false );
       } )
   }

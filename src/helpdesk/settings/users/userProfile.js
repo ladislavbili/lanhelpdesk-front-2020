@@ -10,6 +10,9 @@ import {
   Label,
   Input
 } from 'reactstrap';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import Loading from 'components/loading';
 import Select from 'react-select';
 import {
@@ -96,8 +99,7 @@ export default function UserProfile( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
     setSaving( false );
     closeModal();

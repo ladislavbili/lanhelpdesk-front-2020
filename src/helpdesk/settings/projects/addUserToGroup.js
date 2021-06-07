@@ -23,6 +23,9 @@ import {
 import {
   pickSelectStyle
 } from "configs/components/select";
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import Loading from 'components/loading';
 
 
@@ -83,7 +86,7 @@ export default function AddUserToGroup( props ) {
         setGroup( null );
         finish();
       } )
-      .catch( ( err ) => console.log( err ) )
+      .catch( ( err ) => addLocalError( err ) )
   }
 
   const projectGroups = toSelArr( projectGroupsData.projectGroups )

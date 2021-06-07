@@ -20,6 +20,7 @@ import {
 import Empty from 'components/Empty';
 import ErrorIcon from 'components/errorMessages/errorIcon';
 import NotificationIcon from 'components/notifications/notificationIcon';
+import LocalErrors from 'components/localErrors';
 import classnames from 'classnames';
 import {
   getLocation,
@@ -120,6 +121,7 @@ export default function PageHeader( props ) {
             <i className="fas fa-user m-l-5"/>
           </div>
 
+          <LocalErrors />
           { accessRights.viewErrors &&
             <ErrorIcon history={history} location={URL} />
           }

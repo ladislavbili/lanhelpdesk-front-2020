@@ -24,6 +24,9 @@ import {
 import {
   toSelArr
 } from 'helperFunctions';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 import {
   GET_STATUS_TEMPLATES,
@@ -112,7 +115,7 @@ export default function StatusEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -129,8 +132,7 @@ export default function StatusEdit( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   };

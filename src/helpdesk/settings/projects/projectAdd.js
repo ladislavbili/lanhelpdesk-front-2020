@@ -35,7 +35,9 @@ import Groups from './components/group/groupAdd';
 import ProjectDefaultValues from "./components/defaultValues";
 import ProjectAcl from "./components/acl";
 import ACLErrors from './components/aclErrors';
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import {
   remapRightsToBackend
 } from './helpers';
@@ -240,7 +242,7 @@ export default function ProjectAdd( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

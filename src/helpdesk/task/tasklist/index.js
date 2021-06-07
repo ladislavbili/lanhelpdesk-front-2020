@@ -37,6 +37,7 @@ import {
   setProject,
   setMilestone,
   setTasksSort,
+  addLocalError,
   setLocalTaskSearch,
   setGlobalTaskSearch,
   setLocalTaskStringFilter,
@@ -176,12 +177,13 @@ export default function TasksLoader( props ) {
   }, [ localFilter, localProject.id, tasksSort, globalSearchData, globalStringFilter ] );
 
   //monitor and log timings
-  React.useEffect( () => {
-    if ( !tasksLoading && false ) {
-      console.log( 'timings', [ tasksData.tasks.execTime, tasksData.tasks.secondaryTimes ] );
-    }
-  }, [ tasksLoading ] );
-
+  /*
+    React.useEffect( () => {
+      if ( !tasksLoading ) {
+        console.log( 'timings', [ tasksData.tasks.execTime, tasksData.tasks.secondaryTimes ] );
+      }
+    }, [ tasksLoading ] );
+  */
   //state
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
 
@@ -201,7 +203,7 @@ export default function TasksLoader( props ) {
       .then( ( response ) => {
         userDataRefetch();
       } )
-      .catch( ( err ) => console.log( err ) );
+      .catch( ( err ) => addLocalError( err ) );
   }
 
   const setPreference = ( visibility ) => {
@@ -237,7 +239,7 @@ export default function TasksLoader( props ) {
         } );
       } )
       .catch( ( error ) => {
-        console.log( error );
+        addLocalError( error );
       } )
   }
 
@@ -290,8 +292,7 @@ export default function TasksLoader( props ) {
           } );
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
 
       if ( cantDeleteTasks.length > 0 ) {
@@ -313,7 +314,7 @@ export default function TasksLoader( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
   }
 

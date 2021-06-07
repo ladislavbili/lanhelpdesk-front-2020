@@ -13,6 +13,9 @@ import Loading from 'components/loading';
 import {
   toSelArr
 } from 'helperFunctions';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import DeleteReplacement from 'components/deleteReplacement';
 import {
   GET_TRIP_TYPES,
@@ -92,7 +95,7 @@ export default function TripTypeEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -110,7 +113,7 @@ export default function TripTypeEdit( props ) {
           history.push( '/helpdesk/settings/tripTypes/add' );
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   };

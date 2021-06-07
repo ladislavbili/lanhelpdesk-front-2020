@@ -4,7 +4,9 @@ import {
   useQuery,
   useSubscription,
 } from "@apollo/client";
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import {
   FormGroup,
   Label,
@@ -160,7 +162,7 @@ export default function CompanyAdd( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }
@@ -185,7 +187,7 @@ export default function CompanyAdd( props ) {
         addCompanyFunc();
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

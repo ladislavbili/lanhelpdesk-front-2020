@@ -15,7 +15,9 @@ import {
   ModalHeader,
 } from 'reactstrap';
 import TaskAdd from './taskAdd';
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import ProjectSelectModal from './projectSelectModal';
 
 import {
@@ -154,7 +156,7 @@ export default function TaskAddContainer( props ) {
           taskLayout: value,
         }
       } )
-      .catch( ( err ) => console.log( err ) );
+      .catch( ( err ) => addLocalError( err ) );
   }
 
   const currentUser = getMyData();

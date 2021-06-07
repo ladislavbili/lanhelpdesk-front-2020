@@ -12,6 +12,9 @@ import Select from 'react-select';
 import classnames from 'classnames';
 import Loading from 'components/loading';
 import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+import {
   pickSelectStyle
 } from 'configs/components/select';
 import NotificationInfo from './notificationInfo';
@@ -83,7 +86,7 @@ export default function NotificationList( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   }
@@ -96,7 +99,7 @@ export default function NotificationList( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   }
@@ -105,7 +108,7 @@ export default function NotificationList( props ) {
     if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
       deleteAllUserNotifications()
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   }
@@ -120,7 +123,7 @@ export default function NotificationList( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   }

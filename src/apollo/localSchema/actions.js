@@ -1,4 +1,5 @@
 export * from './filter/actions';
+export * from './localErrors/actions';
 export * from './login/actions';
 export * from './milestone/actions';
 export * from './project/actions';

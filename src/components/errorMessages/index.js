@@ -15,7 +15,9 @@ import {
   pickSelectStyle
 } from 'configs/components/select';
 import ErrorDetails from './errorDetails';
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import {
   timestampToString
 } from 'helperFunctions';
@@ -83,7 +85,7 @@ export default function ErrorList( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   }
@@ -97,7 +99,7 @@ export default function ErrorList( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   }
@@ -107,7 +109,7 @@ export default function ErrorList( props ) {
       setSelectedErrorID( null );
       deleteAllErrorMessages()
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   }
@@ -123,7 +125,7 @@ export default function ErrorList( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   }

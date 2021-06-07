@@ -16,7 +16,9 @@ import lodash from 'lodash';
 
 import Attachments from 'helpdesk/components/attachments';
 import Comments from 'helpdesk/components/comments';
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import classnames from "classnames";
 import {
   toSelArr,
@@ -223,7 +225,7 @@ export default class MultipleTaskEdit extends Component {
                       if ( response.error ) {}
                     } ) )
                   .catch( ( error ) => {
-                    console.log( error );
+                    addLocalError( error );
                   } );
               } );
             //end of sending mail

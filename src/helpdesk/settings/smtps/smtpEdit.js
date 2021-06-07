@@ -18,10 +18,13 @@ import {
 } from 'reactstrap';
 import Loading from 'components/loading';
 import ErrorMessage from 'components/errorMessage';
-import Checkbox from '../../../components/checkbox';
+import Checkbox from 'components/checkbox';
 import {
   toSelArr
 } from 'helperFunctions';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import Select from 'react-select';
 import {
   pickSelectStyle
@@ -168,7 +171,7 @@ export default function SMTPEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -226,8 +229,7 @@ export default function SMTPEdit( props ) {
           history.push( '/helpdesk/settings/smtps/add' );
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   };

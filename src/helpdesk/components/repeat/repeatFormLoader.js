@@ -17,6 +17,9 @@ import Loading from 'components/loading';
 import {
   noMilestone
 } from 'configs/constants/sidebar';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import RepeatForm from './repeatForm';
 import axios from 'axios';
 import {
@@ -180,7 +183,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.addRepeatTemplateShortSubtask, 'shortSubtasks', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -200,7 +203,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.updateRepeatTemplateShortSubtask, 'shortSubtasks', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -218,8 +221,7 @@ export default function RepeatFormLoader( props ) {
         }, 'shortSubtasks', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
   }
 
@@ -245,7 +247,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.addRepeatTemplateSubtask, 'subtasks', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -272,7 +274,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.updateRepeatTemplateSubtask, 'subtasks', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -290,8 +292,7 @@ export default function RepeatFormLoader( props ) {
         }, 'subtasks', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
   }
 
@@ -316,7 +317,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.addRepeatTemplateWorkTrip, 'workTrips', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -342,7 +343,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.updateRepeatTemplateWorkTrip, 'workTrips', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -360,8 +361,7 @@ export default function RepeatFormLoader( props ) {
         }, 'workTrips', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
   }
 
@@ -384,7 +384,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.addRepeatTemplateMaterial, 'materials', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -409,7 +409,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.updateRepeatTemplateMaterial, 'materials', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -427,7 +427,7 @@ export default function RepeatFormLoader( props ) {
         }, 'materials', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
   }
 
@@ -449,7 +449,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.addRepeatTemplateCustomItem, 'customItems', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -473,7 +473,7 @@ export default function RepeatFormLoader( props ) {
         updateCasheStorage( response.data.updateRepeatTemplateCustomItem, 'customItems', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -491,8 +491,7 @@ export default function RepeatFormLoader( props ) {
         }, 'customItems', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
   }
 

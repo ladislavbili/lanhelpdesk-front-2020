@@ -4,9 +4,8 @@ import {
   useQuery
 } from "@apollo/client";
 import {
-  gql
-} from '@apollo/client';
-
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import {
   Modal,
   ModalBody,
@@ -144,7 +143,7 @@ export default function MilestoneEdit( props ) {
         setOpened( false );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -186,8 +185,7 @@ export default function MilestoneEdit( props ) {
           setOpened( false );
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   };

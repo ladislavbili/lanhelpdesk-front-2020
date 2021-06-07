@@ -29,8 +29,6 @@ export default function MomentDatePicker( props ) {
         onChange = {( date ) => {
           if ( onChange ) {
             onChange( moment( date ) )
-          } else {
-            console.log( moment( date ) );
           }
         }}
         />

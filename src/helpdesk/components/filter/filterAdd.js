@@ -31,6 +31,7 @@ import {
 
 import {
   setFilter,
+  addLocalError,
 } from 'apollo/localSchema/actions';
 
 import {
@@ -143,7 +144,7 @@ export default function FilterAdd( props ) {
           history.push( `/helpdesk/taskList/i/${newFilter.id}` );
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     } else {
       updateFilter( {
@@ -184,7 +185,7 @@ export default function FilterAdd( props ) {
           } );
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
     close();

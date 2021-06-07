@@ -12,6 +12,7 @@ import Checkbox from 'components/checkbox';
 
 import {
   setFilter,
+  addLocalError,
 } from 'apollo/localSchema/actions';
 
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
@@ -282,7 +283,7 @@ export default function PublicFilterEdit( props ) {
         setDataChanged( false );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
         setSaving( false );
       } )
   }
@@ -300,8 +301,7 @@ export default function PublicFilterEdit( props ) {
           close();
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   }

@@ -10,13 +10,16 @@ import {
   Label,
   Input
 } from 'reactstrap';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 import CompanyRents from '../companies/companyRents';
 import CompanyPriceList from '../companies/companyPriceList';
 
 import {
   toSelArr
-} from '../../../helperFunctions';
+} from 'helperFunctions';
 import Loading from 'components/loading';
 
 import {
@@ -161,7 +164,7 @@ export default function PausalEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -188,7 +191,7 @@ export default function PausalEdit( props ) {
         updateCompanyFunc();
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
     setDataChanged( false );

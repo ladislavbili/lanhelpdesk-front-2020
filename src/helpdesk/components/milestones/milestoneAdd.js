@@ -16,6 +16,10 @@ import {
 } from 'reactstrap';
 
 import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+
+import {
   GET_MY_PROJECTS
 } from 'helpdesk/settings/projects/queries';
 
@@ -98,7 +102,7 @@ export default function MilestoneAdd( props ) {
         closeModal( response.data.addMilestone );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

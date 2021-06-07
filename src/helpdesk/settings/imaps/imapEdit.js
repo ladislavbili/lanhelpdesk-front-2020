@@ -18,6 +18,9 @@ import {
   toSelArr,
   filterUnique
 } from 'helperFunctions';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import Select, {
   Creatable
 } from 'react-select';
@@ -212,7 +215,7 @@ export default function IMAPEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -236,8 +239,7 @@ export default function IMAPEdit( props ) {
           history.goBack();
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   };

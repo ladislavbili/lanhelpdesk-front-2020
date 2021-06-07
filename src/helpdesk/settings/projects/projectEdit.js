@@ -41,6 +41,7 @@ import Loading from 'components/loading';
 import ACLErrors from './components/aclErrors';
 import {
   setProject,
+  addLocalError,
 } from 'apollo/localSchema/actions';
 import {
   remapRightsToBackend,
@@ -527,7 +528,7 @@ export default function ProjectEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -552,8 +553,7 @@ export default function ProjectEdit( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   };

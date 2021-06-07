@@ -15,6 +15,10 @@ import ErrorMessage from 'components/errorMessage';
 import axios from 'axios';
 
 import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+
+import {
   toSelArr,
   localFilterToValues,
   getMyData,
@@ -283,7 +287,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.addScheduledTask, 'scheduled', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -301,8 +305,7 @@ export default function TaskEditContainer( props ) {
         }, 'scheduled', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
   }
 
@@ -317,7 +320,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.addShortSubtask, 'shortSubtasks', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -337,7 +340,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.updateShortSubtask, 'shortSubtasks', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -355,8 +358,7 @@ export default function TaskEditContainer( props ) {
         }, 'shortSubtasks', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
   }
 
@@ -372,7 +374,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.createSubtaskFromScheduled, 'subtasks', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -399,7 +401,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.addSubtask, 'subtasks', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -426,7 +428,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.updateSubtask, 'subtasks', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -444,8 +446,7 @@ export default function TaskEditContainer( props ) {
         }, 'subtasks', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
   }
 
@@ -469,7 +470,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.addWorkTrip, 'workTrips', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -495,7 +496,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.updateWorkTrip, 'workTrips', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -513,8 +514,7 @@ export default function TaskEditContainer( props ) {
         }, 'workTrips', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
   }
 
@@ -536,7 +536,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.addMaterial, 'materials', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -561,7 +561,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.updateMaterial, 'materials', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -579,7 +579,7 @@ export default function TaskEditContainer( props ) {
         }, 'materials', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
   }
 
@@ -600,7 +600,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.addCustomItem, 'customItems', 'ADD' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -624,7 +624,7 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( response.data.updateCustomItem, 'customItems', 'UPDATE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -642,8 +642,7 @@ export default function TaskEditContainer( props ) {
         }, 'customItems', 'DELETE' );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
-        console.log( err );
+        addLocalError( err );
       } );
   }
 
@@ -682,8 +681,7 @@ export default function TaskEditContainer( props ) {
           } catch ( err ) {}
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   }
@@ -721,7 +719,7 @@ export default function TaskEditContainer( props ) {
       } )
       .catch( ( err ) => {
         setSaving( false );
-        console.log( err.message );
+        addLocalError( err );
       } );
   }
 
@@ -753,7 +751,7 @@ export default function TaskEditContainer( props ) {
       } )
       .catch( ( err ) => {
         setSaving( false );
-        console.log( err.message );
+        addLocalError( err );
       } );
   }
 
@@ -834,7 +832,7 @@ export default function TaskEditContainer( props ) {
           taskLayout: value,
         }
       } )
-      .catch( ( err ) => console.log( err ) );
+      .catch( ( err ) => addLocalError( err ) );
   }
 
   const currentUser = getMyData();

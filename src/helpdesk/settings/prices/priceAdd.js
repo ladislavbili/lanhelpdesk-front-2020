@@ -13,6 +13,9 @@ import {
 import Switch from "react-switch";
 import Loading from 'components/loading';
 import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+import {
   GET_TASK_TYPES,
   TASK_TYPES_SUBSCRIPTION,
 } from '../taskTypes/queries';
@@ -154,7 +157,7 @@ export default function PricelistAdd( props ) {
         history.push( '/helpdesk/settings/pricelists/' + response.data.addPricelist.id )
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

@@ -11,6 +11,9 @@ import {
   DropdownToggle,
 } from 'reactstrap';
 import classnames from 'classnames';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import Empty from '../Empty';
 import {
   GET_USER_NOTIFICATIONS_COUNT,
@@ -93,7 +96,7 @@ export default function NotificationIcon( props ) {
                       .then( ( response ) => {
                         history.push(`${location}/notifications/${notification.id}` )
                       }).catch((err) => {
-                        console.log(err);
+                        addLocalError(err);
                       })
                   }else{
                     history.push(`${location}/notifications/${notification.id}` )

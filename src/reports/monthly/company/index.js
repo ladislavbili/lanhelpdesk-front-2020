@@ -16,6 +16,9 @@ import {
   FormGroup,
   Label
 } from 'reactstrap';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 import moment from 'moment';
 import Select from 'react-select';
@@ -184,7 +187,7 @@ export default function MothlyReportsCompany( props ) {
       } )
       .catch( ( err ) => {
         setCreatingInvoice( false );
-        console.log( err.message );
+        addLocalError( err );
       } );
   }
 

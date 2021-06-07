@@ -14,6 +14,9 @@ import {
   toSelArr,
   getMyData,
 } from 'helperFunctions';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import Loading from 'components/loading';
 import RightRow from './rightRow';
 
@@ -198,7 +201,7 @@ export default function RoleEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -216,8 +219,7 @@ export default function RoleEdit( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   };

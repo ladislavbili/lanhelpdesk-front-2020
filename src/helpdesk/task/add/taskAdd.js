@@ -47,7 +47,9 @@ import {
   invoicedAttributes,
   noTaskType
 } from '../constants';
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 import {
   toSelArr
@@ -444,7 +446,7 @@ export default function TaskAdd( props ) {
               }
             } )
             .catch( ( err ) => {
-              console.log( err.message );
+              addLocalError( err );
               setSaving( false );
             } );
         } else {
@@ -455,7 +457,7 @@ export default function TaskAdd( props ) {
 
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
         setSaving( false );
       } );
   }

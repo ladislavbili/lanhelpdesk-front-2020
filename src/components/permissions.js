@@ -6,7 +6,9 @@ import Select from "react-select";
 import {
   pickSelectStyle
 } from "configs/components/select";
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import {
   rebase
 } from '../index';
@@ -33,7 +35,7 @@ export default class Permissions extends Component {
       state: "users",
       then( data ) {},
       onFailure( err ) {
-        console.log( err );
+        addLocalError( err );
       }
     } );
   }

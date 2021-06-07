@@ -19,6 +19,9 @@ import {
   DELETE_TASK_TYPE,
   GET_TASK_TYPES,
 } from './queries';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 export default function TaskTypeEdit( props ) {
   //data
@@ -92,7 +95,7 @@ export default function TaskTypeEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -113,8 +116,7 @@ export default function TaskTypeEdit( props ) {
           history.push( '/helpdesk/settings/taskTypes/add' );
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   };

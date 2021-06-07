@@ -24,7 +24,9 @@ import Select, {
 import {
   pickSelectStyle
 } from "configs/components/select";
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import {
   GET_IMAPS,
   ADD_IMAP,
@@ -129,7 +131,7 @@ export default function IMAPAdd( props ) {
         history.push( '/helpdesk/settings/imaps/' + newIMAP.id )
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

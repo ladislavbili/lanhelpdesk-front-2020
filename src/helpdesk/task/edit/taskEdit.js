@@ -64,6 +64,9 @@ import {
   toFloatOrZero
 } from 'helperFunctions';
 import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+import {
   GET_TASK,
   GET_TASKS,
 } from '../queries';
@@ -361,7 +364,6 @@ export default function TaskEdit( props ) {
     //save all
     if ( Object.keys( changes )
       .length > 0 ) {
-      console.log( 'project changes', changes );
       autoUpdateTask( changes );
     }
   }
@@ -509,12 +511,11 @@ export default function TaskEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( 'error' );
         setChanges( {
           ...changes,
           ...change
         } );
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -702,7 +703,7 @@ export default function TaskEdit( props ) {
         } );
       } )
       .catch( ( error ) => {
-        console.log( error );
+        addLocalError( error );
       } )
   }
 

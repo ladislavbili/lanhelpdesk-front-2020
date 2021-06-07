@@ -15,6 +15,9 @@ import {
   toSelArr,
   isEmail
 } from 'helperFunctions';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import CompanyRents from './companyRents';
 import CompanyPriceList from './companyPriceList';
 import DeleteReplacement from 'components/deleteReplacement';
@@ -264,7 +267,7 @@ export default function CompanyEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -285,8 +288,7 @@ export default function CompanyEdit( props ) {
           history.push( '/helpdesk/settings/companies/add' );
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   };
@@ -316,7 +318,7 @@ export default function CompanyEdit( props ) {
         updateCompanyFunc( newPricelist.id );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

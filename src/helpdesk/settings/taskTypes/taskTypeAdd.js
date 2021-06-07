@@ -8,7 +8,9 @@ import {
   Label,
   Input
 } from 'reactstrap';
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import {
   ADD_TASK_TYPE,
   GET_TASK_TYPES,
@@ -41,7 +43,7 @@ export default function TaskTypeAdd( props ) {
         history.push( '/helpdesk/settings/taskTypes/' + response.data.addTaskType.id )
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

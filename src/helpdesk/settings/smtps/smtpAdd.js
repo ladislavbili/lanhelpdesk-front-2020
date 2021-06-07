@@ -11,12 +11,14 @@ import {
   InputGroupAddon,
   InputGroupText
 } from 'reactstrap';
-import Checkbox from '../../../components/checkbox';
+import Checkbox from 'components/checkbox';
 import Select from 'react-select';
 import {
   pickSelectStyle
 } from "configs/components/select";
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import wellKnownOptions from 'configs/constants/wellKnown';
 
 import {
@@ -86,7 +88,7 @@ export default function SMTPAdd( props ) {
         history.push( '/helpdesk/settings/smtps/' + newSMTP.id )
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

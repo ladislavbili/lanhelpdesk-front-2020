@@ -17,6 +17,9 @@ import {
 import {
   actions
 } from 'configs/constants/statuses';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 import {
   GET_STATUS_TEMPLATES,
@@ -58,7 +61,7 @@ export default function StatusAdd( props ) {
       } )
       .catch( ( err ) => {
         setSaving( false );
-        console.log( err.message );
+        addLocalError( err );
       } );
   }
 

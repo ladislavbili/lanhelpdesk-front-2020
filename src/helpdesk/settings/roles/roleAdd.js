@@ -9,6 +9,9 @@ import {
   Label,
   Input
 } from 'reactstrap';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import RightRow from './rightRow';
 import {
   getMyData,
@@ -150,7 +153,7 @@ export default function RoleAdd( props ) {
         history.push( '/helpdesk/settings/roles/' + response.data.addRole.id )
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

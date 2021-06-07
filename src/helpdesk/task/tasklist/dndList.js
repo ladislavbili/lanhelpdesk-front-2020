@@ -28,6 +28,9 @@ import {
   Droppable,
   Draggable
 } from 'react-beautiful-dnd';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 import {
   UPDATE_TASK,
@@ -101,8 +104,8 @@ export default function TaskListDnD( props ) {
               task: newTask
             }
           } );
-        } catch ( e ) {
-          console.log( e.message );
+        } catch ( err ) {
+          addLocalError( err );
         }
 
         try {
@@ -143,14 +146,14 @@ export default function TaskListDnD( props ) {
               }
             }
           } );
-        } catch ( e ) {
-          console.log( e.message );
+        } catch ( err ) {
+          addLocalError( err );
         } finally {
 
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
   }
 

@@ -21,6 +21,7 @@ import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
 import FilterDatePickerPopover from 'components/filterDatePickerPopover';
 import {
   setFilter,
+  addLocalError,
 } from 'apollo/localSchema/actions';
 import {
   pickSelectStyle
@@ -268,8 +269,7 @@ export default function FilterForm( props ) {
           close();
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   }
@@ -364,7 +364,6 @@ export default function FilterForm( props ) {
       .filter( ( taskType ) => filter.taskTypes.some( ( taskType2 ) => taskType.id === taskType2.id ) )
     );
     if ( projectId ) {
-      console.log( localProjectData );
       setTags(
         toSelArr( localProjectData.localProject.project.tags )
         .filter( ( tag1 ) => filter.tags.some( ( tag2 ) => tag1.id === tag2.id ) )
@@ -412,8 +411,6 @@ export default function FilterForm( props ) {
   const allTaskTypes = toSelArr( taskTypesData.taskTypes );
 
   let canModify = id !== null;
-
-  console.log( localProjectData.localProject );
 
   return (
     <div>

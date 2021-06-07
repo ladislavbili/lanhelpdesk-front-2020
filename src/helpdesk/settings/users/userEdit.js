@@ -13,6 +13,9 @@ import Select from 'react-select';
 import {
   pickSelectStyle
 } from "configs/components/select";
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 import languages from "configs/constants/languages";
 
@@ -157,7 +160,7 @@ export default function UserEdit( props ) {
         variables: data
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
     setDataChanged( false );
@@ -174,7 +177,7 @@ export default function UserEdit( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
         } );
     }
   };

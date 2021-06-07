@@ -24,6 +24,9 @@ import {
   toSelArr,
   getMyData,
 } from 'helperFunctions';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import Checkbox from 'components/checkbox';
 
 import {
@@ -126,7 +129,7 @@ export default function UserAdd( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

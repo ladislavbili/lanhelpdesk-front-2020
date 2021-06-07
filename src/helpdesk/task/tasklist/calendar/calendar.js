@@ -34,6 +34,9 @@ import {
 import {
   lightenDarkenColor,
 } from 'helperFunctions';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 const DnDCalendar = withDragAndDrop( Calendar );
 
@@ -105,7 +108,7 @@ export default function TaskCalendar( props ) {
       } )
       .then( refetchScheduled )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
   };
 
@@ -130,7 +133,7 @@ export default function TaskCalendar( props ) {
       } )
       .then( refetchScheduled )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
   };
 

@@ -69,6 +69,10 @@ import {
 } from 'configs/constants/projects';
 
 import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+
+import {
   toSelArr,
   toSelItem,
   deleteAttributes,
@@ -324,7 +328,6 @@ export default function RepeatForm( props ) {
     //save all
     if ( Object.keys( changes )
       .length > 0 ) {
-      console.log( 'project changes', changes );
       saveChange( changes );
     }
   }
@@ -457,7 +460,7 @@ export default function RepeatForm( props ) {
             closeModal( true );
           } )
           .catch( ( err ) => {
-            console.log( err );
+            addLocalError( err );
             setSaving( false );
           } )
       }
@@ -500,7 +503,7 @@ export default function RepeatForm( props ) {
           updateRepeatData( response );
         } )
         .catch( ( err ) => {
-          console.log( err );
+          addLocalError( err );
           setSaving( false );
         } )
     } else {
@@ -593,7 +596,7 @@ export default function RepeatForm( props ) {
                 }
               } )
               .catch( ( err ) => {
-                console.log( err.message );
+                addLocalError( err );
                 setSaving( false );
               } );
           } else {
@@ -603,7 +606,7 @@ export default function RepeatForm( props ) {
           }
         } )
         .catch( ( err ) => {
-          console.log( err.message );
+          addLocalError( err );
           setSaving( false );
         } );
     }
@@ -1581,7 +1584,6 @@ export default function RepeatForm( props ) {
             }
           }}
           updateSubtask={(id,newData)=>{
-            console.log(id,newData);
             if(editMode){
               updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
             }

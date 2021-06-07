@@ -7,6 +7,9 @@ import axios from 'axios';
 import {
   REST_URL,
 } from 'configs/restAPI';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import classnames from 'classnames';
 
 export default function TaskAttachments( props ) {
@@ -46,7 +49,7 @@ export default function TaskAttachments( props ) {
         //download
       } )
       .catch( ( err ) => {
-        console.log( err );
+        addLocalError( err );
       } )
   }
 

@@ -41,6 +41,9 @@ import {
   noDef
 } from 'configs/constants/projects';
 import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+import {
   ADD_TASK,
   GET_TASKS,
 } from '../../queries';
@@ -276,7 +279,7 @@ export default function RowTaskAdd( props ) {
         setSaving( false );
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
         setSaving( false );
       } );
   }

@@ -10,6 +10,10 @@ import {
 } from 'reactstrap';
 
 import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+
+import {
   GET_TRIP_TYPES,
   ADD_TRIP_TYPE,
 } from './queries';
@@ -41,7 +45,7 @@ export default function TripTypeAdd( props ) {
         history.push( '/helpdesk/settings/tripTypes/' + response.data.addTripType.id )
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
     setSaving( false );
   }

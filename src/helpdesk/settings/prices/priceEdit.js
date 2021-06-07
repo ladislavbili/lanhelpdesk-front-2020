@@ -3,7 +3,9 @@ import {
   useMutation,
   useQuery
 } from "@apollo/client";
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import {
   FormGroup,
   Label,
@@ -125,7 +127,7 @@ export default function PricelistEdit( props ) {
         }
       } )
       .catch( ( err ) => {
-        console.log( err.message );
+        addLocalError( err );
       } );
 
     setSaving( false );
@@ -147,8 +149,7 @@ export default function PricelistEdit( props ) {
           history.push( '/helpdesk/settings/pricelists/add' );
         } )
         .catch( ( err ) => {
-          console.log( err.message );
-          console.log( err );
+          addLocalError( err );
         } );
     }
   };
