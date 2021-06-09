@@ -12,6 +12,7 @@ important
 invoiced
 invoicedDate
 title
+ganttOrder
 updatedAt
 createdAt
 closeDate
@@ -69,6 +70,7 @@ createdBy {
   name
   surname
 }
+startsAt
 deadline
 description
 milestone{
@@ -255,6 +257,7 @@ const listTasks = `
 tasks {
   id
   title
+  ganttOrder
   invoiced
   updatedAt
   createdAt
@@ -292,11 +295,13 @@ tasks {
     name
     surname
   }
+  startsAt
   deadline
   description
   milestone{
     id
     title
+    order
   }
   pendingDate
   project{
@@ -367,9 +372,11 @@ export const ADD_TASK = gql `
 mutation addTask(
   $important: Boolean,
   $title: String!,
+  $ganttOrder: Int,
   $closeDate: String,
   $assignedTo: [Int]!,
   $company: Int!,
+  $startsAt: String,
   $deadline: String,
   $description: String!,
   $milestone: Int,
@@ -393,9 +400,11 @@ mutation addTask(
   addTask(
     important: $important,
     title: $title,
+    ganttOrder: $ganttOrder,
     closeDate: $closeDate,
     assignedTo: $assignedTo,
     company: $company,
+    startsAt: $startsAt,
     deadline: $deadline,
     description: $description,
     milestone: $milestone,
@@ -478,9 +487,11 @@ mutation updateTask(
   $id: Int!,
   $important: Boolean,
   $title: String,
+  $ganttOrder: Int,
   $closeDate: String,
   $assignedTo: [Int],
   $company: Int,
+  $startsAt: String,
   $deadline: String,
   $description: String,
   $milestone: Int,
@@ -498,9 +509,11 @@ mutation updateTask(
     id: $id,
     important: $important,
     title: $title,
+    ganttOrder: $ganttOrder,
     closeDate: $closeDate,
     assignedTo: $assignedTo,
     company: $company,
+    startsAt: $startsAt,
     deadline: $deadline,
     description: $description,
     milestone: $milestone,

@@ -67,8 +67,12 @@ export default function ModalError( props ) {
               <label className="p-r-5">Error code: </label>
               {error.extensions.code}
             </div>
-            <label>Stack path:</label>
-            <div>{error.path.reduce(((acc, cur) => `${acc.length > 0 ? `${acc} -> ` :''}${cur}` ),'')}</div>
+            { error.path &&
+              <Empty>
+                <label>Stack path:</label>
+                <div>{error.path.reduce(((acc, cur) => `${acc.length > 0 ? `${acc} -> ` :''}${cur}` ),'')}</div>
+              </Empty>
+            }
             <label>Stack trace:</label>
             {error.extensions.exception.stacktrace.map((text, index) => <div key={index}>{text}</div> )}
           </div>

@@ -1,9 +1,12 @@
-import { gql } from '@apollo/client';
+import {
+  gql
+} from '@apollo/client';
 
 export const ADD_MILESTONE = gql `
-mutation addMilestone($title: String!, $description: String!, $startsAt: String, $endsAt: String, $projectId: Int!) {
+mutation addMilestone($title: String!, $order: Int, $description: String!, $startsAt: String, $endsAt: String, $projectId: Int!) {
   addMilestone(
     title: $title,
+    order: $order,
     description: $description,
     startsAt: $startsAt,
     endsAt: $endsAt,
@@ -17,10 +20,11 @@ mutation addMilestone($title: String!, $description: String!, $startsAt: String,
 
 
 export const UPDATE_MILESTONE = gql `
-mutation updateMilestone($id: Int!, $title: String, $description: String, $startsAt: String, $endsAt: String) {
+mutation updateMilestone($id: Int!, $title: String, $order: Int, $description: String, $startsAt: String, $endsAt: String) {
   updateMilestone(
     id: $id,
     title: $title,
+    order: $order,
     description: $description,
     startsAt: $startsAt,
     endsAt: $endsAt
@@ -38,6 +42,7 @@ query milestone($id: Int!) {
 ){
   id
   title
+  order
   description
   startsAt
   endsAt

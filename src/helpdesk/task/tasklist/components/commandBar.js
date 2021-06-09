@@ -49,6 +49,8 @@ export default function CommandBar( props ) {
         return "fa-map";
       case 3:
         return "fa-calendar-alt";
+      case 4:
+        return "fa-project-diagram";
       default:
         return "fa-cog";
     }
@@ -154,21 +156,28 @@ export default function CommandBar( props ) {
                   }
                   <label className={classnames({'active':tasklistLayout === 1 || tasklistLayout === 0}, "btn btn-link t-a-l")}>
                     <input type="radio" name="options" checked={tasklistLayout === 1 || ( tasklistLayout === 2 && localProject.id === null ) } onChange={() => setTasklistLayout(1)}/>
-                    <i className="fa fa-list"/>
-                    {` Zoznam`}
+                    <i className="fa fa-list m-r-5"/>
+                    Zoznam
                   </label>
                   { localProject.id &&
                     <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link t-a-l")}>
                       <input type="radio" name="options" onChange={() => setTasklistLayout(2)} checked={tasklistLayout === 2}/>
-                      <i className="fa fa-map"/>
-                      {` DnD`}
+                      <i className="fa fa-map m-r-5"/>
+                      DnD
                     </label>
                   }
                   { canViewCalendar &&
                     <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link t-a-l")}>
                       <input type="radio" name="options" onChange={() => setTasklistLayout(3)} checked={tasklistLayout === 3}/>
-                      <i className="fa fa-calendar-alt"/>
-                      {` Kalendár`}
+                      <i className="fa fa-calendar-alt m-r-5"/>
+                      Kalendár
+                    </label>
+                  }
+                  { localProject.id &&
+                    <label className={classnames({'active':tasklistLayout === 4}, "btn btn-link t-a-l")}>
+                      <input type="radio" name="options" onChange={() => setTasklistLayout(4)} checked={tasklistLayout === 4}/>
+                      <i className="fa fa-project-diagram m-r-5"/>
+                      Project management
                     </label>
                   }
                 </div>

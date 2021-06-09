@@ -586,7 +586,7 @@ export default function TasksSidebar( props ) {
         history={history}
         match={match}
         disabled={ !canAddTask }
-        projectID={ localProject.id }
+        projectID={ localProject.id !== null && localProject.right.addTasks ? localProject.id : null }
         />
     )
   }

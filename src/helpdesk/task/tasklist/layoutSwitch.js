@@ -6,6 +6,7 @@ import TableList from './tableList';
 import DnDList from './dndList';
 import Calendar from './calendar';
 import Statistics from './statistics';
+import GanttList from './ganttList';
 
 import moment from 'moment';
 
@@ -245,7 +246,7 @@ export default function TasklistSwitch( props ) {
             </div>
           }
 
-          {( [0,1 ].includes(tasklistLayout)  || (tasklistLayout === 2 && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) && !showStatistics &&
+          {( [ 0, 1 ].includes(tasklistLayout)  || ([ 2, 4 ].includes(tasklistLayout) && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) && !showStatistics &&
             <div className="flex" >
               { taskID && <TaskEdit match={match} columns={false} history={history} /> }
               { !taskID &&
@@ -267,6 +268,14 @@ export default function TasklistSwitch( props ) {
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
                 <Calendar {...generalProps} />
+              }
+            </div>
+          }
+          {tasklistLayout === 4 && localProject.id && !showStatistics &&
+            <div className="col-xl-12" >
+              {taskID && <TaskEdit match={match} columns={false} history={history} />}
+              {!taskID &&
+                <GanttList {...generalProps} />
               }
             </div>
           }

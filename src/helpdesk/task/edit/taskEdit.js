@@ -141,6 +141,7 @@ export default function TaskEdit( props ) {
   const [ assignedTo, setAssignedTo ] = React.useState( [] );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
+  const [ startsAt, setStartsAt ] = React.useState( null );
   const [ deadline, setDeadline ] = React.useState( null );
   const [ description, setDescription ] = React.useState( "" );
   const [ important, setImportant ] = React.useState( false );
@@ -163,6 +164,7 @@ export default function TaskEdit( props ) {
   const [ taskTripPausal, setTaskTripPausal ] = React.useState( 0 );
   const [ taskWorkPausal, setTaskWorkPausal ] = React.useState( 0 );
   const [ title, setTitle ] = React.useState( "" );
+  const [ ganttOrder, setGanttOrder ] = React.useState( 0 );
 
   const [ toggleTab, setToggleTab ] = React.useState( 1 );
   const [ usedSubtaskPausal, setUsedSubtaskPausal ] = React.useState( 0 );
@@ -190,6 +192,7 @@ export default function TaskEdit( props ) {
         .filter( ( user ) => assignableUserIds.includes( user.id ) ) );
     }
     setCloseDate( task.closeDate ? moment( parseInt( task.closeDate ) ) : null );
+    setStartsAt( task.startsAt ? moment( parseInt( task.startsAt ) ) : null );
     setDeadline( task.deadline ? moment( parseInt( task.deadline ) ) : null );
     setDescription( task.description );
     setImportant( task.important );
@@ -232,6 +235,7 @@ export default function TaskEdit( props ) {
     setTaskTripPausal( task.company ? task.company.taskTripPausal : 0 );
     setTaskWorkPausal( task.company ? task.company.taskWorkPausal : 0 );
     setTitle( task.title );
+    setGanttOrder( task.ganttOrder );
     setUsedSubtaskPausal( task.company ? task.company.usedSubtaskPausal : 0 );
     setUsedTripPausal( task.company ? task.company.usedTripPausal : 0 );
   }, [ id ] );
@@ -883,6 +887,7 @@ export default function TaskEdit( props ) {
     assignedTo,
     closeDate,
     company,
+    startsAt,
     deadline,
     description,
     important,
@@ -898,7 +903,7 @@ export default function TaskEdit( props ) {
     tags,
     taskType,
     title,
-
+    ganttOrder,
   } )
 
   //Value Change
@@ -1156,7 +1161,8 @@ export default function TaskEdit( props ) {
               onBlur={(e) => {
                 autoUpdateTask({ title })
               }}
-              placeholder="Enter task name" />
+              placeholder="Enter task name"
+              />
           </span>
           {renderTaskInfoAndDates()}
         </div>
@@ -1248,6 +1254,24 @@ export default function TaskEdit( props ) {
   }
 
   const layoutComponents = {
+    Order: (
+      <input
+        className="form-control hidden-input"
+        placeholder="Set order"
+        value={ ganttOrder }
+        onChange={(e)=> {
+          setGanttOrder(e.target.value);
+        }}
+        onBlur={(e) => {
+          if(!isNaN(parseInt(ganttOrder))){
+            autoUpdateTask({ ganttOrder: parseInt(ganttOrder) })
+          }else{
+            autoUpdateTask({ ganttOrder: 0 })
+            setGanttOrder(0);
+          }
+        }}
+        />
+    ),
     Project: (
       <Select
         placeholder="Zadajte projekt"
@@ -1391,6 +1415,27 @@ export default function TaskEdit( props ) {
         }
       </div>
     ),
+    StartsAt: (
+      <div>
+        { !userRights.deadlineWrite &&
+          <div className="disabled-info">{startsAt}</div>
+        }
+        { userRights.deadlineWrite &&
+          <DatePicker
+            className={classnames("form-control")}
+            selected={startsAt}
+            disabled={!userRights.deadlineWrite}
+            onChange={date => {
+              setStartsAt(date);
+              if( date.valueOf() !== null ){
+                autoUpdateTask({ startsAt: date.valueOf().toString() })
+              }
+            }}
+            placeholderText="No start date"
+            />
+        }
+      </div>
+    ),
     Deadline: (
       <div>
         { !userRights.deadlineWrite &&
@@ -1518,6 +1563,14 @@ export default function TaskEdit( props ) {
               }
               { userRights.deadlineRead &&
                 <div className="p-r-10">
+                  <Label className="col-form-label col-3">Starts at</Label>
+                  <div className="col-9">
+                    { layoutComponents.StartsAt }
+                  </div>
+                </div>
+              }
+              { userRights.deadlineRead &&
+                <div className="p-r-10">
                   <Label className="col-form-label col-3">Deadline</Label>
                   <div className="col-9">
                     { layoutComponents.Deadline }
@@ -1567,6 +1620,13 @@ export default function TaskEdit( props ) {
               layout={layout}
               />
           }
+
+          <div className="p-r-10">
+            <Label className="col-form-label col-3">Order</Label>
+            <div className="col-9">
+              { layoutComponents.Order }
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -1661,6 +1721,14 @@ export default function TaskEdit( props ) {
           }
           { userRights.deadlineRead &&
             <div className="form-selects-entry-column" >
+              <Label>Starts at</Label>
+              <div className="form-selects-entry-column-rest" >
+                { layoutComponents.StartsAt }
+              </div>
+            </div>
+          }
+          { userRights.deadlineRead &&
+            <div className="form-selects-entry-column" >
               <Label>Deadline</Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Deadline }
@@ -1723,6 +1791,12 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
+          <div className="form-selects-entry-column" >
+            <Label>Order</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Order }
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -2303,9 +2377,9 @@ export default function TaskEdit( props ) {
 
               { renderComments() }
 
-              { renderModalUserAdd() }
+              { currentUser.role.accessRights.users && renderModalUserAdd() }
 
-              { renderModalCompanyAdd() }
+              { currentUser.role.accessRights.companies && renderModalCompanyAdd() }
 
               { renderStatusChangeModal() }
 

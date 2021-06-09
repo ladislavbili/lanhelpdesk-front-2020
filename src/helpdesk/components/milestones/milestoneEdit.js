@@ -70,6 +70,7 @@ export default function MilestoneEdit( props ) {
 
   //state
   const [ title, setTitle ] = React.useState( "" );
+  const [ order, setOrder ] = React.useState( 0 );
   const [ description, setDescription ] = React.useState( "" );
   const [ startsAt, setStartsAt ] = React.useState( null );
   const [ endsAt, setEndsAt ] = React.useState( null );
@@ -81,6 +82,7 @@ export default function MilestoneEdit( props ) {
   React.useEffect( () => {
     if ( !loading ) {
       setTitle( data ? data.milestone.title : null );
+      setOrder( data ? data.milestone.order : 0 );
       setDescription( data ? data.milestone.description : null );
       setStartsAt( data && data.milestone.startsAt ? moment( parseInt( data.milestone.startsAt ) ) : null );
       setEndsAt( data && data.milestone.endsAt ? moment( parseInt( data.milestone.endsAt ) ) : null );
@@ -100,6 +102,7 @@ export default function MilestoneEdit( props ) {
           id,
           title,
           description,
+          order: isNaN( parseInt( order ) ) ? ( data ? data.milestone.order : 0 ) : parseInt( order ),
           startsAt: startsAt ? ( startsAt.unix() * 1000 )
             .toString() : null,
           endsAt: endsAt ? ( endsAt.unix() * 1000 )
@@ -107,38 +110,6 @@ export default function MilestoneEdit( props ) {
         }
       } )
       .then( ( response ) => {
-        let allProjects = client.readQuery( {
-            query: GET_MY_PROJECTS
-          } )
-          .myProjects;
-        const newProjects = allProjects.map( item => {
-          if ( item.project.id !== projectData.localProject.project.id ) {
-            return {
-              ...item
-            };
-          }
-          let newProject = {
-            ...item,
-            project: {
-              ...item.project,
-              milestones: [
-                ...item.project.milestones.filter( ( milestone ) => milestone.id === id ),
-                {
-                  ...item.project.milestones.filter( ( milestone ) => milestone.id === id ),
-                  ...response.data.updateMilestone,
-                  __typename: "Milestone"
-                }
-              ]
-            }
-          };
-          return newProject;
-        } );
-        client.writeQuery( {
-          query: GET_MY_PROJECTS,
-          data: {
-            myProjects: [ ...newProjects ]
-          }
-        } );
         closeModal( response.data.updateMilestone );
         setOpened( false );
       } )
@@ -207,6 +178,11 @@ export default function MilestoneEdit( props ) {
             <FormGroup>
               <Label for="title">Milestone title</Label>
               <Input type="text" id="title" placeholder="Enter project name" value={title} onChange={(e)=> setTitle(e.target.value)} />
+            </FormGroup>
+
+            <FormGroup>
+              <Label for="order">Order</Label>
+              <Input type="number" id="order" placeholder="Enter order" value={order} onChange={(e)=>setOrder(e.target.value)} />
             </FormGroup>
 
             <FormGroup>

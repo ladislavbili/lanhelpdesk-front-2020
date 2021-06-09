@@ -12,6 +12,8 @@ import {
   pickSelectStyle
 } from 'configs/components/select';
 
+import ErrorMessage from 'components/errorMessage';
+
 import Select from 'react-select';
 
 export default function ProjectSelectModal( props ) {
@@ -55,6 +57,7 @@ export default function ProjectSelectModal( props ) {
                 styles={pickSelectStyle([ 'noArrow', 'required', ])}
                 />
             </FormGroup>
+            <ErrorMessage className="m-t-5" message="Can't create tasks, no available project with rights." show={projects.length === 0} />
             <div className="task-add-layout-2 p-l-0 row ">
               <Button className="btn-link-cancel a-s-c" onClick={closeModal}>Cancel</Button>
               <button

@@ -286,7 +286,6 @@ export default function TaskAdd( props ) {
       newRequester = maybeRequester;
     }
     setRequester( newRequester );
-
     let newType = def.type.def ? taskTypes.find( ( item ) => item.id === def.type.value.id ) : null;
     setTaskType( newType );
 

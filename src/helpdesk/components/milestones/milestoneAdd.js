@@ -20,10 +20,6 @@ import {
 } from 'apollo/localSchema/actions';
 
 import {
-  GET_MY_PROJECTS
-} from 'helpdesk/settings/projects/queries';
-
-import {
   ADD_MILESTONE
 } from './queries';
 
@@ -37,9 +33,7 @@ export default function MilestoneAdd( props ) {
     open,
     closeModal
   } = props;
-  const [ addMilestone, {
-    client
-  } ] = useMutation( ADD_MILESTONE );
+  const [ addMilestone ] = useMutation( ADD_MILESTONE );
 
   const {
     data: projectData,
@@ -48,6 +42,7 @@ export default function MilestoneAdd( props ) {
 
   //state
   const [ title, setTitle ] = React.useState( "" );
+  const [ order, setOrder ] = React.useState( 0 );
   const [ description, setDescription ] = React.useState( "" );
   const [ startsAt, setStartsAt ] = React.useState( null );
   const [ endsAt, setEndsAt ] = React.useState( null );
@@ -60,6 +55,7 @@ export default function MilestoneAdd( props ) {
         variables: {
           title,
           description,
+          order: isNaN( parseInt( order ) ) ? 0 : parseInt( order ),
           startsAt: startsAt ? startsAt.unix()
             .toString() : null,
           endsAt: endsAt ? endsAt.unix()
@@ -68,37 +64,6 @@ export default function MilestoneAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        let allProjects = client.readQuery( {
-            query: GET_MY_PROJECTS
-          } )
-          .myProjects;
-        const newProjects = allProjects.map( item => {
-          if ( item.project.id !== projectData.localProject.project.id ) {
-            return {
-              ...item
-            };
-          }
-          let newProject = {
-            ...item,
-            project: {
-              ...item.project,
-              milestones: [
-              ...item.project.milestones,
-                {
-                  ...response.data.addMilestone,
-                  __typename: "Milestone"
-              }
-            ]
-            }
-          };
-          return newProject;
-        } );
-        client.writeQuery( {
-          query: GET_MY_PROJECTS,
-          data: {
-            myProjects: [ ...newProjects ]
-          }
-        } );
         closeModal( response.data.addMilestone );
       } )
       .catch( ( err ) => {
@@ -115,6 +80,11 @@ export default function MilestoneAdd( props ) {
           <FormGroup>
             <Label for="title">Milestone title</Label>
             <Input type="text" id="title" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
+          </FormGroup>
+
+          <FormGroup>
+            <Label for="order">Order</Label>
+            <Input type="number" id="order" placeholder="Enter order" value={order} onChange={(e)=>setOrder(e.target.value)} />
           </FormGroup>
 
           <FormGroup>

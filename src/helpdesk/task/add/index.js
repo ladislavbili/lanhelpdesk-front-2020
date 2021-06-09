@@ -190,11 +190,12 @@ export default function TaskAddContainer( props ) {
     return (
       <button
         className="btn sidebar-btn"
-        disabled={disabled}
         onClick={() => {
           setOpenAddTaskModal(true);
         }}
-        > <i className="fa fa-plus"/> Task
+        >
+        <i className="fa fa-plus"/>
+        Task
       </button>
     )
   }
@@ -212,7 +213,7 @@ export default function TaskAddContainer( props ) {
               ...myProject.project,
               right: myProject.right,
               users: myProject.usersWithRights.map((userWithRights) => userWithRights.user.id)
-            }) ))
+            }) )).filter((project) => project.right.addTasks )
           }
           onSubmit= {(projectID) => {
             setProjectID(projectID);
@@ -237,7 +238,7 @@ export default function TaskAddContainer( props ) {
                   ...myProject.project,
                   right: myProject.right,
                   users: myProject.usersWithRights
-                }) ))
+                }) )).filter((project) => project.right.addTasks )
               }
               users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }
               companies={ toSelArr(companiesData.basicCompanies) }
