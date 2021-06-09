@@ -8,7 +8,10 @@ export const fromMomentToUnix = ( moment ) => moment !== null ?
   moment.valueOf() :
   null;
 
-export const timestampToString = ( timestamp ) => {
+export const timestampToString = ( timestamp, trimmed = false ) => {
+  if ( trimmed ) {
+    return moment( parseInt( timestamp ) ).format( 'H:mm D.M.YYYY' );
+  }
   return moment( parseInt( timestamp ) ).format( 'HH:mm DD.MM.YYYY' );
 }
 

@@ -10,7 +10,8 @@ import {
 }
 from 'reactstrap';
 import {
-  getItemDisplayValue
+  getItemDisplayValue,
+  timestampToString,
 }
 from 'helperFunctions';
 import Checkbox from 'components/checkbox';
@@ -74,6 +75,11 @@ export default function TableList( props ) {
         }
         if ( display.value === "URL" ) {
           value = task[ "URL" ];
+        }
+        if ( display.type === "date" ) {
+          if ( task[ display.value ] ) {
+            value = `${timestampToString(task[ display.value ])} | ${timestampToString(task[ display.value ], true)}`;
+          }
         }
         if ( display.value === "password" ) {
           value = task[ "password" ];
@@ -224,7 +230,7 @@ export default function TableList( props ) {
               <td
                 colSpan={ (index === filteredDisplayValues.length-1) ? "2" : "1" }
                 style={{
-                  ...(["createdAt", "deadline"].includes(display.value) ? {textAlign: "right"} : {}),
+                  ...(["createdAt", "deadline", "startsAt"].includes(display.value) ? {textAlign: "right"} : {}),
                 }}
                 key={display.value}
                 className={display.value}

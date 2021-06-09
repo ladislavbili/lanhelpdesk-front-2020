@@ -140,6 +140,12 @@ export default function TasklistSwitch( props ) {
       visKey: 'createdAtV'
     },
     {
+      value: 'startsAt',
+      label: 'Starts at',
+      type: 'date',
+      show: preference[ 'startsAt' ]
+    },
+    {
       value: 'deadline',
       label: 'Deadline',
       type: 'date',

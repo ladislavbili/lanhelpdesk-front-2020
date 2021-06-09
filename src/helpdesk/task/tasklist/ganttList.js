@@ -78,7 +78,21 @@ export default function TableList( props ) {
       } )
       .map( ( group ) => ( {
         ...group,
-        tasks: group.tasks.sort( ( task1, task2 ) => task1.ganttOrder > task2.ganttOrder ? 1 : -1 )
+        tasks: group.tasks.sort( ( task1, task2 ) => {
+          if ( task1.startsAt === null && task2.startsAt === null ) {
+            return 0;
+          }
+          if ( task1.startsAt === null ) {
+            return 1;
+          }
+          if ( task2.startsAt === null ) {
+            return -1;
+          }
+          if ( parseInt( task1.startsAt ) > parseInt( task2.startsAt ) ) {
+            return 1;
+          }
+          return -1;
+        } )
       } ) );
   }
   const [ editOpen, setEditOpen ] = React.useState( false );
@@ -269,11 +283,6 @@ export default function TableList( props ) {
       <tr
         key={task.id}
         className="clickable">
-        <td>
-          <h4>
-            { task.milestone ? `${task.milestone.order}.${task.ganttOrder}`: ''}
-          </h4>
-        </td>
         { filteredDisplayValues
           .map((display,index)=>{
             if(display.value === "important" || display.value === "invoiced" ){
@@ -326,9 +335,6 @@ export default function TableList( props ) {
         <table className="table">
           <thead>
             <tr>
-              <td>
-                WBS
-              </td>
               { filteredDisplayValues.map((display) =>
                 renderHeader(display)
               )}
@@ -337,7 +343,6 @@ export default function TableList( props ) {
 
           <tbody>
             <tr>
-              <td style={{ background: 'inherit' }} />
               { filteredDisplayValues.map((display,index) =>
                 renderAttributeFilter(display,index)
               )}
@@ -352,21 +357,12 @@ export default function TableList( props ) {
             { groups.map((group) => (
               <Empty key={ group.milestone === null ? 'null' : group.milestone.id }>
                 <tr>
-                  { group.milestone &&
-                    <td className="noselect">
-                      <h4>
-                        {`${group.milestone.order}.`}
-                      </h4>
-                    </td>
-                  }
-                  <td colSpan={filteredDisplayValues.length } className="noselect">
-                    <h4>
-                      <i
-                        className={classnames( "fa clickable p-l-5 p-r-5", { "fa-chevron-down": !group.show, "fa-chevron-up": group.show } )}
-                        onClick={() => setGroupOpen(group.milestone) }
-                        />
+                  <td colSpan={filteredDisplayValues.length } className="noselect bolder-text" style={{fontSize: 14}}>
+                    <i
+                      className={classnames( "fa clickable p-l-5 p-r-5", { "fa-chevron-down": !group.show, "fa-chevron-up": group.show } )}
+                      onClick={() => setGroupOpen(group.milestone) }
+                      />
                       {group.milestone ? group.milestone.title : 'Without milestone' }
-                    </h4>
                   </td>
                 </tr>
                 { group.show && group.tasks

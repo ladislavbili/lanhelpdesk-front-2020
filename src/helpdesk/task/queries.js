@@ -354,6 +354,7 @@ requester
 company
 assignedTo
 createdAtV
+startsAt
 deadline
 project
 milestone
@@ -556,6 +557,7 @@ mutation addOrUpdateTasklistColumnPerference(
   $company: Boolean
   $assignedTo: Boolean
   $createdAtV: Boolean
+  $startsAt: Boolean
   $deadline: Boolean
   $project: Boolean
   $milestone: Boolean
@@ -579,6 +581,7 @@ mutation addOrUpdateTasklistColumnPerference(
     company: $company
     assignedTo: $assignedTo
     createdAtV: $createdAtV
+    startsAt: $startsAt
     deadline: $deadline
     project: $project
     milestone: $milestone

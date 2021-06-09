@@ -39,6 +39,7 @@ export function setGlobalTaskStringFilter() {
     requester: localSearch.requester,
     company: localSearch.company,
     createdAt: localSearch.createdAt,
+    startsAt: localSearch.startsAt,
     deadline: localSearch.deadline,
     project: localSearch.project,
     taskType: localSearch.taskType,
