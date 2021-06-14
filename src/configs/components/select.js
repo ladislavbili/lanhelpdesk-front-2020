@@ -22,6 +22,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
   const blueFont = wantedAttributes.includes( 'blueFont' );
   const disabled = wantedAttributes.includes( 'disabled' );
   const bordered = wantedAttributes.includes( 'bordered' );
+  const sidebar = wantedAttributes.includes( 'sidebar' );
   return {
     control: ( base, state ) => {
       let newStyle = {
@@ -183,6 +184,12 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
         ...base,
         padding: '0px 5px',
         borderRadius: 0,
+      }
+      if ( sidebar ) {
+        newStyle = {
+          ...newStyle,
+          width: 240,
+        }
       }
       if ( !colored ) {
         newStyle = {

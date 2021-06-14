@@ -11,7 +11,8 @@ import TaskTypeList from 'helpdesk/settings/taskTypes';
 import ImapList from 'helpdesk/settings/imaps';
 import SMTPList from 'helpdesk/settings/smtps';
 
-export default [ {
+export default [
+  {
     title: 'Users',
     link: 'users',
     minimalRole: 1,

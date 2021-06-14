@@ -21,6 +21,10 @@ export default function ListHeader( props ) {
     setPreference,
     preference,
     ascending,
+    layout,
+    orderBy,
+    setOrderBy,
+    setAscending,
     gantt,
   } = props;
 
@@ -126,8 +130,8 @@ export default function ListHeader( props ) {
           <div className={
               classnames(
                 {
-                  "m-r-22": props.layout !== 0,
-                  "m-r-5": props.layout === 0
+                  "m-r-22": layout !== 0,
+                  "m-r-5": layout === 0
                 },
                 "d-flex", "flex-row", "align-items-center", "ml-auto"
               )
@@ -139,22 +143,22 @@ export default function ListHeader( props ) {
             </div>
 
             <select
-              value={props.orderBy}
+              value={orderBy}
               className="invisible-select text-bold text-highlight"
-              onChange={(e)=>props.setOrderBy(e.target.value)}>
+              onChange={(e)=>setOrderBy(e.target.value)}>
               { orderByValues.map((item,index) =>
                 <option value={item.value} key={index}>{item.label}</option>
               ) }
             </select>
 
             { ascending &&
-              <button type="button" className="btn-link" onClick={()=>props.setAscending(false)}>
+              <button type="button" className="btn-link" onClick={()=>setAscending(false)}>
                 <i className="fas fa-arrow-up" />
               </button>
             }
 
             { !ascending &&
-              <button type="button" className="btn-link" onClick={()=>props.setAscending(true)}>
+              <button type="button" className="btn-link" onClick={()=>setAscending(true)}>
                 <i className="fas fa-arrow-down" />
               </button>
             }
@@ -179,7 +183,7 @@ export default function ListHeader( props ) {
                 selected={getPreferenceColumns().filter((displayValue) => displayValue.show )}
                 onChange={(_, item, deleted ) => {
                   let newVisibility = {};
-                  displayValues.forEach((displayValue) => {
+                  displayValues.filter((displayValue) => !displayValue.permanent ).forEach((displayValue) => {
                     if(displayValue.id !== item.id){
                       newVisibility[displayValue.visKey ? displayValue.visKey : displayValue.value ] = displayValue.show;
                     }else{

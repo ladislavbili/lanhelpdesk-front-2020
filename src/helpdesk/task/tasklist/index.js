@@ -39,6 +39,7 @@ import {
   setProject,
   setMilestone,
   setTasksSort,
+  setGanttSort,
   addLocalError,
   setLocalTaskSearch,
   setGlobalTaskSearch,
@@ -52,6 +53,7 @@ import {
   GET_PROJECT,
   GET_MILESTONE,
   GET_TASKS_SORT,
+  GET_GANTT_SORT,
   GET_LOCAL_TASK_SEARCH,
   GET_GLOBAL_TASK_SEARCH,
   GET_LOCAL_TASK_STRING_FILTER,
@@ -94,6 +96,10 @@ export default function TasksLoader( props ) {
   } = useQuery( GET_TASKS_SORT );
 
   const {
+    data: ganttSortData,
+  } = useQuery( GET_GANTT_SORT );
+
+  const {
     data: localSearchData,
   } = useQuery( GET_LOCAL_TASK_SEARCH );
 
@@ -112,6 +118,7 @@ export default function TasksLoader( props ) {
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
+  const ganttSort = ganttSortData.ganttSort;
   const tasksSort = tasksSortData.tasksSort;
 
   const filterVariables = deleteAttributes(
@@ -120,6 +127,7 @@ export default function TasksLoader( props ) {
   );
 
   const currentUser = getMyData();
+  const fetchingGantt = localProject.id !== null && currentUser && currentUser.tasklistLayout === 4;
 
   const statusFilter = ( currentUser ? currentUser.statuses : [] )
     .filter( ( selectedStatus ) => ( localProject.id === null || !localProject.project.statuses ? [] : localProject.project.statuses )
@@ -128,7 +136,8 @@ export default function TasksLoader( props ) {
   const taskVariables = {
     projectId: localProject.id,
     filter: filterVariables,
-    sort: tasksSort,
+    sort: fetchingGantt ? ganttSort : tasksSort,
+    milestoneSort: fetchingGantt,
     search: globalSearchData.globalTaskSearch,
     stringFilter: globalStringFilter.globalTaskStringFilter,
     statuses: statusFilter,
@@ -189,7 +198,7 @@ export default function TasksLoader( props ) {
   //refetch calendar and tasks
   React.useEffect( () => {
     tasksRefetch();
-  }, [ localFilter, localProject.id, tasksSort, globalSearchData, globalStringFilter ] );
+  }, [ localFilter, localProject.id, tasksSort, ganttSort, globalSearchData, globalStringFilter ] );
 
   //monitor and log timings
   /*
@@ -287,7 +296,7 @@ export default function TasksLoader( props ) {
             projectId: localProject.id
           },
           data: {
-            tasklistColumnGanttPreference: newGanttPreference
+            tasklistGanttColumnPreference: newGanttPreference
           }
         } );
       } )
@@ -457,13 +466,21 @@ export default function TasksLoader( props ) {
       ganttPreference = { ganttPreferencesLoading ? defaultTasklistGanttColumnPreference : createGanttPreferences()}
       setPreference={setPreference}
       setGanttPreference={setGanttPreference}
-      orderBy={ tasksSort.key }
+      orderBy={ fetchingGantt ? ganttSort.key : tasksSort.key }
       setOrderBy={(value) => {
-        setTasksSort({ ...tasksSort, key: value })
+        if(fetchingGantt){
+          setGanttSort({ ...ganttSort, key: value })
+        }else{
+          setTasksSort({ ...tasksSort, key: value })
+        }
       }}
-      ascending={ tasksSort.asc }
+      ascending={ fetchingGantt ? ganttSort.asc : tasksSort.asc }
       setAscending={(ascending) => {
-        setTasksSort({ ...tasksSort, asc: ascending })
+        if(fetchingGantt){
+          setGanttSort({ ...ganttSort, asc: ascending })
+        }else{
+          setTasksSort({ ...tasksSort, asc: ascending })
+        }
       }}
       selectedStatuses={currentUser.statuses.map((status) => status.id )}
       setSelectedStatuses={setUserStatusesFunc}

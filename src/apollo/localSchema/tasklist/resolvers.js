@@ -1,5 +1,6 @@
 import {
   tasksSortVar,
+  ganttSortVar,
   localSearchVar,
   globalSearchVar,
   localStringFilterVar,
@@ -8,6 +9,10 @@ import {
 
 export const tasksSort = () => {
   return tasksSortVar();
+}
+
+export const ganttSort = () => {
+  return ganttSortVar();
 }
 
 export const localTaskSearch = () => {

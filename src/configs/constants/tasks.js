@@ -21,6 +21,12 @@ export const defaultTaskSort = {
   key: 'status',
   asc: true
 }
+
+export const defaultGanttSort = {
+  key: 'startsAt',
+  asc: true
+}
+
 export const defaultTasklistColumnPreference = {
   taskId: true,
   status: true,
@@ -104,6 +110,11 @@ export const orderByValues = [
   {
     value: 'createdAt',
     label: 'Created at',
+    type: 'date'
+  },
+  {
+    value: 'startsAt',
+    label: 'Starts at',
     type: 'date'
   },
   {

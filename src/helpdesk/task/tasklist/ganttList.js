@@ -65,36 +65,7 @@ export default function TableList( props ) {
         } )
       }
     } )
-    return groups.sort( ( group1, group2 ) => {
-        if ( group1.milestone === null ) {
-          return 1;
-        }
-        if ( group2.milestone === null ) {
-          return -1;
-        }
-        if ( group1.milestone.order > group2.milestone.order ) {
-          return 1;
-        }
-        return -1;
-      } )
-      .map( ( group ) => ( {
-        ...group,
-        tasks: group.tasks.sort( ( task1, task2 ) => {
-          if ( task1.startsAt === null && task2.startsAt === null ) {
-            return 0;
-          }
-          if ( task1.startsAt === null ) {
-            return 1;
-          }
-          if ( task2.startsAt === null ) {
-            return -1;
-          }
-          if ( parseInt( task1.startsAt ) > parseInt( task2.startsAt ) ) {
-            return 1;
-          }
-          return -1;
-        } )
-      } ) );
+    return groups;
   }
   const [ editOpen, setEditOpen ] = React.useState( false );
   const [ groups, setGroups ] = React.useState( getMilestoneGroups() );

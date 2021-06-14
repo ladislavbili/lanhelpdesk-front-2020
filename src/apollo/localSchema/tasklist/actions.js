@@ -1,5 +1,6 @@
 import {
   tasksSortVar,
+  ganttSortVar,
   localSearchVar,
   globalSearchVar,
   localStringFilterVar,
@@ -8,6 +9,10 @@ import {
 
 export function setTasksSort( newValue ) {
   tasksSortVar( newValue );
+}
+
+export function setGanttSort( newValue ) {
+  ganttSortVar( newValue );
 }
 
 export function setLocalTaskSearch( newValue ) {

@@ -8,6 +8,12 @@ query tasksSort {
 }
 `;
 
+export const GET_GANTT_SORT = gql `
+query ganttSort {
+  ganttSort @client
+}
+`;
+
 export const GET_LOCAL_TASK_SEARCH = gql `
 query localTaskSearch {
   localTaskSearch @client

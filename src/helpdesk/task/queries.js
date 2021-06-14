@@ -461,6 +461,7 @@ query tasks(
   $projectId: Int
   $filter: FilterInput
   $sort: SortTasksInput
+  $milestoneSort: Boolean
   $search: String
   $stringFilter: StringFilterInput
   $limit: Int
@@ -471,6 +472,7 @@ query tasks(
     projectId: $projectId
     filter: $filter
     sort: $sort
+    milestoneSort: $milestoneSort
     search: $search
     stringFilter: $stringFilter
     limit: $limit
@@ -641,12 +643,12 @@ mutation addOrUpdateTasklistGanttColumnPreference(
   $company: Boolean
   $assignedTo: Boolean
   $createdAtV: Boolean
-  $startsAt: Boolean
-  $deadline: Boolean
   $taskType: Boolean
   $overtime: Boolean
   $pausal: Boolean
   $tags: Boolean
+  $works: Boolean
+  $trips: Boolean
   $materialsWithoutDPH: Boolean
   $materialsWithDPH: Boolean
 ) {
@@ -669,7 +671,7 @@ mutation addOrUpdateTasklistGanttColumnPreference(
     materialsWithoutDPH: $materialsWithoutDPH
     materialsWithDPH: $materialsWithDPH
   ){
-    ${tasklistPreferenceBody}
+    ${tasklistGanttPreferenceBody}
   }
 }
 `;
