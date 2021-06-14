@@ -367,7 +367,26 @@ works
 trips
 materialsWithoutDPH
 materialsWithDPH
-`
+`;
+
+const tasklistGanttPreferenceBody = `
+taskId
+status
+important
+invoiced
+requester
+company
+assignedTo
+createdAtV
+taskType
+overtime
+pausal
+tags
+works
+trips
+materialsWithoutDPH
+materialsWithDPH
+`;
 
 export const ADD_TASK = gql `
 mutation addTask(
@@ -545,8 +564,20 @@ query tasklistColumnPreference(
 }
 `;
 
+export const GET_TASKLIST_GANTT_COLUMNS_PREFERENCES = gql `
+query tasklistGanttColumnPreference(
+  $projectId: Int
+){
+  tasklistGanttColumnPreference(
+    projectId: $projectId
+  )  {
+    ${tasklistGanttPreferenceBody}
+  }
+}
+`;
+
 export const ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES = gql `
-mutation addOrUpdateTasklistColumnPerference(
+mutation addOrUpdateTasklistColumnPreference(
   $projectId: Int
   $taskId: Boolean
   $status: Boolean
@@ -570,7 +601,7 @@ mutation addOrUpdateTasklistColumnPerference(
   $materialsWithoutDPH: Boolean
   $materialsWithDPH: Boolean
 ) {
-  addOrUpdateTasklistColumnPerference(
+  addOrUpdateTasklistColumnPreference(
     projectId: $projectId
     taskId: $taskId
     status: $status
@@ -585,6 +616,50 @@ mutation addOrUpdateTasklistColumnPerference(
     deadline: $deadline
     project: $project
     milestone: $milestone
+    taskType: $taskType
+    overtime: $overtime
+    pausal: $pausal
+    tags: $tags
+    works: $works
+    trips: $trips
+    materialsWithoutDPH: $materialsWithoutDPH
+    materialsWithDPH: $materialsWithDPH
+  ){
+    ${tasklistPreferenceBody}
+  }
+}
+`;
+
+export const ADD_OR_UPDATE_TASKLIST_GANTT_COLUMNS_PREFERENCES = gql `
+mutation addOrUpdateTasklistGanttColumnPreference(
+  $projectId: Int
+  $taskId: Boolean
+  $status: Boolean
+  $important: Boolean
+  $invoiced: Boolean
+  $requester: Boolean
+  $company: Boolean
+  $assignedTo: Boolean
+  $createdAtV: Boolean
+  $startsAt: Boolean
+  $deadline: Boolean
+  $taskType: Boolean
+  $overtime: Boolean
+  $pausal: Boolean
+  $tags: Boolean
+  $materialsWithoutDPH: Boolean
+  $materialsWithDPH: Boolean
+) {
+  addOrUpdateTasklistGanttColumnPreference(
+    projectId: $projectId
+    taskId: $taskId
+    status: $status
+    important: $important
+    invoiced: $invoiced
+    requester: $requester
+    company: $company
+    assignedTo: $assignedTo
+    createdAtV: $createdAtV
     taskType: $taskType
     overtime: $overtime
     pausal: $pausal

@@ -6,6 +6,7 @@ import classnames from "classnames";
 import {
   orderByValues,
   attributeLimitingRights,
+  ganttAttributeLimitingRights,
 } from 'configs/constants/tasks';
 
 //statuses, sort, column preferences
@@ -20,6 +21,7 @@ export default function ListHeader( props ) {
     setPreference,
     preference,
     ascending,
+    gantt,
   } = props;
 
   const displayValues = (
@@ -36,7 +38,8 @@ export default function ListHeader( props ) {
     if ( localProject.project.id === null ) {
       return displayValues;
     }
-    let notAllowedColumns = attributeLimitingRights.filter( ( limitingRight ) => !localProject.right[ limitingRight.right ] )
+    let notAllowedColumns = ( gantt ? ganttAttributeLimitingRights : attributeLimitingRights )
+      .filter( ( limitingRight ) => !localProject.right[ limitingRight.right ] )
       .map( ( limitingRight ) => limitingRight.preference );
     return displayValues.filter( ( column ) => !notAllowedColumns.includes( column.value ) );
   }
@@ -172,7 +175,7 @@ export default function ListHeader( props ) {
                 closeMultiSelect={openColumnPreferences}
                 showFilter={false}
                 open={columnPreferencesOpen}
-                items={getPreferenceColumns()}
+                items={getPreferenceColumns().filter((displayValue) => !displayValue.permanent )}
                 selected={getPreferenceColumns().filter((displayValue) => displayValue.show )}
                 onChange={(_, item, deleted ) => {
                   let newVisibility = {};

@@ -8,7 +8,8 @@ import {
   ModalBody
 } from 'reactstrap';
 import {
-  getItemDisplayValue
+  getItemDisplayValue,
+  timestampToString,
 } from 'helperFunctions';
 import classnames from 'classnames';
 import Checkbox from 'components/checkbox';
@@ -143,6 +144,11 @@ export default function TableList( props ) {
         if ( display.value === "URL" ) {
           value = task[ "URL" ];
         }
+        if ( display.type === "date" ) {
+          if ( task[ display.value ] ) {
+            value = `${timestampToString(task[ display.value ])} | ${timestampToString(task[ display.value ], true)}`;
+          }
+        }
         if ( display.value === "password" ) {
           value = task[ "password" ];
         }
@@ -158,7 +164,7 @@ export default function TableList( props ) {
       return null;
     } else if ( display.type === 'checkbox' ) {
       return <th
-        width="40"
+        width={display.width ? display.width : '' }
         key={display.value}
         className="row"
         style={{color: '#0078D4', paddingLeft: "1px", paddingRight: "1px" }}
@@ -196,9 +202,12 @@ export default function TableList( props ) {
     }
     return (
       <th
-        style={(display.value === "createdAt" ? {textAlign: "right"} : {})}
+        style={{
+          ...(["createdAt"].includes(display.value) ? {textAlign: "right"} : {}),
+        }}
         key={display.value}
-        width={display.value === 'title' ? "30%" : ((display.value === "id" || display.value === "status") ? "50px" : '')}>
+        width={display.width ? display.width : '' }
+        >
         {display.label}
       </th>
     )
@@ -207,9 +216,9 @@ export default function TableList( props ) {
     if ( display.type === 'important' || display.type === 'invoiced' ) {
       return null;
     } else if ( [ 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
-      return ( <th key={display.value} width="40" /> );
+      return ( <th key={display.value} width={display.width ? display.width : '' } /> );
     } else if ( display.type === 'checkbox' ) {
-      return <th key={display.value} width="40" >
+      return <th key={display.value} width={display.width ? display.width : '' } >
         <Checkbox
           className = "m-l-7 m-t-6 p-l-0"
           disabled={loading}
@@ -221,7 +230,7 @@ export default function TableList( props ) {
       </th>
     } else {
       const value = ( attributesFilter[ display.value ] === "cur" ? currentUser.fullName : attributesFilter[ display.value ] );
-      return <th key={display.value} >
+      return <th key={display.value} width={display.width ? display.width : '' } >
         <div className={(index === filteredDisplayValues.length - 1 ? "row" : "")}>
 
           <div style={index === filteredDisplayValues.length - 1 ? {flex: "1"} : {}}>
@@ -253,7 +262,7 @@ export default function TableList( props ) {
     }
   }
   const renderWithIcons = ( displayValues, task, index, Component ) => {
-    if ( ![ 'important', 'invoiced' ].includes( displayValues[ index - 1 ].type ) ) {
+    if ( index === 0 || ![ 'important', 'invoiced' ].includes( displayValues[ index - 1 ].type ) ) {
       return Component;
     }
     return (
@@ -292,7 +301,7 @@ export default function TableList( props ) {
               <td
                 colSpan={ (index === filteredDisplayValues.length-1) ? "2" : "1" }
                 style={{
-                  ...(["createdAt", "deadline"].includes(display.value) ? {textAlign: "right"} : {}),
+                  ...(["createdAt"].includes(display.value) ? {textAlign: "right"} : {}),
                 }}
                 key={display.value}
                 className={display.value}
@@ -331,6 +340,7 @@ export default function TableList( props ) {
       <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
         <ListHeader
           {...props}
+          gantt
           />
         <table className="table">
           <thead>
@@ -382,6 +392,23 @@ export default function TableList( props ) {
           </tbody>
         </table>
         <Pagination {...props} taskList/>
+        <div className="bolder-text m-l-30 m-b-10">
+          <p>Práca sumár</p>
+          <p>Neschválených: 8 hodín</p>
+          <p>Schválenych: 8 hodín</p>
+          <p>Spolu: 16 hodín</p>
+        </div>
+
+        <div className="bolder-text m-l-30 m-b-10">
+          <p>Vyjazd sumár ??</p>
+        </div>
+
+        <div className="bolder-text m-l-30 m-b-10">
+          <p>Materiál sumár</p>
+          <p>Neschválených: 100 EUR bez DPH</p>
+          <p>Schválenych: 50 EUR bez DPH</p>
+          <p>Spolu: 150 EUR bez DPH</p>
+        </div>
 
         <Modal isOpen={editOpen}>
           <ModalBody className="scrollable" >

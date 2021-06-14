@@ -305,8 +305,9 @@ export default function TableList( props ) {
         <Modal isOpen={editOpen}>
           <ModalBody className="scrollable" >
             <MultipleTaskEdit tasks={tasks.filter(d => d.checked)} close={() => setEditOpen(false)} />
-          </ModalBody> </Modal>
-        </div>
+          </ModalBody>
+        </Modal>
       </div>
+    </div>
   );
 }

@@ -53,6 +53,7 @@ export default function Search( props ) {
         onClick={()=>{
           setLocalMilestone(allMilestones);
           setLocalProject(dashboard);
+          setGlobalTaskSearch();
           history.push(`/helpdesk/taskList/i/all`)
         }}
         >

@@ -14,7 +14,9 @@ import {
 
 import {
   defaultTasklistColumnPreference,
+  defaultTasklistGanttColumnPreference,
   attributeLimitingRights,
+  ganttAttributeLimitingRights,
   unimplementedAttributes,
 } from 'configs/constants/tasks';
 
@@ -61,7 +63,9 @@ import {
   DELETE_TASK,
   GET_CALENDAR_EVENTS,
   GET_TASKLIST_COLUMNS_PREFERENCES,
+  GET_TASKLIST_GANTT_COLUMNS_PREFERENCES,
   ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES,
+  ADD_OR_UPDATE_TASKLIST_GANTT_COLUMNS_PREFERENCES,
 } from '../queries';
 
 export default function TasksLoader( props ) {
@@ -149,6 +153,16 @@ export default function TasksLoader( props ) {
   } );
 
   const {
+    data: ganttPreferencesData,
+    loading: ganttPreferencesLoading,
+    refetch: ganttPreferencesRefetch
+  } = useQuery( GET_TASKLIST_GANTT_COLUMNS_PREFERENCES, {
+    variables: {
+      projectId: localProject.id
+    },
+  } );
+
+  const {
     data: tasksData,
     loading: tasksLoading,
     refetch: tasksRefetchFunc,
@@ -163,6 +177,7 @@ export default function TasksLoader( props ) {
   const [ setUserStatuses ] = useMutation( SET_USER_STATUSES );
   const [ setTasklistLayout ] = useMutation( SET_TASKLIST_LAYOUT );
   const [ addOrUpdatePreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES );
+  const [ addOrUpdateGanttPreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_GANTT_COLUMNS_PREFERENCES );
 
   //sync
 
@@ -189,7 +204,8 @@ export default function TasksLoader( props ) {
 
   const dataLoading = (
     tasksLoading ||
-    preferencesLoading
+    preferencesLoading ||
+    ganttPreferencesLoading
   );
 
   const tasks = dataLoading ? [] : tasksData.tasks.tasks;
@@ -226,7 +242,7 @@ export default function TasksLoader( props ) {
         let newPreference = preference ? preference : {};
         newPreference = {
           ...newPreference,
-          ...response.data.addOrUpdateTasklistColumnPerference
+          ...response.data.addOrUpdateTasklistColumnPreference
         }
         client.writeQuery( {
           query: GET_TASKLIST_COLUMNS_PREFERENCES,
@@ -235,6 +251,43 @@ export default function TasksLoader( props ) {
           },
           data: {
             tasklistColumnPreference: newPreference
+          }
+        } );
+      } )
+      .catch( ( error ) => {
+        addLocalError( error );
+      } )
+  }
+
+  const setGanttPreference = ( visibility ) => {
+    addOrUpdateGanttPreferences( {
+        variables: {
+          ...createGanttPreferences(),
+          ...visibility,
+          projectId: localProject.id,
+        }
+      } )
+      .then( ( response ) => {
+
+        const ganttPreference = client.readQuery( {
+            query: GET_TASKLIST_GANTT_COLUMNS_PREFERENCES,
+            variables: {
+              projectId: localProject.id
+            },
+          } )
+          .tasklistGanttColumnPreference;
+        let newGanttPreference = ganttPreference ? ganttPreference : {};
+        newGanttPreference = {
+          ...newGanttPreference,
+          ...response.data.addOrUpdateTasklistGanttColumnPreference
+        }
+        client.writeQuery( {
+          query: GET_TASKLIST_GANTT_COLUMNS_PREFERENCES,
+          variables: {
+            projectId: localProject.id
+          },
+          data: {
+            tasklistColumnGanttPreference: newGanttPreference
           }
         } );
       } )
@@ -354,6 +407,25 @@ export default function TasksLoader( props ) {
     return preference;
   }
 
+  const createGanttPreferences = () => {
+    let ganttPreference = defaultTasklistGanttColumnPreference;
+    if ( ganttPreferencesData && ganttPreferencesData.tasklistGanttColumnPreference ) {
+      ganttPreference = {
+        ...ganttPreference,
+        ...ganttPreferencesData.tasklistGanttColumnPreference
+      };
+    }
+    if ( localProject.project.id === null ) {
+      return ganttPreference;
+    }
+    ganttAttributeLimitingRights.forEach( ( limitingRight ) => {
+      if ( !localProject.right[ limitingRight.right ] ) {
+        ganttPreference[ limitingRight.preference ] = false;
+      }
+    } )
+    return ganttPreference;
+  }
+
   const canViewCalendar = localProject.id === null || localProject.right.assignedRead;
 
   if ( !currentUser ) {
@@ -382,7 +454,9 @@ export default function TasksLoader( props ) {
       limit={limit}
       checkTask={checkTask}
       preference = { preferencesLoading ? defaultTasklistColumnPreference : createPreferences()}
+      ganttPreference = { ganttPreferencesLoading ? defaultTasklistGanttColumnPreference : createGanttPreferences()}
       setPreference={setPreference}
+      setGanttPreference={setGanttPreference}
       orderBy={ tasksSort.key }
       setOrderBy={(value) => {
         setTasksSort({ ...tasksSort, key: value })
