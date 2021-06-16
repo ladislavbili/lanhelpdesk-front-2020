@@ -31,10 +31,11 @@ from './arrayManipulations';
 export {
   toMomentInput,
   fromMomentToUnix,
+  timeRangeToString,
   timestampToString,
   timestampToDate,
   timestampToHoursAndMinutes,
-  afterNow
+  afterNow,
 }
 from './moment';
 

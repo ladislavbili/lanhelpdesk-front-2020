@@ -303,6 +303,11 @@ tasks {
     title
     order
   }
+  scheduled{
+    id
+    from
+    to
+  }
   pendingDate
   project{
     id
@@ -353,6 +358,7 @@ title
 requester
 company
 assignedTo
+scheduled
 createdAtV
 startsAt
 deadline
@@ -377,6 +383,7 @@ invoiced
 requester
 company
 assignedTo
+scheduled
 createdAtV
 taskType
 overtime
@@ -459,6 +466,7 @@ mutation addTask(
 export const GET_TASKS = gql `
 query tasks(
   $projectId: Int
+  $milestoneId: Int
   $filter: FilterInput
   $sort: SortTasksInput
   $milestoneSort: Boolean
@@ -469,6 +477,7 @@ query tasks(
   $statuses: [Int]
 ){
   tasks (
+    milestoneId: $milestoneId
     projectId: $projectId
     filter: $filter
     sort: $sort
@@ -589,6 +598,7 @@ mutation addOrUpdateTasklistColumnPreference(
   $requester: Boolean
   $company: Boolean
   $assignedTo: Boolean
+  $scheduled: Boolean
   $createdAtV: Boolean
   $startsAt: Boolean
   $deadline: Boolean
@@ -613,6 +623,7 @@ mutation addOrUpdateTasklistColumnPreference(
     requester: $requester
     company: $company
     assignedTo: $assignedTo
+    scheduled: $scheduled
     createdAtV: $createdAtV
     startsAt: $startsAt
     deadline: $deadline
@@ -642,6 +653,7 @@ mutation addOrUpdateTasklistGanttColumnPreference(
   $requester: Boolean
   $company: Boolean
   $assignedTo: Boolean
+  $scheduled: Boolean
   $createdAtV: Boolean
   $taskType: Boolean
   $overtime: Boolean
@@ -661,6 +673,7 @@ mutation addOrUpdateTasklistGanttColumnPreference(
     requester: $requester
     company: $company
     assignedTo: $assignedTo
+    scheduled: $scheduled
     createdAtV: $createdAtV
     taskType: $taskType
     overtime: $overtime

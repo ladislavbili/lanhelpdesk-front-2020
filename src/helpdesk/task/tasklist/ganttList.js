@@ -153,22 +153,6 @@ export default function TableList( props ) {
           }}>
           <i className="far fa-trash-alt clickable m-l-5"	/>
         </div>
-        { false &&
-          <div
-            className="m-l-5"
-            onClick={() => {
-              if(loading){
-                return;
-              }
-              if( !tasks.some( (task) => task.checked ) ){
-                window.alert('Please first pick tasks to edit!');
-                return;
-              }
-              setEditOpen(true);
-            }}>
-            <i	className="fas fa-pen clickable"/>
-          </div>
-        }
       </th>
     }
     return (
@@ -328,13 +312,6 @@ export default function TableList( props ) {
                 renderAttributeFilter(display,index)
               )}
             </tr>
-            <tr>
-              <td colSpan={filteredDisplayValues.length}>
-                <h3>
-                  {localProject.title}
-                </h3>
-              </td>
-            </tr>
             { groups.map((group) => (
               <Empty key={ group.milestone === null ? 'null' : group.milestone.id }>
                 <tr>
@@ -363,18 +340,14 @@ export default function TableList( props ) {
           </tbody>
         </table>
         <Pagination {...props} taskList/>
-        <div className="bolder-text m-l-30 m-b-10">
+        <div className="m-l-30 m-b-10">
           <p>Práca sumár</p>
           <p>Neschválených: 8 hodín</p>
           <p>Schválenych: 8 hodín</p>
           <p>Spolu: 16 hodín</p>
         </div>
 
-        <div className="bolder-text m-l-30 m-b-10">
-          <p>Vyjazd sumár ??</p>
-        </div>
-
-        <div className="bolder-text m-l-30 m-b-10">
+        <div className="m-l-30 m-b-10">
           <p>Materiál sumár</p>
           <p>Neschválených: 100 EUR bez DPH</p>
           <p>Schválenych: 50 EUR bez DPH</p>

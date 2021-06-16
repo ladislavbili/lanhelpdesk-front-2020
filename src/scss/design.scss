@@ -1617,6 +1617,13 @@ td {
 
 //----------------------END-CMDB---------------------
 
+.project-description-text{
+    min-height: 30px;
+    font: 14px Segoe UI;
+    color: #333;
+    padding: 0px 15px 15px 15px;
+}
+
 //---------------------header---------------------
 .page-header {
   background-color: #004578 !important;
@@ -2445,7 +2452,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   background: #ffffff;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.16);
   margin-bottom: 20px !important;
-  padding: 15px;
 }
 
 .dnd-item-icon {
@@ -2482,7 +2488,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .taskCol-title {
-  font: $font-task-description;
+  font: $font-dnd-task-title;
 }
 
 .taskCol-body {

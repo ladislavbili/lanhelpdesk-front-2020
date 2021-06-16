@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 export const toMomentInput = ( unix ) => ( unix !== null && unix !== undefined ) ?
-  moment( unix ) :
+  moment( parseInt( unix ) ) :
   null;
 
 export const fromMomentToUnix = ( moment ) => moment !== null ?
@@ -13,6 +13,22 @@ export const timestampToString = ( timestamp, trimmed = false ) => {
     return moment( parseInt( timestamp ) ).format( 'H:mm D.M.YYYY' );
   }
   return moment( parseInt( timestamp ) ).format( 'HH:mm DD.MM.YYYY' );
+}
+
+export const timeRangeToString = ( fromDate, toDate ) => {
+  if ( fromDate && toDate ) {
+    return (
+      `
+      ${
+        fromDate.format( 'DD.MM.YYYY' ) === toDate.format( 'DD.MM.YYYY' ) ?
+        fromDate.format( 'HH:mm' ) :
+        fromDate.format( 'HH:mm DD.MM.YYYY' )
+      } -
+      ${ toDate.format( 'HH:mm DD.MM.YYYY' ) }
+    `
+    );
+  }
+  return `Invalid date`;
 }
 
 export const timestampToDate = ( timestamp ) => {

@@ -58,7 +58,7 @@ export default function TableList( props ) {
   const filterTaskByAttributes = ( task ) => {
     return filteredDisplayValues
       .every( ( display ) => {
-        if ( [ 'important', 'invoiced', 'checked', 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
+        if ( [ 'important', 'invoiced', 'checked', 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH', 'scheduled' ].includes( display.value ) ) {
           return true;
         }
         let value = getItemDisplayValue( task, display );

@@ -135,6 +135,7 @@ export default function TasksLoader( props ) {
     .map( ( status ) => status.id );
   const taskVariables = {
     projectId: localProject.id,
+    milestoneId: localMilestone.id,
     filter: filterVariables,
     sort: fetchingGantt ? ganttSort : tasksSort,
     milestoneSort: fetchingGantt,
@@ -224,9 +225,6 @@ export default function TasksLoader( props ) {
         variables: {
           tasklistLayout: value,
         }
-      } )
-      .then( ( response ) => {
-        userDataRefetch();
       } )
       .catch( ( err ) => addLocalError( err ) );
   }
@@ -467,11 +465,15 @@ export default function TasksLoader( props ) {
       setPreference={setPreference}
       setGanttPreference={setGanttPreference}
       orderBy={ fetchingGantt ? ganttSort.key : tasksSort.key }
-      setOrderBy={(value) => {
+      setOrderBy={(key) => {
+        let asc = fetchingGantt ? ganttSort.asc : tasksSort.asc;
+        if(['important'].includes(key)){
+          asc = false;
+        }
         if(fetchingGantt){
-          setGanttSort({ ...ganttSort, key: value })
+          setGanttSort({ asc, key })
         }else{
-          setTasksSort({ ...tasksSort, key: value })
+          setTasksSort({ asc, key })
         }
       }}
       ascending={ fetchingGantt ? ganttSort.asc : tasksSort.asc }

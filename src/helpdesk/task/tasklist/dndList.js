@@ -157,10 +157,11 @@ export default function TaskListDnD( props ) {
       } );
   }
 
-  const onDragEnd = ( {
-    source,
-    destination
-  } ) => {
+  const onDragEnd = ( props ) => {
+    const {
+      source,
+      destination
+    } = props;
     if (
       source !== null &&
       destination !== null &&
@@ -193,129 +194,128 @@ export default function TaskListDnD( props ) {
 
   return (
     <div>
-        <CommandBar
+      <CommandBar
+        {...props}
+        />
+      <div className="scroll-visible overflow-x fit-with-header-and-commandbar task-container">
+        <ListHeader
           {...props}
           />
-        <div className="scroll-visible overflow-x fit-with-header-and-commandbar task-container">
-          <ListHeader
-            {...props}
-            />
-          <div className="flex-row m-l-30" >
-            <DragDropContext onDragEnd={onDragEnd}>
-              {
-                taskGroups
-                .filter( (group) => group.status.action !== 'Invoiced' )
-                .map(
-                  (group) =>
-                  <Card className="dnd-column" key={group.status.id}>
-                    <CardHeader className="dnd-header">{group.status.title}</CardHeader>
-                    <Droppable droppableId={group.status.id.toString()}>
-                      {
-                        (provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            className="dnd-body card-body"
-                            style={{
-                              background: snapshot.isDraggingOver ? 'lightblue' : 'inherit',
-                            }}
-                            >
-                            {
-                              group.tasks.map((item, index) => (
-                                <Draggable
-                                  key={item.id}
-                                  draggableId={item.id.toString()}
-                                  index={index}
-                                  >
-                                  {
-                                    (provided, snapshot) => (
-                                      <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        >
-                                        <ul
-                                          className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
-                                          style={{borderLeft: "3px solid " + group.status.color}}
-                                          onClick={(e)=>{
-                                            history.push(link+'/'+item.id);
-                                          }}
-                                          key={item.id}
-                                          >
-                                          <ItemRender task={item} />
-                                        </ul>
-                                      </div>
-                                    )
-                                  }
-                                </Draggable>
-                              ))
-                            }
-                            {provided.placeholder}
-                          </div>
-                        )
-                      }
-                    </Droppable>
-                  </Card>
-                )
-              }
-            </DragDropContext>
+        <div className="flex-row m-l-30" >
+          <DragDropContext onDragEnd={onDragEnd}>
             {
               taskGroups
-              .filter( (group) => group.status.action === 'Invoiced' )
+              .filter( (group) => group.status.action !== 'Invoiced' )
               .map(
                 (group) =>
                 <Card className="dnd-column" key={group.status.id}>
                   <CardHeader className="dnd-header">{group.status.title}</CardHeader>
-                  <CardBody className="dnd-body">
+                  <Droppable droppableId={group.status.id.toString()}>
                     {
-                      group.tasks.map(
-                        (item)=>
-                        <ul
-                          className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
-                          style={{borderLeft: "3px solid " + group.status.color}}
-                          onClick={(e)=>{
-                            history.push(link+'/'+item.id);
+                      (provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          className="dnd-body card-body"
+                          style={{
+                            background: snapshot.isDraggingOver ? 'lightblue' : 'inherit',
                           }}
-                          key={item.id}
                           >
-                          <ItemRender task={item} />
-                        </ul>
-                      )
-                    }
-                    {
-                      group.tasks.length===0 &&
-                      <div className="center-ver" style={{textAlign:'center'}}>
-                        Neboli nájdené žiadne výsledky pre tento filter
+                          { group.tasks.map((item, index) => (
+                            <Draggable
+                              key={item.id}
+                              draggableId={item.id.toString()}
+                              index={index}
+                              >
+                              {
+                                (provided, snapshot) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    >
+                                    <ul
+                                      className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
+                                      style={{borderLeft: "3px solid " + group.status.color}}
+                                      onClick={(e)=>{
+                                        history.push(link+'/'+item.id);
+                                      }}
+                                      key={item.id}
+                                      >
+                                      <ItemRender task={item} />
+                                    </ul>
+                                  </div>
+                                )
+                              }
+                            </Draggable>
+                          ))
+                        }
+                        {provided.placeholder}
                       </div>
-                    }
-                  </CardBody>
-                </Card>
-              )
-            }
-            {
-              groupRest().length>0 &&
-              <Card className="dnd-column" key="Undefined group">
-                <CardHeader>Undefined group</CardHeader>
-                <CardBody>
-                  {
-                    groupRest().map(
-                      (item)=>
-                      <ul
-                        className={classnames("dnd-item", "clickable", "list-unstyled")}
-                        style={{borderLeft: `4px solid ${item.status.color}`}}
-                        onClick={(e)=>{
-                          history.push(link+'/'+item.id);
-                        }}
-                        key={item.id}
-                        >
-                        <ItemRender task={item} />
-                      </ul>
                     )
                   }
-                </CardBody>
+                </Droppable>
               </Card>
-            }
-          </div>
-        </div>
+            )
+          }
+        </DragDropContext>
+        {
+          taskGroups
+          .filter( (group) => group.status.action === 'Invoiced' )
+          .map(
+            (group) =>
+            <Card className="dnd-column" key={group.status.id}>
+              <CardHeader className="dnd-header">{group.status.title}</CardHeader>
+              <CardBody className="dnd-body">
+                {
+                  group.tasks.map(
+                    (item)=>
+                    <ul
+                      className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
+                      style={{borderLeft: "3px solid " + group.status.color}}
+                      onClick={(e)=>{
+                        history.push(link+'/'+item.id);
+                      }}
+                      key={item.id}
+                      >
+                      <ItemRender task={item} />
+                    </ul>
+                  )
+                }
+                {
+                  group.tasks.length===0 &&
+                  <div className="center-ver" style={{textAlign:'center'}}>
+                    Neboli nájdené žiadne výsledky pre tento filter
+                  </div>
+                }
+              </CardBody>
+            </Card>
+          )
+        }
+        {
+          groupRest().length>0 &&
+          <Card className="dnd-column" key="Undefined group">
+            <CardHeader>Undefined group</CardHeader>
+            <CardBody>
+              {
+                groupRest().map(
+                  (item)=>
+                  <ul
+                    className={classnames("dnd-item", "clickable", "list-unstyled")}
+                    style={{borderLeft: `4px solid ${item.status.color}`}}
+                    onClick={(e)=>{
+                      history.push(link+'/'+item.id);
+                    }}
+                    key={item.id}
+                    >
+                    <ItemRender task={item} />
+                  </ul>
+                )
+              }
+            </CardBody>
+          </Card>
+        }
       </div>
+    </div>
+  </div>
   );
 }

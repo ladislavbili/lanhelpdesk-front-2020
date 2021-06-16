@@ -3,12 +3,20 @@ import {
   useMutation,
   useQuery
 } from "@apollo/client";
-
+import Empty from 'components/Empty';
 import {
   FormGroup,
   Label,
-  Input
+  Input,
+  NavLink,
+  NavItem,
+  Nav,
+  TabContent,
+  TabPane,
 } from 'reactstrap';
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ck5config from 'configs/components/ck5config';
 import {
   toSelArr,
   toSelItem,
@@ -172,6 +180,8 @@ export default function ProjectEdit( props ) {
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
+  const [ openedTab, setOpenedTab ] = React.useState( "description" );
+  const [ editingDescription, setEditingDescription ] = React.useState( false );
   const [ addTaskErrors, setAddTaskErrors ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
@@ -560,12 +570,12 @@ export default function ProjectEdit( props ) {
 
   const doesDefHasValue = () => {
     return (
-    [
-      type,
-    ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
-      defTag,
-      //assignedTo,
-    ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
+      [
+        type,
+      ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
+        defTag,
+        //assignedTo,
+      ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
     )
   }
 
@@ -614,6 +624,76 @@ export default function ProjectEdit( props ) {
   const allTags = getAllTags();
   const allStatuses = getAllStatuses();
 
+  const renderDescription = () => {
+    let RenderDescription = null;
+    if ( !myRights.projectPrimaryWrite ) {
+      if ( description.length !== 0 ) {
+        RenderDescription = <div className="project-description-text" dangerouslySetInnerHTML={{__html:description }} />
+      } else {
+        RenderDescription = <div className="project-description-text">Projekt nemá popis</div>
+      }
+    } else {
+      if ( editingDescription ) {
+        RenderDescription = <div>
+          <CKEditor
+            editor={ ClassicEditor }
+            data={description}
+            onInit={(editor) => {
+              editor.editing.view.document.on( 'keydown', ( evt, data ) => {
+                if ( data.keyCode === 27 ) {
+                  setEditingDescription(false);
+                  data.preventDefault();
+                  evt.stop();
+                }
+              });
+            }}
+            onChange={(e,editor)=>{
+              setDescription(editor.getData());
+              setDataChanged( true );
+            }}
+            config={ck5config}
+            />
+        </div>
+      } else {
+        if ( description.length !== 0 ) {
+          RenderDescription = <div className="project-description-text" dangerouslySetInnerHTML={{__html:description }} />
+        } else {
+          RenderDescription = <div className="project-description-text">Úloha nemá popis</div>
+        }
+      }
+    }
+    return (
+      <div>
+        <div className="row" style={{alignItems: "baseline"}}>
+          <Label>
+            Popis
+          </Label>
+          { myRights.projectPrimaryWrite &&
+            <button
+              className="btn-link btn-distance m-l-5"
+              style={{height: "20px"}}
+              onClick={()=>{
+                setEditingDescription(!editingDescription);
+              }}
+              >
+              <i className={`fa fa-${!editingDescription ? 'pen' : 'save' }`} />
+              { !editingDescription ? 'edit' : 'save' }
+            </button>
+          }
+          { myRights.projectPrimaryWrite &&
+            <label htmlFor={`upload-project-attachment`} className="btn-link btn-distance m-l-0" >
+              <i className="fa fa-plus" />
+              Attachment
+            </label>
+          }
+        </div>
+        <div className="form-section-rest">
+          {RenderDescription}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="dynamic-bg-commandbar a-i-c p-l-20">
@@ -640,264 +720,281 @@ export default function ProjectEdit( props ) {
           Edit project
         </h2>
 
-        { myRights.projectPrimaryRead &&
-          <div>
-            <FormGroup>
-              <Label for="name">Project name<span className="warning-big">*</span></Label>
-              <Input
-                disabled={!myRights.projectPrimaryWrite}
-                type="text"
-                name="name"
-                id="name"
-                placeholder="Enter project name"
-                value={title}
-                onChange={(e)=>{
-                  setTitle(e.target.value);
-                  setDataChanged( true );
-                }}
-                />
-            </FormGroup>
+        <Nav tabs className="b-0 m-b-10">
+          <NavItem>
+            <NavLink
+              className={classnames({ active: openedTab === 'description'}, "clickable", "")}
+              onClick={() => setOpenedTab('description') }
+              >
+              Description
+            </NavLink>
+          </NavItem>
+          { myRights.projectSecondary &&
+            <NavItem>
+              <NavLink>
+                |
+              </NavLink>
+            </NavItem>
+          }
+          { myRights.projectSecondary &&
+            <NavItem>
+              <NavLink
+                className={classnames({ active: openedTab === 'settings' }, "clickable", "")}
+                onClick={() => setOpenedTab('settings') }
+                >
+                Settings
+              </NavLink>
+            </NavItem>
+          }
+        </Nav>
+        <TabContent activeTab={openedTab}>
+          <TabPane tabId={'description'}>
+            { myRights.projectPrimaryRead &&
+              <Empty>
+                <FormGroup>
+                  <Label for="name">Project name<span className="warning-big">*</span></Label>
+                  <Input
+                    disabled={!myRights.projectPrimaryWrite}
+                    type="text"
+                    name="name"
+                    id="name"
+                    placeholder="Enter project name"
+                    value={title}
+                    onChange={(e)=>{
+                      setTitle(e.target.value);
+                      setDataChanged( true );
+                    }}
+                    />
+                </FormGroup>
 
-            <FormGroup>
-              <Label htmlFor="description">Popis</Label>
-              <Input
-                disabled={!myRights.projectPrimaryWrite}
-                type="textarea"
-                className="form-control"
-                id="description"
-                placeholder="Zadajte text"
-                value={description}
-                onChange={(e) => {
-                  setDescription( e.target.value );
-                  setDataChanged( true );
-                }}
-                />
-            </FormGroup>
-          </div>
-        }
-        { myRights.projectSecondary &&
-          <div>
-            <div className="row">
-              <Checkbox
-                className = "m-l-5 m-r-5"
-                centerHor
-                disabled={false}
-                value = { autoApproved}
-                onChange={() => setAutoApproved( !autoApproved) }
-                />
-              <span className="clickable" onClick = { () => setAutoApproved( !autoApproved) }>
-                All subtasks, work trips, materials and custom items are automatically approved.
-              </span>
-            </div>
-            <Statuses
-              statuses={allStatuses}
-              addStatus={(newStatus) => {
-                setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ]);
-                setDataChanged( true );
-              }}
-              deleteStatus={(id) => {
-                if(id > -1){
-                  setUpdateStatuses(updateStatuses.filter((status) => status.id !== id ));
-                  setDeleteStatuses([ ...deleteStatuses, id ]);
-                }else{
-                  setAddStatuses(addStatuses.filter((status) => status.id !== id ));
-                }
-                setDataChanged( true );
-              }}
-              updateStatus={(newStatus) => {
-                if(newStatus.id > -1){
-                  let newStatuses = [...updateStatuses];
-                  let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-                  if(index === -1){
-                    newStatuses = newStatuses.concat(newStatus);
-                  }else{
-                    newStatuses[index] = { ...newStatuses[index], ...newStatus }
-                  }
-                  setUpdateStatuses(newStatuses);
-                }else{
-                  let newStatuses = [...addStatuses];
-                  let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-                  newStatuses[index] = { ...newStatuses[index], ...newStatus }
-                  setAddStatuses(newStatuses);
-                }
-                setDataChanged( true );
-              }}
-              />
-
-            <Tags
-              tags={allTags}
-              addTag={(newTag) => {
-                setAddTags([ ...addTags, {...newTag, id: fakeID -- } ]);
-                setDataChanged( true );
-              }}
-              deleteTag={(id) => {
-                if(id > -1){
-                  setUpdateTags(updateTags.filter((tag) => tag.id !== id ));
-                  setDeleteTags([ ...deleteTags, id ]);
-                }else{
-                  setAddTags(addTags.filter((tag) => tag.id !== id ));
-                }
-                setDataChanged( true );
-              }}
-              updateTag={(newTag) => {
-                if(newTag.id > -1){
-                  let newTags = [...updateTags];
-                  let index = newTags.findIndex((tag) => tag.id === newTag.id );
-                  if(index === -1){
-                    newTags = newTags.concat(newTag);
-                  }else{
-                    newTags[index] = { ...newTags[index], ...newTag }
-                  }
-                  setUpdateTags(newTags);
-                }else{
-                  let newTags = [...addTags];
-                  let index = newTags.findIndex((tag) => tag.id === newTag.id );
-                  newTags[index] = { ...newTags[index], ...newTag }
-                  setAddTags(newTags);
-                }
-                setDataChanged( true );
-              }}
-              />
-
-            <div className="row">
-              <Checkbox
-                className = "m-l-5 m-r-5"
-                centerHor
-                disabled={false}
-                value = { lockedRequester}
-                onChange={() => {
-                  setLockedRequester( !lockedRequester);
-                  setDataChanged( true );
-                }}
-                />
-              <span className="clickable" onClick = { () => {
-                  setLockedRequester( !lockedRequester);
-                  setDataChanged( true );
-                } }>
-                A requester can be only a user with rights to this project.
-              </span>
-            </div>
-
-            <Groups
-              addGroup={(newGroup) => {
-                setGroups([...groups, newGroup]);
-                setDataChanged( true );
-              }}
-              />
-
-            <UserGroups
-              addRight={ (userGroup) => {
-                setUserGroups([...userGroups, userGroup]);
-                setDataChanged( true );
-              }}
-              deleteRight={ (userGroup) => {
-                setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
-                setDataChanged( true );
-              }}
-              updateRight={ (userGroup) => {
-                let newUserGroups = [...userGroups];
-                let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
-                newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
-                setUserGroups(newUserGroups);
-                setDataChanged( true );
-              }}
-              users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-              permissions={ userGroups }
-              isAdmin={ true }
-              groups={ toSelArr(groups) }
-              />
-
-            <ProjectAcl
-              groups={ groups }
-              updateGroupRight={ (groupID, acl, newVal) => {
-                let newGroups = [...groups];
-                let index = newGroups.findIndex((group) => group.id === groupID );
-                newGroups[index]['rights'][acl] = newVal;
-                setUserGroups(userGroups.map((userGroup) => {
-                  if(userGroup.group.id === groupID){
-                    return {...userGroup, group: toSelItem(newGroups[index])  }
-                  }else{
-                    return userGroup;
-                  }
-                } ));
-                setGroups(newGroups);
-                setDataChanged( true );
-              }}
-              updateGroup={(newGroup) => {
-                let newGroups = [...groups];
-                let index = newGroups.findIndex((group) => group.id === newGroup.id );
-                newGroups[index] = { ...newGroups[index], ...newGroup }
-                setGroups(newGroups);
-                setUserGroups(userGroups.map((userGroup) => (
-                  (userGroup.group.id !== newGroup.id) ?
-                  userGroup :
-                  ({...userGroup, group: {...userGroup.group,...newGroup}})
-                ) ));
-                setDataChanged( true );
-              }}
-              deleteGroup={(id) => {
-                setGroups( groups.filter((group) => group.id !== id ) );
-                setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
-                setDataChanged( true );
-              }}
-              />
-
-            <ProjectDefaultValues
-              assignedTo={assignedTo}
-              setAssignedTo={(value) => {setAssignedTo(value); setDataChanged(true);}}
-              company={company}
-              setCompany={(value) => {setCompany(value); setDataChanged(true);}}
-              overtime={overtime}
-              setOvertime={(value) => {setOvertime(value); setDataChanged(true);}}
-              pausal={pausal}
-              setPausal={(value) => {setPausal(value); setDataChanged(true);}}
-              requester={requester}
-              setRequester={(value) => {setRequester(value); setDataChanged(true);}}
-              type={type}
-              setType={(value) => {setType(value); setDataChanged(true);}}
-              status={status}
-              setStatus={(value) => {setStatus(value); setDataChanged(true);}}
-              tag={defTag}
-              setTag={(value) => {setDefTag(value); setDataChanged(true);}}
-              statuses={toSelArr(allStatuses)}
-              companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
-              users={
-                lockedRequester ?
-                userGroups.map( (userGroup) => userGroup.user ) :
-                (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
-              }
-              assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
-              allTags={toSelArr(allTags)}
-              taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
-              />
-
-            { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
-              <div className="red" style={{color:'red'}}>
-                Status, assigned to and company can't be empty if they are fixed!
-              </div>
+                { renderDescription() }
+              </Empty>
             }
+          </TabPane>
+          { myRights.projectSecondary &&
+            <TabPane tabId={'settings'}>
+              <div className="row">
+                <Checkbox
+                  className = "m-l-5 m-r-5"
+                  centerHor
+                  disabled={false}
+                  value = { autoApproved}
+                  onChange={() => setAutoApproved( !autoApproved) }
+                  />
+                <span className="clickable" onClick = { () => setAutoApproved( !autoApproved) }>
+                  All subtasks, work trips, materials and custom items are automatically approved.
+                </span>
+              </div>
+              <Statuses
+                statuses={allStatuses}
+                addStatus={(newStatus) => {
+                  setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ]);
+                  setDataChanged( true );
+                }}
+                deleteStatus={(id) => {
+                  if(id > -1){
+                    setUpdateStatuses(updateStatuses.filter((status) => status.id !== id ));
+                    setDeleteStatuses([ ...deleteStatuses, id ]);
+                  }else{
+                    setAddStatuses(addStatuses.filter((status) => status.id !== id ));
+                  }
+                  setDataChanged( true );
+                }}
+                updateStatus={(newStatus) => {
+                  if(newStatus.id > -1){
+                    let newStatuses = [...updateStatuses];
+                    let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+                    if(index === -1){
+                      newStatuses = newStatuses.concat(newStatus);
+                    }else{
+                      newStatuses[index] = { ...newStatuses[index], ...newStatus }
+                    }
+                    setUpdateStatuses(newStatuses);
+                  }else{
+                    let newStatuses = [...addStatuses];
+                    let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+                    newStatuses[index] = { ...newStatuses[index], ...newStatus }
+                    setAddStatuses(newStatuses);
+                  }
+                  setDataChanged( true );
+                }}
+                />
 
-            <CustomAttributes
-              disabled={false}
-              customAttributes={customAttributes}
-              addCustomAttribute={(newCustomAttribute) => {
-                setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
-                setDataChanged( true );
-              }}
-              updateCustomAttribute={(changedCustomAttribute) => {
-                let newCustomAttributes = [...customAttributes];
-                let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
-                newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
-                setCustomAttributes(newCustomAttributes);
-                setDataChanged( true );
-              }}
-              deleteCustomAttribute={(id) => {
-                setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
-                setDataChanged( true );
-              }}
-              />
-          </div>
-        }
+              <Tags
+                tags={allTags}
+                addTag={(newTag) => {
+                  setAddTags([ ...addTags, {...newTag, id: fakeID -- } ]);
+                  setDataChanged( true );
+                }}
+                deleteTag={(id) => {
+                  if(id > -1){
+                    setUpdateTags(updateTags.filter((tag) => tag.id !== id ));
+                    setDeleteTags([ ...deleteTags, id ]);
+                  }else{
+                    setAddTags(addTags.filter((tag) => tag.id !== id ));
+                  }
+                  setDataChanged( true );
+                }}
+                updateTag={(newTag) => {
+                  if(newTag.id > -1){
+                    let newTags = [...updateTags];
+                    let index = newTags.findIndex((tag) => tag.id === newTag.id );
+                    if(index === -1){
+                      newTags = newTags.concat(newTag);
+                    }else{
+                      newTags[index] = { ...newTags[index], ...newTag }
+                    }
+                    setUpdateTags(newTags);
+                  }else{
+                    let newTags = [...addTags];
+                    let index = newTags.findIndex((tag) => tag.id === newTag.id );
+                    newTags[index] = { ...newTags[index], ...newTag }
+                    setAddTags(newTags);
+                  }
+                  setDataChanged( true );
+                }}
+                />
+
+              <div className="row">
+                <Checkbox
+                  className = "m-l-5 m-r-5"
+                  centerHor
+                  disabled={false}
+                  value = { lockedRequester}
+                  onChange={() => {
+                    setLockedRequester( !lockedRequester);
+                    setDataChanged( true );
+                  }}
+                  />
+                <span className="clickable" onClick = { () => {
+                    setLockedRequester( !lockedRequester);
+                    setDataChanged( true );
+                  } }>
+                  A requester can be only a user with rights to this project.
+                </span>
+              </div>
+
+              <Groups
+                addGroup={(newGroup) => {
+                  setGroups([...groups, newGroup]);
+                  setDataChanged( true );
+                }}
+                />
+
+              <UserGroups
+                addRight={ (userGroup) => {
+                  setUserGroups([...userGroups, userGroup]);
+                  setDataChanged( true );
+                }}
+                deleteRight={ (userGroup) => {
+                  setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+                  setDataChanged( true );
+                }}
+                updateRight={ (userGroup) => {
+                  let newUserGroups = [...userGroups];
+                  let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+                  newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+                  setUserGroups(newUserGroups);
+                  setDataChanged( true );
+                }}
+                users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+                permissions={ userGroups }
+                isAdmin={ true }
+                groups={ toSelArr(groups) }
+                />
+
+              <ProjectAcl
+                groups={ groups }
+                updateGroupRight={ (groupID, acl, newVal) => {
+                  let newGroups = [...groups];
+                  let index = newGroups.findIndex((group) => group.id === groupID );
+                  newGroups[index]['rights'][acl] = newVal;
+                  setUserGroups(userGroups.map((userGroup) => {
+                    if(userGroup.group.id === groupID){
+                      return {...userGroup, group: toSelItem(newGroups[index])  }
+                    }else{
+                      return userGroup;
+                    }
+                  } ));
+                  setGroups(newGroups);
+                  setDataChanged( true );
+                }}
+                updateGroup={(newGroup) => {
+                  let newGroups = [...groups];
+                  let index = newGroups.findIndex((group) => group.id === newGroup.id );
+                  newGroups[index] = { ...newGroups[index], ...newGroup }
+                  setGroups(newGroups);
+                  setUserGroups(userGroups.map((userGroup) => (
+                    (userGroup.group.id !== newGroup.id) ?
+                    userGroup :
+                    ({...userGroup, group: {...userGroup.group,...newGroup}})
+                  ) ));
+                  setDataChanged( true );
+                }}
+                deleteGroup={(id) => {
+                  setGroups( groups.filter((group) => group.id !== id ) );
+                  setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
+                  setDataChanged( true );
+                }}
+                />
+
+              <ProjectDefaultValues
+                assignedTo={assignedTo}
+                setAssignedTo={(value) => {setAssignedTo(value); setDataChanged(true);}}
+                company={company}
+                setCompany={(value) => {setCompany(value); setDataChanged(true);}}
+                overtime={overtime}
+                setOvertime={(value) => {setOvertime(value); setDataChanged(true);}}
+                pausal={pausal}
+                setPausal={(value) => {setPausal(value); setDataChanged(true);}}
+                requester={requester}
+                setRequester={(value) => {setRequester(value); setDataChanged(true);}}
+                type={type}
+                setType={(value) => {setType(value); setDataChanged(true);}}
+                status={status}
+                setStatus={(value) => {setStatus(value); setDataChanged(true);}}
+                tag={defTag}
+                setTag={(value) => {setDefTag(value); setDataChanged(true);}}
+                statuses={toSelArr(allStatuses)}
+                companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
+                users={
+                  lockedRequester ?
+                  userGroups.map( (userGroup) => userGroup.user ) :
+                  (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
+                }
+                assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
+                allTags={toSelArr(allTags)}
+                taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
+                />
+
+              { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
+                <div className="red" style={{color:'red'}}>
+                  Status, assigned to and company can't be empty if they are fixed!
+                </div>
+              }
+
+              <CustomAttributes
+                disabled={false}
+                customAttributes={customAttributes}
+                addCustomAttribute={(newCustomAttribute) => {
+                  setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
+                  setDataChanged( true );
+                }}
+                updateCustomAttribute={(changedCustomAttribute) => {
+                  let newCustomAttributes = [...customAttributes];
+                  let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
+                  newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
+                  setCustomAttributes(newCustomAttributes);
+                  setDataChanged( true );
+                }}
+                deleteCustomAttribute={(id) => {
+                  setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
+                  setDataChanged( true );
+                }}
+                />
+            </TabPane>
+          }
+        </TabContent>
         { addTaskErrors && addTaskIssue &&
           <ACLErrors
             {
@@ -921,7 +1018,7 @@ export default function ProjectEdit( props ) {
             </button>
           }
           { myRights.projectPrimaryWrite &&
-            <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
+            <button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
               Delete
             </button>
           }

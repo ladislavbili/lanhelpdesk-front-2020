@@ -14,13 +14,13 @@ export const dashboard = {
 export const addProject = {
   project: {
     id: -1,
-    title: '+ Project',
-    label: '+ Project',
+    title: 'Project',
+    label: 'Project',
     value: -1
   },
   id: -1,
-  title: '+ Project',
-  label: '+ Project',
+  title: 'Project',
+  label: 'Project',
   value: -1
 };
 export const allMilestones = {

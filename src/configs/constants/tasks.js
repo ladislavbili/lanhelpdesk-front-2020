@@ -1,4 +1,8 @@
 import React from 'react';
+import {
+  toMomentInput,
+  timeRangeToString,
+} from 'helperFunctions';
 
 export const defaultTasksAttributesFilter = {
   id: "",
@@ -36,6 +40,7 @@ export const defaultTasklistColumnPreference = {
   requester: true,
   company: true,
   assignedTo: true,
+  scheduled: false,
   createdAtV: false,
   startsAt: false,
   deadline: true,
@@ -67,6 +72,7 @@ export const defaultTasklistGanttColumnPreference = {
   requester: true,
   company: true,
   assignedTo: true,
+  scheduled: false,
   createdAtV: false,
   taskType: false,
   overtime: false,
@@ -98,6 +104,11 @@ export const orderByValues = [
     type: 'object'
   },
   {
+    value: 'important',
+    label: 'Important',
+    type: 'boolean'
+    },
+  {
     value: 'title',
     label: 'Title',
     type: 'text'
@@ -127,6 +138,10 @@ export const attributeLimitingRights = [
   {
     right: 'assignedRead',
     preference: 'assignedTo'
+  },
+  {
+    right: 'scheduledRead',
+    preference: 'scheduled'
   },
   {
     right: 'companyRead',
@@ -189,6 +204,10 @@ export const ganttAttributeLimitingRights = [
   {
     right: 'assignedRead',
     preference: 'assignedTo'
+  },
+  {
+    right: 'scheduledRead',
+    preference: 'scheduled'
   },
   {
     right: 'companyRead',
@@ -319,6 +338,22 @@ export const createDisplayValues = ( preference ) => [
       )
     },
     show: preference[ 'assignedTo' ]
+  },
+  {
+    value: 'scheduled',
+    label: 'Scheduled',
+    type: 'list',
+    func: ( items ) => {
+      if ( items.length === 0 ) {
+        return null;
+      }
+      return (
+        <div>
+          { items.map((item)=><div key={item.id}>{timeRangeToString(toMomentInput(item.from), toMomentInput(item.to))}</div>) }
+        </div>
+      )
+    },
+    show: preference[ 'scheduled' ]
   },
   {
     value: 'tags',
@@ -501,6 +536,22 @@ export const createGanttDisplayValues = ( preference ) => [
       )
     },
     show: preference[ 'assignedTo' ]
+  },
+  {
+    value: 'scheduled',
+    label: 'Scheduled',
+    type: 'list',
+    func: ( items ) => {
+      if ( items.length === 0 ) {
+        return null;
+      }
+      return (
+        <div>
+          { items.map((item)=><div key={item.id}>{timeRangeToString(toMomentInput(item.from), toMomentInput(item.to))}</div>) }
+        </div>
+      )
+    },
+    show: preference[ 'scheduled' ]
   },
   {
     value: 'tags',

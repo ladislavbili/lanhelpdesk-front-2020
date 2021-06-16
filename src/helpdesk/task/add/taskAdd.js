@@ -1298,7 +1298,7 @@ export default function TaskAdd( props ) {
   }
 
   const showLocalCreationErrorFunc = () => {
-    if ( !cannotSave ) {
+    if ( !cannotSave || !showLocalCreationError ) {
       return (
         <span className="center-hor ml-auto">
         </span>

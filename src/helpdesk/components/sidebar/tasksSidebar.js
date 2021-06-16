@@ -290,7 +290,7 @@ export default function TasksSidebar( props ) {
   }
 
   const renderProjects = () => {
-    const URLprefix = `/helpdesk/taskList/i/${ filterData.localFilter.id ? filterData.localFilter.id :'all'}`;
+    const URLprefix = `/helpdesk/taskList/i/all`;
     return (
       <div>
         <div className="sidebar-label row">
@@ -307,14 +307,15 @@ export default function TasksSidebar( props ) {
         </div>
         <div className="sidebar-menu-item">
           <Select
-            options={[ ...toSelArr(projects.map((project) => ({...project, id: project.project.id, title: project.project.title}) )), addProject ]}
+            options={[ ...toSelArr(projects.map((project) => ({...project, id: project.project.id, title: project.project.title}) )), { label: '+ Project', value: -1 } ]}
             value={localProject}
             styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar' ])}
             onChange={pro => {
-              if(pro.id === -1 ){
+              if(pro.value === -1 ){
                 setOpenProjectAdd(true);
                 return;
               }
+              setMilestone(allMilestones);
               setProject(pro);
               if(!repeatPage){
                 history.push(URLprefix);
@@ -329,7 +330,7 @@ export default function TasksSidebar( props ) {
     )
   }
   const renderProjectsPopover = () => {
-    const URLprefix = `/helpdesk/taskList/i/${ filterData.localFilter.id ? filterData.localFilter.id :'all'}`;
+    const URLprefix = `/helpdesk/taskList/i/all`;
 
     return (
       <div className="popover"  style={{top: 'calc( 0.5em + ( 4.5em * 1 ) )'}}>
@@ -352,6 +353,7 @@ export default function TasksSidebar( props ) {
                 <span
                   className={ classnames("clickable sidebar-menu-item link", { "active": localProject.id === project.id }) }
                   onClick={() => {
+                    setMilestone(allMilestones);
                     setProject(project);
                     if(!repeatPage){
                       history.push(URLprefix);
@@ -411,11 +413,11 @@ export default function TasksSidebar( props ) {
           </div>
         <div className="sidebar-menu-item">
           <Select
-            options={[ ...toSelArr(milestones), addMilestone ]}
+            options={[ ...toSelArr(milestones), , { label: '+ Milestone', value: -1 } ]}
             value={milestoneData.localMilestone}
             styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar' ])}
             onChange={milestone => {
-              if(milestone.id === -1 ){
+              if(milestone.value === -1 ){
                 setOpenMilestoneAdd(true);
                 return;
               }
@@ -770,12 +772,43 @@ export default function TasksSidebar( props ) {
           <div className='p-l-15 p-r-15'>
             { currentUser.role.accessRights.companies && renderCompanyAddBtn() }
             { currentUser.role.accessRights.users && renderUserAddBtn() }
+            { localProject.id !== null &&
+              <NavItem className="row full-width" style={{ overflow: 'hidden' }}>
+                <Button
+                  className='btn-link'
+                  onClick={() => history.push( `/helpdesk/project/${localProject.id}` )}
+                  >
+                  <i className="fa fa-cog"/>
+                  {`Project "${localProject.title}"`}
+                </Button>
+              </NavItem>
+             }
+              { localProject.id !== null && milestoneData.localMilestone.id !== null && localProject.right.milestoneWrite &&
+                <NavItem className="row full-width" style={{ overflow: 'hidden' }}>
+                <MilestoneEdit
+                  label={`Milestone "${milestoneData.localMilestone.title}"`}
+                  closeModal={(editedMilestone) => {
+                    if(editedMilestone !== null){
+                      const milestone = {
+                        id: editedMilestone.id,
+                        value: editedMilestone.id,
+                        title: editedMilestone.title,
+                        label: editedMilestone.title,
+                      }
+                      setMilestone(milestone);
+                    }
+                  }}
+                  milestoneDeleted={()=>{
+                    setMilestone(allMilestones);
+                  }}
+                  />
+                </NavItem>
+              }
           </div>
         }
       </div>
     )
   }
-
   return (
     <div>
       { !sidebarOpen &&

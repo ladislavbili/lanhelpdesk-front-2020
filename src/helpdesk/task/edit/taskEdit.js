@@ -1109,19 +1109,20 @@ export default function TaskEdit( props ) {
             { !task.invoiced && userRights.statusWrite &&
               (project ? toSelArr(project.project.statuses) : [])
               .filter((status) => !['Invoiced'].includes(status.action) )
-              .map((status) => (
+              .map((possibleStatus) => (
                 <button
                   type="button"
-                  key={status.id}
+                  key={possibleStatus.id}
                   className="btn-link task-add-layout-button btn-distance"
-                  onClick={() => setPossibleStatus(status) }
+                  style={ possibleStatus.id === status.id ? { color: status.color } : {}}
+                  onClick={() => setPossibleStatus(possibleStatus) }
                   >
-                  { status.icon.length > 3 &&
+                  { possibleStatus.icon.length > 3 &&
                     <i
-                      className={`${status.icon} commandbar-command-icon`}
+                      className={`${possibleStatus.icon} commandbar-command-icon`}
                       />
                   }
-                  {status.title}
+                  {possibleStatus.title}
                 </button>
               ))
             }
