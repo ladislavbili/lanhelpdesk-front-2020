@@ -191,6 +191,13 @@ statuses{
   icon
   action
 }
+attachments{
+  id
+  path
+  filename
+  size
+  mimetype
+}
 groups{
   id
   title
@@ -300,6 +307,16 @@ mutation deleteProject($id: Int!, $newId: Int!) {
   deleteProject(
     id: $id,
     newId: $newId,
+  ){
+    id
+  }
+}
+`;
+
+export const DELETE_PROJECT_ATTACHMENT = gql `
+mutation deleteProjectAttachment($id: Int!) {
+  deleteProjectAttachment(
+    id: $id,
   ){
     id
   }

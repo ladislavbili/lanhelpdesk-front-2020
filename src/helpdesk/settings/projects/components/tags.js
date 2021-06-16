@@ -79,6 +79,16 @@ export default function Tags( props ) {
                       color={tag.color}
                       onChangeComplete={value => updateTag({ id: tag.id, color: value.hex })}
                       />
+                    <div className="p-t-5 row">
+                      <button
+                        className="btn-link-cancel btn-distance"
+                        onClick={() => {
+                          setEditColorID(null);
+                        }}
+                        >
+                        Close
+                      </button>
+                    </div>
                   </PopoverBody>
                 </Popover>
               </td>
@@ -129,6 +139,16 @@ export default function Tags( props ) {
                     color={color}
                     onChangeComplete={value => setColor( value.hex )}
                     />
+                    <div className="p-t-5 row">
+                      <button
+                        className="btn-link-cancel btn-distance"
+                        onClick={() => {
+                          setEditColorID(null);
+                        }}
+                        >
+                        Close
+                      </button>
+                    </div>
                 </PopoverBody>
               </Popover>
             </td>

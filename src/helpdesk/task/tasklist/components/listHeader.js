@@ -53,7 +53,7 @@ export default function ListHeader( props ) {
   const openColumnPreferences = () => setColumnPreferencesOpen( !columnPreferencesOpen );
 
   return (
-    <div className={classnames("d-flex", "h-60px", "flex-row", 'm-l-30')}>
+    <div className={classnames("d-flex", "h-60px", "flex-row", 'm-l-30', 'relative')} style={{ paddingRight: 270 }}>
       <Search {...props}/>
       { !multiselect && selectedStatuses && allStatuses.length > 0 &&
         <div className="center-hor flex-row">
@@ -125,7 +125,7 @@ export default function ListHeader( props ) {
           />
       }
 
-      <div className="ml-auto p-2 align-self-center">
+      <div className="sort-style">
         <div className="d-flex flex-row">
           <div className={
               classnames(

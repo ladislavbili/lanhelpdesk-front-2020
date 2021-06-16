@@ -1905,7 +1905,7 @@ export default function TaskEdit( props ) {
             </button>
           }
           { userRights.taskAttachmentsWrite &&
-            <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0" >
+            <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0 clickable" >
               <i className="fa fa-plus" />
               Attachment
             </label>

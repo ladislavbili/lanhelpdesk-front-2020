@@ -54,7 +54,7 @@ p {
 }
 
 .center {
-  max-width: 1920px;
+  //max-width: 1920px;
 }
 
 .bolder {
@@ -1263,6 +1263,10 @@ td {
   padding-right: 0px;
 }
 
+.relative{
+  position: relative;
+}
+
 .warning {
   color: red;
   font-size: 10px;
@@ -1651,6 +1655,14 @@ td {
     }
   }
 }
+
+.sort-style {
+  -webkit-align-items: center!important;
+  position: absolute;
+  right: 0px;
+  top: 15px;
+}
+
 .header-link {
   color: white;
   margin-right: 10px;

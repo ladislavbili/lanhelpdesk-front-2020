@@ -107,12 +107,16 @@ export default function Statuses( props ) {
                       color={status.color}
                       onChangeComplete={value => updateStatus({ id: status.id, color: value.hex })}
                       />
-                    <button
-                      className="btn btn-link-cancel"
-                      onClick={() => setEditColorID(null) }
-                      >
-                      Close
-                    </button>
+                      <div className="p-t-5 row">
+                        <button
+                          className="btn-link-cancel btn-distance"
+                          onClick={() => {
+                            setEditColorID(null);
+                          }}
+                          >
+                          Close
+                        </button>
+                      </div>
                   </PopoverBody>
                 </Popover>
               </td>
@@ -180,6 +184,16 @@ export default function Statuses( props ) {
                     color={color}
                     onChangeComplete={value => setColor( value.hex )}
                     />
+                    <div className="p-t-5 row">
+                      <button
+                        className="btn-link-cancel btn-distance"
+                        onClick={() => {
+                          setEditColorID(null);
+                        }}
+                        >
+                        Close
+                      </button>
+                    </div>
                 </PopoverBody>
               </Popover>
             </td>

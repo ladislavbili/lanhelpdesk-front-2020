@@ -53,7 +53,7 @@ export default function Scheduled( props ) {
             setNewFrom(moment());
             setNewTo(moment().add(floatQuantity, 'hours' ));
           }
-         }}
+        }}
         id={'scheduled-' + id }
         >
         { newFrom && newTo ?
@@ -69,113 +69,113 @@ export default function Scheduled( props ) {
         }
       </span>
       <Popover className="scheduled-in-table" placement="bottom" style={{maxWidth: '350px !important', width: '350px !important'}} isOpen={scheduledOpen && !disabled} target={'scheduled-' + id } toggle={() => {setScheduledOpen(!scheduledOpen)}}>
-          <PopoverBody>
-            <FormGroup>
-              <Label className="w-100">From</Label>
-              <DatePicker
-                className="form-control w-100"
-                selected={newFrom}
-                disabled={disabled}
-                onChange={date => {
-                  setNewFrom(date);
+        <PopoverBody>
+          <FormGroup>
+            <Label className="w-100">From</Label>
+            <DatePicker
+              className="form-control w-100"
+              selected={newFrom}
+              disabled={disabled}
+              onChange={date => {
+                setNewFrom(date);
+                if(newTo === null || date.isAfter(newTo) ){
+                  if(floatQuantity !== null){
+                    setNewTo(moment(date).add(floatQuantity, 'hours'))
+                  }else{
+                    setNewTo(moment(date).add(1, 'hours'));
+                    //setQuantity(1);
+                  }
+                }else{
+                  //setQuantity(moment.duration(newTo.diff(date)).asHours());
+                }
+                if(!needsSubmit){
                   if(newTo === null || date.isAfter(newTo) ){
                     if(floatQuantity !== null){
-                      setNewTo(moment(date).add(floatQuantity, 'hours'))
+                      submit( date, moment(date).add(floatQuantity, 'hours'), floatQuantity );
                     }else{
-                      setNewTo(moment(date).add(1, 'hours'));
-                      //setQuantity(1);
+                      submit( date, moment(date).add(1, 'hours'), 1 );
                     }
                   }else{
-                    //setQuantity(moment.duration(newTo.diff(date)).asHours());
+                    submit( date, newTo, getTimeDifference(date, newTo) );
                   }
-                  if(!needsSubmit){
-                    if(newTo === null || date.isAfter(newTo) ){
-                      if(floatQuantity !== null){
-                        submit( date, moment(date).add(floatQuantity, 'hours'), floatQuantity );
-                      }else{
-                        submit( date, moment(date).add(1, 'hours'), 1 );
-                      }
-                    }else{
-                      submit( date, newTo, getTimeDifference(date, newTo) );
-                    }
+                }
+              }}
+              placeholderText="No start"
+              />
+          </FormGroup>
+          <FormGroup>
+            <Label className="w-100">To</Label>
+            <DatePicker
+              className="form-control w-100"
+              selected={newTo}
+              disabled={disabled}
+              popperPlacement="auto-left"
+              minDate={ newFrom }
+              onChange={date => {
+                setNewTo(date);
+                if(newFrom === null || !date.isAfter(newFrom) ){
+                  if(floatQuantity !== null){
+                    setNewFrom(moment(date).add( -1 * floatQuantity, 'hours' ))
+                  }else{
+                    setNewFrom(moment(date).add( -1, 'hours' ));
+                    //setQuantity(1);
                   }
-                }}
-                placeholderText="No start"
-                />
-            </FormGroup>
-            <FormGroup>
-              <Label className="w-100">To</Label>
-              <DatePicker
-                className="form-control w-100"
-                selected={newTo}
-                disabled={disabled}
-                popperPlacement="auto-left"
-                minDate={ newFrom }
-                onChange={date => {
-                  setNewTo(date);
-                  if(newFrom === null || !date.isAfter(newFrom) ){
+                }else{
+                  //setQuantity(moment.duration(date.diff(newFrom)).asHours());
+                }
+                if(!needsSubmit){
+                  if(newFrom === null || date.isAfter(newFrom) ){
                     if(floatQuantity !== null){
-                      setNewFrom(moment(date).add( -1 * floatQuantity, 'hours' ))
+                      submit( date, moment(date).add( -1 * floatQuantity, 'hours' ), floatQuantity );
                     }else{
-                      setNewFrom(moment(date).add( -1, 'hours' ));
-                      //setQuantity(1);
+                      submit( moment(date).add(-1, 'hours'), date , 1 );
                     }
                   }else{
-                    //setQuantity(moment.duration(date.diff(newFrom)).asHours());
+                    submit( newFrom, date, getTimeDifference(newFrom, date) );
                   }
-                  if(!needsSubmit){
-                    if(newFrom === null || date.isAfter(newFrom) ){
-                      if(floatQuantity !== null){
-                        submit( date, moment(date).add( -1 * floatQuantity, 'hours' ), floatQuantity );
-                      }else{
-                        submit( moment(date).add(-1, 'hours'), date , 1 );
-                      }
-                    }else{
-                      submit( newFrom, date, getTimeDifference(newFrom, date) );
-                    }
-                  }
-                }}
-                placeholderText="No end"
-                />
-            </FormGroup>
-            <div className="p-t-5 row">
-              <button
-                className="btn-link-cancel btn-distance"
-                onClick={() => {
-                  if(needsSubmit){
-                    setNewFrom(dateFrom);
-                    setNewTo(dateTo);
-                  }
-                  setScheduledOpen(false);
-                }}
-                >
-                Close
-              </button>
-              <button
-                className="btn-link-cancel btn-distance"
-                onClick={() => {
-                  setNewFrom(null);
-                  setNewTo(null);
-                }}
-                >
-                Clear
-              </button>
-              <button
-                disabled={disabled}
-                className="btn center-hor ml-auto"
-                onClick={() => {
-                  const scheduledClear = newFrom === null || newTo === null;
-                  if(needsSubmit){
-                    submit(scheduledClear ? null : newFrom, scheduledClear ? null : newTo, getTimeDifference(newFrom, newTo));
-                  }
-                  setScheduledOpen(false);
-                }}
-                >
-                Save
-              </button>
-            </div>
-          </PopoverBody>
-        </Popover>
+                }
+              }}
+              placeholderText="No end"
+              />
+          </FormGroup>
+          <div className="p-t-5 row">
+            <button
+              className="btn-link-cancel btn-distance"
+              onClick={() => {
+                if(needsSubmit){
+                  setNewFrom(dateFrom);
+                  setNewTo(dateTo);
+                }
+                setScheduledOpen(false);
+              }}
+              >
+              Close
+            </button>
+            <button
+              className="btn-link-cancel btn-distance"
+              onClick={() => {
+                setNewFrom(null);
+                setNewTo(null);
+              }}
+              >
+              Clear
+            </button>
+            <button
+              disabled={disabled}
+              className="btn center-hor ml-auto"
+              onClick={() => {
+                const scheduledClear = newFrom === null || newTo === null;
+                if(needsSubmit){
+                  submit(scheduledClear ? null : newFrom, scheduledClear ? null : newTo, getTimeDifference(newFrom, newTo));
+                }
+                setScheduledOpen(false);
+              }}
+              >
+              Save
+            </button>
+          </div>
+        </PopoverBody>
+      </Popover>
     </div>
   )
 }

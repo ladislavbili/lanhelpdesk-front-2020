@@ -47,10 +47,15 @@ import DeleteReplacement from 'components/deleteReplacement';
 import CustomAttributes from "./components/customAttributes";
 import Loading from 'components/loading';
 import ACLErrors from './components/aclErrors';
+import Attachments from './components/attachments';
 import {
   setProject,
   addLocalError,
 } from 'apollo/localSchema/actions';
+import axios from 'axios';
+import {
+  REST_URL,
+} from 'configs/restAPI';
 import {
   remapRightsToBackend,
   remapRightsFromBackend
@@ -72,6 +77,7 @@ import {
   UPDATE_PROJECT,
   DELETE_PROJECT,
   GET_NUMBER_OF_TASKS,
+  DELETE_PROJECT_ATTACHMENT,
 } from './queries';
 let fakeID = -1;
 
@@ -98,6 +104,7 @@ export default function ProjectEdit( props ) {
     fetchPolicy: 'network-only',
   } );
   const [ updateProject ] = useMutation( UPDATE_PROJECT );
+  const [ deleteProjectAttachment ] = useMutation( DELETE_PROJECT_ATTACHMENT );
 
   const [ deleteProject, {
     client
@@ -389,7 +396,6 @@ export default function ProjectEdit( props ) {
   if ( dataLoading ) {
     return <Loading />
   }
-
   // functions
   const getAllStatuses = () => {
     let allStatuses = projectData.project.statuses.filter( ( status ) => !deleteStatuses.includes( status.id ) );
@@ -588,6 +594,78 @@ export default function ProjectEdit( props ) {
       ( !group.rights.type.write && !type.def && type.required ) ||
       ( !group.rights.company.write && !company.def )
     ) )
+
+  const addAttachments = ( attachments ) => {
+    const formData = new FormData();
+    attachments.forEach( ( file ) => formData.append( `file`, file ) );
+    formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
+    formData.append( "projectId", id );
+    axios.post( `${REST_URL}/upload-project-attachments`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      } )
+      .then( ( response ) => {
+        const newAttachments = response.data.attachments.map( ( attachment ) => ( {
+          ...attachment,
+          __typename: "ProjectAttachment",
+        } ) );
+        console.log( 'aaa' );
+        console.log( newAttachments );
+        const oldProject = client.readQuery( {
+            query: GET_PROJECT,
+            variables: {
+              id
+            }
+          } )
+          .project;
+        console.log( oldProject );
+        client.writeQuery( {
+          query: GET_PROJECT,
+          variables: {
+            id
+          },
+          data: {
+            project: {
+              ...oldProject,
+              attachments: [ ...oldProject.attachments, ...newAttachments ]
+            }
+          }
+        } )
+      } )
+  }
+
+  const removeAttachment = ( attachment ) => {
+    if ( window.confirm( "Are you sure?" ) ) {
+      deleteProjectAttachment( {
+          variables: {
+            id: attachment.id,
+          }
+        } )
+        .then( ( response ) => {
+          const oldProject = client.readQuery( {
+              query: GET_PROJECT,
+              variables: {
+                id
+              }
+            } )
+            .project;
+          client.writeQuery( {
+            query: GET_PROJECT,
+            variables: {
+              id
+            },
+            data: {
+              project: {
+                ...oldProject,
+                attachments: oldProject.attachments.filter( ( projectAttachment ) => projectAttachment.id !== attachment.id )
+              }
+            }
+          } )
+        } )
+    }
+  }
+
   const cannotSave = (
     saving ||
     title === "" ||
@@ -623,6 +701,20 @@ export default function ProjectEdit( props ) {
     .rights;
   const allTags = getAllTags();
   const allStatuses = getAllStatuses();
+
+  const renderAttachments = () => {
+    return (
+      <Attachments
+        disabled={myRights.projectPrimaryWrite}
+        projectId={id}
+        type="project"
+        top={false}
+        attachments={projectData.project.attachments}
+        addAttachments={addAttachments}
+        removeAttachment={removeAttachment}
+        />
+    )
+  }
 
   const renderDescription = () => {
     let RenderDescription = null;
@@ -681,7 +773,7 @@ export default function ProjectEdit( props ) {
             </button>
           }
           { myRights.projectPrimaryWrite &&
-            <label htmlFor={`upload-project-attachment`} className="btn-link btn-distance m-l-0" >
+            <label htmlFor={`upload-project-attachment-${id}`} className="btn-link btn-distance m-l-0 clickable" >
               <i className="fa fa-plus" />
               Attachment
             </label>
@@ -689,6 +781,7 @@ export default function ProjectEdit( props ) {
         </div>
         <div className="form-section-rest">
           {RenderDescription}
+          {renderAttachments()}
         </div>
       </div>
     )

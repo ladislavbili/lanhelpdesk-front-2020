@@ -3,6 +3,7 @@ import {
   useMutation,
   useQuery
 } from "@apollo/client";
+import moment from 'moment';
 import Empty from 'components/Empty';
 import {
   FormGroup,
@@ -33,6 +34,7 @@ import {
   noDef,
 } from 'configs/constants/projects';
 import classnames from 'classnames';
+import axios from 'axios';
 import Loading from 'components/loading';
 import Checkbox from 'components/checkbox';
 
@@ -44,12 +46,16 @@ import Groups from './components/group/groupAdd';
 import ProjectDefaultValues from "./components/defaultValues";
 import ProjectAcl from "./components/acl";
 import ACLErrors from './components/aclErrors';
+import Attachments from './components/attachments';
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
 import {
   remapRightsToBackend
 } from './helpers';
+import {
+  REST_URL,
+} from 'configs/restAPI';
 
 import {
   GET_BASIC_COMPANIES,
@@ -115,6 +121,7 @@ export default function ProjectAdd( props ) {
   const [ defTag, setDefTag ] = React.useState( defList( noDef.tag.required ) );
 
   const [ tags, setTags ] = React.useState( [] );
+  const [ attachments, setAttachments ] = React.useState( [] );
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
@@ -234,22 +241,57 @@ export default function ProjectAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        if ( closeModal ) {
-          const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
-          const myRights = myUserGroup === undefined ? createCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
-            .rights;
-          if ( myUserGroup ) {
-            closeModal( {
-                ...response.data.addProject,
-                __typename: "Project"
-              },
-              myRights
-            );
-          } else {
-            closeModal( null, null );
-          }
+        if ( attachments.length > 0 ) {
+          const formData = new FormData();
+          attachments.map( ( attachment ) => attachment.data )
+            .forEach( ( file ) => formData.append( `file`, file ) );
+          formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
+          formData.append( "projectId", response.data.addProject.id );
+          axios.post( `${REST_URL}/upload-project-attachments`, formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            } )
+            .then( ( response2 ) => {
+              if ( closeModal ) {
+                const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
+                const myRights = myUserGroup === undefined ? createCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
+                  .rights;
+                if ( myUserGroup ) {
+                  closeModal( {
+                      ...response.data.addProject,
+                      __typename: "Project"
+                    },
+                    myRights
+                  );
+                } else {
+                  closeModal( null, null );
+                }
+              } else {
+                history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
+              }
+            } )
+            .catch( ( err ) => {
+              addLocalError( err );
+            } );
         } else {
-          history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
+          if ( closeModal ) {
+            const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
+            const myRights = myUserGroup === undefined ? createCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
+              .rights;
+            if ( myUserGroup ) {
+              closeModal( {
+                  ...response.data.addProject,
+                  __typename: "Project"
+                },
+                myRights
+              );
+            } else {
+              closeModal( null, null );
+            }
+          } else {
+            history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
+          }
         }
       } )
       .catch( ( err ) => {
@@ -305,6 +347,36 @@ export default function ProjectAdd( props ) {
     addTaskIssue
   )
 
+  const renderAttachments = () => {
+    return (
+      <Attachments
+        disabled={false}
+        projectId={null}
+        type="project"
+        top={false}
+        attachments={attachments}
+        addAttachments={(newAttachments)=>{
+          let time = moment().valueOf();
+          newAttachments = newAttachments.map((attachment)=>{
+            return {
+              title: attachment.name,
+              size: attachment.size,
+              filename: attachment.name,
+              time,
+              data: attachment
+            }
+          });
+          setAttachments([...attachments, ...newAttachments]);
+        }}
+        removeAttachment={(attachment)=>{
+          let newAttachments = [...attachments];
+          newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
+          setAttachments([...newAttachments]);
+        }}
+        />
+    )
+  }
+
   const renderDescription = () => {
     let RenderDescription = null;
     if ( editingDescription ) {
@@ -350,13 +422,14 @@ export default function ProjectAdd( props ) {
             <i className={`fa fa-${!editingDescription ? 'pen' : 'save' }`} />
             { !editingDescription ? 'edit' : 'save' }
           </button>
-          <label htmlFor={`upload-project-attachment`} className="btn-link btn-distance m-l-0" >
+          <label htmlFor={`upload-project-attachment-add`} className="btn-link btn-distance m-l-0 clickable" >
             <i className="fa fa-plus" />
             Attachment
           </label>
         </div>
         <div className="form-section-rest">
           {RenderDescription}
+          {renderAttachments()}
         </div>
       </div>
     )
