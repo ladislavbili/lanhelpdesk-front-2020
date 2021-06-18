@@ -2065,10 +2065,20 @@ export default function TaskEdit( props ) {
             }
           }}
           updateSubtask={(id,newData)=>{
+            let originalSubtask = subtasks.find((item)=>item.id===id);
+            originalSubtask = {
+              ...originalSubtask,
+              scheduled: originalSubtask.scheduled ?
+              {
+                from: originalSubtask.scheduled.from,
+                to: originalSubtask.scheduled.to,
+              } :
+              null
+            }
             if(task.invoiced){
               saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
             }else{
-              updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
+              updateSubtaskFunc({...originalSubtask,...newData});
             }
           }}
           updateSubtasks={(multipleSubtasks)=>{
@@ -2078,7 +2088,17 @@ export default function TaskEdit( props ) {
               })
             } else {
               multipleSubtasks.forEach(({id, newData})=>{
-                updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
+                let originalSubtask = subtasks.find((item)=>item.id===id);
+                originalSubtask = {
+                  ...originalSubtask,
+                  scheduled: originalSubtask.scheduled ?
+                  {
+                    from: originalSubtask.scheduled.from,
+                    to: originalSubtask.scheduled.to,
+                  } :
+                  null
+                }
+                updateSubtaskFunc({...originalSubtask,...newData});
               });
             }
           }}
@@ -2100,20 +2120,47 @@ export default function TaskEdit( props ) {
             }
           }}
           updateTrip={(id,newData)=>{
+            let originalTrip = workTrips.find((item)=>item.id===id);
+            originalTrip = {
+              ...originalTrip,
+              scheduled: originalTrip.scheduled ?
+              {
+                from: originalTrip.scheduled.from,
+                to: originalTrip.scheduled.to,
+              } :
+              null
+            }
             if(task.invoiced){
               saveVykazyChanges( {id, newData}, 'trip', 'EDIT' );
             }else{
-              updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
+              updateWorkTripFunc({...originalTrip,...newData});
             }
           }}
           updateTrips={(multipleTrips)=>{
+            const originalTrips = workTrips.map((item)=>({
+              ...item,
+              scheduled:{
+                from: item.scheduled.from,
+                to: item.scheduled.to,
+              }
+            }));
             if(task.invoiced){
               multipleTrips.forEach(({id, newData}) => {
                 saveVykazyChanges({id,newData}, 'trip', 'EDIT' );
               })
             } else {
               multipleTrips.forEach(({id, newData})=>{
-                updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
+                let originalTrip = workTrips.find((item)=>item.id===id);
+                originalTrip = {
+                  ...originalTrip,
+                  scheduled: originalTrip.scheduled ?
+                  {
+                    from: originalTrip.scheduled.from,
+                    to: originalTrip.scheduled.to,
+                  } :
+                  null
+                }
+                updateWorkTripFunc({...originalTrip,...newData});
               });
             }
           }}

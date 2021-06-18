@@ -7,14 +7,6 @@ import {
   globalStringFilterVar,
 } from './variables';
 
-export const tasksSort = () => {
-  return tasksSortVar();
-}
-
-export const ganttSort = () => {
-  return ganttSortVar();
-}
-
 export const localTaskSearch = () => {
   return localSearchVar();
 }

@@ -51,6 +51,7 @@ import {
 import {
   SET_TASK_LAYOUT,
   ADD_TASK,
+  SET_AFTER_TASK_CREATE,
 } from '../queries';
 
 export default function TaskAddContainer( props ) {
@@ -110,6 +111,7 @@ export default function TaskAddContainer( props ) {
   //mutations
   const [ addTask ] = useMutation( ADD_TASK );
   const [ setTaskLayout ] = useMutation( SET_TASK_LAYOUT );
+  const [ setAfterTaskCreate ] = useMutation( SET_AFTER_TASK_CREATE );
 
   //subscriptions
   useSubscription( TASK_TYPES_SUBSCRIPTION, {
@@ -255,6 +257,7 @@ export default function TaskAddContainer( props ) {
               }}
               addTask={addTask}
               setTaskLayout={setTaskLayoutFunc}
+              setAfterTaskCreate={setAfterTaskCreate}
               />
           }
         </ModalBody>

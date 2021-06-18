@@ -18,6 +18,7 @@ import {
   attributeLimitingRights,
   ganttAttributeLimitingRights,
   unimplementedAttributes,
+  defaultSorts,
 } from 'configs/constants/tasks';
 
 import Loading from 'components/loading';
@@ -38,8 +39,6 @@ import {
   setFilter,
   setProject,
   setMilestone,
-  setTasksSort,
-  setGanttSort,
   addLocalError,
   setLocalTaskSearch,
   setGlobalTaskSearch,
@@ -52,8 +51,6 @@ import {
   GET_FILTER,
   GET_PROJECT,
   GET_MILESTONE,
-  GET_TASKS_SORT,
-  GET_GANTT_SORT,
   GET_LOCAL_TASK_SEARCH,
   GET_GLOBAL_TASK_SEARCH,
   GET_LOCAL_TASK_STRING_FILTER,
@@ -68,6 +65,7 @@ import {
   GET_TASKLIST_GANTT_COLUMNS_PREFERENCES,
   ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES,
   ADD_OR_UPDATE_TASKLIST_GANTT_COLUMNS_PREFERENCES,
+  SET_TASKLIST_SORT,
 } from '../queries';
 
 export default function TasksLoader( props ) {
@@ -92,14 +90,6 @@ export default function TasksLoader( props ) {
   } = useQuery( GET_MILESTONE );
 
   const {
-    data: tasksSortData,
-  } = useQuery( GET_TASKS_SORT );
-
-  const {
-    data: ganttSortData,
-  } = useQuery( GET_GANTT_SORT );
-
-  const {
     data: localSearchData,
   } = useQuery( GET_LOCAL_TASK_SEARCH );
 
@@ -115,18 +105,33 @@ export default function TasksLoader( props ) {
     data: globalStringFilter,
   } = useQuery( GET_GLOBAL_TASK_STRING_FILTER );
 
+  const currentUser = getMyData();
+
+  const getSort = () => {
+    let realLayout = currentUser ? currentUser.tasklistLayout : 0;
+    if ( ( [ 2, 4 ].includes( realLayout ) && localProject.id === null ) || ( realLayout === 3 && !( localProject.id === null || localProject.right.assignedRead ) ) ) {
+      realLayout = 0;
+    }
+    let sort = defaultSorts[ 0 ];
+    if ( currentUser && currentUser.tasklistSorts.some( ( sort ) => sort.layout === realLayout ) ) {
+      sort = currentUser.tasklistSorts.find( ( sort ) => sort.layout === realLayout );
+    } else if ( currentUser && defaultSorts.some( ( sort ) => sort.layout === realLayout ) ) {
+      sort = defaultSorts.find( ( sort ) => sort.layout === realLayout );
+    }
+    return sort;
+  }
+
   const localFilter = filterData.localFilter;
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
-  const ganttSort = ganttSortData.ganttSort;
-  const tasksSort = tasksSortData.tasksSort;
+  const sort = getSort();
+
 
   const filterVariables = deleteAttributes(
     localFilterToValues( localFilter ),
     unimplementedAttributes
   );
 
-  const currentUser = getMyData();
   const fetchingGantt = localProject.id !== null && currentUser && currentUser.tasklistLayout === 4;
 
   const statusFilter = ( currentUser ? currentUser.statuses : [] )
@@ -137,7 +142,10 @@ export default function TasksLoader( props ) {
     projectId: localProject.id,
     milestoneId: localMilestone.id,
     filter: filterVariables,
-    sort: fetchingGantt ? ganttSort : tasksSort,
+    sort: {
+      asc: sort.asc,
+      key: sort.sort
+    },
     milestoneSort: fetchingGantt,
     search: globalSearchData.globalTaskSearch,
     stringFilter: globalStringFilter.globalTaskStringFilter,
@@ -185,9 +193,11 @@ export default function TasksLoader( props ) {
     client
   } ] = useMutation( DELETE_TASK );
   const [ setUserStatuses ] = useMutation( SET_USER_STATUSES );
+  const [ setTasklistSort ] = useMutation( SET_TASKLIST_SORT );
   const [ setTasklistLayout ] = useMutation( SET_TASKLIST_LAYOUT );
   const [ addOrUpdatePreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES );
   const [ addOrUpdateGanttPreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_GANTT_COLUMNS_PREFERENCES );
+
 
   //sync
 
@@ -199,15 +209,15 @@ export default function TasksLoader( props ) {
   //refetch calendar and tasks
   React.useEffect( () => {
     tasksRefetch();
-  }, [ localFilter, localProject.id, tasksSort, ganttSort, globalSearchData, globalStringFilter ] );
+  }, [ localFilter, localProject.id, currentUser, globalSearchData, globalStringFilter ] );
 
   //monitor and log timings
   /*
-    React.useEffect( () => {
-      if ( !tasksLoading ) {
-        console.log( 'timings', [ tasksData.tasks.execTime, tasksData.tasks.secondaryTimes ] );
-      }
-    }, [ tasksLoading ] );
+  React.useEffect( () => {
+  if ( !tasksLoading ) {
+  console.log( 'timings', [ tasksData.tasks.execTime, tasksData.tasks.secondaryTimes ] );
+  }
+  }, [ tasksLoading ] );
   */
   //state
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
@@ -224,6 +234,17 @@ export default function TasksLoader( props ) {
     setTasklistLayout( {
         variables: {
           tasklistLayout: value,
+        }
+      } )
+      .catch( ( err ) => addLocalError( err ) );
+  }
+
+  const setTasklistSortFunc = ( asc, sort ) => {
+    setTasklistSort( {
+        variables: {
+          asc,
+          sort,
+          layout: currentUser.tasklistLayout
         }
       } )
       .catch( ( err ) => addLocalError( err ) );
@@ -370,7 +391,7 @@ export default function TasksLoader( props ) {
           ...currentUser.statuses.map( ( status ) => status.id )
           .filter( ( id ) => !projectStatusIds.includes( id ) ),
           ...ids
-          ]
+        ]
         }
       } )
       .catch( ( err ) => {
@@ -464,25 +485,17 @@ export default function TasksLoader( props ) {
       ganttPreference = { ganttPreferencesLoading ? defaultTasklistGanttColumnPreference : createGanttPreferences()}
       setPreference={setPreference}
       setGanttPreference={setGanttPreference}
-      orderBy={ fetchingGantt ? ganttSort.key : tasksSort.key }
+      orderBy={ sort.sort }
       setOrderBy={(key) => {
-        let asc = fetchingGantt ? ganttSort.asc : tasksSort.asc;
-        if(['important'].includes(key)){
-          asc = false;
+        let ascending = sort.asc;
+        if(['important','updatedAt'].includes(key)){
+          ascending = false;
         }
-        if(fetchingGantt){
-          setGanttSort({ asc, key })
-        }else{
-          setTasksSort({ asc, key })
-        }
+        setTasklistSortFunc( ascending, key );
       }}
-      ascending={ fetchingGantt ? ganttSort.asc : tasksSort.asc }
+      ascending={ sort.asc }
       setAscending={(ascending) => {
-        if(fetchingGantt){
-          setGanttSort({ ...ganttSort, asc: ascending })
-        }else{
-          setTasksSort({ ...tasksSort, asc: ascending })
-        }
+        setTasklistSortFunc( ascending, sort.sort )
       }}
       selectedStatuses={currentUser.statuses.map((status) => status.id )}
       setSelectedStatuses={setUserStatusesFunc}

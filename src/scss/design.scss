@@ -1267,6 +1267,10 @@ td {
   position: relative;
 }
 
+.sticky{
+  position: sticky;
+}
+
 .warning {
   color: red;
   font-size: 10px;
@@ -1654,13 +1658,6 @@ td {
       cursor: pointer;
     }
   }
-}
-
-.sort-style {
-  -webkit-align-items: center!important;
-  position: absolute;
-  right: 0px;
-  top: 15px;
 }
 
 .header-link {
@@ -2097,12 +2094,17 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .task-list-commandbar {
   display: flex;
-  width: 100%;
   padding: 0px 1px 0px 1px;
   height: $task-list-commandbar-height;
   white-space: pre-wrap;
   background-color: $content-background-color; //#f4f8fb;
   border-bottom: $main-border;
+}
+
+.sort-style {
+  @extend .center-hor;
+  margin-left: auto;
+  -webkit-align-items: center!important;
 }
 
 .commandbar-small {
@@ -2439,6 +2441,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   .dnd-body {
     border-right: 0px;
   }
+  padding-right: 30px;
 }
 
 .dnd-header {
@@ -2542,6 +2545,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 //--------------------calendar-------------------------
 .calendar-container{
+  margin-right: 15px;
   .task-stack{
     width: 300px;
     padding: 0px $page-header-odsadenie;

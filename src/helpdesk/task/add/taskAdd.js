@@ -34,18 +34,19 @@ import {
   noMilestone
 } from 'configs/constants/sidebar';
 import {
-  noDef
+  noDef,
+  backendCleanRights,
 } from 'configs/constants/projects';
 import {
-  backendCleanRights
-} from 'configs/constants/projects';
+  actionsAfterAdd,
+} from 'configs/constants/tasks';
 import {
   REST_URL
 } from 'configs/restAPI';
 import {
   defaultVykazyChanges,
   invoicedAttributes,
-  noTaskType
+  noTaskType,
 } from '../constants';
 import {
   addLocalError,
@@ -76,9 +77,10 @@ export default function TaskAdd( props ) {
     defaultUnit,
     closeModal,
     addTask,
-    setTaskLayout
+    setTaskLayout,
+    setAfterTaskCreate,
   } = props;
-
+  const afterTaskCreate = currentUser.afterTaskCreate;
   const currentUserIfInProject = ( project ) => {
     return project && project.users.some( ( userData ) => userData.user.id === currentUser.id ) ? users.find( ( user ) => user.id === currentUser.id ) : null;
   }
@@ -118,7 +120,6 @@ export default function TaskAdd( props ) {
   const [ important, setImportant ] = React.useState( false );
   const [ repeat, setRepeat ] = React.useState( null );
   const [ requester, setRequester ] = React.useState( currentUserIfInProject( project ) );
-  const [ saving, setSaving ] = React.useState( false );
   const [ status, setStatus ] = React.useState( null );
   const [ subtasks, setSubtasks ] = React.useState( [] );
   const [ tags, setTags ] = React.useState( [] );
@@ -130,6 +131,8 @@ export default function TaskAdd( props ) {
   const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
   const [ scheduled, setScheduled ] = React.useState( [] );
 
+  const [ saving, setSaving ] = React.useState( false );
+  const [ actionAfterAdd, setActionAfterAdd ] = React.useState( actionsAfterAdd.find( ( action ) => action.id === afterTaskCreate ) );
   const [ showLocalCreationError, setShowLocalCreationError ] = React.useState( false );
 
 
@@ -156,6 +159,10 @@ export default function TaskAdd( props ) {
   React.useEffect( () => {
     setDefaults( project );
   }, [ project.id ] );
+
+  React.useEffect( () => {
+    setActionAfterAdd( actionsAfterAdd.find( ( action ) => action.id === afterTaskCreate ) );
+  }, [ afterTaskCreate ] );
 
   React.useEffect( () => {
     if ( project ) {
@@ -438,8 +445,20 @@ export default function TaskAdd( props ) {
                   } )
                 }
                 setSaving( false );
-                closeModal();
-                history.push( `${link}/${response.data.addTask.id}` )
+                switch ( actionAfterAdd.action ) {
+                  case 'open_new_task': {
+                    closeModal();
+                    history.push( `${link}/${response.data.addTask.id}` )
+                    break;
+                  }
+                  case 'back': {
+                    closeModal();
+                    break;
+                  }
+                  default: {
+                    break;
+                  }
+                }
               } else {
                 setSaving( false );
               }
@@ -450,8 +469,20 @@ export default function TaskAdd( props ) {
             } );
         } else {
           setSaving( false );
-          closeModal();
-          history.push( `${link}/${response.data.addTask.id}` )
+          switch ( actionAfterAdd.action ) {
+            case 'open_new_task': {
+              closeModal();
+              history.push( `${link}/${response.data.addTask.id}` )
+              break;
+            }
+            case 'back': {
+              closeModal();
+              break;
+            }
+            default: {
+              break;
+            }
+          }
         }
 
       } )
@@ -466,33 +497,33 @@ export default function TaskAdd( props ) {
     return (
       <div className="task-add-layout-2 row">
         <h2 className="center-hor">Create new task</h2>
-          { userRights.important &&
-            <button
-              type="button"
-              style={{color: important ? '#ffc107' : '#0078D4'}}
-              disabled={ !userRights.important }
-              className="btn-link task-add-layout-button btn-distance m-t-auto m-l-10"
-              onClick={()=>{
-                setImportant(!important);
-              }}
-              >
-              <i className="far fa-star" />
-              Important
-            </button>
-          }
-        {false &&
-        <div className="ml-auto m-r-20">
+        { userRights.important &&
           <button
             type="button"
-            className="btn-link task-add-layout-button"
-            onClick={ () => {
-              setTaskLayout( currentUser.taskLayout === 1 ? 2 : 1 )
-            }}>
-            <i className="fas fa-retweet "/>
-            Layout
+            style={{color: important ? '#ffc107' : '#0078D4'}}
+            disabled={ !userRights.important }
+            className="btn-link task-add-layout-button btn-distance m-t-auto m-l-10"
+            onClick={()=>{
+              setImportant(!important);
+            }}
+            >
+            <i className="far fa-star" />
+            Important
           </button>
-        </div>
-      }
+        }
+        {false &&
+          <div className="ml-auto m-r-20">
+            <button
+              type="button"
+              className="btn-link task-add-layout-button"
+              onClick={ () => {
+                setTaskLayout( currentUser.taskLayout === 1 ? 2 : 1 )
+              }}>
+              <i className="fas fa-retweet "/>
+              Layout
+            </button>
+          </div>
+        }
       </div>
     )
   }
@@ -1266,6 +1297,17 @@ export default function TaskAdd( props ) {
           }
           <div className="pull-right row">
             {showLocalCreationErrorFunc()}
+            <div style={{ width: 100 }} className="m-r-5">
+              <Select
+                placeholder="Vyberte akciu"
+                value={actionAfterAdd}
+                onChange={(actionAfterAdd)=>{
+                  setActionAfterAdd(actionAfterAdd);
+                }}
+                options={ actionsAfterAdd }
+                styles={pickSelectStyle( [ 'noArrow' ] )}
+                />
+            </div>
             <button
               className="btn"
               onClick={() => {
@@ -1273,6 +1315,9 @@ export default function TaskAdd( props ) {
                   setShowLocalCreationError(true);
                 } else {
                   addTaskFunc();
+                }
+                if(actionAfterAdd.id !== afterTaskCreate){
+                  setAfterTaskCreate({variables: {afterTaskCreate: actionAfterAdd.id}});
                 }
               }}
               > Create task

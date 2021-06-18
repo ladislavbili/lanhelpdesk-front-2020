@@ -21,15 +21,39 @@ export const defaultTasksAttributesFilter = {
   overtime: "",
   pausal: "",
 }
-export const defaultTaskSort = {
-  key: 'status',
-  asc: true
-}
 
-export const defaultGanttSort = {
-  key: 'startsAt',
-  asc: true
-}
+export const defaultSorts = [
+  //list
+  {
+    layout: 0,
+    sort: 'status',
+    asc: true
+  },
+  //now list used to be columns
+  {
+    layout: 1,
+    sort: 'status',
+    asc: true
+    },
+    //DnD
+  {
+    layout: 2,
+    sort: 'createdAt',
+    asc: false
+  },
+  //calendar
+  {
+    layout: 3,
+    sort: 'status',
+    asc: true
+  },
+  //gantt
+  {
+    layout: 4,
+    sort: 'startsAt',
+    asc: true
+  },
+]
 
 export const defaultTasklistColumnPreference = {
   taskId: true,
@@ -119,6 +143,11 @@ export const orderByValues = [
     type: 'user'
   },
   {
+    value: 'updatedAt',
+    label: 'Change date',
+    type: 'date'
+  },
+  {
     value: 'createdAt',
     label: 'Created at',
     type: 'date'
@@ -132,7 +161,7 @@ export const orderByValues = [
     value: 'deadline',
     label: 'Deadline',
     type: 'date'
-  }
+  },
 ]
 export const attributeLimitingRights = [
   {
@@ -640,5 +669,20 @@ export const createGanttDisplayValues = ( preference ) => [
       return '---';
     },
     show: preference[ 'materialsWithDPH' ],
+  },
+]
+
+export const actionsAfterAdd = [
+  {
+    id: 0,
+    value: 0,
+    action: 'open_new_task',
+    label: 'Open task'
+  },
+  {
+    id: 1,
+    value: 1,
+    action: 'back',
+    label: 'Open list'
   },
 ]

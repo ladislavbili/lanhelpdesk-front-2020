@@ -689,6 +689,18 @@ mutation addOrUpdateTasklistGanttColumnPreference(
 }
 `;
 
+export const SET_TASKLIST_SORT = gql `
+mutation setMySort($sort: String!, $asc: Boolean!, $layout: Int!) {
+  setTasklistSort(
+    sort: $sort
+    asc: $asc
+    layout: $layout
+  ){
+    id
+  }
+}
+`;
+
 export const SET_TASK_LAYOUT = gql `
 mutation setTaskLayout($taskLayout: Int!) {
   setTaskLayout(
@@ -698,6 +710,17 @@ mutation setTaskLayout($taskLayout: Int!) {
   }
 }
 `;
+
+export const SET_AFTER_TASK_CREATE = gql `
+mutation setAfterTaskCreate($afterTaskCreate: Int!) {
+  setAfterTaskCreate(
+    afterTaskCreate: $afterTaskCreate
+  ){
+    afterTaskCreate
+  }
+}
+`;
+
 
 //scheduled
 export const GET_SCHEDULED_TASKS = gql `

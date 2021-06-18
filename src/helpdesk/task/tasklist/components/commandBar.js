@@ -93,7 +93,7 @@ export default function CommandBar( props ) {
     .filter( ( breadcrum ) => breadcrum.show );
 
   return (
-    <div className="task-list-commandbar p-l-30 p-r-19">
+    <div className="task-list-commandbar m-l-30 m-r-45">
       <div className="breadcrum-bar center-hor">
         <div className="flex-row breadcrumbs">
           { filteredBreadcrums.map( (breadcrum, index) =>
@@ -108,10 +108,6 @@ export default function CommandBar( props ) {
       <div className="ml-auto p-2 align-self-center">
         <div className="d-flex flex-row">
           <div className={ classnames(
-              {
-                "m-r-20": tasklistLayout !== 0,
-                "m-r-5": tasklistLayout === 0,
-              },
               "d-flex flex-row align-items-center ml-auto"
             )}
             >

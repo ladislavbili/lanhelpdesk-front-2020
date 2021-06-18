@@ -23,7 +23,12 @@ query {
     language
     tasklistLayout
     taskLayout
-
+    afterTaskCreate
+    tasklistSorts{
+      asc
+      sort
+      layout
+    }
     statuses {
       id
       title

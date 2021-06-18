@@ -250,9 +250,9 @@ export default function TaskCalendar( props ) {
   return (
     <div>
       <CommandBar {...props} />
-      <div className="full-width calendar-container">
+      <div className="calendar-container">
         <ListHeader {...props} />
-        <div className="row">
+        <div className="row m-r-30">
           { canSeeStack &&
             <div className="task-stack fit-with-header-and-commandbar-5 scroll-visible">
               <DndProvider backend={HTML5Backend}>

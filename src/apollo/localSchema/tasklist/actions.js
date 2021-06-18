@@ -1,19 +1,9 @@
 import {
-  tasksSortVar,
-  ganttSortVar,
   localSearchVar,
   globalSearchVar,
   localStringFilterVar,
   globalStringFilterVar,
 } from './variables';
-
-export function setTasksSort( newValue ) {
-  tasksSortVar( newValue );
-}
-
-export function setGanttSort( newValue ) {
-  ganttSortVar( newValue );
-}
 
 export function setLocalTaskSearch( newValue ) {
   localSearchVar( newValue );

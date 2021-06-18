@@ -160,7 +160,7 @@ export default function TasksSidebar( props ) {
 
   //state
   const [ showFilters, setShowFilters ] = React.useState( true );
-  const [ showCalendarUsers, setShowCalendarUsers ] = React.useState( false );
+  const [ showCalendarUsers, setShowCalendarUsers ] = React.useState( true );
   const [ showMilestones, setShowMilestones ] = React.useState( true );
   const [ showFilterAdd, setShowFilterAdd ] = React.useState( false );
   const [ openProjectAdd, setOpenProjectAdd ] = React.useState( false );

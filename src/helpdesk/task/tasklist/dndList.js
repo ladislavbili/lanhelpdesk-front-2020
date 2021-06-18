@@ -193,7 +193,7 @@ export default function TaskListDnD( props ) {
   const taskGroups = groupDataFunc();
 
   return (
-    <div>
+    <div className="relative">
       <CommandBar
         {...props}
         />
@@ -203,8 +203,7 @@ export default function TaskListDnD( props ) {
           />
         <div className="flex-row m-l-30" >
           <DragDropContext onDragEnd={onDragEnd}>
-            {
-              taskGroups
+            { taskGroups
               .filter( (group) => group.status.action !== 'Invoiced' )
               .map(
                 (group) =>
@@ -258,8 +257,7 @@ export default function TaskListDnD( props ) {
             )
           }
         </DragDropContext>
-        {
-          taskGroups
+        { taskGroups
           .filter( (group) => group.status.action === 'Invoiced' )
           .map(
             (group) =>
@@ -291,8 +289,7 @@ export default function TaskListDnD( props ) {
             </Card>
           )
         }
-        {
-          groupRest().length>0 &&
+        { groupRest().length>0 &&
           <Card className="dnd-column" key="Undefined group">
             <CardHeader>Undefined group</CardHeader>
             <CardBody>
