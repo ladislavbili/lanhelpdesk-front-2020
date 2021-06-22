@@ -143,7 +143,6 @@ export default function TaskCalendar( props ) {
       } );
   };
 
-  console.log( fakeEvents );
   const onScheduledResizeOrDrop = ( eventData, fakeEvents ) => {
     const {
       event,
@@ -155,7 +154,6 @@ export default function TaskCalendar( props ) {
     }
     //fake resize broken creates new
     if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === event.id ) ) {
-      console.log( 'is fake' );
       setFakeEvents( [
         ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== event.id ),
         expandScheduledEvent( createEventFromScheduled( {

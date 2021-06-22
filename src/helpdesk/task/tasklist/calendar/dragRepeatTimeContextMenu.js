@@ -120,7 +120,6 @@ export default function DragRepeatContextMenu( props ) {
                     },
                   } );
                 }
-                console.log( 'err' );
                 addLocalError( err );
               } );
             }}
