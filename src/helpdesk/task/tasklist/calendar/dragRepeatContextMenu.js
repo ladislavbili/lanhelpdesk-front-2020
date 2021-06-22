@@ -4,6 +4,9 @@ import {
   PopoverHeader,
   PopoverBody,
 } from 'reactstrap';
+import {
+  GET_REPEAT_TIMES,
+} from './querries';
 
 export default function DragRepeatContextMenu( props ) {
   const {
@@ -12,7 +15,12 @@ export default function DragRepeatContextMenu( props ) {
     openRepeat,
     addRepeatTime,
     repeatsRefetch,
-    repeatTimesRefetch,
+    client,
+    getFakeID,
+    fakeEvents,
+    setFakeEvents,
+    expandRepeatTimeEvent,
+    createEventFromRepeatTime,
   } = props;
 
   if ( !repeatEvent ) {
@@ -47,17 +55,37 @@ export default function DragRepeatContextMenu( props ) {
       <button
         className="btn btn-link"
         onClick={() => {
-        closeContextMenu();
+          const newFakeID = getFakeID();
+          setFakeEvents(
+            [
+              ...fakeEvents,
+              expandRepeatTimeEvent( createEventFromRepeatTime( {
+                id: newFakeID,
+                originalTrigger: time.toString(),
+                triggersAt: newDate.toString(),
+                canEdit: false,
+                task: null,
+                repeat,
+                type: 'repeatTime',
+              } ) )
+            ]
+          );
+          closeContextMenu();
           addRepeatTime( {
             variables: {
               repeatId: repeat.id,
               originalTrigger: time.toString(),
               triggersAt: newDate.toString(),
             }
-          }).then((response) => {
-            repeatsRefetch();
-            repeatTimesRefetch();
           })
+            .then( ( response ) => {
+              setFakeEvents( [ ...fakeEvents.filter( ( event ) => event.id !== newFakeID ), expandRepeatTimeEvent( createEventFromRepeatTime( response.data.addRepeatTime ) ) ] );
+              repeatsRefetch();
+            } )
+            .catch( ( err ) => {
+              setFakeEvents( fakeEvents.filter( ( event ) => event.id !== newFakeID ) )
+              addLocalError( err );
+            } );
         }}
         >
         Move only this event here

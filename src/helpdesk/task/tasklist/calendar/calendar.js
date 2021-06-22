@@ -37,6 +37,15 @@ import {
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
+import {
+  GET_CALENDAR_REPEATS,
+  GET_REPEAT_TIMES,
+} from './querries';
+import {
+  GET_SCHEDULED_TASKS,
+} from '../../queries';
+
+let fakeID = -1;
 
 const DnDCalendar = withDragAndDrop( Calendar );
 
@@ -67,12 +76,16 @@ export default function TaskCalendar( props ) {
     cFrom,
     cTo,
     canSeeStack,
-  } = props;
-
-  let {
     repeatEvents,
     scheduledEvents,
     repeatTimeEvents,
+    client,
+    createEventFromRepeatTime,
+    createEventFromScheduled,
+    scheduledTasksVariables,
+    fakeEvents,
+    setFakeEvents,
+    repeatTimesVariables,
   } = props;
 
   //TODO: AK repeat nacita svoje repeatTimes, existuje dovod preco nacitavat zvlast repeattimes? nezabudnut na podmienku ak je v range zacaitok alebo novy zaciatok
@@ -90,12 +103,27 @@ export default function TaskCalendar( props ) {
   const [ openedRepeat, setOpenedRepeat ] = React.useState( null );
   const [ focusedRepeatTimeEvent, setFocusedRepeatTimeEvent ] = React.useState( null );
 
+  React.useEffect( () => {
+    setFakeEvents( [] );
+  }, [ cFrom, cTo ] );
+
+
   const onDropFromOutside = ( eventData ) => {
     const {
       start,
       end
     } = eventData;
-
+    const newFakeID = fakeID--;
+    setFakeEvents( [ ...fakeEvents, expandScheduledEvent( createEventFromScheduled( {
+      id: newFakeID,
+      task: draggedTask.task,
+      from: start.valueOf()
+        .toString(),
+      to: end.valueOf()
+        .toString(),
+      canEdit: false,
+      type: 'scheduled',
+    } ) ) ] );
     addScheduled( {
         variables: {
           from: start.valueOf()
@@ -106,13 +134,17 @@ export default function TaskCalendar( props ) {
           UserId: scheduledUserId,
         }
       } )
-      .then( refetchScheduled )
+      .then( ( response ) => {
+        setFakeEvents( [ ...fakeEvents.filter( ( event ) => event.id !== newFakeID ), expandScheduledEvent( createEventFromScheduled( response.data.addScheduledTask ) ) ] );
+      } )
       .catch( ( err ) => {
+        setFakeEvents( fakeEvents.filter( ( event ) => event.id !== newFakeID ) )
         addLocalError( err );
       } );
   };
 
-  const onScheduledResizeOrDrop = ( eventData ) => {
+  console.log( fakeEvents );
+  const onScheduledResizeOrDrop = ( eventData, fakeEvents ) => {
     const {
       event,
       start,
@@ -121,7 +153,43 @@ export default function TaskCalendar( props ) {
     if ( !event.canEdit ) {
       return;
     }
+    //fake resize broken creates new
+    if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === event.id ) ) {
+      console.log( 'is fake' );
+      setFakeEvents( [
+        ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== event.id ),
+        expandScheduledEvent( createEventFromScheduled( {
+          ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === event.id ),
+          from: start.valueOf()
+            .toString(),
+          to: end.valueOf()
+            .toString(),
+        } ) )
+      ] )
+    } else {
+      const scheduledTasks = client.readQuery( {
+          query: GET_SCHEDULED_TASKS,
+          variables: scheduledTasksVariables
+        } )
+        .scheduledTasks;
 
+      client.writeQuery( {
+        query: GET_SCHEDULED_TASKS,
+        variables: scheduledTasksVariables,
+        data: {
+          scheduledTasks: [
+            ...scheduledTasks.filter( ( scheduled ) => scheduled.id !== event.id ),
+            {
+              ...scheduledTasks.find( ( scheduled ) => scheduled.id === event.id ),
+              from: start.valueOf()
+                .toString(),
+              to: end.valueOf()
+                .toString(),
+            }
+          ]
+        },
+      } );
+    }
     updateScheduled( {
         variables: {
           id: event.id,
@@ -131,8 +199,41 @@ export default function TaskCalendar( props ) {
             .toString(),
         }
       } )
-      .then( refetchScheduled )
       .catch( ( err ) => {
+        if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === event.id ) ) {
+          setFakeEvents( [
+          ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== event.id ),
+            {
+              ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === event.id ),
+              from: event.start.valueOf()
+                .toString(),
+              to: event.end.valueOf()
+                .toString(),
+          }
+        ] )
+        } else {
+          const scheduledTasks = client.readQuery( {
+              query: GET_SCHEDULED_TASKS,
+              variables: scheduledTasksVariables
+            } )
+            .scheduledTasks;
+          client.writeQuery( {
+            query: GET_SCHEDULED_TASKS,
+            variables: scheduledTasksVariables,
+            data: {
+              scheduledTasks: [
+              ...scheduledTasks.filter( ( scheduled ) => scheduled.id !== event.id ),
+                {
+                  ...scheduledTasks.find( ( scheduled ) => scheduled.id === event.id ),
+                  from: event.start.valueOf()
+                    .toString(),
+                  to: event.end.valueOf()
+                    .toString(),
+              }
+            ]
+            },
+          } );
+        }
         addLocalError( err );
       } );
   };
@@ -160,7 +261,8 @@ export default function TaskCalendar( props ) {
     }
   }
 
-  scheduledEvents = scheduledEvents.map( ( scheduledEvent ) => ( {
+
+  const expandScheduledEvent = ( scheduledEvent ) => ( {
     ...scheduledEvent,
     onDoubleClick: () => history.push( `${ path }/${ scheduledEvent.task.id }` ),
     propsGetter: () => {
@@ -179,16 +281,15 @@ export default function TaskCalendar( props ) {
         style: {}
       };
     },
-    onEventDrop: ( e ) => {
-      onScheduledResizeOrDrop( e );
+    onEventDrop: ( e, fakeEvents ) => {
+      onScheduledResizeOrDrop( e, fakeEvents );
     },
-    onEventResize: ( e ) => {
-      onScheduledResizeOrDrop( e );
+    onEventResize: ( e, fakeEvents ) => {
+      onScheduledResizeOrDrop( e, fakeEvents );
     },
+  } )
 
-  } ) )
-
-  repeatEvents = repeatEvents.map( ( repeatEvent ) => ( {
+  const expandRepeatEvent = ( repeatEvent ) => ( {
     ...repeatEvent,
     onDoubleClick: ( repeatEvent ) => {
       setFocusedRepeatEvent( repeatEvent );
@@ -207,9 +308,9 @@ export default function TaskCalendar( props ) {
     },
     onEventResize: ( e ) => {},
 
-  } ) )
+  } )
 
-  repeatTimeEvents = repeatTimeEvents.map( ( repeatTimeEvent ) => ( {
+  const expandRepeatTimeEvent = ( repeatTimeEvent ) => ( {
     ...repeatTimeEvent,
     onDoubleClick: ( repeatTimeEvent ) => {
       setFocusedRepeatTimeEvent( repeatTimeEvent );
@@ -238,14 +339,12 @@ export default function TaskCalendar( props ) {
     },
     onEventResize: ( e ) => {},
 
-  } ) )
+  } );
 
-  const events = [
-    ...repeatEvents,
-    ...scheduledEvents,
-    ...repeatTimeEvents,
-
-  ]
+  const newScheduledEvents = scheduledEvents.map( expandScheduledEvent )
+  const newRepeatEvents = repeatEvents.map( expandRepeatEvent )
+  const newRepeatTimeEvents = repeatTimeEvents.map( expandRepeatTimeEvent )
+  const events = [ ...newScheduledEvents, ...newRepeatEvents, ...newRepeatTimeEvents, ...fakeEvents ]
 
   return (
     <div>
@@ -279,13 +378,13 @@ export default function TaskCalendar( props ) {
             dragFromOutsideItem={ () => draggedTask }
             onDropFromOutside = { onDropFromOutside }
             onRangeChange={onRangeChange}
-            tooltipAccessor={ (event) => event.tooltip }
-            draggableAccessor={ (event) => event.canEdit }
-            resizableAccessor={(event) => event.resizable }
-            onEventDrop = { (e) => e.event.onEventDrop(e) }
-            onEventResize = { (e) => e.event.onEventResize(e) }
-            eventPropGetter={ (event) => event.propsGetter(event) }
-            onDoubleClickEvent={(event) => event.onDoubleClick(event) }
+            tooltipAccessor={ (e) => e.tooltip }
+            draggableAccessor={ (e) => e.canEdit }
+            resizableAccessor={(e) => e.resizable }
+            onEventDrop = { (e) => e.event.onEventDrop(e, fakeEvents) }
+            onEventResize = { (e) => e.event.onEventResize(e, fakeEvents) }
+            eventPropGetter={ (e) => e.propsGetter(e) }
+            onDoubleClickEvent={(e) => e.onDoubleClick(e) }
             />
         </div>
       </div>
@@ -297,14 +396,26 @@ export default function TaskCalendar( props ) {
         addRepeatTime={ addRepeatTime }
         repeatsRefetch={repeatsRefetch}
         repeatTimesRefetch={repeatTimesRefetch}
+        client={client}
+        getFakeID={ () => fakeID++ }
+        fakeEvents={fakeEvents}
+        setFakeEvents={setFakeEvents}
+        expandRepeatTimeEvent={expandRepeatTimeEvent}
+        createEventFromRepeatTime={createEventFromRepeatTime}
         />
       <DragRepeatTimeContextMenu
-          repeatTimeEvent={ draggedRepeatTimeEvent }
-          openRepeat={ setOpenedRepeat }
-          closeContextMenu={ () => setDraggedRepeatTimeEvent(null) }
-          updateRepeatTime={ updateRepeatTime }
-          repeatTimesRefetch={repeatTimesRefetch}
-          />
+        repeatTimeEvent={ draggedRepeatTimeEvent }
+        openRepeat={ setOpenedRepeat }
+        closeContextMenu={ () => setDraggedRepeatTimeEvent(null) }
+        updateRepeatTime={ updateRepeatTime }
+        repeatTimesRefetch={repeatTimesRefetch}
+        setFakeEvents={setFakeEvents}
+        fakeEvents={fakeEvents}
+        client={client}
+        expandRepeatTimeEvent={expandRepeatTimeEvent}
+        createEventFromRepeatTime={createEventFromRepeatTime}
+        repeatTimesVariables={repeatTimesVariables}
+        />
       <RepeatContextMenu
         repeatEvent={ focusedRepeatEvent }
         closeContextMenu={ () => setFocusedRepeatEvent(null) }
@@ -329,7 +440,14 @@ export default function TaskCalendar( props ) {
         isOpen={ openedRepeat !== null }
         repeat={ openedRepeat }
         newStartsAt={ openedRepeat ? openedRepeat.newDate : null }
-        closeModal={ (hasChanged) => {
+        closeModal={ (hasChanged, isDisabled) => {
+          if(hasChanged){
+            repeatsRefetch();
+            repeatTimesRefetch();
+          }
+          if(isDisabled){
+            setFakeEvents(fakeEvents.filter((fakeEvent) => fakeEvent.type !== 'scheduled' || fakeEvent.repeatTime.repeat.id !== openRepeat.id ))
+          }
           setOpenedRepeat( null );
         } }
         />

@@ -59,7 +59,7 @@ export default function TasklistSwitch( props ) {
     ...props,
     showStatistics: showStatistics,
     setShowStatistics: setShowStatistics,
-    tasks: filterTasks(),
+    //tasks: filterTasks(),
     displayValues: createDisplayValues( preference ),
     link
   }

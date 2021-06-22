@@ -1,6 +1,7 @@
 import React from 'react';
 import Search from './search';
 import Checkbox from 'components/checkbox';
+import Empty from 'components/Empty';
 import MultiSelect from 'components/MultiSelectNew';
 import classnames from "classnames";
 import {
@@ -55,76 +56,79 @@ export default function ListHeader( props ) {
   return (
     <div className={classnames("d-flex", "h-60px", "flex-row", 'p-l-30', "m-r-30", 'sticky')} style={{ left: 0 }}>
       <Search {...props}/>
-      { !multiselect && selectedStatuses && allStatuses.length > 0 &&
-        <div className="center-hor flex-row">
-          <Checkbox
-            className="m-l-5  m-r-10"
-            style={{marginTop: 'auto', height: '20px'}}
-            label= "All"
-            disabled={loading}
-            value={ selectedStatuses.length===0 || allStatuses.every((status)=>selectedStatuses.includes(status.id)) }
-            onChange={()=>{
-              if(selectedStatuses.length===0){
-                let newStatuses = allStatuses.map((status) => status.id );
-                setSelectedStatuses( newStatuses );
-              }else{
-                setSelectedStatuses( [] );
-              }
-            }}
-            />
-          { allStatuses.map((status)=>
-            <Checkbox
-              key={status.id}
-              disabled={loading}
-              className="m-l-5 m-r-10"
-              style={{marginTop: 'auto', height: '20px'}}
-              label={ status.title }
-              value={ selectedStatuses.includes(status.id) }
-              onChange={()=>{
-                if(selectedStatuses.includes(status.id)) {
-                  let newStatuses = selectedStatuses.filter( (id) => !(status.id === id) );
-                  setSelectedStatuses( newStatuses );
-                }else{
-                  let newStatuses = [...selectedStatuses, status.id];
-                  setSelectedStatuses(newStatuses);
-                }
-              }}
-              />
-          )}
-        </div>
-      }
-      { multiselect && selectedStatuses &&
-        <Multiselect
-          className="ml-auto m-r-10"
-          disabled={loading}
-          options={ [{ id:'All', label: 'All' }, ...allStatuses.map((status)=>({...status,label:status.title}))] }
-          value={
-            [{ id:'All', label: 'All' }, ...allStatuses.map((status)=>({...status,label:status.title}))]
-            .filter((status)=> selectedStatuses.includes(status.id))
-            .concat(allStatuses.every((status)=>selectedStatuses.includes(status.id))?[{ id:'All', label: 'All' }]:[])
+      { false &&
+        <Empty>
+          { !multiselect && selectedStatuses && allStatuses.length > 0 &&
+            <div className="center-hor flex-row">
+              <Checkbox
+                className="m-l-5  m-r-10"
+                style={{marginTop: 'auto', height: '20px'}}
+                label= "All"
+                disabled={loading}
+                value={ selectedStatuses.length===0 || allStatuses.every((status)=>selectedStatuses.includes(status.id)) }
+                onChange={()=>{
+                  if(selectedStatuses.length===0){
+                    let newStatuses = allStatuses.map((status) => status.id );
+                    setSelectedStatuses( newStatuses );
+                  }else{
+                    setSelectedStatuses( [] );
+                  }
+                }}
+                />
+              { allStatuses.map((status)=>
+                <Checkbox
+                  key={status.id}
+                  disabled={loading}
+                  className="m-l-5 m-r-10"
+                  style={{marginTop: 'auto', height: '20px'}}
+                  label={ status.title }
+                  value={ selectedStatuses.includes(status.id) }
+                  onChange={()=>{
+                    if(selectedStatuses.includes(status.id)) {
+                      let newStatuses = selectedStatuses.filter( (id) => !(status.id === id) );
+                      setSelectedStatuses( newStatuses );
+                    }else{
+                      let newStatuses = [...selectedStatuses, status.id];
+                      setSelectedStatuses(newStatuses);
+                    }
+                  }}
+                  />
+              )}
+            </div>
           }
-          label={ "Status filter" }
-          onChange={ (status) => {
-            if(status.id === 'All'){
-              if(selectedStatuses.length===0){
-                let newStatuses = allStatuses.map((status) => status.id );
-                setSelectedStatuses( newStatuses );
-              }else{
-                setSelectedStatuses( [] );
+          { multiselect && selectedStatuses &&
+            <Multiselect
+              className="ml-auto m-r-10"
+              disabled={loading}
+              options={ [{ id:'All', label: 'All' }, ...allStatuses.map((status)=>({...status,label:status.title}))] }
+              value={
+                [{ id:'All', label: 'All' }, ...allStatuses.map((status)=>({...status,label:status.title}))]
+                .filter((status)=> selectedStatuses.includes(status.id))
+                .concat(allStatuses.every((status)=>selectedStatuses.includes(status.id))?[{ id:'All', label: 'All' }]:[])
               }
-            }else{
-              if(selectedStatuses.includes(status.id)) {
-                let newStatuses = selectedStatuses.filter( (id) => !(status.id === id) );
-                setSelectedStatuses( newStatuses );
-              }else{
-                let newStatuses = [...selectedStatuses, status.id];
-                setSelectedStatuses(newStatuses);
-              }
-            }
-          } }
-          />
+              label={ "Status filter" }
+              onChange={ (status) => {
+                if(status.id === 'All'){
+                  if(selectedStatuses.length===0){
+                    let newStatuses = allStatuses.map((status) => status.id );
+                    setSelectedStatuses( newStatuses );
+                  }else{
+                    setSelectedStatuses( [] );
+                  }
+                }else{
+                  if(selectedStatuses.includes(status.id)) {
+                    let newStatuses = selectedStatuses.filter( (id) => !(status.id === id) );
+                    setSelectedStatuses( newStatuses );
+                  }else{
+                    let newStatuses = [...selectedStatuses, status.id];
+                    setSelectedStatuses(newStatuses);
+                  }
+                }
+              } }
+              />
+          }
+        </Empty>
       }
-
       <div className="sort-style">
         <div className="d-flex flex-row">
           <div className={

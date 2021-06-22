@@ -158,6 +158,7 @@ export default function RepeatForm( props ) {
   );
   const [ saving, setSaving ] = React.useState( false );
   const [ wasSaved, setWasSaved ] = React.useState( false );
+  const [ wasDisabled, setWasDisabled ] = React.useState( false );
   const [ status, setStatus ] = React.useState( null );
   const [ subtasks, setSubtasks ] = React.useState( [] );
   const [ tags, setTags ] = React.useState( [] );
@@ -457,7 +458,7 @@ export default function RepeatForm( props ) {
           .then( ( response ) => {
             updateTask( response, 'delete' );
             updateRepeatList( response, 'delete' );
-            closeModal( true );
+            closeModal( true, true );
           } )
           .catch( ( err ) => {
             addLocalError( err );
@@ -491,6 +492,7 @@ export default function RepeatForm( props ) {
         )
       }
       setWasSaved( true );
+      setWasDisabled( newRepeatData && newRepeatData.active );
       updateRepeat( {
           variables
         } )
@@ -590,7 +592,7 @@ export default function RepeatForm( props ) {
                 if ( response2.data.ok ) {
                   updateTask( response, 'add' );
                   setSaving( false );
-                  closeModal( true );
+                  closeModal( true, repeat.active );
                 } else {
                   setSaving( false );
                 }
@@ -602,7 +604,7 @@ export default function RepeatForm( props ) {
           } else {
             updateTask( response, 'add' );
             setSaving( false );
-            closeModal( true );
+            closeModal( true, repeat.active );
           }
         } )
         .catch( ( err ) => {
@@ -1719,7 +1721,7 @@ export default function RepeatForm( props ) {
       <div className="form-section task-edit-buttons">
         <div className="row form-section-rest">
           {closeModal &&
-            <button className="btn-link-cancel m-l-20" onClick={() => closeModal(wasSaved)}>Cancel</button>
+            <button className="btn-link-cancel m-l-20" onClick={() => closeModal(wasSaved, wasDisabled)}>Cancel</button>
           }
             { newStartsAt &&
               <span className="text-muted">

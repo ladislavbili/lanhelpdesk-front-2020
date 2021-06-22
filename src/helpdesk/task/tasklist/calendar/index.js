@@ -3,6 +3,7 @@ import Calendar from './calendar';
 import {
   useQuery,
   useMutation,
+  useApolloClient,
 } from "@apollo/client";
 import {
   getDateClock,
@@ -55,19 +56,27 @@ export default function CalendarLoader( props ) {
     to: cTo,
   } = localCalendarDateRange.localCalendarDateRange;
 
+  const scheduledTasksVariables = {
+    projectId: localProject.id,
+    filter: filterVariables,
+    from: cFrom.toString(),
+    to: cTo.toString(),
+    userId: localCalendarUserId.localCalendarUserId,
+  }
+
+  const repeatTimesVariables = {
+    active: true,
+    from: cFrom.toString(),
+    to: cTo.toString(),
+  }
+
   const {
     data: scheduledTasksData,
     loading: scheduledTasksLoading,
     refetch: scheduledTasksRefetch,
   } = useQuery( GET_SCHEDULED_TASKS, {
-    variables: {
-      projectId: localProject.id,
-      filter: filterVariables,
-      from: cFrom.toString(),
-      to: cTo.toString(),
-      userId: localCalendarUserId.localCalendarUserId,
-    },
-    fetchPolicy: 'network-only',
+    variables: scheduledTasksVariables,
+    //fetchPolicy: 'network-only',
   } );
 
   const {
@@ -89,12 +98,8 @@ export default function CalendarLoader( props ) {
     loading: repeatTimesLoading,
     refetch: repeatTimesRefetchFunc,
   } = useQuery( GET_REPEAT_TIMES, {
-    variables: {
-      active: true,
-      from: cFrom.toString(),
-      to: cTo.toString(),
-    },
-    fetchPolicy: 'network-only',
+    variables: repeatTimesVariables,
+    //fetchPolicy: 'network-only',
   } );
 
   const [ addScheduledTask ] = useMutation( ADD_SCHEDULED_TASK );
@@ -103,6 +108,7 @@ export default function CalendarLoader( props ) {
   const [ updateRepeatTime ] = useMutation( UPDATE_REPEAT_TIME );
 
   const [ triggerRepeat ] = useMutation( TRIGGER_REPEAT );
+  const [ fakeEvents, setFakeEvents ] = React.useState( [] );
 
   const scheduledRefetch = () => {
     scheduledTasksRefetch( {
@@ -135,11 +141,20 @@ export default function CalendarLoader( props ) {
     scheduledRefetch();
     repeatsRefetch();
     repeatTimesRefetch();
+    setFakeEvents( [] );
   }, [ cFrom, cTo ] );
 
   const repeats = !calendarRepeatsLoading ? calendarRepeatsData.calendarRepeats : [];
   const scheduled = !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [];
   const repeatTimes = !repeatTimesLoading ? repeatTimesData.repeatTimes : [];
+
+  React.useEffect( () => {
+    setFakeEvents( fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || scheduled.some( ( scheduled ) => scheduled.id !== fakeEvent.id ) ) );
+  }, [ scheduled ] );
+
+  React.useEffect( () => {
+    setFakeEvents( fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'repeatTime' || repeatTimes.some( ( repeatTime ) => repeatTime.id !== fakeEvent.repeatTime.id ) ) );
+  }, [ repeatTimes ] );
 
   const canSeeStack = localProject.id === null || localProject.right.assignedWrite;
 
@@ -158,7 +173,8 @@ export default function CalendarLoader( props ) {
   }
 
   const getAllDatesInRange = ( repeat ) => {
-    const ignoredDates = repeatTimes.map( ( repeatTime ) => parseInt( repeatTime.originalTrigger ) );
+    const ignoredDates = [ ...repeatTimes, ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type === 'repeatTime' )
+      .map( ( fakeEvent ) => fakeEvent.repeatTime ) ].map( ( repeatTime ) => parseInt( repeatTime.originalTrigger ) );
     const startsAt = parseInt( repeat.startsAt );
     const everyMilisec = getRepeatMilisecs( repeat.repeatEvery, repeat.repeatInterval );
     let allDates = []
@@ -169,6 +185,36 @@ export default function CalendarLoader( props ) {
     }
     return allDates.filter( ( date ) => !ignoredDates.includes( date ) );
   };
+
+  const createEventFromRepeatTime = ( repeatTime ) => {
+    let start = ( new Date( parseInt( repeatTime.triggersAt ) ) );
+    let end = ( new Date( parseInt( repeatTime.triggersAt ) ) );
+    end.setHours( end.getHours() + 1 );
+
+    return {
+      repeatTime,
+      canEdit: repeatTime.canEdit,
+      allDay: false,
+      resizable: false,
+      start,
+      end,
+      type: 'repeatTime',
+      time: parseInt( repeatTime.triggersAt ),
+      title: renderRepeatTime( repeatTime, parseInt( repeatTime.triggersAt ) ),
+      tooltip: repeatTime.task ? `Repeat task: ${repeatTime.task.title}` : `Repeat: every ${repeatTime.repeat.repeatEvery} ${repeatTime.repeat.repeatInterval}`,
+    };
+  }
+
+  const createEventFromScheduled = ( scheduled ) => ( {
+    ...scheduled,
+    resizable: scheduled.canEdit,
+    start: new Date( parseInt( scheduled.from ) ),
+    end: new Date( parseInt( scheduled.to ) ),
+    type: 'scheduled',
+    allDay: isAllDay( scheduled ),
+    title: renderScheduled( scheduled.task, new Date( parseInt( scheduled.from ) ), new Date( parseInt( scheduled.to ) ) ),
+    tooltip: `${getDateClock(new Date( parseInt( scheduled.from ) ))} - ${getDateClock(new Date( parseInt( scheduled.to ) ))} ${scheduled.task.title} `,
+  } )
 
   const repeatEvents = repeats.reduce( ( acc, repeat ) => {
     return [
@@ -194,33 +240,9 @@ export default function CalendarLoader( props ) {
     return sFrom.diff( sTo, 'days' ) !== 0;
   }
 
-  const scheduledEvents = scheduled.map( ( scheduled ) => ( {
-    ...scheduled,
-    resizable: scheduled.canEdit,
-    start: new Date( parseInt( scheduled.from ) ),
-    end: new Date( parseInt( scheduled.to ) ),
-    allDay: isAllDay( scheduled ),
-    title: renderScheduled( scheduled.task, new Date( parseInt( scheduled.from ) ), new Date( parseInt( scheduled.to ) ) ),
-    tooltip: `${getDateClock(new Date( parseInt( scheduled.from ) ))} - ${getDateClock(new Date( parseInt( scheduled.to ) ))} ${scheduled.task.title} `,
-  } ) );
+  const scheduledEvents = scheduled.map( createEventFromScheduled );
 
-  const repeatTimeEvents = repeatTimes.map( ( repeatTime ) => {
-    let start = ( new Date( parseInt( repeatTime.triggersAt ) ) );
-    let end = ( new Date( parseInt( repeatTime.triggersAt ) ) );
-    end.setHours( end.getHours() + 1 );
-
-    return {
-      repeatTime,
-      canEdit: repeatTime.canEdit,
-      allDay: false,
-      resizable: false,
-      start,
-      end,
-      time: parseInt( repeatTime.triggersAt ),
-      title: renderRepeatTime( repeatTime, parseInt( repeatTime.triggersAt ) ),
-      tooltip: repeatTime.task ? `Repeat task: ${repeatTime.task.title}` : `Repeat: every ${repeatTime.repeat.repeatEvery} ${repeatTime.repeat.repeatInterval}`,
-    };
-  } );
+  const repeatTimeEvents = repeatTimes.map( createEventFromRepeatTime );
 
   const newProps = {
     ...props,
@@ -249,9 +271,15 @@ export default function CalendarLoader( props ) {
     addRepeatTime,
     updateRepeatTime,
     canSeeStack,
+    createEventFromRepeatTime,
+    createEventFromScheduled,
+    scheduledTasksVariables,
+    repeatTimesVariables,
+    client: useApolloClient(),
+    setFakeEvents,
   }
 
   return (
-    <Calendar {...newProps} />
+    <Calendar {...newProps} fakeEvents={fakeEvents} />
   )
 }

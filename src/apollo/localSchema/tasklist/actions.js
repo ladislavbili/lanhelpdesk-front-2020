@@ -10,7 +10,11 @@ export function setLocalTaskSearch( newValue ) {
 }
 
 export function setGlobalTaskSearch() {
-  globalSearchVar( localSearchVar() );
+  if ( globalSearchVar() === localSearchVar() ) {
+    globalSearchVar( localSearchVar() + ' ' );
+  } else {
+    globalSearchVar( localSearchVar() );
+  }
 }
 
 export function setLocalTaskStringFilter( newValue ) {

@@ -1276,7 +1276,10 @@ td {
   font-size: 10px;
 }
 
-.warning-general {
+.warning-general,
+.warning-general:hover,
+.warning-general:active,
+.warning-general:focus {
   color: red;
 }
 

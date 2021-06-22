@@ -92,6 +92,26 @@ mutation addRepeatTime(
     triggersAt: $triggersAt
   ){
     id
+    originalTrigger
+    triggersAt
+    triggered
+    canEdit
+    canCreateTask
+    task{
+      id
+      title
+      status{
+        color
+      }
+    }
+    repeat{
+      id
+      repeatEvery
+      repeatInterval
+      repeatTemplate{
+        title
+      }
+    }
   }
 }
 `;

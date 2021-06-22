@@ -771,10 +771,20 @@ mutation addScheduledTask($from: String!, $to: String!, $task: Int!, $UserId: In
     id
     from
     to
-    user{
-      id
+    canEdit
+    user {
+      name
+      surname
       fullName
-      email
+    }
+    task {
+      id
+      title
+      status{
+        id
+        title
+        color
+      }
     }
   }
 }

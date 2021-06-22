@@ -29,6 +29,7 @@ export default function Search( props ) {
   return (
     <div
       className={classnames( "search-row" )}
+      style={{ maxWidth: 700 }}
       >
       <div className="search">
         <input
@@ -49,7 +50,25 @@ export default function Search( props ) {
       </div>
 
       <Button
+        disabled={loading}
         className="btn-link center-hor m-l-10"
+        onClick={() => {
+          setLocalTaskSearch("");
+          setGlobalTaskSearch();
+        }}
+        >
+        <i className="fa fa-times" />
+      </Button>
+      <Button
+        disabled={loading}
+        className="btn-link center-hor m-l-10"
+        onClick={setGlobalTaskSearch}
+        >
+        Backend
+      </Button>
+      <Button
+        className="btn-link center-hor m-l-10"
+        disabled={loading}
         onClick={()=>{
           setLocalMilestone(allMilestones);
           setLocalProject(dashboard);
@@ -57,14 +76,7 @@ export default function Search( props ) {
           history.push(`/helpdesk/taskList/i/all`)
         }}
         >
-        Global search
-      </Button>
-      <Button
-        disabled={loading}
-        className="btn-link center-hor m-l-10"
-        onClick={setGlobalTaskSearch}
-        >
-        Search through tasks
+        Global
       </Button>
     </div>
   );
