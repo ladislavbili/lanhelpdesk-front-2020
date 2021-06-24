@@ -1,11 +1,11 @@
 import React from 'react';
 
-import CommandBar from './components/commandBar';
-import ListHeader from './components/listHeader';
 import Loading from 'components/loading';
-import TaskEdit from '../edit';
-import TaskEmpty from '../taskEmpty';
-import ItemRender from './components/columnItemRender';
+import CommandBar from '../components/commandBar';
+import ListHeader from '../components/listHeader';
+import ItemRender from '../components/columnItemRender';
+import TaskEdit from '../../edit';
+import TaskEmpty from '../../taskEmpty';
 import classnames from "classnames";
 
 export default function ColumnList( props ) {

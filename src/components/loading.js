@@ -7,10 +7,28 @@ import classnames from 'classnames';
 export default function Loading( props ) {
   const {
     noPos,
-    size
+    size,
+    flex,
   } = props;
+
+  let divStyle = {
+    backgroundColor: 'inherit'
+  }
+
+  if ( !flex ) {
+    divStyle = {
+      ...divStyle,
+      height: '100vh'
+    }
+  } else {
+    divStyle = {
+      ...divStyle,
+      flex: 1
+    }
+  }
+
   return (
-    <div style={ noPos ? { backgroundColor: 'inherit' } : { height: '100vh', backgroundColor: 'inherit' } }>
+    <div classname="noselect" style={ divStyle }>
       <div
         className={ classnames({ 'center-hor': !noPos, "center-ver": !noPos, "p-t-17p": !noPos }, "row") }
         style={ noPos ? {} : { width: 'fit-content' }}

@@ -14,6 +14,7 @@ import renderRepeat from './renderRepeat';
 import moment from 'moment';
 
 import {
+  GET_TASKS,
   GET_SCHEDULED_TASKS,
   ADD_SCHEDULED_TASK,
   UPDATE_SCHEDULED_TASK,
@@ -36,13 +37,29 @@ import {
   setCalendarTimeRange
 } from 'apollo/localSchema/actions';
 
+const multipliers = {
+  day: 24 * 60 * 60 * 1000,
+  week: 7 * 24 * 60 * 60 * 1000,
+  month: 30 * 24 * 60 * 60 * 1000,
+}
+
 export default function CalendarLoader( props ) {
   const {
     filterVariables,
     localProject,
     currentUser,
+    localMilestone,
+    globalTaskSearch,
+    localFilter,
+    orderBy,
+    ascending,
+    page,
+    limit,
+    processTasks,
   } = props;
 
+
+  //local queries
   const {
     data: localCalendarUserId,
   } = useQuery( GET_LOCAL_CALENDAR_USER_ID );
@@ -56,6 +73,7 @@ export default function CalendarLoader( props ) {
     to: cTo,
   } = localCalendarDateRange.localCalendarDateRange;
 
+  //apollo queries
   const scheduledTasksVariables = {
     projectId: localProject.id,
     filter: filterVariables,
@@ -69,6 +87,28 @@ export default function CalendarLoader( props ) {
     from: cFrom.toString(),
     to: cTo.toString(),
   }
+
+  const taskVariables = {
+    projectId: localProject.id,
+    milestoneId: localMilestone.id,
+    filter: filterVariables,
+    sort: {
+      asc: ascending,
+      key: orderBy
+    },
+    search: globalTaskSearch,
+    page,
+    limit,
+  }
+
+  const {
+    data: tasksData,
+    loading: tasksLoading,
+    refetch: tasksRefetchFunc,
+  } = useQuery( GET_TASKS, {
+    variables: taskVariables,
+    notifyOnNetworkStatusChange: true,
+  } );
 
   const {
     data: scheduledTasksData,
@@ -110,6 +150,13 @@ export default function CalendarLoader( props ) {
   const [ triggerRepeat ] = useMutation( TRIGGER_REPEAT );
   const [ fakeEvents, setFakeEvents ] = React.useState( [] );
 
+  //sync
+  const tasksRefetch = () => {
+    tasksRefetchFunc( {
+      variables: taskVariables,
+    } );
+  }
+
   const scheduledRefetch = () => {
     scheduledTasksRefetch( {
       projectId: localProject.id,
@@ -144,9 +191,15 @@ export default function CalendarLoader( props ) {
     setFakeEvents( [] );
   }, [ cFrom, cTo ] );
 
+  //refetch tasks
+  React.useEffect( () => {
+    tasksRefetch();
+  }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalTaskSearch ] );
+
   const repeats = !calendarRepeatsLoading ? calendarRepeatsData.calendarRepeats : [];
   const scheduled = !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [];
   const repeatTimes = !repeatTimesLoading ? repeatTimesData.repeatTimes : [];
+  const tasks = tasksLoading ? [] : tasksData.tasks.tasks;
 
   React.useEffect( () => {
     setFakeEvents( fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || scheduled.some( ( scheduled ) => scheduled.id !== fakeEvent.id ) ) );
@@ -157,12 +210,6 @@ export default function CalendarLoader( props ) {
   }, [ repeatTimes ] );
 
   const canSeeStack = localProject.id === null || localProject.right.assignedWrite;
-
-  const multipliers = {
-    day: 24 * 60 * 60 * 1000,
-    week: 7 * 24 * 60 * 60 * 1000,
-    month: 30 * 24 * 60 * 60 * 1000,
-  }
 
   const getRepeatMilisecs = ( repeatEvery, repeatInterval ) => {
     let multiplier = multipliers[ repeatInterval ];
@@ -247,7 +294,7 @@ export default function CalendarLoader( props ) {
   const newProps = {
     ...props,
     loading: (
-      props.loading ||
+      tasksLoading ||
       scheduledTasksLoading ||
       calendarRepeatsLoading ||
       repeatTimesLoading
@@ -277,6 +324,8 @@ export default function CalendarLoader( props ) {
     repeatTimesVariables,
     client: useApolloClient(),
     setFakeEvents,
+    tasks: processTasks( tasks ),
+    count: tasksLoading ? null : tasksData.tasks.count,
   }
 
   return (

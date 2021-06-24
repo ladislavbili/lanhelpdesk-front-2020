@@ -2478,6 +2478,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   margin-right: 3px;
 }
 
+.dnd-pagination{
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 12.5px;
+}
+
 .item-in-column {
   border-left: none;
   border-right: none;

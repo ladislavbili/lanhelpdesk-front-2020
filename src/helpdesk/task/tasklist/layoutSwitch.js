@@ -1,16 +1,12 @@
 import React from 'react';
 import TaskEdit from 'helpdesk/task/edit';
 
-import {
-  createDisplayValues,
-  createGanttDisplayValues,
-} from 'configs/constants/tasks';
-import ColumnList from './columnList';
-import TableList from './tableList';
-import DnDList from './dndList';
+import ColumnList from './column';
+import TableList from './table';
+import DnDList from './dnd';
 import Calendar from './calendar';
+import GanttList from './gantt';
 import Statistics from './statistics';
-import GanttList from './ganttList';
 
 import moment from 'moment';
 
@@ -22,10 +18,6 @@ export default function TasklistSwitch( props ) {
     taskSearch,
     tasks,
     checkTask,
-    preference,
-    ganttPreference,
-    setPreference,
-    setGanttPreference,
     orderBy,
     setOrderBy,
     ascending,
@@ -45,22 +37,10 @@ export default function TasklistSwitch( props ) {
 
   const [ showStatistics, setShowStatistics ] = React.useState( false );
 
-  const filterTasks = () => {
-    if ( taskSearch === "" ) {
-      return tasks;
-    }
-    return tasks.filter( ( task ) => {
-      return `${task.id} ${task.title}`.toLowerCase()
-        .includes( taskSearch.toLowerCase() );
-    } )
-  }
-
   const generalProps = {
     ...props,
     showStatistics: showStatistics,
     setShowStatistics: setShowStatistics,
-    //tasks: filterTasks(),
-    displayValues: createDisplayValues( preference ),
     link
   }
 
@@ -108,7 +88,7 @@ export default function TasklistSwitch( props ) {
             <div className="col-xl-12" >
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
-                <GanttList {...generalProps} displayValues={createGanttDisplayValues( ganttPreference )} setPreference={setGanttPreference} />
+                <GanttList {...generalProps} />
               }
             </div>
           }
@@ -117,3 +97,16 @@ export default function TasklistSwitch( props ) {
     </div>
   );
 }
+
+/*
+const filterTasks = () => {
+  if ( taskSearch === "" ) {
+    return tasks;
+  }
+  return tasks.filter( ( task ) => {
+    return `${task.id} ${task.title}`.toLowerCase()
+      .includes( taskSearch.toLowerCase() );
+  } )
+}
+
+*/

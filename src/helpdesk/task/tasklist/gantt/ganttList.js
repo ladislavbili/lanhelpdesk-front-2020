@@ -2,23 +2,22 @@ import React from 'react';
 import {
   useQuery,
   gql
-}
-from "@apollo/client";
+} from "@apollo/client";
 import {
   Modal,
   ModalBody
-}
-from 'reactstrap';
+} from 'reactstrap';
 import {
   getItemDisplayValue,
   timestampToString,
-}
-from 'helperFunctions';
+} from 'helperFunctions';
+import classnames from 'classnames';
 import Checkbox from 'components/checkbox';
 import Loading from 'components/loading';
-import CommandBar from './components/commandBar';
-import ListHeader from './components/listHeader';
-import Pagination from './components/pagination';
+import Empty from 'components/Empty';
+import CommandBar from '../components/commandBar';
+import ListHeader from '../components/listHeader';
+import Pagination from '../components/pagination';
 import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
 
 import {
@@ -30,12 +29,13 @@ export default function TableList( props ) {
     history,
     match,
     loading,
+    localProject,
     displayValues,
     tasks,
     deleteTask,
     checkTask,
     currentUser,
-    attributesFilter,
+    localStringFilter,
     setLocalTaskStringFilter,
     setSingleLocalTaskStringFilter,
     setGlobalTaskStringFilter,
@@ -45,7 +45,46 @@ export default function TableList( props ) {
   if ( match.params.page ) {
     path = `${path}/p/${match.params.page}`
   }
+  const getMilestoneGroups = () => {
+    let groups = [];
+    tasks.forEach( ( task ) => {
+      let groupIndex = groups.findIndex( ( group ) => (
+        ( group.milestone === null && task.milestone === null ) ||
+        ( group.milestone !== null && task.milestone !== null && group.milestone.id === task.milestone.id )
+      ) );
+      if ( groupIndex !== -1 ) {
+        groups[ groupIndex ] = {
+          ...groups[ groupIndex ],
+          tasks: [ ...groups[ groupIndex ].tasks, task ]
+        }
+      } else {
+        groups.push( {
+          milestone: task.milestone,
+          tasks: [ task ],
+          show: true
+        } )
+      }
+    } )
+    return groups;
+  }
   const [ editOpen, setEditOpen ] = React.useState( false );
+  const [ groups, setGroups ] = React.useState( getMilestoneGroups() );
+
+  React.useEffect( () => {
+    if ( !loading ) {
+      setGroups( getMilestoneGroups() );
+    }
+  }, [ loading ] );
+
+  const setGroupOpen = ( milestone ) => {
+    const index = groups.findIndex( ( group ) => ( group.milestone === null && milestone === null ) || ( group.milestone !== null && milestone !== null && group.milestone.id === milestone.id ) );
+    let newGroups = [ ...groups ];
+    newGroups[ index ] = {
+      ...newGroups[ index ],
+      show: !newGroups[ index ].show
+    }
+    setGroups( newGroups );
+  }
 
   const clearFilter = () => {
     if ( window.confirm( "Are you sure you want to clear the filter?" ) ) {
@@ -58,7 +97,7 @@ export default function TableList( props ) {
   const filterTaskByAttributes = ( task ) => {
     return filteredDisplayValues
       .every( ( display ) => {
-        if ( [ 'important', 'invoiced', 'checked', 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH', 'scheduled' ].includes( display.value ) ) {
+        if ( [ 'important', 'invoiced', 'checked', 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
           return true;
         }
         let value = getItemDisplayValue( task, display );
@@ -86,7 +125,7 @@ export default function TableList( props ) {
         }
         let result = value.toString()
           .toLowerCase()
-          .includes( attributesFilter[ display.value ].toLowerCase() );
+          .includes( localStringFilter[ display.value ].toLowerCase() );
         return result;
       } );
   }
@@ -96,7 +135,7 @@ export default function TableList( props ) {
       return null;
     } else if ( display.type === 'checkbox' ) {
       return <th
-        width="40"
+        width={display.width ? display.width : '' }
         key={display.value}
         className="row"
         style={{color: '#0078D4', paddingLeft: "1px", paddingRight: "1px" }}
@@ -114,29 +153,16 @@ export default function TableList( props ) {
           }}>
           <i className="far fa-trash-alt clickable m-l-5"	/>
         </div>
-        { false &&
-          <div
-            className="m-l-5"
-            onClick={() => {
-              if(loading){
-                return;
-              }
-              if( !tasks.some( (task) => task.checked ) ){
-                window.alert('Please first pick tasks to edit!');
-                return;
-              }
-              setEditOpen(true);
-            }}>
-            <i	className="fas fa-pen clickable"/>
-          </div>
-        }
       </th>
     }
     return (
       <th
-        style={(display.value === "createdAt" ? {textAlign: "right"} : {})}
+        style={{
+          ...(["createdAt"].includes(display.value) ? {textAlign: "right"} : {}),
+        }}
         key={display.value}
-        width={display.value === 'title' ? "30%" : ((display.value === "id" || display.value === "status") ? "50px" : '')}>
+        width={display.width ? display.width : '' }
+        >
         {display.label}
       </th>
     )
@@ -145,9 +171,9 @@ export default function TableList( props ) {
     if ( display.type === 'important' || display.type === 'invoiced' ) {
       return null;
     } else if ( [ 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
-      return ( <th key={display.value} width="40" /> );
+      return ( <th key={display.value} width={display.width ? display.width : '' } /> );
     } else if ( display.type === 'checkbox' ) {
-      return <th key={display.value} width="40" >
+      return <th key={display.value} width={display.width ? display.width : '' } >
         <Checkbox
           className = "m-l-7 m-t-6 p-l-0"
           disabled={loading}
@@ -158,8 +184,8 @@ export default function TableList( props ) {
           />
       </th>
     } else {
-      const value = ( attributesFilter[ display.value ] === "cur" ? currentUser.fullName : attributesFilter[ display.value ] );
-      return <th key={display.value} >
+      const value = ( localStringFilter[ display.value ] === "cur" ? currentUser.fullName : localStringFilter[ display.value ] );
+      return <th key={display.value} width={display.width ? display.width : '' } >
         <div className={(index === filteredDisplayValues.length - 1 ? "row" : "")}>
 
           <div style={index === filteredDisplayValues.length - 1 ? {flex: "1"} : {}}>
@@ -191,7 +217,7 @@ export default function TableList( props ) {
     }
   }
   const renderWithIcons = ( displayValues, task, index, Component ) => {
-    if ( ![ 'important', 'invoiced' ].includes( displayValues[ index - 1 ].type ) ) {
+    if ( index === 0 || ![ 'important', 'invoiced' ].includes( displayValues[ index - 1 ].type ) ) {
       return Component;
     }
     return (
@@ -230,7 +256,7 @@ export default function TableList( props ) {
               <td
                 colSpan={ (index === filteredDisplayValues.length-1) ? "2" : "1" }
                 style={{
-                  ...(["createdAt", "deadline", "startsAt"].includes(display.value) ? {textAlign: "right"} : {}),
+                  ...(["createdAt"].includes(display.value) ? {textAlign: "right"} : {}),
                 }}
                 key={display.value}
                 className={display.value}
@@ -241,7 +267,7 @@ export default function TableList( props ) {
                 }}
                 >
                 {	display.type !== 'checkbox' &&
-                  renderWithIcons( filteredDisplayValues, task, index, getItemDisplayValue(task,display, attributesFilter[display.value]) )
+                  renderWithIcons( filteredDisplayValues, task, index, getItemDisplayValue(task,display, localStringFilter[display.value]) )
                 }
                 { display.type === 'checkbox' &&
                   <Checkbox
@@ -269,6 +295,7 @@ export default function TableList( props ) {
       <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
         <ListHeader
           {...props}
+          gantt
           />
         <table className="table">
           <thead>
@@ -285,12 +312,24 @@ export default function TableList( props ) {
                 renderAttributeFilter(display,index)
               )}
             </tr>
-            {
-              tasks
-              .filter((task) => filterTaskByAttributes(task) )
-              .map((task) =>
-              renderTask(task)
-            )}
+            { groups.map((group) => (
+              <Empty key={ group.milestone === null ? 'null' : group.milestone.id }>
+                <tr>
+                  <td colSpan={filteredDisplayValues.length } className="noselect bolder-text" style={{fontSize: 14}}>
+                    <i
+                      className={classnames( "fa clickable p-l-5 p-r-5", { "fa-chevron-down": !group.show, "fa-chevron-up": group.show } )}
+                      onClick={() => setGroupOpen(group.milestone) }
+                      />
+                      {group.milestone ? group.milestone.title : 'Without milestone' }
+                  </td>
+                </tr>
+                { group.show && group.tasks
+                  .filter((task) => filterTaskByAttributes(task) )
+                  .map((task) =>
+                  renderTask(task)
+                )}
+              </Empty>
+            ))}
             { loading &&
               <tr>
                 <td colSpan="100">
@@ -301,13 +340,25 @@ export default function TableList( props ) {
           </tbody>
         </table>
         <Pagination {...props} taskList/>
+        <div className="m-l-30 m-b-10">
+          <p>Práca sumár</p>
+          <p>Neschválených: 8 hodín</p>
+          <p>Schválenych: 8 hodín</p>
+          <p>Spolu: 16 hodín</p>
+        </div>
+
+        <div className="m-l-30 m-b-10">
+          <p>Materiál sumár</p>
+          <p>Neschválených: 100 EUR bez DPH</p>
+          <p>Schválenych: 50 EUR bez DPH</p>
+          <p>Spolu: 150 EUR bez DPH</p>
+        </div>
 
         <Modal isOpen={editOpen}>
           <ModalBody className="scrollable" >
             <MultipleTaskEdit tasks={tasks.filter(d => d.checked)} close={() => setEditOpen(false)} />
-          </ModalBody>
-        </Modal>
+          </ModalBody> </Modal>
+        </div>
       </div>
-    </div>
   );
 }
