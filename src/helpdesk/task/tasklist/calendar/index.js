@@ -31,11 +31,21 @@ import {
 import {
   GET_LOCAL_CALENDAR_USER_ID,
   GET_LOCAL_CALENDAR_DATE_RANGE,
+  GET_LOCAL_TASK_STRING_FILTER,
+  GET_GLOBAL_TASK_STRING_FILTER,
 } from 'apollo/localSchema/queries';
 
 import {
-  setCalendarTimeRange
+  setCalendarTimeRange,
+  setLocalTaskStringFilter,
+  setSingleLocalTaskStringFilter,
+  setGlobalTaskStringFilter,
 } from 'apollo/localSchema/actions';
+
+import {
+  defaultTasklistColumnPreference,
+  createDisplayValues,
+} from 'configs/constants/tasks';
 
 const multipliers = {
   day: 24 * 60 * 60 * 1000,
@@ -69,6 +79,14 @@ export default function CalendarLoader( props ) {
   } = useQuery( GET_LOCAL_CALENDAR_DATE_RANGE );
 
   const {
+    data: localStringFilter,
+  } = useQuery( GET_LOCAL_TASK_STRING_FILTER );
+
+  const {
+    data: globalStringFilter,
+  } = useQuery( GET_GLOBAL_TASK_STRING_FILTER );
+
+  const {
     from: cFrom,
     to: cTo,
   } = localCalendarDateRange.localCalendarDateRange;
@@ -97,6 +115,7 @@ export default function CalendarLoader( props ) {
       key: orderBy
     },
     search: globalTaskSearch,
+    stringFilter: globalStringFilter.globalTaskStringFilter,
     page,
     limit,
   }
@@ -149,6 +168,7 @@ export default function CalendarLoader( props ) {
 
   const [ triggerRepeat ] = useMutation( TRIGGER_REPEAT );
   const [ fakeEvents, setFakeEvents ] = React.useState( [] );
+  const [ forcedRefetch, setForcedRefetch ] = React.useState( false );
 
   //sync
   const tasksRefetch = () => {
@@ -194,7 +214,7 @@ export default function CalendarLoader( props ) {
   //refetch tasks
   React.useEffect( () => {
     tasksRefetch();
-  }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalTaskSearch ] );
+  }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalTaskSearch, globalStringFilter, forcedRefetch ] );
 
   const repeats = !calendarRepeatsLoading ? calendarRepeatsData.calendarRepeats : [];
   const scheduled = !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [];
@@ -326,6 +346,15 @@ export default function CalendarLoader( props ) {
     setFakeEvents,
     tasks: processTasks( tasks ),
     count: tasksLoading ? null : tasksData.tasks.count,
+    globalTaskSearch,
+
+    forceRefetch: () => setForcedRefetch( !forcedRefetch ),
+    localStringFilter: localStringFilter.localTaskStringFilter,
+    setLocalTaskStringFilter,
+    globalStringFilter: globalStringFilter.globalTaskStringFilter,
+    setGlobalTaskStringFilter,
+    setSingleLocalTaskStringFilter,
+    displayValues: createDisplayValues( defaultTasklistColumnPreference ),
   }
 
   return (

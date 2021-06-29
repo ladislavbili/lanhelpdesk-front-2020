@@ -17,7 +17,8 @@ import {
 } from 'react-dnd-html5-backend';
 
 import CommandBar from '../components/commandBar';
-import ListHeader from '../components/listHeader';
+import Search from '../components/search';
+import ActiveSearch from '../components/activeSearch';
 import Pagination from '../components/pagination';
 import TaskEdit from 'helpdesk/task/edit';
 import Repeat from 'helpdesk/components/repeat/repeatFormModal';
@@ -86,6 +87,8 @@ export default function TaskCalendar( props ) {
     fakeEvents,
     setFakeEvents,
     repeatTimesVariables,
+    globalStringFilter,
+    globalTaskSearch,
   } = props;
 
   //TODO: AK repeat nacita svoje repeatTimes, existuje dovod preco nacitavat zvlast repeattimes? nezabudnut na podmienku ak je v range zacaitok alebo novy zaciatok
@@ -259,7 +262,6 @@ export default function TaskCalendar( props ) {
     }
   }
 
-
   const expandScheduledEvent = ( scheduledEvent ) => ( {
     ...scheduledEvent,
     onDoubleClick: () => history.push( `${ path }/${ scheduledEvent.task.id }` ),
@@ -344,14 +346,30 @@ export default function TaskCalendar( props ) {
   const newRepeatTimeEvents = repeatTimeEvents.map( expandRepeatTimeEvent )
   const events = [ ...newScheduledEvents, ...newRepeatEvents, ...newRepeatTimeEvents, ...fakeEvents ]
 
+  const activeSearchHidden = (
+    globalStringFilter === null ||
+    Object.keys( globalStringFilter )
+    .filter( ( filterKey ) => globalStringFilter[ filterKey ].length !== 0 )
+    .length === 0
+  ) && globalTaskSearch.length === 0;
+
   return (
     <div>
-      <CommandBar {...props} />
+      <CommandBar {...props} showSort />
       <div className="calendar-container">
-        <ListHeader {...props} />
+        <Search {...props} />
+        <ActiveSearch {...props} includeGlobalSearch />
         <div className="row m-r-30">
           { canSeeStack &&
-            <div className="task-stack fit-with-header-and-commandbar-5 scroll-visible">
+            <div
+              className={classnames(
+                "task-stack scroll-visible",
+                {
+                  'fit-with-header-and-commandbar-5': activeSearchHidden,
+                  'fit-with-header-and-commandbar-7': !activeSearchHidden,
+              }
+              )}
+              >
               <DndProvider backend={HTML5Backend}>
                 <h1>Tasks stack</h1>
                 { tasks.map( task =>
@@ -366,7 +384,13 @@ export default function TaskCalendar( props ) {
           }
 
           <DnDCalendar
-            className="fit-with-header-and-commandbar-5 calendar"
+            className={classnames(
+              "calendar",
+              {
+                'fit-with-header-and-commandbar-5': activeSearchHidden,
+                'fit-with-header-and-commandbar-7': !activeSearchHidden,
+            }
+            )}
             {...taskCalendarDefaults}
             events = { events }
             defaultView = { calendarLayout }

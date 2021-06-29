@@ -6,8 +6,8 @@ import {
 
 export const defaultTasksAttributesFilter = {
   id: "",
-  status: "",
   title: "",
+  status: "",
   requester: "",
   company: "",
   createdAt: "",
@@ -284,6 +284,85 @@ export const ganttAttributeLimitingRights = [
   },
 ]
 export const unimplementedAttributes = [
+]
+
+//create state for all, display only available ones
+export const allFilterAttributes = [
+  {
+    value: 'id',
+    label: 'ID',
+    right: null,
+  },
+  {
+    value: 'status',
+    label: 'Status',
+    right: 'statusRead',
+  },
+  {
+    value: 'title',
+    label: 'Title',
+    right: null,
+  },
+  {
+    value: 'project',
+    label: 'Project',
+    right: null,
+  },
+  {
+    value: 'milestone',
+    label: 'Milestone',
+    right: 'milestoneRead',
+  },
+  {
+    value: 'requester',
+    label: 'Requester',
+    right: 'requesterRead',
+  },
+  {
+    value: 'company',
+    label: 'Company',
+    right: 'companyRead',
+  },
+  {
+    value: 'assignedTo',
+    label: 'Assigned',
+    right: 'assignedRead',
+  },
+  {
+    value: 'tags',
+    label: 'Tags',
+    right: 'tagsRead',
+  },
+  {
+    value: 'taskType',
+    label: 'Task Type',
+    right: 'typeRead',
+  },
+  {
+    value: 'createdAt',
+    label: 'Created at',
+    right: null,
+  },
+  {
+    value: 'startsAt',
+    label: 'Starts at',
+    right: 'deadlineRead',
+  },
+  {
+    value: 'deadline',
+    label: 'Deadline',
+    right: 'deadlineRead',
+  },
+  {
+    value: 'pausal',
+    label: 'Pausal',
+    right: 'pausalRead',
+  },
+  {
+    value: 'overtime',
+    label: 'Overtime',
+    right: 'overtimeRead',
+  },
 ]
 
 export const createDisplayValues = ( preference ) => [

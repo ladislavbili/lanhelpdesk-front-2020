@@ -28,7 +28,7 @@ export default function Loading( props ) {
   }
 
   return (
-    <div classname="noselect" style={ divStyle }>
+    <div className="noselect" style={ divStyle }>
       <div
         className={ classnames({ 'center-hor': !noPos, "center-ver": !noPos, "p-t-17p": !noPos }, "row") }
         style={ noPos ? {} : { width: 'fit-content' }}

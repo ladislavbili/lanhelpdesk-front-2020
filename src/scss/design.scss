@@ -69,6 +69,10 @@ p {
   @extend .text-muted;
 }
 
+.font-14{
+  font-size: 14px;
+}
+
 .testSonka {
   color: red;
   font-size: 10px;
@@ -186,6 +190,10 @@ html {
 
 .fit-with-header-and-commandbar-6 {
   height: calc(#{$height-without-header} - 90px );
+}
+
+.fit-with-header-and-commandbar-7 {
+  height: calc(#{$height-without-header} - #{$commandbar-height} - 60px - 70px );
 }
 
 .overflow-x {
@@ -693,8 +701,8 @@ h4 {
 .btn-link:hover,
 .btn-link:active,
 .btn-link:focus,
-.btn-link:disabled,
-.btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn) {
+.btn-link:disabled {
+//,.btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn)
   background-color: inherit;
   height: $button-height;
   border: 0px;
@@ -1697,6 +1705,15 @@ td {
   padding: 3px 0px 7px 0px;
 }
 
+.dropdown .dropdown-button:hover{
+  background-color: inherit !important;
+  color: inherit !important;
+}
+.dropdown .dropdown-button{
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
 .header-with-text, .header-with-text:hover, .header-with-text:focus{
   margin-right: 5px !important;
 }
@@ -2133,14 +2150,14 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   display: flex !important;
   margin: 0px;
   width: 60%;
-  max-width: 500px;
+  max-width: 700px;
   margin-top: auto;
   margin-bottom: auto;
 }
 
 .search-text {
   height: $button-height;
-  border-left: none;
+  border: none;
 }
 
 .search {
@@ -2148,14 +2165,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   display: flex;
   margin-top: auto;
   margin-bottom: auto;
-  .search-text:focus + .search-btn {
-    border: 1px solid $basic-button-color !important;
-    border-right: none !important;
-  }
-  .search-btn {
-    order: -1;
-  }
+  border:  1px solid transparent;
 }
+
+.search-focused {
+  border:  1px solid $basic-button-color !important;
+}
+
 .task-container{
   .search{
     width: 50% !important;
@@ -2166,13 +2182,23 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .search-btn:hover,
 .search-btn:active,
 .search-btn:focus,
-.search-btn:disabled {
-  background-color: white;
+.search-btn:disabled,
+.search-btn:focus:active {
+  background-color: white !important;
+  color: #0078D7 !important;
   border: $main-border;
   border-right: none;
   margin: 0;
   height: $button-height;
   font-size: 14px;
+}
+
+.search-popover {
+  max-width: 700px;
+  width: 700px;
+  background-color: $content-background-color;
+  overflow-y: auto;
+  max-height: calc( 90vh - 150px );
 }
 
 .flip {
@@ -2571,7 +2597,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     }
   }
   .rbc-calendar{
-    min-height: calc(100vh - 170px);
+    min-height: max-content;
     background-color: white;
     flex: 1;
     .rbc-toolbar-label{

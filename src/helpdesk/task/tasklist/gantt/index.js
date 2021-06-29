@@ -35,7 +35,6 @@ export default function GanttListLoader( props ) {
   const {
     localProject,
     localMilestone,
-    globalTaskSearch,
     localFilter,
     orderBy,
     ascending,
@@ -65,7 +64,6 @@ export default function GanttListLoader( props ) {
       key: orderBy
     },
     milestoneSort: true,
-    search: globalTaskSearch,
     stringFilter: globalStringFilter.globalTaskStringFilter,
     page,
     limit,
@@ -90,6 +88,9 @@ export default function GanttListLoader( props ) {
     notifyOnNetworkStatusChange: true,
   } );
 
+  //state
+  const [ forcedRefetch, setForcedRefetch ] = React.useState( false );
+
   //mutations
   const [ addOrUpdatePreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_GANTT_COLUMNS_PREFERENCES );
 
@@ -103,7 +104,7 @@ export default function GanttListLoader( props ) {
   //refetch tasks
   React.useEffect( () => {
     tasksRefetch();
-  }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalTaskSearch, globalStringFilter ] );
+  }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalStringFilter, forcedRefetch ] );
 
   const dataLoading = (
     ganttPreferencesLoading ||
@@ -178,10 +179,12 @@ export default function GanttListLoader( props ) {
     count: tasksLoading ? null : tasksData.tasks.count,
     loading: dataLoading,
 
-    setLocalTaskStringFilter,
-    setSingleLocalTaskStringFilter,
-    setGlobalTaskStringFilter,
+    forceRefetch: () => setForcedRefetch( !forcedRefetch ),
     localStringFilter: localStringFilter.localTaskStringFilter,
+    setLocalTaskStringFilter,
+    globalStringFilter: globalStringFilter.globalTaskStringFilter,
+    setGlobalTaskStringFilter,
+    setSingleLocalTaskStringFilter,
   }
 
   return (

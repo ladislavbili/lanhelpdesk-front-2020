@@ -16,8 +16,8 @@ import Checkbox from 'components/checkbox';
 import Loading from 'components/loading';
 import Empty from 'components/Empty';
 import CommandBar from '../components/commandBar';
-import ListHeader from '../components/listHeader';
 import Pagination from '../components/pagination';
+import ActiveSearch from '../components/activeSearch';
 import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
 
 import {
@@ -86,12 +86,6 @@ export default function TableList( props ) {
     setGroups( newGroups );
   }
 
-  const clearFilter = () => {
-    if ( window.confirm( "Are you sure you want to clear the filter?" ) ) {
-      setLocalTaskStringFilter( defaultTasksAttributesFilter );
-      setGlobalTaskStringFilter();
-    }
-  }
   const filteredDisplayValues = displayValues.filter( ( displayValue ) => displayValue.show )
 
   const filterTaskByAttributes = ( task ) => {
@@ -202,7 +196,7 @@ export default function TableList( props ) {
           </div>
           {index === filteredDisplayValues.length - 1 &&
             <div className="ml-auto row">
-              <button type="button" disabled={loading} className="btn-link m-l-8 m-r-5" onClick={clearFilter}>
+              <button type="button" disabled={loading} className="btn-link m-l-8 m-r-5" onClick={() => setLocalTaskStringFilter( defaultTasksAttributesFilter ) }>
                 <i
                   className="fas fa-times commandbar-command-icon text-highlight"
                   />
@@ -291,12 +285,11 @@ export default function TableList( props ) {
     <div>
       <CommandBar
         {...props}
+        showSort
+        showPreferences
+        gantt
         />
       <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
-        <ListHeader
-          {...props}
-          gantt
-          />
         <table className="table">
           <thead>
             <tr>
@@ -312,6 +305,7 @@ export default function TableList( props ) {
                 renderAttributeFilter(display,index)
               )}
             </tr>
+            <ActiveSearch {...props} table />
             { groups.map((group) => (
               <Empty key={ group.milestone === null ? 'null' : group.milestone.id }>
                 <tr>

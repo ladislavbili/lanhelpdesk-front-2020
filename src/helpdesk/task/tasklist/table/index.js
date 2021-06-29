@@ -41,7 +41,6 @@ export default function TableListLoader( props ) {
   const {
     localProject,
     localMilestone,
-    globalTaskSearch,
     localFilter,
     orderBy,
     ascending,
@@ -70,7 +69,6 @@ export default function TableListLoader( props ) {
       asc: ascending,
       key: orderBy
     },
-    search: globalTaskSearch,
     stringFilter: globalStringFilter.globalTaskStringFilter,
     page,
     limit,
@@ -101,6 +99,7 @@ export default function TableListLoader( props ) {
   const client = useApolloClient();
   //state
   const [ markedTasks, setMarkedTasks ] = React.useState( [] );
+  const [ forcedRefetch, setForcedRefetch ] = React.useState( false );
 
   //sync
   const tasksRefetch = () => {
@@ -111,7 +110,7 @@ export default function TableListLoader( props ) {
   //refetch tasks
   React.useEffect( () => {
     tasksRefetch();
-  }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalTaskSearch, globalStringFilter ] );
+  }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalStringFilter, forcedRefetch ] );
 
 
   const dataLoading = (
@@ -247,11 +246,12 @@ export default function TableListLoader( props ) {
     markedTasks,
     deleteTask: deleteTaskFunc,
     count: tasksLoading ? null : tasksData.tasks.count,
-
-    setLocalTaskStringFilter,
-    setSingleLocalTaskStringFilter,
-    setGlobalTaskStringFilter,
+    forceRefetch: () => setForcedRefetch( !forcedRefetch ),
     localStringFilter: localStringFilter.localTaskStringFilter,
+    setLocalTaskStringFilter,
+    globalStringFilter: globalStringFilter.globalTaskStringFilter,
+    setGlobalTaskStringFilter,
+    setSingleLocalTaskStringFilter,
   }
 
   return (

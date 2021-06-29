@@ -10,8 +10,9 @@ import {
   CardBody
 } from 'reactstrap';
 import CommandBar from '../components/commandBar';
-import ListHeader from '../components/listHeader';
 import ItemRender from '../components/columnItemRender';
+import Search from '../components/search';
+import ActiveSearch from '../components/activeSearch';
 import InvoicedColumn from './invoicedColumn';
 import StatusColumn from './statusColumn';
 import classnames from 'classnames';
@@ -47,6 +48,8 @@ export default function TaskListDnD( props ) {
     link,
     localProject,
     localFilter,
+    globalStringFilter,
+    globalTaskSearch,
     tasks,
     taskVariables,
   } = props;
@@ -57,6 +60,14 @@ export default function TaskListDnD( props ) {
     localProject.project.statuses :
     filterUnique( tasks.map( ( task ) => task.status ), 'id' )
   )
+
+  const activeSearchHidden = (
+    globalStringFilter === null ||
+    Object.keys( globalStringFilter )
+    .filter( ( filterKey ) => globalStringFilter[ filterKey ].length !== 0 )
+    .length === 0
+  ) && globalTaskSearch.length === 0;
+
   const [ updateTask ] = useMutation( UPDATE_TASK );
   const [ changedTask, setChangedTask ] = React.useState( null );
 
@@ -113,11 +124,11 @@ export default function TaskListDnD( props ) {
     <div className="relative">
       <CommandBar
         {...props}
+        showSort
         />
       <div className="scroll-visible overflow-x fit-with-header-and-commandbar task-container">
-        <ListHeader
-          {...props}
-          />
+        <Search {...props} />
+        <ActiveSearch {...props} includeGlobalSearch />
         <div className="flex-row m-l-30" >
           <DragDropContext onDragEnd={onDragEnd}>
             { statuses

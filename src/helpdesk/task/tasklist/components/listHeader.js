@@ -27,6 +27,7 @@ export default function ListHeader( props ) {
     setOrderBy,
     setAscending,
     gantt,
+    search,
   } = props;
 
   const displayValues = (
@@ -55,7 +56,7 @@ export default function ListHeader( props ) {
 
   return (
     <div className={classnames("d-flex", "h-60px", "flex-row", 'p-l-30', "m-r-30", 'sticky')} style={{ left: 0 }}>
-      <Search {...props}/>
+      {search && <Search {...props}/>}
       { false &&
         <Empty>
           { !multiselect && selectedStatuses && allStatuses.length > 0 &&

@@ -17,8 +17,8 @@ from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 import Loading from 'components/loading';
 import CommandBar from '../components/commandBar';
-import ListHeader from '../components/listHeader';
 import Pagination from '../components/pagination';
+import ActiveSearch from '../components/activeSearch';
 import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
 
 import {
@@ -47,12 +47,6 @@ export default function TableList( props ) {
   }
   const [ editOpen, setEditOpen ] = React.useState( false );
 
-  const clearFilter = () => {
-    if ( window.confirm( "Are you sure you want to clear the filter?" ) ) {
-      setLocalTaskStringFilter( defaultTasksAttributesFilter );
-      setGlobalTaskStringFilter();
-    }
-  }
   const filteredDisplayValues = displayValues.filter( ( displayValue ) => displayValue.show )
 
   const filterTaskByAttributes = ( task ) => {
@@ -176,7 +170,7 @@ export default function TableList( props ) {
           </div>
           {index === filteredDisplayValues.length - 1 &&
             <div className="ml-auto row">
-              <button type="button" disabled={loading} className="btn-link m-l-8 m-r-5" onClick={clearFilter}>
+              <button type="button" disabled={loading} className="btn-link m-l-8 m-r-5" onClick={() => setLocalTaskStringFilter( defaultTasksAttributesFilter ) }>
                 <i
                   className="fas fa-times commandbar-command-icon text-highlight"
                   />
@@ -266,11 +260,10 @@ export default function TableList( props ) {
     <div>
       <CommandBar
         {...props}
+        showSort
+        showPreferences
         />
       <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
-        <ListHeader
-          {...props}
-          />
         <table className="table">
           <thead>
             <tr>
@@ -286,8 +279,8 @@ export default function TableList( props ) {
                 renderAttributeFilter(display,index)
               )}
             </tr>
-            {
-              tasks
+            <ActiveSearch {...props} table />
+            { tasks
               .filter((task) => filterTaskByAttributes(task) )
               .map((task) =>
               renderTask(task)

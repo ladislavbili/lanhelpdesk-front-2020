@@ -61,18 +61,6 @@ export default function ProjectEditFull( props ) {
         refetchMyProjects();
       }}
       closeModal={(editedProject, rights) => {
-        if(editedProject !== null){
-          const project = {
-            project: { ...currentProject.project ,...editedProject },
-            right: rights,
-            id: editedProject.id,
-            value: editedProject.id,
-            title: editedProject.title,
-            label: editedProject.title,
-          }
-          setProject(project);
-          refetchMyProjects();
-        }
         history.back();
       }}
       />

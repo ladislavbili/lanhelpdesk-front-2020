@@ -24,6 +24,12 @@ export default function DnDInvoicedColumn( props ) {
     taskVariables,
     history,
     limit,
+    localFilter,
+    localProject,
+    localMilestone,
+    currentUser,
+    globalStringFilter,
+    forcedRefetch,
   } = props;
 
   const [ page, setPage ] = React.useState( 1 );
@@ -46,7 +52,14 @@ export default function DnDInvoicedColumn( props ) {
   React.useEffect( () => {
     tasksRefetch();
     setPage( 1 );
-  }, [ taskVariables ] );
+  }, [
+    localFilter,
+    localProject.id,
+    localMilestone.id,
+    currentUser,
+    globalStringFilter,
+    forcedRefetch
+  ] );
 
   React.useEffect( () => {
     tasksRefetch();

@@ -40,11 +40,6 @@ export {
 from './moment';
 
 export {
-  snapshotToArray
-}
-from './firebase';
-
-export {
   applyTaskFilter,
   filterDateSatisfied,
   filterOneOf,

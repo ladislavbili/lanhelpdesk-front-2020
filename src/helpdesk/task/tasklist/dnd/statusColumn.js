@@ -31,6 +31,12 @@ export default function DnDStatusColumn( props ) {
     change,
     limit,
     link,
+    localFilter,
+    localProject,
+    localMilestone,
+    currentUser,
+    globalStringFilter,
+    forcedRefetch,
   } = props;
 
   const [ page, setPage ] = React.useState( 1 );
@@ -53,7 +59,14 @@ export default function DnDStatusColumn( props ) {
   React.useEffect( () => {
     tasksRefetch();
     setPage( 1 );
-  }, [ taskVariables ] );
+  }, [
+    localFilter,
+    localProject.id,
+    localMilestone.id,
+    currentUser,
+    globalStringFilter,
+    forcedRefetch
+    ] );
 
   React.useEffect( () => {
     tasksRefetch();
@@ -71,64 +84,64 @@ export default function DnDStatusColumn( props ) {
   return (
     <Card className="dnd-column" key={status.id}>
       <CardHeader className="dnd-header">{status.title}</CardHeader>
-        { tasksLoading &&
-          <Loading flex />
-        }
-        { !tasksLoading &&
-          <Droppable droppableId={status.id.toString()}>
-            { (provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                className="dnd-body card-body"
-                style={{
-                  background: snapshot.isDraggingOver ? 'lightblue' : 'inherit',
-                }}
-                >
-                { tasks.map((task, index) => (
-                  <Draggable
-                    key={task.id}
-                    draggableId={task.id.toString()}
-                    extraData={'aaaa'}
-                    index={index}
-                    >
-                    { (provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
+      { tasksLoading &&
+        <Loading flex />
+      }
+      { !tasksLoading &&
+        <Droppable droppableId={status.id.toString()}>
+          { (provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              className="dnd-body card-body"
+              style={{
+                background: snapshot.isDraggingOver ? 'lightblue' : 'inherit',
+              }}
+              >
+              { tasks.map((task, index) => (
+                <Draggable
+                  key={task.id}
+                  draggableId={task.id.toString()}
+                  extraData={'aaaa'}
+                  index={index}
+                  >
+                  { (provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      >
+                      <ul
+                        className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
+                        style={{borderLeft: "3px solid " + status.color}}
+                        onClick={(e)=>{
+                          history.push(link+'/'+task.id);
+                        }}
+                        key={task.id}
                         >
-                        <ul
-                          className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
-                          style={{borderLeft: "3px solid " + status.color}}
-                          onClick={(e)=>{
-                            history.push(link+'/'+task.id);
-                          }}
-                          key={task.id}
-                          >
-                          <ItemRender task={task} />
-                        </ul>
-                      </div>
-                    ) }
-                  </Draggable>
-                ))}
+                        <ItemRender task={task} />
+                      </ul>
+                    </div>
+                  ) }
+                </Draggable>
+              ))}
 
-                { tasks.length === 0 &&
-                  <div className="center-ver" style={{textAlign:'center'}}>
-                    Neboli nájdené žiadne výsledky pre tento filter
-                  </div>
-                }
-                {provided.placeholder}
-              </div>
-            ) }
-          </Droppable>
-        }
-        <Pagination
-          page={ page }
-          setPage={ setPage }
-          limit={ limit }
-          count={ count }
-          loading={ tasksLoading }
-          />
+              { tasks.length === 0 &&
+                <div className="center-ver" style={{textAlign:'center'}}>
+                  Neboli nájdené žiadne výsledky pre tento filter
+                </div>
+              }
+              {provided.placeholder}
+            </div>
+          ) }
+        </Droppable>
+      }
+      <Pagination
+        page={ page }
+        setPage={ setPage }
+        limit={ limit }
+        count={ count }
+        loading={ tasksLoading }
+        />
     </Card>
   );
 }
