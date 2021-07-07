@@ -26,7 +26,15 @@ filter {
   }
   tags {
     id
+    order
     title
+    color
+  }
+  statuses {
+    id
+    order
+    title
+    action
     color
   }
   important

@@ -112,7 +112,6 @@ export default function FilterForm( props ) {
     data: localProjectData,
   } = useQuery( GET_PROJECT );
 
-  console.log( filterData );
   const originalProjectId = filterData.localFilter.id ? ( filterData.localFilter.project ? filterData.localFilter.project.id : null ) : localProjectData.localProject.id;
   const id = filterData.localFilter.id;
 
@@ -123,6 +122,7 @@ export default function FilterForm( props ) {
 
   const [ saving, setSaving ] = React.useState( null );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
+  const [ statusesOpen, setStatusesOpen ] = React.useState( false );
   const [ project, setProject ] = React.useState( noProject );
 
   const {
@@ -136,6 +136,8 @@ export default function FilterForm( props ) {
     setTaskTypes,
     tags,
     setTags,
+    statuses,
+    setStatuses,
     statusDateFrom,
     setStatusDateFrom,
     statusDateFromNow,
@@ -225,6 +227,7 @@ export default function FilterForm( props ) {
       //filter information
       setFilterState( filter );
       setTagsOpen( false );
+      setStatusesOpen( false );
     }
   }, [ id, dataLoading ] );
 
@@ -244,6 +247,7 @@ export default function FilterForm( props ) {
         setAssignedTos,
         setTaskTypes,
         setTags,
+        setStatuses,
         setStatusDateFrom,
         setStatusDateFromNow,
         setStatusDateTo,
@@ -317,6 +321,7 @@ export default function FilterForm( props ) {
     companies: companies.filter( ( company ) => company.id !== 'cur' ),
     taskTypes,
     tags,
+    statuses,
     oneOf: oneOf.map( ( oneOf ) => oneOf.value ),
 
     statusDateFrom: statusDateFrom === null ? null : statusDateFrom.valueOf()
@@ -370,6 +375,7 @@ export default function FilterForm( props ) {
       companies: filter.companies.map( ( item ) => item.id ),
       taskTypes: filter.taskTypes.map( ( item ) => item.id ),
       tags: filter.tags.map( ( item ) => item.id ),
+      statuses: filter.statuses.map( ( item ) => item.id ),
     } )
   }
   const setFilterState = ( filterData ) => {
@@ -404,12 +410,18 @@ export default function FilterForm( props ) {
         toSelArr( project.project.tags )
         .filter( ( tag1 ) => filter.tags.some( ( tag2 ) => tag1.id === tag2.id ) )
       );
+      setStatuses(
+        toSelArr( project.project.statuses )
+        .filter( ( status1 ) => filter.statuses.some( ( status2 ) => status1.id === status2.id ) )
+      );
     } else if ( filterData.global ) {
       setProject( globalProject );
       setTags( [] );
+      setStatuses( [] );
     } else {
       setProject( noProject );
       setTags( [] );
+      setStatuses( [] );
     }
 
     setStatusDateFromNow( filter.statusDateFromNow );
@@ -491,6 +503,7 @@ export default function FilterForm( props ) {
               options={[ noProject, globalProject, ...myProjects]}
               onChange={(project)=> {
                 setTags([]);
+                setStatuses([]);
                 setProject(project);
               }}
               value={project}
@@ -523,6 +536,38 @@ export default function FilterForm( props ) {
                 .map( ( tag ) => (
                   <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} key={tag.id} className="m-r-5 p-l-5 p-r-5">
                     {tag.title}
+                  </span>
+                ) )
+              }
+            </div>
+          </div>
+        }
+
+        { project.id !== 'global' && project.id !== null && project.right.statusRead &&
+          <div className="sidebar-filter-row">
+            <label>Status</label>
+            <div className="row mb-auto">
+              <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setStatusesOpen(true) } >
+                <i className="fa fa-plus" />
+                Statuses
+              </button>
+              <MultiSelect
+                className="center-hor"
+                direction="right"
+                header="Select statuses for this task"
+                closeMultiSelect={() => { setStatusesOpen(false) }}
+                open={statusesOpen}
+                items={toSelArr(project.project.statuses)}
+                selected={statuses}
+                onChange={(statuses) => { setStatuses(statuses) }}
+                />
+            </div>
+            <div className="listed-tags" >
+              { statuses
+                .sort( ( status1, status2 ) => status1.order > status2.order ? 1 : -1 )
+                .map( ( status ) => (
+                  <span style={{ background: status.color, color: 'white', borderRadius: 3 }} key={status.id} className="m-r-5 p-l-5 p-r-5">
+                    {status.title}
                   </span>
                 ) )
               }

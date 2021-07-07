@@ -55,16 +55,25 @@ export default function TaskListDnD( props ) {
   } = props;
   const client = useApolloClient();
 
-  const statuses = (
+  let statuses = (
     localProject.project.statuses ?
     localProject.project.statuses :
     filterUnique( tasks.map( ( task ) => task.status ), 'id' )
   )
 
+  const filterStatuses = localFilter.filter.statuses;
+  if ( filterStatuses.length > 0 ) {
+    statuses = statuses.filter( ( status ) => filterStatuses.some( ( status2 ) => status.id === status2.id ) )
+  }
+
   const activeSearchHidden = (
     globalStringFilter === null ||
     Object.keys( globalStringFilter )
-    .filter( ( filterKey ) => globalStringFilter[ filterKey ].length !== 0 )
+    .filter( ( filterKey ) => (
+      ![ 'createdAt', 'startsAt', 'deadline' ].includes( filterKey ) &&
+      globalStringFilter[ filterKey ] !== null &&
+      globalStringFilter[ filterKey ].length !== 0
+    ) )
     .length === 0
   ) && globalTaskSearch.length === 0;
 

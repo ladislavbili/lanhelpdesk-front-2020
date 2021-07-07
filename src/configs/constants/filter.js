@@ -24,6 +24,7 @@ export const emptyFilter = {
   assignedTos: [],
   taskTypes: [],
   tags: [],
+  statuses: [],
 
   statusDateFrom: null,
   statusDateFromNow: false,
@@ -102,6 +103,7 @@ export const getEmptyFilter = () => ( {
   companies: [],
   taskTypes: [],
   tags: [],
+  statuses: [],
   oneOf: [],
 
   statusDateFrom: null,

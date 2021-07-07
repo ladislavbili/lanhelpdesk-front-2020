@@ -349,7 +349,11 @@ export default function TaskCalendar( props ) {
   const activeSearchHidden = (
     globalStringFilter === null ||
     Object.keys( globalStringFilter )
-    .filter( ( filterKey ) => globalStringFilter[ filterKey ].length !== 0 )
+    .filter( ( filterKey ) => (
+      ![ 'createdAt', 'startsAt', 'deadline' ].includes( filterKey ) &&
+      globalStringFilter[ filterKey ] !== null &&
+      globalStringFilter[ filterKey ].length !== 0
+    ) )
     .length === 0
   ) && globalTaskSearch.length === 0;
 

@@ -7,6 +7,7 @@ import {
 } from "@apollo/client";
 import {
   getDateClock,
+  processStringFilter,
 } from 'helperFunctions';
 import renderScheduled from './renderScheduled';
 import renderRepeatTime from './renderRepeatTime';
@@ -115,7 +116,7 @@ export default function CalendarLoader( props ) {
       key: orderBy
     },
     search: globalTaskSearch,
-    stringFilter: globalStringFilter.globalTaskStringFilter,
+    stringFilter: processStringFilter( globalStringFilter.globalTaskStringFilter ),
     page,
     limit,
   }

@@ -7,6 +7,9 @@ import {
   defaultTasksAttributesFilter
 } from 'configs/constants/tasks';
 import {
+  timestampToDate,
+} from 'helperFunctions';
+import {
   dashboard,
   allMilestones,
 } from 'configs/constants/sidebar';
@@ -35,7 +38,11 @@ export default function ActiveSearch( props ) {
     (
       globalStringFilter === null ||
       Object.keys( globalStringFilter )
-      .filter( ( filterKey ) => globalStringFilter[ filterKey ].length !== 0 )
+      .filter( ( filterKey ) => (
+        ![ 'createdAt', 'startsAt', 'deadline' ].includes( filterKey ) &&
+        globalStringFilter[ filterKey ] !== null &&
+        globalStringFilter[ filterKey ].length !== 0
+      ) )
       .length === 0
     ) &&
     ( !includeGlobalSearch || globalTaskSearch.length === 0 )
@@ -61,8 +68,10 @@ export default function ActiveSearch( props ) {
     usedFilter = [
       ...usedFilter,
       ...Object.keys( globalStringFilter )
-    .filter( ( filterKey ) => globalStringFilter[ filterKey ].length !== 0 )
-    .map( ( filterKey ) => `${displayValues.find( ( displayValue ) => displayValue.value === filterKey ).label}: ${globalStringFilter[ filterKey ]}` )
+    .filter( ( filterKey ) => ![ 'createdAtFrom', 'createdAtTo', 'startsAtFrom', 'startsAtTo', 'deadlineFrom', 'deadlineTo' ].includes( filterKey ) && globalStringFilter[ filterKey ] !== null && globalStringFilter[ filterKey ].length !== 0 )
+    .map( ( filterKey ) => ( [ 'createdAt', 'startsAt', 'deadline' ].includes( filterKey ) ?
+        `${displayValues.find( ( displayValue ) => displayValue.value === filterKey ).label}: ${timestampToDate(globalStringFilter[ filterKey ])}` :
+        `${displayValues.find( ( displayValue ) => displayValue.value === filterKey ).label}: ${globalStringFilter[ filterKey ]}` ) )
     ]
   }
 

@@ -522,7 +522,6 @@ export default function TasksSidebar( props ) {
     const userID = localCalendarUserId.localCalendarUserId;
     let usersToRender = [];
     if ( localProject.id !== null ) {
-      console.log( localProject );
       usersToRender = localProject.usersWithRights.filter( ( userWithRights ) => userWithRights.assignable );
     } else {
       usersToRender = myProjects

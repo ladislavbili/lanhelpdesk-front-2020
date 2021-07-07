@@ -610,8 +610,6 @@ export default function ProjectEdit( props ) {
           ...attachment,
           __typename: "ProjectAttachment",
         } ) );
-        console.log( 'aaa' );
-        console.log( newAttachments );
         const oldProject = client.readQuery( {
             query: GET_PROJECT,
             variables: {
@@ -619,7 +617,6 @@ export default function ProjectEdit( props ) {
             }
           } )
           .project;
-        console.log( oldProject );
         client.writeQuery( {
           query: GET_PROJECT,
           variables: {

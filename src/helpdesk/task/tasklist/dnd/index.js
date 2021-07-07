@@ -11,6 +11,10 @@ import {
 } from 'apollo/localSchema/queries';
 
 import {
+  processStringFilter,
+} from 'helperFunctions';
+
+import {
   setLocalTaskStringFilter,
   setSingleLocalTaskStringFilter,
   setGlobalTaskStringFilter,
@@ -50,7 +54,7 @@ export default function DnDListLoader( props ) {
       key: orderBy
     },
     search: globalTaskSearch,
-    stringFilter: globalStringFilter.globalTaskStringFilter,
+    stringFilter: processStringFilter( globalStringFilter.globalTaskStringFilter ),
   }
 
   const dndProps = {

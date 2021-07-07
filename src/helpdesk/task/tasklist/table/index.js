@@ -16,6 +16,7 @@ import {
 import {
   splitArrayByFilter,
   localFilterToValues,
+  processStringFilter,
 } from 'helperFunctions';
 
 import {
@@ -60,6 +61,7 @@ export default function TableListLoader( props ) {
     data: globalStringFilter,
   } = useQuery( GET_GLOBAL_TASK_STRING_FILTER );
 
+
   //apollo queries
   const taskVariables = {
     projectId: localProject.id,
@@ -69,7 +71,7 @@ export default function TableListLoader( props ) {
       asc: ascending,
       key: orderBy
     },
-    stringFilter: globalStringFilter.globalTaskStringFilter,
+    stringFilter: processStringFilter( globalStringFilter.globalTaskStringFilter ),
     page,
     limit,
   }

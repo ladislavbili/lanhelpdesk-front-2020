@@ -36,6 +36,7 @@ export {
   timestampToDate,
   timestampToHoursAndMinutes,
   afterNow,
+  getDayRange,
 }
 from './moment';
 
@@ -45,6 +46,7 @@ export {
   filterOneOf,
   filterProjectsByPermissions,
   localFilterToValues,
+  processStringFilter,
 }
 from './filter';
 

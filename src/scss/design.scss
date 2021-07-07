@@ -301,6 +301,15 @@ html {
 .w-100px {
   width: 100px;
 }
+.w-125px {
+  width: 125px;
+}
+.w-150px {
+  width: 150px;
+}
+.w-175px {
+  width: 175px;
+}
 .w-200px {
   width: 200px;
 }
@@ -999,6 +1008,12 @@ Label {
   padding-left: 5px;
   font: $font-info-text-bold;
   color: $color-info-text;
+}
+
+.react-datepicker__close-icon::after{
+  background-color: inherit;
+  color: #0078D7;
+  font-size: 20px;
 }
 
 .tag {

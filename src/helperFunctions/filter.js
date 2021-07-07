@@ -2,6 +2,9 @@ import moment from 'moment';
 import {
   toSelArr
 } from './select';
+import {
+  deleteAttributes,
+} from './objectManipulations';
 
 export const applyTaskFilter = ( task, filter, user, projectID, milestoneID ) => {
   let currentPermissions = null;
@@ -73,7 +76,15 @@ export const localFilterToValues = ( localFilter ) => {
     companies: localFilter.filter.companies.map( ( company ) => company.id ),
     taskTypes: localFilter.filter.taskTypes.map( ( taskType ) => taskType.id ),
     tags: localFilter.filter.tags.map( ( tag ) => tag.id ),
+    statuses: localFilter.filter.statuses.map( ( tag ) => tag.id ),
   }
   delete filterValues.__typename;
   return filterValues;
+}
+
+export const processStringFilter = ( stringFilter ) => {
+  if ( stringFilter === null ) {
+    return null;
+  }
+  return deleteAttributes( stringFilter, [ 'createdAt', 'startsAt', 'deadline' ] )
 }

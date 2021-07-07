@@ -14,6 +14,8 @@ import {
   timestampToString,
 }
 from 'helperFunctions';
+import moment from 'moment';
+import DatePicker from 'components/DatePicker';
 import Checkbox from 'components/checkbox';
 import Loading from 'components/loading';
 import CommandBar from '../components/commandBar';
@@ -71,9 +73,20 @@ export default function TableList( props ) {
           value = task[ "URL" ];
         }
         if ( display.type === "date" ) {
-          if ( task[ display.value ] ) {
-            value = `${timestampToString(task[ display.value ])} | ${timestampToString(task[ display.value ], true)}`;
+          if ( localStringFilter[ display.value ] === null ) {
+            return true;
           }
+          if ( task[ display.value ] === null ) {
+            return false;
+          }
+          const value = parseInt( task[ display.value ] );
+          const start = ( localStringFilter[ display.value ] )
+            .startOf( 'day' )
+            .valueOf();
+          const end = ( localStringFilter[ display.value ] )
+            .endOf( 'day' )
+            .valueOf();
+          return start <= value && end >= value;
         }
         if ( display.value === "password" ) {
           value = task[ "password" ];
@@ -136,6 +149,7 @@ export default function TableList( props ) {
     )
   }
   const renderAttributeFilter = ( display, index ) => {
+    const last = index === filteredDisplayValues.length - 1;
     if ( display.type === 'important' || display.type === 'invoiced' ) {
       return null;
     } else if ( [ 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
@@ -151,12 +165,40 @@ export default function TableList( props ) {
           highlighted={false}
           />
       </th>
+    } else if ( display.type === 'date' ) {
+      return <th key={display.value} width="40" className={(last ? "w-175px" : "w-125px")}>
+        <div className={(last ? "row" : "")}>
+          <div style={last ? {flex: "1"} : {}}>
+            <DatePicker
+              className="form-control"
+              selected={localStringFilter[ display.value ]}
+              hideTime
+              disabled={loading}
+              isClearable
+              onChange={date => {
+                setSingleLocalTaskStringFilter(display.value, isNaN(date.valueOf()) ? null : date);
+              }}
+              />
+          </div>
+          {last &&
+            <div className="ml-auto row">
+              <button type="button" disabled={loading} className="btn-link m-l-8 m-r-5" onClick={() => setLocalTaskStringFilter( defaultTasksAttributesFilter ) }>
+                <i
+                  className="fas fa-times commandbar-command-icon text-highlight"
+                  />
+              </button>
+              <button type="button" disabled={loading} className="btn" onClick={setGlobalTaskStringFilter}>
+                Filter
+              </button>
+            </div>
+          }
+        </div>
+      </th>
     } else {
       const value = ( localStringFilter[ display.value ] === "cur" ? currentUser.fullName : localStringFilter[ display.value ] );
       return <th key={display.value} >
-        <div className={(index === filteredDisplayValues.length - 1 ? "row" : "")}>
-
-          <div style={index === filteredDisplayValues.length - 1 ? {flex: "1"} : {}}>
+        <div className={(last ? "row" : "")}>
+          <div style={last ? {flex: "1"} : {}}>
             <input
               disabled={loading}
               type="text"
@@ -168,12 +210,10 @@ export default function TableList( props ) {
               }}
               />
           </div>
-          {index === filteredDisplayValues.length - 1 &&
+          {last &&
             <div className="ml-auto row">
               <button type="button" disabled={loading} className="btn-link m-l-8 m-r-5" onClick={() => setLocalTaskStringFilter( defaultTasksAttributesFilter ) }>
-                <i
-                  className="fas fa-times commandbar-command-icon text-highlight"
-                  />
+                <i className="fas fa-times commandbar-command-icon text-highlight" />
               </button>
               <button type="button" disabled={loading} className="btn" onClick={setGlobalTaskStringFilter}>
                 Filter

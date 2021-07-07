@@ -48,3 +48,17 @@ export const timestampToHoursAndMinutes = ( timestamp ) => {
 export const afterNow = ( unix ) => {
   return unix > moment().unix()
 }
+
+export const getDayRange = ( date, getDate = false ) => {
+  if ( getDate ) {
+    return {
+      start: date === null ? null : date.startOf( 'day' ),
+      end: date === null ? null : date.endOf( 'day' ),
+    }
+  } else {
+    return {
+      start: date === null ? null : date.startOf( 'day' ).valueOf(),
+      end: date === null ? null : date.endOf( 'day' ).valueOf(),
+    }
+  }
+}

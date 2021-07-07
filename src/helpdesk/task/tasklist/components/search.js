@@ -9,6 +9,7 @@ import {
   FormGroup,
 } from 'reactstrap';
 import Loading from 'components/loading';
+import DatePicker from 'components/DatePicker';
 import {
   dashboard,
   allMilestones,
@@ -104,20 +105,43 @@ export default function Search( props ) {
         >
         <PopoverBody>
           <div className="p-20 full-width">
-            { configurableStringFilters.map((filterAttribute) => (
-              <FormGroup className="m-b-10" key={filterAttribute.value}>
-                <Label for={filterAttribute.label}>{filterAttribute.label}</Label>
-                <Input
-                  id={filterAttribute.label}
-                  type="text"
-                  placeholder={`Enter ${filterAttribute.label}`}
-                  value={localStringFilter[filterAttribute.value]}
-                  onChange={(e)=>{
-                    setSingleLocalTaskStringFilter(filterAttribute.value, e.target.value)
-                  }}
-                  />
-              </FormGroup>
-            ))}
+            { configurableStringFilters.map((filterAttribute) => {
+              if(['createdAt','startsAt','deadline'].includes(filterAttribute.value)){
+                return (
+                  <FormGroup className="m-b-10" key={filterAttribute.value}>
+                    <Label for={filterAttribute.label}>{filterAttribute.label}</Label>
+                    <div>
+                      <DatePicker
+                        className="form-control full-width"
+                        wrapperClassName="full-width"
+                        selected={localStringFilter[filterAttribute.value]}
+                        hideTime
+                        isClearable
+                        placeholderText={`Select ${filterAttribute.label}`}
+                        onChange={date => {
+                          setSingleLocalTaskStringFilter(filterAttribute.value, isNaN(date.valueOf()) ? null : date);
+                        }}
+                        />
+                    </div>
+                  </FormGroup>
+                )
+              }else{
+                return (
+                  <FormGroup className="m-b-10" key={filterAttribute.value}>
+                    <Label for={filterAttribute.label}>{filterAttribute.label}</Label>
+                    <Input
+                      id={filterAttribute.label}
+                      type="text"
+                      placeholder={`Enter ${filterAttribute.label}`}
+                      value={localStringFilter[filterAttribute.value]}
+                      onChange={(e)=>{
+                        setSingleLocalTaskStringFilter(filterAttribute.value, e.target.value)
+                      }}
+                      />
+                  </FormGroup>
+                )
+              }
+            })}
             <div className="m-t-20 row">
               <Button
                 disabled={loading}
@@ -127,7 +151,7 @@ export default function Search( props ) {
                   if(originalOpenedFilter !== null){
                     setLocalTaskStringFilter( originalOpenedFilter );
                   }
-                 }}
+                }}
                 >
                 Cancel
               </Button>

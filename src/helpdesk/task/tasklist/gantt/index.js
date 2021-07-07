@@ -4,6 +4,7 @@ import GanttList from './ganttList';
 import {
   useQuery,
   useMutation,
+  useApolloClient,
 } from "@apollo/client";
 
 import {
@@ -11,6 +12,10 @@ import {
   defaultTasklistGanttColumnPreference,
   ganttAttributeLimitingRights,
 } from 'configs/constants/tasks';
+
+import {
+  processStringFilter,
+} from 'helperFunctions';
 
 import {
   addLocalError,
@@ -64,7 +69,7 @@ export default function GanttListLoader( props ) {
       key: orderBy
     },
     milestoneSort: true,
-    stringFilter: globalStringFilter.globalTaskStringFilter,
+    stringFilter: processStringFilter( globalStringFilter.globalTaskStringFilter ),
     page,
     limit,
   }
@@ -93,6 +98,7 @@ export default function GanttListLoader( props ) {
 
   //mutations
   const [ addOrUpdatePreferences ] = useMutation( ADD_OR_UPDATE_TASKLIST_GANTT_COLUMNS_PREFERENCES );
+  const client = useApolloClient();
 
   //sync
   const tasksRefetch = () => {

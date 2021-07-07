@@ -4,6 +4,9 @@ import {
   localStringFilterVar,
   globalStringFilterVar,
 } from './variables';
+import {
+  getDayRange,
+} from 'helperFunctions';
 
 export function setLocalTaskSearch( newValue ) {
   localSearchVar( newValue );
@@ -38,8 +41,14 @@ export function setGlobalTaskStringFilter() {
     requester: localSearch.requester,
     company: localSearch.company,
     createdAt: localSearch.createdAt,
+    createdAtFrom: localSearch.createdAt === null ? null : getDayRange( localSearch.createdAt ).start.toString(),
+    createdAtTo: localSearch.createdAt === null ? null : getDayRange( localSearch.createdAt ).end.toString(),
     startsAt: localSearch.startsAt,
+    startsAtFrom: localSearch.startsAt === null ? null : getDayRange( localSearch.startsAt ).start.toString(),
+    startsAtTo: localSearch.startsAt === null ? null : getDayRange( localSearch.startsAt ).end.toString(),
     deadline: localSearch.deadline,
+    deadlineFrom: localSearch.deadline === null ? null : getDayRange( localSearch.deadline ).start.toString(),
+    deadlineTo: localSearch.deadline === null ? null : getDayRange( localSearch.deadline ).end.toString(),
     project: localSearch.project,
     taskType: localSearch.taskType,
     milestone: localSearch.milestone,
