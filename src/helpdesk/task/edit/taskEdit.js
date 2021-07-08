@@ -1080,21 +1080,6 @@ export default function TaskEdit( props ) {
                 Delete
               </button>
             }
-            { userRights.important &&
-              <button
-                type="button"
-                style={{color: important ? '#ffc107' : '#0078D4'}}
-                disabled={ !userRights.important }
-                className="btn-link task-add-layout-button btn-distance"
-                onClick={()=>{
-                  autoUpdateTask({ important: !important })
-                  setImportant(!important);
-                }}
-                >
-                <i className="far fa-star" />
-                Important
-              </button>
-            }
             {false &&
               <button
                 type="button"
@@ -1149,8 +1134,22 @@ export default function TaskEdit( props ) {
   const renderTitle = () => {
     return (
       <div className="d-flex">
-        <div className="row flex">
-          <h2 className="center-hor m-l-10">{id}: </h2>
+        <div className="row flex m-l-10">
+          { userRights.important &&
+            <button
+              type="button"
+              style={{color: important ? '#ffc107' : '#0078D4'}}
+              disabled={ !userRights.important }
+              className="btn-link task-add-layout-button center-hor"
+              onClick={()=>{
+                autoUpdateTask({ important: !important })
+                setImportant(!important);
+              }}
+              >
+              <i className="far fa-star" style={{ fontSize: 25 }} />
+            </button>
+          }
+          <h2 className="center-hor">{id}: </h2>
           <span className="center-hor flex m-r-15">
             <input type="text"
               disabled={ !userRights.taskTitleEdit }

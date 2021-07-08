@@ -115,7 +115,7 @@ export default function PageHeader( props ) {
             </Empty>
           }
         </div>
-        <div className="ml-auto center-hor row">
+        <div className="ml-auto center-hor row m-r-30">
           <div className=" header-icon center-hor clickable" onClick={() => setModalUserProfileOpen(true)}>
             { !currentUser ? `Loading...` : `${currentUser.name} ${currentUser.surname}`}
             <i className="fas fa-user m-l-5"/>
@@ -128,8 +128,7 @@ export default function PageHeader( props ) {
 
           <NotificationIcon history={history} location={URL} />
 
-          {
-            currentUser &&
+          { currentUser &&
             filteredSettings &&
             filteredSettings.length > 0 &&
             <Dropdown className="center-hor" isOpen={settingsOpen} toggle={() =>setSettingsOpen(!settingsOpen)}>

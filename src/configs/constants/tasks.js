@@ -761,7 +761,7 @@ export const actionsAfterAdd = [
   {
     id: 1,
     value: 1,
-    action: 'back',
+    action: 'open_tasklist',
     label: 'Open list'
   },
 ]

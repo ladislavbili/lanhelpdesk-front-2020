@@ -27,12 +27,10 @@ import {
   DropdownToggle,
 } from 'reactstrap';
 
-// breadcrums, statistics switch, layout switch
+// breadcrums, layout switch
 export default function CommandBar( props ) {
   const {
     loading,
-    showStatistics,
-    setShowStatistics,
     tasklistLayout,
     setTasklistLayout,
     localFilter,
@@ -61,7 +59,6 @@ export default function CommandBar( props ) {
       id: displayValue.value
     } ) ) : []
   );
-  const canSeeStatistics = localProject.id !== null && localProject.right.statistics;
 
   //state
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
@@ -152,26 +149,6 @@ export default function CommandBar( props ) {
               "d-flex flex-row align-items-center ml-auto"
             )}
             >
-            { canSeeStatistics &&
-              <div className="m-r-5">
-                <label className="center-hor">
-                  <Switch
-                    checked={showStatistics}
-                    disabled={loading}
-                    onChange={() => {
-                      setShowStatistics(!showStatistics);
-                    }}
-                    height={22}
-                    width={100}
-                    checkedIcon={<span className="switchLabel p-l-20">Tasks</span>}
-                    uncheckedIcon={<span className="switchLabel-right m-l--40">Statistics</span>}
-                    onColor={"#0078D4"}
-                    offColor={"#0078D4"}
-                    />
-                  <span className="m-l-10"></span>
-                </label>
-              </div>
-            }
 
             <div className="d-flex flex-row">
               <div className={classnames( "d-flex", "flex-row", "align-items-center", "ml-auto" )} >
@@ -282,6 +259,22 @@ export default function CommandBar( props ) {
                       <input type="radio" name="options" onChange={() => setTasklistLayout(4)} checked={tasklistLayout === 4}/>
                       <i className="fa fa-project-diagram m-r-5"/>
                       Project management
+                    </label>
+                  }
+                  { localProject.id &&
+                    <label className={classnames({'active':tasklistLayout === 5}, "btn btn-link t-a-l")}>
+                      <input
+                        type="radio"
+                        name="options"
+                        onChange={() =>{
+                          window.alert('This is not implemented yet!');
+                          return;
+                          setTasklistLayout(5);
+                        }}
+                        checked={tasklistLayout === 5}
+                        />
+                      <i className="fa fa-chart-bar m-r-5"/>
+                      Statistics (not working yet)
                     </label>
                   }
                 </div>

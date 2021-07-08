@@ -9,6 +9,7 @@ import Pagination from './pagination';
 
 import {
   useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import {
@@ -21,6 +22,7 @@ import ItemRender from '../components/columnItemRender';
 
 import {
   GET_TASKS,
+  ADD_TASK_SUBSCRIPTION,
 } from '../../queries';
 
 export default function DnDStatusColumn( props ) {
@@ -77,6 +79,12 @@ export default function DnDStatusColumn( props ) {
       tasksRefetch();
     }
   }, [ change ] );
+
+  useSubscription( ADD_TASK_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      tasksRefetch();
+    }
+  } );
 
   const tasks = tasksLoading ? [] : tasksData.tasks.tasks;
   const count = tasksLoading ? 0 : tasksData.tasks.count;

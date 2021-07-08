@@ -1,5 +1,5 @@
 import React from 'react';
-import CommandBar from './components/commandBar';
+import CommandBar from '../components/commandBar';
 import {
   timestampToString,
 } from 'helperFunctions';

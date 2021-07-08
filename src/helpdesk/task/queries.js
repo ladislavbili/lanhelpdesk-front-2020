@@ -563,6 +563,12 @@ mutation updateTask(
 }
 `;
 
+export const ADD_TASK_SUBSCRIPTION = gql `
+  subscription taskAddSubscription {
+    taskAddSubscription
+  }
+`;
+
 export const GET_TASKLIST_COLUMNS_PREFERENCES = gql `
 query tasklistColumnPreference(
   $projectId: Int

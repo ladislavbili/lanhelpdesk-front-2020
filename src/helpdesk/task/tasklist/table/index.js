@@ -5,6 +5,7 @@ import {
   useQuery,
   useMutation,
   useApolloClient,
+  useSubscription,
 } from "@apollo/client";
 
 import {
@@ -36,6 +37,7 @@ import {
   DELETE_TASK,
   GET_TASKLIST_COLUMNS_PREFERENCES,
   ADD_OR_UPDATE_TASKLIST_COLUMNS_PREFERENCES,
+  ADD_TASK_SUBSCRIPTION,
 } from 'helpdesk/task/queries';
 
 export default function TableListLoader( props ) {
@@ -60,7 +62,6 @@ export default function TableListLoader( props ) {
   const {
     data: globalStringFilter,
   } = useQuery( GET_GLOBAL_TASK_STRING_FILTER );
-
 
   //apollo queries
   const taskVariables = {
@@ -113,6 +114,12 @@ export default function TableListLoader( props ) {
   React.useEffect( () => {
     tasksRefetch();
   }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalStringFilter, forcedRefetch ] );
+
+  useSubscription( ADD_TASK_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      tasksRefetch();
+    }
+  } );
 
 
   const dataLoading = (

@@ -4,6 +4,7 @@ import {
   useQuery,
   useMutation,
   useApolloClient,
+  useSubscription,
 } from "@apollo/client";
 import {
   getDateClock,
@@ -19,6 +20,7 @@ import {
   GET_SCHEDULED_TASKS,
   ADD_SCHEDULED_TASK,
   UPDATE_SCHEDULED_TASK,
+  ADD_TASK_SUBSCRIPTION,
 } from '../../queries';
 
 import {
@@ -216,6 +218,16 @@ export default function CalendarLoader( props ) {
   React.useEffect( () => {
     tasksRefetch();
   }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalTaskSearch, globalStringFilter, forcedRefetch ] );
+
+  useSubscription( ADD_TASK_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      tasksRefetch();
+      scheduledRefetch();
+      repeatsRefetch();
+      repeatTimesRefetch();
+      setFakeEvents( [] );
+    }
+  } );
 
   const repeats = !calendarRepeatsLoading ? calendarRepeatsData.calendarRepeats : [];
   const scheduled = !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [];

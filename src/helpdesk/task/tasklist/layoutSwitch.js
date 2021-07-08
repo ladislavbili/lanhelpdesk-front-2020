@@ -35,12 +35,8 @@ export default function TasklistSwitch( props ) {
 
   const link = `/helpdesk/taskList/i/${match.params.listID ? match.params.listID : 'all' }`;
 
-  const [ showStatistics, setShowStatistics ] = React.useState( false );
-
   const generalProps = {
     ...props,
-    showStatistics: showStatistics,
-    setShowStatistics: setShowStatistics,
     link
   }
 
@@ -48,18 +44,13 @@ export default function TasklistSwitch( props ) {
     <div className="content-page">
       <div className="content" style={{ paddingTop: 0 }}>
         <div className="row m-0">
-          { showStatistics &&
-            <div className='col-xl-12'>
-              <Statistics {...generalProps} />
-            </div>
-          }
           { false &&
             <div className='col-xl-12'>
               <ColumnList {...generalProps} />
             </div>
           }
 
-          {( [ 0, 1 ].includes(tasklistLayout)  || ([ 2, 4 ].includes(tasklistLayout) && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) && !showStatistics &&
+          {( [ 0, 1 ].includes(tasklistLayout)  || ([ 2, 4 ].includes(tasklistLayout) && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) &&
             <div className="flex" >
               { taskID && <TaskEdit match={match} columns={false} history={history} /> }
               { !taskID &&
@@ -68,7 +59,7 @@ export default function TasklistSwitch( props ) {
             </div>
           }
 
-          {tasklistLayout === 2 && localProject.id && !showStatistics &&
+          {tasklistLayout === 2 && localProject.id &&
             <div className="col-xl-12" >
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
@@ -76,7 +67,7 @@ export default function TasklistSwitch( props ) {
               }
             </div>
           }
-          {tasklistLayout === 3 && canViewCalendar && !showStatistics &&
+          {tasklistLayout === 3 && canViewCalendar &&
             <div className='col-xl-12'>
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
@@ -84,12 +75,17 @@ export default function TasklistSwitch( props ) {
               }
             </div>
           }
-          {tasklistLayout === 4 && localProject.id && !showStatistics &&
+          {tasklistLayout === 4 && localProject.id &&
             <div className="col-xl-12" >
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
                 <GanttList {...generalProps} />
               }
+            </div>
+          }
+          {tasklistLayout === 5 && localProject.id &&
+            <div className='col-xl-12'>
+              <Statistics {...generalProps} />
             </div>
           }
         </div>
@@ -100,13 +96,13 @@ export default function TasklistSwitch( props ) {
 
 /*
 const filterTasks = () => {
-  if ( taskSearch === "" ) {
-    return tasks;
-  }
-  return tasks.filter( ( task ) => {
-    return `${task.id} ${task.title}`.toLowerCase()
-      .includes( taskSearch.toLowerCase() );
-  } )
+if ( taskSearch === "" ) {
+return tasks;
+}
+return tasks.filter( ( task ) => {
+return `${task.id} ${task.title}`.toLowerCase()
+.includes( taskSearch.toLowerCase() );
+} )
 }
 
 */

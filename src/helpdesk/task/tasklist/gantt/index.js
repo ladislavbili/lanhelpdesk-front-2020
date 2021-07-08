@@ -5,6 +5,7 @@ import {
   useQuery,
   useMutation,
   useApolloClient,
+  useSubscription,
 } from "@apollo/client";
 
 import {
@@ -33,6 +34,7 @@ import {
   GET_TASKS,
   GET_TASKLIST_GANTT_COLUMNS_PREFERENCES,
   ADD_OR_UPDATE_TASKLIST_GANTT_COLUMNS_PREFERENCES,
+  ADD_TASK_SUBSCRIPTION,
 } from 'helpdesk/task/queries';
 
 
@@ -111,6 +113,12 @@ export default function GanttListLoader( props ) {
   React.useEffect( () => {
     tasksRefetch();
   }, [ localFilter, localProject.id, localMilestone.id, currentUser, globalStringFilter, forcedRefetch ] );
+
+  useSubscription( ADD_TASK_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      tasksRefetch();
+    }
+  } );
 
   const dataLoading = (
     ganttPreferencesLoading ||

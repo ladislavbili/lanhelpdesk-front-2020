@@ -50,6 +50,7 @@ import {
 } from '../constants';
 import {
   addLocalError,
+  setProject as setLocalProject,
 } from 'apollo/localSchema/actions';
 
 import {
@@ -69,6 +70,7 @@ export default function TaskAdd( props ) {
     projectID,
     currentUser,
     projects,
+    myProjects,
     users,
     taskTypes,
     tripTypes,
@@ -80,6 +82,7 @@ export default function TaskAdd( props ) {
     setTaskLayout,
     setAfterTaskCreate,
   } = props;
+
   const afterTaskCreate = currentUser.afterTaskCreate;
   const currentUserIfInProject = ( project ) => {
     return project && project.users.some( ( userData ) => userData.user.id === currentUser.id ) ? users.find( ( user ) => user.id === currentUser.id ) : null;
@@ -451,8 +454,17 @@ export default function TaskAdd( props ) {
                     history.push( `${link}/${response.data.addTask.id}` )
                     break;
                   }
-                  case 'back': {
+                  case 'open_tasklist': {
+                    const myProject = myProjects.find( ( myProject ) => myProject.project.id === project.id );
+                    setLocalProject( {
+                      ...myProject,
+                      id: myProject.project.id,
+                      value: myProject.project.id,
+                      title: myProject.project.title,
+                      label: myProject.project.title,
+                    } );
                     closeModal();
+                    history.push( `${link}` );
                     break;
                   }
                   default: {
@@ -472,11 +484,20 @@ export default function TaskAdd( props ) {
           switch ( actionAfterAdd.action ) {
             case 'open_new_task': {
               closeModal();
-              history.push( `${link}/${response.data.addTask.id}` )
+              history.push( `${link}` );
               break;
             }
-            case 'back': {
+            case 'open_tasklist': {
+              const myProject = myProjects.find( ( myProject ) => myProject.project.id === project.id );
+              setLocalProject( {
+                ...myProject,
+                id: myProject.project.id,
+                value: myProject.project.id,
+                title: myProject.project.title,
+                label: myProject.project.title,
+              } );
               closeModal();
+              history.push( `${link}` );
               break;
             }
             default: {
@@ -497,20 +518,6 @@ export default function TaskAdd( props ) {
     return (
       <div className="task-add-layout-2 row">
         <h2 className="center-hor">Create new task</h2>
-        { userRights.important &&
-          <button
-            type="button"
-            style={{color: important ? '#ffc107' : '#0078D4'}}
-            disabled={ !userRights.important }
-            className="btn-link task-add-layout-button btn-distance m-t-auto m-l-10"
-            onClick={()=>{
-              setImportant(!important);
-            }}
-            >
-            <i className="far fa-star" />
-            Important
-          </button>
-        }
         {false &&
           <div className="ml-auto m-r-20">
             <button
@@ -530,36 +537,51 @@ export default function TaskAdd( props ) {
 
   const renderTitle = () => {
     return (
-      <div className="form-section">
-        <Label>Task name<span className="warning-big m-l-5">*</span> </Label>
-        <span className={classnames("form-section-rest", {"placeholder-highlight": showLocalCreationError })}>
-          <input type="text"
-            value={title}
-            className="task-title-input-2 full-width form-control"
-            onChange={ (e) => setTitle(e.target.value) }
-            placeholder="ENTER NEW TASK NAME" />
-        </span>
-        { status && userRights.statusRead &&
-          (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) &&
-          <div className="task-info-add ml-auto center-hor">
-            <span className="">
-              {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Close date: " : "PendingDate: "}
-            </span>
-            <DatePicker
-              className="form-control hidden-input bolder"
-              selected={(status.action==='CloseDate' || status.action==='CloseInvalid') ? closeDate : pendingDate }
-              disabled={userRights.statusWrite}
-              onChange={date => {
-                if (status.action==='CloseDate' || status.action==='CloseInvalid'){
-                  setCloseDate(date);
-                } else {
-                  setPendingDate(date);
-                }
-              }}
-              placeholderText="No close date"
-              />
-          </div>
+      <div className="form-section row">
+        { userRights.important &&
+          <button
+            type="button"
+            style={{color: important ? '#ffc107' : '#0078D4'}}
+            disabled={ !userRights.important }
+            className="btn-link task-add-layout-button center-hor"
+            onClick={()=>{
+              setImportant(!important);
+            }}
+            >
+            <i className="far fa-star" style={{ fontSize: 25 }} />
+          </button>
         }
+        <div className="flex">
+          <Label>Task name<span className="warning-big m-l-5">*</span> </Label>
+          <span className={classnames("form-section-rest", {"placeholder-highlight": showLocalCreationError })}>
+            <input type="text"
+              value={title}
+              className="task-title-input-2 full-width form-control"
+              onChange={ (e) => setTitle(e.target.value) }
+              placeholder="ENTER NEW TASK NAME" />
+          </span>
+          { status && userRights.statusRead &&
+            (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) &&
+            <div className="task-info-add ml-auto center-hor">
+              <span className="">
+                {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Close date: " : "PendingDate: "}
+              </span>
+              <DatePicker
+                className="form-control hidden-input bolder"
+                selected={(status.action==='CloseDate' || status.action==='CloseInvalid') ? closeDate : pendingDate }
+                disabled={userRights.statusWrite}
+                onChange={date => {
+                  if (status.action==='CloseDate' || status.action==='CloseInvalid'){
+                    setCloseDate(date);
+                  } else {
+                    setPendingDate(date);
+                  }
+                }}
+                placeholderText="No close date"
+                />
+            </div>
+          }
+        </div>
       </div>
     );
   }
@@ -1305,7 +1327,7 @@ export default function TaskAdd( props ) {
                   setActionAfterAdd(actionAfterAdd);
                 }}
                 options={ actionsAfterAdd }
-                styles={pickSelectStyle( [ 'noArrow' ] )}
+                styles={pickSelectStyle( [ 'noArrow', 'bordered' ] )}
                 />
             </div>
             <button
