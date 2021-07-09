@@ -38,7 +38,9 @@ export default function MilestoneEdit( props ) {
   const {
     milestoneDeleted,
     closeModal,
-    label
+    label,
+    buttonClassName,
+    containerClassName,
   } = props;
 
   //data & queries
@@ -163,9 +165,9 @@ export default function MilestoneEdit( props ) {
   };
 
   return (
-    <div className=''>
+    <div className={containerClassName}>
 			<button
-				className='btn-link p-0 m-r-15'
+				className={buttonClassName}
 				onClick={toggle}
 				>
 				<i className="fa fa-cog"/>

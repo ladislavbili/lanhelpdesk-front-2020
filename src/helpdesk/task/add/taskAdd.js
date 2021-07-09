@@ -56,6 +56,7 @@ import {
 import {
   toSelArr
 } from 'helperFunctions';
+import 'scss/components/task-ckeditor.scss';
 
 let fakeID = -1;
 
@@ -538,28 +539,28 @@ export default function TaskAdd( props ) {
   const renderTitle = () => {
     return (
       <div className="form-section row">
-        { userRights.important &&
-          <button
-            type="button"
-            style={{color: important ? '#ffc107' : '#0078D4'}}
-            disabled={ !userRights.important }
-            className="btn-link task-add-layout-button center-hor"
-            onClick={()=>{
-              setImportant(!important);
-            }}
-            >
-            <i className="far fa-star" style={{ fontSize: 25 }} />
-          </button>
-        }
         <div className="flex">
           <Label>Task name<span className="warning-big m-l-5">*</span> </Label>
-          <span className={classnames("form-section-rest", {"placeholder-highlight": showLocalCreationError })}>
+          <div className={classnames( "row m-l-10", {"placeholder-highlight": showLocalCreationError })}>
+            { userRights.important &&
+              <button
+                type="button"
+                style={{color: '#ffc107'}}
+                disabled={ !userRights.important }
+                className="btn-link center-hor"
+                onClick={()=>{
+                  setImportant(!important);
+                }}
+                >
+                <i className={`fa${ important ? 's' : 'r' } fa-star`} style={{ fontSize: 25 }} />
+              </button>
+            }
             <input type="text"
               value={title}
-              className="task-title-input-2 full-width form-control"
+              className="form-control task-title-input-2"
               onChange={ (e) => setTitle(e.target.value) }
               placeholder="ENTER NEW TASK NAME" />
-          </span>
+          </div>
           { status && userRights.statusRead &&
             (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) &&
             <div className="task-info-add ml-auto center-hor">
@@ -1101,7 +1102,7 @@ export default function TaskAdd( props ) {
           }
           {renderMultiSelectTags()}
         </div>
-        <div  className="form-section-rest">
+        <div className="form-section-rest">
           <CKEditor5
             editor={ ClassicEditor }
             data={description}
@@ -1327,7 +1328,7 @@ export default function TaskAdd( props ) {
                   setActionAfterAdd(actionAfterAdd);
                 }}
                 options={ actionsAfterAdd }
-                styles={pickSelectStyle( [ 'noArrow', 'bordered' ] )}
+                styles={pickSelectStyle( [ 'invisible' ] )}
                 />
             </div>
             <button

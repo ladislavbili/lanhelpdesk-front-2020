@@ -50,7 +50,7 @@ export default function TasklistSwitch( props ) {
             </div>
           }
 
-          {( [ 0, 1 ].includes(tasklistLayout)  || ([ 2, 4 ].includes(tasklistLayout) && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) &&
+          {( [ 0, 1 ].includes(tasklistLayout)  || ([ 2, 4, 5 ].includes(tasklistLayout) && localProject.id === null ) || (tasklistLayout === 3 && !canViewCalendar ) ) &&
             <div className="flex" >
               { taskID && <TaskEdit match={match} columns={false} history={history} /> }
               { !taskID &&

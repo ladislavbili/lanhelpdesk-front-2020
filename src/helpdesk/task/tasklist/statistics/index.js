@@ -1,14 +1,53 @@
 import React from 'react';
 import CommandBar from '../components/commandBar';
+import Loading from 'components/loading';
+import {
+  useQuery,
+} from "@apollo/client";
+import {
+  GET_TASKS,
+} from 'helpdesk/task/queries';
 import {
   timestampToString,
 } from 'helperFunctions';
 
 export default function Statistics( props ) {
+  const {
+    localProject,
+    localMilestone,
+    filterVariables,
+    ascending,
+    orderBy,
+    page,
+    limit,
+  } = props;
+
+  const taskVariables = {
+    projectId: localProject.id,
+    milestoneId: localMilestone.id,
+    filter: filterVariables,
+    sort: {
+      asc: ascending,
+      key: orderBy
+    },
+    page,
+    limit,
+  }
 
   const {
-    tasks
-  } = props;
+    data: tasksData,
+    loading: tasksLoading,
+    refetch: tasksRefetchFunc,
+  } = useQuery( GET_TASKS, {
+    variables: taskVariables,
+    notifyOnNetworkStatusChange: true,
+  } );
+
+  if ( tasksLoading ) {
+    return ( <Loading /> );
+  }
+
+  const tasks = tasksData.tasks.tasks;
 
   let statistics = [];
   let totals = {

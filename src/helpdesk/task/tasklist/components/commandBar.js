@@ -89,8 +89,29 @@ export default function CommandBar( props ) {
         return "fa-calendar-alt";
       case 4:
         return "fa-project-diagram";
+      case 5:
+        return "fa-chart-bar";
       default:
         return "fa-cog";
+    }
+  }
+
+  const getLayoutTitle = () => {
+    switch ( tasklistLayout ) {
+      case 0:
+        //return "fa-columns";
+      case 1:
+        return "Zoznam";
+      case 2:
+        return "DnD";
+      case 3:
+        return "Kalendár";
+      case 4:
+        return "Project management";
+      case 5:
+        return "Statistics";
+      default:
+        return "";
     }
   }
 
@@ -222,7 +243,8 @@ export default function CommandBar( props ) {
               toggle={() => setLayoutOpen(!layoutOpen)}
               >
               <DropdownToggle className="btn btn-link">
-                <i className={"fa " + getLayoutIcon()}/>
+                <i className={"m-r-5 fa " + getLayoutIcon()}/>
+                {getLayoutTitle()}
               </DropdownToggle>
               <DropdownMenu right>
                 <div className="btn-group-vertical" data-toggle="buttons">
@@ -267,14 +289,12 @@ export default function CommandBar( props ) {
                         type="radio"
                         name="options"
                         onChange={() =>{
-                          window.alert('This is not implemented yet!');
-                          return;
                           setTasklistLayout(5);
                         }}
                         checked={tasklistLayout === 5}
                         />
                       <i className="fa fa-chart-bar m-r-5"/>
-                      Statistics (not working yet)
+                      Statistics
                     </label>
                   }
                 </div>

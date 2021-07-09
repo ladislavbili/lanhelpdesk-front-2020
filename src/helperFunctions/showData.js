@@ -13,7 +13,7 @@ const ImportantIcon = function ImportantIcon( props ) {
   const [ tooltipOpen, setTooltipOpen ] = React.useState( false );
   return (
     <span>
-    <i className="far fa-star" style={{ color: '#ffc107' }} id={`important-${item.id}`} />
+    <i className="fas fa-star" style={{ color: '#ffc107' }} id={`important-${item.id}`} />
       <Tooltip placement="top" target={`important-${item.id}`} isOpen={tooltipOpen} toggle={() => setTooltipOpen(!tooltipOpen) } >
         Task is important!
       </Tooltip>

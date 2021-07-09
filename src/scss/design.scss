@@ -2665,6 +2665,21 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   border: 2px solid red !important;
 }
 
+.task-title-input {
+  border: $main-border !important;
+  margin-left: 0;
+}
+.task-title-input-2 {
+  border: none;
+  flex: 1;
+}
+
+.placeholder-highlight {
+  ::placeholder {
+    color: red;
+  }
+}
+
 .card-box {
   //  border: 1px solid rgba(54, 64, 74, 0.05);
   //  border-top: none;
@@ -2836,7 +2851,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .task-edit-left {
-  background-color: white; //#F9F9F9;
+  background-color: $content-background-color;
   position: relative;
   padding: calc(#{$odsadenie-form} - #{$difference-form})
     calc(#{$odsadenie-form} - #{$difference-form})
@@ -2940,22 +2955,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
       margin-bottom: 10px;
     }
   }
-  .form-section-rest {
-    .task-title-input {
-      border: $main-border !important;
-      margin-left: 0;
-    }
-    .task-title-input-2 {
-      border: 1px solid #c4c4c4 !important;
-      margin-left: $input-padding;
-      width: calc(100% - #{$input-padding});
-    }
-  }
-  .form-section-rest.placeholder-highlight {
-    ::placeholder {
-      color: red;
-    }
-  }
+
   /*.nav-tabs>.nav-item>.nav-link{
   @extend label:not(.col-form-label);
 }*/

@@ -80,6 +80,7 @@ import {
   invoicedAttributes,
   noTaskType
 } from '../constants';
+import 'scss/components/task-ckeditor.scss';
 
 let fakeID = -1;
 
@@ -1003,19 +1004,13 @@ export default function TaskEdit( props ) {
   //render
   const renderCommandbar = () => {
     return (
-      <div className="task-add-layout"> {/*Commandbar*/}
-        <div className={classnames("d-flex", "flex-row", "center-hor", {"m-b-10": columns})}>
-          <div className="display-inline center-hor">
-            {!columns &&
+      <div className="task-add-layout row">
+            {!columns && !inModal &&
               <button
                 type="button"
                 className="btn-link task-add-layout-button btn-distance"
                 onClick={() => {
-                  if(inModal){
-                    closeModal()
-                  }else{
                     history.push(`/helpdesk/taskList/i/${match.params.listID}`)
-                  }
                 }}
                 >
                 <i
@@ -1111,8 +1106,17 @@ export default function TaskEdit( props ) {
                 </button>
               ))
             }
-          </div>
-        </div>
+            <span className="ml-auto">
+            { inModal &&
+              <button
+                type="button"
+                className="btn-link-cancel task-add-layout-button p-l-10 p-r-10 m-r-10"
+                onClick={closeModal}
+                >
+                <i className="fa fa-times" style={{ fontSize: 25 }} />
+              </button>
+            }
+          </span>
       </div>
     )
   }
@@ -1138,7 +1142,7 @@ export default function TaskEdit( props ) {
           { userRights.important &&
             <button
               type="button"
-              style={{color: important ? '#ffc107' : '#0078D4'}}
+              style={{color: '#ffc107'}}
               disabled={ !userRights.important }
               className="btn-link task-add-layout-button center-hor"
               onClick={()=>{
@@ -1146,7 +1150,7 @@ export default function TaskEdit( props ) {
                 setImportant(!important);
               }}
               >
-              <i className="far fa-star" style={{ fontSize: 25 }} />
+              <i className={`fa${ important ? 's' : 'r' } fa-star`} style={{ fontSize: 25 }} />
             </button>
           }
           <h2 className="center-hor">{id}: </h2>
@@ -1621,12 +1625,6 @@ export default function TaskEdit( props ) {
               />
           }
 
-          <div className="p-r-10">
-            <Label className="col-form-label col-3">Order</Label>
-            <div className="col-9">
-              { layoutComponents.Order }
-            </div>
-          </div>
         </div>
       </div>
     )
@@ -1791,12 +1789,6 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          <div className="form-selects-entry-column" >
-            <Label>Order</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Order }
-            </div>
-          </div>
         </div>
       </div>
     );
@@ -2380,9 +2372,10 @@ export default function TaskEdit( props ) {
 
       <div
         className={classnames(
-          {"fit-with-header": !columns},
-          {"fit-with-header-and-commandbar": columns},
-          "scroll-visible",
+          {"fit-with-header": !columns && !inModal},
+          {"fit-with-header-and-commandbar": columns && !inModal},
+          {"scroll-visible": !inModal},
+          {"scroll-x-auto": inModal},
         )}
         >
         { renderCommandbar() }
@@ -2396,7 +2389,6 @@ export default function TaskEdit( props ) {
           >
           <div
             className={classnames(
-              "bkg-white",
               {
                 "task-edit-left":  layout === 2 && !columns,
                 "task-edit-left-columns": (layout === 2 && columns) || layout === 1 || layout === 3,
