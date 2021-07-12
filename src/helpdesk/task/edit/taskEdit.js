@@ -19,7 +19,6 @@ import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 import DatePicker from 'components/DatePicker';
-import MultiSelect from 'components/MultiSelectNew';
 import Empty from 'components/Empty';
 
 import ck5config from 'configs/components/ck5config';
@@ -38,6 +37,7 @@ import Attachments from 'helpdesk/components/attachments';
 import Comments from 'helpdesk/components/comments';
 import Repeat from 'helpdesk/components/repeat/repeatFormInput';
 import TaskHistory from 'helpdesk/components/taskHistory';
+import TagsPickerPopover from 'helpdesk/components/tags';
 import {
   getCreationError as getVykazyError,
 } from 'helpdesk/components/vykazy/errors';
@@ -1086,7 +1086,7 @@ export default function TaskEdit( props ) {
           </button>
         }
 
-        { !task.invoiced && userRights.statusWrite &&
+        { false && !task.invoiced && userRights.statusWrite &&
           (project ? toSelArr(project.project.statuses) : [])
           .filter((status) => !['Invoiced'].includes(status.action) )
           .map((possibleStatus) => (
@@ -1138,12 +1138,26 @@ export default function TaskEdit( props ) {
   const renderTitle = () => {
     return (
       <div className="d-flex">
+        { userRights.important &&
+          <button
+            type="button"
+            style={{color: '#ffc107'}}
+            disabled={ !userRights.important }
+            className="btn-link center-hor m-r-10"
+            onClick={()=>{
+              setImportant(!important);
+              autoUpdateTask({ important: !important });
+            }}
+            >
+            <i className={`fa${ important ? 's' : 'r' } fa-star`} style={{ fontSize: 25 }} />
+          </button>
+        }
         <h2 className="center-hor">{id}: </h2>
         <span className="center-hor flex m-r-15">
           <input type="text"
             disabled={ !userRights.taskTitleEdit }
             value={title}
-            className="task-title-input text-extra-slim hidden-input m-l-10 form-control "
+            className="task-title-input text-extra-slim hidden-input form-control"
             onChange={(e)=> {
               setTitle(e.target.value);
             }}
@@ -1674,7 +1688,7 @@ export default function TaskEdit( props ) {
         <div className="">
           { inModal &&
             <div className="task-edit-buttons row m-b-10">
-              { userRights.important &&
+              { userRights.important && false &&
                 <button
                   type="button"
                   style={{color: '#ffc107'}}
@@ -1846,27 +1860,17 @@ export default function TaskEdit( props ) {
     return (
       <Empty>
         { userRights.tagsRead && userRights.tagsWrite &&
-          <div className="row mb-auto">
-            <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
-              <i className="fa fa-plus" />
-              Tags
-            </button>
-            <MultiSelect
-              className="center-hor"
-              disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
-              direction="right"
-              style={{}}
-              header="Select tags for this task"
-              closeMultiSelect={() => { setTagsOpen(false) }}
-              open={tagsOpen}
-              items={toSelArr(project === null ? [] : project.project.tags)}
-              selected={tags}
-              onChange={(tags) => {
-                setTags(tags);
-                autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
-              }}
-              />
-          </div>
+          <TagsPickerPopover
+            taskID={id}
+            disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
+            items={toSelArr(project === null ? [] : project.project.tags)}
+            className="center-hor"
+            selected={tags}
+            onChange={(tags) => {
+              setTags(tags);
+              autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
+            }}
+            />
         }
 
         { userRights.tagsRead && tags

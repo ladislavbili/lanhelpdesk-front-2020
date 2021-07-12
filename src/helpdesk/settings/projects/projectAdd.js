@@ -490,7 +490,7 @@ export default function ProjectAdd( props ) {
           <TabPane tabId={'description'}>
             <FormGroup>
               <Label for="name">Project name <span className="warning-big">*</span></Label>
-              <Input type="text" name="name" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
+              <Input type="text" className="medium-input" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
             </FormGroup>
 
             { renderDescription() }
@@ -689,7 +689,7 @@ export default function ProjectAdd( props ) {
             <button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </button>
           }
 
-          {closeModal && cannotSave &&
+          {closeModal && cannotSave && addTaskErrors &&
             <div className="ml-auto message error-message" style={{ minWidth: 220 }}>
               Fill in all the required information!
             </div>

@@ -1348,7 +1348,7 @@ export default function RepeatForm( props ) {
       <Empty>
         { userRights.tagsWrite &&
           <div className="row center-hor">
-            <button className="btn-link p-b-10" onClick={ () => setTagsOpen(true) } >
+            <button className="btn-link p-b-10" id="repeat-multiselect-tags" onClick={ () => setTagsOpen(true) } >
               <i className="fa fa-plus" />
               Tags
             </button>
@@ -1358,6 +1358,7 @@ export default function RepeatForm( props ) {
               direction="right"
               style={{}}
               header="Select tags for this task"
+              target="repeat-multiselect-tags"
               closeMultiSelect={() => { setTagsOpen(false) }}
               open={tagsOpen}
               items={toSelArr(project === null ? [] : project.tags)}

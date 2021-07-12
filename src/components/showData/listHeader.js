@@ -79,16 +79,16 @@ export default function ListHeader( props ) {
 
             { useVisibility &&
               <div className="row">
-                <button className="btn-link m-l-10" onClick={ toggle } >
+                <button className="btn-link m-l-10" id="list-header-columns" onClick={ toggle } >
                   <i className="fa fa-cog" />
                 </button>
                 <MultiSelect
                   className="center-hor"
                   menuClassName="m-t-30"
-                  bodyClassName="p-l-10 p-r-10 scrollable"
-                  bodyStyle={{ maxHeight: 300 }}
+                  bodyClassName="p-l-10 p-r-10"
                   direction="left"
                   style={{}}
+                  target="list-header-columns"
                   header="Select task list columns"
                   closeMultiSelect={toggle}
                   showFilter={false}

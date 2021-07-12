@@ -1,0 +1,217 @@
+.btn,
+.btn:hover,
+.btn:focus,
+.btn:focus:active,
+.btn:active,
+.btn:disabled,
+.btn:focus:active {
+  background-color: $basic-button-color;
+  border: 0px;
+  height: $button-height;
+  border-radius: 0px;
+  color: #ffffff;
+  font: $font-value;
+  margin-left: 0px;
+  margin-right: 0px;
+  box-shadow: none;
+  outline: none;
+  opacity: 100;
+}
+
+.btn:last-child {
+  margin-right: 0px;
+}
+
+.btn-link,
+.btn-link:hover,
+.btn-link:active,
+.btn-link:focus,
+.btn-link:disabled {
+//,.btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn)
+  background-color: inherit;
+  height: $button-height;
+  border: 0px;
+  border-radius: 0px;
+  padding: 0px;
+  font: $font-value;
+  color: $color-link;
+  text-decoration: none;
+  box-shadow: none;
+  margin-left: 0px;
+  margin-right: 0px;
+  outline: none;
+}
+
+.btn-distance {
+  margin-right: 10px !important;
+}
+
+.btn-link-reversed {
+  background-color: inherit;
+  border: 0px;
+  border-radius: 0px;
+  color: $main-font-color;
+  padding-left: 0px;
+  margin-left: 0px;
+}
+
+.btn-link-reversed:hover {
+  background-color: inherit;
+  color: $main-font-color;
+  text-decoration: none;
+}
+
+.btn-link-cancel,
+.btn-link-cancel:hover,
+.btn-link-cancel:active,
+.btn-link-cancel:focus,
+.btn-link-cancel:focus:active,
+.btn-link-cancel:disabled {
+  background-color: inherit;
+  font: $font-value;
+  padding-left: 0px;
+  color: #a6a6a6;
+  text-decoration: none;
+  outline: none;
+  border: none;
+}
+
+.btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+  background-color: white;
+  border: 1px solid;
+  border-radius: 0.25rem;
+}
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+}
+
+.btn-repeat,
+.btn-repeat:hover,
+.btn-repeat:focus,
+.btn-repeat:focus:active,
+.btn-repeat:active,
+.btn-repeat:disabled,
+.btn-repeat:focus:active {
+  background-color: white !important;
+  font: $font-no-value;
+  color: $color-no-value;
+  text-align: left;
+  outline: none;
+  border: none;
+  height: $button-height;
+}
+
+.btn-repeat-white {
+  background-color: inherit !important;
+  font: $font-no-value;
+  color: $color-no-value;
+  width: 100%;
+  text-align: left;
+}
+.btn-repeat-white:hover {
+  cursor: pointer;
+  background-color: inherit !important;
+  color: black;
+}
+
+.btn-outline-blue:not(:disabled):not(.disabled).active,
+.btn-outline-blue:not(:disabled):not(.disabled):active,
+.show > .btn-outline-blue.dropdown-toggle {
+  color: #fff;
+  background-color: $basic-button-color;
+}
+
+.btn-success {
+  background-color: lawnGreen;
+  border-radius: 30px;
+  /*height: 30px;
+  width: 30px;*/
+}
+
+.btn-link-red,
+.btn-link-red:hover,
+.btn-link-red:active,
+.btn-link-red:active:focus,
+.btn-link-red:focus {
+  color: red;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-right: 0px;
+  margin-left: 0px;
+  height: $button-height;
+  border: 0px;
+  border-radius: 0px;
+  font: $font-value;
+  box-shadow: none;
+  opacity: 100;
+}
+
+.btn-red,
+.btn-red:hover,
+.btn-red:active,
+.btn-red:active:focus,
+.btn-red:focus {
+  background-color: white;
+  color: red;
+  border: 1px solid red;
+  height: $button-height;
+  border-radius: 0px;
+  font: $font-value;
+  margin-left: 0px;
+  margin-right: 15px;
+  box-shadow: none;
+  outline: none;
+  opacity: 100;
+}
+
+.btn-danger {
+  background-color: red;
+}
+
+.btn-success:hover {
+  background-color: lawnGreen;
+}
+
+.btn-danger:hover {
+  background-color: red;
+}
+
+.btn-grey {
+  background-color: lightGrey;
+}
+
+.form-buttons-row {
+  display: flex !important;
+  margin: 0px;
+  margin-top: 20px;
+}
+
+.hidden-button {
+  color: transparent;
+  background-color: inherit;
+}
+
+.hidden-button:hover {
+  color: $basic-button-color;
+  background-color: inherit;
+}
+
+.link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.btn-secondary:disabled {
+  background-color: $muted-font-color;
+  color: white;
+}

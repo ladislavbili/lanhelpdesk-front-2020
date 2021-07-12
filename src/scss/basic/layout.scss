@@ -71,3 +71,55 @@
 .flex {
   flex: 1;
 }
+
+//ALIGNMENT
+.v-a-m {
+  vertical-align: middle;
+}
+
+.v-a-b {
+  vertical-align: baseline !important;
+}
+
+.a-i-c {
+  align-items: center;
+}
+
+.a-s-c{
+  align-self: center;
+}
+
+.asc {
+  align-self: center;
+}
+
+//COLS
+.col-1-5 {
+  flex: 0 0 12.5%;
+  max-width: 12.5%;
+}
+
+.col-1-45 {
+  flex: 0 0 12.35%;
+  max-width: 12.35%;
+}
+
+.col-0-5 {
+  flex: 0 0 8.2%;
+  max-width: 8.2%;
+}
+
+.col-10-5 {
+  flex: 0 0 87.5%;
+  max-width: 87.5%;
+}
+
+.col-10-45 {
+  flex: 0 0 87.65%;
+  max-width: 87.65%;
+}
+
+.col-11-5 {
+  flex: 0 0 91.8%;
+  max-width: 91.8%;
+}

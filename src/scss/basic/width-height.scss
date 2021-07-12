@@ -21,6 +21,20 @@
   height: 100% !important;
 }
 
+@function increment-by-5($i){
+	@return 0 + ($i * 5);
+}
+
+@for $margin from 1 through 800{
+  .mh-#{increment-by-5($margin)} {
+    max-height: #{increment-by-5($margin)}px;
+  }
+}
+
+.h-f-c {
+  height: fit-content !important;
+}
+
 //Fit with header
 .fit-with-header {
   height: $height-without-header;

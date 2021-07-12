@@ -55,50 +55,48 @@ export default function TaskAttachments( props ) {
 
   return (
     <div className={classnames("task-edit-popis", {"p-t-15": taskID === null}, {"p-l-0 ": taskID === null}, {"display-none": attachments.length === 0} )}>
-      <div className="">
-        <input
-          type="file"
-          id={`uploadAttachment-${taskID}`}
-          multiple={true}
-          style={{display:'none'}}
-          onChange={(e)=>{
-            if(e.target.files.length>0){
-              let files = [...e.target.files];
-              addAttachments(files);
-            }
-          }}
-          />
-        { false && !disabled && !top &&
-          <div className="attachment-label">
-            <label htmlFor={`uploadAttachment-${taskID}`} className="btn-link" >
-              <i className="fa fa-plus" />
-              Attachment
-            </label>
-          </div>
-        }
-        { attachments.map((attachment,index) =>
-          <div key={index}  className="attachment">
-            <span key={attachment.id} className="comment-attachment link m-r-5" onClick={ () => getAttachment(attachment) }>
-              {`${attachment.filename} (${attachment.size/1000}kb)`}
-            </span>
-            {!disabled &&
-              <button className="btn-link"
-                disabled={disabled}
-                onClick={()=>{
-                  removeAttachment(attachment);
-                }}>
-                <i className="fa fa-times"  />
-              </button>
-            }
-          </div>
-        )}
-        { false && !disabled && top &&
+      <input
+        type="file"
+        id={`uploadAttachment-${taskID}`}
+        multiple={true}
+        style={{display:'none'}}
+        onChange={(e)=>{
+          if(e.target.files.length>0){
+            let files = [...e.target.files];
+            addAttachments(files);
+          }
+        }}
+        />
+      { false && !disabled && !top &&
+        <div className="attachment-label">
           <label htmlFor={`uploadAttachment-${taskID}`} className="btn-link" >
             <i className="fa fa-plus" />
             Attachment
           </label>
-        }
-      </div>
+        </div>
+      }
+      { attachments.map((attachment,index) =>
+        <div key={index}  className="attachment">
+          <span key={attachment.id} className="comment-attachment link m-r-5" onClick={ () => getAttachment(attachment) }>
+            {`${attachment.filename} (${attachment.size/1000}kb)`}
+          </span>
+          {!disabled &&
+            <button className="btn-link"
+              disabled={disabled}
+              onClick={()=>{
+                removeAttachment(attachment);
+              }}>
+              <i className="fa fa-times"  />
+            </button>
+          }
+        </div>
+      )}
+      { false && !disabled && top &&
+        <label htmlFor={`uploadAttachment-${taskID}`} className="btn-link" >
+          <i className="fa fa-plus" />
+          Attachment
+        </label>
+      }
     </div>
   );
 }

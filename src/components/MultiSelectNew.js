@@ -5,6 +5,7 @@ import {
   DropdownMenu
 } from 'reactstrap';
 import Checkbox from './checkbox';
+import GeneralPopover from './generalPopover';
 
 export default function MultiSelect( props ) {
 
@@ -19,6 +20,7 @@ export default function MultiSelect( props ) {
     menuStyle,
     bodyStyle,
     header,
+    target,
     closeMultiSelect,
     open,
     items,
@@ -27,26 +29,20 @@ export default function MultiSelect( props ) {
   } = props;
 
   const [ filter, setFilter ] = React.useState( "" );
-
+  const [ random ] = React.useState( ( Math.random() * 100000 )
+    .toFixed( 0 ) );
   const coloredItems = ( items && items.length !== 0 ) ? items[ 0 ].hasOwnProperty( 'color' ) : false;
-
-  return (
-    <ButtonDropdown
-      className={ className }
-      direction={ direction ? direction : "left" }
-      style={ style ? style : {} }
-      isOpen={ open && !disabled }
-      toggle={ closeMultiSelect }
-      >
-      <DropdownToggle className="bkg-white p-0 m-0" style={{ width: 0 }}>
-      </DropdownToggle>
-      <DropdownMenu
-        className={`${menuClassName ? menuClassName : ''} p-0`}
-        style={ menuStyle ? { width:'max-content', ...menuStyle} : { width:'max-content' } }
+  const renderPopover = () => (
+    <GeneralPopover
+        placement="bottom-start"
+        className="overflow-auto mh-400"
+        target={target !== undefined ?  target : `savepoint-${random}`}
+        header={`Select ${header ? header : ''}`}
+        reset={() => {}}
+        submit={closeMultiSelect}
+        open={ open }
+        close={closeMultiSelect}
         >
-        <div className="dynamic-commandbar multiselect-header">
-          {header}
-        </div>
         <div
           className={`${bodyClassName ? bodyClassName : ''}`}
           style={ bodyStyle ? bodyStyle : {} }
@@ -94,7 +90,17 @@ export default function MultiSelect( props ) {
           ))
         }
       </div>
-    </DropdownMenu>
-  </ButtonDropdown>
+    </GeneralPopover>
+  );
+
+  if ( target !== undefined ) {
+    return renderPopover();
+  }
+  console.log( 'missing target', header );
+  return (
+    <div>
+      <span id={`savepoint-${random}`}/>
+      {renderPopover()}
+    </div>
   );
 }

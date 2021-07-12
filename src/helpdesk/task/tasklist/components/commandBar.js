@@ -203,16 +203,16 @@ export default function CommandBar( props ) {
                 }
                 { showPreferences &&
                   <div className="row">
-                    <button className="btn-link m-l-10" onClick={ openColumnPreferences } >
+                    <button className="btn-link m-l-10" id="commandbar-column-preferences" onClick={ openColumnPreferences } >
                       <i className="fa fa-cog" />
                     </button>
                     <MultiSelect
                       disabled={loading}
                       className="center-hor"
                       menuClassName="m-t-30"
-                      bodyClassName="p-l-10 p-r-10 scrollable"
-                      bodyStyle={{ maxHeight: 300 }}
+                      bodyClassName="p-l-10 p-r-10"
                       direction="left"
+                      target="commandbar-column-preferences"
                       style={{}}
                       header="Select task list columns"
                       closeMultiSelect={openColumnPreferences}

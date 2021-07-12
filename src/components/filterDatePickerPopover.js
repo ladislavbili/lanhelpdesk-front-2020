@@ -99,7 +99,7 @@ export default function FilterDatePickerPopover( props ) {
           <button id="Popover1" type="button" className="btn-link p-l-0 p-r-0 m-r-0" onClick={() => setPopoverOpen(true)}>
             {`${dateFrom ? dateFrom.format( 'DD.MM.YYYY' ) : 'All'} - ${dateTo ? dateTo.format( 'DD.MM.YYYY' ) : 'All'}`}
           </button>
-          <Popover placement="right" className="filter-date-picker-popover" isOpen={popoverOpen} target="Popover1" toggle={() => setPopoverOpen(false)}>
+          <Popover placement="right" className="custom-popover" isOpen={popoverOpen} target="Popover1" toggle={() => setPopoverOpen(false)}>
             <PopoverBody>
               <label style={{display: "block"}}>{`Set ${label}`}</label>
                 <button

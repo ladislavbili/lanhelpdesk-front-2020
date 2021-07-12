@@ -547,7 +547,7 @@ export default function TaskAdd( props ) {
                 type="button"
                 style={{color: '#ffc107'}}
                 disabled={ !userRights.important }
-                className="btn-link center-hor"
+                className="btn-link center-hor m-r-10"
                 onClick={()=>{
                   setImportant(!important);
                 }}
@@ -557,9 +557,9 @@ export default function TaskAdd( props ) {
             }
             <input type="text"
               value={title}
-              className="form-control task-title-input-2"
+              className="form-control task-title-input"
               onChange={ (e) => setTitle(e.target.value) }
-              placeholder="ENTER NEW TASK NAME" />
+              placeholder="Enter new task name" />
           </div>
           { status && userRights.statusRead &&
             (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) &&
@@ -923,7 +923,7 @@ export default function TaskAdd( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className="task-edit-right p-b-20 p-t-90">
+      <div className="task-edit-right p-b-20 p-t-20">
         <div className="form-selects-entry-column" >
           <Label>Project <span className="warning-big">*</span></Label>
           <div className="form-selects-entry-column-rest" >
@@ -1055,7 +1055,7 @@ export default function TaskAdd( props ) {
       <Empty>
         { userRights.tagsRead && userRights.tagsWrite &&
           <div className="row center-hor">
-            <button className="btn-link p-b-10 btn-distance" onClick={ () => setTagsOpen(true) } >
+            <button className="btn-link p-b-10 btn-distance" id="tags-multiselect-add" onClick={ () => setTagsOpen(true) } >
               <i className="fa fa-plus" />
               Tags {project.def.tag.required && <span className="warning-big">*</span>}
             </button>
@@ -1065,6 +1065,7 @@ export default function TaskAdd( props ) {
               direction="right"
               style={{}}
               header="Select tags for this task"
+              target="tags-multiselect-add"
               closeMultiSelect={() => { setTagsOpen(false) }}
               open={tagsOpen}
               items={toSelArr(project === null ? [] : project.tags)}
@@ -1397,7 +1398,6 @@ export default function TaskAdd( props ) {
               "task-edit-left-columns": layout !== 2
             }
           )}>
-          {renderHeader()}
 
           { renderTitle() }
 

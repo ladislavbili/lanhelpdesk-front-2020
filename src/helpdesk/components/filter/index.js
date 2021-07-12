@@ -515,14 +515,15 @@ export default function FilterForm( props ) {
           <div className="sidebar-filter-row">
             <label>Tags</label>
             <div className="row mb-auto">
-              <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setTagsOpen(true) } >
+              <button className="btn-link m-b-10 h-20px btn-distance" id="filter-multiselect-tags" onClick={ () => setTagsOpen(true) } >
                 <i className="fa fa-plus" />
                 Tag
               </button>
               <MultiSelect
                 className="center-hor"
                 direction="right"
-                header="Select tags for this task"
+                header="Select tags for this filter"
+                target="filter-multiselect-tags"
                 closeMultiSelect={() => { setTagsOpen(false) }}
                 open={tagsOpen}
                 items={toSelArr(project.project.tags)}
@@ -547,14 +548,15 @@ export default function FilterForm( props ) {
           <div className="sidebar-filter-row">
             <label>Status</label>
             <div className="row mb-auto">
-              <button className="btn-link m-b-10 h-20px btn-distance" onClick={ () => setStatusesOpen(true) } >
+              <button className="btn-link m-b-10 h-20px btn-distance" id="filter-multiselect-statuses" onClick={ () => setStatusesOpen(true) } >
                 <i className="fa fa-plus" />
                 Statuses
               </button>
               <MultiSelect
                 className="center-hor"
                 direction="right"
-                header="Select statuses for this task"
+                header="Select statuses for this filter"
+                target="filter-multiselect-statuses"
                 closeMultiSelect={() => { setStatusesOpen(false) }}
                 open={statusesOpen}
                 items={toSelArr(project.project.statuses)}
