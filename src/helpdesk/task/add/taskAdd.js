@@ -56,7 +56,7 @@ import {
 import {
   toSelArr
 } from 'helperFunctions';
-import 'scss/components/task-ckeditor.scss';
+import 'scss/direct/task-ckeditor.scss';
 
 let fakeID = -1;
 

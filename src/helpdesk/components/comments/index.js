@@ -209,7 +209,7 @@ export default function Comments( props ) {
                 setTos( [] );
               }}
               >
-              Submit
+              {`Add ${ isEmail ? 'e-mail' : 'comment'}`}
             </button>
             { userRights.emails && userRights.addComments &&
               <Checkbox

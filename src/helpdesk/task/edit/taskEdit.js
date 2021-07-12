@@ -80,7 +80,7 @@ import {
   invoicedAttributes,
   noTaskType
 } from '../constants';
-import 'scss/components/task-ckeditor.scss';
+import 'scss/direct/task-ckeditor.scss';
 
 let fakeID = -1;
 
@@ -1005,118 +1005,118 @@ export default function TaskEdit( props ) {
   const renderCommandbar = () => {
     return (
       <div className="task-add-layout row">
-            {!columns && !inModal &&
-              <button
-                type="button"
-                className="btn-link task-add-layout-button btn-distance"
-                onClick={() => {
-                    history.push(`/helpdesk/taskList/i/${match.params.listID}`)
-                }}
-                >
-                <i
-                  className="fas fa-arrow-left commandbar-command-icon"
-                  />
-                Back
-              </button>
-            }
-            { task.invoiced && accessRights.vykazy && canEditInvoiced &&
-              <button
-                type="button"
-                disabled={getCantSave()}
-                className="btn-danger task-add-layout-button btn-distance"
-                onClick={() => submitInvoicedTask(true)}
-                >
-                Re-open
-              </button>
-            }
-            { task.invoiced && accessRights.vykazy && canEditInvoiced &&
-              <button
-                type="button"
-                disabled={getCantSave()}
-                className="btn-link task-add-layout-button btn-distance"
-                onClick={() => submitInvoicedTask(false)}
-                >
-                <i className="far fa-save" />
-                Save invoiced task
-              </button>
-            }
-            { project && canCopy &&
-              <TaskAdd
-                project={project.id}
-                task={task}
-                disabled={!canCopy}
-                />
-            }
-            { false &&
-              <TaskPrint
-                match={match}
-                taskID={id}
-                createdBy={task.createdBy}
-                createdAt={task.createdAt}
-                taskWorks={task.subtasks.map( item => ( {
-                  ...item,
-                  invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
-                  assignedTo: toSelItem( item.assignedTo, 'email' ),
-                  type: toSelItem( item.type )
-                } ) )}
-                workTrips={workTrips}
-                taskMaterials={materials}
-                customItems={customItems}
-                isLoaded={true}
-                />
-            }
-            { userRights.deleteTasks &&
-              <button
-                type="button"
-                className="btn-link task-add-layout-button btn-distance"
-                onClick={deleteTaskFunc}
-                >
-                <i className="far fa-trash-alt" />
-                Delete
-              </button>
-            }
-            {false &&
-              <button
-                type="button"
-                className="btn-link task-add-layout-button btn-distance"
-                onClick={() => setTaskLayout(currentUser.taskLayout === 1 ? 2 : 1)}
-                >
-                <i className="fas fa-retweet "/>
-                Layout
-              </button>
-            }
+        {!columns && !inModal &&
+          <button
+            type="button"
+            className="btn-link task-add-layout-button btn-distance"
+            onClick={() => {
+              history.push(`/helpdesk/taskList/i/${match.params.listID}`)
+            }}
+            >
+            <i
+              className="fas fa-arrow-left commandbar-command-icon"
+              />
+            Back
+          </button>
+        }
+        { task.invoiced && accessRights.vykazy && canEditInvoiced &&
+          <button
+            type="button"
+            disabled={getCantSave()}
+            className="btn-danger task-add-layout-button btn-distance"
+            onClick={() => submitInvoicedTask(true)}
+            >
+            Re-open
+          </button>
+        }
+        { task.invoiced && accessRights.vykazy && canEditInvoiced &&
+          <button
+            type="button"
+            disabled={getCantSave()}
+            className="btn-link task-add-layout-button btn-distance"
+            onClick={() => submitInvoicedTask(false)}
+            >
+            <i className="far fa-save" />
+            Save invoiced task
+          </button>
+        }
+        { project && canCopy &&
+          <TaskAdd
+            project={project.id}
+            task={task}
+            disabled={!canCopy}
+            />
+        }
+        { false &&
+          <TaskPrint
+            match={match}
+            taskID={id}
+            createdBy={task.createdBy}
+            createdAt={task.createdAt}
+            taskWorks={task.subtasks.map( item => ( {
+              ...item,
+              invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
+              assignedTo: toSelItem( item.assignedTo, 'email' ),
+              type: toSelItem( item.type )
+            } ) )}
+            workTrips={workTrips}
+            taskMaterials={materials}
+            customItems={customItems}
+            isLoaded={true}
+            />
+        }
+        { userRights.deleteTasks &&
+          <button
+            type="button"
+            className="btn-link task-add-layout-button btn-distance"
+            onClick={deleteTaskFunc}
+            >
+            <i className="far fa-trash-alt" />
+            Delete
+          </button>
+        }
+        {false &&
+          <button
+            type="button"
+            className="btn-link task-add-layout-button btn-distance"
+            onClick={() => setTaskLayout(currentUser.taskLayout === 1 ? 2 : 1)}
+            >
+            <i className="fas fa-retweet "/>
+            Layout
+          </button>
+        }
 
-            { !task.invoiced && userRights.statusWrite &&
-              (project ? toSelArr(project.project.statuses) : [])
-              .filter((status) => !['Invoiced'].includes(status.action) )
-              .map((possibleStatus) => (
-                <button
-                  type="button"
-                  key={possibleStatus.id}
-                  className="btn-link task-add-layout-button btn-distance"
-                  style={ possibleStatus.id === status.id ? { color: status.color } : {}}
-                  onClick={() => setPossibleStatus(possibleStatus) }
-                  >
-                  { possibleStatus.icon.length > 3 &&
-                    <i
-                      className={`${possibleStatus.icon} commandbar-command-icon`}
-                      />
-                  }
-                  {possibleStatus.title}
-                </button>
-              ))
-            }
-            <span className="ml-auto">
-            { inModal &&
-              <button
-                type="button"
-                className="btn-link-cancel task-add-layout-button p-l-10 p-r-10 m-r-10"
-                onClick={closeModal}
-                >
-                <i className="fa fa-times" style={{ fontSize: 25 }} />
-              </button>
-            }
-          </span>
+        { !task.invoiced && userRights.statusWrite &&
+          (project ? toSelArr(project.project.statuses) : [])
+          .filter((status) => !['Invoiced'].includes(status.action) )
+          .map((possibleStatus) => (
+            <button
+              type="button"
+              key={possibleStatus.id}
+              className="btn-link task-add-layout-button btn-distance"
+              style={ possibleStatus.id === status.id ? { color: status.color } : {}}
+              onClick={() => setPossibleStatus(possibleStatus) }
+              >
+              { possibleStatus.icon.length > 3 &&
+                <i
+                  className={`${possibleStatus.icon} commandbar-command-icon`}
+                  />
+              }
+              {possibleStatus.title}
+            </button>
+          ))
+        }
+        <span className="ml-auto">
+          { inModal &&
+            <button
+              type="button"
+              className="btn-link-cancel task-add-layout-button p-l-10 p-r-10 m-r-10"
+              onClick={closeModal}
+              >
+              <i className="fa fa-times" style={{ fontSize: 25 }} />
+            </button>
+          }
+        </span>
       </div>
     )
   }
@@ -1138,38 +1138,21 @@ export default function TaskEdit( props ) {
   const renderTitle = () => {
     return (
       <div className="d-flex">
-        <div className="row flex m-l-10">
-          { userRights.important &&
-            <button
-              type="button"
-              style={{color: '#ffc107'}}
-              disabled={ !userRights.important }
-              className="btn-link task-add-layout-button center-hor"
-              onClick={()=>{
-                autoUpdateTask({ important: !important })
-                setImportant(!important);
-              }}
-              >
-              <i className={`fa${ important ? 's' : 'r' } fa-star`} style={{ fontSize: 25 }} />
-            </button>
-          }
-          <h2 className="center-hor">{id}: </h2>
-          <span className="center-hor flex m-r-15">
-            <input type="text"
-              disabled={ !userRights.taskTitleEdit }
-              value={title}
-              className="task-title-input text-extra-slim hidden-input m-l-10 form-control "
-              onChange={(e)=> {
-                setTitle(e.target.value);
-              }}
-              onBlur={(e) => {
-                autoUpdateTask({ title })
-              }}
-              placeholder="Enter task name"
-              />
-          </span>
-          {renderTaskInfoAndDates()}
-        </div>
+        <h2 className="center-hor">{id}: </h2>
+        <span className="center-hor flex m-r-15">
+          <input type="text"
+            disabled={ !userRights.taskTitleEdit }
+            value={title}
+            className="task-title-input text-extra-slim hidden-input m-l-10 form-control "
+            onChange={(e)=> {
+              setTitle(e.target.value);
+            }}
+            onBlur={(e) => {
+              autoUpdateTask({ title })
+            }}
+            placeholder="Enter task name"
+            />
+        </span>
       </div>
     );
   }
@@ -1202,23 +1185,33 @@ export default function TaskEdit( props ) {
     }
 
     if ( status && status.action === 'PendingDate' ) {
+      const datepickerDisabled = !status || status.action !== 'PendingDate' || !userRights.statusWrite || !pendingChangable;
       return (
-        <div className="task-info">
+        <div className="task-info ml-auto">
           <span className="center-hor">
             Pending date:
           </span>
-          <DatePicker
-            className="form-control hidden-input bolder"
-            selected={pendingDate}
-            disabled={!status || status.action!=='PendingDate'||!userRights.statusWrite||!pendingChangable}
-            onChange={ (date) => {
-              setPendingDate(date);
-              if(date.valueOf() !== null){
-                autoUpdateTask({pendingDate: date.valueOf().toString()});
-              }
-            }}
-            placeholderText="No pending date"
-            />
+          { datepickerDisabled ?
+            (
+              <span className="bolder center-hor m-l-3">
+                {closeDate?(timestampToString(pendingDate.valueOf())):''}
+              </span>
+            ):
+            (
+              <DatePicker
+                className="form-control hidden-input bolder"
+                selected={pendingDate}
+                disabled={datepickerDisabled}
+                onChange={ (date) => {
+                  setPendingDate(date);
+                  if(date.valueOf() !== null){
+                    autoUpdateTask({pendingDate: date.valueOf().toString()});
+                  }
+                }}
+                placeholderText="No pending date"
+                />
+            )
+          }
         </div>
       )
     }
@@ -1228,28 +1221,38 @@ export default function TaskEdit( props ) {
         status.action === 'Invoiced' ||
         status.action === 'CloseInvalid'
       ) ) {
+      const datepickerDisabled = !status || ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.statustatusWrite;
       return (
-        <div className="task-info">
+        <div className="task-info ml-auto">
           <span className="center-hor">
             Closed at:
           </span>
-          <DatePicker
-            className="form-control hidden-input bolder"
-            selected={closeDate}
-            disabled={!status || (status.action!=='CloseDate' && status.action!=='CloseInvalid')||!userRights.statustatusWrite}
-            onChange={date => {
-              setCloseDate(date);
-              if(date.valueOf() !== null){
-                autoUpdateTask({closeDate: date.valueOf().toString()});
-              }
-            }}
-            placeholderText="No pending date"
-            />
+          { datepickerDisabled ?
+            (
+              <span className="bolder center-hor m-l-3">
+                {closeDate?(timestampToString(closeDate.valueOf())):''}
+              </span>
+            ):
+            (
+              <DatePicker
+                className="form-control hidden-input bolder"
+                selected={closeDate}
+                disabled={datepickerDisabled}
+                onChange={date => {
+                  setCloseDate(date);
+                  if(date.valueOf() !== null){
+                    autoUpdateTask({closeDate: date.valueOf().toString()});
+                  }
+                }}
+                placeholderText="No pending date"
+                />
+            )
+          }
         </div>
       )
     }
     return (
-      <div className="task-info">
+      <div className="task-info ml-auto">
         <span className="center-hor bolder">
           {task.statusChange ? ('Status changed at ' + timestampToString(task.statusChange) ) : ""}
         </span>
@@ -1669,6 +1672,51 @@ export default function TaskEdit( props ) {
     return (
       <div className={classnames("task-edit-right", {"w-250px": columns})}>
         <div className="">
+          { inModal &&
+            <div className="task-edit-buttons row m-b-10">
+              { userRights.important &&
+                <button
+                  type="button"
+                  style={{color: '#ffc107'}}
+                  disabled={ !userRights.important }
+                  className="btn-link btn-distance p-0"
+                  onClick={()=>{
+                    autoUpdateTask({ important: !important })
+                    setImportant(!important);
+                  }}
+                  >
+                  <i className={`fa${ important ? 's' : 'r' } fa-star`} />
+                </button>
+              }
+              <span className="ml-auto">
+
+                { userRights.deleteTasks &&
+                  <button
+                    type="button"
+                    className="btn-link-red btn-distance p-0"
+                    onClick={deleteTaskFunc}
+                    >
+                    <i className="far fa-trash-alt" />
+                  </button>
+                }
+                { project && canCopy &&
+                  <TaskAdd
+                    project={project.id}
+                    task={task}
+                    disabled={!canCopy}
+                    noText
+                    />
+                }
+                <button
+                  type="button"
+                  className="btn-link p-r-10"
+                  onClick={closeModal}
+                  >
+                  <i className="fa fa-times" style={{ fontSize: 25 }} />
+                </button>
+              </span>
+            </div>
+          }
           { userRights.projectRead &&
             <div className="form-selects-entry-column" >
               <Label>Projekt <span className="warning-big">*</span></Label>
@@ -2378,7 +2426,7 @@ export default function TaskEdit( props ) {
           {"scroll-x-auto": inModal},
         )}
         >
-        { renderCommandbar() }
+        { !inModal && renderCommandbar() }
         <div
           className={classnames(
             {
@@ -2398,7 +2446,8 @@ export default function TaskEdit( props ) {
 
             <div className="" >
               { renderTitle() }
-              { layout === 2 && <hr className="m-t-5 m-b-15"/> }
+              { layout === 2 && <hr className="m-t-5 m-b-2"/> }
+              {renderTaskInfoAndDates()}
 
               {canCreateVykazyError()}
 

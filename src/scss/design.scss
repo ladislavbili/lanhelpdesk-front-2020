@@ -1,49 +1,7 @@
 //-----classNames, ktore tu nie su definovane ale su z react-strapu
-/*
-- d-flex
-- flex-row
-- ml-auto - margin-left: auto
-- mr-auto - margin-right: auto
-- fa a vsetko zacinajuce fa- (napr fa-cog, fa-exclamation-triangle...)
-- input-group
-- list-unstyled
-- pull-right
-- p-2
-- col-form-label
-- col-md-12
-- col-md-3
-- col-lg-12
-- col-lg-6
-- justify-content-xxxx
-- table-hover
-- input-group-append
-*/
-/*
-.comments>.tab-content>.tab-pane:active{
-display: block;
-}*/
 
 .min-height-400 {
   min-height: 400px;
-}
-
-.col-lg-1,
-.col-lg-10,
-.col-lg-11,
-.col-lg-12,
-.col-lg-2,
-.col-lg-3,
-.col-lg-4,
-.col-lg-5,
-.col-lg-6,
-.col-lg-7,
-.col-lg-8,
-.col-lg-9 {
-  float: none !important;
-}
-
-p {
-  margin-bottom: 0rem;
 }
 
 .error-style {
@@ -53,88 +11,8 @@ p {
   width: fit-content;
 }
 
-.center {
-  //max-width: 1920px;
-}
-
-.bolder {
-  font: $font-info-text-bold;
-}
-
-.bolder-text {
-  font-weight: bolder;
-}
-
-.info-text {
-  @extend .text-muted;
-}
-
-.font-14{
-  font-size: 14px;
-}
-
-.testSonka {
-  color: red;
-  font-size: 10px;
-}
-
-.testSonka_p {
-  font-family: $main-font;
-}
-
-.modal-dialog {
-  margin-top: 20px;
-}
-
-@media (min-width: 801px) {
-  .modal-dialog {
-    width: 1000px !important;
-  }
-}
-
-@media (max-width: 800px) {
-  .modal-dialog {
-    width: 600px;
-    margin: 30px auto;
-  }
-}
-
-@media (min-width: 576px) {
-  .modal-dialog {
-    max-width: inherit;
-  }
-}
-
-.modal-header {
-  justify-content: normal;
-}
-
-.modal-title {
-  color: $main-font-color;
-  font-size: 2.5rem;
-  font-weight: 400;
-  align-self: left;
-}
-
-.modal-without-borders {
-  .modal-content {
-    background-color: $content-background-color;
-    padding: 0px;
-    .modal-body {
-      padding: 0px;
-    }
-  }
-}
-
 .list-group-item + .list-group-item {
   border-top-width: 1px;
-}
-
-body {
-  font-family: $main-font;
-  background: $main-background-color;
-  font-size: $main-font-size;
-  color: $main-font-color;
 }
 
 .content {
@@ -150,271 +28,12 @@ body {
   flex: 1 1;
 }
 
-//-------------------overflow----------------------
-html {
-  overflow-y: hidden;
+.task-edit-buttons button i {
+  font-size: 25px;
 }
-.scrollable {
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.scroll-visible {
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
-.scroll-x-auto {
-  overflow-x: auto !important;
-}
-
-.fit-with-header {
-  height: $height-without-header;
-}
-.fit-with-header-and-commandbar {
-  height: calc(#{$height-without-header} - #{$commandbar-height});
-}
-.fit-with-header-and-commandbar-2 {
-  height: calc(#{$height-without-header} - 82px);
-}
-.fit-with-header-and-commandbar-3 {
-  height: calc(#{$height-without-header} - #{$commandbar-height} - 40px - 40px);
-}
-.fit-with-header-and-commandbar-4 {
-  height: calc(#{$height-without-header} - #{$task-list-commandbar-height});
-}
-
-.fit-with-header-and-commandbar-5 {
-  height: calc(#{$height-without-header} - #{$commandbar-height} - 60px );
-}
-
-.fit-with-header-and-commandbar-6 {
-  height: calc(#{$height-without-header} - 90px );
-}
-
-.fit-with-header-and-commandbar-7 {
-  height: calc(#{$height-without-header} - #{$commandbar-height} - 60px - 70px );
-}
-
-.overflow-x {
-  overflow-x: auto;
-}
-//-------------------END-overflow----------------------
 
 //---------------všeobecné-atribúty---------------------
-.text-muted {
-  color: $muted-font-color !important;
-}
-.text-basic {
-  color: $main-font-color;
-}
-.text-highlight {
-  color: $basic-button-color !important;
-  label {
-    color: $basic-button-color !important;
-  }
-}
-.font-12 {
-  font-size: 12px;
-}
-.font-13 {
-  font-size: 13px;
-}
-.font-14 {
-  font-size: 14px;
-}
-.font-15 {
-  font-size: 15px;
-}
-.font-16 {
-  font-size: 16px;
-}
-.font-24 {
-  font-size: 24px;
-}
-.center-ver {
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-.center-hor {
-  margin-top: auto !important;
-  margin-bottom: auto !important;
-  vertical-align: middle !important;
-}
-.full-width {
-  width: 100%;
-}
-.w-a {
-  width: auto;
-}
-.w-5 {
-  width: 5%;
-}
-.w-8 {
-  width: 8%;
-}
-.w-10 {
-  width: 10%;
-}
-.w-20 {
-  width: 20%;
-}
-.w-25 {
-  width: 25%;
-}
-.w-30 {
-  width: 30%;
-}
-.w-33 {
-  width: 33%;
-}
-.w-40 {
-  width: 40%;
-}
-.w-50 {
-  width: 50%;
-}
-.w-55 {
-  width: 55%;
-}
-.w-70 {
-  width: 70%;
-}
-.w-95 {
-  width: 95%;
-}
-.w-100 {
-  width: 100%;
-}
-.w-20px {
-  width: 20px;
-}
-.w-25px {
-  width: 25px;
-}
-.w-30px {
-  width: 30px;
-}
-.w-40px {
-  width: 40px;
-}
-.w-100px {
-  width: 100px;
-}
-.w-125px {
-  width: 125px;
-}
-.w-150px {
-  width: 150px;
-}
-.w-175px {
-  width: 175px;
-}
-.w-200px {
-  width: 200px;
-}
-.w-250px {
-  width: 250px !important;
-}
-.w-270px {
-  width: 270px !important;
-}
-.w-300px {
-  width: 300px !important;
-}
-.w-1660px {
-  width: 1660px;
-}
-.h-100 {
-  height: 100%;
-}
 
-.h-20px {
-  height: 20px !important;
-}
-.h-30px {
-  height: 30px !important;
-}
-.h-60px {
-  height: 60px;
-}
-
-.h-100vh {
-  height: 100vh;
-}
-
-.golden-ratio-618 {
-  width: 61.8%;
-}
-.golden-ratio-382 {
-  width: 38.2% !important;
-}
-.max-width-400 {
-  max-width: 400px;
-}
-.max-width-1660 {
-  max-width: 1200px !important;
-}
-.full-height {
-  height: 100% !important;
-}
-.position-inherit {
-  position: inherit;
-}
-
-.position-absolute {
-  position: absolute;
-}
-
-.bottom-15 {
-  bottom: 15px;
-}
-
-.bottom-20 {
-  bottom: 20px;
-}
-
-.make-space-30-r {
-  width: calc(100% - 30px);
-}
-
-.m-r--40 {
-  margin-right: -40px;
-}
-
-.m-l--40 {
-  margin-left: -40px !important;
-}
-
-.m-t-17p {
-  margin-top: 17% !important;
-}
-
-.p-t-17p {
-  padding-top: 17% !important;
-}
-
-p-auto {
-  padding-left: auto;
-  padding-right: auto;
-  padding-top: auto;
-  padding-bottom: auto;
-}
-
-.cke {
-  z-index: 1000;
-}
-
-.f-r {
-  float: right;
-}
-
-.display-inline {
-  display: inline;
-}
-.display-inline-block {
-  display: inline-block;
-}
 .waves-effect {
   position: relative;
   cursor: pointer;
@@ -432,24 +51,6 @@ p-auto {
   transition: all 0.3s ease-out;
 }
 
-.bkg-color-inherit {
-  background-color: inherit;
-}
-
-.bkg-white {
-  background-color: white !important;
-}
-
-.bkg-F2F1F1 {
-  background-color: #f2f1f1;
-}
-.bkg-F6F6F6 {
-  background-color: #f6f6f6;
-}
-.bkg-F9F9F9 {
-  background-color: #f9f9f9;
-}
-
 .ignore-css {
   all: initial !important;
   font-family: $main-font !important;
@@ -460,98 +61,21 @@ p-auto {
   }
 }
 
-.display-none {
-  display: none;
-}
-
 .clickable {
   cursor: pointer;
-}
-
-.not-allowed {
-  cursor: not-allowed;
 }
 
 .grabbable {
   cursor: grab;
 }
 
-h1 {
-  color: $main-font-color;
-  font-size: 2.5rem;
-}
-
-h2 {
-  color: $main-font-color;
-  font-size: 2.5rem;
-}
-
-h2.clickable:hover {
-  color: $basic-button-color;
-}
-
-h3 {
-  font-family: Segoe UI Semibold;
-}
-
-h4 {
-  font-family: Segoe UI Semibold;
-}
-
-.row {
-  display: flex !important;
-  margin: 0px;
-}
-
-.flex-row {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-
-.flex-column {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.no-scrolling {
-  textarea {
-    overflow: hidden;
-  }
-  overflow: hidden;
+.not-allowed {
+  cursor: not-allowed;
 }
 
 .bottom-border {
   border-bottom: 1px solid;
   color: $muted-gray;
-}
-.icon-S {
-  font-size: 1em;
-}
-.icon-M {
-  font-size: 1.2em;
-}
-.text-extra-slim {
-  font-weight: 100;
-}
-.text-slim {
-  font-weight: 400;
-}
-.text-bold {
-  font-family: Segoe UI Semibold;
-}
-.font-bold {
-  font-family: Segoe UI Semibold;
-}
-.h-30 {
-  height: 30px;
-}
-.f-1 {
-  flex: 1;
-}
-.flex {
-  flex: 1;
 }
 
 .b-0 {
@@ -569,15 +93,6 @@ h4 {
 .outside {
   /*position: fixed;
   margin-left: 5000px;*/
-}
-.t-a-c {
-  text-align: center;
-}
-.t-a-r {
-  text-align: right;
-}
-.t-a-l {
-  text-align: left;
 }
 
 .v-a-m {
@@ -2223,10 +1738,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   -ms-transform: scaleX(-1);
 }
 
-.overflow-auto {
-  overflow: auto;
-}
-
 //------------------END-commandbar----------------------
 
 //TABY
@@ -3345,10 +2856,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .rbc-time-content {
   overflow-y: visible;
-}
-
-.overflowX {
-  overflow-x: auto;
 }
 
 .noselect {

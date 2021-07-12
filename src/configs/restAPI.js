@@ -1,8 +1,11 @@
-const testingREST = true;
-const protectedREST = 'https://nodejs02.lanhelpdesk.com:8080';
-const localREST = 'http://localhost:4000';
-const protectedSocket = 'wss://nodejs02.lanhelpdesk.com:8080';
-const localSocket = 'ws://localhost:4000';
+const testing = true;
+const production = false;
+const port = production ? 8080 : 8081;
 
-export const REST_URL = testingREST ? localREST : protectedREST;
-export const SOCKET_URL = testingREST ? localSocket : protectedSocket;
+const protectedREST = `https://nodejs02.lanhelpdesk.com:${port}`;
+const localREST = `http://localhost:4000`;
+const protectedSocket = `wss://nodejs02.lanhelpdesk.com:${port}`;
+const localSocket = `ws://localhost:4000`;
+
+export const REST_URL = testing ? localREST : protectedREST;
+export const SOCKET_URL = testing ? localSocket : protectedSocket;

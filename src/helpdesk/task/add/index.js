@@ -19,6 +19,7 @@ import {
   addLocalError,
 } from 'apollo/localSchema/actions';
 import ProjectSelectModal from './projectSelectModal';
+import classnames from 'classnames';
 
 import {
   noMilestone
@@ -58,6 +59,7 @@ export default function TaskAddContainer( props ) {
   const {
     disabled,
     projectID: sidebarProjectID,
+    noText
   } = props;
 
   //data & queries
@@ -176,14 +178,14 @@ export default function TaskAddContainer( props ) {
     return (
       <button
         type="button"
-        className="btn-link task-add-layout-button btn-distance"
+        className={classnames("btn-link btn-distance", { 'task-add-layout-button': !noText })}
         disabled={disabled}
         onClick={()=> {
           setOpenAddTaskModal(true);
         }}
         >
         <i className="far fa-copy"/>
-        Copy
+        {!noText && 'Copy'}
       </button>
     )
   }

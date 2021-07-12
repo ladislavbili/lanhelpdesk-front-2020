@@ -1,0 +1,36 @@
+p {
+  margin-bottom: 0rem;
+}
+
+body {
+  font-family: $main-font;
+  background: $main-background-color;
+  font-size: $main-font-size;
+  color: $main-font-color;
+}
+
+html {
+  overflow-y: hidden;
+}
+
+h1 {
+  color: $main-font-color;
+  font-size: 2.5rem;
+}
+
+h2 {
+  color: $main-font-color;
+  font-size: 2.5rem;
+}
+
+h2.clickable:hover {
+  color: $basic-button-color;
+}
+
+h3 {
+  font-family: Segoe UI Semibold;
+}
+
+h4 {
+  font-family: Segoe UI Semibold;
+}

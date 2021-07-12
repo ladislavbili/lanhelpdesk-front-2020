@@ -1,0 +1,56 @@
+.font-12 {
+  font-size: 12px;
+}
+.font-13 {
+  font-size: 13px;
+}
+.font-14 {
+  font-size: 14px;
+}
+.font-15 {
+  font-size: 15px;
+}
+.font-16 {
+  font-size: 16px;
+}
+.font-24 {
+  font-size: 24px;
+}
+
+.font-bold {
+  font-family: Segoe UI Semibold;
+}
+
+.text-extra-slim {
+  font-weight: 100;
+}
+.text-slim {
+  font-weight: 400;
+}
+.text-bold {
+  font-family: Segoe UI Semibold;
+}
+
+.text-muted {
+  color: $muted-font-color !important;
+}
+.text-basic {
+  color: $main-font-color;
+}
+.text-highlight {
+  color: $basic-button-color !important;
+  label {
+    color: $basic-button-color !important;
+  }
+}
+
+.info-text {
+  @extend .text-muted;
+}
+.bolder {
+  font: $font-info-text-bold;
+}
+
+.bolder-text {
+  font-weight: bolder;
+}
