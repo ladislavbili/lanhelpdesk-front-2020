@@ -10,6 +10,7 @@ import {
   Label,
   Input
 } from 'reactstrap';
+import classnames from 'classnames';
 import Select from 'react-select';
 import {
   pickSelectStyle
@@ -17,7 +18,6 @@ import {
 import Loading from 'components/loading';
 
 import languages from "configs/constants/languages";
-import classnames from 'classnames';
 
 import {
   isEmail,
@@ -141,19 +141,10 @@ export default function UserAdd( props ) {
 
   return (
     <div>
-      { !closeModal &&
-        <div className="commandbar a-i-c p-l-20">
-          { cannotAddUser() &&
-            <div className="message error-message">
-              Fill in all the required information!
-            </div>
-          }
-        </div>
-      }
       <div
         className={classnames(
-          "p-t-10 p-l-20 p-r-20 p-b-20",
-          {" scroll-visible fit-with-header-and-commandbar": !closeModal},
+          "p-20",
+          {" scroll-visible fit-with-header": !closeModal},
         )}
         >
         <h2 className="m-b-20" >
@@ -265,15 +256,15 @@ export default function UserAdd( props ) {
               Cancel
             </button>
           }
-          { closeModal && cannotAddUser() &&
-            <div className=" ml-auto message error-message">
+          { cannotAddUser() &&
+            <div className=" ml-auto message error-message m-r-10">
               Fill in all the required information!
             </div>
           }
           <button
             className={classnames(
               "btn",
-              {"ml-auto": !closeModal}
+              {"ml-auto": !cannotAddUser()}
             )}
             disabled={ cannotAddUser() }
             onClick={ addUserFunc }

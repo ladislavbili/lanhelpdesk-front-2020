@@ -15,7 +15,10 @@ export default function GeneralPopover( props ) {
     submit,
     open,
     close,
-    className
+    closeOnly,
+    className,
+    headerClassName,
+    hideButtons,
   } = props;
 
   const [ popoverOpen, setPopoverOpen ] = React.useState( false );
@@ -26,8 +29,9 @@ export default function GeneralPopover( props ) {
   return (
     <Popover placement={placement} className={`custom-popover ${className}`} isOpen={isOpened} target={target} toggle={ closeAction }>
       <PopoverBody>
-        <label style={{display: "block"}}>{`Set ${header}`}</label>
+        <label style={{display: "block"}} className={ headerClassName ? headerClassName : ""  }>{`${header}`}</label>
         {children}
+        { !closeOnly && !hideButtons &&
         <div className="row m-t-15">
           <button
             type="button"
@@ -52,6 +56,20 @@ export default function GeneralPopover( props ) {
             Save
           </button>
         </div>
+        }
+        { closeOnly && !hideButtons &&
+        <div className="row m-t-15">
+          <button
+            type="button"
+            className="btn-link-red"
+            onClick={() => {
+              closeAction();
+            }}
+            >
+            Close
+          </button>
+        </div>
+        }
       </PopoverBody>
     </Popover>
   );

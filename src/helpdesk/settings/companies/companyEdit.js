@@ -361,36 +361,23 @@ export default function CompanyEdit( props ) {
 
   return (
     <div>
-      <div className="commandbar a-i-c p-l-20">
-        { dataChanged &&
-          <div className="message error-message">
-            Save changes before leaving!
-          </div>
-        }
-        { !dataChanged &&
-          <div className="message success-message">
-            Saved
-          </div>
-        }
-      </div>
-      <div className="fit-with-header-and-commandbar scroll-visible">
+      <div className="scroll-visible p-20 fit-with-header">
         {dataChanged &&
           <div style={{position: "fixed", zIndex: "999", backgroundColor: "rgba(255,255,255,0.5)", top: "0", left: "0", width: "100%", height: "100vh"}}></div>
         }
 
         <div
           className={ classnames(
-            "p-t-10",
             {
               "bring-to-front": dataChanged
             },
           )}
           >
 
-          <h2 className="m-b-20 p-l-20 p-r-20" >
+          <h2 className="m-b-20" >
             Edit company
           </h2>
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="name">Company name<span className="warning-big">*</span></Label>
               </div>
@@ -409,7 +396,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="dph">DPH</Label>
               </div>
@@ -428,7 +415,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="ico">ICO<span className="warning-big">*</span></Label>
               </div>
@@ -447,7 +434,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="dic">DIC</Label>
               </div>
@@ -466,7 +453,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="ic_dph">IC DPH</Label>
               </div>
@@ -485,7 +472,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="country">Country</Label>
               </div>
@@ -504,7 +491,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="city">City</Label>
               </div>
@@ -523,7 +510,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="street">Street</Label>
               </div>
@@ -542,7 +529,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="psc">PSČ</Label>
               </div>
@@ -561,7 +548,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="mail">E-mail</Label>
               </div>
@@ -581,7 +568,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row m-b-10 p-l-20 p-r-20">
+            <FormGroup className="row m-b-10">
               <div className="m-r-10 w-20">
                 <Label for="phone">Phone</Label>
               </div>
@@ -600,7 +587,7 @@ export default function CompanyEdit( props ) {
               </div>
             </FormGroup>
 
-            <FormGroup className="row p-l-20 p-r-20">
+            <FormGroup className="row">
               <div className="m-r-10 w-20">
                 <Label for="description">Description</Label>
               </div>
@@ -745,7 +732,7 @@ export default function CompanyEdit( props ) {
 
         <div
           className={ classnames(
-            "form-buttons-row p-l-20 p-r-20 p-b-20",
+            "form-buttons-row p-b-20",
             {
               "bring-to-front": dataChanged
             }
@@ -763,8 +750,21 @@ export default function CompanyEdit( props ) {
           }
           <button className="btn-red btn-distance" disabled={saving || deleting || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>Delete</button>
 
+            <div className="ml-auto message m-r-10">
+              { dataChanged &&
+                <div className="message error-message">
+                  Save changes before leaving!
+                </div>
+              }
+              { !dataChanged &&
+                <div className="message success-message">
+                  Saved
+                </div>
+              }
+            </div>
+
             <button
-              className="btn ml-auto"
+              className="btn"
               disabled={ cannotSave && !dataChanged }
               onClick={()=>{
                 if (pricelist.value === "0" && pricelistName !== ""){

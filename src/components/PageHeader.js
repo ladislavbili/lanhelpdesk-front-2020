@@ -5,10 +5,6 @@ import {
   useApolloClient,
 } from "@apollo/client";
 import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
   Modal,
   ModalHeader,
   ModalBody,
@@ -18,6 +14,7 @@ import {
   Link
 } from 'react-router-dom';
 import Empty from 'components/Empty';
+import GeneralPopover from 'components/generalPopover';
 import ErrorIcon from 'components/errorMessages/errorIcon';
 import NotificationIcon from 'components/notifications/notificationIcon';
 import LocalErrors from 'components/localErrors';
@@ -131,23 +128,37 @@ export default function PageHeader( props ) {
           { currentUser &&
             filteredSettings &&
             filteredSettings.length > 0 &&
-            <Dropdown className="center-hor" isOpen={settingsOpen} toggle={() =>setSettingsOpen(!settingsOpen)}>
-              <DropdownToggle className="header-dropdown">
-                <i className="header-icon fa fa-cog"/>
-              </DropdownToggle>
-              <DropdownMenu right>
-                <DropdownItem header={true}>Settings</DropdownItem>
-                <DropdownItem divider={true} />
-                {filteredSettings.map((item, index) =>
-                  <DropdownItem
+            <Empty>
+              <div className="header-icon center-hor clickable" id="page-header-settings" onClick={() => setSettingsOpen(!settingsOpen)}>
+                  <i className="header-icon fa fa-cog m-l-5"/>
+              </div>
+              <GeneralPopover
+                placement="bottom-start"
+                className="overflow-auto"
+                headerClassName="segoe-semi-header custom-popover-header"
+                target="page-header-settings"
+                header="Settings"
+                reset={() => {}}
+                submit={() => {}}
+                open={ settingsOpen }
+                closeOnly
+                hideButtons
+                close={() => setSettingsOpen(false)}
+                >
+                {filteredSettings.map((item, index) => (
+                  <div
                     key={index}
-                    onClick={() => history.push(getLocation(history) + '/settings/' + item.link)}
+                    onClick={() => {
+                      history.push(getLocation(history) + '/settings/' + item.link);
+                      setSettingsOpen(false);
+                    }}
+                    className="segoe-semi-text clickable custom-popover-item"
                     >
                     {item.title}
-                  </DropdownItem>
-                )}
-              </DropdownMenu>
-            </Dropdown>
+                  </div>
+                ))}
+              </GeneralPopover>
+            </Empty>
           }
           <i
             className="header-icon clickable fa fa-sign-out-alt center-hor"

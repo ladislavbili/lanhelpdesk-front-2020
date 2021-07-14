@@ -206,21 +206,12 @@ export default function CompanyAdd( props ) {
   }
 
   const pricelists = [
-  newPricelist,
-  ...toSelArr( pricelistsData.pricelists )
-];
+    newPricelist,
+    ...toSelArr( pricelistsData.pricelists )
+  ];
 
   return (
     <div>
-      {!closeModal &&
-        <div className="commandbar a-i-c p-l-20">
-          { cannotSave &&
-            <div className="message error-message">
-              Fill in all the required information!
-            </div>
-          }
-        </div>
-      }
       {
         newData &&
         !closeModal &&
@@ -229,8 +220,8 @@ export default function CompanyAdd( props ) {
       <div
         className={
           classnames(
-            "p-t-10 p-b-20",
-            {"scroll-visible fit-with-header-and-commandbar": !closeModal},
+            "p-20",
+            {"scroll-visible fit-with-header": !closeModal},
             {
               "bring-to-front": newData
             },
@@ -612,31 +603,31 @@ export default function CompanyAdd( props ) {
             </button>
           }
 
-            { closeModal && cannotSave &&
-              <div className="message error-message">
-                Fill in all the required information!
-              </div>
-            }
+          { cannotSave &&
+            <div className="ml-auto message error-message m-r-10">
+              Fill in all the required information!
+            </div>
+          }
 
-            <button
-              className={classnames(
-                  "btn",
-                  {"ml-auto": !closeModal}
-                )}
-              disabled={cannotSave && !newData}
-              onClick={()=>{
-                if (pricelist.value === "0" && pricelistName !== ""){
-                  savePriceList();
-                } else {
-                  addCompanyFunc();
-                }
-              }}
-              >
-              {(pricelist.value === "0" && pricelistName !== "" ? "Save changes" : (saving?'Adding...':'Add company'))}
-            </button>
+          <button
+            className={classnames(
+              "btn",
+              {"ml-auto": !cannotSave}
+            )}
+            disabled={cannotSave && !newData}
+            onClick={()=>{
+              if (pricelist.value === "0" && pricelistName !== ""){
+                savePriceList();
+              } else {
+                addCompanyFunc();
+              }
+            }}
+            >
+            {(pricelist.value === "0" && pricelistName !== "" ? "Save changes" : (saving?'Adding...':'Add company'))}
+          </button>
 
-          </div>
         </div>
       </div>
+    </div>
   );
 }

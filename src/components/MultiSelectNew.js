@@ -37,7 +37,7 @@ export default function MultiSelect( props ) {
         placement="bottom-start"
         className="overflow-auto mh-400"
         target={target !== undefined ?  target : `savepoint-${random}`}
-        header={`Select ${header ? header : ''}`}
+        header={`${header ? header : ''}`}
         reset={() => {}}
         submit={closeMultiSelect}
         open={ open }

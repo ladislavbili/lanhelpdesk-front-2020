@@ -400,20 +400,8 @@ export default function PublicFilterEdit( props ) {
   }
   return (
     <div>
-      <div className="commandbar a-i-c p-l-20">
-        { dataChanged &&
-          <div className="message error-message">
-            Save changes before leaving!
-          </div>
-        }
-        { !dataChanged &&
-          <div className="message success-message">
-            Saved
-          </div>
-        }
-      </div>
 
-      <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
+      <div className="scroll-visible p-20 fit-with-header">
         <h2 className="m-b-20" >
           Edit public filter
         </h2>
@@ -807,7 +795,21 @@ export default function PublicFilterEdit( props ) {
             onClick={ deletePublicFilter }>
             Delete
           </button>
-          <button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>{saving?'Saving...':'Save filter'}</button>
+
+          <div className="ml-auto message m-r-10">
+            { dataChanged &&
+              <div className="message error-message">
+                Save changes before leaving!
+              </div>
+            }
+            { !dataChanged &&
+              <div className="message success-message">
+                Saved
+              </div>
+            }
+          </div>
+
+          <button className="btn" disabled={cantSave} onClick={submitPublicFilter}>{saving?'Saving...':'Save filter'}</button>
         </div>
       </div>
     </div>

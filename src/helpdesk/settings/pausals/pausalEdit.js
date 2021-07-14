@@ -213,81 +213,66 @@ export default function PausalEdit( props ) {
   ];
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
-        { dataChanged &&
-          <div className="message error-message">
-            Save changes before leaving!
-          </div>
-        }
-        { !dataChanged &&
-          <div className="message success-message">
-            Saved
-          </div>
-        }
-      </div>
-    <div className="fit-with-header-and-commandbar scroll-visible">
+    <div className="scroll-visible p-20 fit-with-header">
 
-      <h2 className="p-t-10 p-l-20">Edit service level agreement - {data.company.title}</h2>
+      <h2>Edit service level agreement - {data.company.title}</h2>
 
-      <div className="p-20">
-
-        <h3>Paušál</h3>
-        <FormGroup>
-          <Label for="pausal">Paušál práce</Label>
-            <Input
-              name="pausal"
-              id="pausal"
-              type="number"
-              placeholder="Enter work pausal"
-              value={taskWorkPausal}
-              onChange={(e) => {
-                setTaskWorkPausal(e.target.value);
-                setDataChanged( true );
-              }}
-              />
-        </FormGroup>
-        <FormGroup className="m-b-10">
-          <Label for="pausal">Paušál výjazdy</Label>
-            <Input
-              name="pausal"
-              id="pausal"
-              type="number"
-              placeholder="Enter drive pausal"
-              value={taskTripPausal}
-              onChange={(e)=> {
-                setTaskTripPausal(e.target.value);
-                setDataChanged( true );
-              }}
-              />
-        </FormGroup>
-
-        <CompanyRents
-          clearForm={clearCompanyRents}
-          setClearForm={()=>{
-            setClearCompanyRents(false);
-            setDataChanged( true );
-          }}
-          data={rents}
-          updateRent={(rent)=>{
-            let newRents=[...rents];
-            newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
-            setRents( newRents );
-            setDataChanged( true );
-          }}
-          addRent={(rent)=>{
-            let newRents=[...rents];
-            newRents.push({...rent, id: getFakeID()})
-            setRents( newRents );
-            setDataChanged( true );
-          }}
-          removeRent={(rent)=>{
-            let newRents=[...rents];
-            newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
-            setRents( newRents );
+      <h3 className="m-t-10 m-b-10" >Paušál</h3>
+      <FormGroup>
+        <Label for="pausal">Paušál práce</Label>
+        <Input
+          name="pausal"
+          id="pausal"
+          type="number"
+          placeholder="Enter work pausal"
+          value={taskWorkPausal}
+          onChange={(e) => {
+            setTaskWorkPausal(e.target.value);
             setDataChanged( true );
           }}
           />
+      </FormGroup>
+      <FormGroup className="m-b-10">
+        <Label for="pausal">Paušál výjazdy</Label>
+        <Input
+          name="pausal"
+          id="pausal"
+          type="number"
+          placeholder="Enter drive pausal"
+          value={taskTripPausal}
+          onChange={(e)=> {
+            setTaskTripPausal(e.target.value);
+            setDataChanged( true );
+          }}
+          />
+      </FormGroup>
+
+      <CompanyRents
+        clearForm={clearCompanyRents}
+        setClearForm={()=>{
+          setClearCompanyRents(false);
+          setDataChanged( true );
+        }}
+        data={rents}
+        updateRent={(rent)=>{
+          let newRents=[...rents];
+          newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
+          setRents( newRents );
+          setDataChanged( true );
+        }}
+        addRent={(rent)=>{
+          let newRents=[...rents];
+          newRents.push({...rent, id: getFakeID()})
+          setRents( newRents );
+          setDataChanged( true );
+        }}
+        removeRent={(rent)=>{
+          let newRents=[...rents];
+          newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
+          setRents( newRents );
+          setDataChanged( true );
+        }}
+        />
 
       <CompanyPriceList
         pricelists={pricelists}
@@ -313,26 +298,35 @@ export default function PausalEdit( props ) {
           setDataChanged( true );
         }}
         match={match}
-         />
+        />
 
-       <div className="form-buttons-row">
-         <button
-           className="btn ml-auto m-r-5"
-           disabled={ cannotSave }
-           onClick={()=>{
-             if (pricelist.value === "0" && pricelistName !== ""){
-               savePriceList();
-             } else {
-               updateCompanyFunc();
-             }
-           }}
-           >
-           {saving?'Saving...':'Save changes'}
-         </button>
-         </div>
-
+      <div className="form-buttons-row">
+        <div className="ml-auto message m-r-10">
+          { dataChanged &&
+            <div className="message error-message">
+              Save changes before leaving!
+            </div>
+          }
+          { !dataChanged &&
+            <div className="message success-message">
+              Saved
+            </div>
+          }
+        </div>
+        <button
+          className="btn"
+          disabled={ cannotSave }
+          onClick={()=>{
+            if (pricelist.value === "0" && pricelistName !== ""){
+              savePriceList();
+            } else {
+              updateCompanyFunc();
+            }
+          }}
+          >
+          {saving?'Saving...':'Save changes'}
+        </button>
       </div>
     </div>
-  </div>
   );
 }

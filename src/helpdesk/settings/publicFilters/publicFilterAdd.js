@@ -8,6 +8,7 @@ import {
   Label,
   Input,
 } from 'reactstrap';
+import classnames from 'classnames';
 import Checkbox from 'components/checkbox';
 
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
@@ -261,16 +262,12 @@ export default function PublicFilterAdd( props ) {
   }
   return (
     <div>
-      <div className="commandbar a-i-c p-l-20">
-        { cantSave &&
-          <div className="message error-message">
-            Fill in all the required information!
-          </div>
-        }
-      </div>
-
-
-      <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
+      <div
+        className={classnames(
+          "p-20",
+          "scroll-visible fit-with-header"
+        )}
+        >
         <h2 className="m-b-20" >
           Add public filter
         </h2>
@@ -357,254 +354,266 @@ export default function PublicFilterAdd( props ) {
         <Label className="m-t-15">Filter attributes</Label>
         <hr className="m-t-5 m-b-10"/>
 
-          {/* Requester */}
-          <FormGroup>
-            <label>Zadal</label>
+        {/* Requester */}
+        <FormGroup>
+          <label>Zadal</label>
+          <Select
+            id="select-requester"
+            isMulti
+            options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+            onChange={ (requesters) => {
+              setRequesters(requesters) ;
+            }}
+            value={requesters}
+            styles={pickSelectStyle()}
+            />
+        </FormGroup>
+
+        {/* Company */}
+        <FormGroup>
+          <label>Firma</label>
+          <Select
+            isMulti
+            options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
+            onChange={ (companies) => {
+              setCompanies(companies);
+            }}
+            value={companies}
+            styles={pickSelectStyle()} />
+        </FormGroup>
+
+        {/* Assigned */}
+        <FormGroup>
+          <label>Riesi</label>
+          <Select
+            options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(usersData.basicUsers, 'email'))}
+            isMulti
+            onChange={(newValue)=>{
+              setAssignedTos(newValue);
+            }}
+            value={assignedTos}
+            styles={pickSelectStyle()}
+            />
+        </FormGroup>
+
+        {/* Task type */}
+        <FormGroup>
+          <label>Typ práce</label>
+          <Select
+            options={toSelArr(taskTypesData.taskTypes)}
+            isMulti
+            onChange={(newValue)=>{
+              setTaskTypes(newValue);
+            }}
+            value={taskTypes}
+            styles={pickSelectStyle()}
+            />
+        </FormGroup>
+
+        {/* Status Date */}
+        <FilterDatePickerInCalendar
+          label="Status date"
+          showNowFrom={statusDateFromNow}
+          dateFrom={statusDateFrom}
+          setShowNowFrom={(e) => {
+            setStatusDateFromNow(e);
+          }}
+          setDateFrom={(e) => {
+            setStatusDateFrom(e);
+          }}
+          showNowTo={statusDateToNow}
+          dateTo={statusDateTo}
+          setShowNowTo={(e) => {
+            setStatusDateToNow(e);
+          }}
+          setDateTo={(e) => {
+            setStatusDateTo(e);
+          }}
+          />
+
+        {/* Pending Date */}
+        <FilterDatePickerInCalendar
+          label="Pending date"
+          showNowFrom={pendingDateFromNow}
+          dateFrom={pendingDateFrom}
+          setShowNowFrom={(e) => {
+            setPendingDateFromNow(e);
+          }}
+          setDateFrom={(e) => {
+            setPendingDateFrom(e);
+          }}
+          showNowTo={pendingDateToNow}
+          dateTo={pendingDateTo}
+          setShowNowTo={(e) => {
+            setPendingDateToNow(e);
+          }}
+          setDateTo={(e) => {
+            setPendingDateTo(e);
+          }}
+          />
+
+        {/* Close Date */}
+        <FilterDatePickerInCalendar
+          label="Close date"
+          showNowFrom={closeDateFromNow}
+          dateFrom={closeDateFrom}
+          showNowTo={closeDateToNow}
+          dateTo={closeDateTo}
+          setShowNowFrom={(e) => {
+            setCloseDateFromNow(e);
+          }}
+          setDateFrom={(e) => {
+            setCloseDateFrom(e);
+          }}
+          setShowNowTo={(e) => {
+            setCloseDateToNow(e);
+          }}
+          setDateTo={(e) => {
+            setCloseDateTo(e);
+          }}
+          />
+
+        {/* Deadline */}
+        <FilterDatePickerInCalendar
+          label="Deadline"
+          showNowFrom={deadlineFromNow}
+          dateFrom={deadlineFrom}
+          showNowTo={deadlineToNow}
+          dateTo={deadlineTo}
+          setShowNowFrom={(e) => {
+            setDeadlineFromNow(e);
+          }}
+          setDateFrom={(e) => {
+            setDeadlineFrom(e);
+          }}
+          setShowNowTo={(e) => {
+            setDeadlineToNow(e);
+          }}
+          setDateTo={(e) => {
+            setDeadlineTo(e);
+          }}
+          />
+
+        {/* Scheduled */}
+        <FilterDatePickerInCalendar
+          label="Scheduled date"
+          showNowFrom={scheduledFromNow}
+          dateFrom={scheduledFrom}
+          showNowTo={scheduledToNow}
+          dateTo={scheduledTo}
+          setShowNowFrom={(e) => {
+            setScheduledFromNow(e);
+          }}
+          setDateFrom={(e) => {
+            setScheduledFrom(e);
+          }}
+          setShowNowTo={(e) => {
+            setScheduledToNow(e);
+          }}
+          setDateTo={(e) => {
+            setScheduledTo(e);
+          }}
+          />
+
+        {/* Created at */}
+        <FilterDatePickerInCalendar
+          label="Created at"
+          showNowFrom={createdAtFromNow}
+          dateFrom={createdAtFrom}
+          showNowTo={createdAtToNow}
+          dateTo={createdAtTo}
+          setShowNowFrom={(e) => {
+            setCreatedAtFromNow(e);
+          }}
+          setDateFrom={(e) => {
+            setCreatedAtFrom(e);
+          }}
+          setShowNowTo={(e) => {
+            setCreatedAtToNow(e);
+          }}
+          setDateTo={(e) => {
+            setCreatedAtTo(e);
+          }}
+          />
+
+        {/* Important */}
+        <div className="sidebar-filter-row">
+          <label htmlFor="filter-Important">Important</label>
+          <div className="flex">
             <Select
-              id="select-requester"
-              isMulti
-              options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
-              onChange={ (requesters) => {
-                setRequesters(requesters) ;
+              id="filter-Important"
+              options={booleanSelectOptions}
+              onChange={(imp) => {
+                setImportant(imp);
               }}
-              value={requesters}
+              value={important}
               styles={pickSelectStyle()}
               />
-          </FormGroup>
+          </div>
+        </div>
 
-          {/* Company */}
-          <FormGroup>
-            <label>Firma</label>
+        {/* Invoiced */}
+        <div className="sidebar-filter-row">
+          <label htmlFor="filter-Invoiced">Invoiced</label>
+          <div className="flex">
             <Select
-              isMulti
-              options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
-              onChange={ (companies) => {
-                setCompanies(companies);
+              id="filter-Invoiced"
+              options={booleanSelectOptions}
+              onChange={(invoiced) => {
+                setInvoiced(invoiced);
               }}
-              value={companies}
-              styles={pickSelectStyle()} />
-          </FormGroup>
-
-          {/* Assigned */}
-          <FormGroup>
-            <label>Riesi</label>
-            <Select
-              options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(usersData.basicUsers, 'email'))}
-              isMulti
-              onChange={(newValue)=>{
-                setAssignedTos(newValue);
-              }}
-              value={assignedTos}
+              value={invoiced}
               styles={pickSelectStyle()}
               />
-          </FormGroup>
+          </div>
+        </div>
 
-          {/* Task type */}
-          <FormGroup>
-            <label>Typ práce</label>
+        {/* Pausal */}
+        <div className="sidebar-filter-row">
+          <label htmlFor="filter-Paušál">Paušál</label>
+          <div className="flex">
             <Select
-              options={toSelArr(taskTypesData.taskTypes)}
-              isMulti
-              onChange={(newValue)=>{
-                setTaskTypes(newValue);
+              id="filter-Paušál"
+              options={booleanSelectOptions}
+              onChange={(pausal) => {
+                setPausal(pausal);
               }}
-              value={taskTypes}
+              value={pausal}
               styles={pickSelectStyle()}
               />
-          </FormGroup>
-
-          {/* Status Date */}
-          <FilterDatePickerInCalendar
-            label="Status date"
-            showNowFrom={statusDateFromNow}
-            dateFrom={statusDateFrom}
-            setShowNowFrom={(e) => {
-              setStatusDateFromNow(e);
-            }}
-            setDateFrom={(e) => {
-              setStatusDateFrom(e);
-            }}
-            showNowTo={statusDateToNow}
-            dateTo={statusDateTo}
-            setShowNowTo={(e) => {
-              setStatusDateToNow(e);
-            }}
-            setDateTo={(e) => {
-              setStatusDateTo(e);
-            }}
-            />
-
-          {/* Pending Date */}
-          <FilterDatePickerInCalendar
-            label="Pending date"
-            showNowFrom={pendingDateFromNow}
-            dateFrom={pendingDateFrom}
-            setShowNowFrom={(e) => {
-              setPendingDateFromNow(e);
-            }}
-            setDateFrom={(e) => {
-              setPendingDateFrom(e);
-            }}
-            showNowTo={pendingDateToNow}
-            dateTo={pendingDateTo}
-            setShowNowTo={(e) => {
-              setPendingDateToNow(e);
-            }}
-            setDateTo={(e) => {
-              setPendingDateTo(e);
-            }}
-            />
-
-          {/* Close Date */}
-          <FilterDatePickerInCalendar
-            label="Close date"
-            showNowFrom={closeDateFromNow}
-            dateFrom={closeDateFrom}
-            showNowTo={closeDateToNow}
-            dateTo={closeDateTo}
-            setShowNowFrom={(e) => {
-              setCloseDateFromNow(e);
-            }}
-            setDateFrom={(e) => {
-              setCloseDateFrom(e);
-            }}
-            setShowNowTo={(e) => {
-              setCloseDateToNow(e);
-            }}
-            setDateTo={(e) => {
-              setCloseDateTo(e);
-            }}
-            />
-
-          {/* Deadline */}
-          <FilterDatePickerInCalendar
-            label="Deadline"
-            showNowFrom={deadlineFromNow}
-            dateFrom={deadlineFrom}
-            showNowTo={deadlineToNow}
-            dateTo={deadlineTo}
-            setShowNowFrom={(e) => {
-              setDeadlineFromNow(e);
-            }}
-            setDateFrom={(e) => {
-              setDeadlineFrom(e);
-            }}
-            setShowNowTo={(e) => {
-              setDeadlineToNow(e);
-            }}
-            setDateTo={(e) => {
-              setDeadlineTo(e);
-            }}
-            />
-
-          {/* Scheduled */}
-          <FilterDatePickerInCalendar
-            label="Scheduled date"
-            showNowFrom={scheduledFromNow}
-            dateFrom={scheduledFrom}
-            showNowTo={scheduledToNow}
-            dateTo={scheduledTo}
-            setShowNowFrom={(e) => {
-              setScheduledFromNow(e);
-            }}
-            setDateFrom={(e) => {
-              setScheduledFrom(e);
-            }}
-            setShowNowTo={(e) => {
-              setScheduledToNow(e);
-            }}
-            setDateTo={(e) => {
-              setScheduledTo(e);
-            }}
-            />
-
-          {/* Created at */}
-          <FilterDatePickerInCalendar
-            label="Created at"
-            showNowFrom={createdAtFromNow}
-            dateFrom={createdAtFrom}
-            showNowTo={createdAtToNow}
-            dateTo={createdAtTo}
-            setShowNowFrom={(e) => {
-              setCreatedAtFromNow(e);
-            }}
-            setDateFrom={(e) => {
-              setCreatedAtFrom(e);
-            }}
-            setShowNowTo={(e) => {
-              setCreatedAtToNow(e);
-            }}
-            setDateTo={(e) => {
-              setCreatedAtTo(e);
-            }}
-            />
-
-          {/* Important */}
-          <div className="sidebar-filter-row">
-            <label htmlFor="filter-Important">Important</label>
-            <div className="flex">
-              <Select
-                id="filter-Important"
-                options={booleanSelectOptions}
-                onChange={(imp) => {
-                  setImportant(imp);
-                }}
-                value={important}
-                styles={pickSelectStyle()}
-                />
-            </div>
           </div>
+        </div>
 
-          {/* Invoiced */}
-          <div className="sidebar-filter-row">
-            <label htmlFor="filter-Invoiced">Invoiced</label>
-            <div className="flex">
-              <Select
-                id="filter-Invoiced"
-                options={booleanSelectOptions}
-                onChange={(invoiced) => {
-                  setInvoiced(invoiced);
-                }}
-                value={invoiced}
-                styles={pickSelectStyle()}
-                />
-            </div>
+        {/* Overtime */}
+        <div className="sidebar-filter-row">
+          <label htmlFor="filter-Overtime">Overtime</label>
+          <div className="flex">
+            <Select
+              id="filter-Overtime"
+              options={booleanSelectOptions}
+              onChange={(overtime) => {
+                setOvertime(overtime);
+              }}
+              value={overtime}
+              styles={pickSelectStyle()}
+              />
           </div>
-
-          {/* Pausal */}
-          <div className="sidebar-filter-row">
-            <label htmlFor="filter-Paušál">Paušál</label>
-            <div className="flex">
-              <Select
-                id="filter-Paušál"
-                options={booleanSelectOptions}
-                onChange={(pausal) => {
-                  setPausal(pausal);
-                }}
-                value={pausal}
-                styles={pickSelectStyle()}
-                />
-            </div>
-          </div>
-
-          {/* Overtime */}
-          <div className="sidebar-filter-row">
-            <label htmlFor="filter-Overtime">Overtime</label>
-            <div className="flex">
-              <Select
-                id="filter-Overtime"
-                options={booleanSelectOptions}
-                onChange={(overtime) => {
-                  setOvertime(overtime);
-                }}
-                value={overtime}
-                styles={pickSelectStyle()}
-                />
-            </div>
-          </div>
+        </div>
 
         <div className="form-buttons-row">
-          <button className="btn ml-auto" disabled={cantSave} onClick={submitPublicFilter}>
+          { cantSave &&
+            <div className="message error-message ml-auto">
+              Fill in all the required information!
+            </div>
+          }
+          <button
+            className={classnames(
+              "btn",
+              {"ml-auto": !cantSave}
+            )}
+            disabled={cantSave}
+            onClick={submitPublicFilter}
+            >
             {saving?'Adding...':'Add filter'}
           </button>
         </div>

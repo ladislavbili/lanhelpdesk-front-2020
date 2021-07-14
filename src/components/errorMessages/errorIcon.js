@@ -4,7 +4,6 @@ import {
   useSubscription,
 } from "@apollo/client";
 import classnames from 'classnames';
-import Empty from 'components/Empty';
 import {
   getMyData,
 } from 'helperFunctions';
@@ -39,23 +38,14 @@ export default function ErrorIcon( props ) {
     return null;
   }
   const accessRights = currentUser.role.accessRights;
+  if ( !accessRights.viewErrors ) {
+    return null;
+  }
+
   return (
-    <Empty>
-      {
-        accessRights.viewErrors &&
-        <i
-          className={classnames({ "danger-color": errorMessageCountData.errorMessageCount > 0 }, "header-icon fas fa-exclamation-triangle center-hor clickable")}
-          style={{marginRight: 6}}
-          onClick={() => history.push(`${location}/errorMessages/`)}
-          />
-    } {
-      accessRights.viewErrors &&
-        <span
-          onClick={() => history.push(`${location}/errorMessages/`)}
-          className={classnames({ "danger-color": errorMessageCountData.errorMessageCount > 0 },"header-icon-text clickable")}
-          >
-          {errorMessageCountData.errorMessageCount}
-        </span>
-    } </Empty>
+    <div className="header-icon center-hor header-with-text clickable" id="page-header-notifications" onClick={() => history.push(`${location}/errorMessages/`)}>
+      <i className={classnames({ "danger-color": errorMessageCountData.errorMessageCount > 0 }, "fas fa-exclamation-triangle header-icon-with-text m-l-5" )}/>
+      <span className="m-l-2 header-icon-text">{ errorMessageCountData.errorMessageCount }</span>
+    </div>
   );
 }

@@ -754,7 +754,7 @@ export default function ProjectEdit( props ) {
                   <Input
                     disabled={!myRights.projectPrimaryWrite}
                     type="text"
-                    className="medium-input m-b-35"
+                    className="medium-input m-b-35 m-t-15"
                     id="name"
                     placeholder="Enter project name"
                     value={title}

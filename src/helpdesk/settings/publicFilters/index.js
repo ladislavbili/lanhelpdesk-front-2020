@@ -12,6 +12,8 @@ import {
   toSelArr
 } from 'helperFunctions';
 import Loading from 'components/loading';
+import Empty from 'components/Empty';
+import SettingListContainer from '../components/settingListContainer';
 import classnames from 'classnames';
 
 import {
@@ -79,112 +81,93 @@ export default function PublicFilterList( props ) {
   }
 
   const dataLoading = ( publicFilterLoading || rolesLoading );
-  return (
-    <div className="content">
-      <div className="row m-0 p-0 taskList-container">
-        <div className="col-lg-4">
-          <div className="commandbar">
-            <div className="search-row">
-              <div className="search">
-                <button className="search-btn" type="button">
-                  <i className="fa fa-search" />
-                </button>
-                <input
-                  type="text"
-                  className="form-control search-text"
-                  value={search}
-                  onChange={(e)=> setSearch(e.target.value)}
-                  placeholder="Search"
-                  />
-              </div>
-            </div>
-            <button
-              className="btn-link center-hor"
-              onClick={()=> history.push('/helpdesk/settings/publicFilters/add')}>
-              <i className="fa fa-plus p-l-5 p-r-5"/> Public Filter
-            </button>
-          </div>
-          <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
-            <div className="row p-l-10 p-b-10">
-              <h2 className="">
-  							Public Filters
-  						</h2>
-              <div className="d-flex flex-row align-items-center ml-auto">
-                <div className="text-basic m-r-5 m-l-5">
-    							Sort by
-    						</div>
-                <select
-  								value={roleFilter}
-  								className="invisible-select text-bold text-highlight"
-  								onChange={(e)=>setRoleFilter(e.target.value)}>
-  									<option value='all'>All filters</option>
-                    { (rolesLoading ? [] : orderArr(toSelArr(rolesData.basicRoles))).map((role) =>
-                      <option value={role.id} key={role.id}>{role.title}</option>
-                    )}
-                    <option value='none'>Without role</option>
-  							</select>
-              </div>
-            </div>
-            {
-              dataLoading ?
-              (
-                <Loading />
-              ):
-              (
-                <table className="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>Title</th>
-                      <th>Order</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    { getFilteredFilters().map( (filter) =>
-                      <tr
-                        key={filter.id}
-                        className={classnames (
-                          "clickable",
-                          {
-                            "active": parseInt(match.params.id) === filter.id
-                          }
-                        )}
-                        style={{whiteSpace: "nowrap",  overflow: "hidden"}}
-                        onClick={()=>history.push('/helpdesk/settings/publicFilters/'+filter.id.toString())}>
-                        <td
-                          style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
-                          {filter.title}
-                        </td>
-                        <td
-                          style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
-                          {filter.order}
-                        </td>
-                      </tr>
-                    ) }
-                  </tbody>
-                </table>
-              )
-            }
-          </div>
-        </div>
-        <div className="col-lg-8">
-          {
-            match.params.id &&
-            match.params.id==='add' &&
-            <PublicFilterAdd {...{history}} />
-          }
 
-          {
-            !dataLoading &&
-            match.params.id &&
-            match.params.id!=='add' &&
-            publicFiltersData.publicFilters.some((item)=>item.id === parseInt(match.params.id)) &&
-            <PublicFilterEdit {...{history, match}}/>
-          }
-          {
-            !dataLoading && !match.params.id && <div className="commandbar"></div>
-          }
-        </div>
+  const PublicFiltersSort = (
+    <div className="d-flex flex-row align-items-center ml-auto">
+      <div className="text-basic m-r-5 m-l-5">
+        Sort by
       </div>
+      <select
+        value={roleFilter}
+        className="invisible-select text-bold text-highlight"
+        onChange={(e)=>setRoleFilter(e.target.value)}>
+          <option value='all'>All filters</option>
+          { (rolesLoading ? [] : orderArr(toSelArr(rolesData.basicRoles))).map((role) =>
+            <option value={role.id} key={role.id}>{role.title}</option>
+          )}
+          <option value='none'>Without role</option>
+      </select>
     </div>
   );
+
+  const RightSideComponent = (
+    <Empty>
+      {
+        match.params.id &&
+        match.params.id==='add' &&
+        <PublicFilterAdd {...{history}} />
+      }
+
+      {
+        !dataLoading &&
+        match.params.id &&
+        match.params.id!=='add' &&
+        publicFiltersData.publicFilters.some((item)=>item.id === parseInt(match.params.id)) &&
+        <PublicFilterEdit {...{history, match}}/>
+      }
+    </Empty>
+  )
+
+  return (
+    <SettingListContainer
+      header="Public Filters"
+      filter={search}
+      setFilter={setSearch}
+      history={history}
+      addURL="/helpdesk/settings/publicFilters/add"
+      addLabel="Public Filter"
+      RightFilterComponent={PublicFiltersSort}
+      RightSideComponent={RightSideComponent}
+      >
+      {
+        dataLoading ?
+        (
+          <Loading />
+        ):
+        (
+          <table className="table table-hover">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Order</th>
+              </tr>
+            </thead>
+            <tbody>
+              { getFilteredFilters().map( (filter) =>
+                <tr
+                  key={filter.id}
+                  className={classnames (
+                    "clickable",
+                    {
+                      "active": parseInt(match.params.id) === filter.id
+                    }
+                  )}
+                  style={{whiteSpace: "nowrap",  overflow: "hidden"}}
+                  onClick={()=>history.push('/helpdesk/settings/publicFilters/'+filter.id.toString())}>
+                  <td
+                    style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
+                    {filter.title}
+                  </td>
+                  <td
+                    style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
+                    {filter.order}
+                  </td>
+                </tr>
+              ) }
+            </tbody>
+          </table>
+        )
+      }
+    </SettingListContainer>
+  )
 }

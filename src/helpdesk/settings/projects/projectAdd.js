@@ -401,9 +401,9 @@ export default function ProjectAdd( props ) {
       </div>
     } else {
       if ( description.length !== 0 ) {
-        RenderDescription = <div className="project-description-text" dangerouslySetInnerHTML={{__html:description }} />
+        RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
-        RenderDescription = <div className="project-description-text">Úloha nemá popis</div>
+        RenderDescription = <div className="task-edit-popis">Projekt nemá popis</div>
       }
     }
     return (
@@ -457,9 +457,9 @@ export default function ProjectAdd( props ) {
           "p-t-10 p-l-20 p-r-20 p-b-20",
         )}
         >
-        <h2 className="m-b-20" >
+        <h1 className="m-b-20 m-t-20" >
           Add project
-        </h2>
+        </h1>
 
         <Nav tabs className="b-0 m-b-10">
           <NavItem>
@@ -490,7 +490,14 @@ export default function ProjectAdd( props ) {
           <TabPane tabId={'description'}>
             <FormGroup>
               <Label for="name">Project name <span className="warning-big">*</span></Label>
-              <Input type="text" className="medium-input" id="name" placeholder="Enter project name" value={title} onChange={(e)=>setTitle(e.target.value)} />
+              <Input
+                type="text"
+                className="medium-input m-b-35 m-t-15"
+                id="name"
+                placeholder="Enter project name"
+                value={title}
+                onChange={(e)=>setTitle(e.target.value)}
+                />
             </FormGroup>
 
             { renderDescription() }

@@ -4,12 +4,7 @@ import {
   useMutation,
   useSubscription,
 } from "@apollo/client";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-} from 'reactstrap';
+import GeneralPopover from 'components/generalPopover';
 import classnames from 'classnames';
 import {
   addLocalError,
@@ -74,64 +69,74 @@ export default function NotificationIcon( props ) {
 
   return (
     <Empty>
-      <Dropdown className="center-hor" isOpen={notificationsOpen} toggle={() => setNotificationsOpen(!notificationsOpen)}>
-        <DropdownToggle className="header-dropdown header-with-text">
-          <i className="header-icon-with-text fa fa fa-envelope"/>
-          <span className="m-l-2 header-icon-text clickable">{count > 99 ? '99+' : count }</span>
-        </DropdownToggle>
-        <DropdownMenu right>
-          <DropdownItem header={true}>Notifications</DropdownItem>
-          <DropdownItem divider={true}/> {notifications.length === 0 && <DropdownItem>You have no notifications!</DropdownItem>}
-            { notifications.map( (notification) =>
-              <DropdownItem
-                key={notification.id}
-                onClick={ () => {
-                  if (!notification.read) {
-                    setUserNotificationRead( {
-                        variables: {
-                          id: notification.id,
-                          read: true,
-                        }
-                      } )
-                      .then( ( response ) => {
-                        history.push(`${location}/notifications/${notification.id}` )
-                      }).catch((err) => {
-                        addLocalError(err);
-                      })
-                  }else{
-                    history.push(`${location}/notifications/${notification.id}` )
+      <div className="header-icon center-hor header-with-text clickable" id="page-header-notifications" onClick={() => setNotificationsOpen(!notificationsOpen)}>
+        <i className="fa fa-envelope header-icon-with-text m-l-5"/>
+        <span className="m-l-2 header-icon-text clickable">{count > 99 ? '99+' : count }</span>
+      </div>
+      <GeneralPopover
+        placement="bottom-start"
+        className="overflow-auto mh-600"
+        headerClassName="segoe-semi-header custom-popover-header"
+        target="page-header-notifications"
+        header="Notifications"
+        reset={() => {}}
+        submit={() => {}}
+        open={ notificationsOpen }
+        closeOnly
+        hideButtons
+        close={() => setNotificationsOpen(false)}
+        >
+        {notifications.length === 0 && <div className="segoe-semi-text custom-popover-item">You have no notifications!</div>}
+        { notifications.map( (notification) =>
+          <div
+            key={notification.id}
+            onClick={ () => {
+              if (!notification.read) {
+                setUserNotificationRead( {
+                  variables: {
+                    id: notification.id,
+                    read: true,
                   }
-                }}
-                className={classnames({
-                  'notification-read-small': notification.read,
-                  'notification-not-read-small': !notification.read
+                } )
+                .then( ( response ) => {
+                  history.push(`${location}/notifications/${notification.id}` )
+                  setNotificationsOpen(false);
+                }).catch((err) => {
+                  addLocalError(err);
+                })
+              }else{
+                history.push(`${location}/notifications/${notification.id}` )
+                setNotificationsOpen(false);
+              }
+            }}
+            className={classnames({
+              'notification-read-small': notification.read,
+              'notification-not-read-small': !notification.read,
+            }, 'segoe-semi-text clickable custom-popover-item')}
+            >
+            <div>
+              <i className={classnames({
+                  'far fa-envelope-open': notification.read,
+                  'fas fa-envelope': !notification.read
                 })}
-                >
-                <div>
-                  <i className={classnames({
-                      'far fa-envelope-open': notification.read,
-                      'fas fa-envelope': !notification.read
-                    })}
-                    />
-                  {notification.subject}
-                </div>
-                <div style={{
-                    overflowX: 'hidden',
-                    maxWidth: 250
-                  }}
-                  >
-                  {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
-                </div>
-              </DropdownItem>
-            )
-          }
-          <DropdownItem divider={true}/>
-          <DropdownItem onClick={() => history.push('/helpdesk/notifications/')}>
-            <span style={{ fontWeight: 'bold' }} >Go to notifications</span>
-            { (count && count > 5) ? <span className='p-l-3'>{` ${count - 5} more unread...`}</span> : null }
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+                />
+              {notification.subject}
+            </div>
+            <div style={{
+                overflowX: 'hidden',
+                maxWidth: 250
+              }}
+              >
+              {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
+            </div>
+          </div>
+        )}
+        <hr/>
+        <div onClick={() => history.push('/helpdesk/notifications/')} className="segoe-semi-text clickable custom-popover-item">
+          <span style={{ fontWeight: 'bold' }} >Go to notifications</span>
+          { (count && count > 5) ? <span className='p-l-3'>{` ${count - 5} more unread...`}</span> : null }
+        </div>
+      </GeneralPopover>
     </Empty>
   )
 }

@@ -1,4 +1,51 @@
 //-----classNames, ktore tu nie su definovane ale su z react-strapu
+.segoe-semi-header{
+font-size: 14px;
+font-family: Segoe UI Semibold;
+
+}
+
+.segoe-semi-text{
+  font-size: 12px;
+  font-family: Segoe UI Semibold;
+  color: $color-link;
+}
+
+.custom-popover {
+  background-color: $content-background-color;
+  min-width: 200px;
+  padding: 10px 15px;
+  input {
+    background-color: white;
+  }
+  .btn-link-reversed,
+  .btn-link-reversed:hover,
+  .btn-link-reversed:active,
+  .btn-link-reversed:focus,
+  .btn-link-reversed:active:focus {
+    font: 14px Segoe UI;
+    color: #a6a6a6;
+    padding: 3.75px 7.5px;
+    border: none;
+    outline: none;
+    background-color: #f2f2f2;
+  }
+}
+
+.custom-popover-header{
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.custom-popover-item{
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.custom-popover-item-double{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
 
 .min-height-400 {
   min-height: 400px;
@@ -13,6 +60,10 @@
 
 .list-group-item + .list-group-item {
   border-top-width: 1px;
+}
+
+.overflowX-hidden {
+  overflow-x: hidden;
 }
 
 .content {
@@ -991,7 +1042,7 @@ td {
   font-size: 15px;
   background-color: transparent !important;
   border-width: 0;
-  margin-right: 10px;
+  margin-right: 5px;
   color: white;
 }
 
@@ -1008,7 +1059,6 @@ td {
 
 .header-icon-text {
   font-size: 10px;
-  margin-right: 15px;
   margin-top: auto;
   margin-left: -5px;
   padding-bottom: 4px;
@@ -1324,27 +1374,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .sidebar-filter-navlink {
   padding-left: 0px !important;
-}
-
-.custom-popover {
-  background-color: $content-background-color;
-  min-width: 200px;
-  padding: 10px 15px;
-  input {
-    background-color: white;
-  }
-  .btn-link-reversed,
-  .btn-link-reversed:hover,
-  .btn-link-reversed:active,
-  .btn-link-reversed:focus,
-  .btn-link-reversed:active:focus {
-    font: 14px Segoe UI;
-    color: #a6a6a6;
-    padding: 3.75px 7.5px;
-    border: none;
-    outline: none;
-    background-color: #f2f2f2;
-  }
 }
 
 //--------------------END-sidebar----------------------

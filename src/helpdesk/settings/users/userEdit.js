@@ -203,198 +203,196 @@ export default function UserEdit( props ) {
   const isDisabled = ( currentUserLevel !== 0 && currentUserLevel >= role.level );
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
-        { dataChanged &&
-          <div className="message error-message">
-            Save changes before leaving!
-          </div>
-        }
-        { !dataChanged &&
-          <div className="message success-message">
-            Saved
-          </div>
-        }
-      </div>
-      <div className="scroll-visible p-l-20 p-r-20 p-b-20 p-t-10 fit-with-header-and-commandbar">
-        <h2 className="m-b-20" >
-          Edit user
-        </h2>
-        <FormGroup>
-          <Label for="role">Role <span className="warning-big">*</span></Label>
-          <Select
-            styles={ pickSelectStyle() }
-            isDisabled={ isDisabled }
-            options={ roles }
-            value={ role }
-            onChange={ role => {
-              setRole(role);
-              setDataChanged( true );
-            }}
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="username">Username <span className="warning-big">*</span></Label>
-          <Input
-            type="text"
-            name="username"
-            id="username"
-            placeholder="Enter username"
-            disabled={ isDisabled }
-            value={ username }
-            onChange={ (e) => {
-              setUsername(e.target.value);
-              setDataChanged( true );
-            }}
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="name">Name <span className="warning-big">*</span></Label>
-          <Input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="Enter name"
-            disabled={ isDisabled }
-            value={ name }
-            onChange={ (e) => {
-              setName(e.target.value);
-              setDataChanged( true );
-            } }
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="surname">Surname <span className="warning-big">*</span></Label>
-          <Input
-            type="text"
-            name="surname"
-            id="surname"
-            placeholder="Enter surname"
-            disabled={ isDisabled }
-            value={ surname }
-            onChange={ (e) => {
-              setSurname(e.target.value);
-              setDataChanged( true );
-            } }
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="email">E-mail <span className="warning-big">*</span></Label>
-          <Input
-            type="email"
-            name="email"
-            id="email"
-            placeholder="Enter email"
-            value={ email }
-            disabled={ isDisabled }
-            onChange={ (e) => {
-              setEmail(e.target.value);
-              setDataChanged( true );
-            } }
-            />
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="language">Language</Label>
-          <Select
-            styles={ pickSelectStyle() }
-            options={ languages }
-            value={ language }
-            isDisabled={ isDisabled }
-            onChange={ lang => {
-              setLanguage(lang);
-              setDataChanged( true );
-            } }
-            />
-        </FormGroup>
-
-        <Checkbox
-          className = "m-b-5 p-l-0"
-          value = { receiveNotifications }
-          label = "Receive e-mail notifications"
-          disabled={isDisabled}
-          onChange={()=> {
-            setReceiveNotifications(!receiveNotifications);
+    <div className="scroll-visible p-20 fit-with-header">
+      <h2 className="m-b-20" >
+        Edit user
+      </h2>
+      <FormGroup>
+        <Label for="role">Role <span className="warning-big">*</span></Label>
+        <Select
+          styles={ pickSelectStyle() }
+          isDisabled={ isDisabled }
+          options={ roles }
+          value={ role }
+          onChange={ role => {
+            setRole(role);
             setDataChanged( true );
           }}
           />
-
-        <FormGroup>
-          <Label for="company">Company <span className="warning-big">*</span></Label>
-          <Select
-            styles={ pickSelectStyle() }
-            isDisabled={ isDisabled }
-            options={ companies }
-            value={ company }
-            onChange={ e => {
-              setCompany( e );
-              setDataChanged( true );
-            } }
-            />
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="signature">Signature</Label>
-          <Input
-            type="textarea"
-            name="signature"
-            id="signature"
-            placeholder="Enter signature"
-            disabled={isDisabled}
-            value={ signature }
-            onChange={ (e) => {
-              setSignature(e.target.value);
-              setDataChanged( true );
-            } }
-            />
-        </FormGroup>
-
-        { !isDisabled &&
-          <div className="form-buttons-row">
-            { id !== currentUser.id &&
-              <button
-                className="btn-red btn-distance"
-                disabled={deletingUser}
-                onClick={deleteUserFunc}
-                >
-                Delete
-              </button>
-            }
-            { id !== currentUser.id &&
-              <button
-                className={ active ? "btn btn-grey" : "btn btn-green"}
-                onClick={()=> deactivateUser(active)}
-                >
-                {active ? 'Deactivate user' : 'Activate user'}
-              </button>
-            }
-            <button
-              className="btn-link ml-auto btn-distance"
-              disabled={ saving || isDisabled }
-              onClick={ ()=>{
-                setPasswordChangeOpen(true);
-              }}
-              >
-              { password === null ? 'Change password' : 'Password change edit' }
-            </button>
-            <button
-              className="btn"
-              disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
-              onClick={ updateUserFunc }
-              >
-              { saving ? 'Saving user...' : 'Save user' }
-            </button>
-          </div>
-        }
-        <PasswordChange
-          submitPass={(pass) => {
-            setPassword(pass);
-            setPasswordChangeOpen(false);
+      </FormGroup>
+      <FormGroup>
+        <Label for="username">Username <span className="warning-big">*</span></Label>
+        <Input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="Enter username"
+          disabled={ isDisabled }
+          value={ username }
+          onChange={ (e) => {
+            setUsername(e.target.value);
+            setDataChanged( true );
           }}
-          isOpen={passwordChangeOpen}
           />
-      </div>
-    </div>
+      </FormGroup>
+      <FormGroup>
+        <Label for="name">Name <span className="warning-big">*</span></Label>
+        <Input
+          type="text"
+          name="name"
+          id="name"
+          placeholder="Enter name"
+          disabled={ isDisabled }
+          value={ name }
+          onChange={ (e) => {
+            setName(e.target.value);
+            setDataChanged( true );
+          } }
+          />
+      </FormGroup>
+      <FormGroup>
+        <Label for="surname">Surname <span className="warning-big">*</span></Label>
+        <Input
+          type="text"
+          name="surname"
+          id="surname"
+          placeholder="Enter surname"
+          disabled={ isDisabled }
+          value={ surname }
+          onChange={ (e) => {
+            setSurname(e.target.value);
+            setDataChanged( true );
+          } }
+          />
+      </FormGroup>
+      <FormGroup>
+        <Label for="email">E-mail <span className="warning-big">*</span></Label>
+        <Input
+          type="email"
+          name="email"
+          id="email"
+          placeholder="Enter email"
+          value={ email }
+          disabled={ isDisabled }
+          onChange={ (e) => {
+            setEmail(e.target.value);
+            setDataChanged( true );
+          } }
+          />
+      </FormGroup>
 
+      <FormGroup>
+        <Label for="language">Language</Label>
+        <Select
+          styles={ pickSelectStyle() }
+          options={ languages }
+          value={ language }
+          isDisabled={ isDisabled }
+          onChange={ lang => {
+            setLanguage(lang);
+            setDataChanged( true );
+          } }
+          />
+      </FormGroup>
+
+      <Checkbox
+        className = "m-b-5 p-l-0"
+        value = { receiveNotifications }
+        label = "Receive e-mail notifications"
+        disabled={isDisabled}
+        onChange={()=> {
+          setReceiveNotifications(!receiveNotifications);
+          setDataChanged( true );
+        }}
+        />
+
+      <FormGroup>
+        <Label for="company">Company <span className="warning-big">*</span></Label>
+        <Select
+          styles={ pickSelectStyle() }
+          isDisabled={ isDisabled }
+          options={ companies }
+          value={ company }
+          onChange={ e => {
+            setCompany( e );
+            setDataChanged( true );
+          } }
+          />
+      </FormGroup>
+
+      <FormGroup>
+        <Label for="signature">Signature</Label>
+        <Input
+          type="textarea"
+          name="signature"
+          id="signature"
+          placeholder="Enter signature"
+          disabled={isDisabled}
+          value={ signature }
+          onChange={ (e) => {
+            setSignature(e.target.value);
+            setDataChanged( true );
+          } }
+          />
+      </FormGroup>
+
+      { !isDisabled &&
+        <div className="form-buttons-row">
+          { id !== currentUser.id &&
+            <button
+              className="btn-red btn-distance"
+              disabled={deletingUser}
+              onClick={deleteUserFunc}
+              >
+              Delete
+            </button>
+          }
+          { id !== currentUser.id &&
+            <button
+              className={ active ? "btn btn-grey btn-distance" : "btn btn-green btn-distance"}
+              onClick={()=> deactivateUser(active)}
+              >
+              {active ? 'Deactivate user' : 'Activate user'}
+            </button>
+          }
+          <button
+            className="btn-link btn-distance"
+            disabled={ saving || isDisabled }
+            onClick={ ()=>{
+              setPasswordChangeOpen(true);
+            }}
+            >
+            { password === null ? 'Change password' : 'Password change edit' }
+          </button>
+          <div className="ml-auto message m-r-10">
+            { dataChanged &&
+              <div className="message error-message">
+                Save changes before leaving!
+              </div>
+            }
+            { !dataChanged &&
+              <div className="message success-message">
+                Saved
+              </div>
+            }
+          </div>
+
+          <button
+            className="btn"
+            disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
+            onClick={ updateUserFunc }
+            >
+            { saving ? 'Saving user...' : 'Save user' }
+          </button>
+        </div>
+      }
+      <PasswordChange
+        submitPass={(pass) => {
+          setPassword(pass);
+          setPasswordChangeOpen(false);
+        }}
+        isOpen={passwordChangeOpen}
+        />
+    </div>
   )
 }

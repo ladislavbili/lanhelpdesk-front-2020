@@ -3,6 +3,8 @@ import {
   useQuery,
   useSubscription,
 } from "@apollo/client";
+import Empty from 'components/Empty';
+import SettingListContainer from '../components/settingListContainer';
 
 import PausalEdit from './pausalEdit';
 import classnames from 'classnames';
@@ -38,32 +40,24 @@ export default function CompaniesList( props ) {
 
   const COMPANIES = ( loading || !data ? [] : data.companies );
 
-  return (
-    <div className="content">
-      <div className="row m-0 p-0 taskList-container">
-        <div className="col-lg-4">
-          <div className="commandbar">
-            <div className="search-row">
-              <div className="search">
-                <button className="search-btn" type="button">
-                  <i className="fa fa-search" />
-                </button>
-                  <input
-                    type="text"
-                    className="form-control search-text"
-                    value={companyFilter}
-                    onChange={(e)=>setCompanyFilter(e.target.value)}
-                    placeholder="Search"
-                  />
-              </div>
-            </div>
-          </div>
+  const RightSideComponent = (
+    <Empty>
+      {
+      match.params.id && COMPANIES.some((item)=>item.id===parseInt(match.params.id)) && <PausalEdit match={match} history = {history} />
+      }
+    </Empty>
+  )
 
-          <div className="p-t-9 p-r-10 p-l-10 scroll-visible fit-with-header-and-commandbar">
-            <h2 className=" p-b-10 p-l-10">
-              Service level agreements
-						</h2>
-            <table className="table table-hover">
+  return (
+    <SettingListContainer
+      header="Service level agreements"
+      filter={companyFilter}
+      setFilter={setCompanyFilter}
+      history={history}
+      RightSideComponent={RightSideComponent}
+      noAdd
+      >
+      <table className="table table-hover">
               <thead>
                 <tr>
                   <th>Title</th>
@@ -99,17 +93,6 @@ export default function CompaniesList( props ) {
               }
               </tbody>
             </table>
-          </div>
-        </div>
-        <div className="col-lg-8">
-          {
-          match.params.id && COMPANIES.some((item)=>item.id===parseInt(match.params.id)) && <PausalEdit match={match} history = {history} />
-          }
-          {
-            !loading && !match.params.id && <div className="commandbar"></div>
-          }
-        </div>
-      </div>
-      </div>
+    </SettingListContainer>
   );
 }
