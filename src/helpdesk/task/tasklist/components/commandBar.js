@@ -1,5 +1,6 @@
 import React from 'react';
 import MultiSelect from 'components/MultiSelectNew';
+import GeneralPopover from 'components/generalPopover';
 import Empty from 'components/Empty';
 import classnames from 'classnames';
 import {
@@ -16,16 +17,6 @@ import {
 
 import Checkbox from 'components/checkbox';
 import Switch from "react-switch";
-import {
-  Button,
-  Popover,
-  PopoverHeader,
-  PopoverBody,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-} from 'reactstrap';
 
 // breadcrums, layout switch
 export default function CommandBar( props ) {
@@ -213,6 +204,7 @@ export default function CommandBar( props ) {
                       bodyClassName="p-l-10 p-r-10"
                       direction="left"
                       target="commandbar-column-preferences"
+                      useLegacy
                       style={{}}
                       header="Select task list columns"
                       closeMultiSelect={openColumnPreferences}
@@ -238,15 +230,22 @@ export default function CommandBar( props ) {
               </div>
             </div>
 
-            <Dropdown className="center-hor m-l-5"
-              isOpen={layoutOpen}
-              toggle={() => setLayoutOpen(!layoutOpen)}
-              >
-              <DropdownToggle className="btn btn-link">
+            <Empty>
+              <button className="btn btn-link center-hor m-l-5" id={`commandbar-layout-switch`} onClick={ () => setLayoutOpen(true) } >
                 <i className={"m-r-5 fa " + getLayoutIcon()}/>
                 {getLayoutTitle()}
-              </DropdownToggle>
-              <DropdownMenu right>
+              </button>
+              <GeneralPopover
+                placement="bottom-start"
+                className="overflow-auto mh-100 mw-0"
+                target={`commandbar-layout-switch`}
+                useLegacy
+                reset={() => {}}
+                submit={() => {}}
+                open={ layoutOpen }
+                close={() => setLayoutOpen(false)}
+                hideButtons
+                >
                 <div className="btn-group-vertical" data-toggle="buttons">
                   {
                     /*
@@ -258,27 +257,27 @@ export default function CommandBar( props ) {
                     */
                   }
                   <label className={classnames({'active':tasklistLayout === 1 || tasklistLayout === 0}, "btn btn-link t-a-l")}>
-                    <input type="radio" name="options" checked={tasklistLayout === 1 || ( tasklistLayout === 2 && localProject.id === null ) } onChange={() => setTasklistLayout(1)}/>
+                    <input type="radio" name="options" checked={tasklistLayout === 1 || ( tasklistLayout === 2 && localProject.id === null ) } onChange={() => {setTasklistLayout(1); setLayoutOpen(false); }}/>
                     <i className="fa fa-list m-r-5"/>
                     Zoznam
                   </label>
                   { localProject.id &&
                     <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link t-a-l")}>
-                      <input type="radio" name="options" onChange={() => setTasklistLayout(2)} checked={tasklistLayout === 2}/>
+                      <input type="radio" name="options" onChange={() => {setTasklistLayout(2); setLayoutOpen(false); }} checked={tasklistLayout === 2}/>
                       <i className="fa fa-map m-r-5"/>
                       DnD
                     </label>
                   }
                   { canViewCalendar &&
                     <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link t-a-l")}>
-                      <input type="radio" name="options" onChange={() => setTasklistLayout(3)} checked={tasklistLayout === 3}/>
+                      <input type="radio" name="options" onChange={() => {setTasklistLayout(3); setLayoutOpen(false); }} checked={tasklistLayout === 3}/>
                       <i className="fa fa-calendar-alt m-r-5"/>
                       Kalendár
                     </label>
                   }
                   { localProject.id &&
                     <label className={classnames({'active':tasklistLayout === 4}, "btn btn-link t-a-l")}>
-                      <input type="radio" name="options" onChange={() => setTasklistLayout(4)} checked={tasklistLayout === 4}/>
+                      <input type="radio" name="options" onChange={() => {setTasklistLayout(4); setLayoutOpen(false); }} checked={tasklistLayout === 4}/>
                       <i className="fa fa-project-diagram m-r-5"/>
                       Project management
                     </label>
@@ -290,6 +289,7 @@ export default function CommandBar( props ) {
                         name="options"
                         onChange={() =>{
                           setTasklistLayout(5);
+                          setLayoutOpen(false);
                         }}
                         checked={tasklistLayout === 5}
                         />
@@ -298,8 +298,8 @@ export default function CommandBar( props ) {
                     </label>
                   }
                 </div>
-              </DropdownMenu>
-            </Dropdown>
+              </GeneralPopover>
+            </Empty>
           </div>
         </div>
       </div>

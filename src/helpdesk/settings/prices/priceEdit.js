@@ -1,11 +1,11 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient,
 } from "@apollo/client";
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
+import classnames from 'classnames';
+
 import {
   FormGroup,
   Label,
@@ -15,17 +15,21 @@ import {
   ModalHeader,
   ModalFooter
 } from 'reactstrap';
-
-import {
-  toSelArr
-} from 'helperFunctions';
+import Switch from "react-switch";
+import Loading from 'components/loading';
+import SettingsInput from '../components/settingsInput';
 import Select from 'react-select';
+
 import {
   pickSelectStyle
 } from "configs/components/select";
-import Loading from 'components/loading';
-import Switch from "react-switch";
+import {
+  toSelArr
+} from 'helperFunctions';
 
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import {
   GET_PRICELISTS,
   GET_PRICELIST,
@@ -33,33 +37,33 @@ import {
   DELETE_PRICELIST,
 } from './queries';
 
-
-
 export default function PricelistEdit( props ) {
-  //data
   const {
-    history
+    history,
+    listId
   } = props;
-  const {
-    data,
-    loading,
-    refetch
-  } = useQuery( GET_PRICELIST, {
-    variables: {
-      id: ( props.listId ? props.listId : parseInt( props.match.params.id ) )
-    },
-    fetchPolicy: 'network-only'
-  } );
-  const [ updatePricelist ] = useMutation( UPDATE_PRICELIST );
-  const [ deletePricelist, {
-    client
-  } ] = useMutation( DELETE_PRICELIST );
+  const id = props.listId ? props.listId : parseInt( props.match.params.id );
+  const client = useApolloClient();
   const allPricelists = toSelArr( client.readQuery( {
       query: GET_PRICELISTS
     } )
     .pricelists );
-  const filteredPricelists = allPricelists.filter( pricelist => pricelist.id !== ( props.listId ? props.listId : parseInt( props.match.params.id ) ) );
-  const theOnlyOneLeft = allPricelists.length === 0;
+  const filteredPricelists = allPricelists.filter( pricelist => pricelist.id !== id );
+  const theOnlyOneLeft = allPricelists.length === 1;
+
+  const {
+    data: pricelistData,
+    loading: pricelistLoading,
+    refetch: pricelistRefetch
+  } = useQuery( GET_PRICELIST, {
+    variables: {
+      id
+    },
+    fetchPolicy: 'network-only'
+  } );
+
+  const [ updatePricelist ] = useMutation( UPDATE_PRICELIST );
+  const [ deletePricelist ] = useMutation( DELETE_PRICELIST );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -80,43 +84,44 @@ export default function PricelistEdit( props ) {
   // sync
   React.useEffect( () => {
     setData()
-  }, [ loading ] );
+  }, [ pricelistLoading ] );
 
   React.useEffect( () => {
-    refetch( {
+    pricelistRefetch( {
         variables: {
-          id: ( props.listId ? props.listId : parseInt( props.match.params.id ) )
+          id
         }
       } )
       .then( setData );
-  }, [ ( props.listId ? props.listId : parseInt( props.match.params.id ) ) ] );
+  }, [ id ] );
 
   // functions
   const setData = () => {
-    if ( loading ) {
+    if ( pricelistLoading ) {
       return;
     }
-    setTitle( data.pricelist.title );
-    setOrder( data.pricelist.order );
-    setAfterHours( data.pricelist.afterHours );
-    setDef( data.pricelist.def );
-    setMaterialMargin( data.pricelist.materialMargin );
-    setMaterialMarginExtra( data.pricelist.materialMarginExtra );
-    setPrices( data.pricelist.prices );
+    const pricelist = pricelistData.pricelist;
+    setTitle( pricelist.title );
+    setOrder( pricelist.order );
+    setAfterHours( pricelist.afterHours );
+    setDef( pricelist.def );
+    setMaterialMargin( pricelist.materialMargin );
+    setMaterialMarginExtra( pricelist.materialMarginExtra );
+    setPrices( pricelist.prices );
     setDataChanged( false );
   }
 
   const updatePricelistFunc = () => {
     setSaving( true );
-    let newPrices = prices.map( p => {
+    let newPrices = prices.map( price => {
       return {
-        id: p.id,
-        price: ( p.price === "" ? 0 : parseFloat( p.price ) )
+        id: price.id,
+        price: ( price.price === "" ? 0 : parseFloat( price.price ) )
       }
     } );
     updatePricelist( {
         variables: {
-          id: ( props.listId ? props.listId : parseInt( props.match.params.id ) ),
+          id,
           title,
           order: ( order !== '' ? parseInt( order ) : 0 ),
           afterHours: ( afterHours !== '' ? parseInt( afterHours ) : 0 ),
@@ -140,7 +145,7 @@ export default function PricelistEdit( props ) {
     if ( window.confirm( "Are you sure?" ) ) {
       deletePricelist( {
           variables: {
-            id: ( props.listId ? props.listId : parseInt( props.match.params.id ) ),
+            id,
             newDefId: ( newDefPricelist ? parseInt( newDefPricelist.id ) : null ),
             newId: ( newPricelist ? parseInt( newPricelist.id ) : null ),
           }
@@ -154,238 +159,200 @@ export default function PricelistEdit( props ) {
     }
   };
 
-  if ( loading ) {
+  if ( pricelistLoading ) {
     return <Loading />
   }
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
-        { dataChanged &&
-          <div className="message error-message">
-            Save changes before leaving!
-          </div>
-        }
-        { !dataChanged &&
-          <div className="message success-message">
-            Saved
-          </div>
+    <div className="scroll-visible p-20 fit-with-header">
+      <h2 className="m-b-20" >
+        Edit price list
+      </h2>
+      <label className="m-b-20">
+        <Switch
+          checked={def}
+          onChange={ () => {
+            setDef(!def);
+            setDataChanged( true );
+          } }
+          height={22}
+          checkedIcon={<span className="switchLabel">YES</span>}
+          uncheckedIcon={<span className="switchLabel">NO</span>}
+          onColor={"#0078D4"} />
+        <span className="m-l-10">Default</span>
+      </label>
+
+      <SettingsInput
+        required
+        id="title"
+        label="Pricelist name"
+        value={title}
+        onChange={(e) => {
+          setTitle(e.target.value);
+          setDataChanged( true );
+        }}
+        />
+
+      <h3>Ceny úloh</h3>
+      <div className="p-t-10 p-b-10">
+        { prices.filter(item => item.type === "TaskType" )
+          .map((item, index) => (
+            <SettingsInput
+              key={index}
+              id={ item.taskType ? `taskTypes-${item.taskType.title}-${item.taskType.id}` : `unknown-${index}`}
+              label={item.taskType ? item.taskType.title : "Unnamed"}
+              placeholder="Enter price"
+              value={item.price}
+              onChange={(e) => {
+                let newPrices = prices.map(price => {
+                  if (price.id === item.id){
+                    return {...price, price: e.target.value.replace(",", ".")}
+                  } else {
+                    return {...price};
+                  }
+                });
+                setPrices(newPrices);
+                setDataChanged( true );
+              }}
+              />
+          ))
         }
       </div>
-      <div className="scroll-visible p-t-10 p-l-20 p-r-20 fit-with-header-and-commandbar">
-        <h2 className="m-b-20" >
-          Edit price list
-        </h2>
-        <label className="m-b-20">
-          <Switch
-            checked={def}
-            onChange={ () => {
-              setDef(!def);
-              setDataChanged( true );
-            } }
-            height={22}
-            checkedIcon={<span className="switchLabel">YES</span>}
-            uncheckedIcon={<span className="switchLabel">NO</span>}
-            onColor={"#0078D4"} />
-          <span className="m-l-10">Default</span>
-        </label>
 
-        <FormGroup className="row m-b-10">
-          <div className="m-r-10 w-20">
-            <Label for="name">Pricelist name <span className="warning-big">*</span></Label>
-          </div>
-          <div className="flex">
-            <Input
-              type="text"
-              name="name"
-              id="name"
-              placeholder="Enter pricelist name"
-              value={title}
-              onChange={ (e) => {
-                setTitle(e.target.value);
+      <h3>Ceny Výjazdov</h3>
+      <div className="p-t-10 p-b-10">
+        { prices.filter(item => item.type === "TripType" )
+          .map((item, index) => (
+            <SettingsInput
+              key={index}
+              id={ item.tripType ? `tripTypes-${item.tripType.title}-${item.tripType.id}` : `unknown-${index}`}
+              label={item.tripType ? item.tripType.title : "Unnamed"}
+              placeholder="Enter price"
+              value={item.price}
+              onChange={(e) => {
+                let newPrices = prices.map(p => {
+                  if (p.id === item.id){
+                    return {...p, price: e.target.value.replace(",", ".")}
+                  } else {
+                    return {...p};
+                  }
+                });
+                setPrices(newPrices);
                 setDataChanged( true );
-              } }
+              }}
               />
-          </div>
-        </FormGroup>
+          ))
+        }
+      </div>
 
-        <h3>Ceny úloh</h3>
-        <div className="p-t-10 p-b-10">
-          {
-            prices.filter(item => item.type === "TaskType" )
-            .map((item, i) =>
-            <FormGroup key={i} className="row m-b-10">
-              <div className="m-r-10 w-20">
-                <Label for={item.type}>{item.taskType ? item.taskType.title : "Unnamed"}</Label>
-              </div>
-              <div className="flex">
-                <Input
-                  type="text"
-                  name={item.type}
-                  id={item.type}
-                  placeholder="Enter price"
-                  value={item.price}
-                  onChange={(e)=>{
-                    let newPrices = prices.map(p => {
-                      if (p.id === item.id){
-                        return {...p, price: e.target.value.replace(",", ".")}
-                      } else {
-                        return {...p};
-                      }
-                    });
-                    setPrices(newPrices);
-                    setDataChanged( true );
-                  }}
-                  />
-              </div>
-            </FormGroup>
-          )}
-        </div>
+      <h3>Všeobecné prirážky</h3>
+      <div className="p-t-10">
 
-        <h3>Ceny Výjazdov</h3>
-        <div className="p-t-10 p-b-10">
-          {
-            prices.filter(item => item.type === "TripType" )
-            .map((item, i) =>
-            <FormGroup key={i} className="row m-b-10">
-              <div className="m-r-10 w-20">
-                <Label for={item.type}>{item.tripType ? item.tripType.title : "Unnamed"}</Label>
-              </div>
-              <div className="flex">
-                <Input
-                  type="text"
-                  name={item.type}
-                  id={item.type}
-                  placeholder="Enter price"
-                  value={item.price}
-                  onChange={(e)=>{
-                    let newPrices = prices.map(p => {
-                      if (p.id === item.id){
-                        return {...p, price: e.target.value.replace(",", ".")}
-                      } else {
-                        return {...p};
-                      }
-                    });
-                    setPrices(newPrices);
-                    setDataChanged( true );
-                  }}
-                  />
-              </div>
-            </FormGroup>
-          )}
-        </div>
+        <SettingsInput
+          id="afterHours"
+          label="After hours percentage"
+          value={afterHours}
+          onChange={(e) => {
+            setAfterHours(e.target.value.replace(",", "."));
+            setDataChanged( true );
+          }}
+          />
 
-        <h3>Všeobecné prirážky</h3>
-        <div className="p-t-10">
-          <FormGroup className="row m-b-10">
-            <div className="m-r-10 w-20">
-              <Label for="afterPer">After hours percentage</Label>
-            </div>
-            <div className="flex">
-              <Input
-                type="text"
-                name="afterPer"
-                id="afterPer"
-                placeholder="Enter after hours percentage"
-                value={afterHours}
-                onChange={(e)=>{
-                  setAfterHours(e.target.value.replace(",", "."));
-                  setDataChanged( true );
-                }}
-                />
-            </div>
+        <SettingsInput
+          id="materialMargin"
+          label="Materials margin percentage 50-"
+          placeholder="Enter materials margin percentage"
+          value={materialMargin}
+          onChange={(e) => {
+            setMaterialMargin(e.target.value.replace(",", "."));
+            setDataChanged( true );
+          }}
+          />
+
+        <SettingsInput
+          id="materialMarginExtra"
+          label="Materials margin percentage 50+"
+          placeholder="Enter materials margin percentage"
+          value={materialMarginExtra}
+          onChange={(e) => {
+            setMaterialMarginExtra(e.target.value.replace(",", "."));
+            setDataChanged( true );
+          }}
+          />
+      </div>
+
+      <Modal isOpen={choosingNewPricelist}>
+        <ModalHeader>
+          Please choose a pricelist to replace this one
+        </ModalHeader>
+        <ModalBody>
+          <FormGroup>
+            { def && <Label>A replacement pricelist</Label> }
+            <Select
+              styles={pickSelectStyle()}
+              options={filteredPricelists}
+              value={newPricelist}
+              onChange={s => {
+                setNewPricelist(s);
+                setDataChanged( true );
+              }}
+              />
           </FormGroup>
-          <FormGroup className="row m-b-10">
-            <div className="m-r-10 w-20">
-              <Label for="materMarg">Materials margin percentage 50-</Label>
-            </div>
-            <div className="flex">
-              <Input
-                type="text"
-                name="materMarg"
-                id="materMarg"
-                placeholder="Enter materials margin percentage"
-                value={materialMargin}
-                onChange={(e)=>{
-                  setMaterialMargin(e.target.value.replace(",", "."));
-                  setDataChanged( true );
-                }}
-                />
-            </div>
-          </FormGroup>
-          <FormGroup className="row m-b-10">
-            <div className="m-r-10 w-20">
-              <Label for="materMarg+">Materials margin percentage 50+</Label>
-            </div>
-            <div className="flex">
-              <Input
-                type="text"
-                name="materMarg+"
-                id="materMarg+"
-                placeholder="Enter materials margin percentage"
-                value={materialMarginExtra}
-                onChange={(e)=>{
-                  setMaterialMarginExtra(e.target.value.replace(",", "."));
-                  setDataChanged( true );
-                }}
-                />
-            </div>
-          </FormGroup>
-        </div>
 
-        <Modal isOpen={choosingNewPricelist}>
-          <ModalHeader>
-            Please choose a pricelist to replace this one
-          </ModalHeader>
-          <ModalBody>
+          {def &&
             <FormGroup>
-              { def && <Label>A replacement pricelist</Label> }
+              <Label>New default pricelist</Label>
               <Select
                 styles={pickSelectStyle()}
                 options={filteredPricelists}
-                value={newPricelist}
+                value={newDefPricelist}
                 onChange={s => {
-                  setNewPricelist(s);
+                  setNewDefPricelist(s);
                   setDataChanged( true );
                 }}
                 />
             </FormGroup>
-
-            {def &&
-              <FormGroup>
-                <Label>New default pricelist</Label>
-                <Select
-                  styles={pickSelectStyle()}
-                  options={filteredPricelists}
-                  value={newDefPricelist}
-                  onChange={s => {
-                    setNewDefPricelist(s);
-                    setDataChanged( true );
-                  }}
-                  />
-              </FormGroup>
-            }
-          </ModalBody>
-          <ModalFooter>
-            <button className="btn-link-cancel mr-auto"onClick={() => setChoosingNewPricelist(false)}>
-              Cancel
-            </button>
-            <button className="btn ml-auto" disabled={!newPricelist || (def ? !newDefPricelist : false)} onClick={deletePricelistFunc}>
-              Complete deletion
-            </button>
-          </ModalFooter>
-        </Modal>
-
-        <div className="form-buttons-row m-b-20">
-          <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={() => setChoosingNewPricelist(true)}>Delete</button>
+          }
+        </ModalBody>
+        <ModalFooter>
+          <button className="btn-link-cancel mr-auto"onClick={() => setChoosingNewPricelist(false)}>
+            Cancel
+          </button>
           <button
             className="btn ml-auto"
-            disabled={saving}
-            onClick={updatePricelistFunc}
-            >
-            {saving?'Saving prices...':'Save prices'}
+            disabled={!newPricelist || (def ? !newDefPricelist : false)}
+            onClick={deletePricelistFunc}>
+            Complete deletion
           </button>
+        </ModalFooter>
+      </Modal>
+
+      <div className="form-buttons-row m-b-20">
+        <button
+          className="btn-red" disabled={saving || theOnlyOneLeft}
+          onClick={() => setChoosingNewPricelist(true)}
+          >
+          Delete
+        </button>
+        <div className="ml-auto message m-r-10">
+          { dataChanged &&
+            <div className="message error-message">
+              Save changes before leaving!
+            </div>
+          }
+          { !dataChanged &&
+            <div className="message success-message">
+              Saved
+            </div>
+          }
         </div>
+        <button
+          className="btn m-t-5"
+          disabled={saving}
+          onClick={updatePricelistFunc}
+          >
+          { saving ? 'Saving prices...' : 'Save prices' }
+        </button>
       </div>
     </div>
   );

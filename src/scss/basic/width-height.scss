@@ -66,6 +66,12 @@
 
 
 //WIDTH
+@for $margin from 0 through 800{
+  .mw-#{increment-by-5($margin)} {
+    min-width: #{increment-by-5($margin)}px !important;
+  }
+}
+
 .full-width {
   width: 100%;
 }

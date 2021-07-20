@@ -4,21 +4,23 @@ import {
   useQuery,
   useApolloClient
 } from "@apollo/client";
+import classnames from 'classnames';
 
 import {
   FormGroup,
   Label,
   Input
 } from 'reactstrap';
-import classnames from 'classnames';
 import Select from 'react-select';
+import Loading from 'components/loading';
+import Checkbox from 'components/checkbox';
+import SettingsInput from '../components/settingsInput';
+import SettingsHiddenInput from '../components/settingsHiddenInput';
+
+import languages from "configs/constants/languages";
 import {
   pickSelectStyle
 } from "configs/components/select";
-import Loading from 'components/loading';
-
-import languages from "configs/constants/languages";
-
 import {
   isEmail,
   toSelArr,
@@ -27,37 +29,38 @@ import {
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
-import Checkbox from 'components/checkbox';
 
 import {
   GET_USERS,
   GET_BASIC_USERS,
   ADD_USER,
 } from './queries';
-
 import {
   GET_ROLES,
 } from '../roles/queries';
-
 import {
   GET_BASIC_COMPANIES,
 } from '../companies/queries';
 
 
 export default function UserAdd( props ) {
-  // data & queries
   const {
     history,
     addUserToList,
     closeModal
   } = props;
+
   const client = useApolloClient();
+
+  const currentUser = getMyData();
+
   const {
     data: rolesData,
     loading: rolesLoading
   } = useQuery( GET_ROLES, {
     fetchPolicy: 'network-only'
   } );
+
   const {
     data: companiesData,
     loading: companiesLoading
@@ -80,9 +83,8 @@ export default function UserAdd( props ) {
   const [ role, setRole ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
   const [ language, setLanguage ] = React.useState( languages[ 0 ] );
-  const [ saving, setSaving ] = React.useState( false );
 
-  const currentUser = getMyData();
+  const [ saving, setSaving ] = React.useState( false );
 
   const dataLoading = (
     !currentUser ||
@@ -125,7 +127,7 @@ export default function UserAdd( props ) {
           addUserToList( newUser );
           closeModal();
         } else {
-          history.push( '/helpdesk/settings/users/' + newUser.id );
+          history.push( `/helpdesk/settings/users/${newUser.id}` );
         }
       } )
       .catch( ( err ) => {
@@ -133,7 +135,8 @@ export default function UserAdd( props ) {
       } );
     setSaving( false );
   }
-  const cannotAddUser = () => {
+
+  const cannotSave = () => {
     let cond1 = saving || companies.length === 0;
     let cond2 = !username || !name || !surname || !isEmail( email ) || password.length < 6 || !role || !company;
     return cond1 || cond2;
@@ -147,9 +150,11 @@ export default function UserAdd( props ) {
           {" scroll-visible fit-with-header": !closeModal},
         )}
         >
+        
         <h2 className="m-b-20" >
           Add user
         </h2>
+
         <FormGroup>
           <Label for="role">Role <span className="warning-big">*</span></Label>
           <Select
@@ -159,44 +164,69 @@ export default function UserAdd( props ) {
             onChange={ role => setRole(role) }
             />
         </FormGroup>
-        <FormGroup>
-          <Label for="username">Username <span className="warning-big">*</span></Label>
-          <Input type="text" name="username" id="username" placeholder="Enter username" value={ username } onChange={ (e) => setUsername(e.target.value) } />
-        </FormGroup>
-        <FormGroup>
-          <Label for="name">Name <span className="warning-big">*</span></Label>
-          <Input type="text" name="name" id="name" placeholder="Enter name" value={ name } onChange={ (e)=>{
-              if (signatureChanged){
-                setName(e.target.value);
-              } else {
-                setName(e.target.value);
-                setSignature(`${e.target.value} ${surname}, ${(company? company.title :'')}`);
-                setSignatureChanged(false);
-              }
-            }}
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="surname">Surname <span className="warning-big">*</span></Label>
-          <Input type="text" name="surname" id="surname" placeholder="Enter surname" value={ surname } onChange={ (e) => {
-              if (signatureChanged) {
-                setSurname(e.target.value);
-              } else {
-                setSurname(e.target.value);
-                setSignature(`${name} ${e.target.value}, ${(company? company.title :'')}`);
-                setSignatureChanged(false);
-              }
-            }}
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="email">E-mail <span className="warning-big">*</span></Label>
-          <Input type="email" name="email" id="email" placeholder="Enter email" value={ email } onChange={ (e) => setEmail(e.target.value) } />
-        </FormGroup>
-        <FormGroup>
-          <Label for="password">Password <span className="warning-big">*</span></Label>
-          <Input type="password" name="password" id="password" placeholder="Enter password" value={ password } onChange={ (e) => setPassword(e.target.value) } />
-        </FormGroup>
+
+        <SettingsInput
+          required
+          label="Username"
+          id="username"
+          value={username}
+          onChange={(e) => {
+            setUsername(e.target.value);
+          }}
+          />
+
+        <SettingsInput
+          required
+          label="Name"
+          id="name"
+          value={name}
+          onChange={ (e) => {
+            if (signatureChanged){
+              setName(e.target.value);
+            } else {
+              setName(e.target.value);
+              setSignature(`${e.target.value} ${surname}, ${(company? company.title :'')}`);
+              setSignatureChanged(false);
+            }
+          }}
+          />
+
+        <SettingsInput
+          required
+          label="Surname"
+          id="surname"
+          value={surname}
+          onChange={ (e) => {
+            if (signatureChanged) {
+              setSurname(e.target.value);
+            } else {
+              setSurname(e.target.value);
+              setSignature(`${name} ${e.target.value}, ${(company? company.title :'')}`);
+              setSignatureChanged(false);
+            }
+          }}
+          />
+
+        <SettingsInput
+          required
+          label="E-mail"
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+          />
+
+        <SettingsHiddenInput
+          required
+          label="Password"
+          id="password"
+          value={password}
+          onChange={(e)=> {
+            setPassword(e.target.value);
+          }}
+          />
 
         <FormGroup>
           <Label for="role">Language</Label>
@@ -232,22 +262,20 @@ export default function UserAdd( props ) {
             }}
             />
         </FormGroup>
-        <FormGroup>
-          <Label for="signature">Signature</Label>
-          <Input
-            type="textarea"
-            name="signature"
-            id="signature"
-            placeholder="Enter signature"
-            value={ signature }
-            onChange={ (e) => {
-              setSignature(e.target.value);
-              setSignatureChanged(true);
-            }}
-            />
-        </FormGroup>
+
+        <SettingsInput
+          label="Signature"
+          id="signature"
+          type="textarea"
+          value={signature}
+          onChange={(e)=> {
+            setSignature(e.target.value);
+            setSignatureChanged(true);
+          }}
+          />
 
         <div className="form-buttons-row">
+
           {closeModal &&
             <button
               className="btn-link"
@@ -256,21 +284,24 @@ export default function UserAdd( props ) {
               Cancel
             </button>
           }
-          { cannotAddUser() &&
+
+          { cannotSave() &&
             <div className=" ml-auto message error-message m-r-10">
               Fill in all the required information!
             </div>
           }
+
           <button
             className={classnames(
               "btn",
-              {"ml-auto": !cannotAddUser()}
+              {"ml-auto": !cannotSave()}
             )}
-            disabled={ cannotAddUser() }
+            disabled={ cannotSave() }
             onClick={ addUserFunc }
             >
             { saving ? 'Adding...' : 'Add user' }
           </button>
+
         </div>
       </div>
     </div>

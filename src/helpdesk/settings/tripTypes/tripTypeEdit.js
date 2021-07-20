@@ -1,22 +1,22 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient,
 } from "@apollo/client";
+import classnames from 'classnames';
 
-import {
-  FormGroup,
-  Label,
-  Input
-} from 'reactstrap';
 import Loading from 'components/loading';
+import DeleteReplacement from 'components/deleteReplacement';
+import SettingsInput from '../components/settingsInput';
+
 import {
   toSelArr
 } from 'helperFunctions';
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
-import DeleteReplacement from 'components/deleteReplacement';
+
 import {
   GET_TRIP_TYPES,
   GET_TRIP_TYPE,
@@ -25,31 +25,31 @@ import {
 } from './queries';
 
 export default function TripTypeEdit( props ) {
-  // data & queries
   const {
     history,
     match
   } = props;
-  const {
-    data,
-    loading,
-    refetch
-  } = useQuery( GET_TRIP_TYPE, {
-    variables: {
-      id: parseInt( match.params.id )
-    },
-    fetchPolicy: 'network-only',
-  } );
-  const [ updateTripType ] = useMutation( UPDATE_TRIP_TYPE );
-  const [ deleteTripType, {
-    client
-  } ] = useMutation( DELETE_TRIP_TYPE );
+  const client = useApolloClient();
   const allTripTypes = toSelArr( client.readQuery( {
       query: GET_TRIP_TYPES
     } )
     .tripTypes );
   const filteredTripTypes = allTripTypes.filter( tripType => tripType.id !== parseInt( match.params.id ) );
   const theOnlyOneLeft = allTripTypes.length < 2;
+
+  const {
+    data: tripTypeData,
+    loading: tripTypeLoading,
+    refetch: tripTypeRefetch
+  } = useQuery( GET_TRIP_TYPE, {
+    variables: {
+      id: parseInt( match.params.id )
+    },
+    fetchPolicy: 'network-only',
+  } );
+
+  const [ updateTripType ] = useMutation( UPDATE_TRIP_TYPE );
+  const [ deleteTripType ] = useMutation( DELETE_TRIP_TYPE );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -60,13 +60,13 @@ export default function TripTypeEdit( props ) {
 
   // sync
   React.useEffect( () => {
-    if ( !loading ) {
+    if ( !tripTypeLoading ) {
       setData();
     }
-  }, [ loading ] );
+  }, [ tripTypeLoading ] );
 
   React.useEffect( () => {
-    refetch( {
+    tripTypeRefetch( {
         variables: {
           id: parseInt( match.params.id )
         }
@@ -76,11 +76,11 @@ export default function TripTypeEdit( props ) {
 
   // functions
   const setData = () => {
-    if ( loading ) {
+    if ( tripTypeLoading ) {
       return;
     }
-    setTitle( data.tripType.title );
-    setOrder( data.tripType.order );
+    setTitle( tripTypeData.tripType.title );
+    setOrder( tripTypeData.tripType.order );
     setDataChanged( false );
   }
 
@@ -101,6 +101,7 @@ export default function TripTypeEdit( props ) {
     setSaving( false );
     setDataChanged( false );
   };
+
   const deleteTripTypeFunc = ( replacement ) => {
     if ( window.confirm( "Are you sure?" ) ) {
       deleteTripType( {
@@ -110,7 +111,7 @@ export default function TripTypeEdit( props ) {
           }
         } )
         .then( ( response ) => {
-          history.push( '/helpdesk/settings/tripTypes/add' );
+          history.push( '/helpdesk/settings/tripTypes' );
         } )
         .catch( ( err ) => {
           addLocalError( err );
@@ -118,58 +119,41 @@ export default function TripTypeEdit( props ) {
     }
   };
 
-  if ( loading ) {
+  if ( tripTypeLoading ) {
     return <Loading />
   }
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
-        { dataChanged &&
-          <div className="message error-message">
-            Save changes before leaving!
-          </div>
-        }
-        { !dataChanged &&
-          <div className="message success-message">
-            Saved
-          </div>
-        }
-      </div>
+    <div className="scroll-visible p-20 fit-with-header">
 
-      <h2 className="p-l-20 m-t-10" >
+      <h2 className="m-b-20" >
         Edit trip type
       </h2>
 
       <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-        <FormGroup>
-          <Label for="name">Task type name <span className="warning-big">*</span></Label>
-          <Input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="Enter trip type"
-            value={title}
-            onChange={(e)=> {
-              setTitle(e.target.value);
-              setDataChanged( true );
-            }}
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="order">Order</Label>
-          <Input
-            type="number"
-            name="order"
-            id="order"
-            placeholder="Lower means first"
-            value={order}
-            onChange={(e)=> {
-              setOrder(e.target.value);
-              setDataChanged( true );
-            }}
-            />
-        </FormGroup>
+
+        <SettingsInput
+          required
+          label="Trip type"
+          id="title"
+          value={title}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            setDataChanged( true );
+          }}
+          />
+
+        <SettingsInput
+          label="Order"
+          placeholder="Lower means first"
+          id="order"
+          value={order}
+          onChange={(e) => {
+            setOrder(e.target.value);
+            setDataChanged( true );
+          }}
+          />
+
         <div className="form-buttons-row">
           <button
             className="btn-red"
@@ -178,7 +162,26 @@ export default function TripTypeEdit( props ) {
             >
             Delete
           </button>
-          <button className="btn ml-auto" disabled={saving} onClick={updateTripTypeFunc}>{saving ? 'Saving trip type...' : 'Save trip type'}</button>
+
+          <div className="ml-auto message m-r-10">
+            { dataChanged &&
+              <div className="message error-message">
+                Save changes before leaving!
+              </div>
+            }
+            { !dataChanged &&
+              <div className="message success-message">
+                Saved
+              </div>
+            }
+          </div>
+
+          <button
+            className="btn m-t-5"
+            disabled={saving}
+            onClick={updateTripTypeFunc}>
+            { saving ? 'Saving trip type...' : 'Save trip type' }
+          </button>
         </div>
         <DeleteReplacement
           isOpen={deleteOpen}
@@ -189,6 +192,5 @@ export default function TripTypeEdit( props ) {
           />
       </div>
     </div>
-
   )
 }

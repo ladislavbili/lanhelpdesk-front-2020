@@ -8,6 +8,7 @@ import {
 } from 'reactstrap';
 import Empty from 'components/Empty';
 import Scheduled from './scheduled';
+import DatePicker from 'components/DatePicker';
 import Select from 'react-select';
 import {
   pickSelectStyle
@@ -39,7 +40,7 @@ const defaultCols = [
     key: 'scheduled',
     width: "15%",
     headerClassnames: "",
-    columnClassnames: "p-l-8 center-hor",
+    columnClassnames: "p-l-8 center-hor mw-160",
   },
   {
     header: 'Mn.',
@@ -60,7 +61,7 @@ const defaultCols = [
     key: 'assigned',
     width: "12%",
     headerClassnames: "",
-    columnClassnames: "p-l-8",
+    columnClassnames: "p-l-8 mw-150",
   },
   {
     header: 'Faktúrovať',
@@ -73,7 +74,7 @@ const defaultCols = [
     header: 'Akcie',
     key: 'actions',
     width: "93",
-    headerClassnames: "t-a-c",
+    headerClassnames: "t-a-r",
     columnClassnames: "t-a-r",
   },
   //advanced
@@ -82,7 +83,7 @@ const defaultCols = [
     key: 'price',
     width: "93",
     headerClassnames: "t-a-r",
-    columnClassnames: "p-l-8",
+    columnClassnames: "p-l-8 mw-100",
   },
   {
     header: 'Zľava',
@@ -96,7 +97,7 @@ const defaultCols = [
     key: 'priceAfterDiscount',
     width: "93",
     headerClassnames: "t-a-r",
-    columnClassnames: "p-l-8",
+    columnClassnames: "p-l-8 mw-100",
   },
 ]
 
@@ -214,7 +215,7 @@ export default function WorksTable( props ) {
 
   const onFocusSubtask = ( subtask ) => {
     setEditedSubtaskTitle( subtask.title );
-    setEditedSubtaskQuantity( subtask.quantity ? subtask.quantity : '' );
+    setEditedSubtaskQuantity( isNaN( parseFloat( subtask.quantity ) ) ? '' : subtask.quantity );
     setEditedSubtaskDiscount( subtask.discount );
     setFocusedSubtask( subtask.id );
   }
@@ -246,7 +247,7 @@ export default function WorksTable( props ) {
       case 'done': {
         return (
           <Checkbox
-            className="m-t-5"
+            className="m-t-5 segoe-blue-text"
             disabled= { disabled || !canAddSubtasksAndTrips }
             value={ subtask.done }
             onChange={()=>{
@@ -259,7 +260,7 @@ export default function WorksTable( props ) {
         return (
           <input
             disabled={disabled || !canAddSubtasksAndTrips}
-            className="form-control hidden-input"
+            className="form-control hidden-input segoe-blue-text"
             placeholder="Add note"
             value={
               subtask.id === focusedSubtask ?
@@ -277,20 +278,20 @@ export default function WorksTable( props ) {
       }
       case 'scheduled': {
         return (
-          <Scheduled
-            dateFrom={subtask.scheduled ? moment( parseInt( subtask.scheduled.from ) ) : null}
-            dateTo={subtask.scheduled ? moment( parseInt( subtask.scheduled.to ) ) : null}
+          <DatePicker
+            className="form-control hidden-input segoe-blue-text"
+            isClearable
+            selected={subtask.scheduled ? moment( parseInt( subtask.scheduled.from ) ) : null}
             disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
-            needsSubmit={true}
-            quantity={subtask.quantity}
-            submit={(fromDate, toDate, quantity ) => {
-              if(fromDate === null ){
+            onChange={date => {
+              const newDate = isNaN(date.valueOf()) ? null : date;
+              if( newDate === null ){
                 updateSubtask( subtask.id, { scheduled: null } )
               }else{
-                updateSubtask( subtask.id, { quantity, scheduled: { from: fromDate.valueOf().toString(), to: toDate.valueOf().toString() } } )
+                updateSubtask( subtask.id, { scheduled: { from: newDate.valueOf().toString(), to: moment(newDate).add( isNaN(parseFloat(subtask.quantity)) ? 0 : parseFloat(subtask.quantity), 'hours') } } )
               }
-            } }
-            id={`sub-${subtask.id}`}
+            }}
+            placeholderText="No start"
             />
         );
       }
@@ -300,7 +301,7 @@ export default function WorksTable( props ) {
             disabled={disabled || !canAddSubtasksAndTrips}
             type="text"
             pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-            className="form-control hidden-input h-30 t-a-r"
+            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
             value={
               subtask.id === focusedSubtask
               ? editedSubtaskQuantity.toString()
@@ -338,7 +339,7 @@ export default function WorksTable( props ) {
               updateSubtask(subtask.id,{type:type})
             }}
             options={taskTypes}
-            styles={pickSelectStyle([ 'invisible', ])}
+            styles={pickSelectStyle([ 'invisible', 'segoe' ])}
             />
         )
       }
@@ -351,7 +352,7 @@ export default function WorksTable( props ) {
               updateSubtask(subtask.id,{assignedTo:assignedTo})
             }}
             options={taskAssigned}
-            styles={pickSelectStyle([ 'invisible', ])}
+            styles={pickSelectStyle([ 'invisible', 'segoe' ])}
             />
         );
       }
@@ -423,7 +424,7 @@ export default function WorksTable( props ) {
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control hidden-input h-30"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={ getPrice(subtask.type) }
               />
           </span>
@@ -437,7 +438,7 @@ export default function WorksTable( props ) {
               disabled={disabled || !canAddSubtasksAndTrips}
               style={{display: "inline", width: "60%"}}
               type="number"
-              className="form-control hidden-input h-30"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={ parseInt(
                 subtask.id === focusedSubtask ?
                 editedSubtaskDiscount :
@@ -466,7 +467,7 @@ export default function WorksTable( props ) {
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control hidden-input h-30"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={ getDiscountPrice(subtask) }
               />
           </span>
@@ -483,7 +484,7 @@ export default function WorksTable( props ) {
       case 'done': {
         return (
           <Checkbox
-            className="m-t-5"
+            className="m-t-5 segoe-blue-text"
             disabled= { disabled || !canAddSubtasksAndTrips }
             value={ trip.done }
             onChange={()=>{
@@ -501,26 +502,26 @@ export default function WorksTable( props ) {
               updateTrip(trip.id,{type:type})
             }}
             options={tripTypes}
-            styles={pickSelectStyle([ 'invisible', ])}
+            styles={pickSelectStyle([ 'invisible', 'segoe' ])}
             />
         )
       }
       case 'scheduled': {
         return (
-          <Scheduled
-            dateFrom={trip.scheduled ? moment( parseInt( trip.scheduled.from ) ) : null}
-            dateTo={trip.scheduled ? moment( parseInt( trip.scheduled.to ) ) : null}
+          <DatePicker
+            className="form-control hidden-input segoe-blue-text"
+            isClearable
+            selected={trip.scheduled ? moment( parseInt( trip.scheduled.from ) ) : null}
             disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
-            needsSubmit={true}
-            quantity={trip.quantity}
-            submit={(fromDate, toDate, quantity ) => {
-              if(fromDate === null ){
+            onChange={date => {
+              const newDate = isNaN(date.valueOf()) ? null : date;
+              if( newDate === null ){
                 updateTrip( trip.id, { scheduled: null } )
               }else{
-                updateTrip( trip.id, { quantity, scheduled: { from: fromDate.valueOf().toString(), to: toDate.valueOf().toString() } } )
+                updateTrip( trip.id, { scheduled: { from: newDate.valueOf().toString(), to: moment(newDate).add( isNaN(parseFloat(trip.quantity)) ? 0 : parseFloat(trip.quantity), 'hours') } } )
               }
-            } }
-            id={`trip-${trip.id}`}
+            }}
+            placeholderText="No start"
             />
         );
       }
@@ -530,7 +531,7 @@ export default function WorksTable( props ) {
             disabled={disabled || !canAddSubtasksAndTrips}
             type="text"
             pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-            className="form-control hidden-input h-30 t-a-r"
+            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
             value={
               trip.id === focusedTrip ?
               editedTripQuantity.toString() :
@@ -570,7 +571,7 @@ export default function WorksTable( props ) {
               updateTrip(trip.id,{type:type})
             }}
             options={tripTypes}
-            styles={pickSelectStyle([ 'invisible', ])}
+            styles={pickSelectStyle([ 'invisible', 'segoe' ])}
             />
         )
       }
@@ -583,7 +584,7 @@ export default function WorksTable( props ) {
               updateTrip(trip.id,{assignedTo:assignedTo})
             }}
             options={taskAssigned}
-            styles={pickSelectStyle([ 'invisible', ])}
+            styles={pickSelectStyle([ 'invisible', 'segoe' ])}
             />
         );
       }
@@ -658,7 +659,7 @@ export default function WorksTable( props ) {
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control hidden-input h-30"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={ getPrice(trip.type) }
               />
           </span>
@@ -672,7 +673,7 @@ export default function WorksTable( props ) {
               disabled={disabled || !canAddSubtasksAndTrips}
               style={{display: "inline", width: "60%"}}
               type="number"
-              className="form-control hidden-input h-30"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={ parseInt(
                 trip.id === focusedTrip ?
                 editedTripDiscount :
@@ -694,14 +695,14 @@ export default function WorksTable( props ) {
       case 'priceAfterDiscount': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe-blue-text">
               €
             </div>
             <input
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control hidden-input h-30"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={ getDiscountPrice(trip) }
               />
           </span>
@@ -720,7 +721,7 @@ export default function WorksTable( props ) {
           <input
             disabled={disabled || !canAddSubtasksAndTrips}
             type="text"
-            className="form-control"
+            className="form-control segoe-blue-text"
             id="inlineFormInput"
             placeholder=""
             value={newSubtaskTitle}
@@ -760,18 +761,22 @@ export default function WorksTable( props ) {
       }
       case 'scheduled': {
         return (
-          <Scheduled
-            dateFrom={newSubtaskScheduledFrom}
-            dateTo={newSubtaskScheduledTo}
+          <DatePicker
+            className="form-control hidden-input segoe-blue-text"
+            isClearable
+            selected={ newSubtaskScheduledFrom }
             disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
-            needsSubmit={false}
-            quantity={newSubtaskQuantity}
-            submit={(fromDate, toDate, quantity ) => {
-              setNewSubtaskScheduledFrom(fromDate);
-              setNewSubtaskScheduledTo(toDate);
-              setNewSubtaskQuantity(quantity.toString());
-            } }
-            id={`newSubScheduled`}
+            onChange={date => {
+              const newDate = isNaN(date.valueOf()) ? null : date;
+              if( newDate === null ){
+                setNewSubtaskScheduledFrom(null);
+                setNewSubtaskScheduledTo(null);
+              }else{
+                setNewSubtaskScheduledFrom(newDate);
+                setNewSubtaskScheduledTo(moment(newDate).add( isNaN(parseFloat(newSubtaskQuantity)) ? 0 : parseFloat(newSubtaskQuantity), 'hours'));
+              }
+            }}
+            placeholderText="No start"
             />
         );
       }
@@ -788,7 +793,7 @@ export default function WorksTable( props ) {
                 setNewSubtaskScheduledTo(moment(newSubtaskScheduledFrom).add( parseFloat(e.target.value.replace(',', '.')) ,'hours'))
               }
             }}
-            className="form-control h-30 t-a-r"
+            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
             id="inlineFormInput"
             placeholder=""
             />
@@ -803,7 +808,7 @@ export default function WorksTable( props ) {
             onChange={(type)=>{
               setNewSubtaskType(type)
             }}
-            styles={pickSelectStyle()}
+            styles={pickSelectStyle(['segoe'])}
             />
         )
       }
@@ -816,7 +821,7 @@ export default function WorksTable( props ) {
               setNewSubtaskAssigned(newSubtaskAssigned);
             }}
             options={taskAssigned}
-            styles={pickSelectStyle( [ 'invisible', 'noArrow', ] )}
+            styles={pickSelectStyle( [ 'invisible', 'noArrow', 'segoe' ] )}
             />
         );
       }
@@ -890,14 +895,14 @@ export default function WorksTable( props ) {
       case 'price': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe">
               €
             </div>
             <input
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control h-30"
+              className="form-control h-30 segoe"
               value={ newSubtaskType ? getPrice(newSubtaskType) : 0 }
               />
           </span>
@@ -905,13 +910,13 @@ export default function WorksTable( props ) {
       }
       case 'discount': {
         return (
-          <span className="text p-l-8">
+          <span className="text p-l-8 segoe">
             -
             <input
               disabled={disabled || !canAddSubtasksAndTrips}
               style={{display: "inline", width: "60%"}}
               type="number"
-              className="form-control m-l-5 m-r-5 input h-30"
+              className="form-control m-l-5 m-r-5 input h-30 segoe"
               value={newSubtaskDiscount}
               onChange={(e)=>setNewSubtaskDiscount(e.target.value)}
               />
@@ -922,20 +927,19 @@ export default function WorksTable( props ) {
       case 'priceAfterDiscount': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe">
               €
             </div>
             <input
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control hidden-input h-30"
+              className="form-control hidden-input h-30 segoe"
               value={ newSubtaskType ? getDiscountPrice({type: newSubtaskType, discount: newSubtaskDiscount }) : 0 }
               />
           </span>
         )
       }
-
       default: {
         return null;
       }
@@ -953,24 +957,28 @@ export default function WorksTable( props ) {
               setNewTripType(newTripType)
             }}
             options={tripTypes}
-            styles={pickSelectStyle()}
+            styles={pickSelectStyle( [ 'segoe' ] )}
             />
         )
       }
       case 'scheduled': {
         return (
-          <Scheduled
-            dateFrom={newTripScheduledFrom}
-            dateTo={newTripScheduledTo}
+          <DatePicker
+            className="form-control hidden-input segoe-blue-text"
+            isClearable
+            selected={ newTripScheduledFrom }
             disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
-            needsSubmit={false}
-            quantity={newTripQuantity}
-            submit={(fromDate, toDate, quantity ) => {
-              setNewTripScheduledFrom(fromDate);
-              setNewTripScheduledTo(toDate);
-              setNewTripQuantity(quantity);
-            } }
-            id={`newTripScheduled`}
+            onChange={date => {
+              const newDate = isNaN(date.valueOf()) ? null : date;
+              if( newDate === null ){
+                setNewTripScheduledFrom(null);
+                setNewTripScheduledTo(null);
+              }else{
+                setNewTripScheduledFrom(newDate);
+                setNewTripScheduledTo(moment(newDate).add( isNaN(parseFloat(newTripQuantity)) ? 0 : parseFloat(newTripQuantity), 'hours'));
+              }
+            }}
+            placeholderText="No start"
             />
         );
       }
@@ -987,7 +995,7 @@ export default function WorksTable( props ) {
                 setNewTripScheduledTo(moment(newTripScheduledFrom).add( parseFloat(e.target.value.replace(',', '.')) ,'hours'))
               }
             }}
-            className="form-control h-30 t-a-r"
+            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
             id="inlineFormInput"
             placeholder=""
             />
@@ -1002,7 +1010,7 @@ export default function WorksTable( props ) {
               setNewTripType(newTripType)
             }}
             options={tripTypes}
-            styles={pickSelectStyle()}
+            styles={pickSelectStyle([ 'segoe' ])}
             />
         )
       }
@@ -1015,7 +1023,7 @@ export default function WorksTable( props ) {
               setNewTripAssigned(newTripAssigned)
             }}
             options={taskAssigned}
-            styles={pickSelectStyle( [ 'invisible', 'noArrow', ] )}
+            styles={pickSelectStyle( [ 'invisible', 'noArrow', 'segoe' ] )}
             />
         );
       }
@@ -1082,14 +1090,14 @@ export default function WorksTable( props ) {
       case 'price': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe-blue-text">
               €
             </div>
             <input
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control h-30"
+              className="form-control h-30 segoe-blue-text"
               value={ newTripType ? getPrice(newTripType) : 0 }
               />
           </span>
@@ -1097,13 +1105,13 @@ export default function WorksTable( props ) {
       }
       case 'discount': {
         return (
-          <span className="text p-l-8">
+          <span className="text p-l-8 segoe-blue-text">
             -
             <input
               disabled={disabled || !canAddSubtasksAndTrips}
               style={{display: "inline", width: "60%"}}
               type="number"
-              className="form-control m-l-5 m-r-5 input h-30"
+              className="form-control m-l-5 m-r-5 input h-30 segoe-blue-text"
               value={newTripDiscount}
               onChange={(e)=>setNewTripDiscount(e.target.value)}
               />
@@ -1114,14 +1122,14 @@ export default function WorksTable( props ) {
       case 'priceAfterDiscount': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe-blue-text">
               €
             </div>
             <input
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control hidden-input h-30"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={ newTripType ? getDiscountPrice({type: newTripType, discount: newTripDiscount }) : 0 }
               />
           </span>

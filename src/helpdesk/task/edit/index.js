@@ -392,7 +392,7 @@ export default function TaskEditContainer( props ) {
           discount: sub.discount,
           quantity: sub.quantity,
           type: sub.type.id,
-          task: parseInt( match.params.taskID ),
+          task: parseInt( id ),
           assignedTo: sub.assignedTo.id,
           scheduled: sub.scheduled,
         }
@@ -461,7 +461,7 @@ export default function TaskEditContainer( props ) {
           discount: parseFloat( wt.discount ),
           quantity: parseFloat( wt.quantity ),
           type: wt.type.id,
-          task: parseInt( match.params.taskID ),
+          task: parseInt( id ),
           assignedTo: wt.assignedTo.id,
           scheduled: wt.scheduled,
         }
@@ -529,7 +529,7 @@ export default function TaskEditContainer( props ) {
           quantity: parseFloat( item.quantity ),
           margin: parseFloat( item.margin ),
           price: parseFloat( item.price ),
-          task: parseInt( match.params.taskID ),
+          task: parseInt( id ),
         }
       } )
       .then( ( response ) => {
@@ -593,7 +593,7 @@ export default function TaskEditContainer( props ) {
           approved: item.approved,
           quantity: parseFloat( item.quantity ),
           price: parseFloat( item.price ),
-          task: parseInt( match.params.taskID ),
+          task: parseInt( id ),
         }
       } )
       .then( ( response ) => {

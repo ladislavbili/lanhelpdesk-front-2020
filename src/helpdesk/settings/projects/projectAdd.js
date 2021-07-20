@@ -437,24 +437,13 @@ export default function ProjectAdd( props ) {
 
   return (
     <div>
-      { !closeModal &&
-        <div className="dynamic-bg-commandbar a-i-c p-l-20">
-          { cannotSave &&
-            <div className="message error-message" style={{ minWidth: 220 }}>
-              Fill in all the required information!
-            </div>
-          }
-        </div>
-      }
-
-
       <div
         className={ classnames(
           {
             "scroll-visible": !closeModal,
-            "fit-with-header-and-commandbar": !closeModal,
+            "fit-with-header": !closeModal,
           },
-          "p-t-10 p-l-20 p-r-20 p-b-20",
+          "p-20",
         )}
         >
         <h1 className="m-b-20 m-t-20" >
@@ -696,15 +685,15 @@ export default function ProjectAdd( props ) {
             <button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </button>
           }
 
-          {closeModal && cannotSave && addTaskErrors &&
+          { cannotSave && addTaskErrors &&
             <div className="ml-auto message error-message" style={{ minWidth: 220 }}>
               Fill in all the required information!
             </div>
           }
-
+          
           <button className={classnames(
               "btn",
-              {"ml-auto": !closeModal}
+              {"ml-auto": !(cannotSave && addTaskErrors)}
             )}
             disabled={ addTaskErrors && cannotSave }
             onClick={() => {

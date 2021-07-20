@@ -1,36 +1,36 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient,
 } from "@apollo/client";
+import classnames from 'classnames';
 
 import {
   FormGroup,
   Label,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
   Modal,
   ModalBody,
   ModalFooter,
   ModalHeader
 } from 'reactstrap';
+import Select from 'react-select';
+import SettingsInput from '../components/settingsInput';
+import SettingsHiddenInput from '../components/settingsHiddenInput';
 import Loading from 'components/loading';
 import ErrorMessage from 'components/errorMessage';
 import Checkbox from 'components/checkbox';
+
+import wellKnownOptions from 'configs/constants/wellKnown';
 import {
   toSelArr
 } from 'helperFunctions';
 import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
-import Select from 'react-select';
-import {
   pickSelectStyle
 } from "configs/components/select";
-
-import wellKnownOptions from 'configs/constants/wellKnown';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 import {
   GET_SMTPS,
@@ -40,18 +40,23 @@ import {
   TEST_SMTP
 } from './queries';
 
-
-
 export default function SMTPEdit( props ) {
-  //data
   const {
     history,
     match
   } = props;
+  const client = useApolloClient();
+  const allSMTPs = toSelArr( client.readQuery( {
+      query: GET_SMTPS
+    } )
+    .smtps );
+  const filteredSMTPs = allSMTPs.filter( SMTP => SMTP.id !== parseInt( match.params.id ) );
+  const theOnlyOneLeft = allSMTPs.length === 1;
+
   const {
-    data,
-    loading,
-    refetch
+    data: smtpData,
+    loading: smtpLoading,
+    refetch: smtpRefetch
   } = useQuery( GET_SMTP, {
     variables: {
       id: parseInt( props.match.params.id )
@@ -59,17 +64,10 @@ export default function SMTPEdit( props ) {
     fetchPolicy: 'network-only',
     notifyOnNetworkStatusChange: true,
   } );
+
   const [ updateSmtp ] = useMutation( UPDATE_SMTP );
   const [ testSmtp ] = useMutation( TEST_SMTP );
-  const [ deleteSmtp, {
-    client
-  } ] = useMutation( DELETE_SMTP );
-  const allSMTPs = toSelArr( client.readQuery( {
-      query: GET_SMTPS
-    } )
-    .smtps );
-  const filteredSMTPs = allSMTPs.filter( SMTP => SMTP.id !== parseInt( match.params.id ) );
-  const theOnlyOneLeft = allSMTPs.length === 1;
+  const [ deleteSmtp ] = useMutation( DELETE_SMTP );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -82,8 +80,6 @@ export default function SMTPEdit( props ) {
   const [ rejectUnauthorized, setRejectUnauthorized ] = React.useState( false );
   const [ secure, setSecure ] = React.useState( true );
 
-  const [ showPass, setShowPass ] = React.useState( false );
-
   const [ saving, setSaving ] = React.useState( false );
   const [ dataChanged, setDataChanged ] = React.useState( false );
 
@@ -92,28 +88,30 @@ export default function SMTPEdit( props ) {
   const [ choosingNewSMTP, setChoosingNewSMTP ] = React.useState( false );
   const [ newDefSMTP, setNewDefSMTP ] = React.useState( null );
   const [ wellKnown, setWellKnown ] = React.useState( wellKnownOptions[ 0 ] );
+
   const wellKnownBlock = wellKnown.id !== null;
 
   // sync
   React.useEffect( () => {
-    if ( !loading ) {
-      setTitle( data.smtp.title );
-      setOrder( data.smtp.order );
-      setDef( data.smtp.def );
-      setHost( data.smtp.host );
-      setPort( data.smtp.port );
-      setUsername( data.smtp.username );
-      setPassword( data.smtp.password );
-      setRejectUnauthorized( data.smtp.rejectUnauthorized );
-      setSecure( data.smtp.secure );
-      setWellKnown( wellKnownOptions.find( ( option ) => option.id === data.smtp.wellKnown ) );
+    if ( !smtpLoading ) {
+      const smtp = smtpData.smtp;
+      setTitle( smtp.title );
+      setOrder( smtp.order );
+      setDef( smtp.def );
+      setHost( smtp.host );
+      setPort( smtp.port );
+      setUsername( smtp.username );
+      setPassword( smtp.password );
+      setRejectUnauthorized( smtp.rejectUnauthorized );
+      setSecure( smtp.secure );
+      setWellKnown( wellKnownOptions.find( ( option ) => option.id === smtp.wellKnown ) );
       setTested( false );
       setDataChanged( false );
     }
-  }, [ loading ] );
+  }, [ smtpLoading ] );
 
   React.useEffect( () => {
-    refetch( {
+    smtpRefetch( {
       variables: {
         id: parseInt( match.params.id )
       }
@@ -177,6 +175,7 @@ export default function SMTPEdit( props ) {
     setSaving( false );
     setDataChanged( false );
   };
+
   const startTest = () => {
     let newSmtps = [ ...allSMTPs ];
     let smtpIndex = newSmtps.findIndex( ( smtp ) => smtp.id === parseInt( match.params.id ) );
@@ -194,6 +193,7 @@ export default function SMTPEdit( props ) {
       }
     } );
   }
+
   const deleteSMTPFunc = () => {
     setChoosingNewSMTP( false );
 
@@ -226,7 +226,7 @@ export default function SMTPEdit( props ) {
               }
             } );
           }
-          history.push( '/helpdesk/settings/smtps/add' );
+          history.push( '/helpdesk/settings/smtps' );
         } )
         .catch( ( err ) => {
           addLocalError( err );
@@ -234,33 +234,24 @@ export default function SMTPEdit( props ) {
     }
   };
 
+  const cannotSave = () => (
+    (
+      wellKnownBlock &&
+      ( saving || password === '' || username === '' )
+    ) ||
+    (
+      !wellKnownBlock &&
+      ( saving || title === '' || host === '' || port === '' || password === '' || username === '' )
+    )
+  );
 
-  const cannotSave = (
-    ( wellKnownBlock && ( saving || password === '' || username === '' ) ) ||
-    ( !wellKnownBlock && ( saving || title === '' || host === '' || port === '' || password === '' || username === '' ) )
-  )
 
-
-  if ( loading ) {
+  if ( smtpLoading ) {
     return <Loading />
   }
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
-        { dataChanged &&
-          <div className="message error-message">
-            Save changes before leaving!
-          </div>
-        }
-        { !dataChanged &&
-          <div className="message success-message">
-            Saved
-          </div>
-        }
-      </div>
-
-      <div className="p-l-20 p-r-20 p-t-10 p-b-20 scroll-visible fit-with-header-and-commandbar">
+    <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20" >
         Edit SMTP
@@ -276,20 +267,16 @@ export default function SMTPEdit( props ) {
         label = "Default"
         />
 
-      <FormGroup>
-        <Label for="name">Title { !wellKnownBlock && <span className="warning-big">*</span>}</Label>
-        <Input
-          type="text"
-          name="name"
-          id="name"
-          placeholder="Enter title"
-          value={title}
-          onChange={ (e) => {
-            setTitle(e.target.value);
-            setDataChanged( true );
-          } }
-          />
-      </FormGroup>
+      <SettingsInput
+        required={!wellKnownBlock}
+        label="Title"
+        id="title"
+        value={title}
+        onChange={(e)=> {
+          setTitle(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
       <FormGroup>
         <Label>Well known providers - requires only user and password</Label>
@@ -304,35 +291,27 @@ export default function SMTPEdit( props ) {
           />
       </FormGroup>
 
-      <FormGroup>
-        <Label for="name">Host { !wellKnownBlock && <span className="warning-big">*</span>}</Label>
-        <Input
-          type="text"
-          name="name"
-          id="host"
-          placeholder="Enter host"
-          value={host}
-          onChange={ (e) => {
-            setHost(e.target.value);
-            setDataChanged( true );
-          } }
-          />
-      </FormGroup>
+      <SettingsInput
+        required={!wellKnownBlock}
+        label="Host"
+        id="host"
+        value={host}
+        onChange={(e)=> {
+          setHost(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
-      <FormGroup>
-        <Label for="name">Port { !wellKnownBlock && <span className="warning-big">*</span>}</Label>
-        <Input
-          type="number"
-          name="name"
-          id="port"
-          placeholder="Enter port"
-          value={port}
-          onChange={ (e) => {
-            setPort(e.target.value);
-            setDataChanged( true );
-          } }
-          />
-      </FormGroup>
+      <SettingsInput
+        required={!wellKnownBlock}
+        label="Port"
+        id="port"
+        value={port}
+        onChange={(e)=> {
+          setPort(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
       <Checkbox
         className = "m-b-5 p-l-0"
@@ -344,41 +323,27 @@ export default function SMTPEdit( props ) {
         label = "Secure"
         />
 
-      <FormGroup>
-        <Label for="name">Username <span className="warning-big">*</span></Label>
-        <Input
-          type="text"
-          name="name"
-          id="user"
-          placeholder="Enter user"
-          value={username}
-          onChange={ (e) => {
-            setUsername(e.target.value);
-            setDataChanged( true );
-          }  }
-          />
-      </FormGroup>
+      <SettingsInput
+        required
+        label="Username"
+        id="username"
+        value={username}
+        onChange={(e)=> {
+          setUsername(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
-      <FormGroup>
-        <Label>Password <span className="warning-big">*</span></Label>
-        <InputGroup>
-          <Input
-            type={showPass?'text':"password"}
-            className="from-control"
-            placeholder="Enter password"
-            value={password}
-            onChange={ (e) => {
-              setPassword(e.target.value);
-              setDataChanged( true );
-            } }
-            />
-          <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
-            <InputGroupText>
-              <i className={"mt-auto mb-auto "+ ( !showPass ?' fa fa-eye':'fa fa-eye-slash') }/>
-            </InputGroupText>
-          </InputGroupAddon>
-        </InputGroup>
-      </FormGroup>
+      <SettingsHiddenInput
+        required
+        label="Password"
+        id="password"
+        value={password}
+        onChange={(e)=> {
+          setPassword(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
       <Checkbox
         className = "m-b-5 p-l-0"
@@ -434,12 +399,44 @@ export default function SMTPEdit( props ) {
       </Modal>
 
       <div className="form-buttons-row">
-        <button className="btn-red mr-auto" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</button>
-        <ErrorMessage show={ !loading && !data.smtp.currentlyTested && !data.smtp.working  } message={data.smtp.errorMessage} />
-        <button className="btn btn-distance" disabled={saving || tested} onClick={ startTest }>Test SMTP</button>
-        <button className="btn" disabled={cannotSave} onClick={updateSMTPFunc}>{ saving ? 'Saving SMTP...' : 'Save SMTP' }</button>
+
+        <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</button>
+
+        <ErrorMessage
+          className="ml-auto m-r-10"
+          show={ !smtpLoading && !smtpData.smtp.currentlyTested && !smtpData.smtp.working  }
+          message={smtpData.smtp.errorMessage}
+          />
+
+        <div className="message m-r-10">
+          { dataChanged &&
+            <div className="message error-message">
+              Save changes before leaving!
+            </div>
+          }
+          { !dataChanged &&
+            <div className="message success-message">
+              Saved
+            </div>
+          }
+        </div>
+
+        <button
+          className="btn btn-distance"
+          disabled={saving || tested}
+          onClick={ startTest }
+          >
+          Test SMTP
+        </button>
+
+        <button
+          className="btn"
+          disabled={cannotSave}
+          onClick={updateSMTPFunc}
+          >
+          { saving ? 'Saving SMTP...' : 'Save SMTP' }
+        </button>
       </div>
     </div>
-  </div>
   );
 }

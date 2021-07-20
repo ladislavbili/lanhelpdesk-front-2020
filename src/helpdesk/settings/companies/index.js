@@ -3,44 +3,51 @@ import {
   useQuery,
   useSubscription,
 } from "@apollo/client";
+import classnames from 'classnames';
+
+import Empty from 'components/Empty';
+import SettingLoading from '../components/settingLoading';
+import SettingListContainer from '../components/settingListContainer';
+import {
+  itemAttributesFullfillsString
+} from '../components/helpers';
 
 import CompanyAdd from './companyAdd';
 import CompanyEdit from './companyEdit';
-import Loading from 'components/loading';
-import Empty from 'components/Empty';
-import SettingListContainer from '../components/settingListContainer';
-import classnames from 'classnames';
 import {
   GET_COMPANIES,
   COMPANIES_SUBSCRIPTION,
 } from './queries';
 
 export default function CompanysList( props ) {
-  // state
-  const [ companyFilter, setCompanyFilter ] = React.useState( "" );
-  const [ sortBy, setSortBy ] = React.useState( "" );
-
-  //data
   const {
     history,
     match
   } = props;
 
   const {
-    data,
-    loading,
-    refetch
+    data: companiesData,
+    loading: companiesLoading,
+    refetch: companiesRefetch,
   } = useQuery( GET_COMPANIES, {
     fetchPolicy: 'network-only'
   } );
 
   useSubscription( COMPANIES_SUBSCRIPTION, {
     onSubscriptionData: () => {
-      refetch();
+      companiesRefetch();
     }
   } );
 
-  const companies = ( loading || !data ? [] : data.companies );
+  // state
+  const [ companyFilter, setCompanyFilter ] = React.useState( "" );
+  const [ sortBy, setSortBy ] = React.useState( "" );
+
+  if ( companiesLoading ) {
+    return ( <SettingLoading match={match} /> );
+  }
+
+  const companies = companiesData.companies;
 
   const CompanySort = (
     <div className="d-flex flex-row align-items-center ml-auto">
@@ -63,7 +70,7 @@ export default function CompanysList( props ) {
       { match.params.id && match.params.id==='add' &&
         <CompanyAdd {...props}/>
       }
-      { loading && match.params.id && match.params.id!=='add' &&
+      { companiesLoading && match.params.id && match.params.id!=='add' &&
         <Loading />
       }
       { match.params.id && match.params.id!=='add' && companies.some((item)=>item.id===parseInt(match.params.id)) &&
@@ -91,27 +98,25 @@ export default function CompanysList( props ) {
           </tr>
         </thead>
         <tbody>
-          {
-            companies.filter((item) => {
-              let cond = true;
-              if (sortBy === "1"){
-                cond = item.monthly;
-              } else if (sortBy === "2"){
-                cond = !item.monthly;
-              }
-
-              return cond && item.title.toLowerCase().includes(companyFilter.toLowerCase());
-            })
-            .map((company)=>
+          { companies.filter((item) => {
+            let cond = true;
+            if (sortBy === "1"){
+              cond = item.monthly;
+            } else if (sortBy === "2"){
+              cond = !item.monthly;
+            }
+            return cond && itemAttributesFullfillsString(item, companyFilter, ['title']);
+          })
+          .map((company) => (
             <tr
               key={company.id}
-              className={classnames (
+              className={classnames(
                 "clickable",
                 {
                   "active": parseInt(match.params.id) === company.id
                 }
               )}
-              onClick={()=>history.push('/helpdesk/settings/companies/'+company.id)}>
+              onClick={ () => history.push(`/helpdesk/settings/companies/${company.id}`) }>
               <td>
                 {company.title}
               </td>
@@ -119,9 +124,8 @@ export default function CompanysList( props ) {
                 {company.monthly  ? "Zmluvný" : "Nezmluvný"}
               </td>
             </tr>
-          )
-        }
-      </tbody>
+          ))}
+        </tbody>
       </table>
     </SettingListContainer>
   )

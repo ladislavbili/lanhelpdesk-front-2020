@@ -37,14 +37,14 @@ const defaultCols = [
     key: 'price',
     width: "8%",
     headerClassnames: "t-a-r",
-    columnClassnames: "p-l-8",
+    columnClassnames: "p-l-8 mw-100",
   },
   {
     header: 'Spolu',
     key: 'total',
     width: "8%",
     headerClassnames: "t-a-r",
-    columnClassnames: "p-l-8",
+    columnClassnames: "p-l-8 mw-100",
   },
   {
     header: 'Faktúrovať',
@@ -56,8 +56,8 @@ const defaultCols = [
   {
     header: 'Akcie',
     key: 'actions',
-    width: "8%",
-    headerClassnames: "t-a-c",
+    width: "80",
+    headerClassnames: "t-a-r",
     columnClassnames: "t-a-r",
   },
 ]
@@ -166,7 +166,7 @@ export default function Rozpocet( props ) {
       case 'done': {
         return (
           <Checkbox
-            className="m-t-5"
+            className="m-t-5 segoe-blue-text"
             disabled= { disabled }
             value={ material.done }
             onChange={()=>{
@@ -179,7 +179,7 @@ export default function Rozpocet( props ) {
         return (
           <input
             disabled={disabled}
-            className="form-control hidden-input"
+            className="form-control hidden-input segoe-blue-text"
             value={
               material.id === focusedMaterial ?
               editedMaterialTitle :
@@ -200,7 +200,7 @@ export default function Rozpocet( props ) {
             disabled={disabled}
             type="text"
             pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-            className="form-control hidden-input h-30 t-a-r"
+            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
             value={
               material.id === focusedMaterial ?
               editedMaterialQuantity.toString() :
@@ -218,7 +218,7 @@ export default function Rozpocet( props ) {
       }
       case 'price': {
         return (
-          <span className="text" style={{float: "right"}}>
+          <span className="text segoe-blue-text" style={{float: "right"}}>
             <div style={{float: "right"}} className="p-t-8 p-r-8">
               €
             </div>
@@ -226,7 +226,7 @@ export default function Rozpocet( props ) {
               disabled={disabled}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control hidden-input h-30"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={
                 material.id === focusedMaterial ?
                 editedMaterialPrice :
@@ -246,7 +246,7 @@ export default function Rozpocet( props ) {
       }
       case 'total': {
         return (
-          <div className="p-t-7 p-r-8 t-a-r font-14">
+          <div className="p-t-7 p-r-8 t-a-r segoe-blue-text">
             {  material.id === focusedMaterial
               ?
               (
@@ -338,7 +338,7 @@ export default function Rozpocet( props ) {
           <input
           disabled={disabled}
           type="text"
-          className="form-control h-30"
+          className="form-control h-30 segoe-blue-text"
           id="inlineFormInput"
           placeholder="Názov"
           value={newMaterialTitle}
@@ -354,7 +354,7 @@ export default function Rozpocet( props ) {
           pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
           value={newMaterialQuantity.toString()}
           onChange={(e)=>setNewMaterialQuantity(e.target.value.replace(',', '.') )}
-          className="form-control h-30 t-a-r"
+          className="form-control h-30 t-a-r segoe-blue-text"
           id="inlineFormInput"
           placeholder="Množstvo"
           />
@@ -363,7 +363,7 @@ export default function Rozpocet( props ) {
       case 'price': {
         return (
           <span className="text" style={{float: "right"}}>
-          <div style={{float: "right"}} className="p-t-8 p-r-8 p-l-4">
+          <div style={{float: "right"}} className="p-t-8 p-r-8 p-l-4 segoe-blue-text">
             €
           </div>
           <input
@@ -374,7 +374,7 @@ export default function Rozpocet( props ) {
             onChange={(e)=>{
               setNewMaterialPrice(e.target.value);
             }}
-            className="form-control h-30"
+            className="form-control h-30 segoe-blue-text"
             placeholder="Cena"
             />
         </span>
@@ -383,7 +383,7 @@ export default function Rozpocet( props ) {
       case 'total': {
         return (
           <span className="text" style={{float: "right"}}>
-          <div style={{float: "right"}} className="p-t-8 p-r-8 p-l-4">
+          <div style={{float: "right"}} className="p-t-8 p-r-8 p-l-4 segoe-blue-text">
             €
           </div>
           <input
@@ -400,7 +400,7 @@ export default function Rozpocet( props ) {
               }
             }}
             clas
-            className="form-control h-30"
+            className="form-control h-30 segoe-blue-text"
             placeholder="Celková cena"
             />
         </span>

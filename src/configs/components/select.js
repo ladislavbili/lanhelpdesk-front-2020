@@ -23,6 +23,8 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
   const disabled = wantedAttributes.includes( 'disabled' );
   const bordered = wantedAttributes.includes( 'bordered' );
   const sidebar = wantedAttributes.includes( 'sidebar' );
+  const segoe = wantedAttributes.includes( 'segoe' );
+
   return {
     control: ( base, state ) => {
       let newStyle = {
@@ -55,7 +57,6 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           borderWidth: base.borderWidth,
         }
       }
-
       if ( blueFont ) {
         newStyle = {
           ...newStyle,
@@ -67,6 +68,14 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           lineHeight: "20px",
           letterSpacing: "0.5px",
           color: "#0078D4",
+        }
+      }
+
+      if ( segoe ) {
+        newStyle = {
+          ...newStyle,
+          fontFamily: "Segoe UI",
+          color: "#0078D7 !important",
         }
       }
 
@@ -122,6 +131,15 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           color: "#0078D4",
         };
       }
+
+      if ( segoe ) {
+        newStyle = {
+          ...newStyle,
+          fontFamily: "Segoe UI",
+          color: "#0078D7 !important",
+        }
+      }
+
       if ( colored && data.color ) {
         const color = chroma( data.color );
         let newStyle = {
@@ -197,7 +215,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           ...value,
         }
       }
-      if ( invisible || noArrow || colored || highlight || blueFont ) {
+      if ( invisible || noArrow || colored || highlight || blueFont || segoe ) {
         newStyle = {
           ...newStyle,
           padding: '0px 6px',
@@ -219,7 +237,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
         backgroundColor: "white",
         borderRadius: 0
       }
-      if ( invisible || colored || blueFont ) {
+      if ( invisible || colored || blueFont || segoe ) {
         newStyle = {
           ...newStyle,
           backgroundColor: "inherit",
@@ -255,6 +273,13 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           ...newStyle,
           color: "#0078D4",
           fontSize: "14px",
+        }
+      }
+      if ( segoe ) {
+        newStyle = {
+          ...newStyle,
+          fontFamily: "Segoe UI",
+          color: "#0078D7 !important",
         }
       }
       if ( required ) {
@@ -327,6 +352,13 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           backgroundColor: "#F2F1F1",
           borderRadius: 0,
           color: "#0078D4",
+        }
+      }
+      if ( segoe ) {
+        newStyle = {
+          ...newStyle,
+          fontFamily: "Segoe UI",
+          color: "#0078D7 !important",
         }
       }
       if ( colored && data.color ) {

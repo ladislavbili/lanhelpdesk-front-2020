@@ -10,17 +10,17 @@ import {
   Label,
   Input
 } from 'reactstrap';
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
-
+import Loading from 'components/loading';
 import CompanyRents from '../companies/companyRents';
+import SettingsInput from '../components/settingsInput';
 import CompanyPriceList from '../companies/companyPriceList';
 
 import {
   toSelArr
 } from 'helperFunctions';
-import Loading from 'components/loading';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 
 import {
   GET_PRICELISTS,
@@ -31,29 +31,32 @@ import {
   GET_COMPANY,
   UPDATE_COMPANY
 } from '../companies/queries';
+
 const newPricelist = {
   label: "Nový cenník",
   value: "0"
 };
 
+let fakeID = -1;
+const getFakeID = () => {
+  return fakeID--;
+}
 export default function PausalEdit( props ) {
-  //data
   const {
     match
   } = props;
+
   const {
-    data,
-    loading,
-    refetch
+    data: companyData,
+    loading: companyLoading,
+    refetch: companyRefetch
   } = useQuery( GET_COMPANY, {
     variables: {
       id: parseInt( match.params.id )
     },
     notifyOnNetworkStatusChange: true,
   } );
-  const [ updateCompany ] = useMutation( UPDATE_COMPANY );
 
-  const [ addPricelist ] = useMutation( ADD_PRICELIST );
   const {
     data: pricelistsData,
     loading: pricelistsLoading,
@@ -68,38 +71,36 @@ export default function PausalEdit( props ) {
     }
   } );
 
+  const [ updateCompany ] = useMutation( UPDATE_COMPANY );
+  const [ addPricelist ] = useMutation( ADD_PRICELIST );
+
   //state
   const [ monthlyPausal, setMonthlyPausal ] = React.useState( 0 );
   const [ taskWorkPausal, setTaskWorkPausal ] = React.useState( 0 );
   const [ taskTripPausal, setTaskTripPausal ] = React.useState( 0 );
-  const [ pricelist, setPricelist ] = React.useState( {} );
-  const [ oldPricelist, setOldPricelist ] = React.useState( {} );
+  const [ pricelist, setPricelist ] = React.useState( null );
+  const [ oldPricelist, setOldPricelist ] = React.useState( null );
   const [ pricelistName, setPricelistName ] = React.useState( "" );
-
   const [ rents, setRents ] = React.useState( [] );
+
   const [ clearCompanyRents, setClearCompanyRents ] = React.useState( false );
-
-  const [ fakeID, setFakeID ] = React.useState( 0 );
-
   const [ saving, setSaving ] = React.useState( false );
-
   const [ dataChanged, setDataChanged ] = React.useState( false );
 
-  const getFakeID = () => {
-    let fake = fakeID;
-    setFakeID( fakeID + 1 );
-    return fake;
-  }
+  const dataLoading = (
+    companyLoading ||
+    pricelistsLoading
+  )
 
   //sync
   React.useEffect( () => {
-    if ( !loading ) {
+    if ( !companyLoading ) {
       setData();
     }
-  }, [ loading ] );
+  }, [ companyLoading ] );
 
   React.useEffect( () => {
-    refetch( {
+    companyRefetch( {
         variables: {
           id: parseInt( match.params.id )
         }
@@ -109,30 +110,31 @@ export default function PausalEdit( props ) {
 
   // functions
   const setData = () => {
-    if ( loading ) {
+    if ( companyLoading ) {
       return;
     }
-    setMonthlyPausal( data.company.monthlyPausal );
-    setTaskWorkPausal( data.company.taskWorkPausal );
-    setTaskTripPausal( data.company.taskTripPausal );
-    let pl = {
-      ...data.company.pricelist,
-      value: data.company.pricelist.id,
-      label: data.company.pricelist.title
+    const company = companyData.company;
+    setMonthlyPausal( company.monthlyPausal );
+    setTaskWorkPausal( company.taskWorkPausal );
+    setTaskTripPausal( company.taskTripPausal );
+    const pricelist = {
+      ...company.pricelist,
+      value: company.pricelist.id,
+      label: company.pricelist.title
     };
-    setPricelist( pl );
-    setOldPricelist( pl );
-    let r = data.company.companyRents.map( re => {
+    setPricelist( pricelist );
+    setOldPricelist( pricelist );
+    const rents = company.companyRents.map( rent => {
       return {
-        id: re.id,
-        title: re.title,
-        quantity: re.quantity,
-        unitPrice: re.price,
-        unitCost: re.cost,
-        totalPrice: parseInt( re.quantity ) * parseFloat( re.price ),
+        id: rent.id,
+        title: rent.title,
+        quantity: rent.quantity,
+        unitPrice: rent.price,
+        unitCost: rent.cost,
+        totalPrice: parseInt( rent.quantity ) * parseFloat( rent.price ),
       }
     } )
-    setRents( r );
+    setRents( rents );
 
     setDataChanged( false );
   }
@@ -140,15 +142,15 @@ export default function PausalEdit( props ) {
   const updateCompanyFunc = () => {
     setSaving( true );
 
-    let newRents = rents.map( r => {
+    let newRents = rents.map( rent => {
       let newRent = {
-        title: r.title,
-        quantity: isNaN( parseInt( r.quantity ) ) ? 0 : parseInt( r.quantity ),
-        cost: isNaN( parseInt( r.unitCost ) ) ? 0 : parseInt( r.unitCost ),
-        price: isNaN( parseInt( r.unitPrice ) ) ? 0 : parseInt( r.unitPrice )
+        title: rent.title,
+        quantity: isNaN( parseInt( rent.quantity ) ) ? 0 : parseInt( rent.quantity ),
+        cost: isNaN( parseInt( rent.unitCost ) ) ? 0 : parseInt( rent.unitCost ),
+        price: isNaN( parseInt( rent.unitPrice ) ) ? 0 : parseInt( rent.unitPrice )
       };
-      if ( r.id ) {
-        newRent.id = r.id;
+      if ( rent.id ) {
+        newRent.id = rent.id;
       }
       return newRent;
     } );
@@ -201,9 +203,9 @@ export default function PausalEdit( props ) {
     setClearCompanyRents( true );
   }
 
-  const cannotSave = saving || ( pricelist.value === "0" && pricelistName === "" );
+  const cannotSave = () => ( saving || pricelist === null || ( pricelist.value === "0" && pricelistName === "" ) );
 
-  if ( loading ) {
+  if ( dataLoading ) {
     return <Loading />
   }
 
@@ -215,37 +217,30 @@ export default function PausalEdit( props ) {
   return (
     <div className="scroll-visible p-20 fit-with-header">
 
-      <h2>Edit service level agreement - {data.company.title}</h2>
+      <h2>Edit service level agreement - {companyData.company.title}</h2>
 
       <h3 className="m-t-10 m-b-10" >Paušál</h3>
-      <FormGroup>
-        <Label for="pausal">Paušál práce</Label>
-        <Input
-          name="pausal"
-          id="pausal"
+        <SettingsInput
+          id="taskWorkPausal"
+          label="Paušál práce"
           type="number"
-          placeholder="Enter work pausal"
           value={taskWorkPausal}
           onChange={(e) => {
             setTaskWorkPausal(e.target.value);
             setDataChanged( true );
           }}
           />
-      </FormGroup>
-      <FormGroup className="m-b-10">
-        <Label for="pausal">Paušál výjazdy</Label>
-        <Input
-          name="pausal"
-          id="pausal"
+
+        <SettingsInput
+          id="taskTripPausal"
+          label="Paušál výjazdy"
           type="number"
-          placeholder="Enter drive pausal"
           value={taskTripPausal}
           onChange={(e)=> {
             setTaskTripPausal(e.target.value);
             setDataChanged( true );
           }}
           />
-      </FormGroup>
 
       <CompanyRents
         clearForm={clearCompanyRents}
@@ -254,7 +249,7 @@ export default function PausalEdit( props ) {
           setDataChanged( true );
         }}
         data={rents}
-        updateRent={(rent)=>{
+        updateRent={(rent) => {
           let newRents=[...rents];
           newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
           setRents( newRents );
@@ -284,17 +279,17 @@ export default function PausalEdit( props ) {
           cancel();
           setDataChanged( true );
         }}
-        setPricelist={(pl) => {
-          setPricelist(pl);
+        setPricelist={(pricelist) => {
+          setPricelist(pricelist);
           setDataChanged( true );
         }}
-        setOldPricelist={(pl) => {
-          setOldPricelist(pl);
+        setOldPricelist={(pricelist) => {
+          setOldPricelist(pricelist);
           setDataChanged( true );
         }}
         setNewData={(e) => {}}
-        setPricelistName={(n) => {
-          setPricelistName(n);
+        setPricelistName={(pricelistName) => {
+          setPricelistName(pricelistName);
           setDataChanged( true );
         }}
         match={match}
@@ -315,8 +310,8 @@ export default function PausalEdit( props ) {
         </div>
         <button
           className="btn"
-          disabled={ cannotSave }
-          onClick={()=>{
+          disabled={ cannotSave() }
+          onClick={ () => {
             if (pricelist.value === "0" && pricelistName !== ""){
               savePriceList();
             } else {
@@ -324,7 +319,7 @@ export default function PausalEdit( props ) {
             }
           }}
           >
-          {saving?'Saving...':'Save changes'}
+          { saving ? 'Saving...' : 'Save changes' }
         </button>
       </div>
     </div>

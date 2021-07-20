@@ -114,6 +114,7 @@ export default function TaskAdd( props ) {
   const [ company, setCompany ] = React.useState( null );
   const [ customItems, setCustomItems ] = React.useState( [] );
   const [ deadline, setDeadline ] = React.useState( null );
+  const [ startsAt, setStartsAt ] = React.useState( null );
   const [ description, setDescription ] = React.useState( "" );
   const [ descriptionVisible, setDescriptionVisible ] = React.useState( false );
   const [ milestone, setMilestone ] = React.useState( [ noMilestone ] );
@@ -350,6 +351,8 @@ export default function TaskAdd( props ) {
             .toString() : null,
           assignedTo: assignedTo.map( user => user.id ),
           company: company ? company.id : null,
+          startsAt: startsAt ? startsAt.valueOf()
+            .toString() : null,
           deadline: deadline ? deadline.valueOf()
             .toString() : null,
           description,
@@ -714,12 +717,46 @@ export default function TaskAdd( props ) {
         options={booleanSelects}
         />
     ),
+    StartsAt: (
+      <div>
+        { !userRights.deadlineWrite &&
+          <div className="disabled-info">{startsAt}</div>
+        }
+        { userRights.deadlineWrite &&
+          <DatePicker
+            className={classnames("form-control")}
+            selected={startsAt}
+            disabled={!userRights.deadlineWrite}
+            hideTime
+            isClearable
+            onChange={date => {
+              setStartsAt( isNaN(date.valueOf()) ? null : date );
+              autoUpdateTask({ startsAt: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
+            }}
+            placeholderText="No start date"
+            />
+        }
+      </div>
+    ),
+    StartsAt: (
+      <DatePicker
+        className={classnames("form-control")}
+        selected={startsAt}
+        disabled={!userRights.deadlineWrite}
+        onChange={date => setStartsAt( isNaN(date.valueOf()) ? null : date )}
+        hideTime
+        isClearable
+        placeholderText="No start date"
+        />
+    ),
     Deadline: (
       <DatePicker
         className={classnames("form-control")}
         selected={deadline}
         disabled={!userRights.deadlineWrite}
-        onChange={date => setDeadline(date)}
+        onChange={date => setDeadline( isNaN(date.valueOf()) ? null : date )}
+        hideTime
+        isClearable
         placeholderText="No deadline"
         />
     ),
@@ -819,6 +856,14 @@ export default function TaskAdd( props ) {
             <div className="col-4">
               { userRights.deadlineRead && userRights.deadlineWrite &&
                 <div className="row p-r-10">
+                  <Label className="col-3 col-form-label">Starts at</Label>
+                  <div className="col-9">
+                    { layoutComponents.StartsAt }
+                  </div>
+                </div>
+              }
+              { userRights.deadlineRead && userRights.deadlineWrite &&
+                <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Deadline</Label>
                   <div className="col-9">
                     { layoutComponents.Deadline }
@@ -855,7 +900,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
 
-          { userRights.scheduledRead &&
+          { userRights.scheduledRead && false &&
             <Scheduled
               items={scheduled}
               users={assignedTo}
@@ -972,6 +1017,14 @@ export default function TaskAdd( props ) {
         }
         { userRights.deadlineRead && userRights.deadlineWrite &&
           <div className="form-selects-entry-column" >
+            <Label>Starts at</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.StartsAt }
+            </div>
+          </div>
+        }
+        { userRights.deadlineRead && userRights.deadlineWrite &&
+          <div className="form-selects-entry-column" >
             <Label>Deadline</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Deadline }
@@ -997,7 +1050,7 @@ export default function TaskAdd( props ) {
             vertical={true}
             />
         }
-        { userRights.scheduledRead &&
+        { userRights.scheduledRead && false &&
           <Scheduled
             items={scheduled}
             users={assignedTo}

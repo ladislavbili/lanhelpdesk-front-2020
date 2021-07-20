@@ -3,18 +3,19 @@ import {
   useQuery,
   useSubscription
 } from "@apollo/client";
+import classnames from 'classnames';
 
 import Multiselect from 'components/multiselect';
-import {
-  toSelArr
-} from 'helperFunctions';
-
 import UserAdd from './userAdd';
 import UserEdit from './userEdit';
 import Loading from 'components/loading';
 import Empty from 'components/Empty';
 import SettingListContainer from '../components/settingListContainer';
-import classnames from 'classnames';
+
+import {
+  toSelArr
+} from 'helperFunctions';
+
 import {
   GET_USERS,
   USERS_SUBSCRIPTION,
@@ -29,11 +30,11 @@ import {
 } from '../roles/queries';
 
 export default function UserListContainer( props ) {
-  //data
   const {
     history,
     match
   } = props;
+
   const {
     data: usersData,
     loading: usersLoading,
@@ -41,27 +42,6 @@ export default function UserListContainer( props ) {
   } = useQuery( GET_USERS, {
     fetchPolicy: 'network-only'
   } );
-  const {
-    data: rolesData,
-    loading: rolesLoading,
-    refetch: rolesRefetch
-  } = useQuery( GET_ROLES, {
-    fetchPolicy: 'network-only'
-  } );
-
-
-  // sync
-  React.useEffect( () => {
-    if ( !rolesLoading ) {
-      setSelectedRoles( toSelArr( rolesData.roles ) );
-    }
-  }, [ rolesLoading ] );
-
-
-  const dataLoading = (
-    usersLoading ||
-    rolesLoading
-  )
 
   useSubscription( USERS_SUBSCRIPTION, {
     onSubscriptionData: () => {
@@ -75,6 +55,14 @@ export default function UserListContainer( props ) {
     }
   } );
 
+  const {
+    data: rolesData,
+    loading: rolesLoading,
+    refetch: rolesRefetch
+  } = useQuery( GET_ROLES, {
+    fetchPolicy: 'network-only'
+  } );
+
   useSubscription( ROLES_SUBSCRIPTION, {
     onSubscriptionData: () => {
       rolesRefetch()
@@ -85,6 +73,17 @@ export default function UserListContainer( props ) {
   const [ userFilter, setUserFilter ] = React.useState( "" );
   const [ selectedRoles, setSelectedRoles ] = React.useState( [] );
 
+  const dataLoading = (
+    usersLoading ||
+    rolesLoading
+  )
+
+  // sync
+  React.useEffect( () => {
+    if ( !rolesLoading ) {
+      setSelectedRoles( toSelArr( rolesData.roles ) );
+    }
+  }, [ rolesLoading ] );
 
   if ( dataLoading ) {
     return (
@@ -103,7 +102,8 @@ export default function UserListContainer( props ) {
       </div>
     )
   }
-  const users = usersData.users.filter( user => selectedRoles.some( sr => sr.id === user.role.id ) );
+
+  const users = usersData.users.filter( user => selectedRoles.some( selectedRole => ( selectedRole.id === user.role.id ) ) );
   const roles = toSelArr( rolesData.roles );
 
   //data
@@ -164,27 +164,30 @@ export default function UserListContainer( props ) {
           </tr>
         </thead>
         <tbody>
-          {users.filter((item)=>item.email.toLowerCase().includes(userFilter.toLowerCase())).sort((user1,user2)=>user1.email>user2.email?1:-1).map((user)=>
-            <tr
-              key={user.id}
-              className={classnames (
-                "clickable",
-                {
-                  "active": parseInt(match.params.id) === user.id
-                }
-              )}
-              style={{whiteSpace: "nowrap",  overflow: "hidden"}}
-              onClick={()=>history.push('/helpdesk/settings/users/'+user.id)}>
-              <td
-                style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
-                {user.username}
-              </td>
-              <td className={(match.params.id === user.id ? " active":"") }
-                style={{maxWidth: "200px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }} >
-                { (user.company ? user.company.title  : "NEZARADENÉ")}
-              </td>
-            </tr>
-          )}
+          { users.filter( (item) => item.email.toLowerCase().includes( userFilter.toLowerCase() ) )
+            .sort( ( user1, user2 ) => user1.email > user2.email ? 1 : -1 )
+            .map( (user) => (
+              <tr
+                key={user.id}
+                className={classnames (
+                  "clickable",
+                  {
+                    "active": parseInt(match.params.id) === user.id
+                  }
+                )}
+                style={{whiteSpace: "nowrap",  overflow: "hidden"}}
+                onClick={()=>history.push(`/helpdesk/settings/users/${user.id}`)}>
+                <td
+                  style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
+                  {user.username}
+                </td>
+                <td className={(match.params.id === user.id ? " active":"") }
+                  style={{maxWidth: "200px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }} >
+                  { (user.company ? user.company.title  : "NEZARADENÉ")}
+                </td>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
     </SettingListContainer>

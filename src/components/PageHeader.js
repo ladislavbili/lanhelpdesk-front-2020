@@ -138,6 +138,7 @@ export default function PageHeader( props ) {
                 headerClassName="segoe-semi-header custom-popover-header"
                 target="page-header-settings"
                 header="Settings"
+                useLegacy
                 reset={() => {}}
                 submit={() => {}}
                 open={ settingsOpen }

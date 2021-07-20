@@ -26,6 +26,7 @@ export default function MultiSelect( props ) {
     items,
     selected,
     onChange,
+    useLegacy,
   } = props;
 
   const [ filter, setFilter ] = React.useState( "" );
@@ -42,6 +43,7 @@ export default function MultiSelect( props ) {
         submit={closeMultiSelect}
         open={ open }
         close={closeMultiSelect}
+        useLegacy={useLegacy}
         >
         <div
           className={`${bodyClassName ? bodyClassName : ''}`}

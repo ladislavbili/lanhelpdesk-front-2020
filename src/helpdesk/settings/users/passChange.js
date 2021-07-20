@@ -32,7 +32,7 @@ export default function PasswordChange( props ) {
             <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={newPass} id="new-pass" onChange={ (e) => setNewPass(e.target.value) } />
             <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
               <InputGroupText>
-                <i className={"mt-auto mb-auto "+ (!showPass ?'fa fa-eye':'fa fa-eye-slash')}/>
+                <i className={"mt-auto mb-auto " + (!showPass ? 'fa fa-eye' : 'fa fa-eye-slash')} />
               </InputGroupText>
             </InputGroupAddon>
           </InputGroup>

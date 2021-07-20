@@ -1,8 +1,10 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient
 } from "@apollo/client";
+
 import {
   FormGroup,
   Label,
@@ -10,22 +12,23 @@ import {
 } from 'reactstrap';
 import Loading from 'components/loading';
 import Select from 'react-select';
+import Checkbox from 'components/checkbox';
+import PasswordChange from './passChange';
+import SettingsInput from '../components/settingsInput';
+
+import languages from "configs/constants/languages";
 import {
   pickSelectStyle
 } from "configs/components/select";
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
-
-import languages from "configs/constants/languages";
-
 import {
   isEmail,
   toSelArr,
   compareObjectAttributes,
   getMyData,
 } from 'helperFunctions';
-import Checkbox from 'components/checkbox';
 
 import {
   GET_USERS,
@@ -42,15 +45,17 @@ import {
 import {
   GET_BASIC_COMPANIES,
 } from '../companies/queries';
-import PasswordChange from './passChange';
 
 export default function UserEdit( props ) {
-  // data & queries
   const {
     history,
     match
   } = props;
+
   const id = parseInt( match.params.id );
+  const client = useApolloClient();
+  const currentUser = getMyData();
+
   const {
     data: userData,
     loading: userLoading,
@@ -61,23 +66,23 @@ export default function UserEdit( props ) {
     },
     fetchPolicy: 'network-only',
   } );
+
   const {
     data: rolesData,
     loading: rolesLoading
   } = useQuery( GET_ROLES, {
     fetchPolicy: 'network-only'
   } );
+
   const {
     data: companiesData,
     loading: companiesLoading
   } = useQuery( GET_BASIC_COMPANIES, {
     fetchPolicy: 'network-only'
   } );
-  const [ updateUser ] = useMutation( UPDATE_USER );
-  const [ deleteUser, {
-    client
-  } ] = useMutation( DELETE_USER );
 
+  const [ updateUser ] = useMutation( UPDATE_USER );
+  const [ deleteUser ] = useMutation( DELETE_USER );
   const [ setUserActive ] = useMutation( SET_USER_ACTIVE );
 
   //state
@@ -91,11 +96,11 @@ export default function UserEdit( props ) {
   const [ role, setRole ] = React.useState( {} );
   const [ company, setCompany ] = React.useState( {} );
   const [ language, setLanguage ] = React.useState( languages[ 0 ] );
-  const [ saving, setSaving ] = React.useState( false );
-  const [ deletingUser /*, setDeletingUser */ ] = React.useState( false );
   const [ passwordChangeOpen, setPasswordChangeOpen ] = React.useState( false );
   const [ password, setPassword ] = React.useState( null );
 
+  const [ saving, setSaving ] = React.useState( false );
+  const [ deletingUser ] = React.useState( false );
   const [ dataChanged, setDataChanged ] = React.useState( false );
 
   // sync
@@ -159,11 +164,14 @@ export default function UserEdit( props ) {
     updateUser( {
         variables: data
       } )
+      .then( () => {
+        setSaving( false );
+        setDataChanged( false );
+      } )
       .catch( ( err ) => {
+        setSaving( false );
         addLocalError( err );
       } );
-    setSaving( false );
-    setDataChanged( false );
   };
 
   const deleteUserFunc = () => {
@@ -192,21 +200,26 @@ export default function UserEdit( props ) {
     setActive( !active );
   }
 
-  const currentUser = getMyData();
-  if ( userLoading || rolesLoading || companiesLoading || !currentUser ) {
+  const dataLoading = ( userLoading || rolesLoading || companiesLoading || !currentUser );
+
+  if ( dataLoading ) {
     return <Loading />
   }
+
   const currentUserLevel = currentUser.role.level;
   const roles = toSelArr( rolesData.roles )
     .filter( ( role ) => role.level > currentUserLevel || role.id === userData.user.role.id || ( currentUserLevel === 0 && role.level === 0 ) );
   const companies = toSelArr( companiesData.basicCompanies );
+
   const isDisabled = ( currentUserLevel !== 0 && currentUserLevel >= role.level );
 
   return (
     <div className="scroll-visible p-20 fit-with-header">
+
       <h2 className="m-b-20" >
         Edit user
       </h2>
+
       <FormGroup>
         <Label for="role">Role <span className="warning-big">*</span></Label>
         <Select
@@ -220,66 +233,55 @@ export default function UserEdit( props ) {
           }}
           />
       </FormGroup>
-      <FormGroup>
-        <Label for="username">Username <span className="warning-big">*</span></Label>
-        <Input
-          type="text"
-          name="username"
-          id="username"
-          placeholder="Enter username"
-          disabled={ isDisabled }
-          value={ username }
-          onChange={ (e) => {
-            setUsername(e.target.value);
-            setDataChanged( true );
-          }}
-          />
-      </FormGroup>
-      <FormGroup>
-        <Label for="name">Name <span className="warning-big">*</span></Label>
-        <Input
-          type="text"
-          name="name"
-          id="name"
-          placeholder="Enter name"
-          disabled={ isDisabled }
-          value={ name }
-          onChange={ (e) => {
-            setName(e.target.value);
-            setDataChanged( true );
-          } }
-          />
-      </FormGroup>
-      <FormGroup>
-        <Label for="surname">Surname <span className="warning-big">*</span></Label>
-        <Input
-          type="text"
-          name="surname"
-          id="surname"
-          placeholder="Enter surname"
-          disabled={ isDisabled }
-          value={ surname }
-          onChange={ (e) => {
-            setSurname(e.target.value);
-            setDataChanged( true );
-          } }
-          />
-      </FormGroup>
-      <FormGroup>
-        <Label for="email">E-mail <span className="warning-big">*</span></Label>
-        <Input
-          type="email"
-          name="email"
-          id="email"
-          placeholder="Enter email"
-          value={ email }
-          disabled={ isDisabled }
-          onChange={ (e) => {
-            setEmail(e.target.value);
-            setDataChanged( true );
-          } }
-          />
-      </FormGroup>
+
+      <SettingsInput
+        required
+        label="Username"
+        id="username"
+        disabled={ isDisabled }
+        value={username}
+        onChange={(e) => {
+          setUsername(e.target.value);
+          setDataChanged( true );
+        }}
+        />
+
+      <SettingsInput
+        required
+        label="Name"
+        id="name"
+        disabled={ isDisabled }
+        value={ name }
+        onChange={(e) => {
+          setName(e.target.value);
+          setDataChanged( true );
+        }}
+        />
+
+      <SettingsInput
+        required
+        label="Surname"
+        id="surname"
+        disabled={ isDisabled }
+        value={ surname }
+        onChange={(e) => {
+          setSurname(e.target.value);
+          setDataChanged( true );
+        }}
+        />
+
+      <SettingsInput
+        required
+        label="E-mail"
+        id="email"
+        type="email"
+        disabled={ isDisabled }
+        value={ email }
+        onChange={(e) => {
+          setEmail(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
       <FormGroup>
         <Label for="language">Language</Label>
@@ -299,7 +301,7 @@ export default function UserEdit( props ) {
         className = "m-b-5 p-l-0"
         value = { receiveNotifications }
         label = "Receive e-mail notifications"
-        disabled={isDisabled}
+        disabled={ isDisabled }
         onChange={()=> {
           setReceiveNotifications(!receiveNotifications);
           setDataChanged( true );
@@ -320,24 +322,21 @@ export default function UserEdit( props ) {
           />
       </FormGroup>
 
-      <FormGroup>
-        <Label for="signature">Signature</Label>
-        <Input
-          type="textarea"
-          name="signature"
-          id="signature"
-          placeholder="Enter signature"
-          disabled={isDisabled}
-          value={ signature }
-          onChange={ (e) => {
-            setSignature(e.target.value);
-            setDataChanged( true );
-          } }
-          />
-      </FormGroup>
+      <SettingsInput
+        label="Signature"
+        id="signature"
+        type="textarea"
+        disabled={ isDisabled }
+        value={ signature }
+        onChange={(e) => {
+          setSignature(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
       { !isDisabled &&
         <div className="form-buttons-row">
+
           { id !== currentUser.id &&
             <button
               className="btn-red btn-distance"
@@ -347,23 +346,26 @@ export default function UserEdit( props ) {
               Delete
             </button>
           }
+
           { id !== currentUser.id &&
             <button
               className={ active ? "btn btn-grey btn-distance" : "btn btn-green btn-distance"}
-              onClick={()=> deactivateUser(active)}
+              onClick={() => deactivateUser(active)}
               >
               {active ? 'Deactivate user' : 'Activate user'}
             </button>
           }
+
           <button
             className="btn-link btn-distance"
             disabled={ saving || isDisabled }
-            onClick={ ()=>{
+            onClick={ () => {
               setPasswordChangeOpen(true);
             }}
             >
             { password === null ? 'Change password' : 'Password change edit' }
           </button>
+
           <div className="ml-auto message m-r-10">
             { dataChanged &&
               <div className="message error-message">
@@ -384,6 +386,7 @@ export default function UserEdit( props ) {
             >
             { saving ? 'Saving user...' : 'Save user' }
           </button>
+
         </div>
       }
       <PasswordChange

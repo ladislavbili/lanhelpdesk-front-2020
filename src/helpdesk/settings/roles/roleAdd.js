@@ -1,18 +1,23 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient,
 } from "@apollo/client";
-import ErrorMessage from 'components/errorMessage';
+import classnames from "classnames";
+
 import {
   FormGroup,
   Label,
   Input
 } from 'reactstrap';
+import ErrorMessage from 'components/errorMessage';
+import SettingsInput from '../components/settingsInput';
+import RightRow from './rightRow';
+
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
-import RightRow from './rightRow';
 import {
   getMyData,
 } from 'helperFunctions';
@@ -23,16 +28,16 @@ import {
 } from './queries';
 
 export default function RoleAdd( props ) {
-  //data
   const {
     history,
     match
   } = props;
-  const [ addRole, {
-    client
-  } ] = useMutation( ADD_ROLE );
+
+  const client = useApolloClient();
+
   const currentUser = getMyData();
-  const currentUserLevel = currentUser ? currentUser.role.level : null;
+
+  const [ addRole ] = useMutation( ADD_ROLE );
   //state
   const [ title, setTitle ] = React.useState( "" );
   const [ order, setOrder ] = React.useState( 0 );
@@ -141,16 +146,18 @@ export default function RoleAdd( props ) {
           level: (
             level !== '' ?
             parseInt( level ) :
-            0 ),
+            0
+          ),
           order: (
             order !== '' ?
             parseInt( order ) :
-            0 ),
+            0
+          ),
           accessRights
         }
       } )
       .then( ( response ) => {
-        history.push( '/helpdesk/settings/roles/' + response.data.addRole.id )
+        history.push( `/helpdesk/settings/roles/${response.data.addRole.id}` )
       } )
       .catch( ( err ) => {
         addLocalError( err );
@@ -158,118 +165,132 @@ export default function RoleAdd( props ) {
     setSaving( false );
   }
 
-  const cannotSave = () => {
-    return currentUserLevel === null || currentUserLevel >= level || title.length === 0;
-  }
+  const currentUserLevel = currentUser ? currentUser.role.level : null;
+
+  const cannotSave = () => (
+    currentUserLevel === null ||
+    currentUserLevel >= level ||
+    title.length === 0
+  );
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
+    <div className="scroll-visible p-20 fit-with-header">
+      <h2 className="m-b-20" >
+        Add role
+      </h2>
+
+      <SettingsInput
+        required
+        id="title"
+        label="Role name"
+        value={title}
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+        />
+
+      <SettingsInput
+        id="order"
+        label="Order"
+        value={order}
+        onChange={(e) => {
+          setOrder(e.target.value);
+        }}
+        />
+
+      <SettingsInput
+        id="level"
+        label="Level"
+        type="number"
+        error={ currentUserLevel === null || level <= currentUserLevel }
+        errorMessage={`Targets role can't be lower or same as yours(${currentUserLevel})!`}
+        value={level}
+        onChange={(e) => {
+          setLevel(e.target.value);
+        }}
+        />
+
+      <div>
+        <h2>General rights</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th width={"90%"} key={1}>
+                Name
+              </th>
+              <th className="t-a-c" key={2}>
+                Granted
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            { generalRights.map( (right) => (
+              <RightRow
+                key={[right.key,right.state[0]].toString()}
+                onChange={right.state[1]}
+                label={right.label}
+                disabled={false}
+                value={right.state[0]}
+                />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2>Settings</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th width={"90%"} key={1}>
+                Access
+              </th>
+              <th className="t-a-c" key={2}>
+                View & Edit
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            { settings.map( (right) => (
+              <RightRow
+                key={[right.key,right.state[0]].toString()}
+                onChange={right.state[1]}
+                label={right.label}
+                disabled={false}
+                value={right.state[0]}
+                />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="form-buttons-row">
+        { props.close &&
+          <button className="btn-link" onClick={() => {
+              props.close()
+            }}
+            >
+            Cancel
+          </button>
+        }
+
         { cannotSave() &&
-          <div className="message error-message">
+          <div className="message error-message ml-auto m-r-14">
             Fill in all the required information!
           </div>
         }
-      </div>
 
-
-      <div className="p-t-10 p-l-20 p-r-20 p-b-20 scroll-visible fit-with-header-and-commandbar">
-        <h2 className="m-b-20" >
-          Add role
-        </h2>
-        <FormGroup>
-          <Label for="role">Role <span className="warning-big">*</span></Label>
-          <Input name="name" id="name" type="text" placeholder="Enter role name" value={title} onChange={(e) => setTitle(e.target.value)}/>
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="role">Order</Label>
-          <Input name="name" id="name" type="number" placeholder="Enter role name" value={order} onChange={(e) => setOrder(e.target.value)}/>
-        </FormGroup>
-
-        <FormGroup>
-          <div className="row">
-            <Label for="role">Level <span className="warning-big">*</span></Label>
-            <ErrorMessage show={ currentUserLevel === null || level <= currentUserLevel } message={`Targets role can't be lower or same as yours(${currentUserLevel})!`} />
-          </div>
-          <Input name="name" id="name" type="number" placeholder="Enter role name" value={level} onChange={(e) => setLevel(e.target.value)}/>
-        </FormGroup>
-
-        <div className="">
-          <h2>General rights</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th width={"90%"} key={1}>
-                  Name
-                </th>
-                <th className="t-a-c" key={2}>
-                  Granted
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              { generalRights.map( (right) =>
-                <RightRow
-                  key={[right.key,right.state[0]].toString()}
-                  onChange={right.state[1]}
-                  label={right.label}
-                  disabled={false}
-                  value={right.state[0]}
-                  />
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="">
-          <h2>Settings</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th width={"90%"} key={1}>
-                  Access
-                </th>
-                <th className="t-a-c" key={2}>
-                  View & Edit
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              { settings.map( (right) =>
-                <RightRow
-                  key={[right.key,right.state[0]].toString()}
-                  onChange={right.state[1]}
-                  label={right.label}
-                  disabled={false}
-                  value={right.state[0]}
-                  />
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="form-buttons-row">
-          {
-            props.close &&
-            <button className="btn-link" onClick={() => {
-                props.close()
-              }}
-              >
-              Cancel
-            </button>
-          }
-
-          <button className="btn ml-auto" disabled={cannotSave()} onClick={addRoleFunc}>
-            {
-              saving
-              ? 'Adding...'
-              : 'Add role'
-            }
-          </button>
-        </div>
+        <button
+          className={classnames(
+            "btn",
+            {"ml-auto": !cannotSave()}
+          )}
+          disabled={cannotSave()}
+          onClick={addRoleFunc}
+          >
+          { saving ? 'Adding...' : 'Add role' }
+        </button>
       </div>
     </div>
-
   );
 }

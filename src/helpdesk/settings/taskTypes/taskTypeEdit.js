@@ -1,54 +1,60 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient,
 } from "@apollo/client";
+import classnames from 'classnames';
+
 import {
   FormGroup,
   Label,
   Input,
 } from 'reactstrap';
 import Loading from 'components/loading';
+import DeleteReplacement from 'components/deleteReplacement';
+import SettingsInput from '../components/settingsInput';
+
 import {
   toSelArr
 } from 'helperFunctions';
-import DeleteReplacement from 'components/deleteReplacement';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+
 import {
   GET_TASK_TYPE,
   UPDATE_TASK_TYPE,
   DELETE_TASK_TYPE,
   GET_TASK_TYPES,
 } from './queries';
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
 
 export default function TaskTypeEdit( props ) {
-  //data
   const {
     history,
     match
   } = props;
-  const {
-    data,
-    loading,
-    refetch
-  } = useQuery( GET_TASK_TYPE, {
-    variables: {
-      id: parseInt( props.match.params.id )
-    },
-    fetchPolicy: 'network-only',
-  } );
-  const [ updateTaskType ] = useMutation( UPDATE_TASK_TYPE );
-  const [ deleteTaskType, {
-    client
-  } ] = useMutation( DELETE_TASK_TYPE );
+  const client = useApolloClient();
   const allTaskTypes = toSelArr( client.readQuery( {
       query: GET_TASK_TYPES
     } )
     .taskTypes );
   const filteredTaskTypes = allTaskTypes.filter( taskType => taskType.id !== parseInt( match.params.id ) );
   const theOnlyOneLeft = allTaskTypes.length < 2;
+
+  const {
+    data: taskTypeData,
+    loading: taskTypeLoading,
+    refetch: taskTypeRefetch
+  } = useQuery( GET_TASK_TYPE, {
+    variables: {
+      id: parseInt( props.match.params.id )
+    },
+    fetchPolicy: 'network-only',
+  } );
+
+  const [ updateTaskType ] = useMutation( UPDATE_TASK_TYPE );
+  const [ deleteTaskType ] = useMutation( DELETE_TASK_TYPE );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -60,13 +66,13 @@ export default function TaskTypeEdit( props ) {
 
   // sync
   React.useEffect( () => {
-    if ( !loading ) {
+    if ( !taskTypeLoading ) {
       setData();
     }
-  }, [ loading ] );
+  }, [ taskTypeLoading ] );
 
   React.useEffect( () => {
-    refetch( {
+    taskTypeRefetch( {
         variables: {
           id: parseInt( match.params.id )
         }
@@ -76,11 +82,12 @@ export default function TaskTypeEdit( props ) {
 
   // functions
   const setData = () => {
-    if ( loading ) {
+    if ( taskTypeLoading ) {
       return;
     }
-    setTitle( data.taskType.title );
-    setOrder( data.taskType.order );
+    const taskType = taskTypeData.taskType;
+    setTitle( taskType.title );
+    setOrder( taskType.order );
     setDataChanged( false );
   }
 
@@ -113,7 +120,7 @@ export default function TaskTypeEdit( props ) {
           }
         } )
         .then( ( response ) => {
-          history.push( '/helpdesk/settings/taskTypes/add' );
+          history.push( '/helpdesk/settings/taskTypes' );
         } )
         .catch( ( err ) => {
           addLocalError( err );
@@ -121,82 +128,79 @@ export default function TaskTypeEdit( props ) {
     }
   };
 
-  if ( loading ) {
+  if ( taskTypeLoading ) {
     return <Loading />
   }
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
-        { dataChanged &&
-          <div className="message error-message">
-            Save changes before leaving!
-          </div>
-        }
-        { !dataChanged &&
-          <div className="message success-message">
-            Saved
-          </div>
-        }
-      </div>
+    <div className="scroll-visible p-20 fit-with-header">
 
-      <h2 className="p-l-20 m-t-10" >
+      <h2 className="m-b-20" >
         Edit task type
       </h2>
 
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
-        <FormGroup>
-          <Label for="name">Task type name</Label>
-          <Input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="Enter task type name"
-            value={title}
-            onChange={(e)=>{
-              setTitle(e.target.value);
-              setDataChanged( true );
-            }}
-            />
-        </FormGroup>
+      <SettingsInput
+        required
+        label="Task type name"
+        id="title"
+        value={title}
+        onChange={(e)=> {
+          setTitle(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
-        <FormGroup>
-          <Label for="order">Order</Label>
-          <Input
-            type="number"
-            name="order"
-            id="order"
-            placeholder="Lower means first"
-            value={order}
-            onChange={(e)=>{
-              setOrder(e.target.value);
-              setDataChanged( true );
-            }}
-            />
-        </FormGroup>
+      <SettingsInput
+        label="Order"
+        placeholder="Lower means first"
+        id="order"
+        value={order}
+        onChange={(e)=> {
+          setOrder(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
-        <div className="form-buttons-row">
-          <button
-            className="btn-red"
-            disabled={saving || theOnlyOneLeft}
-            onClick={() => {
-              setDeleteOpen(true);
-              setDataChanged( true );
-            }}
-            >
-            Delete
-          </button>
-          <button className="btn ml-auto" disabled={saving} onClick={updateTaskTypeFunc}>{saving?'Saving task type...':'Save task type'}</button>
+      <div className="form-buttons-row">
+        <button
+          className="btn-red"
+          disabled={saving || theOnlyOneLeft}
+          onClick={() => {
+            setDeleteOpen(true);
+            setDataChanged( true );
+          }}
+          >
+          Delete
+        </button>
+
+        <div className="ml-auto message m-r-10">
+          { dataChanged &&
+            <div className="message error-message">
+              Save changes before leaving!
+            </div>
+          }
+          { !dataChanged &&
+            <div className="message success-message">
+              Saved
+            </div>
+          }
         </div>
-        <DeleteReplacement
-          isOpen={deleteOpen}
-          label="task type"
-          options={filteredTaskTypes}
-          close={()=>setDeleteOpen(false)}
-          finishDelete={deleteTaskTypeFunc}
-          />
-      </div>
-    </div>
 
+        <button
+          className="btn"
+          disabled={saving}
+          onClick={updateTaskTypeFunc}
+          >
+          {saving ? 'Saving task type...' : 'Save task type'}
+        </button>
+      </div>
+      <DeleteReplacement
+        isOpen={deleteOpen}
+        label="task type"
+        options={filteredTaskTypes}
+        close={()=>setDeleteOpen(false)}
+        finishDelete={deleteTaskTypeFunc}
+        />
+    </div>
   )
 }

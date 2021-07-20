@@ -1,13 +1,11 @@
 import React from 'react';
 import {
-  useMutation
+  useMutation,
+  useApolloClient,
 } from "@apollo/client";
+import classnames from "classnames";
 
-import {
-  FormGroup,
-  Label,
-  Input
-} from 'reactstrap';
+import SettingsInput from '../components/settingsInput';
 
 import {
   addLocalError,
@@ -19,13 +17,12 @@ import {
 } from './queries';
 
 export default function TripTypeAdd( props ) {
-  //data & queries
   const {
     history
   } = props;
-  const [ addTripType, {
-    client
-  } ] = useMutation( ADD_TRIP_TYPE );
+  const client = useApolloClient();
+
+  const [ addTripType ] = useMutation( ADD_TRIP_TYPE );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -42,7 +39,7 @@ export default function TripTypeAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        history.push( '/helpdesk/settings/tripTypes/' + response.data.addTripType.id )
+        history.push( `/helpdesk/settings/tripTypes/${response.data.addTripType.id}` )
       } )
       .catch( ( err ) => {
         addLocalError( err );
@@ -55,34 +52,47 @@ export default function TripTypeAdd( props ) {
   }
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
-        { cannotSave() &&
-          <div className="message error-message">
-            Fill in all the required information!
-          </div>
-        }
-      </div>
-
-      <h2 className="p-l-20 m-t-10" >
+    <div className="scroll-visible p-20 fit-with-header">
+      <h2 className="m-b-20" >
         Add trip type
       </h2>
 
-      <div className="p-20 scroll-visible fit-with-header-and-commandbar">
+      <SettingsInput
+        required
+        label="Trip type"
+        id="title"
+        value={title}
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+        />
 
-        <FormGroup>
-          <Label for="name">Trip type <span className="warning-big">*</span></Label>
-          <Input type="text" name="name" id="name" placeholder="Enter trip type" value={title} onChange={(e)=>setTitle(e.target.value)} />
-        </FormGroup>
-        <FormGroup>
-          <Label for="order">Order</Label>
-          <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
-        </FormGroup>
-        <div className="form-buttons-row">
-          <button className="btn ml-auto" disabled={cannotSave()} onClick={addTripTypeFunc}>
-            {saving?'Adding...':'Add trip type'}
-          </button>
-        </div>
+      <SettingsInput
+        label="Order"
+        placeholder="Lower means first"
+        id="order"
+        value={order}
+        onChange={(e) => {
+          setOrder(e.target.value);
+        }}
+        />
+
+      <div className="form-buttons-row">
+        { cannotSave() &&
+          <div className="message error-message ml-auto m-r-14">
+            Fill in all the required information!
+          </div>
+        }
+        <button
+          className={classnames(
+            "btn",
+            {"ml-auto": !cannotSave()}
+          )}
+          disabled={cannotSave()}
+          onClick={addTripTypeFunc}
+          >
+          { saving ? 'Adding...' : 'Add trip type' }
+        </button>
       </div>
     </div>
   )

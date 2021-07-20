@@ -3,18 +3,22 @@ import {
   useQuery,
   useSubscription,
 } from "@apollo/client";
+import classnames from 'classnames';
 
+import Empty from 'components/Empty';
+import SettingLoading from '../components/settingLoading';
+import SettingListContainer from '../components/settingListContainer';
 import PublicFilterAdd from './publicFilterAdd';
 import PublicFilterEdit from './publicFilterEdit';
+
+import {
+  itemAttributesFullfillsString
+} from '../components/helpers';
 import {
   textIncluded,
   orderArr,
   toSelArr
 } from 'helperFunctions';
-import Loading from 'components/loading';
-import Empty from 'components/Empty';
-import SettingListContainer from '../components/settingListContainer';
-import classnames from 'classnames';
 
 import {
   GET_BASIC_ROLES,
@@ -27,11 +31,6 @@ import {
 } from './queries';
 
 export default function PublicFilterList( props ) {
-  // state
-  const [ search, setSearch ] = React.useState( "" );
-  const [ roleFilter, setRoleFilter ] = React.useState( "all" );
-
-  //data
   const {
     history,
     match
@@ -43,6 +42,12 @@ export default function PublicFilterList( props ) {
     refetch: publicFilterRefetch,
   } = useQuery( GET_PUBLIC_FILTERS, {
     fetchPolicy: 'network-only',
+  } );
+
+  useSubscription( FILTERS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      publicFilterRefetch();
+    }
   } );
 
   const {
@@ -59,12 +64,15 @@ export default function PublicFilterList( props ) {
     }
   } );
 
-  useSubscription( FILTERS_SUBSCRIPTION, {
-    onSubscriptionData: () => {
-      publicFilterRefetch();
-    }
-  } );
+  // state
+  const [ search, setSearch ] = React.useState( "" );
+  const [ roleFilter, setRoleFilter ] = React.useState( "all" );
 
+  const dataLoading = ( publicFilterLoading || rolesLoading );
+
+  if ( dataLoading ) {
+    return ( <SettingLoading match={match} /> );
+  }
 
   const getFilteredFilters = () => {
     if ( publicFilterLoading ) {
@@ -80,8 +88,6 @@ export default function PublicFilterList( props ) {
     ) );
   }
 
-  const dataLoading = ( publicFilterLoading || rolesLoading );
-
   const PublicFiltersSort = (
     <div className="d-flex flex-row align-items-center ml-auto">
       <div className="text-basic m-r-5 m-l-5">
@@ -90,27 +96,25 @@ export default function PublicFilterList( props ) {
       <select
         value={roleFilter}
         className="invisible-select text-bold text-highlight"
-        onChange={(e)=>setRoleFilter(e.target.value)}>
-          <option value='all'>All filters</option>
-          { (rolesLoading ? [] : orderArr(toSelArr(rolesData.basicRoles))).map((role) =>
-            <option value={role.id} key={role.id}>{role.title}</option>
-          )}
-          <option value='none'>Without role</option>
+        onChange={ (e) => setRoleFilter(e.target.value) }
+        >
+        <option value='all'>All filters</option>
+        { orderArr(toSelArr(rolesData.basicRoles)).map((role) => (
+          <option value={role.id} key={role.id}>{role.title}</option>
+        ))}
+        <option value='none'>Without role</option>
       </select>
     </div>
   );
 
   const RightSideComponent = (
     <Empty>
-      {
-        match.params.id &&
-        match.params.id==='add' &&
+      { match.params.id &&
+        match.params.id === 'add' &&
         <PublicFilterAdd {...{history}} />
       }
 
-      {
-        !dataLoading &&
-        match.params.id &&
+      { match.params.id &&
         match.params.id!=='add' &&
         publicFiltersData.publicFilters.some((item)=>item.id === parseInt(match.params.id)) &&
         <PublicFilterEdit {...{history, match}}/>
@@ -129,45 +133,37 @@ export default function PublicFilterList( props ) {
       RightFilterComponent={PublicFiltersSort}
       RightSideComponent={RightSideComponent}
       >
-      {
-        dataLoading ?
-        (
-          <Loading />
-        ):
-        (
-          <table className="table table-hover">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Order</th>
+      <table className="table table-hover">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Order</th>
+          </tr>
+        </thead>
+        <tbody>
+          { getFilteredFilters().map( (filter) => (
+              <tr
+                key={filter.id}
+                className={classnames (
+                  "clickable",
+                  {
+                    "active": parseInt(match.params.id) === filter.id
+                  }
+                )}
+                style={{whiteSpace: "nowrap",  overflow: "hidden"}}
+                onClick={ () => history.push(`/helpdesk/settings/publicFilters/${filter.id.toString()}`) }>
+                <td
+                  style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }} >
+                  {filter.title}
+                </td>
+                <td
+                  style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }} >
+                  {filter.order}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              { getFilteredFilters().map( (filter) =>
-                <tr
-                  key={filter.id}
-                  className={classnames (
-                    "clickable",
-                    {
-                      "active": parseInt(match.params.id) === filter.id
-                    }
-                  )}
-                  style={{whiteSpace: "nowrap",  overflow: "hidden"}}
-                  onClick={()=>history.push('/helpdesk/settings/publicFilters/'+filter.id.toString())}>
-                  <td
-                    style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
-                    {filter.title}
-                  </td>
-                  <td
-                    style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
-                    {filter.order}
-                  </td>
-                </tr>
-              ) }
-            </tbody>
-          </table>
-        )
-      }
+            ))}
+        </tbody>
+      </table>
     </SettingListContainer>
   )
 }

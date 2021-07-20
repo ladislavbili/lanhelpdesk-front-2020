@@ -1,19 +1,27 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient,
 } from "@apollo/client";
+import classnames from 'classnames';
+
 import {
   FormGroup,
   Label,
   Input,
 } from 'reactstrap';
-import classnames from 'classnames';
-import Checkbox from 'components/checkbox';
-
-import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
-import Loading from 'components/loading';
 import Select from 'react-select';
+import Checkbox from 'components/checkbox';
+import Loading from 'components/loading';
+import SettingsInput from '../components/settingsInput';
+import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
+
+import {
+  oneOfOptions,
+  emptyFilter,
+  booleanSelectOptions,
+} from 'configs/constants/filter';
 import {
   pickSelectStyle
 } from 'configs/components/select';
@@ -21,6 +29,10 @@ import {
   toSelArr,
   fromObjectToState
 } from 'helperFunctions';
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
+
 import {
   ADD_PUBLIC_FILTER,
   GET_PUBLIC_FILTERS
@@ -41,19 +53,38 @@ import {
   GET_ROLES,
 } from '../roles/queries';
 
-import {
-  oneOfOptions,
-  emptyFilter,
-  booleanSelectOptions,
-} from 'configs/constants/filter';
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
-
 export default function PublicFilterAdd( props ) {
   const {
     history
   } = props;
+  const client = useApolloClient();
+
+  const {
+    data: taskTypesData,
+    loading: taskTypesLoading
+  } = useQuery( GET_TASK_TYPES );
+
+  const {
+    data: usersData,
+    loading: usersLoading
+  } = useQuery( GET_BASIC_USERS );
+
+  const {
+    data: companiesData,
+    loading: companiesLoading
+  } = useQuery( GET_BASIC_COMPANIES );
+
+  const {
+    data: projectsData,
+    loading: projectsLoading
+  } = useQuery( GET_PROJECTS );
+
+  const {
+    data: rolesData,
+    loading: rolesLoading
+  } = useQuery( GET_ROLES );
+
+  const [ addPublicFilter ] = useMutation( ADD_PUBLIC_FILTER );
 
   // state
   const [ global, setGlobal ] = React.useState( false );
@@ -134,36 +165,6 @@ export default function PublicFilterAdd( props ) {
     setOneOf,
   } = fromObjectToState( emptyFilter );
 
-  //get data
-  const {
-    data: taskTypesData,
-    loading: taskTypesLoading
-  } = useQuery( GET_TASK_TYPES );
-
-  const {
-    data: usersData,
-    loading: usersLoading
-  } = useQuery( GET_BASIC_USERS );
-
-  const {
-    data: companiesData,
-    loading: companiesLoading
-  } = useQuery( GET_BASIC_COMPANIES );
-
-  const {
-    data: projectsData,
-    loading: projectsLoading
-  } = useQuery( GET_PROJECTS );
-
-  const {
-    data: rolesData,
-    loading: rolesLoading
-  } = useQuery( GET_ROLES );
-
-  const [ addPublicFilter, {
-    client
-  } ] = useMutation( ADD_PUBLIC_FILTER );
-
   const dataLoading = (
     taskTypesLoading ||
     usersLoading ||
@@ -172,7 +173,7 @@ export default function PublicFilterAdd( props ) {
     rolesLoading
   )
 
-  const cantSave = (
+  const cannotSave = () => (
     dataLoading ||
     saving ||
     title === "" ||
@@ -260,363 +261,363 @@ export default function PublicFilterAdd( props ) {
   if ( dataLoading ) {
     return <Loading />
   }
+
   return (
-    <div>
-      <div
-        className={classnames(
-          "p-20",
-          "scroll-visible fit-with-header"
-        )}
-        >
-        <h2 className="m-b-20" >
-          Add public filter
-        </h2>
+    <div
+      className={classnames(
+        "p-20",
+        "scroll-visible fit-with-header"
+      )}
+      >
+      <h2 className="m-b-20" >
+        Add public filter
+      </h2>
 
-        {/* Title */}
-        <FormGroup>
-          <Label htmlFor="title">Filter name <span className="warning-big">*</span></Label>
-          <Input
-            id="title"
-            type="text"
-            placeholder="Enter role name"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            />
-        </FormGroup>
+      <SettingsInput
+        required
+        id="title"
+        label="Filter name"
+        value={title}
+        onChange={(e) => {
+          setTitle(e.target.value);
+        }}
+        />
 
-        {/* Order */}
-        <FormGroup>
-          <Label for="order">Filter order <span className="warning-big">*</span></Label>
-          <Input
-            id="order"
-            type="number"
-            placeholder="Enter filter order"
-            value={order}
-            onChange={(e) => setOrder(e.target.value)}
-            />
-        </FormGroup>
+      <SettingsInput
+        required
+        id="order"
+        type="number"
+        label="Filter order"
+        placeholder="Enter filter order"
+        value={order}
+        onChange={(e) => {
+          setOrder(e.target.value);
+        }}
+        />
 
-        {/* Roles */}
-        <FormGroup>
-          <Label className="">Roles</Label>
-          <Select
-            placeholder="Choose roles"
-            value={roles}
-            isMulti
-            onChange={(newRoles)=>{
-              if(newRoles.some((role) => role.id === 'all' )){
-                if( roles.length === rolesData.roles.length ){
-                  setRoles([]);
-                }else{
-                  setRoles(toSelArr(rolesData.roles));
-                }
+      {/* Roles */}
+      <FormGroup>
+        <Label className="">Roles</Label>
+        <Select
+          placeholder="Choose roles"
+          value={roles}
+          isMulti
+          onChange={ (newRoles) => {
+            if(newRoles.some((role) => role.id === 'all' )){
+              if( roles.length === rolesData.roles.length ){
+                setRoles([]);
               }else{
-                setRoles(newRoles);
+                setRoles(toSelArr(rolesData.roles));
               }
-            }}
-            options={toSelArr([{id: 'all', title: roles.length === rolesData.roles.length ? 'Clear' : 'All' }, ...rolesData.roles])}
-            styles={pickSelectStyle()}
-            />
-        </FormGroup>
-
-        <Label  className="m-t-15">Show filter <span className="warning-big">*</span></Label>
-        <hr className="m-t-5 m-b-10"/>
-        {/* Global */}
-        <Checkbox
-          className = "m-l-5 m-r-5"
-          label = "Global (shown in all projects)"
-          value = { global }
-          onChange={(e) => setGlobal(!global)}
-          addition={ <span className="one-of-big">*</span>}
+            }else{
+              setRoles(newRoles);
+            }
+          }}
+          options={toSelArr([
+            { id: 'all', title: roles.length === rolesData.roles.length ? 'Clear' : 'All' },
+            ...rolesData.roles
+          ])}
+          styles={pickSelectStyle()}
           />
+      </FormGroup>
 
-        {/* Project */}
-        <div className="m-b-10">
-          <Label className="form-label">Projekt <span className="one-of-big">*</span></Label>
+      <Label  className="m-t-15">Show filter <span className="warning-big">*</span></Label>
+      <hr className="m-t-5 m-b-10"/>
+      {/* Global */}
+      <Checkbox
+        className = "m-l-5 m-r-5"
+        label = "Global (shown in all projects)"
+        value = { global }
+        onChange={(e) => setGlobal(!global)}
+        addition={ <span className="one-of-big">*</span>}
+        />
+
+      {/* Project */}
+      <div className="m-b-10">
+        <Label className="form-label">Projekt <span className="one-of-big">*</span></Label>
+        <Select
+          placeholder="Vyberte projekt"
+          value={project}
+          isDisabled={global}
+          onChange={(project) => setProject(project)}
+          options={toSelArr(projectsData.projects)}
+          styles={pickSelectStyle()}
+          />
+      </div>
+
+      {/* Dashboard */}
+      <Checkbox
+        className = "m-l-5 m-r-5"
+        label = "Dashboard (shown in dashboard)"
+        value = { dashboard }
+        onChange={(e) => setDashboard(!dashboard)}
+        />
+
+      <Label className="m-t-15">Filter attributes</Label>
+      <hr className="m-t-5 m-b-10"/>
+
+      {/* Requester */}
+      <FormGroup>
+        <label>Zadal</label>
+        <Select
+          id="select-requester"
+          isMulti
+          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+          onChange={ (requesters) => {
+            setRequesters(requesters) ;
+          }}
+          value={requesters}
+          styles={pickSelectStyle()}
+          />
+      </FormGroup>
+
+      {/* Company */}
+      <FormGroup>
+        <label>Firma</label>
+        <Select
+          isMulti
+          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
+          onChange={ (companies) => {
+            setCompanies(companies);
+          }}
+          value={companies}
+          styles={pickSelectStyle()} />
+      </FormGroup>
+
+      {/* Assigned */}
+      <FormGroup>
+        <label>Riesi</label>
+        <Select
+          options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(usersData.basicUsers, 'email'))}
+          isMulti
+          onChange={(newValue)=>{
+            setAssignedTos(newValue);
+          }}
+          value={assignedTos}
+          styles={pickSelectStyle()}
+          />
+      </FormGroup>
+
+      {/* Task type */}
+      <FormGroup>
+        <label>Typ práce</label>
+        <Select
+          options={toSelArr(taskTypesData.taskTypes)}
+          isMulti
+          onChange={(newValue)=>{
+            setTaskTypes(newValue);
+          }}
+          value={taskTypes}
+          styles={pickSelectStyle()}
+          />
+      </FormGroup>
+
+      {/* Status Date */}
+      <FilterDatePickerInCalendar
+        label="Status date"
+        showNowFrom={statusDateFromNow}
+        dateFrom={statusDateFrom}
+        setShowNowFrom={(e) => {
+          setStatusDateFromNow(e);
+        }}
+        setDateFrom={(e) => {
+          setStatusDateFrom(e);
+        }}
+        showNowTo={statusDateToNow}
+        dateTo={statusDateTo}
+        setShowNowTo={(e) => {
+          setStatusDateToNow(e);
+        }}
+        setDateTo={(e) => {
+          setStatusDateTo(e);
+        }}
+        />
+
+      {/* Pending Date */}
+      <FilterDatePickerInCalendar
+        label="Pending date"
+        showNowFrom={pendingDateFromNow}
+        dateFrom={pendingDateFrom}
+        setShowNowFrom={(e) => {
+          setPendingDateFromNow(e);
+        }}
+        setDateFrom={(e) => {
+          setPendingDateFrom(e);
+        }}
+        showNowTo={pendingDateToNow}
+        dateTo={pendingDateTo}
+        setShowNowTo={(e) => {
+          setPendingDateToNow(e);
+        }}
+        setDateTo={(e) => {
+          setPendingDateTo(e);
+        }}
+        />
+
+      {/* Close Date */}
+      <FilterDatePickerInCalendar
+        label="Close date"
+        showNowFrom={closeDateFromNow}
+        dateFrom={closeDateFrom}
+        showNowTo={closeDateToNow}
+        dateTo={closeDateTo}
+        setShowNowFrom={(e) => {
+          setCloseDateFromNow(e);
+        }}
+        setDateFrom={(e) => {
+          setCloseDateFrom(e);
+        }}
+        setShowNowTo={(e) => {
+          setCloseDateToNow(e);
+        }}
+        setDateTo={(e) => {
+          setCloseDateTo(e);
+        }}
+        />
+
+      {/* Deadline */}
+      <FilterDatePickerInCalendar
+        label="Deadline"
+        showNowFrom={deadlineFromNow}
+        dateFrom={deadlineFrom}
+        showNowTo={deadlineToNow}
+        dateTo={deadlineTo}
+        setShowNowFrom={(e) => {
+          setDeadlineFromNow(e);
+        }}
+        setDateFrom={(e) => {
+          setDeadlineFrom(e);
+        }}
+        setShowNowTo={(e) => {
+          setDeadlineToNow(e);
+        }}
+        setDateTo={(e) => {
+          setDeadlineTo(e);
+        }}
+        />
+
+      {/* Scheduled */}
+      <FilterDatePickerInCalendar
+        label="Scheduled date"
+        showNowFrom={scheduledFromNow}
+        dateFrom={scheduledFrom}
+        showNowTo={scheduledToNow}
+        dateTo={scheduledTo}
+        setShowNowFrom={(e) => {
+          setScheduledFromNow(e);
+        }}
+        setDateFrom={(e) => {
+          setScheduledFrom(e);
+        }}
+        setShowNowTo={(e) => {
+          setScheduledToNow(e);
+        }}
+        setDateTo={(e) => {
+          setScheduledTo(e);
+        }}
+        />
+
+      {/* Created at */}
+      <FilterDatePickerInCalendar
+        label="Created at"
+        showNowFrom={createdAtFromNow}
+        dateFrom={createdAtFrom}
+        showNowTo={createdAtToNow}
+        dateTo={createdAtTo}
+        setShowNowFrom={(e) => {
+          setCreatedAtFromNow(e);
+        }}
+        setDateFrom={(e) => {
+          setCreatedAtFrom(e);
+        }}
+        setShowNowTo={(e) => {
+          setCreatedAtToNow(e);
+        }}
+        setDateTo={(e) => {
+          setCreatedAtTo(e);
+        }}
+        />
+
+      {/* Important */}
+      <div className="sidebar-filter-row">
+        <label htmlFor="filter-Important">Important</label>
+        <div className="flex">
           <Select
-            placeholder="Vyberte projekt"
-            value={project}
-            isDisabled={global}
-            onChange={(project) => setProject(project)}
-            options={toSelArr(projectsData.projects)}
+            id="filter-Important"
+            options={booleanSelectOptions}
+            onChange={(imp) => {
+              setImportant(imp);
+            }}
+            value={important}
             styles={pickSelectStyle()}
             />
         </div>
+      </div>
 
-        {/* Dashboard */}
-        <Checkbox
-          className = "m-l-5 m-r-5"
-          label = "Dashboard (shown in dashboard)"
-          value = { dashboard }
-          onChange={(e) => setDashboard(!dashboard)}
-          />
-
-        <Label className="m-t-15">Filter attributes</Label>
-        <hr className="m-t-5 m-b-10"/>
-
-        {/* Requester */}
-        <FormGroup>
-          <label>Zadal</label>
+      {/* Invoiced */}
+      <div className="sidebar-filter-row">
+        <label htmlFor="filter-Invoiced">Invoiced</label>
+        <div className="flex">
           <Select
-            id="select-requester"
-            isMulti
-            options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
-            onChange={ (requesters) => {
-              setRequesters(requesters) ;
+            id="filter-Invoiced"
+            options={booleanSelectOptions}
+            onChange={(invoiced) => {
+              setInvoiced(invoiced);
             }}
-            value={requesters}
+            value={invoiced}
             styles={pickSelectStyle()}
             />
-        </FormGroup>
+        </div>
+      </div>
 
-        {/* Company */}
-        <FormGroup>
-          <label>Firma</label>
+      {/* Pausal */}
+      <div className="sidebar-filter-row">
+        <label htmlFor="filter-Paušál">Paušál</label>
+        <div className="flex">
           <Select
-            isMulti
-            options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
-            onChange={ (companies) => {
-              setCompanies(companies);
+            id="filter-Paušál"
+            options={booleanSelectOptions}
+            onChange={(pausal) => {
+              setPausal(pausal);
             }}
-            value={companies}
-            styles={pickSelectStyle()} />
-        </FormGroup>
-
-        {/* Assigned */}
-        <FormGroup>
-          <label>Riesi</label>
-          <Select
-            options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(usersData.basicUsers, 'email'))}
-            isMulti
-            onChange={(newValue)=>{
-              setAssignedTos(newValue);
-            }}
-            value={assignedTos}
+            value={pausal}
             styles={pickSelectStyle()}
             />
-        </FormGroup>
+        </div>
+      </div>
 
-        {/* Task type */}
-        <FormGroup>
-          <label>Typ práce</label>
+      {/* Overtime */}
+      <div className="sidebar-filter-row">
+        <label htmlFor="filter-Overtime">Overtime</label>
+        <div className="flex">
           <Select
-            options={toSelArr(taskTypesData.taskTypes)}
-            isMulti
-            onChange={(newValue)=>{
-              setTaskTypes(newValue);
+            id="filter-Overtime"
+            options={booleanSelectOptions}
+            onChange={(overtime) => {
+              setOvertime(overtime);
             }}
-            value={taskTypes}
+            value={overtime}
             styles={pickSelectStyle()}
             />
-        </FormGroup>
+        </div>
+      </div>
 
-        {/* Status Date */}
-        <FilterDatePickerInCalendar
-          label="Status date"
-          showNowFrom={statusDateFromNow}
-          dateFrom={statusDateFrom}
-          setShowNowFrom={(e) => {
-            setStatusDateFromNow(e);
-          }}
-          setDateFrom={(e) => {
-            setStatusDateFrom(e);
-          }}
-          showNowTo={statusDateToNow}
-          dateTo={statusDateTo}
-          setShowNowTo={(e) => {
-            setStatusDateToNow(e);
-          }}
-          setDateTo={(e) => {
-            setStatusDateTo(e);
-          }}
-          />
-
-        {/* Pending Date */}
-        <FilterDatePickerInCalendar
-          label="Pending date"
-          showNowFrom={pendingDateFromNow}
-          dateFrom={pendingDateFrom}
-          setShowNowFrom={(e) => {
-            setPendingDateFromNow(e);
-          }}
-          setDateFrom={(e) => {
-            setPendingDateFrom(e);
-          }}
-          showNowTo={pendingDateToNow}
-          dateTo={pendingDateTo}
-          setShowNowTo={(e) => {
-            setPendingDateToNow(e);
-          }}
-          setDateTo={(e) => {
-            setPendingDateTo(e);
-          }}
-          />
-
-        {/* Close Date */}
-        <FilterDatePickerInCalendar
-          label="Close date"
-          showNowFrom={closeDateFromNow}
-          dateFrom={closeDateFrom}
-          showNowTo={closeDateToNow}
-          dateTo={closeDateTo}
-          setShowNowFrom={(e) => {
-            setCloseDateFromNow(e);
-          }}
-          setDateFrom={(e) => {
-            setCloseDateFrom(e);
-          }}
-          setShowNowTo={(e) => {
-            setCloseDateToNow(e);
-          }}
-          setDateTo={(e) => {
-            setCloseDateTo(e);
-          }}
-          />
-
-        {/* Deadline */}
-        <FilterDatePickerInCalendar
-          label="Deadline"
-          showNowFrom={deadlineFromNow}
-          dateFrom={deadlineFrom}
-          showNowTo={deadlineToNow}
-          dateTo={deadlineTo}
-          setShowNowFrom={(e) => {
-            setDeadlineFromNow(e);
-          }}
-          setDateFrom={(e) => {
-            setDeadlineFrom(e);
-          }}
-          setShowNowTo={(e) => {
-            setDeadlineToNow(e);
-          }}
-          setDateTo={(e) => {
-            setDeadlineTo(e);
-          }}
-          />
-
-        {/* Scheduled */}
-        <FilterDatePickerInCalendar
-          label="Scheduled date"
-          showNowFrom={scheduledFromNow}
-          dateFrom={scheduledFrom}
-          showNowTo={scheduledToNow}
-          dateTo={scheduledTo}
-          setShowNowFrom={(e) => {
-            setScheduledFromNow(e);
-          }}
-          setDateFrom={(e) => {
-            setScheduledFrom(e);
-          }}
-          setShowNowTo={(e) => {
-            setScheduledToNow(e);
-          }}
-          setDateTo={(e) => {
-            setScheduledTo(e);
-          }}
-          />
-
-        {/* Created at */}
-        <FilterDatePickerInCalendar
-          label="Created at"
-          showNowFrom={createdAtFromNow}
-          dateFrom={createdAtFrom}
-          showNowTo={createdAtToNow}
-          dateTo={createdAtTo}
-          setShowNowFrom={(e) => {
-            setCreatedAtFromNow(e);
-          }}
-          setDateFrom={(e) => {
-            setCreatedAtFrom(e);
-          }}
-          setShowNowTo={(e) => {
-            setCreatedAtToNow(e);
-          }}
-          setDateTo={(e) => {
-            setCreatedAtTo(e);
-          }}
-          />
-
-        {/* Important */}
-        <div className="sidebar-filter-row">
-          <label htmlFor="filter-Important">Important</label>
-          <div className="flex">
-            <Select
-              id="filter-Important"
-              options={booleanSelectOptions}
-              onChange={(imp) => {
-                setImportant(imp);
-              }}
-              value={important}
-              styles={pickSelectStyle()}
-              />
+      <div className="form-buttons-row">
+        { cannotSave() &&
+          <div className="message error-message ml-auto">
+            Fill in all the required information!
           </div>
-        </div>
-
-        {/* Invoiced */}
-        <div className="sidebar-filter-row">
-          <label htmlFor="filter-Invoiced">Invoiced</label>
-          <div className="flex">
-            <Select
-              id="filter-Invoiced"
-              options={booleanSelectOptions}
-              onChange={(invoiced) => {
-                setInvoiced(invoiced);
-              }}
-              value={invoiced}
-              styles={pickSelectStyle()}
-              />
-          </div>
-        </div>
-
-        {/* Pausal */}
-        <div className="sidebar-filter-row">
-          <label htmlFor="filter-Paušál">Paušál</label>
-          <div className="flex">
-            <Select
-              id="filter-Paušál"
-              options={booleanSelectOptions}
-              onChange={(pausal) => {
-                setPausal(pausal);
-              }}
-              value={pausal}
-              styles={pickSelectStyle()}
-              />
-          </div>
-        </div>
-
-        {/* Overtime */}
-        <div className="sidebar-filter-row">
-          <label htmlFor="filter-Overtime">Overtime</label>
-          <div className="flex">
-            <Select
-              id="filter-Overtime"
-              options={booleanSelectOptions}
-              onChange={(overtime) => {
-                setOvertime(overtime);
-              }}
-              value={overtime}
-              styles={pickSelectStyle()}
-              />
-          </div>
-        </div>
-
-        <div className="form-buttons-row">
-          { cantSave &&
-            <div className="message error-message ml-auto">
-              Fill in all the required information!
-            </div>
-          }
-          <button
-            className={classnames(
-              "btn",
-              {"ml-auto": !cantSave}
-            )}
-            disabled={cantSave}
-            onClick={submitPublicFilter}
-            >
-            {saving?'Adding...':'Add filter'}
-          </button>
-        </div>
+        }
+        <button
+          className={classnames(
+            "btn",
+            {"ml-auto": !cannotSave()}
+          )}
+          disabled={cannotSave()}
+          onClick={submitPublicFilter}
+          >
+          { saving ? 'Adding...' : 'Add filter' }
+        </button>
       </div>
     </div>
   );

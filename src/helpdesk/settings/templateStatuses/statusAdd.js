@@ -1,16 +1,20 @@
 import React from 'react';
 import {
-  useMutation
+  useMutation,
+  useApolloClient,
 } from "@apollo/client";
+import classnames from "classnames";
+
 import {
   FormGroup,
   Label,
-  Input
 } from 'reactstrap';
 import {
   SketchPicker
 } from "react-color";
 import Select from 'react-select';
+import SettingsInput from '../components/settingsInput';
+
 import {
   pickSelectStyle
 } from "configs/components/select";
@@ -31,9 +35,9 @@ export default function StatusAdd( props ) {
   const {
     history
   } = props;
-  const [ addStatusTemplate, {
-    client
-  } ] = useMutation( ADD_STATUS_TEMPLATE );
+  const client = useApolloClient();
+
+  const [ addStatusTemplate ] = useMutation( ADD_STATUS_TEMPLATE );
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -57,7 +61,7 @@ export default function StatusAdd( props ) {
       } )
       .then( ( response ) => {
         setSaving( false );
-        history.push( '/helpdesk/settings/statuses/' + response.data.addStatusTemplate.id )
+        history.push( `/helpdesk/settings/statuses/${response.data.addStatusTemplate.id}` )
       } )
       .catch( ( err ) => {
         setSaving( false );
@@ -70,54 +74,80 @@ export default function StatusAdd( props ) {
   }
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
+    <div className="scroll-visible p-20 fit-with-header">
+
+      <h2 className="m-b-20">
+        Add status template
+      </h2>
+
+      <SettingsInput
+        required
+        label="Status name"
+        id="title"
+        value={title}
+        onChange={(e)=> {
+          setTitle(e.target.value);
+        }}
+        />
+
+      <SettingsInput
+        label="Icon"
+        placeholder="fas fa-arrow-left"
+        id="icon"
+        value={icon}
+        onChange={(e)=> {
+          setIcon(e.target.value);
+        }}
+        />
+
+      <SettingsInput
+        label="Order"
+        placeholder="Lower means first"
+        type="number"
+        id="order"
+        value={order}
+        onChange={(e)=> {
+          setOrder(e.target.value);
+        }}
+        />
+
+      <FormGroup>
+        <Label for="actionIfSelected">Action if selected</Label>
+        <Select
+          id="actionIfSelected"
+          name="Action"
+          styles={pickSelectStyle()}
+          options={actions}
+          value={action}
+          onChange={e => setAction(e) }
+          />
+      </FormGroup>
+
+      <SketchPicker
+        id="color"
+        color={color}
+        onChangeComplete={value => setColor( value.hex )}
+        />
+
+      <div className="form-buttons-row">
+
         { cannotSave() &&
-          <div className="message error-message">
+          <div className="message error-message ml-auto m-r-14">
             Fill in all the required information!
           </div>
         }
-      </div>
 
-      <div className="scroll-visible p-l-20 p-r-20 p-b-20 p-t-10 fit-with-header-and-commandbar">
+        <button
+          className={classnames(
+            "btn",
+            {"ml-auto": !cannotSave()}
+          )}
+          disabled={cannotSave()}
+          onClick={addStatusFunc}
+          >
+          { saving ? 'Adding...' : 'Add status' }
+        </button>
 
-        <h2 className="m-b-20">
-          Add status
-        </h2>
-
-        <FormGroup>
-          <Label for="name">Status name <span className="warning-big">*</span></Label>
-          <Input type="text" name="name" id="name" placeholder="Enter status name" value={title} onChange={(e)=>setTitle(e.target.value)} />
-        </FormGroup>
-        <FormGroup>
-          <Label for="icon">Icon</Label>
-          <Input type="text" name="icon" id="icon" placeholder="fas fa-arrow-left" value={icon} onChange={(e)=>setIcon(e.target.value)} />
-        </FormGroup>
-        <FormGroup>
-          <Label for="order">Order</Label>
-          <Input type="number" name="order" id="order" placeholder="Lower means first" value={order} onChange={(e)=>setOrder(e.target.value)} />
-        </FormGroup>
-        <FormGroup>
-          <Label for="actionIfSelected">Action if selected</Label>
-          <Select
-            id="actionIfSelected"
-            name="Action"
-            styles={pickSelectStyle()}
-            options={actions}
-            value={action}
-            onChange={e => setAction(e) }
-            />
-        </FormGroup>
-        <SketchPicker
-          id="color"
-          color={color}
-          onChangeComplete={value => setColor( value.hex )}
-          />
-        <div className="form-buttons-row">
-          <button className="btn m-t-5 ml-auto" disabled={cannotSave()} onClick={addStatusFunc}>
-            {saving?'Adding...':'Add status'}
-          </button>
-        </div>
       </div>
     </div>
   );

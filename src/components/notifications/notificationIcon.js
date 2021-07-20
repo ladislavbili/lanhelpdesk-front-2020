@@ -79,6 +79,7 @@ export default function NotificationIcon( props ) {
         headerClassName="segoe-semi-header custom-popover-header"
         target="page-header-notifications"
         header="Notifications"
+        useLegacy
         reset={() => {}}
         submit={() => {}}
         open={ notificationsOpen }

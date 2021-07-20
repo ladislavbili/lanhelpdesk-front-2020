@@ -85,6 +85,7 @@ export default function ProjectEdit( props ) {
     currentUser,
     dataLoading,
     id,
+    setting,
   } = props;
 
   //state
@@ -708,13 +709,13 @@ export default function ProjectEdit( props ) {
     <div>
       <div
         className={ classnames(
-          "p-t-10 p-l-20 p-r-20 p-b-20",
+          "p-20",
           "scroll-visible",
-          "fit-with-header-and-commandbar",
+          "fit-with-header",
         )}
         >
 
-        <h1 className="m-b-20 m-t-20" >
+        <h1 className={classnames({ "m-t-20": !setting },"m-b-20")} >
           Edit project
         </h1>
 

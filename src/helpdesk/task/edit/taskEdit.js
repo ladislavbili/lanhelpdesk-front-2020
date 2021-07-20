@@ -1446,11 +1446,11 @@ export default function TaskEdit( props ) {
             className={classnames("form-control")}
             selected={startsAt}
             disabled={!userRights.deadlineWrite}
+            hideTime
+            isClearable
             onChange={date => {
-              setStartsAt(date);
-              if( date.valueOf() !== null ){
-                autoUpdateTask({ startsAt: date.valueOf().toString() })
-              }
+              setStartsAt( isNaN(date.valueOf()) ? null : date );
+              autoUpdateTask({ startsAt: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
             }}
             placeholderText="No start date"
             />
@@ -1467,11 +1467,11 @@ export default function TaskEdit( props ) {
             className={classnames("form-control")}
             selected={deadline}
             disabled={!userRights.deadlineWrite}
+            hideTime
+            isClearable
             onChange={date => {
-              setDeadline(date);
-              if( date.valueOf() !== null ){
-                autoUpdateTask({ deadline: date.valueOf().toString() })
-              }
+              setDeadline( isNaN(date.valueOf()) ? null : date );
+              autoUpdateTask({ deadline: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
             }}
             placeholderText="No deadline"
             />
@@ -1621,7 +1621,7 @@ export default function TaskEdit( props ) {
             </div>
           </div>
 
-          { userRights.scheduledRead &&
+          { userRights.scheduledRead && false &&
             <Scheduled
               canTransfer={ userRights.assignedWrite && userRights.vykazWrite && taskType }
               onTransfer={createSubtaskFromScheduled}
@@ -1806,7 +1806,7 @@ export default function TaskEdit( props ) {
               layout={layout}
               />
           }
-          { userRights.scheduledRead &&
+          { userRights.scheduledRead && false && 
             <Scheduled
               canTransfer={ userRights.assignedWrite && userRights.vykazWrite && taskType }
               onTransfer={createSubtaskFromScheduled}

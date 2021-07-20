@@ -1,23 +1,27 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useApolloClient,
 } from "@apollo/client";
+import classnames from 'classnames';
 
 import {
   FormGroup,
   Label,
   Input
 } from 'reactstrap';
-import Loading from 'components/loading';
-import {
-  actions
-} from 'configs/constants/statuses';
 import {
   SketchPicker
 } from "react-color";
-import DeleteReplacement from 'components/deleteReplacement';
 import Select from 'react-select';
+import Loading from 'components/loading';
+import SettingsInput from '../components/settingsInput';
+import DeleteReplacement from 'components/deleteReplacement';
+
+import {
+  actions
+} from 'configs/constants/statuses';
 import {
   pickSelectStyle
 } from "configs/components/select";
@@ -36,25 +40,11 @@ import {
 } from './queries';
 
 export default function StatusEdit( props ) {
-  //data
   const {
     history,
     match
   } = props;
-  const {
-    data,
-    loading,
-    refetch
-  } = useQuery( GET_STATUS_TEMPLATE, {
-    variables: {
-      id: parseInt( props.match.params.id )
-    },
-    fetchPolicy: 'network-only',
-  } );
-  const [ updateStatus ] = useMutation( UPDATE_STATUS_TEMPLATE );
-  const [ deleteStatus, {
-    client
-  } ] = useMutation( DELETE_STATUS_TEMPLATE );
+  const client = useApolloClient();
 
   const allStatuses = toSelArr( client.readQuery( {
       query: GET_STATUS_TEMPLATES
@@ -63,24 +53,38 @@ export default function StatusEdit( props ) {
   const filteredStatuses = allStatuses.filter( status => status.id !== parseInt( match.params.id ) );
   const theOnlyOneLeft = allStatuses.length === 0;
 
+  const {
+    data: statusTemplateData,
+    loading: statusTemplateLoading,
+    refetch: statusTemplateRefetch
+  } = useQuery( GET_STATUS_TEMPLATE, {
+    variables: {
+      id: parseInt( props.match.params.id )
+    },
+    fetchPolicy: 'network-only',
+  } );
+
+  const [ updateStatus ] = useMutation( UPDATE_STATUS_TEMPLATE );
+  const [ deleteStatus ] = useMutation( DELETE_STATUS_TEMPLATE );
+
   //state
   const [ title, setTitle ] = React.useState( "" );
   const [ color, setColor ] = React.useState( "#f759f2" );
   const [ order, setOrder ] = React.useState( 0 );
   const [ icon, setIcon ] = React.useState( "fas fa-arrow-left" );
   const [ action, setAction ] = React.useState( actions[ 0 ] );
+
   const [ saving, setSaving ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
-
   const [ dataChanged, setDataChanged ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
     setData();
-  }, [ loading ] );
+  }, [ statusTemplateLoading ] );
 
   React.useEffect( () => {
-    refetch( {
+    statusTemplateRefetch( {
         variables: {
           id: parseInt( match.params.id )
         }
@@ -90,14 +94,15 @@ export default function StatusEdit( props ) {
 
   // functions
   const setData = () => {
-    if ( loading ) {
+    if ( statusTemplateLoading ) {
       return;
     }
-    setTitle( data.statusTemplate.title );
-    setColor( data.statusTemplate.color );
-    setOrder( data.statusTemplate.order );
-    setIcon( data.statusTemplate.icon );
-    setAction( actions.find( a => a.value === data.statusTemplate.action ) );
+    const statusTemplate = statusTemplateData.statusTemplate;
+    setTitle( statusTemplate.title );
+    setColor( statusTemplate.color );
+    setOrder( statusTemplate.order );
+    setIcon( statusTemplate.icon );
+    setAction( actions.find( a => a.value === statusTemplate.action ) );
 
     setDataChanged( false );
   }
@@ -131,112 +136,113 @@ export default function StatusEdit( props ) {
             id: parseInt( match.params.id ),
           }
         } )
+        .then( ( response ) => {
+          history.push( '/helpdesk/settings/statuses' );
+        } )
         .catch( ( err ) => {
           addLocalError( err );
         } );
     }
   };
 
-  if ( loading ) {
+  if ( statusTemplateLoading ) {
     return <Loading />
   }
 
   return (
-    <div>
-      <div className="commandbar a-i-c p-l-20">
-        { dataChanged &&
-          <div className="message error-message">
-            Save changes before leaving!
-          </div>
-        }
-        { !dataChanged &&
-          <div className="message success-message">
-            Saved
-          </div>
-        }
-      </div>
+    <div className="scroll-visible p-20 fit-with-header">
 
-      <div className="scroll-visible p-l-20 p-r-20 p-b-20 p-t-10 fit-with-header-and-commandbar">
+      <h2 className="m-b-20" >
+        Edit status
+      </h2>
 
-        <h2 className="m-b-20" >
-          Edit status
-        </h2>
+      <SettingsInput
+        required
+        label="Status name"
+        id="title"
+        value={title}
+        onChange={(e)=> {
+          setTitle(e.target.value);
+          setDataChanged( true );
+        }}
+        />
 
-        <FormGroup>
-          <Label for="name">Status name <span className="warning-big">*</span></Label>
-          <Input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="Enter status name"
-            value={title}
-            onChange={ (e) =>  {
-              setTitle(e.target.value);
-              setDataChanged( true );
-            } }
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="name">Icon</Label>
-          <Input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="fas fa-arrow-left"
-            value={icon}
-            onChange={ (e) =>  {
-              setIcon(e.target.value);
-              setDataChanged( true );
-            }}
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="order">Order</Label>
-          <Input
-            type="number"
-            name="order"
-            id="order"
-            placeholder="Lower means first"
-            value={order}
-            onChange={ (e) =>  {
-              setOrder(e.target.value);
-              setDataChanged( true );
-            } }
-            />
-        </FormGroup>
-        <FormGroup>
-          <Label for="actionIfSelected">Action if selected</Label>
-          <Select
-            id="actionIfSelected"
-            name="Action"
-            styles={pickSelectStyle()}
-            options={actions}
-            value={action}
-            onChange={ e =>  {
-              setAction(e) ;
-              setDataChanged( true );
-            }}
-            />
-        </FormGroup>
-        <SketchPicker
-          id="color"
-          color={color}
-          onChangeComplete={ value =>  {
-            setColor( value.hex );
+      <SettingsInput
+        label="Icon"
+        placeholder="fas fa-arrow-left"
+        id="icon"
+        value={icon}
+        onChange={(e)=> {
+          setIcon(e.target.value);
+          setDataChanged( true );
+        }}
+        />
+
+      <SettingsInput
+        label="Order"
+        placeholder="Lower means first"
+        type="number"
+        id="order"
+        value={order}
+        onChange={(e)=> {
+          setOrder(e.target.value);
+          setDataChanged( true );
+        }}
+        />
+
+      <FormGroup>
+        <Label for="actionIfSelected">Action if selected</Label>
+        <Select
+          id="actionIfSelected"
+          name="Action"
+          styles={pickSelectStyle()}
+          options={actions}
+          value={action}
+          onChange={ e =>  {
+            setAction(e) ;
             setDataChanged( true );
           }}
           />
+      </FormGroup>
 
-        <div className="form-buttons-row">
-          <button
-            className="btn-red m-l-5 m-t-5"
-            disabled={saving || theOnlyOneLeft}
-            onClick={ deleteStatusFunc }
-            >
-            Delete
-          </button>
-          <button className="btn m-t-5 ml-auto" disabled={saving} onClick={updateStatusFunc}>{saving?'Saving status...':'Save status'}</button>
+      <SketchPicker
+        id="color"
+        color={color}
+        onChangeComplete={ value =>  {
+          setColor( value.hex );
+          setDataChanged( true );
+        }}
+        />
+
+      <div className="form-buttons-row">
+
+        <button
+          className="btn-red m-l-5 m-t-5"
+          disabled={saving || theOnlyOneLeft}
+          onClick={ deleteStatusFunc }
+          >
+          Delete
+        </button>
+
+        <div className="ml-auto message m-r-10">
+          { dataChanged &&
+            <div className="message error-message">
+              Save changes before leaving!
+            </div>
+          }
+          { !dataChanged &&
+            <div className="message success-message">
+              Saved
+            </div>
+          }
         </div>
+
+        <button
+          className="btn m-t-5"
+          disabled={saving}
+          onClick={updateStatusFunc}>
+          { saving ? 'Saving status...' : 'Save status' }
+        </button>
       </div>
     </div>
   );

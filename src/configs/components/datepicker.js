@@ -4,7 +4,7 @@ export default function config( time ) {
     showTimeSelect: time,
     todayButton: "Today",
     timeIntervals: 15,
-    dateFormat: `dd.MM.yyyy${time ? ' HH:mm' : ''}`,
+    dateFormat: `${time ? ' HH:mm' : ''} dd.MM.yyyy`,
   }
 
 }

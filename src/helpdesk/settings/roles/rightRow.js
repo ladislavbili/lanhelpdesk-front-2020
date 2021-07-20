@@ -8,6 +8,7 @@ export default function RightRow( props ) {
     disabled,
     value
   } = props;
+
   return (
     <tr
       onClick={() => {
@@ -24,7 +25,7 @@ export default function RightRow( props ) {
           disabled={disabled}
           value = { value }
           label = ""
-          onChange={(e)=>{}}
+          onChange={ (e) => {} }
           />
       </td>
     </tr>
