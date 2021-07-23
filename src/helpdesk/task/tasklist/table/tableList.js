@@ -22,7 +22,6 @@ import CommandBar from '../components/commandBar';
 import Pagination from '../components/pagination';
 import ActiveSearch from '../components/activeSearch';
 import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
-import ModalTaskEdit from 'helpdesk/task/edit/modalEdit';
 
 import {
   defaultTasksAttributesFilter
@@ -49,7 +48,6 @@ export default function TableList( props ) {
     path = `${path}/p/${match.params.page}`
   }
   const [ editOpen, setEditOpen ] = React.useState( false );
-  const [ editedTask, setEditedTask ] = React.useState( null );
 
   const filteredDisplayValues = displayValues.filter( ( displayValue ) => displayValue.show )
 
@@ -272,8 +270,7 @@ export default function TableList( props ) {
                 className={display.value}
                 onClick={(e)=>{
                   if (display.type !== 'checkbox'){
-                    setEditedTask(task);
-                    //history.push(`${ path }/${ task.id }`);
+                    history.push(`${ path }/${ task.id }`);
                   }
                 }}
                 >
@@ -345,7 +342,6 @@ export default function TableList( props ) {
           </ModalBody>
         </Modal>
       </div>
-      <ModalTaskEdit opened={editedTask} taskID={ editedTask ? editedTask.id : null } closeModal={ () => setEditedTask(null) } />
     </div>
   );
 }

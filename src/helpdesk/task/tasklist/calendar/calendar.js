@@ -1,6 +1,8 @@
 import React from 'react';
-import Loading from 'components/loading';
+import classnames from 'classnames';
 
+
+import Loading from 'components/loading';
 // http://intljusticemission.github.io/react-big-calendar/examples/index.html
 //https://github.com/jquense/react-big-calendar/blob/master/examples/demos/dndOutsideSource.js
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
@@ -27,7 +29,8 @@ import DragRepeatTimeContextMenu from './dragRepeatTimeContextMenu';
 import RepeatContextMenu from './repeatContextMenu';
 import RepeatTimeContextMenu from './repeatTimeContextMenu';
 import StackItem from './renderStackItem';
-import classnames from 'classnames';
+import ModalTaskEdit from 'helpdesk/task/edit/modalEdit';
+
 import moment from "moment";
 import {
   taskCalendarDefaults,
@@ -43,7 +46,7 @@ import {
   GET_REPEAT_TIMES,
 } from './querries';
 import {
-  GET_SCHEDULED_TASKS,
+  GET_SCHEDULED_WORKS,
 } from '../../queries';
 
 let fakeID = -1;
@@ -63,10 +66,10 @@ export default function TaskCalendar( props ) {
     localProject,
     localFilter,
     scheduledUserId,
-    addScheduled,
     updateScheduled,
     refetchScheduled,
     setCalendarTimeRange,
+    addScheduledWork,
     repeats,
     triggerRepeat,
     repeatTimes,
@@ -83,7 +86,7 @@ export default function TaskCalendar( props ) {
     client,
     createEventFromRepeatTime,
     createEventFromScheduled,
-    scheduledTasksVariables,
+    scheduledWorksVariables,
     fakeEvents,
     setFakeEvents,
     repeatTimesVariables,
@@ -106,6 +109,8 @@ export default function TaskCalendar( props ) {
   const [ openedRepeat, setOpenedRepeat ] = React.useState( null );
   const [ focusedRepeatTimeEvent, setFocusedRepeatTimeEvent ] = React.useState( null );
 
+  const [ editedTask, setEditedTask ] = React.useState( null );
+
   React.useEffect( () => {
     setFakeEvents( [] );
   }, [ cFrom, cTo ] );
@@ -127,18 +132,18 @@ export default function TaskCalendar( props ) {
       canEdit: false,
       type: 'scheduled',
     } ) ) ] );
-    addScheduled( {
+    addScheduledWork( {
         variables: {
+          taskId: draggedTask.task.id,
+          userId: scheduledUserId,
           from: start.valueOf()
             .toString(),
           to: end.valueOf()
             .toString(),
-          task: draggedTask.task.id,
-          UserId: scheduledUserId,
         }
       } )
       .then( ( response ) => {
-        setFakeEvents( [ ...fakeEvents.filter( ( event ) => event.id !== newFakeID ), expandScheduledEvent( createEventFromScheduled( response.data.addScheduledTask ) ) ] );
+        setFakeEvents( [ ...fakeEvents.filter( ( event ) => event.id !== newFakeID ), expandScheduledEvent( createEventFromScheduled( response.data.addScheduledWork ) ) ] );
       } )
       .catch( ( err ) => {
         setFakeEvents( fakeEvents.filter( ( event ) => event.id !== newFakeID ) )
@@ -168,20 +173,20 @@ export default function TaskCalendar( props ) {
         } ) )
       ] )
     } else {
-      const scheduledTasks = client.readQuery( {
-          query: GET_SCHEDULED_TASKS,
-          variables: scheduledTasksVariables
+      const scheduledWorks = client.readQuery( {
+          query: GET_SCHEDULED_WORKS,
+          variables: scheduledWorksVariables
         } )
-        .scheduledTasks;
+        .scheduledWorks;
 
       client.writeQuery( {
-        query: GET_SCHEDULED_TASKS,
-        variables: scheduledTasksVariables,
+        query: GET_SCHEDULED_WORKS,
+        variables: scheduledWorksVariables,
         data: {
-          scheduledTasks: [
-            ...scheduledTasks.filter( ( scheduled ) => scheduled.id !== event.id ),
+          scheduledWorks: [
+            ...scheduledWorks.filter( ( scheduled ) => scheduled.id !== event.id ),
             {
-              ...scheduledTasks.find( ( scheduled ) => scheduled.id === event.id ),
+              ...scheduledWorks.find( ( scheduled ) => scheduled.id === event.id ),
               from: start.valueOf()
                 .toString(),
               to: end.valueOf()
@@ -213,19 +218,19 @@ export default function TaskCalendar( props ) {
           }
         ] )
         } else {
-          const scheduledTasks = client.readQuery( {
-              query: GET_SCHEDULED_TASKS,
-              variables: scheduledTasksVariables
+          const scheduledWorks = client.readQuery( {
+              query: GET_SCHEDULED_WORKS,
+              variables: scheduledWorksVariables
             } )
-            .scheduledTasks;
+            .scheduledWorks;
           client.writeQuery( {
-            query: GET_SCHEDULED_TASKS,
-            variables: scheduledTasksVariables,
+            query: GET_SCHEDULED_WORKS,
+            variables: scheduledWorksVariables,
             data: {
-              scheduledTasks: [
-              ...scheduledTasks.filter( ( scheduled ) => scheduled.id !== event.id ),
+              scheduledWorks: [
+              ...scheduledWorks.filter( ( scheduled ) => scheduled.id !== event.id ),
                 {
-                  ...scheduledTasks.find( ( scheduled ) => scheduled.id === event.id ),
+                  ...scheduledWorks.find( ( scheduled ) => scheduled.id === event.id ),
                   from: event.start.valueOf()
                     .toString(),
                   to: event.end.valueOf()
@@ -264,7 +269,7 @@ export default function TaskCalendar( props ) {
 
   const expandScheduledEvent = ( scheduledEvent ) => ( {
     ...scheduledEvent,
-    onDoubleClick: () => history.push( `${ path }/${ scheduledEvent.task.id }` ),
+    onDoubleClick: () => setEditedTask( scheduledEvent.task ),
     propsGetter: () => {
       const status = scheduledEvent.task.status;
       if ( status ) {
@@ -371,13 +376,13 @@ export default function TaskCalendar( props ) {
                 {
                   'fit-with-header-and-commandbar-5': activeSearchHidden,
                   'fit-with-header-and-commandbar-7': !activeSearchHidden,
-              }
+                }
               )}
               >
               <DndProvider backend={HTML5Backend}>
                 <h1>Tasks stack</h1>
                 { tasks.map( task =>
-                  <StackItem task={task} key={task.id} path={path} setDraggedTask={setDraggedTask} history={history} scheduledUserId={scheduledUserId} />
+                  <StackItem task={task} key={task.id} setDraggedTask={setDraggedTask} scheduledUserId={ scheduledUserId } openTask={ setEditedTask } />
                 )}
                 <Pagination
                   {...props}
@@ -393,7 +398,7 @@ export default function TaskCalendar( props ) {
               {
                 'fit-with-header-and-commandbar-5': activeSearchHidden,
                 'fit-with-header-and-commandbar-7': !activeSearchHidden,
-            }
+              }
             )}
             {...taskCalendarDefaults}
             events = { events }
@@ -477,6 +482,8 @@ export default function TaskCalendar( props ) {
           setOpenedRepeat( null );
         } }
         />
+
+      <ModalTaskEdit opened={editedTask} taskID={ editedTask ? editedTask.id : null } closeModal={ () => setEditedTask(null) } />
 
     </div>
   );

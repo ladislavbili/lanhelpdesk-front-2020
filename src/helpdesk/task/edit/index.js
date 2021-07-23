@@ -59,12 +59,9 @@ import {
   UPDATE_INVOICED_TASK,
   SET_TASK_LAYOUT,
 
-  ADD_SCHEDULED_TASK,
-  DELETE_SCHEDULED_TASK,
   ADD_SHORT_SUBTASK,
   UPDATE_SHORT_SUBTASK,
   DELETE_SHORT_SUBTASK,
-  CREATE_SUBTASK_FROM_SCHEDULED,
   ADD_SUBTASK,
   UPDATE_SUBTASK,
   DELETE_SUBTASK,
@@ -161,13 +158,10 @@ export default function TaskEditContainer( props ) {
   const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
   const [ setTaskLayout ] = useMutation( SET_TASK_LAYOUT );
 
-  const [ addScheduledTask ] = useMutation( ADD_SCHEDULED_TASK );
-  const [ deleteScheduledTask ] = useMutation( DELETE_SCHEDULED_TASK );
   const [ addShortSubtask ] = useMutation( ADD_SHORT_SUBTASK );
   const [ updateShortSubtask ] = useMutation( UPDATE_SHORT_SUBTASK );
   const [ deleteShortSubtask ] = useMutation( DELETE_SHORT_SUBTASK );
   const [ deleteTask ] = useMutation( DELETE_TASK );
-  const [ createSubtaskFromScheduled ] = useMutation( CREATE_SUBTASK_FROM_SCHEDULED );
   const [ addSubtask ] = useMutation( ADD_SUBTASK );
   const [ updateSubtask ] = useMutation( UPDATE_SUBTASK );
   const [ deleteSubtask ] = useMutation( DELETE_SUBTASK );
@@ -277,39 +271,6 @@ export default function TaskEditContainer( props ) {
     } );
   }
 
-  const addScheduledTaskFunc = ( scheduled ) => {
-    setSaving( true );
-
-    addScheduledTask( {
-        variables: scheduled
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.addScheduledTask, 'scheduled', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const deleteScheduledTaskFunc = ( id ) => {
-    deleteScheduledTask( {
-        variables: {
-          id,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'scheduled', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-  }
-
-
   const addShortSubtaskFunc = ( sub ) => {
     setSaving( true );
 
@@ -360,24 +321,6 @@ export default function TaskEditContainer( props ) {
       .catch( ( err ) => {
         addLocalError( err );
       } );
-  }
-
-  const createSubtaskFromScheduledFunc = ( id ) => {
-    setSaving( true );
-
-    createSubtaskFromScheduled( {
-        variables: {
-          id
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.createSubtaskFromScheduled, 'subtasks', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
   }
 
   const addSubtaskFunc = ( sub ) => {
@@ -882,10 +825,7 @@ export default function TaskEditContainer( props ) {
       submitEmail={submitEmail}
       addAttachments={addAttachments}
       removeAttachment={removeAttachment}
-      addScheduledTaskFunc={addScheduledTaskFunc}
-      deleteScheduledTaskFunc={deleteScheduledTaskFunc}
       deleteTaskFunc={deleteTaskFunc}
-      createSubtaskFromScheduled={createSubtaskFromScheduledFunc}
       addSubtaskFunc={addSubtaskFunc}
       updateSubtaskFunc={updateSubtaskFunc}
       deleteSubtaskFunc={deleteSubtaskFunc}

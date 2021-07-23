@@ -11,11 +11,10 @@ export default function RenderTaskStackItemRender( props ) {
     task,
     showEvent,
     setDraggedTask,
-    path,
-    history,
     scheduledUserId,
+    openTask,
   } = props;
-  const cantBeAdded = ( !task.rights.assignedWrite || !task.usersWithRights.some( ( userWithRights ) => userWithRights.user.id === scheduledUserId && userWithRights.assignable ) );
+  const cantBeAdded = ( !task.rights.assignedWrite || !task.rights.vykazWrite || !task.usersWithRights.some( ( userWithRights ) => userWithRights.user.id === scheduledUserId && userWithRights.assignable ) );
 
   const backgroundColor = (
     !task.status ?
@@ -62,9 +61,7 @@ export default function RenderTaskStackItemRender( props ) {
       <button
         className="btn btn-link"
         style={{color: 'white'}}
-        onClick={() => {
-          history.push(`${ path }/${ task.id }`);
-        }}
+        onClick={() => { openTask(task) }}
         >
         <i
           className="fa fa-external-link-alt"

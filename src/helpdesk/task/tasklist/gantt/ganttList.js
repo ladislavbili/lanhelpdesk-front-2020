@@ -3,16 +3,14 @@ import {
   useQuery,
   gql
 } from "@apollo/client";
+import classnames from 'classnames';
+import moment from 'moment';
+
 import {
   Modal,
   ModalBody
 } from 'reactstrap';
-import {
-  getItemDisplayValue,
-  timestampToString,
-} from 'helperFunctions';
-import classnames from 'classnames';
-import moment from 'moment';
+import ModalTaskEdit from 'helpdesk/task/edit/modalEdit';
 import Checkbox from 'components/checkbox';
 import Loading from 'components/loading';
 import Empty from 'components/Empty';
@@ -21,6 +19,11 @@ import CommandBar from '../components/commandBar';
 import Pagination from '../components/pagination';
 import ActiveSearch from '../components/activeSearch';
 import MultipleTaskEdit from 'helpdesk/task/edit/multipleTaskEdit';
+
+import {
+  getItemDisplayValue,
+  timestampToString,
+} from 'helperFunctions';
 
 import {
   defaultTasksAttributesFilter
@@ -71,6 +74,7 @@ export default function TableList( props ) {
   }
   const [ editOpen, setEditOpen ] = React.useState( false );
   const [ groups, setGroups ] = React.useState( getMilestoneGroups() );
+  const [ editedTask, setEditedTask ] = React.useState( null );
 
   React.useEffect( () => {
     if ( !loading ) {
@@ -297,7 +301,8 @@ export default function TableList( props ) {
                 className={display.value}
                 onClick={(e)=>{
                   if (display.type !== 'checkbox'){
-                    history.push(`${ path }/${ task.id }`);
+                    setEditedTask(task);
+                    //history.push(`${ path }/${ task.id }`);
                   }
                 }}
                 >
@@ -355,7 +360,7 @@ export default function TableList( props ) {
                       className={classnames( "fa clickable p-l-5 p-r-5", { "fa-chevron-down": !group.show, "fa-chevron-up": group.show } )}
                       onClick={() => setGroupOpen(group.milestone) }
                       />
-                      {group.milestone ? group.milestone.title : 'Without milestone' }
+                    {group.milestone ? group.milestone.title : 'Without milestone' }
                   </td>
                 </tr>
                 { group.show && group.tasks
@@ -392,8 +397,10 @@ export default function TableList( props ) {
         <Modal isOpen={editOpen}>
           <ModalBody className="scrollable" >
             <MultipleTaskEdit tasks={tasks.filter(d => d.checked)} close={() => setEditOpen(false)} />
-          </ModalBody> </Modal>
-        </div>
+          </ModalBody>
+        </Modal>
       </div>
+      <ModalTaskEdit opened={editedTask} taskID={ editedTask ? editedTask.id : null } closeModal={ () => setEditedTask(null) } />
+    </div>
   );
 }

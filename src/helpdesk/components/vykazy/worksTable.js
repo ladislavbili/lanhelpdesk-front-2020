@@ -288,7 +288,15 @@ export default function WorksTable( props ) {
               if( newDate === null ){
                 updateSubtask( subtask.id, { scheduled: null } )
               }else{
-                updateSubtask( subtask.id, { scheduled: { from: newDate.valueOf().toString(), to: moment(newDate).add( isNaN(parseFloat(subtask.quantity)) ? 0 : parseFloat(subtask.quantity), 'hours') } } )
+                updateSubtask(
+                  subtask.id,
+                  {
+                    scheduled: {
+                      from: newDate.valueOf().toString(),
+                      to: moment(newDate).add( isNaN(parseFloat(subtask.quantity)) ? 0 : parseFloat(subtask.quantity), 'hours').valueOf().toString()
+                    }
+                  }
+                )
               }
             }}
             placeholderText="No start"
@@ -518,7 +526,15 @@ export default function WorksTable( props ) {
               if( newDate === null ){
                 updateTrip( trip.id, { scheduled: null } )
               }else{
-                updateTrip( trip.id, { scheduled: { from: newDate.valueOf().toString(), to: moment(newDate).add( isNaN(parseFloat(trip.quantity)) ? 0 : parseFloat(trip.quantity), 'hours') } } )
+                updateTrip(
+                  trip.id,
+                  {
+                    scheduled: {
+                      from: newDate.valueOf().toString(),
+                      to: moment(newDate).add( isNaN(parseFloat(trip.quantity)) ? 0 : parseFloat(trip.quantity), 'hours').valueOf().toString()
+                    }
+                  }
+                )
               }
             }}
             placeholderText="No start"
@@ -740,7 +756,7 @@ export default function WorksTable( props ) {
                   quantity:newSubtaskQuantity!==''?parseInt(newSubtaskQuantity):0,
                   discount: isNaN(parseFloat(newSubtaskDiscount)) ? 0 : parseFloat(newSubtaskDiscount),
                   assignedTo: newSubtaskAssigned,
-                  order:subtasks.length,
+                  order: subtasks.length,
                   scheduled: newSubtaskScheduledFrom === null || newSubtaskScheduledTo === null ? null : { from: newSubtaskScheduledFrom.valueOf().toString(), to: newSubtaskScheduledTo.valueOf().toString() },
                 }
 

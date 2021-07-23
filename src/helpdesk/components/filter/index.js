@@ -17,7 +17,6 @@ import AddFilter from './filterAdd';
 import Loading from 'components/loading';
 import Empty from 'components/Empty';
 import MultiSelect from 'components/MultiSelectNew';
-import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
 import FilterDatePickerPopover from 'components/filterDatePickerPopover';
 import {
   setFilter,
@@ -691,20 +690,6 @@ export default function FilterForm( props ) {
           dateTo={deadlineTo}
           setShowNowTo={(deadlineToNow)=> setDeadlineToNow( deadlineToNow )}
           setDateTo={(deadlineTo)=> setDeadlineTo( deadlineTo )}
-          />
-
-        {/* Scheduled */}
-        <FilterDatePickerPopover
-          label="Scheduled date"
-          minimal
-          showNowFrom={scheduledFromNow}
-          dateFrom={scheduledFrom}
-          setShowNowFrom={(scheduledFromNow)=> setScheduledFromNow( scheduledFromNow )}
-          setDateFrom={(scheduledFrom)=> setScheduledFrom( scheduledFrom )}
-          showNowTo={scheduledToNow}
-          dateTo={scheduledTo}
-          setShowNowTo={(scheduledToNow)=> setScheduledToNow( scheduledToNow )}
-          setDateTo={(scheduledTo)=> setScheduledTo( scheduledTo )}
           />
 
         {/* Created at */}

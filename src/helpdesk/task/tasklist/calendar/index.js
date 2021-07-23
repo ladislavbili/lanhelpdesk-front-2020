@@ -17,10 +17,10 @@ import moment from 'moment';
 
 import {
   GET_TASKS,
-  GET_SCHEDULED_TASKS,
-  ADD_SCHEDULED_TASK,
-  UPDATE_SCHEDULED_TASK,
+  GET_SCHEDULED_WORKS,
+  UPDATE_SCHEDULED_WORK,
   ADD_TASK_SUBSCRIPTION,
+  ADD_SCHEDULED_WORK,
 } from '../../queries';
 
 import {
@@ -95,7 +95,7 @@ export default function CalendarLoader( props ) {
   } = localCalendarDateRange.localCalendarDateRange;
 
   //apollo queries
-  const scheduledTasksVariables = {
+  const scheduledWorksVariables = {
     projectId: localProject.id,
     filter: filterVariables,
     from: cFrom.toString(),
@@ -133,11 +133,11 @@ export default function CalendarLoader( props ) {
   } );
 
   const {
-    data: scheduledTasksData,
-    loading: scheduledTasksLoading,
-    refetch: scheduledTasksRefetch,
-  } = useQuery( GET_SCHEDULED_TASKS, {
-    variables: scheduledTasksVariables,
+    data: scheduledWorksData,
+    loading: scheduledWorksLoading,
+    refetch: scheduledWorksRefetch,
+  } = useQuery( GET_SCHEDULED_WORKS, {
+    variables: scheduledWorksVariables,
     //fetchPolicy: 'network-only',
   } );
 
@@ -164,12 +164,12 @@ export default function CalendarLoader( props ) {
     //fetchPolicy: 'network-only',
   } );
 
-  const [ addScheduledTask ] = useMutation( ADD_SCHEDULED_TASK );
-  const [ updateScheduledTask ] = useMutation( UPDATE_SCHEDULED_TASK );
+  const [ updateScheduledWork ] = useMutation( UPDATE_SCHEDULED_WORK );
   const [ addRepeatTime ] = useMutation( ADD_REPEAT_TIME );
   const [ updateRepeatTime ] = useMutation( UPDATE_REPEAT_TIME );
-
   const [ triggerRepeat ] = useMutation( TRIGGER_REPEAT );
+  const [ addScheduledWork ] = useMutation( ADD_SCHEDULED_WORK );
+
   const [ fakeEvents, setFakeEvents ] = React.useState( [] );
   const [ forcedRefetch, setForcedRefetch ] = React.useState( false );
 
@@ -181,13 +181,7 @@ export default function CalendarLoader( props ) {
   }
 
   const scheduledRefetch = () => {
-    scheduledTasksRefetch( {
-      projectId: localProject.id,
-      filter: filterVariables,
-      from: cFrom.toString(),
-      to: cTo.toString(),
-      userId: localCalendarUserId.localCalendarUserId,
-    } );
+    scheduledWorksRefetch( scheduledWorksVariables );
   }
 
   const repeatsRefetch = () => {
@@ -230,7 +224,7 @@ export default function CalendarLoader( props ) {
   } );
 
   const repeats = !calendarRepeatsLoading ? calendarRepeatsData.calendarRepeats : [];
-  const scheduled = !scheduledTasksLoading ? scheduledTasksData.scheduledTasks : [];
+  const scheduled = !scheduledWorksLoading ? scheduledWorksData.scheduledWorks : [];
   const repeatTimes = !repeatTimesLoading ? repeatTimesData.repeatTimes : [];
   const tasks = tasksLoading ? [] : tasksData.tasks.tasks;
 
@@ -328,15 +322,14 @@ export default function CalendarLoader( props ) {
     ...props,
     loading: (
       tasksLoading ||
-      scheduledTasksLoading ||
+      scheduledWorksLoading ||
       calendarRepeatsLoading ||
       repeatTimesLoading
     ),
     scheduled,
     setCalendarTimeRange,
     scheduledUserId: localCalendarUserId.localCalendarUserId ? localCalendarUserId.localCalendarUserId : currentUser.id,
-    addScheduled: addScheduledTask,
-    updateScheduled: updateScheduledTask,
+    updateScheduled: updateScheduledWork,
     refetchScheduled: scheduledRefetch,
     repeats,
     repeatsRefetch,
@@ -353,7 +346,8 @@ export default function CalendarLoader( props ) {
     canSeeStack,
     createEventFromRepeatTime,
     createEventFromScheduled,
-    scheduledTasksVariables,
+    scheduledWorksVariables,
+    addScheduledWork,
     repeatTimesVariables,
     client: useApolloClient(),
     setFakeEvents,

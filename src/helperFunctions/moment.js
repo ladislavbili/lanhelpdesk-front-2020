@@ -62,3 +62,13 @@ export const getDayRange = ( date, getDate = false ) => {
     }
   }
 }
+
+export const getDatesDifferenceInHours = ( fromDate, toDate ) => {
+  if ( fromDate === null || toDate === null ) {
+    return null;
+  }
+  return (
+    moment.duration( toDate.diff( fromDate ) )
+    .asMinutes() / 60
+  )
+}

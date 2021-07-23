@@ -18,7 +18,6 @@ import Empty from 'components/Empty';
 import Repeat from 'helpdesk/components/repeat/simpleRepeat';
 import Attachments from 'helpdesk/components/attachments';
 import CheckboxList from 'helpdesk/components/checkboxList';
-import Scheduled from 'helpdesk/components/scheduled';
 import {
   getCreationError as getVykazyError
 } from 'helpdesk/components/vykazy/vykazyTable';
@@ -134,7 +133,6 @@ export default function TaskAdd( props ) {
   const [ workTrips, setWorkTrips ] = React.useState( [] );
 
   const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
-  const [ scheduled, setScheduled ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
   const [ actionAfterAdd, setActionAfterAdd ] = React.useState( actionsAfterAdd.find( ( action ) => action.id === afterTaskCreate ) );
@@ -415,13 +413,6 @@ export default function TaskAdd( props ) {
           shortSubtasks: simpleSubtasks.map( ( item ) => ( {
             done: item.done,
             title: item.title,
-          } ) ),
-          scheduled: scheduled.map( ( item ) => ( {
-            to: item.to.valueOf()
-              .toString(),
-            from: item.from.valueOf()
-              .toString(),
-            UserId: item.user.id,
           } ) ),
         }
       } )
@@ -899,33 +890,6 @@ export default function TaskAdd( props ) {
               }
             </div>
           </div>
-
-          { userRights.scheduledRead && false &&
-            <Scheduled
-              items={scheduled}
-              users={assignedTo}
-              disabled={assignedTo.length === 0}
-              onChange={(item) => {
-                let newScheduled = [...scheduled];
-                newScheduled[newScheduled.findIndex((item2) => item2.id === item.id )] = item;
-                setScheduled(newScheduled);
-              }}
-              submitItem = { (newScheduled) => {
-                setScheduled([
-                  ...scheduled,
-                  {
-                    ...newScheduled,
-                    id: fakeID--,
-                  }
-                ])
-              }}
-              deleteItem = { (newScheduled) => {
-                setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
-              } }
-              layout={layout}
-              />
-          }
-
         </div>
       </div>
     )
@@ -1048,31 +1012,6 @@ export default function TaskAdd( props ) {
             columns={true}
             addTask={true}
             vertical={true}
-            />
-        }
-        { userRights.scheduledRead && false &&
-          <Scheduled
-            items={scheduled}
-            users={assignedTo}
-            disabled={assignedTo.length === 0 }
-            onChange={(item) => {
-              let newScheduled = [...scheduled];
-              newScheduled[newScheduled.findIndex((item2) => item2.id === item.id )] = item;
-              setScheduled(newScheduled);
-            }}
-            submitItem = { (newScheduled) => {
-              setScheduled([
-                ...scheduled,
-                {
-                  ...newScheduled,
-                  id: fakeID--,
-                }
-              ])
-            }}
-            deleteItem = { (newScheduled) => {
-              setScheduled(scheduled.filter((newScheduled2) => newScheduled.id !== newScheduled2.id ))
-            } }
-            layout={layout}
             />
         }
         { userRights.typeRead && userRights.typeWrite &&

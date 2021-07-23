@@ -44,7 +44,6 @@ import {
 import Materials from 'helpdesk/components/vykazy/materialsTable';
 import WorksTable from 'helpdesk/components/vykazy/worksTable';
 import CheckboxList from 'helpdesk/components/checkboxList';
-import Scheduled from 'helpdesk/components/scheduled';
 import StatusChangeModal from 'helpdesk/components/statusChangeModal';
 import PendingPicker from 'helpdesk/components/pendingPicker';
 import AddUserToGroup from 'helpdesk/settings/projects/addUserToGroup';
@@ -109,13 +108,10 @@ export default function TaskEdit( props ) {
     filterId,
     submitComment,
     submitEmail,
-    addScheduledTaskFunc,
-    deleteScheduledTaskFunc,
     deleteTaskFunc,
     addCompanyToList,
     addAttachments,
     removeAttachment,
-    createSubtaskFromScheduled,
     addSubtaskFunc,
     updateSubtaskFunc,
     deleteSubtaskFunc,
@@ -871,7 +867,6 @@ export default function TaskEdit( props ) {
   const canCopy = userRights.addTasks && !getCantSave();
 
   const getTaskData = () => ( {
-    scheduled: task.scheduled,
     shortSubtasks: task.shortSubtasks,
     subtasks: task.subtasks.map( item => ( {
       ...item,
@@ -1620,28 +1615,6 @@ export default function TaskEdit( props ) {
               }
             </div>
           </div>
-
-          { userRights.scheduledRead && false &&
-            <Scheduled
-              canTransfer={ userRights.assignedWrite && userRights.vykazWrite && taskType }
-              onTransfer={createSubtaskFromScheduled}
-              items={task.scheduled.map((item) => ({
-                ...item,
-                from: moment(parseInt(item.from)),
-                to: moment(parseInt(item.to)),
-              }))}
-              users={assignedTo}
-              disabled={ assignedTo.length === 0 || !userRights.assignedWrite }
-              submitItem = { (newScheduled) => {
-                addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from , to: newScheduled.to });
-              }}
-              deleteItem = { (scheduled) => {
-                deleteScheduledTaskFunc(scheduled.id);
-              } }
-              layout={layout}
-              />
-          }
-
         </div>
       </div>
     )
@@ -1806,27 +1779,6 @@ export default function TaskEdit( props ) {
               layout={layout}
               />
           }
-          { userRights.scheduledRead && false && 
-            <Scheduled
-              canTransfer={ userRights.assignedWrite && userRights.vykazWrite && taskType }
-              onTransfer={createSubtaskFromScheduled}
-              items={task.scheduled.map((item) => ({
-                ...item,
-                from: moment(parseInt(item.from)),
-                to: moment(parseInt(item.to)),
-              }))}
-              users={assignedTo}
-              disabled={ assignedTo.length === 0 }
-              submitItem = { (newScheduled) => {
-                addScheduledTaskFunc({task: id, UserId: newScheduled.user.id, from: newScheduled.from.valueOf().toString() , to: newScheduled.to.valueOf().toString() });
-              }}
-              deleteItem = { (scheduled) => {
-                deleteScheduledTaskFunc(scheduled.id);
-              } }
-              layout={layout}
-              />
-          }
-
           { userRights.typeRead &&
             <div className="form-selects-entry-column" >
               <Label>Task Type <span className="warning-big">*</span></Label>

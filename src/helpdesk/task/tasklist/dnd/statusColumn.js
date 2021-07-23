@@ -1,24 +1,23 @@
 import React from 'react';
 import {
+  useQuery,
+  useSubscription,
+} from "@apollo/client";
+import classnames from 'classnames';
+
+import {
   Card,
   CardHeader,
   CardBody
 } from 'reactstrap';
-import classnames from 'classnames';
-import Pagination from './pagination';
-
-import {
-  useQuery,
-  useSubscription,
-} from "@apollo/client";
-
 import {
   Droppable,
   Draggable
 } from 'react-beautiful-dnd';
-
+import Pagination from './pagination';
 import Loading from 'components/loading';
 import ItemRender from '../components/columnItemRender';
+import ModalTaskEdit from 'helpdesk/task/edit/modalEdit';
 
 import {
   GET_TASKS,
@@ -57,6 +56,8 @@ export default function DnDStatusColumn( props ) {
     notifyOnNetworkStatusChange: true,
   } );
 
+  const [ editedTask, setEditedTask ] = React.useState( null );
+
   //refetch tasks
   React.useEffect( () => {
     tasksRefetch();
@@ -68,7 +69,7 @@ export default function DnDStatusColumn( props ) {
     currentUser,
     globalStringFilter,
     forcedRefetch
-    ] );
+  ] );
 
   React.useEffect( () => {
     tasksRefetch();
@@ -122,7 +123,8 @@ export default function DnDStatusColumn( props ) {
                         className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
                         style={{borderLeft: "3px solid " + status.color}}
                         onClick={(e)=>{
-                          history.push(link+'/'+task.id);
+                          //history.push(link+'/'+task.id);
+                          setEditedTask(task);
                         }}
                         key={task.id}
                         >
@@ -150,6 +152,7 @@ export default function DnDStatusColumn( props ) {
         count={ count }
         loading={ tasksLoading }
         />
+      <ModalTaskEdit opened={editedTask} taskID={ editedTask ? editedTask.id : null } closeModal={ () => setEditedTask(null) } />
     </Card>
   );
 }

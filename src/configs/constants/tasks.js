@@ -64,7 +64,6 @@ export const defaultTasklistColumnPreference = {
   requester: true,
   company: true,
   assignedTo: true,
-  scheduled: false,
   createdAtV: false,
   startsAt: false,
   deadline: true,
@@ -96,7 +95,6 @@ export const defaultTasklistGanttColumnPreference = {
   requester: true,
   company: true,
   assignedTo: true,
-  scheduled: false,
   createdAtV: false,
   taskType: false,
   overtime: false,
@@ -169,10 +167,6 @@ export const attributeLimitingRights = [
     preference: 'assignedTo'
   },
   {
-    right: 'scheduledRead',
-    preference: 'scheduled'
-  },
-  {
     right: 'companyRead',
     preference: 'company'
   },
@@ -233,10 +227,6 @@ export const ganttAttributeLimitingRights = [
   {
     right: 'assignedRead',
     preference: 'assignedTo'
-  },
-  {
-    right: 'scheduledRead',
-    preference: 'scheduled'
   },
   {
     right: 'companyRead',
@@ -447,6 +437,7 @@ export const createDisplayValues = ( preference ) => [
     },
     show: preference[ 'assignedTo' ]
   },
+  /*
   {
     value: 'scheduled',
     label: 'Scheduled',
@@ -463,6 +454,7 @@ export const createDisplayValues = ( preference ) => [
     },
     show: preference[ 'scheduled' ]
   },
+  */
   {
     value: 'tags',
     label: 'Tags',
@@ -645,6 +637,7 @@ export const createGanttDisplayValues = ( preference ) => [
     },
     show: preference[ 'assignedTo' ]
   },
+  /*
   {
     value: 'scheduled',
     label: 'Scheduled',
@@ -661,6 +654,7 @@ export const createGanttDisplayValues = ( preference ) => [
     },
     show: preference[ 'scheduled' ]
   },
+  */
   {
     value: 'tags',
     label: 'Tags',
