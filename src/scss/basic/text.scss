@@ -17,6 +17,10 @@
   font-size: 24px;
 }
 
+.font-normal {
+  font-family: Segoe UI;
+}
+
 .font-bold {
   font-family: Segoe UI Semibold;
 }
@@ -53,4 +57,12 @@
 
 .bolder-text {
   font-weight: bolder;
+}
+
+.normal-weight{
+  font-weight: normal;
+}
+
+.white-text {
+  color: white;
 }

@@ -14,6 +14,7 @@ import {
   DropdownToggle
 } from 'reactstrap';
 import Checkbox from 'components/checkbox';
+import Pagination from './pagination';
 import {
   timestampToString
 } from 'helperFunctions';
@@ -40,6 +41,8 @@ import Email from './email';
 
 import downloadjs from 'downloadjs';
 
+const limit = 5;
+
 export default function Comments( props ) {
 
   const {
@@ -50,6 +53,7 @@ export default function Comments( props ) {
     submitComment,
     submitEmail,
   } = props;
+  const [ page, setPage ] = React.useState( 1 );
 
   const {
     data: commentsData,
@@ -57,7 +61,9 @@ export default function Comments( props ) {
     refetch: commentsRefetch,
   } = useQuery( GET_COMMENTS, {
     variables: {
-      task: id
+      task: id,
+      page,
+      limit
     },
     fetchPolicy: 'network-only'
   } );
@@ -69,7 +75,9 @@ export default function Comments( props ) {
     onSubscriptionData: () => {
       commentsRefetch( {
         variables: {
-          task: id
+          task: id,
+          page,
+          limit
         }
       } );
     }
@@ -85,15 +93,30 @@ export default function Comments( props ) {
   const [ subject, setSubject ] = React.useState( "" );
   const [ tos, setTos ] = React.useState( [] );
   const [ openedComments, setOpenedComments ] = React.useState( [] );
+
   React.useEffect( () => {
     setOpenedComments( [] )
     setIsEmail( !userRights.addComments );
+    setPage( 1 );
     commentsRefetch( {
       variables: {
-        task: id
+        task: id,
+        page: 1,
+        limit
       }
     } );
   }, [ id ] );
+
+  React.useEffect( () => {
+    setOpenedComments( [] )
+    commentsRefetch( {
+      variables: {
+        task: id,
+        page,
+        limit
+      }
+    } );
+  }, [ page ] );
 
   const getAttachment = ( attachment ) => {
     axios.get( `${REST_URL}/get-attachments`, {
@@ -124,6 +147,7 @@ export default function Comments( props ) {
   if ( commentsLoading ) {
     return <Loading />
   }
+  const comments = commentsData.comments;
 
   return (
     <div>
@@ -282,8 +306,7 @@ export default function Comments( props ) {
           </div>
         </div>
       }
-
-      { !isMulti && commentsData.comments.filter((comment)=> userRights.internal || !comment.isInternal).sort((item1,item2)=>item2.createdAt-item1.createdAt).map((comment)=>
+      { !isMulti && comments.map((comment) => (
         <div key={comment.id} >
           { comment.isEmail &&
             <Email
@@ -303,7 +326,8 @@ export default function Comments( props ) {
             <Comment getAttachment={getAttachment} comment={comment} />
           }
         </div>
-      )}
+      ))}
+      <Pagination count={comments.length === 0 ? 0 : comments[0].messageCount } limit={limit} page={page} setPage={setPage} loading={commentsLoading} />
     </div>
   );
 }

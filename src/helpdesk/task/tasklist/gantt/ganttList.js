@@ -97,7 +97,7 @@ export default function TableList( props ) {
   const filterTaskByAttributes = ( task ) => {
     return filteredDisplayValues
       .every( ( display ) => {
-        if ( [ 'important', 'invoiced', 'checked', 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
+        if ( [ 'important', 'invoiced', 'checked', 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH', 'subtasks', 'subtaskAssigned', 'subtasksHours' ].includes( display.value ) ) {
           return true;
         }
         let value = getItemDisplayValue( task, display );
@@ -286,6 +286,7 @@ export default function TableList( props ) {
       <tr
         key={task.id}
         className="clickable">
+        <td/>
         { filteredDisplayValues
           .map((display,index)=>{
             if(display.value === "important" || display.value === "invoiced" ){
@@ -300,7 +301,7 @@ export default function TableList( props ) {
                 key={display.value}
                 className={display.value}
                 onClick={(e)=>{
-                  if (display.type !== 'checkbox'){
+                  if (display.type !== 'checkbox' && display.value !== 'subtasks' ){
                     setEditedTask(task);
                     //history.push(`${ path }/${ task.id }`);
                   }
@@ -327,6 +328,19 @@ export default function TableList( props ) {
     )
   }
 
+  const getMilestoneDates = ( milestone ) => {
+    if ( milestone === null ) {
+      return {
+        startsAt: '---',
+        endsAt: '---',
+      }
+    }
+    return {
+      startsAt: milestone.startsAt === null ? '---' : timestampToString( milestone.startsAt ),
+      endsAt: milestone.endsAt === null ? '---' : timestampToString( milestone.endsAt ),
+    }
+  }
+
   return (
     <div>
       <CommandBar
@@ -339,6 +353,7 @@ export default function TableList( props ) {
         <table className="table">
           <thead>
             <tr>
+              <th width="22" />
               { filteredDisplayValues.map((display) =>
                 renderHeader(display)
               )}
@@ -347,6 +362,7 @@ export default function TableList( props ) {
 
           <tbody>
             <tr>
+              <td style={{ background: 'inherit' }}></td>
               { filteredDisplayValues.map((display,index) =>
                 renderAttributeFilter(display,index)
               )}
@@ -354,12 +370,17 @@ export default function TableList( props ) {
             <ActiveSearch {...props} table />
             { groups.map((group) => (
               <Empty key={ group.milestone === null ? 'null' : group.milestone.id }>
-                <tr>
-                  <td colSpan={filteredDisplayValues.length } className="noselect bolder-text" style={{fontSize: 14}}>
-                    <i
-                      className={classnames( "fa clickable p-l-5 p-r-5", { "fa-chevron-down": !group.show, "fa-chevron-up": group.show } )}
-                      onClick={() => setGroupOpen(group.milestone) }
-                      />
+                <tr onClick={() => setGroupOpen(group.milestone) } className="clickable bolder-text" >
+                  <td>
+                    <i className={classnames( "fa p-l-5 p-r-5", { "fa-chevron-down": !group.show, "fa-chevron-up": group.show } )} />
+                    </td>
+                  <td>
+                    { getMilestoneDates(group.milestone).endsAt }
+                  </td>
+                  <td>
+                    { getMilestoneDates(group.milestone).endsAt }
+                  </td>
+                  <td colSpan={filteredDisplayValues.length - 2 } className="noselect bolder-text" style={{fontSize: 14}}>
                     {group.milestone ? group.milestone.title : 'Without milestone' }
                   </td>
                 </tr>
@@ -381,17 +402,29 @@ export default function TableList( props ) {
         </table>
         <Pagination {...props} taskList/>
         <div className="m-l-30 m-b-10">
-          <p>Práca sumár</p>
-          <p>Neschválených: 8 hodín</p>
-          <p>Schválenych: 8 hodín</p>
-          <p>Spolu: 16 hodín</p>
+          <h4>Práca</h4>
+          <p>
+            Neschválených: { tasks.reduce( (acc, task) => acc + task.pendingSubtasksQuantity, 0 ) } hodín
+          </p>
+          <p>
+            Schválenych: { tasks.reduce( (acc, task) => acc + task.approvedSubtasksQuantity, 0 ) } hodín
+          </p>
+          <p>
+            Spolu: { tasks.reduce( (acc, task) => acc + task.pendingSubtasksQuantity + task.approvedSubtasksQuantity, 0 ) } hodín
+          </p>
         </div>
 
         <div className="m-l-30 m-b-10">
-          <p>Materiál sumár</p>
-          <p>Neschválených: 100 EUR bez DPH</p>
-          <p>Schválenych: 50 EUR bez DPH</p>
-          <p>Spolu: 150 EUR bez DPH</p>
+          <h4>Materiál</h4>
+          <p>
+            Neschválených: { tasks.reduce( (acc, task) => acc + task.pendingMaterialsPrice, 0 ) } EUR bez DPH
+          </p>
+          <p>
+            Schválenych: { tasks.reduce( (acc, task) => acc + task.approvedMaterialsPrice, 0 ) } EUR bez DPH
+          </p>
+          <p>
+            Spolu: { tasks.reduce( (acc, task) => acc + task.pendingMaterialsPrice + task.approvedMaterialsPrice, 0 ) } EUR bez DPH
+          </p>
         </div>
 
         <Modal isOpen={editOpen}>

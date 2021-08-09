@@ -21,6 +21,8 @@ import {
   UPDATE_SCHEDULED_WORK,
   ADD_TASK_SUBSCRIPTION,
   ADD_SCHEDULED_WORK,
+  UPDATE_SUBTASK,
+  UPDATE_WORKTRIP,
 } from '../../queries';
 
 import {
@@ -71,6 +73,7 @@ export default function CalendarLoader( props ) {
     processTasks,
   } = props;
 
+  const client = useApolloClient();
 
   //local queries
   const {
@@ -169,6 +172,8 @@ export default function CalendarLoader( props ) {
   const [ updateRepeatTime ] = useMutation( UPDATE_REPEAT_TIME );
   const [ triggerRepeat ] = useMutation( TRIGGER_REPEAT );
   const [ addScheduledWork ] = useMutation( ADD_SCHEDULED_WORK );
+  const [ updateSubtask ] = useMutation( UPDATE_SUBTASK );
+  const [ updateWorkTrip ] = useMutation( UPDATE_WORKTRIP );
 
   const [ fakeEvents, setFakeEvents ] = React.useState( [] );
   const [ forcedRefetch, setForcedRefetch ] = React.useState( false );
@@ -286,7 +291,105 @@ export default function CalendarLoader( props ) {
     end: new Date( parseInt( scheduled.to ) ),
     type: 'scheduled',
     allDay: isAllDay( scheduled ),
-    title: renderScheduled( scheduled.task, new Date( parseInt( scheduled.from ) ), new Date( parseInt( scheduled.to ) ) ),
+    title: renderScheduled(
+      scheduled.task,
+      new Date( parseInt( scheduled.from ) ),
+      new Date( parseInt( scheduled.to ) ),
+      scheduled.canEdit,
+      scheduled.subtask !== null ? scheduled.subtask.done : scheduled.workTrip.done,
+      ( done ) => {
+        if ( scheduled.subtask !== null ) {
+          if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ) ) {
+            setFakeEvents( [
+              ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== scheduled.id ),
+              expandScheduledEvent( createEventFromScheduled( {
+                ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ),
+                subtask: {
+                  ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id )
+                  .subtask,
+                  done,
+                }
+              } ) )
+            ] )
+          } else {
+            const scheduledWorks = client.readQuery( {
+                query: GET_SCHEDULED_WORKS,
+                variables: scheduledWorksVariables
+              } )
+              .scheduledWorks;
+
+            client.writeQuery( {
+              query: GET_SCHEDULED_WORKS,
+              variables: scheduledWorksVariables,
+              data: {
+                scheduledWorks: [
+                  ...scheduledWorks.filter( ( scheduledWork ) => scheduledWork.id !== scheduled.id ),
+                  {
+                    ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id ),
+                    subtask: {
+                      ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id )
+                      .subtask,
+                      done,
+                    }
+                  }
+                ]
+              },
+            } );
+          }
+          updateSubtask( {
+            variables: {
+              id: scheduled.subtask.id,
+              done,
+            }
+          } )
+
+        } else {
+          if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ) ) {
+            setFakeEvents( [
+              ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== scheduled.id ),
+              expandScheduledEvent( createEventFromScheduled( {
+                ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ),
+                workTrip: {
+                  ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id )
+                  .workTrip,
+                  done,
+                }
+              } ) )
+            ] )
+          } else {
+            const scheduledWorks = client.readQuery( {
+                query: GET_SCHEDULED_WORKS,
+                variables: scheduledWorksVariables
+              } )
+              .scheduledWorks;
+
+            client.writeQuery( {
+              query: GET_SCHEDULED_WORKS,
+              variables: scheduledWorksVariables,
+              data: {
+                scheduledWorks: [
+                  ...scheduledWorks.filter( ( scheduledWork ) => scheduledWork.id !== scheduled.id ),
+                  {
+                    ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id ),
+                    workTrip: {
+                      ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id )
+                      .workTrip,
+                    },
+                  }
+                ]
+              },
+            } );
+          }
+          updateWorkTrip( {
+            variables: {
+              id: scheduled.workTrip.id,
+              done,
+            }
+          } )
+        }
+
+      },
+    ),
     tooltip: `${getDateClock(new Date( parseInt( scheduled.from ) ))} - ${getDateClock(new Date( parseInt( scheduled.to ) ))} ${scheduled.task.title} `,
   } )
 
@@ -349,7 +452,7 @@ export default function CalendarLoader( props ) {
     scheduledWorksVariables,
     addScheduledWork,
     repeatTimesVariables,
-    client: useApolloClient(),
+    client,
     setFakeEvents,
     tasks: processTasks( tasks ),
     count: tasksLoading ? null : tasksData.tasks.count,

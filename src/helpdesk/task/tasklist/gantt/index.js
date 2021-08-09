@@ -186,7 +186,7 @@ export default function GanttListLoader( props ) {
 
   const ganttProps = {
     ...props,
-    displayValues: createGanttDisplayValues( createGanttPreferences() ),
+    displayValues: createGanttDisplayValues( createGanttPreferences(), taskVariables ),
     preference: createGanttPreferences(),
     setPreference,
     tasks: processTasks( tasks ),

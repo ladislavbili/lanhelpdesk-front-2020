@@ -56,6 +56,17 @@ tasks {
     id
     title
     order
+    startsAt
+    endsAt
+  }
+  subtasks{
+    id
+    done
+    title
+    quantity
+    assignedTo{
+      fullName
+    }
   }
   pendingDate
   project{
@@ -87,8 +98,12 @@ tasks {
     title
   }
   subtasksQuantity
+  approvedSubtasksQuantity
+  pendingSubtasksQuantity
   workTripsQuantity
   materialsPrice
+  approvedMaterialsPrice
+  pendingMaterialsPrice
 }
 count
 execTime
@@ -140,6 +155,9 @@ works
 trips
 materialsWithoutDPH
 materialsWithDPH
+subtasks
+subtaskAssigned
+subtasksHours
 `;
 
 export const GET_TASKS = gql `
@@ -269,6 +287,9 @@ mutation addOrUpdateTasklistGanttColumnPreference(
   $trips: Boolean
   $materialsWithoutDPH: Boolean
   $materialsWithDPH: Boolean
+  $subtasks: Boolean
+$subtaskAssigned: Boolean
+$subtasksHours: Boolean
 ) {
   addOrUpdateTasklistGanttColumnPreference(
     projectId: $projectId
@@ -288,6 +309,9 @@ mutation addOrUpdateTasklistGanttColumnPreference(
     trips: $trips
     materialsWithoutDPH: $materialsWithoutDPH
     materialsWithDPH: $materialsWithDPH
+    subtasks: $subtasks
+    subtaskAssigned: $subtaskAssigned
+    subtasksHours: $subtasksHours
   ){
     ${tasklistGanttPreferenceBody}
   }
@@ -336,11 +360,15 @@ user {
   fullName
 }
 workTrip{
+  id
+  done
   type{
     title
   }
 }
 subtask{
+  id
+  done
   title
 }
 `;

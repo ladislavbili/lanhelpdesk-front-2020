@@ -2405,6 +2405,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   height: 20px;
   width: 20px;
+  padding-right: 15px;
   border: 1px solid #c4c4c4;
   border-radius: 0px;
   background-color: white;
@@ -2428,6 +2429,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   border-radius: 0px;
   background-color: white;
   margin-bottom: 0px;
+}
+
+.checkbox-container {
+  word-break: break-all;
+  display: flex;
 }
 
 .checkbox-container .checkbox-mark:after,

@@ -3,11 +3,14 @@ import {
 } from '@apollo/client';
 
 export const GET_COMMENTS = gql `
-query comments($task: Int!){
+query comments($task: Int!, $page: Int, $limit: Int){
 	comments(
 		task: $task
+    page: $page
+    limit: $limit
 	){
     id
+    messageCount
     createdAt
     internal
     isEmail
