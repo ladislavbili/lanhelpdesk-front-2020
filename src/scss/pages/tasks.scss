@@ -1,0 +1,365 @@
+
+.task-edit-buttons button i {
+  font-size: 25px;
+}
+
+.task-info,
+.task-info-add {
+  font: $font-info-text;
+  color: $color-info-text;
+  margin-bottom: 0px;
+  text-align: end;
+}
+
+.task-info > .react-datepicker-wrapper {
+  width: 43% !important;
+}
+
+.task-info
+  > .react-datepicker-wrapper
+  > .react-datepicker__input-container
+  > input {
+  padding-right: 0px;
+  padding-left: 5px;
+  font: $font-info-text-bold;
+  color: $color-info-text;
+}
+
+.task-list-commandbar {
+  display: flex;
+  padding: 0px 1px 0px 1px;
+  height: $task-list-commandbar-height;
+  white-space: pre-wrap;
+  background-color: $content-background-color; //#f4f8fb;
+  border-bottom: $main-border;
+}
+
+.task-list-title {
+  display: inline;
+  -webkit-box-decoration-break: clone;
+}
+
+
+.task-container{
+  .search{
+    width: 50% !important;
+  }
+}
+
+.task-container {
+  .modal-content {
+    background-color: $form-background-color;
+    width: 1200px;
+  }
+}
+
+
+.task-add-container {
+  width: 1200px !important;
+  .modal-content {
+    background-color: $form-background-color;
+    padding: 0px;
+    .modal-body {
+      padding: 0px;
+    }
+  }
+}
+
+.task-add-layout {
+  height: $header-height;
+  padding-left: $odsadenie-form;
+  background-color: #f4f8fb;
+  margin: 0px;
+  width: 100% !important;
+  border-bottom: $main-border;
+}
+.task-add-layout-button {
+  margin-top: calc(( #{$header-height} - 30px) / 2);
+}
+
+.task-add-layout-2 {
+  height: 70px;
+  padding-left: $difference-form;
+  background-color: transparent; //#f4f8fb;
+  margin: 0px;
+  width: 100% !important;
+  border-bottom: $main-border;
+}
+
+.task-add-date-picker-placeholder {
+  ::placeholder {
+    color: red;
+  }
+}
+
+.task-container-col {
+  background-color: #fff;
+}
+
+.task-container {
+  .table {
+    background-color: transparent; //white;
+    margin-left: 30px;
+    margin-right: 30px;
+    width: calc(100% - 60px) !important; //0
+  }
+  .table > thead {
+    font-family: $main-font;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 16px;
+    color: #333;
+    border: none;
+  }
+
+  .table > tbody > tr {
+    border-bottom: 1px solid $content-background-color;
+  }
+/*
+  .table > tbody > tr:last-child,
+  .table > tbody > tr:first-child {
+    border-bottom: none;
+  }*/
+
+  .statistics > .table > tbody > tr {
+    border-bottom: none;
+  }
+
+  .table > thead > tr > th {
+    border: none;
+    //border-color: #F9F9F9 !important;
+  }
+
+  .table > tbody > tr:first-child > th:not(last-child) {
+    padding: 4px 10px 10px 0px !important;
+    background-color: transparent;
+    font-family: $main-font;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 19px;
+    color: #989898;
+    border: none;
+    .checkbox-mark {
+      border: 0px;
+    }
+  }
+
+  .table > tbody > tr:first-child > th:last-child {
+    padding: 4px 0px 10px 0px !important;
+  }
+
+  .table > tbody > tr > th {
+    padding: 4px 10px 10px 0px !important;
+    background-color: #fff;
+    font-family: $main-font;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 19px;
+    color: #989898;
+    border: none;
+    /*border-bottom: 5px solid #F9F9F9 !important;
+    border-right: 5px solid #F9F9F9;*/
+    //  border-bottom: 1px solid #bdbdbd !important;
+  }
+
+  .table > tbody > tr > th:last-child {
+    border-right: 0px;
+    //  border-bottom: 1px solid #bdbdbd !important;
+  }
+
+  .table > tbody > tr > th > .hidden-input {
+    border: 0px !important;
+    background-color: inherit;
+  }
+
+  .table > tbody > tr > td {
+    background-color: white;
+    font-family: $main-font;
+    font-size: 12px;
+    color: #767676 !important;
+    border: none;
+    vertical-align: middle;
+  }
+
+  .table > tbody > tr > td.title {
+    background-color: white;
+    font-family: $main-font;
+    font-size: 14px;
+    color: #333 !important;
+  }
+}
+
+
+.taskCol {
+  background-color: #ffffff;
+  min-height: 40px;
+  margin-bottom: 0px;
+  border-top: 0px;
+  border-bottom: 1px solid #0000001a;
+}
+
+.taskCol:hover {
+  background-color: #f4f8fb;
+}
+
+.taskCol li {
+  padding: 10px;
+}
+
+.taskCol-title {
+  font: $font-dnd-task-title;
+}
+
+.taskCol-body {
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.taskCol-body > p {
+  margin-bottom: 0px;
+}
+
+.taskCol-tags {
+  min-height: 21px;
+}
+
+.taskCol .checkbox {
+  margin-left: 20px;
+  margin-top: 5px;
+}
+
+.task-title-input {
+  font-size: 2.5rem;
+  line-height: 1.5;
+  color: $main-font-color;
+  box-shadow: none;
+  flex: 1;
+  //  margin-left: 10px;
+}
+
+.task-title-input-add {
+  font-size: 2.5rem;
+  line-height: 1.2;
+  color: $main-font-color;
+  box-shadow: none;
+  margin-left: 10px;
+  border: 2px solid red !important;
+}
+
+.task-title-input-add:focus {
+  border: 2px solid red !important;
+}
+
+.task-title-input {
+  border: $main-border !important;
+  margin-left: 0;
+}
+.task-title-input-2 {
+  border: none;
+  flex: 1;
+}
+
+
+.task-add-right-half {
+  width: 220px;
+  padding-left: 20px;
+  height: 600px;
+}
+
+.task-add-left-half {
+  flex: 1;
+  padding-right: 20px;
+  border-right: 1px solid $content-background-color;
+}
+
+.task-edit-align-select-labels {
+  label {
+    padding-left: 8px;
+  }
+}
+
+.task-edit-width {
+  min-width: 1000px;
+}
+
+.task-edit-right {
+  flex: auto;
+  min-width: 200px;
+  max-width: 300px;
+  margin: 0px 0px 0px 0px;
+  padding: 20px 20px 20px 13px;
+  background-color: $content-background-color;
+  border-left: $main-border;
+}
+.task-edit-right-columns {
+  flex: auto;
+  max-width: 200px;
+  margin: 0px 0px 0px 10px;
+  padding: 20px 20px 20px 13px;
+  background-color: $content-background-color;
+}
+
+.task-edit-left {
+  background-color: $content-background-color;
+  position: relative;
+  padding: calc(#{$odsadenie-form} - #{$difference-form})
+    calc(#{$odsadenie-form} - #{$difference-form})
+    0px
+    calc(#{$odsadenie-form} - #{$difference-form});
+  max-width: 1620px;
+  min-width: 400px;
+  width: calc(100% - 300px) !important;
+//  min-height: calc(100vh - 110px) !important;
+}
+
+.task-edit-left-columns {
+  background-color: white;
+  padding: 15px calc(#{$odsadenie-form} - #{$difference-form}) $odsadenie-form
+    calc(#{$odsadenie-form} - #{$difference-form});
+  max-width: 1670px;
+  min-width: 400px;
+  width: auto;
+}
+
+.task-edit-buttons {
+  background-color: transparent// #f9f9f9;
+  //  padding: $odsadenie-form;
+  /*position: absolute;
+  bottom: 10px;
+  width: calc(100% - ( 2 *  #{$odsadenie-form} ) + #{$difference-form} )  !important;*/
+}
+
+.task-edit-buttons-columns {
+  /*position: absolute;
+  bottom: 10px;
+  width: 100%;*/
+}
+
+.task-edit-popis {
+  min-height: 30px;
+  font: $font-value;
+  color: $color-value;
+  background-color: #f9f9f9 !important;
+  padding: 15px;
+}
+
+.task-edit-popis:last-child {
+  padding-top: 0px;
+}
+
+.task-edit-popis > div > p {
+  margin-bottom: 0px;
+}
+
+.form-section.task-edit-buttons {
+  position: absolute;
+  bottom: 30px;
+  .pull-right {
+    width: 500px;
+    position: absolute;
+    left: 350px;
+  }
+}

@@ -19,7 +19,6 @@ export default function DragRepeatContextMenu( props ) {
     fakeEvents,
     client,
     repeatTimesVariables,
-    expandRepeatTimeEvent,
     createEventFromRepeatTime,
   } = props;
 
@@ -61,10 +60,10 @@ export default function DragRepeatContextMenu( props ) {
               if(fakeEvents.some((event) => event.type === 'repeatTime' && event.repeatTime.id === repeatTime.id )){
                 setFakeEvents([
                   ...fakeEvents.filter((event) => event.type !== 'repeatTime' || event.repeatTime.id !== repeatTime.id),
-                  expandRepeatTimeEvent( createEventFromRepeatTime( {
+                   createEventFromRepeatTime( {
                     ...fakeEvents.find((event) => event.type === 'repeatTime' && event.repeatTime.id === repeatTime.id).repeatTime,
                     triggersAt: newDate.toString(),
-                  } ) )
+                  } )
                 ])
               }else{
                 const repeatTimes = client.readQuery( {
@@ -95,10 +94,10 @@ export default function DragRepeatContextMenu( props ) {
                 if(fakeEvents.some((event) => event.type === 'repeatTime' && event.repeatTime.id === repeatTime.id )){
                   setFakeEvents([
                     ...fakeEvents.filter((event) => event.type !== 'repeatTime' || event.repeatTime.id !== repeatTime.id),
-                    expandRepeatTimeEvent( createEventFromRepeatTime( {
+                    createEventFromRepeatTime( {
                       ...fakeEvents.find((event) => event.type === 'repeatTime' && event.repeatTime.id === repeatTime.id).repeatTime,
                       triggersAt: repeatTime.triggersAt,
-                    } ) )
+                    } )
                   ])
                 }else{
                   const repeatTimes = client.readQuery( {

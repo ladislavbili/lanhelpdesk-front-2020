@@ -10,7 +10,6 @@ import {
   getDateClock,
   processStringFilter,
 } from 'helperFunctions';
-import renderScheduled from './renderScheduled';
 import renderRepeatTime from './renderRepeatTime';
 import renderRepeat from './renderRepeat';
 import moment from 'moment';
@@ -284,6 +283,99 @@ export default function CalendarLoader( props ) {
     };
   }
 
+  const setScheduledDone = ( scheduled, done ) => {
+    if ( scheduled.subtask !== null ) {
+      const scheduledWorks = client.readQuery( {
+          query: GET_SCHEDULED_WORKS,
+          variables: scheduledWorksVariables
+        } )
+        .scheduledWorks;
+      if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ) || !scheduledWorks.some( ( scheduledWork ) => scheduledWork.id === scheduled.id ) ) {
+        setFakeEvents( [
+          ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== scheduled.id ),
+           createEventFromScheduled( {
+            ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ),
+            subtask: {
+              ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id )
+              .subtask,
+              done,
+            }
+          } )
+        ] )
+      } else {
+
+        client.writeQuery( {
+          query: GET_SCHEDULED_WORKS,
+          variables: scheduledWorksVariables,
+          data: {
+            scheduledWorks: [
+              ...scheduledWorks.filter( ( scheduledWork ) => scheduledWork.id !== scheduled.id ),
+              {
+                ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id ),
+                subtask: {
+                  ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id )
+                  .subtask,
+                  done,
+                }
+              }
+            ]
+          },
+        } );
+      }
+      updateSubtask( {
+        variables: {
+          id: scheduled.subtask.id,
+          done,
+        }
+      } )
+
+    } else {
+      if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ) ) {
+        setFakeEvents( [
+          ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== scheduled.id ),
+           createEventFromScheduled( {
+            ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ),
+            workTrip: {
+              ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id )
+              .workTrip,
+              done,
+            }
+          } )
+        ] )
+      } else {
+        const scheduledWorks = client.readQuery( {
+            query: GET_SCHEDULED_WORKS,
+            variables: scheduledWorksVariables
+          } )
+          .scheduledWorks;
+
+        client.writeQuery( {
+          query: GET_SCHEDULED_WORKS,
+          variables: scheduledWorksVariables,
+          data: {
+            scheduledWorks: [
+              ...scheduledWorks.filter( ( scheduledWork ) => scheduledWork.id !== scheduled.id ),
+              {
+                ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id ),
+                workTrip: {
+                  ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id )
+                  .workTrip,
+                },
+              }
+            ]
+          },
+        } );
+      }
+      updateWorkTrip( {
+        variables: {
+          id: scheduled.workTrip.id,
+          done,
+        }
+      } )
+    }
+
+  }
+
   const createEventFromScheduled = ( scheduled ) => ( {
     ...scheduled,
     resizable: scheduled.canEdit,
@@ -291,105 +383,6 @@ export default function CalendarLoader( props ) {
     end: new Date( parseInt( scheduled.to ) ),
     type: 'scheduled',
     allDay: isAllDay( scheduled ),
-    title: renderScheduled(
-      scheduled.task,
-      new Date( parseInt( scheduled.from ) ),
-      new Date( parseInt( scheduled.to ) ),
-      scheduled.canEdit,
-      scheduled.subtask !== null ? scheduled.subtask.done : scheduled.workTrip.done,
-      ( done ) => {
-        if ( scheduled.subtask !== null ) {
-          if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ) ) {
-            setFakeEvents( [
-              ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== scheduled.id ),
-              expandScheduledEvent( createEventFromScheduled( {
-                ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ),
-                subtask: {
-                  ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id )
-                  .subtask,
-                  done,
-                }
-              } ) )
-            ] )
-          } else {
-            const scheduledWorks = client.readQuery( {
-                query: GET_SCHEDULED_WORKS,
-                variables: scheduledWorksVariables
-              } )
-              .scheduledWorks;
-
-            client.writeQuery( {
-              query: GET_SCHEDULED_WORKS,
-              variables: scheduledWorksVariables,
-              data: {
-                scheduledWorks: [
-                  ...scheduledWorks.filter( ( scheduledWork ) => scheduledWork.id !== scheduled.id ),
-                  {
-                    ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id ),
-                    subtask: {
-                      ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id )
-                      .subtask,
-                      done,
-                    }
-                  }
-                ]
-              },
-            } );
-          }
-          updateSubtask( {
-            variables: {
-              id: scheduled.subtask.id,
-              done,
-            }
-          } )
-
-        } else {
-          if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ) ) {
-            setFakeEvents( [
-              ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== scheduled.id ),
-              expandScheduledEvent( createEventFromScheduled( {
-                ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id ),
-                workTrip: {
-                  ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === scheduled.id )
-                  .workTrip,
-                  done,
-                }
-              } ) )
-            ] )
-          } else {
-            const scheduledWorks = client.readQuery( {
-                query: GET_SCHEDULED_WORKS,
-                variables: scheduledWorksVariables
-              } )
-              .scheduledWorks;
-
-            client.writeQuery( {
-              query: GET_SCHEDULED_WORKS,
-              variables: scheduledWorksVariables,
-              data: {
-                scheduledWorks: [
-                  ...scheduledWorks.filter( ( scheduledWork ) => scheduledWork.id !== scheduled.id ),
-                  {
-                    ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id ),
-                    workTrip: {
-                      ...scheduledWorks.find( ( scheduledWork ) => scheduledWork.id === scheduled.id )
-                      .workTrip,
-                    },
-                  }
-                ]
-              },
-            } );
-          }
-          updateWorkTrip( {
-            variables: {
-              id: scheduled.workTrip.id,
-              done,
-            }
-          } )
-        }
-
-      },
-    ),
     tooltip: `${getDateClock(new Date( parseInt( scheduled.from ) ))} - ${getDateClock(new Date( parseInt( scheduled.to ) ))} ${scheduled.task.title} `,
   } )
 
@@ -457,6 +450,7 @@ export default function CalendarLoader( props ) {
     tasks: processTasks( tasks ),
     count: tasksLoading ? null : tasksData.tasks.count,
     globalTaskSearch,
+    setScheduledDone,
 
     forceRefetch: () => setForcedRefetch( !forcedRefetch ),
     localStringFilter: localStringFilter.localTaskStringFilter,

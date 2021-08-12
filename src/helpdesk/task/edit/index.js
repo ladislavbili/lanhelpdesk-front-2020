@@ -194,7 +194,8 @@ export default function TaskEditContainer( props ) {
     },
     onSubscriptionData: () => {
       if ( inModal ) {
-        closeModal();
+        //update calendar
+        closeModal( true );
       } else {
         history.push( match.url.substring( 0, match.url.length - match.params.taskID.length ) );
       }

@@ -1,76 +1,4 @@
 //-----classNames, ktore tu nie su definovane ale su z react-strapu
-.segoe-semi-header{
-font-size: 14px;
-font-family: Segoe UI Semibold;
-
-}
-
-.segoe-semi-text-f{
-  font-size: 12px;
-  font-family: Segoe UI Semibold;
-  color: $color-link;
-}
-
-.segoe-semi-text-f{
-  font-size: 12px !important;
-  font-family: Segoe UI Semibold;
-  color: $color-link !important;
-}
-
-.segoe-blue-text, .segoe-blue-text::placeholder {
-  font-family: Segoe UI;
-  color: $color-link !important;
-}
-
-.custom-popover {
-  background-color: $content-background-color;
-  min-width: 200px;
-  padding: 10px 15px;
-  input {
-    background-color: white;
-  }
-  .btn-link-reversed,
-  .btn-link-reversed:hover,
-  .btn-link-reversed:active,
-  .btn-link-reversed:focus,
-  .btn-link-reversed:active:focus {
-    font: 14px Segoe UI;
-    color: #a6a6a6;
-    padding: 3.75px 7.5px;
-    border: none;
-    outline: none;
-    background-color: #f2f2f2;
-  }
-}
-
-.t-a-c{
-  text-align: center;
-}
-.t-a-r{
-  text-align: right;
-}
-.t-a-l{
-  text-align: left;
-}
-
-.custom-popover-header{
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-}
-
-.custom-popover-item{
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.custom-popover-item-double{
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-.min-height-400 {
-  min-height: 400px;
-}
 
 .error-style {
   color: #ff1919;
@@ -81,10 +9,6 @@ font-family: Segoe UI Semibold;
 
 .list-group-item + .list-group-item {
   border-top-width: 1px;
-}
-
-.overflowX-hidden {
-  overflow-x: hidden;
 }
 
 .content {
@@ -100,18 +24,7 @@ font-family: Segoe UI Semibold;
   flex: 1 1;
 }
 
-.task-edit-buttons button i {
-  font-size: 25px;
-}
 
-.form-container {
-  margin-bottom: 15px;
-}
-
-
-.form-lg-container {
-  margin-bottom: 35px;
-}
 
 //---------------všeobecné-atribúty---------------------
 
@@ -168,45 +81,13 @@ font-family: Segoe UI Semibold;
 .b-r-0 {
   border-radius: 0px;
 }
-.b-cl-form {
-  border-color: $muted-gray;
-}
-.outside {
-  /*position: fixed;
-  margin-left: 5000px;*/
-}
 
-.modal.fade.show {
-  opacity: 1;
-}
-
-.form-body {
-  height: calc(#{$height-without-header} - 41px - 50px);
-}
-
-.form-body-highlighted {
-  position: relative;
-  height: calc(
-    100vh - 40px - #{$commandbar-height} - 40px - 60px
-  ); //header, commandbar, nadpis, buttons
-}
 
 .bring-to-front {
   position: relative;
   z-index: 99999 !important;
 }
 
-.form-footer {
-  border-top: 1px solid $muted-gray;
-  background-color: white;
-  position: relative;
-  //bottom: 0;
-  width: 100%;
-  height: 50px;
-  padding-top: 10px;
-  padding-left: 20px;
-  padding-right: 40px;
-}
 
 .basic-border {
   border: $main-border !important;
@@ -286,57 +167,14 @@ font-family: Segoe UI Semibold;
   color: $muted-font-color !important;
 }
 
-.col-form-label {
-  font: $font-label;
-  color: $color-label;
-  line-height: 16px;
-  padding-top: 8px;
-  padding-bottom: none;
-}
 
-.col-form-label-3 {
-  font: $font-info-text;
-  color: $color-label;
-  line-height: 16px;
-  padding-top: 8px;
-  padding-bottom: none;
-}
 
-.col-form-label-description {
-  font: $font-task-description;
-  color: $color-task-description;
-  line-height: 16px;
-  padding-top: 8px;
-  padding-bottom: none;
-  margin-top: 10px;
-  margin-right: 20px;
-}
 
-.task-info,
-.task-info-add {
-  font: $font-info-text;
-  color: $color-info-text;
-  margin-bottom: 0px;
-  text-align: end;
-}
 
 .popover > .arrow {
   display: none;
 }
 
-.task-info > .react-datepicker-wrapper {
-  width: 43% !important;
-}
-
-.task-info
-  > .react-datepicker-wrapper
-  > .react-datepicker__input-container
-  > input {
-  padding-right: 0px;
-  padding-left: 5px;
-  font: $font-info-text-bold;
-  color: $color-info-text;
-}
 
 .react-datepicker__close-icon::after{
   background-color: inherit;
@@ -348,12 +186,7 @@ font-family: Segoe UI Semibold;
   margin-right: 5px;
 }
 
-.form {
-  background-color: $form-background-color;
-  //  max-width: 1284px;
-  border-radius: 0px;
-  padding: 0px;
-}
+
 
 .breadcrum-bar {
   width: 68%;
@@ -368,12 +201,6 @@ font-family: Segoe UI Semibold;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.modal-content {
-  background-color: $content-background-color; //white;
-  padding-left: 20px;
-  padding-right: 20px;
 }
 
 .comment:nth-child(2) {
@@ -453,44 +280,7 @@ td {
   padding-right: 0px;
 }
 
-.form-control {
-  font: $font-value;
-  color: $color-value;
-  border-radius: 0px;
-  box-shadow: none;
-  height: 30px; //calc(1.5em + .75rem + 4px);
-  border: $main-border;
-  outline: none;
-}
 
-.form-control-secondary {
-  font: $font-value;
-  color: $color-value;
-  border-radius: 0px;
-  box-shadow: none;
-  height: 30px; //calc(1.5em + .75rem + 4px);
-  border: $secondary-border;
-  outline: none;
-}
-
-.form-control:disabled {
-  background-color: inherit;
-  border: none;
-  cursor: default;
-}
-
-.form-control:focus,
-.form-control-secondary:focus {
-  box-shadow: none;
-  border-width: 1px;
-  border-color: $basic-button-color;
-}
-
-.form-control-warning:focus {
-  box-shadow: none;
-  border-width: 1px;
-  border-color: red;
-}
 
 .hidden-input {
   background-color: inherit;
@@ -1429,14 +1219,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   border-bottom: $main-border;
 }
 
-.task-list-commandbar {
-  display: flex;
-  padding: 0px 1px 0px 1px;
-  height: $task-list-commandbar-height;
-  white-space: pre-wrap;
-  background-color: $content-background-color; //#f4f8fb;
-  border-bottom: $main-border;
-}
 
 .sort-style {
   @extend .center-hor;
@@ -1456,11 +1238,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .commandbar-icon {
   height: 19px;
-}
-
-.task-list-title {
-  display: inline;
-  -webkit-box-decoration-break: clone;
 }
 
 .search-row {
@@ -1489,11 +1266,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   border:  1px solid $basic-button-color !important;
 }
 
-.task-container{
-  .search{
-    width: 50% !important;
-  }
-}
 
 .search-btn,
 .search-btn:hover,
@@ -1610,161 +1382,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 //---------------------TaskList----------------------
-.task-container {
-  .modal-content {
-    background-color: $form-background-color;
-    width: 1200px;
-  }
-}
 
-.small-modal {
-  width: 600px !important;
-  .modal-content {
-    background-color: $content-background-color;
-    padding: 0px;
-    .modal-body {
-      padding: 0px;
-    }
-  }
-}
-
-.task-add-container {
-  width: 1200px !important;
-  .modal-content {
-    background-color: $form-background-color;
-    padding: 0px;
-    .modal-body {
-      padding: 0px;
-    }
-  }
-}
-
-.task-add-layout {
-  height: $header-height;
-  padding-left: $odsadenie-form;
-  background-color: #f4f8fb;
-  margin: 0px;
-  width: 100% !important;
-  border-bottom: $main-border;
-}
-.task-add-layout-button {
-  margin-top: calc(( #{$header-height} - 30px) / 2);
-}
-
-.task-add-layout-2 {
-  height: 70px;
-  padding-left: $difference-form;
-  background-color: transparent; //#f4f8fb;
-  margin: 0px;
-  width: 100% !important;
-  border-bottom: $main-border;
-}
-
-.task-add-date-picker-placeholder {
-  ::placeholder {
-    color: red;
-  }
-}
-
-.task-container-col {
-  background-color: #fff;
-}
-
-.task-container {
-  .table {
-    background-color: transparent; //white;
-    margin-left: 30px;
-    margin-right: 30px;
-    width: calc(100% - 60px) !important; //0
-  }
-  .table > thead {
-    font-family: $main-font;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 12px;
-    line-height: 16px;
-    color: #333;
-    border: none;
-  }
-
-  .table > tbody > tr {
-    border-bottom: 1px solid $content-background-color;
-  }
-/*
-  .table > tbody > tr:last-child,
-  .table > tbody > tr:first-child {
-    border-bottom: none;
-  }*/
-
-  .statistics > .table > tbody > tr {
-    border-bottom: none;
-  }
-
-  .table > thead > tr > th {
-    border: none;
-    //border-color: #F9F9F9 !important;
-  }
-
-  .table > tbody > tr:first-child > th:not(last-child) {
-    padding: 4px 10px 10px 0px !important;
-    background-color: transparent;
-    font-family: $main-font;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 12px;
-    line-height: 19px;
-    color: #989898;
-    border: none;
-    .checkbox-mark {
-      border: 0px;
-    }
-  }
-
-  .table > tbody > tr:first-child > th:last-child {
-    padding: 4px 0px 10px 0px !important;
-  }
-
-  .table > tbody > tr > th {
-    padding: 4px 10px 10px 0px !important;
-    background-color: #fff;
-    font-family: $main-font;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 12px;
-    line-height: 19px;
-    color: #989898;
-    border: none;
-    /*border-bottom: 5px solid #F9F9F9 !important;
-    border-right: 5px solid #F9F9F9;*/
-    //  border-bottom: 1px solid #bdbdbd !important;
-  }
-
-  .table > tbody > tr > th:last-child {
-    border-right: 0px;
-    //  border-bottom: 1px solid #bdbdbd !important;
-  }
-
-  .table > tbody > tr > th > .hidden-input {
-    border: 0px !important;
-    background-color: inherit;
-  }
-
-  .table > tbody > tr > td {
-    background-color: white;
-    font-family: $main-font;
-    font-size: 12px;
-    color: #767676 !important;
-    border: none;
-    vertical-align: middle;
-  }
-
-  .table > tbody > tr > td.title {
-    background-color: white;
-    font-family: $main-font;
-    font-size: 14px;
-    color: #333 !important;
-  }
-}
 
 .card-header {
   font: 20px Segoe UI;
@@ -1831,44 +1449,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .item-in-column:hover {
   background-color: #20a8d8;
   color: white;
-}
-
-.taskCol {
-  background-color: #ffffff;
-  min-height: 40px;
-  margin-bottom: 0px;
-  border-top: 0px;
-  border-bottom: 1px solid #0000001a;
-}
-
-.taskCol:hover {
-  background-color: #f4f8fb;
-}
-
-.taskCol li {
-  padding: 10px;
-}
-
-.taskCol-title {
-  font: $font-dnd-task-title;
-}
-
-.taskCol-body {
-  margin-top: 10px;
-  font-size: 12px;
-}
-
-.taskCol-body > p {
-  margin-bottom: 0px;
-}
-
-.taskCol-tags {
-  min-height: 21px;
-}
-
-.taskCol .checkbox {
-  margin-left: 20px;
-  margin-top: 5px;
 }
 
 .selected-item {
@@ -1942,36 +1522,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 //--------------------END-calendar-------------------------
 
 //----------------------taskEdit--------------------------
-.task-title-input {
-  font-size: 2.5rem;
-  line-height: 1.5;
-  color: $main-font-color;
-  box-shadow: none;
-  flex: 1;
-  //  margin-left: 10px;
-}
 
-.task-title-input-add {
-  font-size: 2.5rem;
-  line-height: 1.2;
-  color: $main-font-color;
-  box-shadow: none;
-  margin-left: 10px;
-  border: 2px solid red !important;
-}
-
-.task-title-input-add:focus {
-  border: 2px solid red !important;
-}
-
-.task-title-input {
-  border: $main-border !important;
-  margin-left: 0;
-}
-.task-title-input-2 {
-  border: none;
-  flex: 1;
-}
 
 .medium-input {
   font-size: 2.5rem;
@@ -2120,110 +1671,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   overflow-x: auto;
 }
 
-.task-add-right-half {
-  width: 220px;
-  padding-left: 20px;
-  height: 600px;
-}
-
-.task-add-left-half {
-  flex: 1;
-  padding-right: 20px;
-  border-right: 1px solid $content-background-color;
-}
-
-.task-edit-align-select-labels {
-  label {
-    padding-left: 8px;
-  }
-}
-
-.task-edit-width {
-  min-width: 1000px;
-}
-
-.task-edit-right {
-  flex: auto;
-  min-width: 200px;
-  max-width: 300px;
-  margin: 0px 0px 0px 0px;
-  padding: 20px 20px 20px 13px;
-  background-color: $content-background-color;
-  border-left: $main-border;
-}
-.task-edit-right-columns {
-  flex: auto;
-  max-width: 200px;
-  margin: 0px 0px 0px 10px;
-  padding: 20px 20px 20px 13px;
-  background-color: $content-background-color;
-}
-
-.task-edit-left {
-  background-color: $content-background-color;
-  position: relative;
-  padding: calc(#{$odsadenie-form} - #{$difference-form})
-    calc(#{$odsadenie-form} - #{$difference-form})
-    0px
-    calc(#{$odsadenie-form} - #{$difference-form});
-  max-width: 1620px;
-  min-width: 400px;
-  width: calc(100% - 300px) !important;
-//  min-height: calc(100vh - 110px) !important;
-}
-
-.task-edit-left-columns {
-  background-color: white;
-  padding: 15px calc(#{$odsadenie-form} - #{$difference-form}) $odsadenie-form
-    calc(#{$odsadenie-form} - #{$difference-form});
-  max-width: 1670px;
-  min-width: 400px;
-  width: auto;
-}
-
-.task-edit-buttons {
-  background-color: transparent// #f9f9f9;
-  //  padding: $odsadenie-form;
-  /*position: absolute;
-  bottom: 10px;
-  width: calc(100% - ( 2 *  #{$odsadenie-form} ) + #{$difference-form} )  !important;*/
-}
-
-.task-edit-buttons-columns {
-  /*position: absolute;
-  bottom: 10px;
-  width: 100%;*/
-}
-
-.task-edit-popis {
-  min-height: 30px;
-  font: $font-value;
-  color: $color-value;
-  background-color: #f9f9f9 !important;
-  padding: 15px;
-}
-
-.task-edit-popis:last-child {
-  padding-top: 0px;
-}
-
-.task-edit-popis > div > p {
-  margin-bottom: 0px;
-}
-
-.statusChangeModal {
-  .modal-content {
-    padding: 20px;
-    h1 {
-      margin-bottom: 20px;
-    }
-    .react-datepicker-wrapper,
-    .form-control {
-      width: 100%;
-    }
-  }
-}
-
 .attachments {
   background-color: inherit;
   padding: 5px 20px 20px 0px;
@@ -2272,16 +1719,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .form-section:last-child, .form-section:nth-last-child(2) {
   margin-bottom: 0px;
-}
-
-.form-section.task-edit-buttons {
-  position: absolute;
-  bottom: 30px;
-  .pull-right {
-    width: 500px;
-    position: absolute;
-    left: 350px;
-  }
 }
 
 

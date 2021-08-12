@@ -105,6 +105,12 @@ tasks {
   approvedMaterialsPrice
   pendingMaterialsPrice
 }
+totals{
+  approvedSubtasks
+  pendingSubtasks
+  approvedMaterials
+  pendingMaterials
+}
 count
 execTime
 secondaryTimes {

@@ -126,6 +126,13 @@ export default function GanttListLoader( props ) {
   );
 
   const tasks = dataLoading ? [] : tasksData.tasks.tasks;
+  const totals = dataLoading ? {
+      approvedSubtasks: 0,
+      pendingSubtasks: 0,
+      approvedMaterials: 0,
+      pendingMaterials: 0,
+    } :
+    tasksData.tasks.totals;
 
   const createGanttPreferences = () => {
     let ganttPreference = defaultTasklistGanttColumnPreference;
@@ -190,6 +197,7 @@ export default function GanttListLoader( props ) {
     preference: createGanttPreferences(),
     setPreference,
     tasks: processTasks( tasks ),
+    totals,
     count: tasksLoading ? null : tasksData.tasks.count,
     loading: dataLoading,
 

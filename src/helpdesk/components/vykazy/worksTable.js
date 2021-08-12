@@ -413,9 +413,7 @@ export default function WorksTable( props ) {
             </button>
             <button className="btn-link" disabled={disabled || !canAddSubtasksAndTrips}
               onClick={()=>{
-                if(window.confirm('Are you sure?')){
-                  removeSubtask(subtask.id);
-                }
+                removeSubtask(subtask.id);
               }}>
               <i className="fa fa-times" />
             </button>
@@ -654,10 +652,8 @@ export default function WorksTable( props ) {
             <button
               className="btn-link"
               disabled={disabled || !canAddSubtasksAndTrips}
-              onClick={()=>{
-                if(window.confirm('Are you sure?')){
-                  removeTrip(trip.id);
-                }
+              onClick={() => {
+                removeTrip(trip.id);
               }}
               >
               <i className="fa fa-times" />

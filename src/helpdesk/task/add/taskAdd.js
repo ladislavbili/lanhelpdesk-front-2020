@@ -597,116 +597,160 @@ export default function TaskAdd( props ) {
         />
     ),
     Assigned: (
-      <Select
-        placeholder="Select reccomended"
-        value={assignedTo}
-        isDisabled={ defaultFields.assignedTo.fixed || !userRights.assignedWrite }
-        isMulti
-        onChange={(users)=> {
-          setAssignedTo(users);
-        }}
-        options={assignableUsers}
-        styles={pickSelectStyle([ 'noArrow' ])}
-        />
-    ),
-    Status: (
-      <Select
-        placeholder="Select required"
-        value={status}
-        isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
-        styles={showLocalCreationError ? pickSelectStyle( [ 'noArrow', 'colored', 'required', 'highlight', ] ) : pickSelectStyle([ 'noArrow', 'colored', 'required', ])}
-        onChange={(status)=>{
-          if(status.action==='PendingDate'){
-            setStatus(status);
-            setPendingDate( moment().add(1,'d') );
-          }else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
-            setStatus(status);
-            setCloseDate( moment() );
-          }
-          else{
-            setStatus(status);
-          }
-        }}
-        options={project ? toSelArr(project.statuses.filter((status) => status.action.toLowerCase() !== 'invoiced' )) : []}
-        />
-    ),
-    Type: (
       <div>
-        { userRights.typeRead &&
+        { (defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
+          <div> {assignedTo.map((user) =>
+              <div className="disabled-info">{user.label}</div>
+            )}
+            { assignedTo.length === 0 &&
+              <div className="message error-message">Úloha nepriradená</div>
+            }
+          </div>
+        }
+        { userRights.assignedWrite &&
           <Select
-            placeholder="Select task type"
-            value={taskType}
-            isDisabled={defaultFields.type.fixed || !userRights.typeWrite }
-            styles={ (showLocalCreationError && defaultFields.type.required) ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', defaultFields.type.required ? 'required' : ''  ]) }
-            onChange={(taskType)=> {
-              setTaskType(taskType);
+            placeholder="Select reccomended"
+            value={assignedTo}
+            isDisabled={ defaultFields.assignedTo.fixed || !userRights.assignedWrite }
+            isMulti
+            onChange={(users)=> {
+              setAssignedTo(users);
             }}
-            options={taskTypes}
+            options={assignableUsers}
+            styles={pickSelectStyle([ 'noArrow' ])}
             />
         }
       </div>
     ),
-    Milestone: (
+    Status: (
+      <div>
+        { (defaultFields.status.fixed || !userRights.statusWrite ) &&
+          <div className="disabled-info">{status ? status.label : "None"}</div>
+        }
+        { !defaultFields.status.fixed && userRights.statusWrite &&
+          <Select
+            placeholder="Select required"
+            value={status}
+            isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
+            styles={showLocalCreationError ? pickSelectStyle( [ 'noArrow', 'colored', 'required', 'highlight', ] ) : pickSelectStyle([ 'noArrow', 'colored', 'required', ])}
+            onChange={(status)=>{
+              if(status.action==='PendingDate'){
+                setStatus(status);
+                setPendingDate( moment().add(1,'d') );
+              }else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
+                setStatus(status);
+                setCloseDate( moment() );
+              }
+              else{
+                setStatus(status);
+              }
+            }}
+            options={project ? toSelArr(project.statuses.filter((status) => status.action.toLowerCase() !== 'invoiced' )) : []}
+            />
+        }
+      </div>
+    ),
+    Type: (
       <Select
-        isDisabled={!userRights.milestoneWrite}
-        placeholder="None"
-        value={milestone}
-        onChange={(milestone)=> {
-          if(status.action==='PendingDate'){
-            if(milestone.startsAt !== null){
-              setMilestone(milestone);
-              setPendingDate(moment(milestone.startsAt));
-              setPendingChangable(false);
-            }else{
-              setMilestone(milestone);
-              setPendingChangable(true);
-            }
-          }else{
-            setMilestone(milestone);
-          }
+        placeholder="Zadajte typ"
+        value={taskType}
+        isDisabled={defaultFields.type.fixed || !userRights.typeWrite }
+        styles={ (showLocalCreationError && defaultFields.type.required) ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', defaultFields.type.required ? 'required' : ''  ]) }
+        onChange={(taskType)=> {
+          setTaskType(taskType);
         }}
-        options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={ pickSelectStyle([ 'noArrow', ]) }
+        options={taskTypes}
         />
+    ),
+    Milestone: (
+      <div>
+        { !userRights.milestoneWrite &&
+          <div className="disabled-info">{milestone ? milestone.label : "None"}</div>
+        }
+        { userRights.milestoneWrite &&
+          <Select
+            isDisabled={!userRights.milestoneWrite}
+            placeholder="None"
+            value={milestone}
+            onChange={(milestone)=> {
+              if(status.action==='PendingDate'){
+                if(milestone.startsAt !== null){
+                  setMilestone(milestone);
+                  setPendingDate(moment(milestone.startsAt));
+                  setPendingChangable(false);
+                }else{
+                  setMilestone(milestone);
+                  setPendingChangable(true);
+                }
+              }else{
+                setMilestone(milestone);
+              }
+            }}
+            options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
+            styles={ pickSelectStyle([ 'noArrow', ]) }
+            />
+        }
+      </div>
     ),
     Requester: (
-      <Select
-        value={requester}
-        placeholder="Select reccomended"
-        isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
-        onChange={(requester)=>{
-          setRequester(requester);
-          if(userRights.companyWrite && !defaultFields.company.fixed){
-            const newCompany = companies.find((company) => company.id === requester.id );
-            setCompany(newCompany);
-          }
-        }}
-        options={projectRequesters}
-        styles={ pickSelectStyle([ 'noArrow', ]) }
-        />
+      <div>
+        { (defaultFields.requester.fixed || !userRights.requesterWrite) &&
+          <div className="disabled-info">{requester ? requester.label : "None"}</div>
+        }
+        { !defaultFields.requester.fixed && userRights.requesterWrite &&
+          <Select
+            value={requester}
+            placeholder="Select reccomended"
+            isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
+            onChange={(requester)=>{
+              setRequester(requester);
+              if(userRights.companyWrite && !defaultFields.company.fixed){
+                const newCompany = companies.find((company) => company.id === requester.id );
+                setCompany(newCompany);
+              }
+            }}
+            options={projectRequesters}
+            styles={ pickSelectStyle([ 'noArrow', ]) }
+            />
+        }
+      </div>
     ),
     Company: (
-      <Select
-        value={company}
-        placeholder="Select required"
-        isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
-        onChange={(company)=> {
-          setCompany(company);
-          setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
-        }}
-        options={companies}
-        styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle( ['noArrow', 'required' ] ) }
-        />
+      <div>
+        { (defaultFields.company.fixed || !userRights.companyWrite) &&
+          <div className="disabled-info">{company ? company.label : "None"}</div>
+        }
+        { !defaultFields.company.fixed && userRights.companyWrite &&
+          <Select
+            value={company}
+            placeholder="Select required"
+            isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
+            onChange={(company)=> {
+              setCompany(company);
+              setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
+            }}
+            options={companies}
+            styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle( ['noArrow', 'required' ] ) }
+            />
+        }
+      </div>
     ),
     Pausal: (
-      <Select
-        value={pausal}
-        placeholder="Select required"
-        isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-        styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', 'required', ]) }
-        onChange={(pausal)=> setPausal(pausal)}
-        options={booleanSelects}
-        />
+      <div>
+        { (!userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed || parseInt(company.taskWorkPausal) < 0) &&
+          <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
+        }
+        { userRights.pausalWrite && company && company.monthly && (parseInt(company.taskWorkPausal) >= 0) && !defaultFields.pausal.fixed &&
+          <Select
+            value={pausal}
+            placeholder="Select required"
+            isDisabled={!userRights.pausalWrite || !company || !company.monthly || parseInt(company.taskWorkPausal) < 0 || defaultFields.pausal.fixed}
+            styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', 'required', ]) }
+            onChange={(pausal)=> setPausal(pausal)}
+            options={booleanSelects}
+            />
+        }
+      </div>
     ),
     StartsAt: (
       <div>
@@ -730,36 +774,57 @@ export default function TaskAdd( props ) {
       </div>
     ),
     StartsAt: (
-      <DatePicker
-        className={classnames("form-control")}
-        selected={startsAt}
-        disabled={!userRights.deadlineWrite}
-        onChange={date => setStartsAt( isNaN(date.valueOf()) ? null : date )}
-        hideTime
-        isClearable
-        placeholderText="No start date"
-        />
+      <div>
+        { !userRights.deadlineWrite &&
+          <div className="disabled-info">{startsAt}</div>
+        }
+        { userRights.deadlineWrite &&
+          <DatePicker
+            className={classnames("form-control")}
+            selected={startsAt}
+            disabled={!userRights.deadlineWrite}
+            onChange={date => setStartsAt( isNaN(date.valueOf()) ? null : date )}
+            hideTime
+            isClearable
+            placeholderText="No start date"
+            />
+        }
+      </div>
     ),
     Deadline: (
-      <DatePicker
-        className={classnames("form-control")}
-        selected={deadline}
-        disabled={!userRights.deadlineWrite}
-        onChange={date => setDeadline( isNaN(date.valueOf()) ? null : date )}
-        hideTime
-        isClearable
-        placeholderText="No deadline"
-        />
+      <div>
+        { !userRights.deadlineWrite &&
+          <div className="disabled-info">{deadline}</div>
+        }
+        { userRights.deadlineWrite &&
+          <DatePicker
+            className={classnames("form-control")}
+            selected={deadline}
+            disabled={!userRights.deadlineWrite}
+            onChange={date => setDeadline( isNaN(date.valueOf()) ? null : date )}
+            hideTime
+            isClearable
+            placeholderText="No deadline"
+            />
+        }
+      </div>
     ),
     Overtime: (
-      <Select
-        placeholder="Select required"
-        value={overtime}
-        isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', 'required', ]) }
-        onChange={(overtime) => setOvertime(overtime)}
-        options={booleanSelects}
-        />
+      <div>
+        { (!userRights.overtimeWrite || defaultFields.overtime.fixed) &&
+          <div className="disabled-info">{overtime.label}</div>
+        }
+        { userRights.overtimeWrite && !defaultFields.overtime.fixed &&
+          <Select
+            placeholder="Select required"
+            value={overtime}
+            isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
+            styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', 'required', ]) }
+            onChange={(overtime) => setOvertime(overtime)}
+            options={booleanSelects}
+            />
+        }
+      </div>
     )
   }
 
@@ -779,7 +844,7 @@ export default function TaskAdd( props ) {
             { userRights.assignedRead &&
               <div className="col-8">
                 <div className="row p-r-10">
-                  <Label className="col-1-45 col-form-label">Assigned {project.def.assignedTo.required && <span className="warning-big">*</span>}</Label>
+                  <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
                   <div className="col-10-45">
                     { layoutComponents.Assigned }
                   </div>
@@ -790,7 +855,7 @@ export default function TaskAdd( props ) {
 
           <div className="row">
             <div className="col-4">
-              {userRights.statusRead && !defaultFields.status.fixed && userRights.statusWrite &&
+              {userRights.statusRead &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Status {project.def.status.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
@@ -799,7 +864,7 @@ export default function TaskAdd( props ) {
                 </div>
               }
 
-              { userRights.typeRead && userRights.typeWrite &&
+              { userRights.typeRead &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Task type {project.def.type.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
@@ -807,7 +872,7 @@ export default function TaskAdd( props ) {
                   </div>
                 </div>
               }
-              { userRights.milestoneRead && userRights.milestoneWrite &&
+              { userRights.milestoneRead &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Milestone</Label>
                   <div className="col-9">
@@ -818,7 +883,7 @@ export default function TaskAdd( props ) {
             </div>
 
             <div className="col-4">
-              {userRights.requesterRead && !defaultFields.requester.fixed &&  userRights.requesterWrite &&
+              { userRights.requesterRead &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Requester {project.def.requester.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
@@ -826,7 +891,7 @@ export default function TaskAdd( props ) {
                   </div>
                 </div>
               }
-              {userRights.companyRead && !defaultFields.company.fixed && userRights.companyWrite &&
+              { userRights.companyRead &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Company {project.def.company.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
@@ -834,7 +899,7 @@ export default function TaskAdd( props ) {
                   </div>
                 </div>
               }
-              {userRights.pausalRead && userRights.pausalWrite && company && !company.monthly && !defaultFields.pausal.fixed &&
+              { userRights.pausalRead &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Pausal {project.def.pausal.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
@@ -845,7 +910,7 @@ export default function TaskAdd( props ) {
             </div>
 
             <div className="col-4">
-              { userRights.deadlineRead && userRights.deadlineWrite &&
+              { userRights.deadlineRead &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Starts at</Label>
                   <div className="col-9">
@@ -853,7 +918,7 @@ export default function TaskAdd( props ) {
                   </div>
                 </div>
               }
-              { userRights.deadlineRead && userRights.deadlineWrite &&
+              { userRights.deadlineRead &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Deadline</Label>
                   <div className="col-9">
@@ -861,7 +926,7 @@ export default function TaskAdd( props ) {
                   </div>
                 </div>
               }
-              { userRights.repeatRead && userRights.repeatWrite &&
+              { userRights.repeatRead &&
                 <Repeat
                   taskID={null}
                   repeat={repeat}
@@ -880,7 +945,7 @@ export default function TaskAdd( props ) {
                   addTask={true}
                   />
               }
-              { userRights.overtimeRead && userRights.overtimeWrite && !defaultFields.overtime.fixed &&
+              { userRights.overtimeRead &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Outside PH {project.def.overtime.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
@@ -939,15 +1004,15 @@ export default function TaskAdd( props ) {
             { layoutComponents.Project(true) }
           </div>
         </div>
-        { userRights.statusRead && !defaultFields.status.fixed && userRights.statusWrite &&
+        { userRights.statusRead &&
           <div className="form-selects-entry-column" >
-            <Label>Status {project.def.status.required && <span className="warning-big">*</span>}</Label>
+            <Label>Status<span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Status }
             </div>
           </div>
         }
-        { userRights.milestoneRead && userRights.milestoneWrite &&
+        { userRights.milestoneRead &&
           <div className="form-selects-entry-column" >
             <Label>Milestone</Label>
             <div className="form-selects-entry-column-rest" >
@@ -955,15 +1020,15 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.requesterRead && !defaultFields.requester.fixed &&  userRights.requesterWrite &&
+        { userRights.requesterRead &&
           <div className="form-selects-entry-column" >
-            <Label>Requester {project.def.requester.required && <span className="warning-big">*</span>}</Label>
+            <Label>Requester<span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Requester }
             </div>
           </div>
         }
-        { userRights.companyRead && !defaultFields.company.fixed && userRights.companyWrite &&
+        { userRights.companyRead &&
           <div className="form-selects-entry-column" >
             <Label>Company {project.def.company.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
@@ -979,7 +1044,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.deadlineRead && userRights.deadlineWrite &&
+        { userRights.deadlineRead &&
           <div className="form-selects-entry-column" >
             <Label>Starts at</Label>
             <div className="form-selects-entry-column-rest" >
@@ -987,7 +1052,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.deadlineRead && userRights.deadlineWrite &&
+        { userRights.deadlineRead &&
           <div className="form-selects-entry-column" >
             <Label>Deadline</Label>
             <div className="form-selects-entry-column-rest" >
@@ -995,7 +1060,7 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.repeatRead && userRights.repeatWrite &&
+        { userRights.repeatRead &&
           <Repeat
             taskID={null}
             repeat={repeat}
@@ -1014,7 +1079,7 @@ export default function TaskAdd( props ) {
             vertical={true}
             />
         }
-        { userRights.typeRead && userRights.typeWrite &&
+        { userRights.typeRead &&
           <div className="form-selects-entry-column" >
             <Label>Task Type {project.def.type.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
@@ -1022,17 +1087,17 @@ export default function TaskAdd( props ) {
             </div>
           </div>
         }
-        { userRights.pausalRead && userRights.pausalWrite && company && !company.monthly && !defaultFields.pausal.fixed &&
+        { userRights.pausalRead &&
           <div className="form-selects-entry-column" >
-            <Label>Pausal {project.def.pausal.required && <span className="warning-big">*</span>}</Label>
+            <Label>Pausal<span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Pausal }
             </div>
           </div>
         }
-        { userRights.overtimeRead && userRights.overtimeWrite && !defaultFields.overtime.fixed &&
+        { userRights.overtimeRead &&
           <div className="form-selects-entry-column" >
-            <Label>Outside PH {project.def.overtime.required && <span className="warning-big">*</span>}</Label>
+            <Label>Outside PH<span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Overtime }
             </div>

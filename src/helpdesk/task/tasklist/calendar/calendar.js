@@ -20,6 +20,7 @@ import {
 
 import CommandBar from '../components/commandBar';
 import Search from '../components/search';
+import renderScheduled from './renderScheduled';
 import ActiveSearch from '../components/activeSearch';
 import Pagination from '../components/pagination';
 import TaskEdit from 'helpdesk/task/edit';
@@ -92,6 +93,7 @@ export default function TaskCalendar( props ) {
     repeatTimesVariables,
     globalStringFilter,
     globalTaskSearch,
+    setScheduledDone,
   } = props;
 
   //TODO: AK repeat nacita svoje repeatTimes, existuje dovod preco nacitavat zvlast repeattimes? nezabudnut na podmienku ak je v range zacaitok alebo novy zaciatok
@@ -122,16 +124,22 @@ export default function TaskCalendar( props ) {
       end
     } = eventData;
     const newFakeID = fakeID--;
-    setFakeEvents( [ ...fakeEvents, expandScheduledEvent( createEventFromScheduled( {
+
+    setFakeEvents( [ ...fakeEvents, createEventFromScheduled( {
       id: newFakeID,
       task: draggedTask.task,
+      subtask: {
+        id: newFakeID,
+        title: '',
+        done: false,
+      },
       from: start.valueOf()
         .toString(),
       to: end.valueOf()
         .toString(),
       canEdit: false,
       type: 'scheduled',
-    } ) ) ] );
+    } ) ] );
     addScheduledWork( {
         variables: {
           taskId: draggedTask.task.id,
@@ -143,7 +151,7 @@ export default function TaskCalendar( props ) {
         }
       } )
       .then( ( response ) => {
-        setFakeEvents( [ ...fakeEvents.filter( ( event ) => event.id !== newFakeID ), expandScheduledEvent( createEventFromScheduled( response.data.addScheduledWork ) ) ] );
+        setFakeEvents( [ ...fakeEvents.filter( ( event ) => event.id !== newFakeID ), createEventFromScheduled( response.data.addScheduledWork ) ] );
       } )
       .catch( ( err ) => {
         setFakeEvents( fakeEvents.filter( ( event ) => event.id !== newFakeID ) )
@@ -164,13 +172,13 @@ export default function TaskCalendar( props ) {
     if ( fakeEvents.some( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === event.id ) ) {
       setFakeEvents( [
         ...fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'scheduled' || fakeEvent.id !== event.id ),
-        expandScheduledEvent( createEventFromScheduled( {
+        createEventFromScheduled( {
           ...fakeEvents.find( ( fakeEvent ) => fakeEvent.type === 'scheduled' && fakeEvent.id === event.id ),
           from: start.valueOf()
             .toString(),
           to: end.valueOf()
             .toString(),
-        } ) )
+        } )
       ] )
     } else {
       const scheduledWorks = client.readQuery( {
@@ -292,6 +300,14 @@ export default function TaskCalendar( props ) {
     onEventResize: ( e, fakeEvents ) => {
       onScheduledResizeOrDrop( e, fakeEvents );
     },
+    title: renderScheduled(
+      scheduledEvent.task,
+      new Date( parseInt( scheduledEvent.from ) ),
+      new Date( parseInt( scheduledEvent.to ) ),
+      scheduledEvent.canEdit,
+      scheduledEvent.subtask !== null ? scheduledEvent.subtask.done : scheduledEvent.workTrip.done,
+      ( done ) => setScheduledDone( scheduledEvent, done ),
+    ),
   } )
 
   const expandRepeatEvent = ( repeatEvent ) => ( {
@@ -346,10 +362,28 @@ export default function TaskCalendar( props ) {
 
   } );
 
+  const expandFakeEvent = ( fakeEvent ) => {
+    switch ( fakeEvent.type ) {
+      case 'scheduled': {
+        return expandScheduledEvent( fakeEvent );
+        break;
+
+      }
+      case 'repeatTime': {
+        return expandRepeatTimeEvent( fakeEvent );
+      }
+      default: {
+        break;
+      }
+
+    }
+  }
+
   const newScheduledEvents = scheduledEvents.map( expandScheduledEvent )
   const newRepeatEvents = repeatEvents.map( expandRepeatEvent )
   const newRepeatTimeEvents = repeatTimeEvents.map( expandRepeatTimeEvent )
-  const events = [ ...newScheduledEvents, ...newRepeatEvents, ...newRepeatTimeEvents, ...fakeEvents ]
+  const newFakeEvents = fakeEvents.map( expandFakeEvent )
+  const events = [ ...newScheduledEvents, ...newRepeatEvents, ...newRepeatTimeEvents, ...newFakeEvents ]
 
   const activeSearchHidden = (
     globalStringFilter === null ||
@@ -483,7 +517,16 @@ export default function TaskCalendar( props ) {
         } }
         />
 
-      <ModalTaskEdit opened={editedTask} taskID={ editedTask ? editedTask.id : null } closeModal={ () => setEditedTask(null) } />
+      <ModalTaskEdit
+        opened={editedTask}
+        taskID={ editedTask ? editedTask.id : null }
+        closeModal={ (vykazyUpdated) => {
+          setEditedTask(null);
+           if(vykazyUpdated){
+             refetchScheduled();
+           }
+        } }
+        />
 
     </div>
   );

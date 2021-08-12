@@ -316,9 +316,7 @@ export default function Rozpocet( props ) {
           <button className="btn-link"
             disabled={disabled}
             onClick={()=>{
-              if(window.confirm('Are you sure?')){
-                removeMaterial(material.id);
-              }
+              removeMaterial(material.id);
             }}>
             <i className="fa fa-times" />
           </button>

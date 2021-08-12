@@ -773,13 +773,32 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     {
       value: 'subtaskAssigned',
       label: 'Subtask assigned to',
-      type: 'user',
+      type: 'custom',
+      func: ( task ) => (
+        <div>
+          { task.subtasks.map((subtask) => (
+            <div key={subtask.id} className="m-r-5 m-t-5 p-l-5 p-r-5">
+              {console.log(subtask.assignedTo)}
+              { subtask.assignedTo ? `${subtask.assignedTo.fullName}` : '---'}
+            </div>
+          ))}
+        </div>
+      ),
       show: preference[ 'subtaskAssigned' ]
     },
     {
       value: 'subtasksHours',
       label: 'Hours',
-      type: 'int',
+      type: 'custom',
+      func: ( task ) => (
+        <div>
+          { task.subtasks.map((subtask) => (
+            <div key={subtask.id} className="m-r-5 m-t-5 p-l-5 p-r-5">
+              { subtask.quantity }
+            </div>
+          ))}
+        </div>
+      ),
       show: preference[ 'subtasksHours' ]
     },
 

@@ -25,6 +25,33 @@
   font-family: Segoe UI Semibold;
 }
 
+.segoe-semi-header{
+font-size: 14px;
+font-family: Segoe UI Semibold;
+
+}
+
+.segoe-semi-text-f{
+  font-size: 12px !important;
+  font-family: Segoe UI Semibold;
+  color: $color-link !important;
+}
+
+.segoe-blue-text, .segoe-blue-text::placeholder {
+  font-family: Segoe UI;
+  color: $color-link !important;
+}
+
+.t-a-c{
+  text-align: center;
+}
+.t-a-r{
+  text-align: right;
+}
+.t-a-l{
+  text-align: left;
+}
+
 .text-extra-slim {
   font-weight: 100;
 }

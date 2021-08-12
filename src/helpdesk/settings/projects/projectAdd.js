@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 import moment from 'moment';
 import Empty from 'components/Empty';
@@ -23,9 +24,6 @@ import {
   toSelItem,
   getMyData,
 } from 'helperFunctions';
-import {
-  fetchNetOptions
-} from "configs/constants/apollo";
 import {
   defList,
   defBool,
@@ -62,6 +60,7 @@ import {
 } from '../companies/queries';
 import {
   GET_BASIC_USERS,
+  USERS_SUBSCRIPTION,
 } from '../users/queries';
 import {
   GET_STATUS_TEMPLATES,
@@ -84,22 +83,41 @@ export default function ProjectAdd( props ) {
   const [ addProject, {
     client
   } ] = useMutation( ADD_PROJECT );
+
   const {
     data: statusesData,
     loading: statusesLoading
-  } = useQuery( GET_STATUS_TEMPLATES, fetchNetOptions );
+  } = useQuery( GET_STATUS_TEMPLATES, {
+    fetchPolicy: 'network-only'
+  } );
+
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_BASIC_COMPANIES, fetchNetOptions );
+  } = useQuery( GET_BASIC_COMPANIES, {
+    fetchPolicy: 'network-only'
+  } );
+
   const {
     data: usersData,
-    loading: usersLoading
-  } = useQuery( GET_BASIC_USERS, fetchNetOptions );
+    loading: usersLoading,
+    refetch: usersRefetch
+  } = useQuery( GET_BASIC_USERS, {
+    fetchPolicy: 'network-only'
+  } );
+
+  useSubscription( USERS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      usersRefetch()
+    }
+  } );
+
   const {
     data: taskTypesData,
     loading: taskTypesLoading
-  } = useQuery( GET_TASK_TYPES, fetchNetOptions );
+  } = useQuery( GET_TASK_TYPES, {
+    fetchPolicy: 'network-only'
+  } );
 
   const currentUser = getMyData();
 
@@ -690,7 +708,7 @@ export default function ProjectAdd( props ) {
               Fill in all the required information!
             </div>
           }
-          
+
           <button className={classnames(
               "btn",
               {"ml-auto": !(cannotSave && addTaskErrors)}

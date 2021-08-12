@@ -21,6 +21,10 @@
   height: 100% !important;
 }
 
+.min-height-400 {
+  min-height: 400px;
+}
+
 @function increment-by-5($i){
 	@return 0 + ($i * 5);
 }

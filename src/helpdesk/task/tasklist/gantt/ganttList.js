@@ -37,6 +37,7 @@ export default function TableList( props ) {
     localProject,
     displayValues,
     tasks,
+    totals,
     deleteTask,
     checkTask,
     currentUser,
@@ -404,26 +405,26 @@ export default function TableList( props ) {
         <div className="m-l-30 m-b-10">
           <h4>Práca</h4>
           <p>
-            Neschválených: { tasks.reduce( (acc, task) => acc + task.pendingSubtasksQuantity, 0 ) } hodín
+            Neschválených: { totals.pendingSubtasks } hodín
           </p>
           <p>
-            Schválenych: { tasks.reduce( (acc, task) => acc + task.approvedSubtasksQuantity, 0 ) } hodín
+            Schválenych: { totals.approvedSubtasks } hodín
           </p>
           <p>
-            Spolu: { tasks.reduce( (acc, task) => acc + task.pendingSubtasksQuantity + task.approvedSubtasksQuantity, 0 ) } hodín
+            Spolu: { totals.pendingSubtasks + totals.approvedSubtasks } hodín
           </p>
         </div>
 
         <div className="m-l-30 m-b-10">
           <h4>Materiál</h4>
           <p>
-            Neschválených: { tasks.reduce( (acc, task) => acc + task.pendingMaterialsPrice, 0 ) } EUR bez DPH
+            Neschválených: { totals.pendingMaterials } EUR bez DPH
           </p>
           <p>
-            Schválenych: { tasks.reduce( (acc, task) => acc + task.approvedMaterialsPrice, 0 ) } EUR bez DPH
+            Schválenych: { totals.approvedMaterials } EUR bez DPH
           </p>
           <p>
-            Spolu: { tasks.reduce( (acc, task) => acc + task.pendingMaterialsPrice + task.approvedMaterialsPrice, 0 ) } EUR bez DPH
+            Spolu: { totals.pendingMaterials + totals.approvedMaterials } EUR bez DPH
           </p>
         </div>
 

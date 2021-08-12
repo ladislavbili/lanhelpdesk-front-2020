@@ -171,6 +171,7 @@ export default function TaskEdit( props ) {
 
   const [ changes, setChanges ] = React.useState( {} );
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
+  const [ vykazyChanged, setVykazyChanged ] = React.useState( false );
 
   const invoicedTask = task.invoiced ? task.invoicedTasks[ 0 ] : null;
 
@@ -1106,7 +1107,7 @@ export default function TaskEdit( props ) {
             <button
               type="button"
               className="btn-link-cancel task-add-layout-button p-l-10 p-r-10 m-r-10"
-              onClick={closeModal}
+              onClick={() => closeModal(vykazyChanged)}
               >
               <i className="fa fa-times" style={{ fontSize: 25 }} />
             </button>
@@ -1270,24 +1271,6 @@ export default function TaskEdit( props ) {
   }
 
   const layoutComponents = {
-    Order: (
-      <input
-        className="form-control hidden-input"
-        placeholder="Set order"
-        value={ ganttOrder }
-        onChange={(e)=> {
-          setGanttOrder(e.target.value);
-        }}
-        onBlur={(e) => {
-          if(!isNaN(parseInt(ganttOrder))){
-            autoUpdateTask({ ganttOrder: parseInt(ganttOrder) })
-          }else{
-            autoUpdateTask({ ganttOrder: 0 })
-            setGanttOrder(0);
-          }
-        }}
-        />
-    ),
     Project: (
       <Select
         placeholder="Zadajte projekt"
@@ -1302,7 +1285,7 @@ export default function TaskEdit( props ) {
       <div>
         { (defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
           <div> {assignedTo.map((user) =>
-              <div className="disabled-info">{ user.label}</div>
+              <div className="disabled-info">{user.label}</div>
             )}
             { assignedTo.length === 0 &&
               <div className="message error-message">Úloha nepriradená</div>
@@ -1661,20 +1644,6 @@ export default function TaskEdit( props ) {
         <div className="">
           { inModal &&
             <div className="task-edit-buttons row m-b-10">
-              { userRights.important && false &&
-                <button
-                  type="button"
-                  style={{color: '#ffc107'}}
-                  disabled={ !userRights.important }
-                  className="btn-link btn-distance p-0"
-                  onClick={()=>{
-                    autoUpdateTask({ important: !important })
-                    setImportant(!important);
-                  }}
-                  >
-                  <i className={`fa${ important ? 's' : 'r' } fa-star`} />
-                </button>
-              }
               <span className="ml-auto">
 
                 { userRights.deleteTasks &&
@@ -1697,7 +1666,7 @@ export default function TaskEdit( props ) {
                 <button
                   type="button"
                   className="btn-link p-r-10"
-                  onClick={closeModal}
+                  onClick={() => closeModal(vykazyChanged)}
                   >
                   <i className="fa fa-times" style={{ fontSize: 25 }} />
                 </button>
@@ -2057,6 +2026,7 @@ export default function TaskEdit( props ) {
               saveVykazyChanges({...newSubtask, price}, 'subtask', 'ADD' );
             }else{
               addSubtaskFunc(newSubtask);
+              setVykazyChanged(true);
             }
           }}
           updateSubtask={(id,newData)=>{
@@ -2074,6 +2044,7 @@ export default function TaskEdit( props ) {
               saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
             }else{
               updateSubtaskFunc({...originalSubtask,...newData});
+              setVykazyChanged(true);
             }
           }}
           updateSubtasks={(multipleSubtasks)=>{
@@ -2094,6 +2065,7 @@ export default function TaskEdit( props ) {
                   null
                 }
                 updateSubtaskFunc({...originalSubtask,...newData});
+                setVykazyChanged(true);
               });
             }
           }}
@@ -2102,6 +2074,7 @@ export default function TaskEdit( props ) {
               saveVykazyChanges( id, 'subtask', 'DELETE' );
             }else{
               deleteSubtaskFunc(id);
+              setVykazyChanged(true);
             }
           }}
 
@@ -2112,6 +2085,7 @@ export default function TaskEdit( props ) {
               saveVykazyChanges( { ...newTrip, price }, 'trip', 'ADD' );
             }else{
               addWorkTripFunc(newTrip);
+              setVykazyChanged(true);
             }
           }}
           updateTrip={(id,newData)=>{
@@ -2129,6 +2103,7 @@ export default function TaskEdit( props ) {
               saveVykazyChanges( {id, newData}, 'trip', 'EDIT' );
             }else{
               updateWorkTripFunc({...originalTrip,...newData});
+              setVykazyChanged(true);
             }
           }}
           updateTrips={(multipleTrips)=>{
@@ -2156,6 +2131,7 @@ export default function TaskEdit( props ) {
                   null
                 }
                 updateWorkTripFunc({...originalTrip,...newData});
+                setVykazyChanged(true);
               });
             }
           }}
@@ -2164,6 +2140,7 @@ export default function TaskEdit( props ) {
               saveVykazyChanges( id, 'trip', 'DELETE' );
             }else{
               deleteWorkTripFunc(id);
+              setVykazyChanged(true);
             }
           }}
           />

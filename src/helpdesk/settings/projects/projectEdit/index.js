@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   useMutation,
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 import {
   toSelArr,
@@ -15,6 +16,7 @@ import {
 } from '../../companies/queries';
 import {
   GET_BASIC_USERS,
+  USERS_SUBSCRIPTION,
 } from '../../users/queries';
 import {
   GET_TASK_TYPES,
@@ -67,9 +69,16 @@ export default function ProjectEditLoader( props ) {
 
   const {
     data: usersData,
-    loading: usersLoading
+    loading: usersLoading,
+    refetch: usersRefetch
   } = useQuery( GET_BASIC_USERS, {
     fetchPolicy: 'network-only',
+  } );
+
+  useSubscription( USERS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      usersRefetch()
+    }
   } );
 
   const {

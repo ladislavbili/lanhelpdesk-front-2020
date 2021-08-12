@@ -1,0 +1,109 @@
+
+.form-container {
+  margin-bottom: 15px;
+}
+
+
+.form-lg-container {
+  margin-bottom: 35px;
+}
+
+.b-cl-form {
+  border-color: $muted-gray;
+}
+
+.form-body {
+  height: calc(#{$height-without-header} - 41px - 50px);
+}
+
+.form-body-highlighted {
+  position: relative;
+  height: calc(
+    100vh - 40px - #{$commandbar-height} - 40px - 60px
+  ); //header, commandbar, nadpis, buttons
+}
+
+
+.form-footer {
+  border-top: 1px solid $muted-gray;
+  background-color: white;
+  position: relative;
+  //bottom: 0;
+  width: 100%;
+  height: 50px;
+  padding-top: 10px;
+  padding-left: 20px;
+  padding-right: 40px;
+}
+
+.col-form-label {
+  font: $font-label;
+  color: $color-label;
+  line-height: 16px;
+  padding-top: 8px;
+  padding-bottom: none;
+}
+
+.col-form-label-3 {
+  font: $font-info-text;
+  color: $color-label;
+  line-height: 16px;
+  padding-top: 8px;
+  padding-bottom: none;
+}
+
+.col-form-label-description {
+  font: $font-task-description;
+  color: $color-task-description;
+  line-height: 16px;
+  padding-top: 8px;
+  padding-bottom: none;
+  margin-top: 10px;
+  margin-right: 20px;
+}
+
+.form {
+  background-color: $form-background-color;
+  //  max-width: 1284px;
+  border-radius: 0px;
+  padding: 0px;
+}
+
+.form-control {
+  font: $font-value;
+  color: $color-value;
+  border-radius: 0px;
+  box-shadow: none;
+  height: 30px; //calc(1.5em + .75rem + 4px);
+  border: $main-border;
+  outline: none;
+}
+
+.form-control-secondary {
+  font: $font-value;
+  color: $color-value;
+  border-radius: 0px;
+  box-shadow: none;
+  height: 30px; //calc(1.5em + .75rem + 4px);
+  border: $secondary-border;
+  outline: none;
+}
+
+.form-control:disabled {
+  background-color: inherit;
+  border: none;
+  cursor: default;
+}
+
+.form-control:focus,
+.form-control-secondary:focus {
+  box-shadow: none;
+  border-width: 1px;
+  border-color: $basic-button-color;
+}
+
+.form-control-warning:focus {
+  box-shadow: none;
+  border-width: 1px;
+  border-color: red;
+}

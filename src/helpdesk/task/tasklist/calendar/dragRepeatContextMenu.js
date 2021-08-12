@@ -19,7 +19,6 @@ export default function DragRepeatContextMenu( props ) {
     getFakeID,
     fakeEvents,
     setFakeEvents,
-    expandRepeatTimeEvent,
     createEventFromRepeatTime,
   } = props;
 
@@ -59,7 +58,7 @@ export default function DragRepeatContextMenu( props ) {
           setFakeEvents(
             [
               ...fakeEvents,
-              expandRepeatTimeEvent( createEventFromRepeatTime( {
+              createEventFromRepeatTime( {
                 id: newFakeID,
                 originalTrigger: time.toString(),
                 triggersAt: newDate.toString(),
@@ -67,7 +66,7 @@ export default function DragRepeatContextMenu( props ) {
                 task: null,
                 repeat,
                 type: 'repeatTime',
-              } ) )
+              } )
             ]
           );
           closeContextMenu();
@@ -79,7 +78,7 @@ export default function DragRepeatContextMenu( props ) {
             }
           })
             .then( ( response ) => {
-              setFakeEvents( [ ...fakeEvents.filter( ( event ) => event.id !== newFakeID ), expandRepeatTimeEvent( createEventFromRepeatTime( response.data.addRepeatTime ) ) ] );
+              setFakeEvents( [ ...fakeEvents.filter( ( event ) => event.id !== newFakeID ), createEventFromRepeatTime( response.data.addRepeatTime ) ] );
               repeatsRefetch();
             } )
             .catch( ( err ) => {
