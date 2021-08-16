@@ -1,3 +1,7 @@
+.popover > .arrow {
+  display: none;
+}
+
 .custom-popover {
   background-color: $content-background-color;
   min-width: 200px;

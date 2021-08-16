@@ -46,42 +46,32 @@ export default function RowTaskAddContainer( props ) {
     data: companiesData,
     loading: companiesLoading
   } = useQuery( GET_BASIC_COMPANIES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
   const {
     data: usersData,
     loading: usersLoading
   } = useQuery( GET_BASIC_USERS, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
   const {
     data: taskTypesData,
     loading: taskTypesLoading
   } = useQuery( GET_TASK_TYPES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
   const {
     data: tripTypesData,
     loading: tripTypesLoading
   } = useQuery( GET_TRIP_TYPES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
 
   const {
     data: projectsData,
     loading: projectsLoading
   } = useQuery( GET_MY_PROJECTS, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
 
   const {

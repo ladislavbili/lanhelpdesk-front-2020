@@ -1204,7 +1204,7 @@ export default function TaskEdit( props ) {
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
-                {closeDate?(timestampToString(pendingDate.valueOf())):''}
+                { closeDate ? (timestampToString(pendingDate.valueOf())) : '' }
               </span>
             ):
             (
@@ -1231,7 +1231,7 @@ export default function TaskEdit( props ) {
         status.action === 'Invoiced' ||
         status.action === 'CloseInvalid'
       ) ) {
-      const datepickerDisabled = !status || ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.statustatusWrite;
+      const datepickerDisabled = !status || ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.statusWrite;
       return (
         <div className="task-info ml-auto">
           <span className="center-hor">
@@ -1240,7 +1240,7 @@ export default function TaskEdit( props ) {
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
-                {closeDate?(timestampToString(closeDate.valueOf())):''}
+                { closeDate ? (timestampToString(closeDate.valueOf())) : '' }
               </span>
             ):
             (
@@ -1641,10 +1641,10 @@ export default function TaskEdit( props ) {
   const renderSelectsLayout2Side = () => {
     return (
       <div className={classnames("task-edit-right", {"w-250px": columns})}>
-        <div className="">
+        <div>
           { inModal &&
             <div className="task-edit-buttons row m-b-10">
-              <span className="ml-auto">
+              <span className="ml-auto center-hor">
 
                 { userRights.deleteTasks &&
                   <button
@@ -2384,7 +2384,7 @@ export default function TaskEdit( props ) {
 
               {canCreateVykazyError()}
 
-              { layout === 1 ? renderSelectsLayout1() : null }
+              { layout === 1 && renderSelectsLayout1() }
 
               { renderDescription() }
 

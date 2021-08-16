@@ -1,0 +1,26 @@
+.bottom-border {
+  border-bottom: 1px solid;
+  color: $muted-gray;
+}
+
+.b-0 {
+  border: 0px;
+}
+.b-1 {
+  border: 1px solid;
+}
+.b-r-0 {
+  border-radius: 0px;
+}
+
+.basic-border {
+  border: $main-border !important;
+}
+
+.secondary-border {
+  border: $secondary-border !important;
+}
+
+.basic-border-top {
+  border-top: $main-border;
+}

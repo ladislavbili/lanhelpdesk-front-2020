@@ -38,7 +38,7 @@ export default function Statuses( props ) {
 
   return (
     <div>
-      <h3 className="m-t-20 m-b-20"> Statuses  <span className="warning-big">*</span></h3>
+      <h3 className="m-b-20"> Statuses  <span className="warning-big">*</span></h3>
       <table className="table m-t-10 vykazyTable">
         <thead>
           <tr>

@@ -1,0 +1,32 @@
+input[type="datetime-local"]::-webkit-inner-spin-button,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+.react-datepicker__close-icon::after{
+  background-color: inherit;
+  color: #0078D7;
+  font-size: 20px;
+}
+
+.react-datepicker__time-container {
+  right: -85px !important;
+  top: -1px !important;
+}
+
+.public-filters > .react-datepicker-wrapper {
+  width: 50% !important;
+}
+
+.public-filters
+  > .react-datepicker-wrapper:nth-child(1)
+  > .react-datepicker__input-container {
+  width: 98% !important;
+}
+
+.public-filters
+  > .react-datepicker-wrapper:nth-child(2)
+  > .react-datepicker__input-container {
+  width: 100% !important;
+}

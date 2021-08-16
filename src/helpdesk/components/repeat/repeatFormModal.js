@@ -13,7 +13,7 @@ export default function RepeatFormModal( props ) {
   } = props;
 
   return (
-    <Modal isOpen={isOpen} className="task-add-container" >
+    <Modal isOpen={isOpen} className="repeat-form-container" >
       <ModalBody style={{ overflowY: 'visible' }}>
         { isOpen &&
           <RepeatLoader

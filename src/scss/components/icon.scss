@@ -4,3 +4,15 @@
 .icon-M {
   font-size: 1.2em;
 }
+.hidden-icon {
+  color: transparent;
+  background-color: inherit;
+}
+.hidden-icon:hover {
+  color: $basic-button-color;
+}
+.fa,
+.fas,
+.far {
+  padding-right: 5px;
+}

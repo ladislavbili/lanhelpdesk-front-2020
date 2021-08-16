@@ -715,11 +715,11 @@ export default function ProjectEdit( props ) {
         )}
         >
 
-        <h1 className={classnames({ "m-t-20": !setting },"m-b-20")} >
+        <h2 className="m-b-17" >
           Edit project
-        </h1>
+        </h2>
 
-        <Nav tabs className="b-0 m-b-10">
+        <Nav tabs className="b-0 m-b-25">
           <NavItem>
             <NavLink
               className={classnames({ active: openedTab === 'description'}, "clickable", "")}
@@ -750,12 +750,12 @@ export default function ProjectEdit( props ) {
           <TabPane tabId={'description'}>
             { myRights.projectPrimaryRead &&
               <Empty>
-                <FormGroup>
+                <FormGroup className="m-b-25">
                   <Label for="name">Project name<span className="warning-big">*</span></Label>
                   <Input
                     disabled={!myRights.projectPrimaryWrite}
                     type="text"
-                    className="medium-input m-b-35 m-t-15"
+                    className="medium-input m-t-15"
                     id="name"
                     placeholder="Enter project name"
                     value={title}
@@ -772,18 +772,15 @@ export default function ProjectEdit( props ) {
           </TabPane>
           { myRights.projectSecondary &&
             <TabPane tabId={'settings'}>
-              <div className="row">
-                <Checkbox
-                  className = "m-l-5 m-r-5"
-                  centerHor
-                  disabled={false}
-                  value = { autoApproved}
-                  onChange={() => setAutoApproved( !autoApproved) }
-                  />
-                <span className="clickable" onClick = { () => setAutoApproved( !autoApproved) }>
-                  All subtasks, work trips, materials and custom items are automatically approved.
-                </span>
-              </div>
+              <Checkbox
+                className="m-b-25"
+                labelClassName="normal-weight font-normal"
+                centerHor
+                disabled={false}
+                value={ autoApproved}
+                onChange={() => setAutoApproved( !autoApproved) }
+                label="All subtasks, work trips, materials and custom items are automatically approved."
+                />
               <Statuses
                 statuses={allStatuses}
                 addStatus={(newStatus) => {
@@ -854,52 +851,24 @@ export default function ProjectEdit( props ) {
                 }}
                 />
 
-              <div className="row">
-                <Checkbox
-                  className = "m-l-5 m-r-5"
-                  centerHor
-                  disabled={false}
-                  value = { lockedRequester}
-                  onChange={() => {
-                    setLockedRequester( !lockedRequester);
-                    setDataChanged( true );
-                  }}
-                  />
-                <span className="clickable" onClick = { () => {
-                    setLockedRequester( !lockedRequester);
-                    setDataChanged( true );
-                  } }>
-                  A requester can be only a user with rights to this project.
-                </span>
-              </div>
+              <Checkbox
+                className = "m-b-5 m-t-25"
+                labelClassName="normal-weight font-normal"
+                label="A requester can be only a user with rights to this project."
+                centerHor
+                disabled={false}
+                value = { lockedRequester}
+                onChange={() => {
+                  setLockedRequester( !lockedRequester);
+                  setDataChanged( true );
+                }}
+                />
 
               <Groups
                 addGroup={(newGroup) => {
                   setGroups([...groups, newGroup]);
                   setDataChanged( true );
                 }}
-                />
-
-              <UserGroups
-                addRight={ (userGroup) => {
-                  setUserGroups([...userGroups, userGroup]);
-                  setDataChanged( true );
-                }}
-                deleteRight={ (userGroup) => {
-                  setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
-                  setDataChanged( true );
-                }}
-                updateRight={ (userGroup) => {
-                  let newUserGroups = [...userGroups];
-                  let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
-                  newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
-                  setUserGroups(newUserGroups);
-                  setDataChanged( true );
-                }}
-                users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-                permissions={ userGroups }
-                isAdmin={ true }
-                groups={ toSelArr(groups) }
                 />
 
               <ProjectAcl
@@ -935,6 +904,28 @@ export default function ProjectEdit( props ) {
                   setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
                   setDataChanged( true );
                 }}
+                />
+
+              <UserGroups
+                addRight={ (userGroup) => {
+                  setUserGroups([...userGroups, userGroup]);
+                  setDataChanged( true );
+                }}
+                deleteRight={ (userGroup) => {
+                  setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+                  setDataChanged( true );
+                }}
+                updateRight={ (userGroup) => {
+                  let newUserGroups = [...userGroups];
+                  let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+                  newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+                  setUserGroups(newUserGroups);
+                  setDataChanged( true );
+                }}
+                users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+                permissions={ userGroups }
+                isAdmin={ true }
+                groups={ toSelArr(groups) }
                 />
 
               <ProjectDefaultValues

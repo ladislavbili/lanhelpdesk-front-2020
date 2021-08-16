@@ -71,7 +71,7 @@ export default function TaskAttachments( props ) {
         <div className="attachment-label">
           <label htmlFor={`uploadAttachment-${taskID}`} className="btn-link" >
             <i className="fa fa-plus" />
-            Attachment
+            Attachment          
           </label>
         </div>
       }

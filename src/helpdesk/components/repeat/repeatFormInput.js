@@ -43,7 +43,6 @@ export default function RepeatFormInput( props ) {
                   "No repeat"
                 }
               </button>
-              { triggeredAt && `Created at: ${timestampToString(parseInt(triggeredAt))}` }
             </div>
           </div>
         }
@@ -62,7 +61,6 @@ export default function RepeatFormInput( props ) {
                   "No repeat"
                 }
               </button>
-              { triggeredAt && `Created at: ${timestampToString(parseInt(triggeredAt))}` }
             </div>
           </div>
         }

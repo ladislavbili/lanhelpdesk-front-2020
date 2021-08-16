@@ -12,6 +12,7 @@ import DatePicker from 'components/DatePicker';
 import MultiSelect from 'components/MultiSelectNew';
 import Empty from 'components/Empty';
 import SimpleRepeat from 'helpdesk/components/repeat/simpleRepeat';
+import TagsPickerPopover from 'helpdesk/components/tags';
 import moment from 'moment';
 
 import Attachments from 'helpdesk/components/attachments';
@@ -91,7 +92,6 @@ export default function RepeatForm( props ) {
     users,
     taskTypes,
     tripTypes,
-    milestones,
     companies,
     defaultUnit,
     closeModal,
@@ -187,7 +187,7 @@ export default function RepeatForm( props ) {
     )
   );
 
-  const REQUESTERS = ( project && project.lockedRequester ? projectUsers : users );
+  const requesters = ( project && project.lockedRequester ? projectUsers : users );
 
   const setDefaults = ( project ) => {
     if ( project === null ) {
@@ -765,7 +765,7 @@ export default function RepeatForm( props ) {
   //data functions
   const changeProject = ( project ) => {
     setProject( project );
-    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.assignable && projectUser.user.id === user.id ) );
+    let newAssignedTo = assignedTo.filter( ( user ) => project.users.some( ( projectUser ) => projectUser.assignable && projectUser.user.id === user.id ) );
     setAssignedTo( newAssignedTo );
     setMilestone( noMilestone );
     setTags( [] );
@@ -872,27 +872,26 @@ export default function RepeatForm( props ) {
   //RENDERS
   const renderHeader = () => {
     return (
-      <div className="task-add-layout row">
-        <h2 className="center-hor p-r-20">{`${ !editMode ? 'Add repeat' : 'Edit repeat' }`}</h2>
-        <div className="ml-auto m-r-20">
-          <button
-            type="button"
-            className="btn-link task-add-layout-button btn-distance"
-            onClick={ () => setLayout( (layout === 1 ? 2 : 1) ) }>
-            <i className="fas fa-retweet "/>
-            Layout
-          </button>
-
+      <div className="task-edit-buttons row m-b-10 m-l-20 m-r-20 m-t-20">
+        <h2 className="center-hor">{`${ !editMode ? 'Add repeat' : 'Edit repeat' }`}</h2>
+        <span className="ml-auto">
           { editMode && userRights.repeatWrite &&
             <button
               type="button"
-              className="btn-link task-add-layout-button"
-              onClick={ deleteRepeatFunc }>
-              <i className="far fa-trash-alt "/>
-              Delete Repeat
+              className="btn-link-red btn-distance p-0"
+              onClick={deleteRepeatFunc}
+              >
+              <i className="far fa-trash-alt" />
             </button>
           }
-        </div>
+          <button
+            type="button"
+            className="btn-link p-r-10"
+            onClick={() => closeModal(wasSaved, wasDisabled)}
+            >
+            <i className="fa fa-times" style={{ fontSize: 25 }} />
+          </button>
+        </span>
 
       </div>
     )
@@ -900,83 +899,174 @@ export default function RepeatForm( props ) {
 
   const renderTitle = () => {
     return (
-      <div className="form-section">
-        <Label>Task name<span className="warning-big m-l-5">*</span> </Label>
-        <span className="form-section-rest">
-          <input type="text"
-            value={title}
-            className="task-title-input full-width form-control"
-            onChange={ (e) =>{ setTitle(e.target.value); saveChange({ title: e.target.value }); }}
-            placeholder="ENTER NEW TASK NAME" />
-        </span>
-        { status && userRights.statusRead &&
-          (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) &&
-          <div className="task-info-add ml-auto center-hor">
-            <span className="">
-              {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Close date: " : "PendingDate: "}
-            </span>
-            <DatePicker
-              className="form-control"
-              selected={(status.action==='CloseDate' || status.action==='CloseInvalid') ? closeDate : pendingDate }
-              disabled={userRights.statusWrite}
-              onChange={date => {
-                if (status.action==='CloseDate' || status.action==='CloseInvalid'){
-                  setCloseDate(date);
-                  saveChange({ closeDate: date });
-                } else {
-                  setPendingDate(date);
-                  saveChange({ pendingDate: date });
-                }
-              }}
-              placeholderText="No close date"
-              />
-          </div>
+      <div className="d-flex">
+        { userRights.important &&
+          <button
+            type="button"
+            style={{color: '#ffc107'}}
+            className="btn-link center-hor m-r-10"
+            onClick={()=>{
+              setImportant(!important);
+              saveChange({ important: !important });
+            }}
+            >
+            <i className={`fa${ important ? 's' : 'r' } fa-star`} style={{ fontSize: 25 }} />
+          </button>
         }
+        { editMode && <h2 className="center-hor">{originalRepeat.id}: </h2> }
+        <span className="center-hor flex m-r-15">
+          <input type="text"
+            disabled={ !userRights.taskTitleEdit }
+            value={title}
+            className="task-title-input text-extra-slim hidden-input form-control"
+            onChange={(e)=> {
+              setTitle(e.target.value);
+              saveChange({ title: e.target.value })
+            }}
+            placeholder="Enter task name"
+            />
+        </span>
       </div>
     );
   }
 
+  const renderStatusDate = () => {
+    if ( !userRights.statusRead || !status ) {
+      return null;
+    }
+
+    if ( status.action === 'PendingDate' ) {
+      const datepickerDisabled = !userRights.statusWrite || !pendingChangable;
+      return (
+        <div className="task-info ml-auto">
+          <span className="center-hor">
+            Pending date:
+          </span>
+          { datepickerDisabled ?
+            (
+              <span className="bolder center-hor m-l-3">
+                { closeDate ? (timestampToString(pendingDate.valueOf())) : '' }
+              </span>
+            ):
+            (
+              <DatePicker
+                className="form-control hidden-input bolder"
+                selected={pendingDate}
+                disabled={datepickerDisabled}
+                onChange={ (date) => {
+                  setPendingDate(date);
+                  if(date.valueOf() !== null){
+                    saveChange({pendingDate: date.valueOf().toString()});
+                  }
+                }}
+                placeholderText="No pending date"
+                />
+            )
+          }
+        </div>
+      )
+    }
+
+    if (
+      status.action === 'CloseDate' ||
+      status.action === 'Invoiced' ||
+      status.action === 'CloseInvalid'
+    ) {
+      const datepickerDisabled = ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.statusWrite;
+      return (
+        <div className="task-info ml-auto">
+          <span className="center-hor">
+            Closed at:
+          </span>
+          { datepickerDisabled ?
+            (
+              <span className="bolder center-hor m-l-3">
+                { closeDate ? (timestampToString(closeDate.valueOf())) : '' }
+              </span>
+            ):
+            (
+              <DatePicker
+                className="form-control hidden-input bolder"
+                selected={closeDate}
+                disabled={datepickerDisabled}
+                onChange={date => {
+                  setCloseDate(date);
+                  if(date.valueOf() !== null){
+                    saveChange({closeDate: date.valueOf().toString()});
+                  }
+                }}
+                placeholderText="No pending date"
+                />
+            )
+          }
+        </div>
+      )
+    }
+    return null;
+  }
+
   const layoutComponents = {
-    Project: () => (
+    Project: (
       <Select
         placeholder="Zadajte projekt"
         value={project}
         onChange={changeProject}
         options={projects.filter((project) => currentUser.role.level === 0 || (project.right.addTasks && project.right.repeatWrite ) )}
-        styles={pickSelectStyle( [ 'invisible', 'required' ] )}
+        styles={pickSelectStyle([ 'noArrow', 'required', ])}
         />
     ),
     Assigned: (
-      <Select
-        placeholder="Select required"
-        value={assignedTo}
-        isDisabled={ defaultFields.assignedTo.fixed || !userRights.assignedWrite }
-        isMulti
-        onChange={(users)=> {
-          setAssignedTo(users);
-          saveChange({ assignedTo: users.map((user) => user.id) })
-        }}
-        options={projectUsers}
-        styles={pickSelectStyle( [ 'invisible', 'required' ] )}
-        />
+      <div>
+        { (defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
+          <div>
+            { assignedTo.map((user) => (
+              <div className="disabled-info">{user.label}</div>
+            ) )}
+            { assignedTo.length === 0 &&
+              <div className="message error-message">Úloha nepriradená</div>
+            }
+          </div>
+        }
+        { userRights.assignedWrite &&
+          <Select
+            value={assignedTo}
+            placeholder="Select reccomended"
+            isMulti
+            isDisabled={defaultFields.assignedTo.fixed || !userRights.assignedWrite}
+            onChange={(users)=> {
+              setAssignedTo(users);
+              saveChange({ assignedTo: users.map((user) => user.id) })
+            }}
+            options={projectUsers}
+            styles={pickSelectStyle( [ 'noArrow', ] )}
+            />
+        }
+      </div>
     ),
     Status: (
-      <Select
-        placeholder="Select required"
-        value={status}
-        isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
-        styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
-        onChange={changeStatus}
-        options={project ? toSelArr(project.statuses.filter((status) => status.action.toLowerCase() !== 'invoiced' )) : []}
-        />
+      <div>
+        { (defaultFields.status.fixed || !userRights.statusWrite ) &&
+          <div className="disabled-info">{status ? status.label : "None"}</div>
+        }
+        { !defaultFields.status.fixed && userRights.statusWrite &&
+          <Select
+            placeholder="Status required"
+            value={status}
+            isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
+            styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
+            onChange={ changeStatus }
+            options={(project ? toSelArr(project.statuses) : []).filter( (status) => status.action !== 'Invoiced' )}
+            />
+        }
+      </div>
     ),
     Type: (
       <Select
-        placeholder="Select task type"
+        placeholder="Zadajte typ"
         value={taskType}
         isDisabled={ defaultFields.type.fixed || !userRights.typeWrite }
-        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
-        onChange={(taskType)=> {
+        styles={ pickSelectStyle( [ 'noArrow', defaultFields.type.required ? 'required' : ''] ) }
+        onChange={ (taskType) => {
           setTaskType(taskType);
           saveChange({ taskType: taskType.id })
         }}
@@ -984,84 +1074,125 @@ export default function RepeatForm( props ) {
         />
     ),
     Milestone: (
-      <Select
-        isDisabled={!userRights.milestoneWrite}
-        placeholder="None"
-        value={milestone}
-        onChange={changeMilestone}
-        options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-        styles={ pickSelectStyle( [ 'noArrow', ] ) }
-        />
+      <div>
+        { !userRights.milestoneWrite &&
+          <div className="disabled-info">{milestone ? milestone.label : "None"}</div>
+        }
+        { userRights.milestoneWrite &&
+          <Select
+            isDisabled={!userRights.milestoneWrite}
+            value={milestone}
+            onChange={changeMilestone}
+            options={ project ? [noMilestone, ...toSelArr(project.milestones)] : [noMilestone] }
+            styles={pickSelectStyle( [ 'noArrow', ] )}
+            />
+        }
+      </div>
     ),
     Requester: (
-      <Select
-        value={requester}
-        placeholder="Select required"
-        isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
-        onChange={(requester)=>{
-          setRequester(requester);
-          if(!editMode){
-            const newCompany = companies.find((company) => company.id === requester.id );
-            setCompany(newCompany);
-          }
-          saveChange({
-            requester: requester.id
-          })
-        }}
-        options={REQUESTERS}
-        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
-        />
+      <div>
+        { (defaultFields.requester.fixed || !userRights.requesterWrite) &&
+          <div className="disabled-info">{requester ? requester.label : "None"}</div>
+        }
+        { !defaultFields.requester.fixed && userRights.requesterWrite &&
+          <Select
+            placeholder="Zadajte žiadateľa"
+            value={requester}
+            isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
+            onChange={(requester)=>{
+              setRequester(requester);
+              if(!editMode){
+                const newCompany = companies.find((company) => company.id === requester.id );
+                setCompany(newCompany);
+              }
+              saveChange({
+                requester: requester.id
+              })
+            }}
+            options={requesters}
+            styles={ pickSelectStyle([ 'noArrow', 'required', ])}
+            />
+        }
+      </div>
     ),
     Company: (
-      <Select
-        value={company}
-        placeholder="Select required"
-        isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
-        onChange={(company)=> {
-          setCompany(company);
-          setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
-          saveChange({
-            requester: company.id,
-            pausal: company.monthly
-          })
-        }}
-        options={companies}
-        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
-        />
+      <div>
+        { (defaultFields.company.fixed || !userRights.companyWrite) &&
+          <div className="disabled-info">{company ? company.label : "None"}</div>
+        }
+        { !defaultFields.company.fixed && userRights.companyWrite &&
+          <Select
+            placeholder="Zadajte firmu"
+            value={company}
+            isDisabled={defaultFields.company.fixed || !userRights.companyWrite}
+            onChange={(company)=> {
+              setCompany(company);
+              setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
+              saveChange({
+                requester: company.id,
+                pausal: company.monthly
+              })
+            }}
+            options={companies}
+            styles={pickSelectStyle([ 'noArrow', 'required', ])}
+            />
+        }
+      </div>
     ),
     Pausal: (
-      <Select
-        value={pausal}
-        placeholder="Select required"
-        isDisabled={ !userRights.pausalWrite || !company || company.monthly || defaultFields.pausal.fixed}
-        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
-        onChange={(pausal)=> { setPausal(pausal); saveChange({ pausal: pausal.value }) }}
-        options={booleanSelects}
-        />
+      <div>
+        { (!userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed || parseInt(company.taskWorkPausal) < 0) &&
+          <div className="disabled-info">{ pausal ? pausal.label : "None" }</div>
+        }
+        { userRights.pausalWrite && company && company.monthly && (parseInt(company.taskWorkPausal) >= 0) && !defaultFields.pausal.fixed &&
+          <Select
+            value={company && parseInt(company.taskWorkPausal) === 0 && pausal.value === false ? {...pausal, label: pausal.label + " (nezmluvný)"} : pausal }
+            isDisabled={!userRights.pausalWrite || !company || !company.monthly || parseInt(company.taskWorkPausal) < 0 || defaultFields.pausal.fixed}
+            styles={pickSelectStyle([ 'noArrow', 'required', ]) }
+            onChange={(pausal)=> { setPausal(pausal); saveChange({ pausal: pausal.value }) }}
+            options={booleanSelects}
+            />
+        }
+      </div>
     ),
     Deadline: (
-      <DatePicker
-        className={classnames("form-control")}
-        selected={deadline}
-        disabled={!userRights.deadlineWrite}
-        onChange={date => {
-          setDeadline(date);
-          if( date.valueOf() !== null ){
-            saveChange({ deadline: date.valueOf().toString() })
-          }
-        }}
-        placeholderText="No deadline"
-        />
+      <div>
+        { !userRights.deadlineWrite &&
+          <div className="disabled-info">{deadline}</div>
+        }
+        { userRights.deadlineWrite &&
+          <DatePicker
+            className={classnames("form-control")}
+            selected={deadline}
+            disabled={!userRights.deadlineWrite}
+            hideTime
+            isClearable
+            onChange={date => {
+              setDeadline(date);
+              if( date.valueOf() !== null ){
+                saveChange({ deadline: date.valueOf().toString() })
+              }
+            }}
+            placeholderText="No deadline"
+            />
+        }
+      </div>
     ),
     Overtime: (
-      <Select
-        placeholder="Select required"
-        value={overtime}
-        isDisabled={ !userRights.overtimeWrite || defaultFields.overtime.fixed}
-        styles={ pickSelectStyle( [ 'invisible', 'required' ] ) }
-        onChange={(overtime) => { setOvertime(overtime); saveChange({ overtime: pausal.value }); }}
-        options={booleanSelects}
-        />
+      <div>
+        { (!userRights.overtimeWrite || defaultFields.overtime.fixed) &&
+          <div className="disabled-info">{overtime.label}</div>
+        }
+        { userRights.overtimeWrite && !defaultFields.overtime.fixed &&
+          <Select
+            value={overtime}
+            isDisabled={!userRights.overtimeWrite || defaultFields.overtime.fixed}
+            styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
+            onChange={(overtime) => { setOvertime(overtime); saveChange({ overtime: pausal.value }); }}
+            options={booleanSelects}
+            />
+        }
+      </div>
     ),
   }
 
@@ -1075,7 +1206,7 @@ export default function RepeatForm( props ) {
               <div className="row p-r-10">
                 <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
                 <div className="col-9">
-                  { layoutComponents.Project() }
+                  { layoutComponents.Project }
                 </div>
               </div>
             </div>
@@ -1094,8 +1225,6 @@ export default function RepeatForm( props ) {
           <div className="row">
             <div className="col-4">
               {userRights.statusRead &&
-                !defaultFields.status.fixed &&
-                userRights.statusWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Status <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1105,7 +1234,6 @@ export default function RepeatForm( props ) {
               }
 
               { userRights.typeRead &&
-                userRights.typeWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Typ</Label>
                   <div className="col-9">
@@ -1114,7 +1242,6 @@ export default function RepeatForm( props ) {
                 </div>
               }
               { userRights.milestoneRead &&
-                userRights.milestoneWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Milestone</Label>
                   <div className="col-9">
@@ -1126,8 +1253,6 @@ export default function RepeatForm( props ) {
 
             <div className="col-4">
               {userRights.requesterRead &&
-                !defaultFields.requester.fixed &&
-                userRights.requesterWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Zadal <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1136,8 +1261,6 @@ export default function RepeatForm( props ) {
                 </div>
               }
               {userRights.companyRead &&
-                !defaultFields.company.fixed &&
-                userRights.companyWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Firma <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1146,10 +1269,6 @@ export default function RepeatForm( props ) {
                 </div>
               }
               {userRights.pausalRead &&
-                userRights.pausalWrite &&
-                company &&
-                !company.monthly &&
-                !defaultFields.pausal.fixed &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Paušál <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1161,7 +1280,6 @@ export default function RepeatForm( props ) {
 
             <div className="col-4">
               { userRights.deadlineRead &&
-                userRights.deadlineWrite &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Deadline</Label>
                   <div className="col-9">
@@ -1181,8 +1299,6 @@ export default function RepeatForm( props ) {
                   />
               }
               { userRights.overtimeRead &&
-                userRights.overtimeWrite &&
-                !defaultFields.overtime.fixed &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">Mimo PH <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1203,7 +1319,7 @@ export default function RepeatForm( props ) {
       <div className="col-12 row task-edit-align-select-labels">
         <div className="col-2">
           <Label className="col-form-label">Projekt</Label>
-          { layoutComponents.Project() }
+          { layoutComponents.Project }
         </div>
         { userRights.statusRead &&
           <div className="col-2" >
@@ -1235,16 +1351,14 @@ export default function RepeatForm( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className="task-edit-right p-b-20">
+      <div className="task-edit-right p-b-20 m-t-0">
         <div className="form-selects-entry-column" >
           <Label>Project <span className="warning-big">*</span></Label>
           <div className="form-selects-entry-column-rest" >
-            { layoutComponents.Project(true) }
+            { layoutComponents.Project }
           </div>
         </div>
         { userRights.statusRead &&
-          !defaultFields.status.fixed &&
-          userRights.statusWrite &&
           <div className="form-selects-entry-column" >
             <Label>Status <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -1253,7 +1367,6 @@ export default function RepeatForm( props ) {
           </div>
         }
         { userRights.milestoneRead &&
-          userRights.milestoneWrite &&
           <div className="form-selects-entry-column" >
             <Label>Milestone</Label>
             <div className="form-selects-entry-column-rest" >
@@ -1262,8 +1375,6 @@ export default function RepeatForm( props ) {
           </div>
         }
         { userRights.requesterRead &&
-          !defaultFields.requester.fixed &&
-          userRights.requesterWrite &&
           <div className="form-selects-entry-column" >
             <Label>Requester <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -1272,8 +1383,6 @@ export default function RepeatForm( props ) {
           </div>
         }
         { userRights.companyRead &&
-          !defaultFields.company.fixed &&
-          userRights.companyWrite &&
           <div className="form-selects-entry-column" >
             <Label>Company <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -1290,7 +1399,6 @@ export default function RepeatForm( props ) {
           </div>
         }
         { userRights.deadlineRead &&
-          userRights.deadlineWrite &&
           <div className="form-selects-entry-column" >
             <Label>Deadline</Label>
             <div className="form-selects-entry-column-rest" >
@@ -1309,7 +1417,6 @@ export default function RepeatForm( props ) {
             />
         }
         { userRights.typeRead &&
-          userRights.typeWrite &&
           <div className="form-selects-entry-column" >
             <Label>Task Type</Label>
             <div className="form-selects-entry-column-rest" >
@@ -1318,10 +1425,6 @@ export default function RepeatForm( props ) {
           </div>
         }
         { userRights.pausalRead &&
-          userRights.pausalWrite &&
-          company &&
-          !company.monthly &&
-          !defaultFields.pausal.fixed &&
           <div className="form-selects-entry-column" >
             <Label>Pausal <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -1330,8 +1433,6 @@ export default function RepeatForm( props ) {
           </div>
         }
         { userRights.overtimeRead &&
-          userRights.overtimeWrite &&
-          !defaultFields.overtime.fixed &&
           <div className="form-selects-entry-column" >
             <Label>Outside PH <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
@@ -1346,31 +1447,20 @@ export default function RepeatForm( props ) {
   const renderMultiSelectTags = () => {
     return (
       <Empty>
+        <span className="m-l-10"/>
         { userRights.tagsWrite &&
-          <div className="row center-hor">
-            <button className="btn-link p-b-10" id="repeat-multiselect-tags" onClick={ () => setTagsOpen(true) } >
-              <i className="fa fa-plus" />
-              Tags
-            </button>
-            <MultiSelect
-              className="center-hor"
-              disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
-              direction="right"
-              style={{}}
-              header="Select tags for this task"
-              target="repeat-multiselect-tags"
-              closeMultiSelect={() => { setTagsOpen(false) }}
-              open={tagsOpen}
-              items={toSelArr(project === null ? [] : project.tags)}
-              selected={tags}
-              onChange={ (tags) => { setTags(tags); saveChange({ tags: tags.map((tag) => tag.id ) }) }}
-              />
-          </div>
+          <TagsPickerPopover
+            taskID={`repeat-${ editMode ? originalRepeat.id : 'add' }`}
+            disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
+            items={toSelArr(project === null ? [] : project.tags)}
+            className="center-hor"
+            selected={tags}
+            onChange={ (tags) => { setTags(tags); saveChange({ tags: tags.map((tag) => tag.id ) }) }}
+            />
         }
 
-        {
-          userRights.tagsRead && tags
-          .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+        { userRights.tagsRead &&
+          tags.sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
           .map( ( tag ) => (
             <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} key={tag.id} className="m-r-5 p-l-5 p-r-5">
               {tag.title}
@@ -1380,7 +1470,6 @@ export default function RepeatForm( props ) {
       </Empty>
     )
   }
-
 
   const renderDescription = () => {
     if ( !userRights.taskDescriptionRead && !userRights.taskAttachmentsRead ) {
@@ -1724,21 +1813,21 @@ export default function RepeatForm( props ) {
           {closeModal &&
             <button className="btn-link-cancel m-l-20" onClick={() => closeModal(wasSaved, wasDisabled)}>Cancel</button>
           }
-            { newStartsAt &&
-              <span className="text-muted">
-                New Repeat time has been loaded, you can just save the changes or edit repeat!
+          { newStartsAt &&
+            <span className="text-muted">
+              New Repeat time has been loaded, you can just save the changes or edit repeat!
             </span>
-            }
+          }
           <div className="row pull-right">
-          {canCreateVykazyError()}
-          <button
-            className="btn"
-            disabled={ cantSave }
-            onClick={ triggerSave }
-            >
-            { editMode ? 'Update repeat' : 'Create repeat' }
-          </button>
-        </div>
+            {canCreateVykazyError()}
+            <button
+              className="btn"
+              disabled={ cantSave }
+              onClick={ triggerSave }
+              >
+              { editMode ? 'Update repeat' : 'Create repeat' }
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -1760,7 +1849,7 @@ export default function RepeatForm( props ) {
   }
 
   return (
-    <div style={{backgroundColor: "#f9f9f9"}}>
+    <div>
       {renderHeader()}
       <div
         className={classnames(
@@ -1773,14 +1862,16 @@ export default function RepeatForm( props ) {
         <div
           className={classnames(
             {
-              "task-edit-left": layout === 2
-            },
-            {
+              "task-edit-left": layout === 2,
               "task-edit-left-columns": layout !== 2
-            }
+            },
+            'm-t-0'
           )}>
 
           { renderTitle() }
+
+          { layout === 2 && <hr className="m-t-5 m-b-18"/> }
+          { renderStatusDate() }
 
           { layout === 1 && renderSelectsLayout1()  }
 

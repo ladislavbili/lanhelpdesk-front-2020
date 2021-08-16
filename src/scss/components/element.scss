@@ -35,7 +35,41 @@ h4 {
   font-family: Segoe UI Semibold;
 }
 
+//Label
+
 Label {
   font: $font-label;
   color: $color-label;
+}
+
+.label {
+  border-radius: 0px;
+  background-color: $basic-button-color;
+  font: $font-label;
+  color: $color-label;
+}
+
+.label-event {
+  background-color: inherit;
+  color: rgb(155, 155, 155);
+}
+
+.label-info {
+  font: $font-info-text;
+  color: white;
+  display: inline;
+  padding: 0.1em 0.3em 0.1em;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+.attribute-label {
+  color: $muted-font-color !important;
+}
+
+hr {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }

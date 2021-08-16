@@ -14,6 +14,7 @@ import Repeat from './repeatFormModal';
 
 import {
   GET_PROJECT,
+  GET_MILESTONE,
 } from 'apollo/localSchema/queries';
 
 import {
@@ -37,11 +38,17 @@ export default function RepeatList( props ) {
   } = useQuery( GET_PROJECT );
 
   const {
+    data: milestoneData,
+    loading: milestoneLoading
+  } = useQuery( GET_MILESTONE );
+
+  const {
     data: repeatsData,
     loading: repeatsLoading
   } = useQuery( GET_REPEATS, {
     variables: {
-      projectId: projectData.localProject.id
+      projectId: projectData.localProject.id,
+      milestoneId: milestoneData.localMilestone.id,
     },
     fetchPolicy: 'network-only',
   } );

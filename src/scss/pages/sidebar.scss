@@ -1,0 +1,15 @@
+.sidebar-btn,
+.sidebar-btn:hover,
+.sidebar-btn:active,
+.sidebar-btn:focus:active,
+.sidebar-btn:focus {
+  width: calc(100% - 30px);
+  color: white;
+  margin: 1em 15px 0px 15px;
+  padding-left: 10px;
+  height: $button-height;
+  text-align: left;
+  border-radius: 0px;
+  background-color: $basic-button-color;
+  border: none;
+}

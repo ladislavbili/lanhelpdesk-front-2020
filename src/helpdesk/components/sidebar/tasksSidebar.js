@@ -452,8 +452,11 @@ export default function TasksSidebar( props ) {
                 return;
               }
               setMilestone(milestone);
-              history.push(`${match.url}`);
-
+              if(!repeatPage){
+                history.push(URLprefix);
+              }else{
+                history.push(`/helpdesk/repeats`)
+              }
             }}
             />
         </div>

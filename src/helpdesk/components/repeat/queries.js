@@ -198,9 +198,11 @@ query repeat($id: Int){
 export const GET_REPEATS = gql `
 query (
   $projectId: Int
+    $milestoneId: Int
 ) {
   repeats(
     projectId: $projectId
+      milestoneId: $milestoneId
   ) {
     id
     repeatEvery

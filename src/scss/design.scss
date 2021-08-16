@@ -67,230 +67,37 @@
   cursor: not-allowed;
 }
 
-.bottom-border {
-  border-bottom: 1px solid;
-  color: $muted-gray;
-}
-
-.b-0 {
-  border: 0px;
-}
-.b-1 {
-  border: 1px solid;
-}
-.b-r-0 {
-  border-radius: 0px;
-}
-
-
 .bring-to-front {
   position: relative;
   z-index: 99999 !important;
-}
-
-
-.basic-border {
-  border: $main-border !important;
-}
-
-.secondary-border {
-  border: $secondary-border !important;
-}
-
-.basic-border-top {
-  border-top: $main-border;
 }
 
 //---------------END-všeobecné-atribúty-----------------
 
 //---------------všeobecné-elementy---------------------
 
-.sidebar-btn,
-.sidebar-btn:hover,
-.sidebar-btn:active,
-.sidebar-btn:focus:active,
-.sidebar-btn:focus {
-  width: calc(100% - 30px);
-  color: white;
-  margin: 1em 15px 0px 15px;
-  padding-left: 10px;
-  height: $button-height;
-  text-align: left;
-  border-radius: 0px;
-  background-color: $basic-button-color;
-  border: none;
-}
 
-.hidden-icon {
-  color: transparent;
-  background-color: inherit;
-}
+
+
 
 .transparent-background {
   background-color: inherit;
 }
 
-.hidden-icon:hover {
-  color: $basic-button-color;
-}
-
-.fa,
-.fas,
-.far {
-  padding-right: 5px;
-}
-
-.label {
-  border-radius: 0px;
-  background-color: $basic-button-color;
-  font: $font-label;
-  color: $color-label;
-}
-
-.label-event {
-  background-color: inherit;
-  color: rgb(155, 155, 155);
-}
-
-.label-info {
-  font: $font-info-text;
-  color: white;
-  display: inline;
-  padding: 0.1em 0.3em 0.1em;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-}
-
-.attribute-label {
-  color: $muted-font-color !important;
-}
 
 
 
 
 
-.popover > .arrow {
-  display: none;
-}
-
-
-.react-datepicker__close-icon::after{
-  background-color: inherit;
-  color: #0078D7;
-  font-size: 20px;
+.repeat-form-container {
+  @extend .task-add-container;
+  .modal-body {    
+    background-color: #eaeaea;
+  }
 }
 
 .tag {
   margin-right: 5px;
-}
-
-
-
-.breadcrum-bar {
-  width: 68%;
-}
-
-.breadcrum-bar > div {
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.breadcrum-bar > div > h2:last-child {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.comment:nth-child(2) {
-  background-color: $form-background-color;
-}
-
-hr {
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
-
-.table > tbody > tr:hover {
-  //background-color: ; //#f4f8fb;
-}
-
-th {
-  font-size: 12px;
-  font-weight: 500;
-}
-/*th:nth-child(2){
-font-size: 14px;
-font-family: Segoe UI Semibold;
-color: #333;
-}*/
-th:last-child {
-  margin-left: auto;
-}
-
-td {
-  color: $contrasting-font-color;
-}
-
-.tr-no-lines > th {
-  border-bottom: 0px solid $table-lines !important;
-}
-.tr-no-lines > td {
-  border-top: 0px solid $table-lines !important;
-}
-.tr-no-lines {
-  border: 0px !important;
-}
-
-.table > tbody > tr > td,
-.table > tbody > tr > th,
-.table > tfoot > tr > td,
-.table > tfoot > tr > th,
-.table > thead > tr > td,
-.table > thead > tr > th {
-  //    border-top: 0px solid #ddd;
-}
-
-.table > tbody > tr.active > td,
-.table > tbody > tr.active > th,
-.table > tbody > tr > td.active,
-.table > tbody > tr > th.active,
-.table > tfoot > tr.active > td,
-.table > tfoot > tr.active > th,
-.table > tfoot > tr > td.active,
-.table > tfoot > tr > th.active,
-.table > thead > tr.active > td,
-.table > thead > tr.active > th,
-.table > thead > tr > td.active,
-.table > thead > tr > th.active {
-  background-color: $sidebar-item-color;
-}
-
-.table-hover > tbody > tr.active:hover > td,
-.table-hover > tbody > tr.active:hover > th,
-.table-hover > tbody > tr:hover > .active,
-.table-hover > tbody > tr > td.active:hover,
-.table-hover > tbody > tr > th.active:hover {
-  background-color: $sidebar-item-color;
-}
-
-.table-checkbox {
-  padding-top: 15px !important;
-  padding-right: 0px;
-}
-
-
-
-.hidden-input {
-  background-color: inherit;
-  border-width: 1px;
-  border-color: transparent;
-  border-radius: 0px;
-  box-shadow: none;
-  width: 100%;
-  font: $font-value;
-  color: $color-value;
 }
 
 .hidden-input {
@@ -458,26 +265,7 @@ td {
   background-color: $row-highlighted-background;
 }
 
-.public-filters > .react-datepicker-wrapper {
-  width: 50% !important;
-}
 
-.public-filters
-  > .react-datepicker-wrapper:nth-child(1)
-  > .react-datepicker__input-container {
-  width: 98% !important;
-}
-
-.public-filters
-  > .react-datepicker-wrapper:nth-child(2)
-  > .react-datepicker__input-container {
-  width: 100% !important;
-}
-
-.react-datepicker__time-container {
-  right: -85px !important;
-  top: -1px !important;
-}
 
 .input-error {
   border-color: #f19a9aed;
@@ -947,7 +735,7 @@ td {
     margin-top: 0.5em;
     }
 
-.popover{
+.popover {
   display: none;
 }
 
@@ -1125,12 +913,6 @@ td {
 
 .sidebar-filter-row {
   margin: 0px 0px !important;
-}
-
-input[type="datetime-local"]::-webkit-inner-spin-button,
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  display: none;
-  -webkit-appearance: none;
 }
 
 .sidebar-filter-row > label {
@@ -1525,7 +1307,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 
 .medium-input {
-  font-size: 2.5rem;
+  font-size: 2rem;
   height: auto;
 }
 

@@ -68,36 +68,28 @@ export default function TaskAddContainer( props ) {
     loading: companiesLoading,
     refetch: companiesRefetch,
   } = useQuery( GET_BASIC_COMPANIES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
   const {
     data: usersData,
     loading: usersLoading,
     refetch: usersRefetch,
   } = useQuery( GET_BASIC_USERS, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
   const {
     data: taskTypesData,
     loading: taskTypesLoading,
     refetch: taskTypesRefetch,
   } = useQuery( GET_TASK_TYPES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
   const {
     data: tripTypesData,
     loading: tripTypesLoading,
     refetch: tripTypesRefetch,
   } = useQuery( GET_TRIP_TYPES, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
 
   const {
@@ -105,9 +97,7 @@ export default function TaskAddContainer( props ) {
     loading: projectsLoading,
     refetch: projectsRefetch,
   } = useQuery( GET_MY_PROJECTS, {
-    options: {
-      fetchPolicy: 'network-only'
-    }
+    fetchPolicy: 'network-only'
   } );
 
   //mutations

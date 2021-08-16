@@ -91,24 +91,34 @@ export default function RepeatFormLoader( props ) {
   const {
     data: companiesData,
     loading: companiesLoading
-  } = useQuery( GET_BASIC_COMPANIES );
+  } = useQuery( GET_BASIC_COMPANIES, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: usersData,
     loading: usersLoading
-  } = useQuery( GET_BASIC_USERS );
+  } = useQuery( GET_BASIC_USERS, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: taskTypesData,
     loading: taskTypesLoading
-  } = useQuery( GET_TASK_TYPES );
+  } = useQuery( GET_TASK_TYPES, {
+    fetchPolicy: 'network-only'
+  } );
   const {
     data: tripTypesData,
     loading: tripTypesLoading
-  } = useQuery( GET_TRIP_TYPES );
+  } = useQuery( GET_TRIP_TYPES, {
+    fetchPolicy: 'network-only'
+  } );
 
   const {
     data: projectsData,
     loading: projectsLoading
-  } = useQuery( GET_MY_PROJECTS );
+  } = useQuery( GET_MY_PROJECTS, {
+    fetchPolicy: 'network-only'
+  } );
 
   const [ addShortSubtask ] = useMutation( ADD_SHORT_SUBTASK );
   const [ updateShortSubtask ] = useMutation( UPDATE_SHORT_SUBTASK );
@@ -605,7 +615,6 @@ export default function RepeatFormLoader( props ) {
       taskTypes={ toSelArr(taskTypesData.taskTypes) }
       tripTypes={ toSelArr(tripTypesData.tripTypes) }
       currentUser={ currentUser }
-      milestones={[noMilestone]}
       defaultUnit={null}
       directSaving={saving}
       taskID={taskID}

@@ -144,7 +144,7 @@ export default function ProjectAdd( props ) {
 
   const [ saving, setSaving ] = React.useState( false );
   const [ openedTab, setOpenedTab ] = React.useState( "description" );
-  const [ editingDescription, setEditingDescription ] = React.useState( true );
+  const [ editingDescription, setEditingDescription ] = React.useState( false );
   const [ addTaskErrors, setAddTaskErrors ] = React.useState( false );
   const [ statuses, setStatuses ] = React.useState( [] );
 
@@ -277,11 +277,9 @@ export default function ProjectAdd( props ) {
                   .rights;
                 if ( myUserGroup ) {
                   closeModal( {
-                      ...response.data.addProject,
-                      __typename: "Project"
-                    },
-                    myRights
-                  );
+                    ...response.data.addProject,
+                    __typename: "Project"
+                  }, myRights );
                 } else {
                   closeModal( null, null );
                 }
@@ -332,12 +330,12 @@ export default function ProjectAdd( props ) {
 
   const doesDefHasValue = () => {
     return (
-      [
-        type,
-      ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
-        defTag,
-        //assignedTo,
-      ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
+    [
+      type,
+    ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
+      defTag,
+      //assignedTo,
+    ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
     )
   }
 
@@ -368,30 +366,30 @@ export default function ProjectAdd( props ) {
   const renderAttachments = () => {
     return (
       <Attachments
-        disabled={false}
-        projectId={null}
-        type="project"
-        top={false}
-        attachments={attachments}
-        addAttachments={(newAttachments)=>{
-          let time = moment().valueOf();
-          newAttachments = newAttachments.map((attachment)=>{
-            return {
-              title: attachment.name,
-              size: attachment.size,
-              filename: attachment.name,
-              time,
-              data: attachment
-            }
-          });
-          setAttachments([...attachments, ...newAttachments]);
-        }}
-        removeAttachment={(attachment)=>{
-          let newAttachments = [...attachments];
-          newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
-          setAttachments([...newAttachments]);
-        }}
-        />
+      disabled={false}
+      projectId={null}
+      type="project"
+      top={false}
+      attachments={attachments}
+      addAttachments={(newAttachments)=>{
+        let time = moment().valueOf();
+        newAttachments = newAttachments.map((attachment)=>{
+          return {
+            title: attachment.name,
+            size: attachment.size,
+            filename: attachment.name,
+            time,
+            data: attachment
+          }
+        });
+        setAttachments([...attachments, ...newAttachments]);
+      }}
+      removeAttachment={(attachment)=>{
+        let newAttachments = [...attachments];
+        newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
+        setAttachments([...newAttachments]);
+      }}
+      />
     )
   }
 
@@ -399,24 +397,24 @@ export default function ProjectAdd( props ) {
     let RenderDescription = null;
     if ( editingDescription ) {
       RenderDescription = <div>
-        <CKEditor
-          editor={ ClassicEditor }
-          data={description}
-          onInit={(editor) => {
-            editor.editing.view.document.on( 'keydown', ( evt, data ) => {
-              if ( data.keyCode === 27 ) {
-                setEditingDescription(false);
-                data.preventDefault();
-                evt.stop();
-              }
-            });
-          }}
-          onChange={(e,editor)=>{
-            setDescription(editor.getData());
-          }}
-          config={ck5config}
-          />
-      </div>
+      <CKEditor
+        editor={ ClassicEditor }
+        data={description}
+        onInit={(editor) => {
+          editor.editing.view.document.on( 'keydown', ( evt, data ) => {
+            if ( data.keyCode === 27 ) {
+              setEditingDescription(false);
+              data.preventDefault();
+              evt.stop();
+            }
+          });
+        }}
+        onChange={(e,editor)=>{
+          setDescription(editor.getData());
+        }}
+        config={ck5config}
+        />
+    </div>
     } else {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
@@ -426,307 +424,299 @@ export default function ProjectAdd( props ) {
     }
     return (
       <div>
-        <div className="row" style={{alignItems: "baseline"}}>
-          <Label>
-            Popis
-          </Label>
-          <button
-            className="btn-link btn-distance m-l-5"
-            style={{height: "20px"}}
-            onClick={()=>{
-              setEditingDescription(!editingDescription);
-            }}
-            >
-            <i className={`fa fa-${!editingDescription ? 'pen' : 'save' }`} />
-            { !editingDescription ? 'edit' : 'save' }
-          </button>
-          <label htmlFor={`upload-project-attachment-add`} className="btn-link btn-distance m-l-0 clickable" >
-            <i className="fa fa-plus" />
-            Attachment
-          </label>
-        </div>
-        <div className="form-section-rest">
-          {RenderDescription}
-          {renderAttachments()}
-        </div>
+      <div className="row" style={{alignItems: "baseline"}}>
+        <Label>
+          Popis
+        </Label>
+        <button
+          className="btn-link btn-distance m-l-5"
+          style={{height: "20px"}}
+          onClick={()=>{
+            setEditingDescription(!editingDescription);
+          }}
+          >
+          <i className={`fa fa-${!editingDescription ? 'pen' : 'save' }`} />
+          { !editingDescription ? 'edit' : 'save' }
+        </button>
+        <label htmlFor={`upload-project-attachment-add`} className="btn-link btn-distance m-l-0 clickable" >
+          <i className="fa fa-plus" />
+          Attachment
+        </label>
       </div>
+      <div className="form-section-rest">
+        {RenderDescription}
+        {renderAttachments()}
+      </div>
+    </div>
     )
   }
 
   return (
-    <div>
-      <div
-        className={ classnames(
-          {
-            "scroll-visible": !closeModal,
-            "fit-with-header": !closeModal,
-          },
-          "p-20",
-        )}
-        >
-        <h1 className="m-b-20 m-t-20" >
-          Add project
-        </h1>
+    <div
+    className={ classnames(
+      {
+        "scroll-visible": !closeModal,
+        "fit-with-header": !closeModal,
+      },
+      "p-20",
+    )}
+    >
+    <h2 className="m-b-17">
+      Add project
+    </h2>
 
-        <Nav tabs className="b-0 m-b-10">
-          <NavItem>
-            <NavLink
-              className={classnames({ active: openedTab === 'description'}, "clickable", "")}
-              onClick={() => setOpenedTab('description') }
-              >
-              Description
-            </NavLink>
-          </NavItem>
-            <NavItem>
-              <NavLink>
-                |
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink
-                className={classnames({ active: openedTab === 'settings' }, "clickable", "")}
-                onClick={() => setOpenedTab('settings') }
-                >
-                Settings
-              </NavLink>
-            </NavItem>
-        </Nav>
+    <Nav tabs className="b-0 m-b-25">
+      <NavItem>
+        <NavLink
+          className={classnames({ active: openedTab === 'description'}, "clickable", "")}
+          onClick={() => setOpenedTab('description') }
+          >
+          Description
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink>
+          |
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink
+          className={classnames({ active: openedTab === 'settings' }, "clickable", "")}
+          onClick={() => setOpenedTab('settings') }
+          >
+          Settings
+        </NavLink>
+      </NavItem>
+    </Nav>
 
-        <TabContent activeTab={openedTab}>
+    <TabContent activeTab={openedTab}>
 
-          <TabPane tabId={'description'}>
-            <FormGroup>
-              <Label for="name">Project name <span className="warning-big">*</span></Label>
-              <Input
-                type="text"
-                className="medium-input m-b-35 m-t-15"
-                id="name"
-                placeholder="Enter project name"
-                value={title}
-                onChange={(e)=>setTitle(e.target.value)}
-                />
-            </FormGroup>
-
-            { renderDescription() }
-          </TabPane>
-
-          <TabPane tabId={'settings'}>
-            <div className="row">
-              <Checkbox
-                className = "m-l-5 m-r-5"
-                centerHor
-                disabled={false}
-                value = { autoApproved}
-                onChange={() => setAutoApproved( !autoApproved) }
-                />
-              <span className="clickable" onClick = { () => setAutoApproved( !autoApproved) }>
-                All subtasks, work trips, materials and custom items are automatically approved.
-              </span>
-            </div>
-
-            <Statuses
-              statuses={statuses}
-              addStatus={(newStatus) => {
-                setStatuses([ ...statuses, {...newStatus, id: fakeID -- } ])
-              }}
-              deleteStatus={(id) => {
-                setStatuses( statuses.filter((tag) => tag.id !== id ) )
-              }}
-              updateStatus={(newStatus) => {
-                let newStatuses = [...statuses];
-                let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-                newStatuses[index] = { ...newStatuses[index], ...newStatus }
-                setStatuses(newStatuses);
-              }}
-              />
-
-            <Tags
-              tags={tags}
-              addTag={(newTag) => {
-                setTags([ ...tags, {...newTag, id: fakeID -- } ])
-              }}
-              deleteTag={(id) => {
-                setTags( tags.filter((tag) => tag.id !== id ) )
-              }}
-              updateTag={(newTag) => {
-                let newTags = [...tags];
-                let index = newTags.findIndex((tag) => tag.id === newTag.id );
-                newTags[index] = { ...newTags[index], ...newTag }
-                setTags(newTags);
-              }}
-              />
-
-            <div className="row">
-              <Checkbox
-                className = "m-l-5 m-r-5"
-                centerHor
-                disabled={false}
-                value = { lockedRequester}
-                onChange={() => setLockedRequester( !lockedRequester) }
-                />
-              <span className="clickable" onClick = { () => setLockedRequester( !lockedRequester) }>
-                A requester can be only a user with rights to this project.
-              </span>
-            </div>
-
-            <Groups
-              addGroup={(newGroup) => {
-                setGroups([...groups, newGroup])
-              }}
-              />
-
-            <UserGroups
-              addRight={ (userGroup) => {
-                setUserGroups([...userGroups, userGroup]);
-              }}
-              deleteRight={ (userGroup) => {
-                setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
-              }}
-              updateRight={ (userGroup) => {
-                let newUserGroups = [...userGroups];
-                let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
-                newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
-                setUserGroups(newUserGroups);
-              }}
-              users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-              permissions={ userGroups }
-              isAdmin={ true }
-              groups={ toSelArr(groups) }
-              />
-
-            <ProjectAcl
-              groups={ groups }
-              updateGroupRight={ (groupID, acl, newVal) => {
-                let newGroups = [...groups];
-                let index = newGroups.findIndex((group) => group.id === groupID );
-                newGroups[index]['rights'][acl] = newVal;
-                setUserGroups(userGroups.map((userGroup) => {
-                  if(userGroup.group.id === groupID){
-                    return {...userGroup, group: toSelItem(newGroups[index])  }
-                  }else{
-                    return userGroup;
-                  }
-                } ));
-                setGroups(newGroups);
-              }}
-              updateGroup={(newGroup) => {
-                let newGroups = [...groups];
-                let index = newGroups.findIndex((group) => group.id === newGroup.id );
-                newGroups[index] = { ...newGroups[index], ...newGroup }
-                setGroups(newGroups);
-                setUserGroups(userGroups.map((userGroup) => (
-                  (userGroup.group.id !== newGroup.id) ?
-                  userGroup :
-                  ({...userGroup, group: {...userGroup.group,...newGroup}})
-                ) ))
-              }}
-              deleteGroup={(id) => {
-                setGroups( groups.filter((group) => group.id !== id ) );
-                setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
-              }}
-              />
-
-            <ProjectDefaultValues
-              assignedTo={assignedTo}
-              setAssignedTo={setAssignedTo}
-              company={company}
-              setCompany={setCompany}
-              overtime={overtime}
-              setOvertime={setOvertime}
-              pausal={pausal}
-              setPausal={setPausal}
-              requester={requester}
-              setRequester={setRequester}
-              type={type}
-              setType={setType}
-              status={status}
-              setStatus={setStatus}
-              tag={defTag}
-              setTag={setDefTag}
-              statuses={toSelArr(statuses)}
-              companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
-              users={
-                lockedRequester ?
-                userGroups.map( (userGroup) => userGroup.user ) :
-                (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
-              }
-              assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
-              allTags={toSelArr(tags)}
-              taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
-              />
-
-            { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) ) &&
-              <div className="red" style={{color:'red'}}>
-                Status, assigned to and company can't be empty if they are fixed!
-              </div>
-            }
-
-
-            <CustomAttributes
-              disabled={false}
-              customAttributes={customAttributes}
-              addCustomAttribute={(newCustomAttribute) => {
-                setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
-              }}
-              updateCustomAttribute={(changedCustomAttribute) => {
-                let newCustomAttributes = [...customAttributes];
-                let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
-                newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
-                setCustomAttributes(newCustomAttributes);
-              }}
-              deleteCustomAttribute={(id) => {
-                setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
-              }}
-              />
-          </TabPane>
-
-        </TabContent>
-
-        { addTaskErrors && addTaskIssue &&
-          <ACLErrors
-            {
-              ...{
-                groups,
-                status,
-                defTag,
-                assignedTo,
-                requester,
-                type,
-                company
-              }
-            }
+      <TabPane tabId={'description'}>
+        <FormGroup className="m-b-25">
+          <Label for="name">Project name <span className="warning-big">*</span></Label>
+          <Input
+            type="text"
+            className="medium-input m-t-15"
+            id="name"
+            placeholder="Enter project name"
+            value={title}
+            onChange={(e)=>setTitle(e.target.value)}
             />
-        }
-        <div className="row form-buttons-row">
-          {
-            closeModal &&
-            <button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </button>
-          }
+        </FormGroup>
 
-          { cannotSave && addTaskErrors &&
-            <div className="ml-auto message error-message" style={{ minWidth: 220 }}>
-              Fill in all the required information!
-            </div>
-          }
+        { renderDescription() }
+      </TabPane>
 
-          <button className={classnames(
-              "btn",
-              {"ml-auto": !(cannotSave && addTaskErrors)}
-            )}
-            disabled={ addTaskErrors && cannotSave }
-            onClick={() => {
-              if(cannotSave){
-                setAddTaskErrors(true);
-                return;
+      <TabPane tabId={'settings'}>
+        <Checkbox
+          className="m-b-25"
+          labelClassName="normal-weight font-normal"
+          centerHor
+          disabled={false}
+          value={ autoApproved}
+          onChange={() => setAutoApproved( !autoApproved) }
+          label="All subtasks, work trips, materials and custom items are automatically approved."
+          />
+
+        <Statuses
+          statuses={statuses}
+          addStatus={(newStatus) => {
+            setStatuses([ ...statuses, {...newStatus, id: fakeID -- } ])
+          }}
+          deleteStatus={(id) => {
+            setStatuses( statuses.filter((tag) => tag.id !== id ) )
+          }}
+          updateStatus={(newStatus) => {
+            let newStatuses = [...statuses];
+            let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+            newStatuses[index] = { ...newStatuses[index], ...newStatus }
+            setStatuses(newStatuses);
+          }}
+          />
+
+        <Tags
+          tags={tags}
+          addTag={(newTag) => {
+            setTags([ ...tags, {...newTag, id: fakeID -- } ])
+          }}
+          deleteTag={(id) => {
+            setTags( tags.filter((tag) => tag.id !== id ) )
+          }}
+          updateTag={(newTag) => {
+            let newTags = [...tags];
+            let index = newTags.findIndex((tag) => tag.id === newTag.id );
+            newTags[index] = { ...newTags[index], ...newTag }
+            setTags(newTags);
+          }}
+          />
+
+        <Checkbox
+          className = "m-b-5 m-t-25"
+          labelClassName="normal-weight font-normal"
+          label="A requester can be only a user with rights to this project."
+          centerHor
+          disabled={false}
+          value = { lockedRequester}
+          onChange={() => setLockedRequester( !lockedRequester) }
+          />
+
+        <Groups
+          addGroup={(newGroup) => {
+            setGroups([...groups, newGroup])
+          }}
+          />
+
+        <ProjectAcl
+          groups={ groups }
+          updateGroupRight={ (groupID, acl, newVal) => {
+            let newGroups = [...groups];
+            let index = newGroups.findIndex((group) => group.id === groupID );
+            newGroups[index]['rights'][acl] = newVal;
+            setUserGroups(userGroups.map((userGroup) => {
+              if(userGroup.group.id === groupID){
+                return {...userGroup, group: toSelItem(newGroups[index])  }
               }else{
-                addProjectFunc();
+                return userGroup;
               }
-            }}
-            >
-            {saving?'Adding...':'Add project'}
-          </button>
+            } ));
+            setGroups(newGroups);
+          }}
+          updateGroup={(newGroup) => {
+            let newGroups = [...groups];
+            let index = newGroups.findIndex((group) => group.id === newGroup.id );
+            newGroups[index] = { ...newGroups[index], ...newGroup }
+            setGroups(newGroups);
+            setUserGroups(userGroups.map((userGroup) => (
+              (userGroup.group.id !== newGroup.id) ?
+              userGroup :
+              ({...userGroup, group: {...userGroup.group,...newGroup}})
+            ) ))
+          }}
+          deleteGroup={(id) => {
+            setGroups( groups.filter((group) => group.id !== id ) );
+            setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
+          }}
+          />
+
+        <UserGroups
+          addRight={ (userGroup) => {
+            setUserGroups([...userGroups, userGroup]);
+          }}
+          deleteRight={ (userGroup) => {
+            setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+          }}
+          updateRight={ (userGroup) => {
+            let newUserGroups = [...userGroups];
+            let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+            newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+            setUserGroups(newUserGroups);
+          }}
+          users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+          permissions={ userGroups }
+          isAdmin={ true }
+          groups={ toSelArr(groups) }
+          />
+
+        <ProjectDefaultValues
+          assignedTo={assignedTo}
+          setAssignedTo={setAssignedTo}
+          company={company}
+          setCompany={setCompany}
+          overtime={overtime}
+          setOvertime={setOvertime}
+          pausal={pausal}
+          setPausal={setPausal}
+          requester={requester}
+          setRequester={setRequester}
+          type={type}
+          setType={setType}
+          status={status}
+          setStatus={setStatus}
+          tag={defTag}
+          setTag={setDefTag}
+          statuses={toSelArr(statuses)}
+          companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
+          users={
+            lockedRequester ?
+            userGroups.map( (userGroup) => userGroup.user ) :
+            (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
+          }
+          assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
+          allTags={toSelArr(tags)}
+          taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
+          />
+
+        { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) ) &&
+          <div className="red" style={{color:'red'}}>
+            Status, assigned to and company can't be empty if they are fixed!
+          </div>
+        }
+
+
+        <CustomAttributes
+          disabled={false}
+          customAttributes={customAttributes}
+          addCustomAttribute={(newCustomAttribute) => {
+            setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
+          }}
+          updateCustomAttribute={(changedCustomAttribute) => {
+            let newCustomAttributes = [...customAttributes];
+            let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
+            newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
+            setCustomAttributes(newCustomAttributes);
+          }}
+          deleteCustomAttribute={(id) => {
+            setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
+          }}
+          />
+      </TabPane>
+
+    </TabContent>
+
+    { addTaskErrors && addTaskIssue &&
+      <ACLErrors
+        {
+          ...{
+            groups,
+            status,
+            defTag,
+            assignedTo,
+            requester,
+            type,
+            company
+          }
+        }
+        />
+    }
+    <div className="row form-buttons-row">
+      {
+        closeModal &&
+        <button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </button>
+      }
+
+      { cannotSave && addTaskErrors &&
+        <div className="ml-auto message error-message" style={{ minWidth: 220 }}>
+          Fill in all the required information!
         </div>
-      </div>
+      }
+
+      <button className={classnames(
+          "btn",
+          {"ml-auto": !(cannotSave && addTaskErrors)}
+        )}
+        disabled={ addTaskErrors && cannotSave }
+        onClick={() => {
+          if(cannotSave){
+            setAddTaskErrors(true);
+            return;
+          }else{
+            addProjectFunc();
+          }
+        }}
+        >
+        {saving?'Adding...':'Add project'}
+      </button>
     </div>
+  </div>
   );
 }
