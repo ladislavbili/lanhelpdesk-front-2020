@@ -737,10 +737,10 @@ export default function TaskAdd( props ) {
     ),
     Pausal: (
       <div>
-        { (!userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed || parseInt(company.taskWorkPausal) < 0) &&
+        { (!userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed ) &&
           <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
         }
-        { userRights.pausalWrite && company && company.monthly && (parseInt(company.taskWorkPausal) >= 0) && !defaultFields.pausal.fixed &&
+        { userRights.pausalWrite && company && company.monthly && !defaultFields.pausal.fixed &&
           <Select
             value={pausal}
             placeholder="Select required"

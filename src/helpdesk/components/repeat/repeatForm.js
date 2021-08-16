@@ -1141,13 +1141,13 @@ export default function RepeatForm( props ) {
     ),
     Pausal: (
       <div>
-        { (!userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed || parseInt(company.taskWorkPausal) < 0) &&
+        { ( !userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed ) &&
           <div className="disabled-info">{ pausal ? pausal.label : "None" }</div>
         }
-        { userRights.pausalWrite && company && company.monthly && (parseInt(company.taskWorkPausal) >= 0) && !defaultFields.pausal.fixed &&
+        { userRights.pausalWrite && company && company.monthly && !defaultFields.pausal.fixed &&
           <Select
-            value={company && parseInt(company.taskWorkPausal) === 0 && pausal.value === false ? {...pausal, label: pausal.label + " (nezmluvný)"} : pausal }
-            isDisabled={!userRights.pausalWrite || !company || !company.monthly || parseInt(company.taskWorkPausal) < 0 || defaultFields.pausal.fixed}
+            value={ pausal }
+            isDisabled={!userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed}
             styles={pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(pausal)=> { setPausal(pausal); saveChange({ pausal: pausal.value }) }}
             options={booleanSelects}

@@ -12,8 +12,8 @@ import {
   itemAttributesFullfillsString
 } from '../components/helpers';
 
-import PriceAdd from './priceAdd';
-import PriceEdit from './priceEdit';
+import PricelistAdd from './pricelistAdd';
+import PricelistEdit from './pricelistEdit';
 import {
   GET_PRICELISTS,
   PRICELISTS_SUBSCRIPTION
@@ -51,13 +51,13 @@ export default function PricelistsList( props ) {
   const RightSideComponent = (
     <Empty>
       { match.params.id && match.params.id === 'add' &&
-        <PriceAdd {...props} />
+        <PricelistAdd {...props} />
       }
       { pricelistsLoading && match.params.id && match.params.id !== 'add' &&
         <Loading />
       }
       { match.params.id && match.params.id!=='add' && pricelists.some( (item) => item.id === parseInt(match.params.id) ) &&
-        <PriceEdit {...{history, match}} />
+        <PricelistEdit {...{history, match}} />
       }
     </Empty>
   )

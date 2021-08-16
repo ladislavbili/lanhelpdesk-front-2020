@@ -9,7 +9,7 @@ import {
   pickSelectStyle
 } from "configs/components/select";
 import Switch from "react-switch";
-import PriceEdit from "../prices/priceEdit";
+import PriceEdit from "../pricelists/pricelistEdit";
 
 export default function CompanyPriceList( props ) {
   //data

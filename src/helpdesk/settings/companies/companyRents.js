@@ -260,7 +260,7 @@ export default function CompanyRents( props ) {
         <div className="row justify-content-end">
           <div className="col-md-6">
             <p className="text-right">
-              <b>Sub-total:</b>
+              <b>Sub-total: </b>
               {(data.map( (rent) => parseFloat(rent.totalPrice)).reduce((acc, cur) => {
                 if(!isNaN(cur)){
                   return acc+parseInt(cur);

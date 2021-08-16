@@ -4,7 +4,7 @@ import PublicFiltersList from 'helpdesk/settings/publicFilters';
 import SLAList from 'helpdesk/settings/pausals';
 import ProjectList from 'helpdesk/settings/projects';
 import StatusList from 'helpdesk/settings/templateStatuses';
-import PriceList from 'helpdesk/settings/prices';
+import PriceList from 'helpdesk/settings/pricelists';
 import RoleList from 'helpdesk/settings/roles';
 import TripTypeList from 'helpdesk/settings/tripTypes';
 import TaskTypeList from 'helpdesk/settings/taskTypes';

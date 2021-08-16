@@ -9,13 +9,21 @@ import classnames from "classnames";
 
 import {
   Label,
+  NavLink,
+  NavItem,
+  Nav,
+  TabContent,
+  TabPane,
+  FormGroup,
 } from 'reactstrap';
+import {
+  pickSelectStyle
+} from "configs/components/select";
+import Select from 'react-select';
 import Switch from "react-switch";
 import Loading from 'components/loading';
 import SettingsInput from '../components/settingsInput';
 import CompanyRents from './companyRents';
-import CompanyPriceList from './companyPriceList';
-
 import {
   toSelArr,
   toSelItem,
@@ -29,7 +37,7 @@ import {
   GET_PRICELISTS,
   ADD_PRICELIST,
   PRICELISTS_SUBSCRIPTION,
-} from '../prices/queries';
+} from '../pricelists/queries';
 
 import {
   ADD_COMPANY,
@@ -97,6 +105,7 @@ export default function CompanyAdd( props ) {
 
   const [ saving, setSaving ] = React.useState( false );
   const [ newData, setNewData ] = React.useState( false );
+  const [ openedTab, setOpenedTab ] = React.useState( "company" );
   const [ clearCompanyRents, setClearCompanyRents ] = React.useState( false );
 
   //sync
@@ -231,236 +240,262 @@ export default function CompanyAdd( props ) {
           Add company
         </h2>
 
-        <SettingsInput
-          required
-          id="name"
-          label="Company name"
-          value={title}
-          onChange={(e) => {
-            setTitle(e.target.value);
-            setNewData( true );
-          }}
-          />
+        <Nav tabs className="b-0 m-b-25">
+          <NavItem>
+            <NavLink
+              className={classnames({ active: openedTab === 'company'}, "clickable", "")}
+              onClick={() => setOpenedTab('company') }
+              >
+              Faktúračné údaje
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink>
+              |
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: openedTab === 'contract' }, "clickable", "")}
+              onClick={() => setOpenedTab('contract') }
+              >
+              Zmluva
+            </NavLink>
+          </NavItem>
+        </Nav>
 
-        <SettingsInput
-          id="dph"
-          label="DPH"
-          value={dph}
-          onChange={(e) => {
-            setDph(e.target.value);
-            setNewData( true );
-          }}
-          />
+        <TabContent activeTab={openedTab}>
 
-        <SettingsInput
-          required
-          id="ico"
-          label="ICO"
-          value={ico}
-          onChange={(e) => {
-            setIco(e.target.value);
-            setNewData( true );
-          }}
-          />
+          <TabPane tabId={'company'}>
+            <SettingsInput
+              required
+              id="name"
+              label="Company name"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                setNewData( true );
+              }}
+              />
 
-        <SettingsInput
-          id="dic"
-          label="DIC"
-          value={dic}
-          onChange={(e) => {
-            setDic(e.target.value);
-            setNewData( true );
-          }}
-          />
+            <SettingsInput
+              id="dph"
+              label="DPH"
+              value={dph}
+              onChange={(e) => {
+                setDph(e.target.value);
+                setNewData( true );
+              }}
+              />
 
-        <SettingsInput
-          id="ic_dph"
-          label="IC DPH"
-          value={ic_dph}
-          onChange={(e) => {
-            setIcDph(e.target.value);
-            setNewData( true );
-          }}
-          />
+            <SettingsInput
+              required
+              id="ico"
+              label="ICO"
+              value={ico}
+              onChange={(e) => {
+                setIco(e.target.value);
+                setNewData( true );
+              }}
+              />
 
-        <SettingsInput
-          id="country"
-          label="Country"
-          value={country}
-          onChange={(e) => {
-            setCountry(e.target.value);
-            setNewData( true );
-          }}
-          />
+            <SettingsInput
+              id="dic"
+              label="DIC"
+              value={dic}
+              onChange={(e) => {
+                setDic(e.target.value);
+                setNewData( true );
+              }}
+              />
 
-        <SettingsInput
-          id="city"
-          label="City"
-          value={city}
-          onChange={(e) => {
-            setCity(e.target.value);
-            setNewData( true );
-          }}
-          />
+            <SettingsInput
+              id="ic_dph"
+              label="IC DPH"
+              value={ic_dph}
+              onChange={(e) => {
+                setIcDph(e.target.value);
+                setNewData( true );
+              }}
+              />
+
+            <SettingsInput
+              id="country"
+              label="Country"
+              value={country}
+              onChange={(e) => {
+                setCountry(e.target.value);
+                setNewData( true );
+              }}
+              />
+
+            <SettingsInput
+              id="city"
+              label="City"
+              value={city}
+              onChange={(e) => {
+                setCity(e.target.value);
+                setNewData( true );
+              }}
+              />
 
 
-        <SettingsInput
-          id="street"
-          label="Street"
-          value={street}
-          onChange={(e) => {
-            setStreet(e.target.value);
-            setNewData( true );
-          }}
-          />
+            <SettingsInput
+              id="street"
+              label="Street"
+              value={street}
+              onChange={(e) => {
+                setStreet(e.target.value);
+                setNewData( true );
+              }}
+              />
 
-        <SettingsInput
-          id="psc"
-          label="PSČ"
-          value={zip}
-          onChange={(e) => {
-            setZip(e.target.value);
-            setNewData( true );
-          }}
-          />
+            <SettingsInput
+              id="psc"
+              label="PSČ"
+              value={zip}
+              onChange={(e) => {
+                setZip(e.target.value);
+                setNewData( true );
+              }}
+              />
 
-        <SettingsInput
-          id="mail"
-          label="E-mail"
-          placeholder="Enter e-mail (must be email or empty)"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setNewData( true );
-          }}
-          inputClassName={(email.length > 0 && !isEmail(email)) ? "form-control-warning" : ""}
-          />
+            <SettingsInput
+              id="mail"
+              label="E-mail"
+              placeholder="Enter e-mail (must be email or empty)"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setNewData( true );
+              }}
+              inputClassName={(email.length > 0 && !isEmail(email)) ? "form-control-warning" : ""}
+              />
 
-        <SettingsInput
-          id="phone"
-          label="Phone"
-          value={phone}
-          onChange={(e) => {
-            setPhone(e.target.value);
-            setNewData( true );
-          }}
-          />
+            <SettingsInput
+              id="phone"
+              label="Phone"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setNewData( true );
+              }}
+              />
 
-        <SettingsInput
-          id="description"
-          label="Description"
-          type="textarea"
-          value={description}
-          onChange={(e) => {
-            setDescription(e.target.value);
-            setNewData( true );
-          }}
-          />
-
-        <div className="p-20 m-t-15 table-highlight-background">
-          <div className="row">
-            <span className="m-r-5">
-              <h3>Mesačný paušál</h3>
-            </span>
-            <label>
-              <Switch
-                checked={monthly}
-                onChange={()=> {
-                  setMonthly(!monthly);
-                  setNewData( true );
-                }}
-                height={22}
-                checkedIcon={<span className="switchLabel">YES</span>}
-                uncheckedIcon={<span className="switchLabel">NO</span>}
-                onColor={"#0078D4"} />
-              <span className="m-l-10"></span>
-            </label>
-          </div>
-          { monthly &&
-            <div>
-
-              <SettingsInput
-                id="monthlyPausal"
-                label="Mesačná"
-                type="number"
-                value={monthlyPausal}
-                onChange={(e) => {
-                  setMonthlyPausal(e.target.value);
-                  setNewData( true );
-                }}
-                >
-                <div className="m-l-10">
-                  <Label for="monthlyPausal">EUR bez DPH/mesiac</Label>
-                </div>
-              </SettingsInput>
-
-              <SettingsInput
-                id="taskWorkPausal"
-                label="Paušál práce"
-                type="number"
-                value={taskWorkPausal}
-                onChange={(e) => {
-                  setTaskWorkPausal(e.target.value);
-                  setNewData( true );
+            <SettingsInput
+              id="description"
+              label="Description"
+              type="textarea"
+              value={description}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                setNewData( true );
+              }}
+              />
+          </TabPane>
+          <TabPane tabId={'contract'}>
+            <FormGroup>
+              <Label for="pricelist">Pricelist</Label>
+              <Select
+                id="pricelist"
+                name="pricelist"
+                styles={pickSelectStyle()}
+                options={pricelists}
+                value={pricelist}
+                onChange={e => {
+                  setOldPricelist({...pricelist});
+                  setPricelist( e );
+                  setNewData(true);
                 }}
                 />
-
-              <SettingsInput
-                id="taskTripPausal"
-                label="Paušál výjazdy"
-                type="number"
-                value={taskTripPausal}
-                onChange={(e)=> {
-                  setTaskTripPausal(e.target.value);
-                  setNewData( true );
-                }}
-                />
-
-              {!props.addCompany &&
-                <div className="p-20">
-                  <h3 className="m-b-15">Mesačný prenájom licencií a hardware</h3>
-                  <CompanyRents
-                    clearForm={clearCompanyRents}
-                    setClearForm={()=>setClearCompanyRents(false)}
-                    data={rents}
-                    updateRent={(rent)=>{
-                      let newRents=[...rents];
-                      newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
-                      setRents( newRents );
-                      setNewData( true );
-                    }}
-                    addRent={(rent)=>{
-                      let newRents=[...rents];
-                      newRents.push({...rent, id: getFakeID()})
-                      setRents( newRents );
-                      setNewData( true );
-                    }}
-                    removeRent={(rent)=>{
-                      let newRents=[...rents];
-                      newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
-                      setRents( newRents );
-                      setNewData( true );
-                    }}
-                    />
-                </div>
-              }
+            </FormGroup>
+            <div className="row">
+              <label>
+                <Switch
+                  checked={monthly}
+                  onChange={()=> {
+                    setMonthly(!monthly);
+                    setNewData( true );
+                  }}
+                  height={22}
+                  checkedIcon={<span className="switchLabel">YES</span>}
+                  uncheckedIcon={<span className="switchLabel">NO</span>}
+                  onColor={"#0078D4"}
+                  />
+                <span className="m-l-10"></span>
+              </label>
+              <span className="m-r-5">
+                Mesačný paušál
+              </span>
             </div>
-          }
+            <SettingsInput
+              id="monthlyPausal"
+              label="Mesačná"
+              type="number"
+              value={monthlyPausal}
+              disabled={!monthly}
+              onChange={(e) => {
+                setMonthlyPausal(e.target.value);
+                setNewData( true );
+              }}
+              >
+              <div className="m-l-10">
+                <Label for="monthlyPausal">EUR bez DPH/mesiac</Label>
+              </div>
+            </SettingsInput>
 
-          <CompanyPriceList
-            pricelists={pricelists}
-            pricelist={pricelist}
-            oldPricelist={oldPricelist}
-            pricelistName={pricelistName}
-            newData={newData}
-            cancel={() => cancel()}
-            setPricelist={(pl) => setPricelist(pl)}
-            setOldPricelist={(pl) => setOldPricelist(pl)}
-            setNewData={(e) => setNewData(e)}
-            setPricelistName={(n) => setPricelistName(n)}
-            match={match}
-            />
-        </div>
+            <SettingsInput
+              id="taskWorkPausal"
+              label="Paušál práce"
+              type="number"
+              value={taskWorkPausal}
+              disabled={!monthly}
+              onChange={(e) => {
+                setTaskWorkPausal(e.target.value);
+                setNewData( true );
+              }}
+              />
+
+            <SettingsInput
+              id="taskTripPausal"
+              label="Paušál výjazdy"
+              type="number"
+              value={taskTripPausal}
+              disabled={!monthly}
+              onChange={(e)=> {
+                setTaskTripPausal(e.target.value);
+                setNewData( true );
+              }}
+              />
+
+            {!props.addCompany &&
+              <CompanyRents
+                clearForm={clearCompanyRents}
+                setClearForm={()=>setClearCompanyRents(false)}
+                data={rents}
+                disabled={!monthly}
+                updateRent={(rent)=>{
+                  let newRents=[...rents];
+                  newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
+                  setRents( newRents );
+                  setNewData( true );
+                }}
+                addRent={(rent)=>{
+                  let newRents=[...rents];
+                  newRents.push({...rent, id: getFakeID()})
+                  setRents( newRents );
+                  setNewData( true );
+                }}
+                removeRent={(rent)=>{
+                  let newRents=[...rents];
+                  newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
+                  setRents( newRents );
+                  setNewData( true );
+                }}
+                />
+            }
+          </TabPane>
+        </TabContent>
 
         <div className="form-buttons-row p-l-20 p-r-20">
           { closeModal &&

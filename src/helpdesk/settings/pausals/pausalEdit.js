@@ -26,7 +26,7 @@ import {
   GET_PRICELISTS,
   ADD_PRICELIST,
   PRICELISTS_SUBSCRIPTION
-} from '../prices/queries';
+} from '../pricelists/queries';
 import {
   GET_COMPANY,
   UPDATE_COMPANY
