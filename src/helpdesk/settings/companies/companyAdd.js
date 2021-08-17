@@ -9,9 +9,9 @@ import classnames from "classnames";
 
 import {
   Label,
-  NavLink,
-  NavItem,
   Nav,
+  NavItem,
+  NavLink,
   TabContent,
   TabPane,
   FormGroup,
@@ -409,7 +409,7 @@ export default function CompanyAdd( props ) {
                 }}
                 />
             </FormGroup>
-            <div className="row">
+            <div className="row m-t-20 m-b-20">
               <label>
                 <Switch
                   checked={monthly}

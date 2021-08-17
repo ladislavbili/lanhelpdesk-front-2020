@@ -30,7 +30,6 @@ export default function ProjectGroups( props ) {
 
   return (
     <div className="row">
-      <h3 className="m-t-20 m-b-20 m-r-10"> Project groups </h3>
       <button
         id={`add-project-group`}
         className="btn center-hor"

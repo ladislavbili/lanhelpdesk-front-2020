@@ -9,7 +9,12 @@ import classnames from "classnames";
 import {
   FormGroup,
   Label,
-  Input
+  Input,
+  Nav,
+  NavItem,
+  NavLink,
+  TabContent,
+  TabPane,
 } from 'reactstrap';
 import Switch from "react-switch";
 import Loading from 'components/loading';
@@ -81,6 +86,7 @@ export default function PricelistAdd( props ) {
   const [ tripTypePrices, setTripTypePrices ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
+  const [ openedTab, setOpenedTab ] = React.useState( "taskTypes" );
   const dataLoading = taskTypesLoading || tripTypesLoading;
 
   const taskTypes = ( taskTypesLoading ? [] : taskTypesData.taskTypes );
@@ -178,6 +184,7 @@ export default function PricelistAdd( props ) {
       <h2 className="m-b-20" >
         Add price list
       </h2>
+
       <label className="m-b-20">
         <Switch
           checked={def}
@@ -199,88 +206,121 @@ export default function PricelistAdd( props ) {
         }}
         />
 
-      <h3>Ceny úloh</h3>
-      <div className="p-t-10 p-b-10">
-        { taskTypes.map((item,index) => (
+      <Nav tabs className="b-0 m-b-25 m-t-20">
+        <NavItem>
+          <NavLink
+            className={classnames({ active: openedTab === 'taskTypes'}, "clickable", "")}
+            onClick={() => setOpenedTab('taskTypes') }
+            >
+            Task Types
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink>
+            |
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink
+            className={classnames({ active: openedTab === 'tripTypes' }, "clickable", "")}
+            onClick={() => setOpenedTab('tripTypes') }
+            >
+            Trip Types
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink>
+            |
+          </NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink
+            className={classnames({ active: openedTab === 'extra' }, "clickable", "")}
+            onClick={() => setOpenedTab('extra') }
+            >
+            Prirážky
+          </NavLink>
+        </NavItem>
+      </Nav>
+
+      <TabContent activeTab={openedTab}>
+        <TabPane tabId={'taskTypes'}>
+          { taskTypes.map((item,index) => (
+            <SettingsInput
+              key={index}
+              id={`taskTypes-${item.title}-${item.id}`}
+              label={item.title}
+              placeholder="Enter price"
+              value={
+                taskTypePrices.find( (price) => price.id === item.id ) ?
+                taskTypePrices.find( (price) => price.id === item.id ).price :
+                ''
+              }
+              onChange={(e) => {
+                let newPrices = taskTypePrices.map(p => {
+                  if (p.id === item.id){
+                    return ({id: p.id, price: e.target.value.replace(",", ".")});
+                  } else {
+                    return p;
+                  }
+                });
+                setTaskTypePrices(newPrices);
+              }}
+              />
+          ))}
+        </TabPane>
+        <TabPane tabId={'tripTypes'}>
+          { tripTypes.map((item,index) => (
+            <SettingsInput
+              key={index}
+              id={`tripTypes-${item.title}-${item.id}`}
+              label={item.title}
+              placeholder="Enter price"
+              value={tripTypePrices.find( (price) => price.id === item.id ) ? tripTypePrices.find( (price) => price.id === item.id ).price : undefined}
+              onChange={(e) => {
+                let newPrices = tripTypePrices.map(p => {
+                  if (p.id === item.id){
+                    return ({id: p.id, price: e.target.value.replace(",", ".")});
+                  } else {
+                    return p;
+                  }
+                });
+                setTripTypePrices(newPrices);
+              }}
+              />
+          ))}
+        </TabPane>
+        <TabPane tabId={'extra'}>
           <SettingsInput
-            key={index}
-            id={`taskTypes-${item.title}-${item.id}`}
-            label={item.title}
-            placeholder="Enter price"
-            value={
-              taskTypePrices.find( (price) => price.id === item.id ) ?
-              taskTypePrices.find( (price) => price.id === item.id ).price :
-              ''
-            }
+            id="afterHours"
+            label="After hours percentage"
+            value={afterHours}
             onChange={(e) => {
-              let newPrices = taskTypePrices.map(p => {
-                if (p.id === item.id){
-                  return ({id: p.id, price: e.target.value.replace(",", ".")});
-                } else {
-                  return p;
-                }
-              });
-              setTaskTypePrices(newPrices);
+              setAfterHours(e.target.value.replace(",", "."));
             }}
             />
-        ))}
-      </div>
 
-      <h3>Ceny Výjazdov</h3>
-      <div className="p-t-10 p-b-10">
-        { tripTypes.map((item,index) => (
           <SettingsInput
-            key={index}
-            id={`tripTypes-${item.title}-${item.id}`}
-            label={item.title}
-            placeholder="Enter price"
-            value={tripTypePrices.find( (price) => price.id === item.id ) ? tripTypePrices.find( (price) => price.id === item.id ).price : undefined}
+            id="materialMargin"
+            label="Materials margin percentage 50-"
+            placeholder="Enter materials margin percentage"
+            value={materialMargin}
             onChange={(e) => {
-              let newPrices = tripTypePrices.map(p => {
-                if (p.id === item.id){
-                  return ({id: p.id, price: e.target.value.replace(",", ".")});
-                } else {
-                  return p;
-                }
-              });
-              setTripTypePrices(newPrices);
+              setMaterialMargin(e.target.value.replace(",", "."));
             }}
             />
-        ))}
-      </div>
 
-      <h3>Všeobecné prirážky</h3>
-      <div className="p-t-10 p-b-10">
-
-        <SettingsInput
-          id="afterHours"
-          label="After hours percentage"
-          value={afterHours}
-          onChange={(e) => {
-            setAfterHours(e.target.value.replace(",", "."));
-          }}
-          />
-
-        <SettingsInput
-          id="materialMargin"
-          label="Materials margin percentage 50-"
-          placeholder="Enter materials margin percentage"
-          value={materialMargin}
-          onChange={(e) => {
-            setMaterialMargin(e.target.value.replace(",", "."));
-          }}
-          />
-
-        <SettingsInput
-          id="materialMarginExtra"
-          label="Materials margin percentage 50+"
-          placeholder="Enter materials margin percentage"
-          value={materialMarginExtra}
-          onChange={(e) => {
-            setMaterialMarginExtra(e.target.value.replace(",", "."));
-          }}
-          />
-      </div>
+          <SettingsInput
+            id="materialMarginExtra"
+            label="Materials margin percentage 50+"
+            placeholder="Enter materials margin percentage"
+            value={materialMarginExtra}
+            onChange={(e) => {
+              setMaterialMarginExtra(e.target.value.replace(",", "."));
+            }}
+            />
+        </TabPane>
+      </TabContent>
 
       <div className="form-buttons-row">
         { cannotSave() &&
@@ -296,7 +336,7 @@ export default function PricelistAdd( props ) {
           disabled={cannotSave()}
           onClick={addPricelistFunc}
           >
-          {saving?'Saving prices...':'Save prices'}
+          { saving ? 'Saving prices...' : 'Save prices' }
         </button>
       </div>
     </div>

@@ -78,7 +78,8 @@ export default function ProjectAdd( props ) {
   //data & queries
   const {
     history,
-    closeModal
+    match,
+    closeModal,
   } = props;
   const [ addProject, {
     client
@@ -160,7 +161,7 @@ export default function ProjectAdd( props ) {
   //events
   React.useEffect( () => {
     setData();
-  }, [ statusesLoading, usersLoading ] );
+  }, [ dataLoading ] );
 
   React.useEffect( () => {
     updateDefAssigned();
@@ -284,7 +285,11 @@ export default function ProjectAdd( props ) {
                   closeModal( null, null );
                 }
               } else {
-                history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
+                if ( match.path.includes( 'settings' ) ) {
+                  history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
+                } else {
+                  history.push( '/helpdesk/project/' + response.data.addProject.id );
+                }
               }
             } )
             .catch( ( err ) => {
@@ -306,7 +311,11 @@ export default function ProjectAdd( props ) {
               closeModal( null, null );
             }
           } else {
-            history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
+            if ( match.path.includes( 'settings' ) ) {
+              history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
+            } else {
+              history.push( '/helpdesk/project/' + response.data.addProject.id );
+            }
           }
         }
       } )
@@ -481,10 +490,75 @@ export default function ProjectAdd( props ) {
       </NavItem>
       <NavItem>
         <NavLink
-          className={classnames({ active: openedTab === 'settings' }, "clickable", "")}
-          onClick={() => setOpenedTab('settings') }
+          className={classnames({ active: openedTab === 'statuses' }, "clickable", "")}
+          onClick={() => setOpenedTab('statuses') }
           >
-          Settings
+          Statuses
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink>
+          |
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink
+          className={classnames({ active: openedTab === 'tags' }, "clickable", "")}
+          onClick={() => setOpenedTab('tags') }
+          >
+          Tags
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink>
+          |
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink
+          className={classnames({ active: openedTab === 'groups' }, "clickable", "")}
+          onClick={() => setOpenedTab('groups') }
+          >
+          Project groups
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink>
+          |
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink
+          className={classnames({ active: openedTab === 'accRights' }, "clickable", "")}
+          onClick={() => setOpenedTab('accRights') }
+          >
+          Access rights
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink>
+          |
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink
+          className={classnames({ active: openedTab === 'def' }, "clickable", "")}
+          onClick={() => setOpenedTab('def') }
+          >
+          Default values
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink>
+          |
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink
+          className={classnames({ active: openedTab === 'custom' }, "clickable", "")}
+          onClick={() => setOpenedTab('custom') }
+          >
+          Custom attributes
         </NavLink>
       </NavItem>
     </Nav>
@@ -505,11 +579,9 @@ export default function ProjectAdd( props ) {
         </FormGroup>
 
         { renderDescription() }
-      </TabPane>
 
-      <TabPane tabId={'settings'}>
         <Checkbox
-          className="m-b-25"
+          className="m-b-5 m-t-20"
           labelClassName="normal-weight font-normal"
           centerHor
           disabled={false}
@@ -518,6 +590,20 @@ export default function ProjectAdd( props ) {
           label="All subtasks, work trips, materials and custom items are automatically approved."
           />
 
+        <Checkbox
+          className = "m-b-5 m-t-20"
+          labelClassName="normal-weight font-normal"
+          label="A requester can be only a user with rights to this project."
+          centerHor
+          disabled={false}
+          value = { lockedRequester}
+          onChange={() => setLockedRequester( !lockedRequester) }
+          />
+
+
+      </TabPane>
+
+      <TabPane tabId={'statuses'}>
         <Statuses
           statuses={statuses}
           addStatus={(newStatus) => {
@@ -533,7 +619,8 @@ export default function ProjectAdd( props ) {
             setStatuses(newStatuses);
           }}
           />
-
+      </TabPane>
+      <TabPane tabId={'tags'}>
         <Tags
           tags={tags}
           addTag={(newTag) => {
@@ -549,23 +636,33 @@ export default function ProjectAdd( props ) {
             setTags(newTags);
           }}
           />
-
-        <Checkbox
-          className = "m-b-5 m-t-25"
-          labelClassName="normal-weight font-normal"
-          label="A requester can be only a user with rights to this project."
-          centerHor
-          disabled={false}
-          value = { lockedRequester}
-          onChange={() => setLockedRequester( !lockedRequester) }
-          />
-
+      </TabPane>
+      <TabPane tabId={'groups'}>
         <Groups
           addGroup={(newGroup) => {
             setGroups([...groups, newGroup])
           }}
           />
-
+        <UserGroups
+          addRight={ (userGroup) => {
+            setUserGroups([...userGroups, userGroup]);
+          }}
+          deleteRight={ (userGroup) => {
+            setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+          }}
+          updateRight={ (userGroup) => {
+            let newUserGroups = [...userGroups];
+            let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+            newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+            setUserGroups(newUserGroups);
+          }}
+          users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+          permissions={ userGroups }
+          isAdmin={ true }
+          groups={ toSelArr(groups) }
+          />
+      </TabPane>
+      <TabPane tabId={'accRights'}>
         <ProjectAcl
           groups={ groups }
           updateGroupRight={ (groupID, acl, newVal) => {
@@ -597,26 +694,8 @@ export default function ProjectAdd( props ) {
             setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
           }}
           />
-
-        <UserGroups
-          addRight={ (userGroup) => {
-            setUserGroups([...userGroups, userGroup]);
-          }}
-          deleteRight={ (userGroup) => {
-            setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
-          }}
-          updateRight={ (userGroup) => {
-            let newUserGroups = [...userGroups];
-            let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
-            newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
-            setUserGroups(newUserGroups);
-          }}
-          users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-          permissions={ userGroups }
-          isAdmin={ true }
-          groups={ toSelArr(groups) }
-          />
-
+      </TabPane>
+      <TabPane tabId={'def'}>
         <ProjectDefaultValues
           assignedTo={assignedTo}
           setAssignedTo={setAssignedTo}
@@ -645,14 +724,8 @@ export default function ProjectAdd( props ) {
           allTags={toSelArr(tags)}
           taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
           />
-
-        { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) ) &&
-          <div className="red" style={{color:'red'}}>
-            Status, assigned to and company can't be empty if they are fixed!
-          </div>
-        }
-
-
+      </TabPane>
+      <TabPane tabId={'custom'}>
         <CustomAttributes
           disabled={false}
           customAttributes={customAttributes}
@@ -670,8 +743,12 @@ export default function ProjectAdd( props ) {
           }}
           />
       </TabPane>
-
     </TabContent>
+    { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) ) &&
+      <div className="red" style={{color:'red'}}>
+        Status, assigned to and company can't be empty if they are fixed!
+      </div>
+    }
 
     { addTaskErrors && addTaskIssue &&
       <ACLErrors
@@ -689,8 +766,7 @@ export default function ProjectAdd( props ) {
         />
     }
     <div className="row form-buttons-row">
-      {
-        closeModal &&
+      {  closeModal &&
         <button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </button>
       }
 
@@ -714,7 +790,7 @@ export default function ProjectAdd( props ) {
           }
         }}
         >
-        {saving?'Adding...':'Add project'}
+        { saving ? 'Adding...' : 'Add project' }
       </button>
     </div>
   </div>

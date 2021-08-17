@@ -34,7 +34,6 @@ import classnames from 'classnames';
 
 import Filter from '../filter';
 import TaskAdd from '../../task/add';
-import ProjectAdd from '../projects/projectAddContainer';
 import MilestoneEdit from '../milestones/milestoneEdit';
 import MilestoneAdd from '../milestones/milestoneAdd';
 import UserAdd from 'helpdesk/settings/users/userAdd';
@@ -320,7 +319,7 @@ export default function TasksSidebar( props ) {
             styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar' ])}
             onChange={pro => {
               if(pro.value === -1 ){
-                setOpenProjectAdd(true);
+                history.push( `/helpdesk/project/add` )
                 return;
               }
               setMilestone(allMilestones);
@@ -395,7 +394,7 @@ export default function TasksSidebar( props ) {
       <NavItem className="row full-width">
         <button
           className='btn-link'
-          onClick={() => setOpenProjectAdd(true)}
+          onClick={() => history.push( `/helpdesk/project/add` )}
           >
           <i className="fa fa-plus p-l-15" />
           { addProject.project.title }
@@ -873,30 +872,7 @@ export default function TasksSidebar( props ) {
       </div>
     }
 
-    { sidebarOpen && renderOpenSidebar()}
-
-    { openProjectAdd &&
-      <ProjectAdd
-        open={openProjectAdd}
-        closeModal={(newProject, rights) => {
-          setOpenProjectAdd(false);
-          if(newProject!==null){
-            const project = {
-              project: {
-                ...newProject,
-                milestones: [],
-              },
-              right: rights,
-              id: newProject.id,
-              value: newProject.id,
-              title: newProject.title,
-              label: newProject.title,
-            }
-            setProject(project);
-          }
-        }}
-        />
-    }
+    { sidebarOpen && renderOpenSidebar() }
 
     { canEditProject &&
       openMilestoneAdd &&

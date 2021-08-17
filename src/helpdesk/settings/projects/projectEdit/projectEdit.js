@@ -729,21 +729,86 @@ export default function ProjectEdit( props ) {
             </NavLink>
           </NavItem>
           { myRights.projectSecondary &&
-            <NavItem>
-              <NavLink>
-                |
-              </NavLink>
-            </NavItem>
-          }
-          { myRights.projectSecondary &&
-            <NavItem>
-              <NavLink
-                className={classnames({ active: openedTab === 'settings' }, "clickable", "")}
-                onClick={() => setOpenedTab('settings') }
-                >
-                Settings
-              </NavLink>
-            </NavItem>
+            <Empty>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'statuses' }, "clickable", "")}
+                  onClick={() => setOpenedTab('statuses') }
+                  >
+                  Statuses
+                </NavLink>
+              </NavItem>
+                <NavItem>
+                  <NavLink>
+                    |
+                  </NavLink>
+                </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'tags' }, "clickable", "")}
+                  onClick={() => setOpenedTab('tags') }
+                  >
+                  Tags
+                </NavLink>
+              </NavItem>
+                <NavItem>
+                  <NavLink>
+                    |
+                  </NavLink>
+                </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'groups' }, "clickable", "")}
+                  onClick={() => setOpenedTab('groups') }
+                  >
+                  Project groups
+                </NavLink>
+              </NavItem>
+                <NavItem>
+                  <NavLink>
+                    |
+                  </NavLink>
+                </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'accRights' }, "clickable", "")}
+                  onClick={() => setOpenedTab('accRights') }
+                  >
+                  Access rights
+                </NavLink>
+              </NavItem>
+                <NavItem>
+                  <NavLink>
+                    |
+                  </NavLink>
+                </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'def' }, "clickable", "")}
+                  onClick={() => setOpenedTab('def') }
+                  >
+                  Default values
+                </NavLink>
+              </NavItem>
+                <NavItem>
+                  <NavLink>
+                    |
+                  </NavLink>
+                </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'custom' }, "clickable", "")}
+                  onClick={() => setOpenedTab('custom') }
+                  >
+                  Custom attributes
+                </NavLink>
+              </NavItem>
+            </Empty>
           }
         </Nav>
         <TabContent activeTab={openedTab}>
@@ -767,224 +832,229 @@ export default function ProjectEdit( props ) {
                 </FormGroup>
 
                 { renderDescription() }
+
+                <Checkbox
+                  className="m-b-5 m-t-20"
+                  labelClassName="normal-weight font-normal"
+                  centerHor
+                  disabled={false}
+                  value={ autoApproved}
+                  onChange={() => setAutoApproved( !autoApproved) }
+                  label="All subtasks, work trips, materials and custom items are automatically approved."
+                  />
+                <Checkbox
+                  className = "m-b-5 m-t-20"
+                  labelClassName="normal-weight font-normal"
+                  label="A requester can be only a user with rights to this project."
+                  centerHor
+                  disabled={false}
+                  value = { lockedRequester}
+                  onChange={() => {
+                    setLockedRequester( !lockedRequester);
+                    setDataChanged( true );
+                  }}
+                  />
               </Empty>
             }
           </TabPane>
           { myRights.projectSecondary &&
-            <TabPane tabId={'settings'}>
-              <Checkbox
-                className="m-b-25"
-                labelClassName="normal-weight font-normal"
-                centerHor
-                disabled={false}
-                value={ autoApproved}
-                onChange={() => setAutoApproved( !autoApproved) }
-                label="All subtasks, work trips, materials and custom items are automatically approved."
-                />
-              <Statuses
-                statuses={allStatuses}
-                addStatus={(newStatus) => {
-                  setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ]);
-                  setDataChanged( true );
-                }}
-                deleteStatus={(id) => {
-                  if(id > -1){
-                    setUpdateStatuses(updateStatuses.filter((status) => status.id !== id ));
-                    setDeleteStatuses([ ...deleteStatuses, id ]);
-                  }else{
-                    setAddStatuses(addStatuses.filter((status) => status.id !== id ));
-                  }
-                  setDataChanged( true );
-                }}
-                updateStatus={(newStatus) => {
-                  if(newStatus.id > -1){
-                    let newStatuses = [...updateStatuses];
-                    let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-                    if(index === -1){
-                      newStatuses = newStatuses.concat(newStatus);
+            <Empty>
+              <TabPane tabId={'statuses'}>
+                <Statuses
+                  statuses={allStatuses}
+                  addStatus={(newStatus) => {
+                    setAddStatuses([ ...addStatuses, {...newStatus, id: fakeID -- } ]);
+                    setDataChanged( true );
+                  }}
+                  deleteStatus={(id) => {
+                    if(id > -1){
+                      setUpdateStatuses(updateStatuses.filter((status) => status.id !== id ));
+                      setDeleteStatuses([ ...deleteStatuses, id ]);
                     }else{
+                      setAddStatuses(addStatuses.filter((status) => status.id !== id ));
+                    }
+                    setDataChanged( true );
+                  }}
+                  updateStatus={(newStatus) => {
+                    if(newStatus.id > -1){
+                      let newStatuses = [...updateStatuses];
+                      let index = newStatuses.findIndex((status) => status.id === newStatus.id );
+                      if(index === -1){
+                        newStatuses = newStatuses.concat(newStatus);
+                      }else{
+                        newStatuses[index] = { ...newStatuses[index], ...newStatus }
+                      }
+                      setUpdateStatuses(newStatuses);
+                    }else{
+                      let newStatuses = [...addStatuses];
+                      let index = newStatuses.findIndex((status) => status.id === newStatus.id );
                       newStatuses[index] = { ...newStatuses[index], ...newStatus }
+                      setAddStatuses(newStatuses);
                     }
-                    setUpdateStatuses(newStatuses);
-                  }else{
-                    let newStatuses = [...addStatuses];
-                    let index = newStatuses.findIndex((status) => status.id === newStatus.id );
-                    newStatuses[index] = { ...newStatuses[index], ...newStatus }
-                    setAddStatuses(newStatuses);
-                  }
-                  setDataChanged( true );
-                }}
-                />
-
-              <Tags
-                tags={allTags}
-                addTag={(newTag) => {
-                  setAddTags([ ...addTags, {...newTag, id: fakeID -- } ]);
-                  setDataChanged( true );
-                }}
-                deleteTag={(id) => {
-                  if(id > -1){
-                    setUpdateTags(updateTags.filter((tag) => tag.id !== id ));
-                    setDeleteTags([ ...deleteTags, id ]);
-                  }else{
-                    setAddTags(addTags.filter((tag) => tag.id !== id ));
-                  }
-                  setDataChanged( true );
-                }}
-                updateTag={(newTag) => {
-                  if(newTag.id > -1){
-                    let newTags = [...updateTags];
-                    let index = newTags.findIndex((tag) => tag.id === newTag.id );
-                    if(index === -1){
-                      newTags = newTags.concat(newTag);
+                    setDataChanged( true );
+                  }}
+                  />
+              </TabPane>
+              <TabPane tabId={'tags'}>
+                <Tags
+                  tags={allTags}
+                  addTag={(newTag) => {
+                    setAddTags([ ...addTags, {...newTag, id: fakeID -- } ]);
+                    setDataChanged( true );
+                  }}
+                  deleteTag={(id) => {
+                    if(id > -1){
+                      setUpdateTags(updateTags.filter((tag) => tag.id !== id ));
+                      setDeleteTags([ ...deleteTags, id ]);
                     }else{
+                      setAddTags(addTags.filter((tag) => tag.id !== id ));
+                    }
+                    setDataChanged( true );
+                  }}
+                  updateTag={(newTag) => {
+                    if(newTag.id > -1){
+                      let newTags = [...updateTags];
+                      let index = newTags.findIndex((tag) => tag.id === newTag.id );
+                      if(index === -1){
+                        newTags = newTags.concat(newTag);
+                      }else{
+                        newTags[index] = { ...newTags[index], ...newTag }
+                      }
+                      setUpdateTags(newTags);
+                    }else{
+                      let newTags = [...addTags];
+                      let index = newTags.findIndex((tag) => tag.id === newTag.id );
                       newTags[index] = { ...newTags[index], ...newTag }
+                      setAddTags(newTags);
                     }
-                    setUpdateTags(newTags);
-                  }else{
-                    let newTags = [...addTags];
-                    let index = newTags.findIndex((tag) => tag.id === newTag.id );
-                    newTags[index] = { ...newTags[index], ...newTag }
-                    setAddTags(newTags);
+                    setDataChanged( true );
+                  }}
+                  />
+              </TabPane>
+              <TabPane tabId={'groups'}>
+                <Groups
+                  addGroup={(newGroup) => {
+                    setGroups([...groups, newGroup]);
+                    setDataChanged( true );
+                  }}
+                  />
+                <UserGroups
+                  addRight={ (userGroup) => {
+                    setUserGroups([...userGroups, userGroup]);
+                    setDataChanged( true );
+                  }}
+                  deleteRight={ (userGroup) => {
+                    setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+                    setDataChanged( true );
+                  }}
+                  updateRight={ (userGroup) => {
+                    let newUserGroups = [...userGroups];
+                    let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+                    newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+                    setUserGroups(newUserGroups);
+                    setDataChanged( true );
+                  }}
+                  users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+                  permissions={ userGroups }
+                  isAdmin={ true }
+                  groups={ toSelArr(groups) }
+                  />
+              </TabPane>
+              <TabPane tabId={'accRights'}>
+                <ProjectAcl
+                  groups={ groups }
+                  updateGroupRight={ (groupID, acl, newVal) => {
+                    let newGroups = [...groups];
+                    let index = newGroups.findIndex((group) => group.id === groupID );
+                    newGroups[index]['rights'][acl] = newVal;
+                    setUserGroups(userGroups.map((userGroup) => {
+                      if(userGroup.group.id === groupID){
+                        return {...userGroup, group: toSelItem(newGroups[index])  }
+                      }else{
+                        return userGroup;
+                      }
+                    } ));
+                    setGroups(newGroups);
+                    setDataChanged( true );
+                  }}
+                  updateGroup={(newGroup) => {
+                    let newGroups = [...groups];
+                    let index = newGroups.findIndex((group) => group.id === newGroup.id );
+                    newGroups[index] = { ...newGroups[index], ...newGroup }
+                    setGroups(newGroups);
+                    setUserGroups(userGroups.map((userGroup) => (
+                      (userGroup.group.id !== newGroup.id) ?
+                      userGroup :
+                      ({...userGroup, group: {...userGroup.group,...newGroup}})
+                    ) ));
+                    setDataChanged( true );
+                  }}
+                  deleteGroup={(id) => {
+                    setGroups( groups.filter((group) => group.id !== id ) );
+                    setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
+                    setDataChanged( true );
+                  }}
+                  />
+              </TabPane>
+              <TabPane tabId={'def'}>
+                <ProjectDefaultValues
+                  assignedTo={assignedTo}
+                  setAssignedTo={(value) => {setAssignedTo(value); setDataChanged(true);}}
+                  company={company}
+                  setCompany={(value) => {setCompany(value); setDataChanged(true);}}
+                  overtime={overtime}
+                  setOvertime={(value) => {setOvertime(value); setDataChanged(true);}}
+                  pausal={pausal}
+                  setPausal={(value) => {setPausal(value); setDataChanged(true);}}
+                  requester={requester}
+                  setRequester={(value) => {setRequester(value); setDataChanged(true);}}
+                  type={type}
+                  setType={(value) => {setType(value); setDataChanged(true);}}
+                  status={status}
+                  setStatus={(value) => {setStatus(value); setDataChanged(true);}}
+                  tag={defTag}
+                  setTag={(value) => {setDefTag(value); setDataChanged(true);}}
+                  statuses={toSelArr(allStatuses)}
+                  companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
+                  users={
+                    lockedRequester ?
+                    userGroups.map( (userGroup) => userGroup.user ) :
+                    (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
                   }
-                  setDataChanged( true );
-                }}
-                />
-
-              <Checkbox
-                className = "m-b-5 m-t-25"
-                labelClassName="normal-weight font-normal"
-                label="A requester can be only a user with rights to this project."
-                centerHor
-                disabled={false}
-                value = { lockedRequester}
-                onChange={() => {
-                  setLockedRequester( !lockedRequester);
-                  setDataChanged( true );
-                }}
-                />
-
-              <Groups
-                addGroup={(newGroup) => {
-                  setGroups([...groups, newGroup]);
-                  setDataChanged( true );
-                }}
-                />
-
-              <ProjectAcl
-                groups={ groups }
-                updateGroupRight={ (groupID, acl, newVal) => {
-                  let newGroups = [...groups];
-                  let index = newGroups.findIndex((group) => group.id === groupID );
-                  newGroups[index]['rights'][acl] = newVal;
-                  setUserGroups(userGroups.map((userGroup) => {
-                    if(userGroup.group.id === groupID){
-                      return {...userGroup, group: toSelItem(newGroups[index])  }
-                    }else{
-                      return userGroup;
-                    }
-                  } ));
-                  setGroups(newGroups);
-                  setDataChanged( true );
-                }}
-                updateGroup={(newGroup) => {
-                  let newGroups = [...groups];
-                  let index = newGroups.findIndex((group) => group.id === newGroup.id );
-                  newGroups[index] = { ...newGroups[index], ...newGroup }
-                  setGroups(newGroups);
-                  setUserGroups(userGroups.map((userGroup) => (
-                    (userGroup.group.id !== newGroup.id) ?
-                    userGroup :
-                    ({...userGroup, group: {...userGroup.group,...newGroup}})
-                  ) ));
-                  setDataChanged( true );
-                }}
-                deleteGroup={(id) => {
-                  setGroups( groups.filter((group) => group.id !== id ) );
-                  setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
-                  setDataChanged( true );
-                }}
-                />
-
-              <UserGroups
-                addRight={ (userGroup) => {
-                  setUserGroups([...userGroups, userGroup]);
-                  setDataChanged( true );
-                }}
-                deleteRight={ (userGroup) => {
-                  setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
-                  setDataChanged( true );
-                }}
-                updateRight={ (userGroup) => {
-                  let newUserGroups = [...userGroups];
-                  let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
-                  newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
-                  setUserGroups(newUserGroups);
-                  setDataChanged( true );
-                }}
-                users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-                permissions={ userGroups }
-                isAdmin={ true }
-                groups={ toSelArr(groups) }
-                />
-
-              <ProjectDefaultValues
-                assignedTo={assignedTo}
-                setAssignedTo={(value) => {setAssignedTo(value); setDataChanged(true);}}
-                company={company}
-                setCompany={(value) => {setCompany(value); setDataChanged(true);}}
-                overtime={overtime}
-                setOvertime={(value) => {setOvertime(value); setDataChanged(true);}}
-                pausal={pausal}
-                setPausal={(value) => {setPausal(value); setDataChanged(true);}}
-                requester={requester}
-                setRequester={(value) => {setRequester(value); setDataChanged(true);}}
-                type={type}
-                setType={(value) => {setType(value); setDataChanged(true);}}
-                status={status}
-                setStatus={(value) => {setStatus(value); setDataChanged(true);}}
-                tag={defTag}
-                setTag={(value) => {setDefTag(value); setDataChanged(true);}}
-                statuses={toSelArr(allStatuses)}
-                companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
-                users={
-                  lockedRequester ?
-                  userGroups.map( (userGroup) => userGroup.user ) :
-                  (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
-                }
-                assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
-                allTags={toSelArr(allTags)}
-                taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
-                />
-
-              { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
-                <div className="red" style={{color:'red'}}>
-                  Status, assigned to and company can't be empty if they are fixed!
-                </div>
-              }
-
-              <CustomAttributes
-                disabled={false}
-                customAttributes={customAttributes}
-                addCustomAttribute={(newCustomAttribute) => {
-                  setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
-                  setDataChanged( true );
-                }}
-                updateCustomAttribute={(changedCustomAttribute) => {
-                  let newCustomAttributes = [...customAttributes];
-                  let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
-                  newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
-                  setCustomAttributes(newCustomAttributes);
-                  setDataChanged( true );
-                }}
-                deleteCustomAttribute={(id) => {
-                  setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
-                  setDataChanged( true );
-                }}
-                />
-            </TabPane>
+                  assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
+                  allTags={toSelArr(allTags)}
+                  taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
+                  />
+              </TabPane>
+              <TabPane tabId={'custom'}>
+                <CustomAttributes
+                  disabled={false}
+                  customAttributes={customAttributes}
+                  addCustomAttribute={(newCustomAttribute) => {
+                    setCustomAttributes([...customAttributes, {...newCustomAttribute, id: fakeID-- }]);
+                    setDataChanged( true );
+                  }}
+                  updateCustomAttribute={(changedCustomAttribute) => {
+                    let newCustomAttributes = [...customAttributes];
+                    let index = newCustomAttributes.findIndex((attribute) => attribute.id === changedCustomAttribute.id);
+                    newCustomAttributes[index] = {...newCustomAttributes[index],...changedCustomAttribute};
+                    setCustomAttributes(newCustomAttributes);
+                    setDataChanged( true );
+                  }}
+                  deleteCustomAttribute={(id) => {
+                    setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
+                    setDataChanged( true );
+                  }}
+                  />
+              </TabPane>
+            </Empty>
           }
         </TabContent>
+        { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
+          <div className="red" style={{color:'red'}}>
+            Status, assigned to and company can't be empty if they are fixed!
+          </div>
+        }
         { addTaskErrors && addTaskIssue &&
           <ACLErrors
             {
@@ -1001,8 +1071,7 @@ export default function ProjectEdit( props ) {
             />
         }
         <div className="form-buttons-row">
-          {
-            closeModal &&
+          { closeModal &&
             <button className="btn-link-red btn-distance" onClick={() => closeModal(null, null)}>
               Close
             </button>
