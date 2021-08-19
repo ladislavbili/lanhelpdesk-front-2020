@@ -15,6 +15,7 @@ export default function Checkbox( props ) {
     addition,
     value,
     disabled,
+    blocked,
     onChange,
   } = props;
 
@@ -22,13 +23,13 @@ export default function Checkbox( props ) {
   const name = `checkbox-${ID}`;
 
   return (
-    <div className={`checkbox-container ${ className ? className : null }`} style={style}>
+    <div className={`${ blocked ? 'checkbox-blocked-container' : 'checkbox-container' } ${ className ? className : null }`} style={style}>
       <input
         type="checkbox"
         className="checkbox-input"
-        checked={ value }
-        disabled={ disabled }
-        onChange={ onChange }
+        checked={ value || blocked === true }
+        disabled={ disabled || blocked }
+        onChange={ blocked ? () => {} : onChange }
         id={ name }
         />
       <label
@@ -37,12 +38,13 @@ export default function Checkbox( props ) {
           {
             'center-hor': centerHor,
             'center-ver': centerVer,
-            'checkbox-mark-grey': disabled,
+            'checkbox-mark-grey': disabled && !blocked,
+            'checkbox-blocked': blocked,
             'checkbox-mark': !highlighted,
-            'checkbox-highlighted': highlighted
+            'checkbox-highlighted': highlighted,
+            "clickable": !blocked,
           },
           labelClassName ? labelClassName : '',
-          "clickable",
           "noselect"
         )}
         />
@@ -50,13 +52,14 @@ export default function Checkbox( props ) {
         htmlFor={ name }
         className={classnames(
           {
-            'm-l-5': !right,
-            'm-r-5': right,
+            'm-l-5': !right && label && label.length > 0,
+            'm-r-5': right && label && label.length > 0,
+            'm-0': label === null || label === undefined || label.length === 0,
             'center-hor': centerHor,
             'center-ver': centerVer,
+            "clickable": !blocked,
           },
           labelClassName ? labelClassName : '',
-          "clickable",
           "noselect"
         )}
         >

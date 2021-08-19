@@ -1,0 +1,50 @@
+.dnd-column {
+  background-color: $content-background-color;
+  min-width: 400px;
+  max-width: 401px;
+  border-radius: 0px;
+  border: none;
+}
+
+.dnd-column:last-child {
+  .dnd-body {
+    border-right: 0px;
+  }
+  padding-right: 30px;
+}
+
+.dnd-header {
+  background-color: $content-background-color;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+
+  font-family: $main-font;
+  font-style: normal;
+  font-weight: 350;
+  font-size: 21px;
+  line-height: 37px;
+  padding-left: 40px;
+
+  color: #333333;
+}
+
+.dnd-body {
+  background-color: $content-background-color;
+  border-right: 1px solid rgba(0,0,0,.1);
+}
+
+.dnd-item {
+  background: #ffffff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.16);
+  margin-bottom: 20px !important;
+}
+
+.dnd-item-icon {
+  height: 12px;
+  margin-top: -3px;
+  margin-right: 3px;
+}
+
+.dnd-pagination{
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 12.5px;
+}

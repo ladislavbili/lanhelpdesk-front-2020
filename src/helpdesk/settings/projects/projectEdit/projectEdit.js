@@ -26,15 +26,16 @@ import {
   noDef,
 } from 'configs/constants/projects';
 import classnames from 'classnames';
-import Checkbox from 'components/checkbox';
 import DeleteReplacement from 'components/deleteReplacement';
 import Loading from 'components/loading';
+import Switch from "components/switch";
 
-import ProjectDefaultValues from "../components/defaultValues";
+import Attributes from "../components/attributes";
 import Tags from '../components/tags';
 import Statuses from '../components/statuses';
-import UserGroups from "../components/userGroups";
-import Groups from '../components/group/groupAdd';
+import Users from "../components/users";
+import Groups from '../components/group';
+import GroupAdd from '../components/group/groupAdd';
 import ProjectAcl from "../components/acl";
 import CustomAttributes from "../components/customAttributes";
 import ACLErrors from '../components/aclErrors';
@@ -93,6 +94,7 @@ export default function ProjectEdit( props ) {
   const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
   const [ autoApproved, setAutoApproved ] = React.useState( true );
+  const [ archived, setArchived ] = React.useState( false );
   const [ groups, setGroups ] = React.useState( [] );
   const [ userGroups, setUserGroups ] = React.useState( [] );
   const [ addTags, setAddTags ] = React.useState( [] );
@@ -156,6 +158,7 @@ export default function ProjectEdit( props ) {
     setDescription( project.description );
     setLockedRequester( project.lockedRequester );
     setAutoApproved( project.autoApproved );
+    setArchived( project.archived );
 
     //STATUS
     let newStatus = {
@@ -346,6 +349,7 @@ export default function ProjectEdit( props ) {
         const originalRights = originalGroup.rights;
         return (
           group.title !== originalGroup.title ||
+          group.description !== originalGroup.description ||
           group.order !== originalGroup.order ||
           (
             allACLs.filter( ( acl ) => !acl.separator )
@@ -438,6 +442,7 @@ export default function ProjectEdit( props ) {
           description,
           lockedRequester,
           autoApproved,
+          archived,
           def: newDef,
           addTags,
           updateTags,
@@ -673,7 +678,7 @@ export default function ProjectEdit( props ) {
       }
     }
     return (
-      <div>
+      <div className="m-b-15">
         <div className="row" style={{alignItems: "baseline"}}>
           <Label>
             Popis
@@ -743,11 +748,11 @@ export default function ProjectEdit( props ) {
                   Statuses
                 </NavLink>
               </NavItem>
-                <NavItem>
-                  <NavLink>
-                    |
-                  </NavLink>
-                </NavItem>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
               <NavItem>
                 <NavLink
                   className={classnames({ active: openedTab === 'tags' }, "clickable", "")}
@@ -756,50 +761,63 @@ export default function ProjectEdit( props ) {
                   Tags
                 </NavLink>
               </NavItem>
-                <NavItem>
-                  <NavLink>
-                    |
-                  </NavLink>
-                </NavItem>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
               <NavItem>
                 <NavLink
                   className={classnames({ active: openedTab === 'groups' }, "clickable", "")}
                   onClick={() => setOpenedTab('groups') }
                   >
-                  Project groups
+                  Groups
                 </NavLink>
               </NavItem>
-                <NavItem>
-                  <NavLink>
-                    |
-                  </NavLink>
-                </NavItem>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
               <NavItem>
                 <NavLink
                   className={classnames({ active: openedTab === 'accRights' }, "clickable", "")}
                   onClick={() => setOpenedTab('accRights') }
                   >
-                  Access rights
+                  Group rights
                 </NavLink>
               </NavItem>
-                <NavItem>
-                  <NavLink>
-                    |
-                  </NavLink>
-                </NavItem>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'users' }, "clickable", "")}
+                  onClick={() => setOpenedTab('users') }
+                  >
+                  Users
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
               <NavItem>
                 <NavLink
                   className={classnames({ active: openedTab === 'def' }, "clickable", "")}
                   onClick={() => setOpenedTab('def') }
                   >
-                  Default values
+                  Attributes
                 </NavLink>
               </NavItem>
-                <NavItem>
-                  <NavLink>
-                    |
-                  </NavLink>
-                </NavItem>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
               <NavItem>
                 <NavLink
                   className={classnames({ active: openedTab === 'custom' }, "clickable", "")}
@@ -811,12 +829,14 @@ export default function ProjectEdit( props ) {
             </Empty>
           }
         </Nav>
+
         <TabContent activeTab={openedTab}>
+
           <TabPane tabId={'description'}>
             { myRights.projectPrimaryRead &&
               <Empty>
                 <FormGroup className="m-b-25">
-                  <Label for="name">Project name<span className="warning-big">*</span></Label>
+                  <Label for="name">Project name <span className="warning-big">*</span></Label>
                   <Input
                     disabled={!myRights.projectPrimaryWrite}
                     type="text"
@@ -833,27 +853,21 @@ export default function ProjectEdit( props ) {
 
                 { renderDescription() }
 
-                <Checkbox
-                  className="m-b-5 m-t-20"
-                  labelClassName="normal-weight font-normal"
-                  centerHor
-                  disabled={false}
-                  value={ autoApproved}
-                  onChange={() => setAutoApproved( !autoApproved) }
-                  label="All subtasks, work trips, materials and custom items are automatically approved."
-                  />
-                <Checkbox
-                  className = "m-b-5 m-t-20"
-                  labelClassName="normal-weight font-normal"
-                  label="A requester can be only a user with rights to this project."
-                  centerHor
-                  disabled={false}
-                  value = { lockedRequester}
+                <Switch
+                  value={archived}
                   onChange={() => {
-                    setLockedRequester( !lockedRequester);
+                    setArchived(!archived)
                     setDataChanged( true );
                   }}
+                  label="Archived"
+                  labelClassName="normal-weight font-normal"
+                  simpleSwitch
                   />
+                { myRights.projectPrimaryWrite &&
+                  <button className="btn btn-full-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
+                    DELETE PROJECT
+                  </button>
+                }
               </Empty>
             }
           </TabPane>
@@ -933,48 +947,9 @@ export default function ProjectEdit( props ) {
               </TabPane>
               <TabPane tabId={'groups'}>
                 <Groups
+                  groups={groups}
                   addGroup={(newGroup) => {
                     setGroups([...groups, newGroup]);
-                    setDataChanged( true );
-                  }}
-                  />
-                <UserGroups
-                  addRight={ (userGroup) => {
-                    setUserGroups([...userGroups, userGroup]);
-                    setDataChanged( true );
-                  }}
-                  deleteRight={ (userGroup) => {
-                    setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
-                    setDataChanged( true );
-                  }}
-                  updateRight={ (userGroup) => {
-                    let newUserGroups = [...userGroups];
-                    let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
-                    newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
-                    setUserGroups(newUserGroups);
-                    setDataChanged( true );
-                  }}
-                  users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-                  permissions={ userGroups }
-                  isAdmin={ true }
-                  groups={ toSelArr(groups) }
-                  />
-              </TabPane>
-              <TabPane tabId={'accRights'}>
-                <ProjectAcl
-                  groups={ groups }
-                  updateGroupRight={ (groupID, acl, newVal) => {
-                    let newGroups = [...groups];
-                    let index = newGroups.findIndex((group) => group.id === groupID );
-                    newGroups[index]['rights'][acl] = newVal;
-                    setUserGroups(userGroups.map((userGroup) => {
-                      if(userGroup.group.id === groupID){
-                        return {...userGroup, group: toSelItem(newGroups[index])  }
-                      }else{
-                        return userGroup;
-                      }
-                    } ));
-                    setGroups(newGroups);
                     setDataChanged( true );
                   }}
                   updateGroup={(newGroup) => {
@@ -996,8 +971,55 @@ export default function ProjectEdit( props ) {
                   }}
                   />
               </TabPane>
+              <TabPane tabId={'accRights'}>
+                <ProjectAcl
+                  groups={ groups }
+                  updateGroupRight={ (groupID, acl, newVal) => {
+                    let newGroups = [...groups];
+                    let index = newGroups.findIndex((group) => group.id === groupID );
+                    newGroups[index]['rights'][acl] = newVal;
+                    setUserGroups(userGroups.map((userGroup) => {
+                      if(userGroup.group.id === groupID){
+                        return {...userGroup, group: toSelItem(newGroups[index])  }
+                      }else{
+                        return userGroup;
+                      }
+                    } ));
+                    setGroups(newGroups);
+                    setDataChanged( true );
+                  }}
+                  />
+              </TabPane>
+              <TabPane tabId={'users'}>
+                <Users
+                  users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+                  permissions={ userGroups }
+                  disabled={ !myRights.projectSecondary }
+                  groups={ toSelArr(groups) }
+                  lockedRequester={ lockedRequester }
+                  setLockedRequester={(lockedRequester) => {
+                    setLockedRequester(lockedRequester);
+                    setDataChanged( true );
+                  }}
+                  addRight={ (userGroup) => {
+                    setUserGroups([...userGroups, userGroup]);
+                    setDataChanged( true );
+                  }}
+                  deleteRight={ (userGroup) => {
+                    setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+                    setDataChanged( true );
+                  }}
+                  updateRight={ (userGroup) => {
+                    let newUserGroups = [...userGroups];
+                    let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+                    newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+                    setUserGroups(newUserGroups);
+                    setDataChanged( true );
+                  }}
+                  />
+              </TabPane>
               <TabPane tabId={'def'}>
-                <ProjectDefaultValues
+                <Attributes
                   assignedTo={assignedTo}
                   setAssignedTo={(value) => {setAssignedTo(value); setDataChanged(true);}}
                   company={company}
@@ -1024,6 +1046,11 @@ export default function ProjectEdit( props ) {
                   assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
                   allTags={toSelArr(allTags)}
                   taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
+                  autoApproved={autoApproved}
+                  setAutoApproved={(autoApproved) => {
+                    setAutoApproved(autoApproved)
+                    setDataChanged( true );
+                  }}
                   />
               </TabPane>
               <TabPane tabId={'custom'}>
@@ -1050,6 +1077,7 @@ export default function ProjectEdit( props ) {
             </Empty>
           }
         </TabContent>
+
         { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
           <div className="red" style={{color:'red'}}>
             Status, assigned to and company can't be empty if they are fixed!
@@ -1071,16 +1099,6 @@ export default function ProjectEdit( props ) {
             />
         }
         <div className="form-buttons-row">
-          { closeModal &&
-            <button className="btn-link-red btn-distance" onClick={() => closeModal(null, null)}>
-              Close
-            </button>
-          }
-          { myRights.projectPrimaryWrite &&
-            <button className="btn-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
-              Delete
-            </button>
-          }
           { !numberOfTasksLoading && !numberOfTasksError &&
             <div className="ml-auto center-hor p-r-5">
               { `This project includes ${numberOfTasksData.getNumberOfTasks} tasks.` }

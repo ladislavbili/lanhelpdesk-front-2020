@@ -1,0 +1,150 @@
+.lanwiki-tag-form {
+  position: relative;
+  background-color: #faf9f8;
+  height: $height-without-header;
+  padding: 1em $odsadenie-form;
+
+  .form-group {
+    label {
+      margin-left: $input-padding;
+    }
+  }
+
+  .table {
+    margin-top: 30px;
+    background-color: #f4f6f8;
+    tr {
+      height: $button-height;
+    }
+    thead > tr,
+    tbody > tr:not(:last-child) {
+      border-bottom: 1px solid #e8ebee;
+    }
+    th {
+      @extend Label;
+    }
+    th,
+    td {
+      vertical-align: middle;
+      border: none;
+      padding-left: 0px;
+    }
+    th:first-child,
+    td:first-child {
+      padding-left: 10px;
+    }
+    th:first-child {
+      font-family: $main-font-bold;
+    }
+    td {
+      border: none;
+    }
+  }
+
+  .buttons {
+    position: absolute;
+    bottom: $odsadenie-form;
+    width: calc(100% - 2 *#{$odsadenie-form});
+  }
+}
+
+.commandbar {
+  padding-left: $odsadenie-form;
+}
+
+.lanwiki-content {
+  li {
+    list-style-type: none;
+  }
+  .lanwiki-list {
+    padding: 1em $page-header-odsadenie;
+
+    .search-row {
+      margin-top: 2em;
+      margin-bottom: 2em;
+      width: 100%;
+    }
+
+    li {
+      padding: 1em;
+      background-color: white;
+      border-bottom: $secondary-border;
+      .pull-right {
+        font: $font-info-text;
+        color: #767676;
+      }
+      .lanwiki-tags {
+        font: $font-info-text;
+        margin-top: 1em;
+      }
+      .list-title {
+        font: $font-info-text-bold;
+      }
+    }
+  }
+  hr {
+    border: none;
+    border-top: $main-border;
+  }
+
+  .lanwiki-note {
+    background-color: white;
+    padding: 1em $odsadenie-form;
+
+    .group {
+      margin-bottom: 2em;
+      label:not(.clickable):not(.checkbox-mark),
+      .header,
+      .rest {
+        margin-bottom: 1em !important;
+        .form-group {
+          border: $secondary-border;
+        }
+      }
+    }
+
+    .note-tags-edit {
+      label {
+        margin-left: $input-padding;
+      }
+      .select {
+        border: $secondary-border;
+      }
+    }
+
+    .lanwiki-title-edit {
+      border: $secondary-border;
+      background-color: white;
+      input {
+        border: none;
+      }
+    }
+    .lanwiki-title {
+      h1 {
+        margin-left: 0px;
+      }
+    }
+
+    .description {
+      background-color: #f9f9f9;
+      padding: 1em;
+    }
+  }
+  .nav-item {
+    border: none;
+    .nav-link {
+      font: $font-value;
+      color: #c4c4c4;
+    }
+    .nav-link:first-child {
+      padding-left: 0px;
+    }
+    .nav-link.active {
+      list-style-type: none;
+      text-decoration: none;
+      color: black;
+      border: none !important;
+      @extend Label;
+    }
+  }
+}

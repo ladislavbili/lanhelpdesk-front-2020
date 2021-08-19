@@ -34,14 +34,15 @@ import {
 import classnames from 'classnames';
 import axios from 'axios';
 import Loading from 'components/loading';
+import Switch from "components/switch";
 import Checkbox from 'components/checkbox';
 
-import UserGroups from "./components/userGroups";
+import Users from "./components/users";
 import CustomAttributes from "./components/customAttributes";
 import Tags from './components/tags';
 import Statuses from './components/statuses';
-import Groups from './components/group/groupAdd';
-import ProjectDefaultValues from "./components/defaultValues";
+import Groups from './components/group';
+import Attributes from "./components/attributes";
 import ProjectAcl from "./components/acl";
 import ACLErrors from './components/aclErrors';
 import Attachments from './components/attachments';
@@ -127,6 +128,7 @@ export default function ProjectAdd( props ) {
   const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
   const [ autoApproved, setAutoApproved ] = React.useState( true );
+  const [ archived, setArchived ] = React.useState( false );
   const [ groups, setGroups ] = React.useState( defaultGroups );
   const [ userGroups, setUserGroups ] = React.useState( [] );
 
@@ -252,6 +254,7 @@ export default function ProjectAdd( props ) {
           description,
           lockedRequester,
           autoApproved,
+          archived,
           def: newDef,
           groups: newGroups,
           userGroups: newUserGroups,
@@ -519,7 +522,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'groups' }, "clickable", "")}
           onClick={() => setOpenedTab('groups') }
           >
-          Project groups
+          Groups
         </NavLink>
       </NavItem>
       <NavItem>
@@ -532,7 +535,20 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'accRights' }, "clickable", "")}
           onClick={() => setOpenedTab('accRights') }
           >
-          Access rights
+          Group rights
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink>
+          |
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink
+          className={classnames({ active: openedTab === 'users' }, "clickable", "")}
+          onClick={() => setOpenedTab('users') }
+          >
+          Users
         </NavLink>
       </NavItem>
       <NavItem>
@@ -545,7 +561,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'def' }, "clickable", "")}
           onClick={() => setOpenedTab('def') }
           >
-          Default values
+          Attributes
         </NavLink>
       </NavItem>
       <NavItem>
@@ -580,27 +596,15 @@ export default function ProjectAdd( props ) {
 
         { renderDescription() }
 
-        <Checkbox
-          className="m-b-5 m-t-20"
+        <Switch
+          value={archived}
+          onChange={() => {
+            setArchived(!archived)
+          }}
+          label="Archived"
           labelClassName="normal-weight font-normal"
-          centerHor
-          disabled={false}
-          value={ autoApproved}
-          onChange={() => setAutoApproved( !autoApproved) }
-          label="All subtasks, work trips, materials and custom items are automatically approved."
+          simpleSwitch
           />
-
-        <Checkbox
-          className = "m-b-5 m-t-20"
-          labelClassName="normal-weight font-normal"
-          label="A requester can be only a user with rights to this project."
-          centerHor
-          disabled={false}
-          value = { lockedRequester}
-          onChange={() => setLockedRequester( !lockedRequester) }
-          />
-
-
       </TabPane>
 
       <TabPane tabId={'statuses'}>
@@ -639,44 +643,9 @@ export default function ProjectAdd( props ) {
       </TabPane>
       <TabPane tabId={'groups'}>
         <Groups
+          groups={groups}
           addGroup={(newGroup) => {
             setGroups([...groups, newGroup])
-          }}
-          />
-        <UserGroups
-          addRight={ (userGroup) => {
-            setUserGroups([...userGroups, userGroup]);
-          }}
-          deleteRight={ (userGroup) => {
-            setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
-          }}
-          updateRight={ (userGroup) => {
-            let newUserGroups = [...userGroups];
-            let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
-            newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
-            setUserGroups(newUserGroups);
-          }}
-          users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-          permissions={ userGroups }
-          isAdmin={ true }
-          groups={ toSelArr(groups) }
-          />
-      </TabPane>
-      <TabPane tabId={'accRights'}>
-        <ProjectAcl
-          groups={ groups }
-          updateGroupRight={ (groupID, acl, newVal) => {
-            let newGroups = [...groups];
-            let index = newGroups.findIndex((group) => group.id === groupID );
-            newGroups[index]['rights'][acl] = newVal;
-            setUserGroups(userGroups.map((userGroup) => {
-              if(userGroup.group.id === groupID){
-                return {...userGroup, group: toSelItem(newGroups[index])  }
-              }else{
-                return userGroup;
-              }
-            } ));
-            setGroups(newGroups);
           }}
           updateGroup={(newGroup) => {
             let newGroups = [...groups];
@@ -695,8 +664,50 @@ export default function ProjectAdd( props ) {
           }}
           />
       </TabPane>
+      <TabPane tabId={'accRights'}>
+        <ProjectAcl
+          groups={ groups }
+          updateGroupRight={ (groupID, acl, newVal) => {
+            let newGroups = [...groups];
+            let index = newGroups.findIndex((group) => group.id === groupID );
+            newGroups[index]['rights'][acl] = newVal;
+            setUserGroups(userGroups.map((userGroup) => {
+              if(userGroup.group.id === groupID){
+                return {...userGroup, group: toSelItem(newGroups[index])  }
+              }else{
+                return userGroup;
+              }
+            } ));
+            setGroups(newGroups);
+          }}
+          />
+      </TabPane>
+      <TabPane tabId={'users'}>
+        <Users
+          users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
+          permissions={ userGroups }
+          disabled={ false }
+          groups={ toSelArr(groups) }
+          lockedRequester={ lockedRequester }
+          setLockedRequester={(lockedRequester) => {
+            setLockedRequester(lockedRequester);
+          }}
+          addRight={ (userGroup) => {
+            setUserGroups([...userGroups, userGroup]);
+          }}
+          deleteRight={ (userGroup) => {
+            setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
+          }}
+          updateRight={ (userGroup) => {
+            let newUserGroups = [...userGroups];
+            let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
+            newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
+            setUserGroups(newUserGroups);
+          }}
+          />
+      </TabPane>
       <TabPane tabId={'def'}>
-        <ProjectDefaultValues
+        <Attributes
           assignedTo={assignedTo}
           setAssignedTo={setAssignedTo}
           company={company}
@@ -723,6 +734,10 @@ export default function ProjectAdd( props ) {
           assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
           allTags={toSelArr(tags)}
           taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
+          autoApproved={autoApproved}
+          setAutoApproved={(autoApproved) => {
+            setAutoApproved(autoApproved)
+          }}
           />
       </TabPane>
       <TabPane tabId={'custom'}>

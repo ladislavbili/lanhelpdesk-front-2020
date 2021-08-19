@@ -53,6 +53,7 @@ export default function ProjectEditLoader( props ) {
     },
     fetchPolicy: 'network-only',
   } );
+
   const [ updateProject ] = useMutation( UPDATE_PROJECT );
   const [ deleteProjectAttachment ] = useMutation( DELETE_PROJECT_ATTACHMENT );
 

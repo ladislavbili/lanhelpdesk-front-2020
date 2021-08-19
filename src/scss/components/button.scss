@@ -169,6 +169,24 @@
   opacity: 100;
 }
 
+.btn-full-red,
+.btn-full-red:hover,
+.btn-full-red:active,
+.btn-full-red:active:focus,
+.btn-full-red:focus {
+  background-color: red;
+  color: white;
+  border: 1px solid red;
+  height: $button-height;
+  border-radius: 0px;
+  font: $font-value;
+  margin-left: 0px;
+  margin-right: 15px;
+  box-shadow: none;
+  outline: none;
+  opacity: 100;
+}
+
 .btn-danger {
   background-color: red;
 }

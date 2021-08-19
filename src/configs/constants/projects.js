@@ -6,9 +6,9 @@ let fakeID = -1;
 
 export const allACLs = [
   {
-    id: 'sep1',
-    title: 'PROJECT ACL',
-    separator: true
+    id: 'header1',
+    title: 'Project ACL',
+    header: true
   },
   {
     id: 'projectPrimary',
@@ -29,9 +29,13 @@ export const allACLs = [
     both: false
   },
   {
-    id: 'sep2',
-    title: 'TASK LIST',
+    id: 'separator1',
     separator: true,
+  },
+  {
+    id: 'header2',
+    title: 'Task list',
+    header: true,
   },
   {
     id: 'myTasks',
@@ -71,19 +75,27 @@ export const allACLs = [
     both: false,
   },
   {
-    id: 'sepAdd',
-    title: 'ADD TASK',
+    id: 'separator2',
     separator: true,
+  },
+  {
+    id: 'headerAdd',
+    title: 'Add task',
+    header: true,
   },
   {
     id: 'addTasks',
-    title: 'Add Tasks',
+    title: 'Add Tasks (can be requester)',
     both: false
   },
   {
-    id: 'sepEdit',
-    title: 'EDIT TASK',
+    id: 'separator3',
     separator: true,
+  },
+  {
+    id: 'headerEdit',
+    title: 'Edit task',
+    header: true,
   },
   {
     id: 'deleteTasks',
@@ -131,9 +143,13 @@ export const allACLs = [
     both: true
   },
   {
-    id: 'sep3',
-    title: 'TASK ACL DEFAULT ATTRIBUTES',
-    separator: true
+    id: 'separator4',
+    separator: true,
+  },
+  {
+    id: 'header3',
+    title: 'Task default attributes',
+    header: true
   },
   {
     id: 'status',
@@ -191,9 +207,32 @@ export const allACLs = [
     both: true
   },
   {
-    id: 'sepComments',
-    title: 'COMMENTS & HISTORY',
+    id: 'separator5',
     separator: true,
+  },
+  {
+    id: 'headerSLA',
+    title: 'Pausal',
+    header: true,
+  },
+  {
+    id: 'pausal',
+    title: 'Pausal VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'overtime',
+    title: 'Mimo pracovných hodín VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'separator6',
+    separator: true,
+  },
+  {
+    id: 'headerComments',
+    title: 'Comments & history',
+    header: true,
   },
   {
     id: 'viewComments',
@@ -236,27 +275,12 @@ export const allACLs = [
     title: 'Task history',
     both: false
   },
-  {
-    id: 'sepSLA',
-    title: 'SERVICE LEVEL AGREMENTS',
-    separator: true,
-  },
-  {
-    id: 'pausal',
-    title: 'Pausal VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'overtime',
-    title: 'Mimo pracovných hodín VIEW/EDIT',
-    both: true
-  },
 
 ];
 
 export const createCleanRights = ( access = false ) => {
   let rights = {};
-  allACLs.filter( ( acl ) => !acl.separator && !acl.fake ).forEach( ( acl ) => {
+  allACLs.filter( ( acl ) => !acl.header && !acl.fake ).forEach( ( acl ) => {
     if ( acl.both ) {
       rights[ acl.id ] = {
         read: access,
@@ -280,6 +304,7 @@ export const backendCleanRights = ( access = false ) => {
 
 export const defaultGroups = [ 'Admin', 'Manager', 'Agent', 'Customer' ].map( ( name, index ) => ( {
   title: name,
+  description: `${name} role`,
   id: fakeID--,
   order: index,
   rights: createCleanRights( index === 0 )

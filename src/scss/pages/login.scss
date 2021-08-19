@@ -1,0 +1,33 @@
+.login-bkg {
+  height: 100vh;
+  display: flex;
+  background-color: #f9f9f9;
+}
+
+.login-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background-clip: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  background-color: $content-background-color;
+  border-radius: 4px;
+  width: 350px;
+  margin: auto;
+  .login-item {
+    margin: 10px 20px;
+  }
+  .btn {
+    border-radius: 4px;
+  }
+  .btn:active:focus {
+    margin: 10px 20px;
+  }
+}
+.login-header {
+  background-color: $basic-button-color;
+  color: white;
+  padding: 10px 20px;
+  margin: 0px;
+}

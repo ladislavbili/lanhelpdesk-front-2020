@@ -128,6 +128,7 @@ query {
       title
       lockedRequester
       autoApproved
+      archived
       milestones {
         id
         title
@@ -183,6 +184,7 @@ title
 description
 lockedRequester
 autoApproved
+archived
 statuses{
   id
   title
@@ -201,6 +203,7 @@ attachments{
 groups{
   id
   title
+  description
   order
   rights{
     ${groupRights}
@@ -228,6 +231,7 @@ mutation addProject(
   $description: String!,
   $lockedRequester: Boolean!,
   $autoApproved: Boolean!,
+  $archived: Boolean!,
   $def: ProjectDefaultsInput!,
   $tags: [NewTagInput]!,
   $statuses: [NewStatusInput]!
@@ -239,6 +243,7 @@ mutation addProject(
     description: $description,
     lockedRequester: $lockedRequester,
     autoApproved: $autoApproved,
+    archived: $archived,
     def: $def,
     tags: $tags,
     statuses: $statuses,
@@ -267,6 +272,7 @@ mutation updateProject(
   $description: String,
   $lockedRequester: Boolean,
   $autoApproved: Boolean,
+  $archived: Boolean,
   $def: ProjectDefaultsInput,
   $deleteTags: [Int]!,
   $updateTags: [TagUpdateInput]!,
@@ -285,6 +291,7 @@ mutation updateProject(
     description: $description
     lockedRequester: $lockedRequester
     autoApproved: $autoApproved
+    archived: $archived
     def: $def
     deleteTags: $deleteTags
     updateTags: $updateTags
@@ -358,6 +365,7 @@ query projectGroups($id: Int!) {
   ){
     id
     title
+    description
     order
   }
 }

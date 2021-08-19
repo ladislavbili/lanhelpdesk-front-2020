@@ -2,6 +2,7 @@ export const remapRightsToBackend = ( group ) => {
   return {
     id: group.id,
     title: group.title,
+    description: group.description,
     order: parseInt( group.order ),
     rights: {
       assignedRead: group.rights.assigned.read,
@@ -63,6 +64,7 @@ export const remapRightsToBackend = ( group ) => {
 export const remapRightsFromBackend = ( group ) => ( {
   id: group.id,
   title: group.title,
+  description: group.description,
   order: parseInt( group.order ),
   rights: {
     assigned: {

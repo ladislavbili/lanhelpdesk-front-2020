@@ -30,3 +30,67 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   > .react-datepicker__input-container {
   width: 100% !important;
 }
+
+.datepicker-width-185 {
+  width: 185px;
+}
+
+.flex-input-with-icon {
+  .react-datepicker__input-container {
+    width: 100%;
+  }
+  .react-datepicker-wrapper {
+    width: calc(100% - 34px);
+  }
+}
+
+.flex-input {
+  .react-datepicker__input-container {
+    width: 100%;
+  }
+  .react-datepicker-wrapper {
+    width: 100%;
+  }
+}
+
+
+
+.datepicker-input-button {
+  @extend .btn-link-reversed, .center-hor;
+  color: inherit !important;
+  text-align: left;
+  padding: 0px 7.5px;
+}
+.datepicker-input-button:active,
+.datepicker-input-button:focus {
+  background-color: inherit !important;
+  outline: none !important;
+  color: inherit !important;
+}
+
+.datepicker-input-button-minimal {
+  @extend .datepicker-input-button;
+  font-size: 11px;
+  padding: 0px 5px 0px 2px;
+}
+
+.rbc-time-content {
+  overflow-y: visible;
+}
+
+.col-9 {
+  .react-datepicker-wrapper {
+    height: 30px;
+    width: 100%;
+    .react-datepicker__input-container {
+      width: 100%;
+      input {
+        height: 30px;
+        border: none;
+      }
+    }
+  }
+  .react-datepicker-popper {
+    z-index: 9999;
+  }
+}

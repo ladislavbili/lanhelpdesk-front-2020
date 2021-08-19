@@ -7,6 +7,7 @@ import {
   Input,
   FormGroup,
 } from 'reactstrap';
+import Empty from 'components/Empty';
 import ProjectAdd from 'helpdesk/settings/projects/projectAdd';
 import {
   setProject,
@@ -22,18 +23,21 @@ export default function ProjectGroups( props ) {
   //props
   const {
     updateGroup,
-    group
+    disabled,
+    group,
   } = props;
 
   const [ open, setOpen ] = React.useState( false );
   const [ title, setTitle ] = React.useState( group.title );
+  const [ description, setDescription ] = React.useState( group.description );
   const [ order, setOrder ] = React.useState( group.order );
 
   return (
-    <div>
+    <Empty>
       <button
+        className="btn btn-link btn-distance"
+        disabled={disabled}
         id={`edit-project-group-${group.id}`}
-        className="btn m-r-5"
         onClick={ () => setOpen(true) }
         >
         EDIT
@@ -51,6 +55,10 @@ export default function ProjectGroups( props ) {
             <Input placeholder="Enter group name" value={title} onChange={(e) => setTitle(e.target.value)}/>
           </FormGroup>
           <FormGroup>
+            <Label for="group-title">Group description</Label>
+            <Input placeholder="Enter group description" value={description} onChange={(e) => setDescription(e.target.value)}/>
+          </FormGroup>
+          <FormGroup>
             <Label for="role">Order</Label>
             <Input placeholder="Set order" value={order} onChange={(e) => setOrder(e.target.value)}/>
           </FormGroup>
@@ -58,6 +66,7 @@ export default function ProjectGroups( props ) {
             className="btn btn-link-cancel"
             onClick={ () => {
               setTitle(group.title);
+              setDescription(group.description);
               setOrder(group.order);
               setOpen(false);
             } }
@@ -68,6 +77,7 @@ export default function ProjectGroups( props ) {
             className="btn btn-distance"
             onClick={ () => {
               setTitle(group.title);
+              setDescription(group.description);
               setOrder(group.order);
             } }
             >
@@ -77,7 +87,7 @@ export default function ProjectGroups( props ) {
             className="btn"
             disabled={ title.length === 0 || isNaN(parseInt(order)) }
             onClick={ () => {
-              updateGroup({ title, id: group.id, order })
+              updateGroup({ title, description, id: group.id, order })
               setOpen(false);
             } }
             >
@@ -85,6 +95,6 @@ export default function ProjectGroups( props ) {
           </button>
         </PopoverBody>
       </Popover>
-    </div>
+    </Empty>
   );
 }
