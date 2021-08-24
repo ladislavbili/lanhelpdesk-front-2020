@@ -75,8 +75,8 @@ export default function NotificationIcon( props ) {
       </div>
       <GeneralPopover
         placement="bottom-start"
-        className="overflow-auto mh-600"
-        headerClassName="segoe-semi-header custom-popover-header"
+        className="overflow-auto max-height-600"
+        headerClassName="header-font custom-popover-header"
         target="page-header-notifications"
         header="Notifications"
         useLegacy

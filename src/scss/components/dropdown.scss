@@ -1,0 +1,29 @@
+.dropdown-header {
+  padding-left: 0px;
+}
+
+.dropdown-item {
+  padding: 3px 0px;
+}
+
+.dropdown-item:last-child {
+  padding: 3px 0px 7px 0px;
+}
+
+.dropdown .dropdown-button:hover{
+  background-color: inherit !important;
+  color: inherit !important;
+}
+.dropdown .dropdown-button{
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+.dropdown-menu {
+  min-width: auto;
+  padding: 10px;
+  padding-bottom: 0px;
+  .fa {
+    padding-right: 0px !important;
+  }
+}

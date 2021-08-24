@@ -400,7 +400,7 @@ export default function CompanyEdit( props ) {
           Edit company
         </h2>
 
-        <Nav tabs className="b-0 m-b-25">
+        <Nav tabs className="no-border m-b-25">
           <NavItem>
             <NavLink
               className={classnames({ active: openedTab === 'company'}, "clickable", "")}

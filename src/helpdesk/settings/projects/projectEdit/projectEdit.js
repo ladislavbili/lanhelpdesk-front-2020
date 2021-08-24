@@ -724,7 +724,7 @@ export default function ProjectEdit( props ) {
           Edit project
         </h2>
 
-        <Nav tabs className="b-0 m-b-25">
+        <Nav tabs className="no-border m-b-25">
           <NavItem>
             <NavLink
               className={classnames({ active: openedTab === 'description'}, "clickable", "")}
@@ -860,7 +860,7 @@ export default function ProjectEdit( props ) {
                     setDataChanged( true );
                   }}
                   label="Archived"
-                  labelClassName="normal-weight font-normal"
+                  labelClassName="text-normal font-normal"
                   simpleSwitch
                   />
                 { myRights.projectPrimaryWrite &&

@@ -112,7 +112,7 @@ export default function CompanyRents( props ) {
                       />
                   </td>
 
-                  <td className="t-a-r">
+                  <td className="text-right">
                     <button className="btn-link"
                       disabled={disabled}
                       onClick={()=>{
@@ -220,7 +220,7 @@ export default function CompanyRents( props ) {
                     }}
                     />
                 </td>
-                <td className="t-a-r">
+                <td className="text-right">
                   <button className="btn-link"
                     disabled={
                       disabled||

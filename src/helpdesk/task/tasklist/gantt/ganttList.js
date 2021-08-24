@@ -197,7 +197,7 @@ export default function TableList( props ) {
           />
       </th>
     } else if ( display.type === 'date' ) {
-      return <th key={display.value} width="40" className={(last ? "w-200px" : "")}>
+      return <th key={display.value} width="40" className={(last ? "width-200" : "")}>
         <div className={(last ? "row" : "")}>
           <div style={last ? {flex: "1"} : {}}>
             <DatePicker
@@ -350,7 +350,7 @@ export default function TableList( props ) {
         showPreferences
         gantt
         />
-      <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
+      <div className="full-width scroll-visible fit-with-header-and-commandbar-list task-container">
         <table className="table">
           <thead>
             <tr>
@@ -371,7 +371,7 @@ export default function TableList( props ) {
             <ActiveSearch {...props} table />
             { groups.map((group) => (
               <Empty key={ group.milestone === null ? 'null' : group.milestone.id }>
-                <tr onClick={() => setGroupOpen(group.milestone) } className="clickable bolder-text" >
+                <tr onClick={() => setGroupOpen(group.milestone) } className="clickable bolder" >
                   <td>
                     <i className={classnames( "fa p-l-5 p-r-5", { "fa-chevron-down": !group.show, "fa-chevron-up": group.show } )} />
                     </td>
@@ -381,7 +381,7 @@ export default function TableList( props ) {
                   <td>
                     { getMilestoneDates(group.milestone).endsAt }
                   </td>
-                  <td colSpan={filteredDisplayValues.length - 2 } className="noselect bolder-text" style={{fontSize: 14}}>
+                  <td colSpan={filteredDisplayValues.length - 2 } className="noselect bolder" style={{fontSize: 14}}>
                     {group.milestone ? group.milestone.title : 'Without milestone' }
                   </td>
                 </tr>

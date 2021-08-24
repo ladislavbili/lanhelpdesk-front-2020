@@ -11,13 +11,13 @@ export default function CalendarRenderScheduled( task, start, end, canEdit, done
     <div>
       <p className="m-0">
         <Checkbox
-          className = "p-l-0 mw-20 m-t-5 m-l-5"
+          className = "p-l-0 min-width-20 m-t-5 m-l-5"
           value = { done }
           disabled={ !canEdit }
           onChange={ () => {
             update(!done);
           } }
-          labelClassName="white-text normal-weight"
+          labelClassName="color-white text-normal"
           label={`${ task.title } | #${ task.id }`}
           />
       </p>

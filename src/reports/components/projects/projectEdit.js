@@ -275,7 +275,7 @@ class ProjectEdit extends Component {
     return (
       <div className='sidebar-menu-item'>
         <Button
-          className='btn-link sidebar-menu-item t-a-l'
+          className='btn-link sidebar-menu-item text-left'
           onClick={this.toggle.bind(this)}
           >
           <i className="fa fa-cog m-r-5 m-l-5 "/> Project settings

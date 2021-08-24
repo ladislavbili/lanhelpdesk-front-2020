@@ -33,7 +33,7 @@ export default function TableSubtaskRender( props ) {
       { task.subtasks.map((subtask) => (
         <div key={subtask.id} className="m-r-5 m-t-5 p-l-5 p-r-5">
           <Checkbox
-            className = "p-l-0 mw-20 m-t-5 m-l-5"
+            className = "p-l-0 min-width-20 m-t-5 m-l-5"
             value = { subtask.done }
             disabled={ !task.rights.vykazWrite }
             onChange={ () => {

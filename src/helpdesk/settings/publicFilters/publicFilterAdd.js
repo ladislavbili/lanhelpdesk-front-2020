@@ -14,6 +14,7 @@ import {
 import Select from 'react-select';
 import Checkbox from 'components/checkbox';
 import Loading from 'components/loading';
+import RequiredLabel from 'components/requiredLabel';
 import SettingsInput from '../components/settingsInput';
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
 
@@ -321,7 +322,7 @@ export default function PublicFilterAdd( props ) {
           />
       </FormGroup>
 
-      <Label  className="m-t-15">Show filter <span className="warning-big">*</span></Label>
+      <RequiredLabel className="m-t-15">Show filter</RequiredLabel>
       <hr className="m-t-5 m-b-10"/>
       {/* Global */}
       <Checkbox
@@ -329,12 +330,12 @@ export default function PublicFilterAdd( props ) {
         label = "Global (shown in all projects)"
         value = { global }
         onChange={(e) => setGlobal(!global)}
-        addition={ <span className="one-of-big">*</span>}
+        addition={ <span className="warning-big m-l-5">*</span>}
         />
 
       {/* Project */}
       <div className="m-b-10">
-        <Label className="form-label">Projekt <span className="one-of-big">*</span></Label>
+        <RequiredLabel>Projekt</RequiredLabel>
         <Select
           placeholder="Vyberte projekt"
           value={project}

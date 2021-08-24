@@ -29,7 +29,7 @@ export default function ProjectUsers( props ) {
     <div>
       <Checkbox
         className="m-b-5 m-t-20 p-5 bkg-white"
-        labelClassName="normal-weight font-normal"
+        labelClassName="text-normal font-normal"
         label="A requester can be only a user with rights to this project."
         centerHor
         disabled={ disabled }
@@ -67,7 +67,7 @@ export default function ProjectUsers( props ) {
             </td>
             <td>
               <button
-                className="btn mw-100"
+                className="btn min-width-100"
                 disabled={ chosenUser === null || group === null }
                 onClick={() => {
                   addRight({ user: chosenUser, group });
@@ -152,7 +152,7 @@ export default function ProjectUsers( props ) {
             </td>
             <td>
               <button
-                className="btn mw-100"
+                className="btn min-width-100"
                 disabled={ chosenUser === null || group === null }
                 onClick={() => {
                   addRight({ user: chosenUser, group });
@@ -231,7 +231,7 @@ export default function ProjectUsers( props ) {
             </td>
             <td>
               <button
-                className="btn mw-100"
+                className="btn min-width-100"
                 disabled={ chosenUser === null || group === null }
                 onClick={() => {
                   addRight({ user: chosenUser, group });

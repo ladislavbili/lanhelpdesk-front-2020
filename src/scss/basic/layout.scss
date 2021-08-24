@@ -1,31 +1,3 @@
-.bottom-15 {
-  bottom: 15px;
-}
-
-.bottom-20 {
-  bottom: 20px;
-}
-
-//FLOAT
-.f-r {
-  float: right;
-}
-
-.col-lg-2,
-.col-lg-3,
-.col-lg-4,
-.col-lg-5,
-.col-lg-6,
-.col-lg-7,
-.col-lg-8,
-.col-lg-9,
-.col-lg-1,
-.col-lg-10,
-.col-lg-11,
-.col-lg-12 {
-  float: none !important;
-}
-
 //POSITION
 .position-inherit {
   position: inherit;
@@ -35,6 +7,18 @@
   position: absolute;
 }
 
+.relative {
+  position: relative;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.bring-to-front {
+  position: relative;
+  z-index: 99999 !important;
+}
 
 //DISPLAY
 .display-none {
@@ -46,6 +30,7 @@
 .display-inline-block {
   display: inline-block;
 }
+
 .row {
   display: flex !important;
   margin: 0px;
@@ -65,31 +50,28 @@
   flex: 1;
 }
 
-.f-1 {
-  flex: 1;
-}
 .flex {
   flex: 1;
 }
 
+.display-flex {
+  display: flex !important;
+}
+
 //ALIGNMENT
-.v-a-m {
+.ver-align-middle {
   vertical-align: middle;
 }
 
-.v-a-b {
+.ver-align-bottom {
   vertical-align: baseline !important;
 }
 
-.a-i-c {
+.align-items-center {
   align-items: center;
 }
 
-.a-s-c{
-  align-self: center;
-}
-
-.asc {
+.align-self-center {
   align-self: center;
 }
 
@@ -122,4 +104,39 @@
 .col-11-5 {
   flex: 0 0 91.8%;
   max-width: 91.8%;
+}
+
+@for $i from 1 through 12 {
+  .col-lg-#{$i} {
+    float: none !important;
+  }
+  .col-#{$i} {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .col-sm-#{$i} {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .col-md-#{$i} {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .col-lg-#{$i} {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .col-xl-#{$i} {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+}
+
+.col,
+.col-lg,
+.col-md,
+.col-sm,
+.col-xl {
+  padding-left: 0px;
+  padding-right: 0px;
 }

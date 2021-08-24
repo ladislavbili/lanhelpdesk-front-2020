@@ -74,9 +74,9 @@ export default function RepeatList( props ) {
               </div>
             </div>
 
-            <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
+            <div className="full-width scroll-visible fit-with-header-and-commandbar-list task-container">
 
-              <div className={classnames("d-flex", "h-60px", "flex-row")}>
+              <div className={classnames("d-flex", "h-60", "flex-row")}>
                 <div
                   className={classnames(
                     "m-l-30",

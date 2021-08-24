@@ -74,7 +74,7 @@ export default function StatusChangeModal( props ) {
         <ModalBody>
           <h1>Change status</h1>
           <div className="row" >
-            <div className="w-50 p-r-10">
+            <div className="width-50-p p-r-10">
               <Label className="center-hor">
                 New status
               </Label>
@@ -87,7 +87,7 @@ export default function StatusChangeModal( props ) {
                 options={(statuses).filter((status)=>status.action!=='Invoiced')}
                 />
             </div>
-            <div className="w-50">
+            <div className="width-50-p">
               <Label className="center-hor">
                 {getDateType()}
               </Label>

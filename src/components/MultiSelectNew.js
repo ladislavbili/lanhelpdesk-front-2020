@@ -36,7 +36,7 @@ export default function MultiSelect( props ) {
   const renderPopover = () => (
     <GeneralPopover
         placement="bottom-start"
-        className="overflow-auto mh-400"
+        className="overflow-auto max-height-400"
         target={target !== undefined ?  target : `savepoint-${random}`}
         header={`${header ? header : ''}`}
         reset={() => {}}

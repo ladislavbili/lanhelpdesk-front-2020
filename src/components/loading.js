@@ -30,7 +30,7 @@ export default function Loading( props ) {
   return (
     <div className="noselect" style={ divStyle }>
       <div
-        className={ classnames({ 'center-hor': !noPos, "center-ver": !noPos, "p-t-17p": !noPos }, "row") }
+        className={ classnames({ 'center-hor': !noPos, "center-ver": !noPos, "p-t-17per": !noPos }, "row") }
         style={ noPos ? {} : { width: 'fit-content' }}
         >
         <Spinner color="primary" style={{ width: `${size ? size : 3 }rem`, height: `${size ? size : 3 }rem` }} className="m-r-10" />

@@ -1,0 +1,48 @@
+.warning {
+  color: red;
+  font-size: 10px;
+}
+.warning-general,
+.warning-general:hover,
+.warning-general:active,
+.warning-general:focus {
+  color: red;
+}
+
+.warning-text {
+  @extend .color-muted;
+  color: #ffc107 !important;
+}
+
+.disabled-info {
+  height: 30px;
+  font: $font-info-text;
+  font-size: 14px;
+  line-height: 32px;
+}
+
+.message {
+  padding: 4px 4px;
+  height: $button-height;
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.project-message {
+  padding: 4px 4px;
+  font-size: 14px;
+  margin: 5px;
+}
+
+.success-message {
+  background-color: #e6f3e6;
+  color: #365836;
+}
+
+.error-message {
+  background-color: #fcece6;
+  color: #da460f;
+  height: auto;
+  padding: 4px 4px;
+  font-size: 14px;
+}

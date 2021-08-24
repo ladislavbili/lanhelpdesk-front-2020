@@ -135,7 +135,7 @@ export default function PageHeader( props ) {
               <GeneralPopover
                 placement="bottom-start"
                 className="overflow-auto"
-                headerClassName="segoe-semi-header custom-popover-header"
+                headerClassName="header-font custom-popover-header"
                 target="page-header-settings"
                 header="Settings"
                 useLegacy

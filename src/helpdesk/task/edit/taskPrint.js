@@ -88,11 +88,11 @@ class TaskInfo extends Component {
 
 						<div className="ml-auto center-hor">
 							<p className="m-b-0 task-info">
-								<span className="text-muted">
+								<span className="color-muted">
 									{this.props.createdBy?"Created by ":""}
 								</span>
 								{this.props.createdBy? (this.props.createdBy.name + " " +this.props.createdBy.surname) :''}
-								<span className="text-muted">
+								<span className="color-muted">
 									{this.props.createdBy?' at ':'Created at '}
 									{this.props.createdAt?(timestampToString(this.props.createdAt)):''}
 								</span>
@@ -101,14 +101,14 @@ class TaskInfo extends Component {
 								{(()=>{
 									if(this.props.status && this.props.status.action==='pending'){
 										return (
-											<span className="text-muted task-info m-r--40">
+											<span className="color-muted task-info m-r--40">
 												<span className="center-hor">
 													{`Pending date: ${this.props.pendingDate}`}
 												</span>
 											</span>)
 								}else if(this.props.status && (this.props.status.action==='close'||this.props.status.action==='invoiced'||this.props.status.action==='invalid')){
 									return (
-										<span className="text-muted task-info m-r--40">
+										<span className="color-muted task-info m-r--40">
 											<span className="center-hor">
 												{`Closed at: ${this.props.closeDate}`}
 												Closed at:
@@ -117,7 +117,7 @@ class TaskInfo extends Component {
 									}else{
 										return (
 											<span className="task-info ">
-												<span className="center-hor text-muted">
+												<span className="center-hor color-muted">
 													{this.props.statusChange ? ('Status changed at ' + timestampToString(this.props.statusChange) ) : ""}
 												</span>
 											</span>

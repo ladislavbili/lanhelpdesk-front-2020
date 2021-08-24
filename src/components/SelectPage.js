@@ -8,7 +8,7 @@ export default function PageHeader( props ) {
   } = props;
 
   return (
-    <div className="w-270px page-header">
+    <div className="width-270 page-header">
 				<div className="lansystems-title">
           <i className="fas fa-bars" onClick={() => setSidebarOpen(!sidebarOpen)}/>
 					<h1 className="center-hor p-l-15">LanHelpdesk</h1>

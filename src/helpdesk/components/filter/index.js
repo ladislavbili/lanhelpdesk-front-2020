@@ -514,7 +514,7 @@ export default function FilterForm( props ) {
           <div className="sidebar-filter-row">
             <label>Tags</label>
             <div className="row mb-auto">
-              <button className="btn-link m-b-10 h-20px btn-distance" id="filter-multiselect-tags" onClick={ () => setTagsOpen(true) } >
+              <button className="btn-link m-b-10 h-20-f btn-distance" id="filter-multiselect-tags" onClick={ () => setTagsOpen(true) } >
                 <i className="fa fa-plus" />
                 Tag
               </button>
@@ -547,7 +547,7 @@ export default function FilterForm( props ) {
           <div className="sidebar-filter-row">
             <label>Status</label>
             <div className="row mb-auto">
-              <button className="btn-link m-b-10 h-20px btn-distance" id="filter-multiselect-statuses" onClick={ () => setStatusesOpen(true) } >
+              <button className="btn-link m-b-10 h-20-f btn-distance" id="filter-multiselect-statuses" onClick={ () => setStatusesOpen(true) } >
                 <i className="fa fa-plus" />
                 Statuses
               </button>

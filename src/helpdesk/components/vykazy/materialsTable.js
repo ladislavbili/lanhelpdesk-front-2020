@@ -29,22 +29,22 @@ const defaultCols = [
     header: 'Mn.',
     key: 'quantity',
     width: "50",
-    headerClassnames: "t-a-r",
+    headerClassnames: "text-right",
     columnClassnames: "p-l-5",
   },
   {
     header: 'Cena/ks',
     key: 'price',
     width: "8%",
-    headerClassnames: "t-a-r",
-    columnClassnames: "p-l-8 mw-100",
+    headerClassnames: "text-right",
+    columnClassnames: "p-l-8 min-width-100",
   },
   {
     header: 'Spolu',
     key: 'total',
     width: "8%",
-    headerClassnames: "t-a-r",
-    columnClassnames: "p-l-8 mw-100",
+    headerClassnames: "text-right",
+    columnClassnames: "p-l-8 min-width-100",
   },
   {
     header: 'Faktúrovať',
@@ -57,8 +57,8 @@ const defaultCols = [
     header: 'Akcie',
     key: 'actions',
     width: "80",
-    headerClassnames: "t-a-r",
-    columnClassnames: "t-a-r",
+    headerClassnames: "text-right",
+    columnClassnames: "text-right",
   },
 ]
 
@@ -200,7 +200,7 @@ export default function Rozpocet( props ) {
             disabled={disabled}
             type="text"
             pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
+            className="form-control hidden-input h-30 text-right segoe-blue-text"
             value={
               material.id === focusedMaterial ?
               editedMaterialQuantity.toString() :
@@ -246,7 +246,7 @@ export default function Rozpocet( props ) {
       }
       case 'total': {
         return (
-          <div className="p-t-7 p-r-8 t-a-r segoe-blue-text">
+          <div className="p-t-7 p-r-8 text-right segoe-blue-text">
             {  material.id === focusedMaterial
               ?
               (
@@ -352,7 +352,7 @@ export default function Rozpocet( props ) {
           pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
           value={newMaterialQuantity.toString()}
           onChange={(e)=>setNewMaterialQuantity(e.target.value.replace(',', '.') )}
-          className="form-control h-30 t-a-r segoe-blue-text"
+          className="form-control h-30 text-right segoe-blue-text"
           id="inlineFormInput"
           placeholder="Množstvo"
           />

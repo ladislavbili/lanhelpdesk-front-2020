@@ -88,12 +88,12 @@ export default function CommandBar( props ) {
                   </DropdownToggle>
                   <DropdownMenu right>
                     <div className="btn-group-vertical" data-toggle="buttons">
-                      <label className={classnames({'active':layout === 0}, "btn btn-link t-a-l")}>
+                      <label className={classnames({'active':layout === 0}, "btn btn-link text-left")}>
                         <input type="radio" name="options" onChange={() => setLayout(0)} checked={layout === 0}/>
                         <i className="fa fa-columns"/>
                         {` Trojstlpec`}
                       </label>
-                      <label className={classnames({'active':layout === 1}, "btn btn-link t-a-l")}>
+                      <label className={classnames({'active':layout === 1}, "btn btn-link text-left")}>
                         <input type="radio" name="options" checked={layout === 1} onChange={() => setLayout(1)}/>
                         <i className="fa fa-list"/>
                         {` Zoznam`}

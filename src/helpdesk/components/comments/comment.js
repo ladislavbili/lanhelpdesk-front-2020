@@ -20,7 +20,7 @@ export default function CommentRender( props ) {
           alt="Generic placeholder XX"
           />
         <div className="flex">
-          <span className="media-meta pull-right text-muted">{timestampToString(comment.createdAt)}</span>
+          <span className="media-meta pull-right color-muted">{timestampToString(comment.createdAt)}</span>
           <h2 className="font-13 m-0"><Label>{comment.user !== null ? (comment.user.fullName) : 'Unknown sender'}</Label></h2>
         </div>
       </div>

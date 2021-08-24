@@ -61,7 +61,6 @@ import {
 
 import {
   defaultVykazyChanges,
-  invoicedAttributes,
   noTaskType
 } from 'helpdesk/task/constants';
 
@@ -1814,7 +1813,7 @@ export default function RepeatForm( props ) {
             <button className="btn-link-cancel m-l-20" onClick={() => closeModal(wasSaved, wasDisabled)}>Cancel</button>
           }
           { newStartsAt &&
-            <span className="text-muted">
+            <span className="color-muted">
               New Repeat time has been loaded, you can just save the changes or edit repeat!
             </span>
           }
@@ -1854,7 +1853,7 @@ export default function RepeatForm( props ) {
       <div
         className={classnames(
           "scrollable",
-          "min-height-400",
+          "max-height-400",
           { "row": layout === 2}
         )}
         >

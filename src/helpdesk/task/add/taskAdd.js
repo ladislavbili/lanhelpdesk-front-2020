@@ -44,7 +44,6 @@ import {
 } from 'configs/restAPI';
 import {
   defaultVykazyChanges,
-  invoicedAttributes,
   noTaskType,
 } from '../constants';
 import {
@@ -1153,7 +1152,7 @@ export default function TaskAdd( props ) {
         <div className="row" style={{alignItems: "baseline"}}>
           <Label className="m-r-10">Popis úlohy</Label>
           { userRights.taskAttachmentsRead && userRights.taskAttachmentsWrite &&
-            <label htmlFor={`uploadAttachment-${null}`} className="btn-link h-20px btn-distance" >
+            <label htmlFor={`uploadAttachment-${null}`} className="btn-link h-20-f btn-distance" >
               <i className="fa fa-plus" />
               Attachment
             </label>
@@ -1441,7 +1440,7 @@ export default function TaskAdd( props ) {
     <div style={{backgroundColor: "#f9f9f9"}}>
       <div
         className={classnames(
-          "min-height-400",
+          "max-height-400",
           { "row": layout === 2}
         )}
         >

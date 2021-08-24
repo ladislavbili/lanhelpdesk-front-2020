@@ -67,9 +67,6 @@ export default function TableList( props ) {
         if ( display.value === 'invoiced' ) {
           return true;
         }
-        if ( display.value === 'invoiced' ) {
-          return true;
-        }
         if ( display.value === 'checked' ) {
           return true;
         }
@@ -241,7 +238,7 @@ export default function TableList( props ) {
   return (
     <div>
       <CommandBar {...props} />
-      <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
+      <div className="full-width scroll-visible fit-with-header-and-commandbar-list task-container">
         <ListHeader {...props}/>
         <table className="table">
           <thead>

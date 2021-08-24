@@ -109,9 +109,9 @@ export default class Permissions extends Component {
 						<thead>
 							<tr>
 								<th > Username </th>
-								<th className="t-a-c"> View </th>
-								<th className="t-a-c"> Edit </th>
-								<th className="t-a-c"> Permissions</th>
+								<th className="text-center"> View </th>
+								<th className="text-center"> Edit </th>
+								<th className="text-center"> Permissions</th>
 							</tr>
 						</thead>
 
@@ -120,7 +120,7 @@ export default class Permissions extends Component {
 								USERS_TABLE.map(user =>
 								<tr key={user.id}>
 									<td> {user.name} </td>
-										<td className="table-checkbox t-a-c">
+										<td className="table-checkbox text-center">
 											<input
 												type="checkbox"
 												checked={user.view}
@@ -138,7 +138,7 @@ export default class Permissions extends Component {
 											/>
 										</td>
 
-										<td className="table-checkbox t-a-c">
+										<td className="table-checkbox text-center">
 											<input
 												type="checkbox"
 												checked={user.edit}
@@ -156,7 +156,7 @@ export default class Permissions extends Component {
 											/>
 										</td>
 
-										<td className="table-checkbox t-a-c">
+										<td className="table-checkbox text-center">
 											<input
 												type="checkbox"
 												checked={user.permissions}

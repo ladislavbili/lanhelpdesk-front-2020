@@ -56,7 +56,6 @@ import {
   DELETE_TASK,
   TASK_DELETE_SUBSCRIPTION,
   UPDATE_TASK,
-  UPDATE_INVOICED_TASK,
   SET_TASK_LAYOUT,
 
   ADD_SHORT_SUBTASK,
@@ -155,7 +154,6 @@ export default function TaskEditContainer( props ) {
   } = useQuery( GET_PROJECT );
 
   const [ updateTask ] = useMutation( UPDATE_TASK );
-  const [ updateInvoicedTask ] = useMutation( UPDATE_INVOICED_TASK );
   const [ setTaskLayout ] = useMutation( SET_TASK_LAYOUT );
 
   const [ addShortSubtask ] = useMutation( ADD_SHORT_SUBTASK );
@@ -843,12 +841,10 @@ export default function TaskEditContainer( props ) {
       updateShortSubtask={updateShortSubtaskFunc}
       deleteShortSubtask={deleteShortSubtaskFunc}
       updateTask={updateTask}
-      updateInvoicedTask={updateInvoicedTask}
       setTaskLayout={setTaskLayoutFunc}
       client={client}
       saving={saving}
       setSaving={setSaving}
-      canEditInvoiced={props.canEditInvoiced === true}
       />
   );
 

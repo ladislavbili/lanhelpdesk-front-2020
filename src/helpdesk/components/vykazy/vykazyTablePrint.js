@@ -209,7 +209,7 @@ export default class Rozpocet extends Component {
 						<thead>
 							<tr>
 								<th colSpan={this.props.showColumns.includes(0) ? 2 : 1} width="300">
-										<Nav tabs className="b-0 m-0">
+										<Nav tabs className="no-border m-0">
 											<NavItem>
 											<NavLink
 												className="active"
@@ -219,11 +219,11 @@ export default class Rozpocet extends Component {
 										</NavItem>
 									</Nav>
 								</th>
-								{this.props.showColumns.includes(5) && <th width="70" className="table-highlight-background t-a-r">Nákup</th> }
-								{this.props.showColumns.includes(7) && <th width="70" className="table-highlight-background t-a-r">Cena</th>}
+								{this.props.showColumns.includes(5) && <th width="70" className="table-highlight-background text-right">Nákup</th> }
+								{this.props.showColumns.includes(7) && <th width="70" className="table-highlight-background text-right">Cena</th>}
 								{this.props.showColumns.includes(2) && <th width="130">Rieši</th> }
 								{this.props.showColumns.includes(3) && <th width="130">Typ</th> }
-								{this.props.showColumns.includes(4) && <th width="50" className="t-a-r">Mn.</th> }
+								{this.props.showColumns.includes(4) && <th width="50" className="text-right">Mn.</th> }
 							</tr>
 						</thead>
 						<tbody>
@@ -255,7 +255,7 @@ export default class Rozpocet extends Component {
 
 
 											{this.props.showColumns.includes(7) &&
-												<td className="p-t-15 p-l-8 p-r-8 t-a-r"> {/* //cena*/}
+												<td className="p-t-15 p-l-8 p-r-8 text-right"> {/* //cena*/}
 												</td>
 											}
 
@@ -319,7 +319,7 @@ export default class Rozpocet extends Component {
 
 
 									{this.props.showColumns.includes(7) &&
-										<td className="p-t-15 p-l-8 p-r-8 t-a-r">	{/* //cena*/}
+										<td className="p-t-15 p-l-8 p-r-8 text-right">	{/* //cena*/}
 										</td>}
 
 									{this.props.showColumns.includes(2) &&
@@ -441,7 +441,7 @@ export default class Rozpocet extends Component {
 
 										{this.props.showColumns.includes(7) &&
 											this.state.toggleTab === "2" &&
-											<td className="table-highlight-background p-l-8 p-t-15 p-r-8 t-a-r">{/* 	//cena*/}
+											<td className="table-highlight-background p-l-8 p-t-15 p-r-8 text-right">{/* 	//cena*/}
 												{
 													(
 													(parseFloat(material.id === this.state.focusedMaterial

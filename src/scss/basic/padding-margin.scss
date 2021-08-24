@@ -1,5 +1,5 @@
 //PADDING
-.p-t-17p {
+.p-t-17per {
   padding-top: 17% !important;
 }
 
@@ -10,10 +10,29 @@ p-auto {
   padding-bottom: auto;
 }
 
+@for $i from 0 through 300 {
+  .p-#{$i} {
+    padding: #{$i}px !important;
+  }
+  .p-l-#{$i} {
+    padding-left: #{$i}px !important;
+  }
+  .p-r-#{$i} {
+    padding-right: #{$i}px !important;
+  }
+  .p-t-#{$i} {
+    padding-top: #{$i}px !important;
+  }
+  .p-b-#{$i} {
+    padding-bottom:  #{$i}px !important;
+  }
+}
+
 //MARGIN
 .center-ver {
   margin-left: auto !important;
   margin-right: auto !important;
+  align-self: center !important;
 }
 
 .center-hor {
@@ -22,18 +41,24 @@ p-auto {
   vertical-align: middle !important;
 }
 
-.m-r--40 {
-  margin-right: -40px;
-}
-
-.m-l--40 {
-  margin-left: -40px !important;
-}
-
-.m-t-17p {
+.m-t-17per {
   margin-top: 17% !important;
 }
 
-.small-p {
-  margin: 0px;
+@for $i from 0 through 300 {
+  .m-#{$i} {
+    margin: #{$i}px !important;
+  }
+  .m-l-#{$i} {
+    margin-left: #{$i}px !important;
+  }
+  .m-r-#{$i} {
+    margin-right: #{$i}px !important;
+  }
+  .m-t-#{$i} {
+    margin-top: #{$i}px !important;
+  }
+  .m-b-#{$i} {
+    margin-bottom: #{$i}px !important;
+  }
 }

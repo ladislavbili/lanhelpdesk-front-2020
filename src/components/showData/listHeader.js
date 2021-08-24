@@ -28,7 +28,7 @@ export default function ListHeader( props ) {
   const toggle = () => setPopoverOpen( !popoverOpen );
 
   return (
-    <div className={classnames("d-flex", "h-60px", "flex-row")}>
+    <div className={classnames("d-flex", "h-60", "flex-row")}>
       <Search {...props}/>
 
       <div className="ml-auto p-2 align-self-center">
@@ -52,13 +52,13 @@ export default function ListHeader( props ) {
             )}
             >
 
-            <div className="text-basic m-r-5 m-l-5">
+            <div className="color-basic m-r-5 m-l-5">
               Sort by
             </div>
 
             <select
               value={orderBy}
-              className="invisible-select text-bold text-highlight"
+              className="invisible-select font-bold text-highlight"
               onChange={(e)=>setOrderBy(e.target.value)}>
               { orderByValues.map((item,index) =>
                 <option value={item.value} key={index}>{item.label}</option>

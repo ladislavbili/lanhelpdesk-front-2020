@@ -51,7 +51,7 @@ export default function MonthSelector( props ) {
       <FormGroup>
         <Label>Select month and year</Label>
         <div className="flex-row">
-          <div className="w-50 p-r-20">
+          <div className="width-50-p p-r-20">
             <Select
               value={month}
               onChange={(mn) => {
@@ -61,7 +61,7 @@ export default function MonthSelector( props ) {
               styles={pickSelectStyle()}
               />
           </div>
-          <div className="w-50 p-r-20">
+          <div className="width-50-p p-r-20">
             <Select
               value={year}
               onChange={(yr) => {
@@ -96,7 +96,7 @@ export default function MonthSelector( props ) {
       <FormGroup>
         <Label>Select date range you preffer</Label>
         <div className="flex-row">
-          <div className="w-50 p-r-20">
+          <div className="width-50-p p-r-20">
             <DatePicker
               className="form-control datepicker-width-185"
               selected={fromDate}
@@ -106,7 +106,7 @@ export default function MonthSelector( props ) {
               dateFormat="DD.MM.YYYY"
               />
           </div>
-          <div className="w-50 p-r-20">
+          <div className="width-50-p p-r-20">
             <DatePicker
               className="form-control datepicker-width-185"
               selected={toDate}

@@ -477,7 +477,7 @@ export default function ProjectAdd( props ) {
       Add project
     </h2>
 
-    <Nav tabs className="b-0 m-b-25">
+    <Nav tabs className="no-border m-b-25">
       <NavItem>
         <NavLink
           className={classnames({ active: openedTab === 'description'}, "clickable", "")}
@@ -602,7 +602,7 @@ export default function ProjectAdd( props ) {
             setArchived(!archived)
           }}
           label="Archived"
-          labelClassName="normal-weight font-normal"
+          labelClassName="text-normal font-normal"
           simpleSwitch
           />
       </TabPane>

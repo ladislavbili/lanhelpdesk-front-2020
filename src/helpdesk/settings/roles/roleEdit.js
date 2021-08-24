@@ -286,7 +286,7 @@ export default function RoleEdit( props ) {
               <th  width={"90%"} key={1}>
                 Name
               </th>
-              <th className="t-a-c" key={2}>
+              <th className="text-center" key={2}>
                 Granted
               </th>
             </tr>
@@ -316,7 +316,7 @@ export default function RoleEdit( props ) {
               <th width={"90%"} key={1}>
                 Access
               </th>
-              <th className="t-a-c" key={2}>
+              <th className="text-center" key={2}>
                 View & Edit
               </th>
             </tr>

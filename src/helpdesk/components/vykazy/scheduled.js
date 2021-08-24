@@ -71,9 +71,9 @@ export default function Scheduled( props ) {
       <Popover className="scheduled-in-table" placement="bottom" style={{maxWidth: '350px !important', width: '350px !important'}} isOpen={scheduledOpen && !disabled} target={'scheduled-' + id } toggle={() => {setScheduledOpen(!scheduledOpen)}}>
         <PopoverBody>
           <FormGroup>
-            <Label className="w-100">From</Label>
+            <Label className="width-100-p">From</Label>
             <DatePicker
-              className="form-control w-100"
+              className="form-control width-100-p"
               selected={newFrom}
               disabled={disabled}
               onChange={date => {
@@ -104,9 +104,9 @@ export default function Scheduled( props ) {
               />
           </FormGroup>
           <FormGroup>
-            <Label className="w-100">To</Label>
+            <Label className="width-100-p">To</Label>
             <DatePicker
-              className="form-control w-100"
+              className="form-control width-100-p"
               selected={newTo}
               disabled={disabled}
               popperPlacement="auto-left"

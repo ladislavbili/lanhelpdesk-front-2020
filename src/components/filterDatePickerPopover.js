@@ -147,7 +147,7 @@ export default function FilterDatePickerPopover( props ) {
                   Last month
                 </button>
                 <div className="row">
-                  <div className="w-50 p-r-10">
+                  <div className="width-50-p p-r-10">
                     <div className="row">
                       <label className="center-hor">From</label>
                       <button type="button" className="btn-link ml-auto m-r-0" onClick={() => setNewDateFrom(moment())}>
@@ -165,7 +165,7 @@ export default function FilterDatePickerPopover( props ) {
                       />
                   </div>
 
-                  <div className="w-50 p-l-10">
+                  <div className="width-50-p p-l-10">
                     <div className="row">
                       <label className="center-hor">To</label>
                       <button type="button" className="btn-link ml-auto m-r-0" onClick={() => setNewDateTo(moment())}>

@@ -1,0 +1,42 @@
+.commandbar {
+  display: flex;
+  width: 100%;
+  background-color: #f4f8fb;
+  padding: 0px 1px 0px 1px;
+  height: $commandbar-height;
+  white-space: pre-wrap;
+  border-bottom: $main-border;
+}
+
+.dynamic-bg-commandbar {
+  display: flex;
+  background-color: #f4f8fb;
+  width: 100%;
+  padding: 0px 1px 0px 1px;
+  white-space: pre-wrap;
+  border-bottom: $main-border;
+  min-height: $commandbar-height;
+}
+
+.dynamic-commandbar {
+  display: flex;
+  background-color: #f4f8fb;
+  width: 100%;
+  padding: 0px 1px 0px 1px;
+  white-space: pre-wrap;
+  border-bottom: $main-border;
+}
+
+.commandbar-small {
+  display: flex;
+  width: 100%;
+  background-color: $main-background-color;
+  padding: 0px 1px 0px 1px;
+  height: 60px;
+  white-space: pre-wrap;
+  border-bottom: $main-border;
+}
+
+.commandbar-icon {
+  height: 19px;
+}

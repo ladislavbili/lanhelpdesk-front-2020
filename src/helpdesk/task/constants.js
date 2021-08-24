@@ -20,33 +20,8 @@ export const defaultVykazyChanges = {
     DELETE: []
   },
 }
-export const invoicedAttributes = {
-  subtask: [
-    'price',
-    'quantity',
-    'type',
-    'assignedTo',
-  ],
-  trip: [
-    'price',
-    'quantity',
-    'type',
-    'assignedTo',
-  ],
-  material: [
-    'title',
-    'quantity',
-    'price',
-    'totalPrice',
-    'margin',
-  ],
-  customItem: [
-    'title',
-    'quantity',
-    'price',
-    'totalPrice',
-  ],
-}
+
+
 export const defaultCheckboxList = [
   {
     id: 1,

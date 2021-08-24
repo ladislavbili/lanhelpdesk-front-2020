@@ -1,22 +1,21 @@
-.font-12 {
-  font-size: 12px;
-}
-.font-13 {
-  font-size: 13px;
-}
-.font-14 {
-  font-size: 14px;
-}
-.font-15 {
-  font-size: 15px;
-}
-.font-16 {
-  font-size: 16px;
-}
-.font-24 {
-  font-size: 24px;
+@for $i from 10 through 30 {
+  .font-#{$i} {
+    font-size: #{$i}px;
+  }
 }
 
+//text align
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.text-left {
+  text-align: left;
+}
+
+//font family
 .font-normal {
   font-family: Segoe UI;
 }
@@ -25,49 +24,30 @@
   font-family: Segoe UI Semibold;
 }
 
-.segoe-semi-header{
+.header-font {
 font-size: 14px;
 font-family: Segoe UI Semibold;
-
 }
 
-.segoe-semi-text-f{
-  font-size: 12px !important;
-  font-family: Segoe UI Semibold;
-  color: $color-link !important;
+//font weight
+.bolder {
+  font: $font-info-text-bold;
+  font-weight: bolder;
 }
 
-.segoe-blue-text, .segoe-blue-text::placeholder {
-  font-family: Segoe UI;
-  color: $color-link !important;
+.text-normal {
+  font-weight: normal;
 }
 
-.t-a-c{
-  text-align: center;
-}
-.t-a-r{
-  text-align: right;
-}
-.t-a-l{
-  text-align: left;
+.text-slim {
+  font-weight: 400;
 }
 
 .text-extra-slim {
   font-weight: 100;
 }
-.text-slim {
-  font-weight: 400;
-}
-.text-bold {
-  font-family: Segoe UI Semibold;
-}
 
-.text-muted {
-  color: $muted-font-color !important;
-}
-.text-basic {
-  color: $main-font-color;
-}
+//text color
 .text-highlight {
   color: $basic-button-color !important;
   label {
@@ -75,21 +55,7 @@ font-family: Segoe UI Semibold;
   }
 }
 
-.info-text {
-  @extend .text-muted;
-}
-.bolder {
-  font: $font-info-text-bold;
-}
-
-.bolder-text {
-  font-weight: bolder;
-}
-
-.normal-weight{
-  font-weight: normal;
-}
-
-.white-text {
-  color: white;
+.segoe-blue-text, .segoe-blue-text::placeholder {
+  font-family: Segoe UI;
+  color: $color-link !important;
 }

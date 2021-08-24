@@ -28,8 +28,8 @@ export default function TagACL( props ) {
     <div>
       <FormGroup>
         <Label>User</Label>
-        <div className="row w-30">
-          <div className="f-1">
+        <div className="row width-30-p">
+          <div className="flex">
             <Select
               value={chosenUser}
               styles={pickSelectStyle()}
@@ -92,7 +92,7 @@ export default function TagACL( props ) {
                   />
               </td>
               <td>
-                <button className="btn btn-link waves-effect t-a-c"
+                <button className="btn btn-link waves-effect text-center"
                   onClick={()=>{
                     if(window.confirm('Are you sure?')){
                       removeUserWithRights(user.id);

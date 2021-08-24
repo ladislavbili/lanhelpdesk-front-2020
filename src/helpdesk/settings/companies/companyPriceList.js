@@ -76,7 +76,7 @@ export default function CompanyPriceList( props ) {
           newData
         ) &&
         <FormGroup className="row m-b-10">
-          <div className="m-r-10 w-20">
+          <div className="m-r-10 width-20-p">
             <Label for="priceName">Price list name</Label>
           </div>
           <div className="flex">

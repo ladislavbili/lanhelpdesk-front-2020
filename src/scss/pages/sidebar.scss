@@ -13,3 +13,225 @@
   background-color: $basic-button-color;
   border: none;
 }
+
+.sidebar {
+  width: $sidebar-width;
+  border: none;
+  border-right: $main-border;
+  list-style-type: none;
+  background: $sidebar-background-color;
+  position: relative;
+  z-index: 20;
+}
+
+.sidebar-item-active {
+  background-color: #deeaf3;
+}
+
+.sidebar-compressed {
+  width: $compressed-sidebar-width;
+  background-color: $header-color;
+  border: none;
+  border-right: $main-border;
+  list-style-type: none;
+  position: relative;
+  top: inherit;
+  z-index: 20;
+  .btn.popover-toggler{
+    height: 3em !important;
+    width: 100% !important;
+    background-color: $header-color;
+    .fa, .fas{
+      padding-right: 0px;
+    }
+    i, img{
+      height: 20px;
+      font-size: 20px;
+      color: white;
+    }
+    img.invert{
+      -webkit-filter:invert(100%);
+      filter:progid:DXImageTransform.Microsoft.BasicImage(invert='1');
+    }
+  }
+}
+
+.btn.popover-toggler:first-child{
+  margin-top: 0.5em;
+}
+
+
+.sidebar-menu {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.sidebar-filter {
+  width: calc(100% - 30px);
+  margin: 10px 15px 0px calc(15px - #{$input-padding});
+  label,
+  .listed-tags,
+  .btn-link {
+    margin-left: $input-padding;
+  }
+}
+
+.sidebar-btn-link {
+  display: flex;
+  margin: 0px;
+  padding-left: 12px;
+  height: $button-height;
+}
+
+.sidebar-btn-link:hover {
+  color: #0078d4 !important;
+  background-color: rgb(238, 238, 238);
+}
+
+.sidebar-label {
+  padding-top: 1em;
+  padding-left: 15px;
+  padding-right: 15px;
+  label {
+    margin-left: 5px;
+    font: $font-value;
+  }
+  img {
+    color: #212121;
+    height: 14px;
+    margin-bottom: 3px;
+  }
+}
+
+.sidebar-plus {
+  margin-right: 10px;
+  margin-left: 8px;
+  margin-top: 5px;
+}
+
+.sidebar-item {
+  background-color: inherit;
+}
+
+.sidebar-item.active {
+  background-color: #deeaf3;
+}
+
+.sidebar-menu-item {
+  color: $main-font-color;
+  display: flex;
+  flex: auto;
+  height: 35px;
+  border: none !important;
+  padding: 7px 15px !important;
+}
+
+.sidebar-menu-item.active {
+  color: #0078d4 !important;
+}
+
+.sidebar-icon {
+  color: transparent;
+  padding-top: 7px;
+  padding-right: 20px;
+}
+
+.sidebar-icon.active {
+  font-weight: 900;
+  color: #0078d4 !important;
+}
+
+.sidebar-align {
+  padding-left: 33px !important;
+}
+
+.sidebar-filter {
+}
+
+.sidebar-filter-label {
+  margin: 0px 15px 0px 15px;
+  font-family: Segoe UI;
+  font-style: normal;
+  font-weight: 350;
+  font-size: 15px;
+  line-height: 38px;
+  letter-spacing: 0.5px;
+  color: #3c3c3c;
+}
+
+.sidebar-filter-name {
+  margin: 0px 15px 5px 15px;
+  font-family: Segoe UI;
+  font-style: normal;
+  font-weight: 350;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  color: #0078d4;
+}
+
+.sidebar-filter-commandbar {
+  .btn-link:not(.inner),
+  .filter-add-btn {
+    width: 20%;
+    margin-right: 0px !important;
+  }
+}
+
+.sidebar-filter-row {
+  margin: 0px 0px !important;
+}
+
+.sidebar-filter-row > label {
+  font-family: Segoe UI;
+  font-style: normal;
+  font-weight: 350;
+  font-size: 15px;
+  line-height: 38px;
+  letter-spacing: 0.5px;
+  color: #3c3c3c;
+  margin-bottom: -5px !important;
+}
+
+.sidebar-filter-row > .row > .react-datepicker-wrapper {
+  font-family: Segoe UI;
+  font-style: normal;
+  font-weight: 350;
+  font-size: 13px;
+  line-height: 38px;
+  letter-spacing: 0.5px;
+  color: #3c3c3c;
+  display: inline;
+  width: 50% !important;
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+.sidebar-filter-row:hover {
+  color: inherit !important;
+  background-color: inherit !important;
+}
+
+.sidebar-filter-input {
+  font-family: Segoe UI;
+  font-style: normal;
+  font-weight: 350;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  color: #0078d4;
+  margin-top: 0px;
+  margin-left: 15px;
+  width: calc(100% - 30px);
+}
+
+.sidebar-filter-input:focus {
+  background-color: inherit;
+  border: none;
+  border-bottom: 1px solid #dadada;
+  margin: 0px 15px 0px 15px !important;
+}
+
+.sidebar-filter-navlink {
+  padding-left: 0px !important;
+}

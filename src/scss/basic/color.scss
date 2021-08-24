@@ -1,11 +1,11 @@
-.bkg-color-inherit {
+//background
+.transparent-background {
   background-color: inherit;
 }
 
 .bkg-white {
   background-color: white !important;
 }
-
 .bkg-F2F1F1 {
   background-color: #f2f1f1;
 }
@@ -15,7 +15,23 @@
 .bkg-F9F9F9 {
   background-color: #f9f9f9;
 }
-
 .bkg-content {
   background-color: $content-background-color;
+}
+
+//color
+.color-danger {
+  color: #dc3545;
+}
+
+.color-white {
+  color: white;
+}
+
+.color-basic {
+  color: $main-font-color;
+}
+
+.color-muted {
+  color: $muted-font-color !important;
 }

@@ -411,7 +411,7 @@ export default class MultipleTaskEdit extends Component {
         </span>
         <button
           type="button"
-          className="btn-link ml-auto asc"
+          className="btn-link ml-auto align-self-center"
           onClick={() => this.setState({layout: (this.state.layout === "1" ? "2" : "1")})}>
           Switch layout
         </button>
@@ -658,7 +658,7 @@ export default class MultipleTaskEdit extends Component {
     const REQUESTERS = ( this.state.project && this.state.project.lockedRequester ? USERS_WITH_PERMISSIONS : this.state.users );
 
     return (
-      <div className={"task-edit-right" + (this.props.columns ? " w-250px" : "")} >
+      <div className={"task-edit-right" + (this.props.columns ? " width-250" : "")} >
         <div className="">
           <Label className="col-form-label-2">Projekt</Label>
           <div className="col-form-value-2">
@@ -915,7 +915,7 @@ export default class MultipleTaskEdit extends Component {
 
     return (
       <div className="comments">
-                        <Nav tabs className="b-0 m-b-22 m-l--10 m-t-15">
+                        <Nav tabs className="no-border m-b-22 m-l--10 m-t-15">
                           <NavItem>
                             <NavLink
                               className={classnames({ active: true}, "clickable", "")}

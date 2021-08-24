@@ -58,8 +58,8 @@ export default function ProjectAttributes( props ) {
           <tr>
             <th width="300">Task attributes</th>
             <th>Default value</th>
-            <th width="100" className="t-a-c">Fixed</th>
-            <th width="100" className="t-a-c">Required</th>
+            <th width="100" className="text-center">Fixed</th>
+            <th width="100" className="text-center">Required</th>
           </tr>
         </thead>
         <tbody>
@@ -246,8 +246,8 @@ export default function ProjectAttributes( props ) {
           <tr>
             <th width="300">Pausal attributes</th>
             <th>Default value</th>
-            <th width="100" className="t-a-c">Fixed</th>
-            <th width="100" className="t-a-c">Required</th>
+            <th width="100" className="text-center">Fixed</th>
+            <th width="100" className="text-center">Required</th>
           </tr>
         </thead>
         <tbody>
@@ -352,7 +352,7 @@ export default function ProjectAttributes( props ) {
                 value={autoApproved}
                 onChange={() => setAutoApproved(!autoApproved) }
                 className="m-t-4"
-                labelClassName="normal-weight font-normal"
+                labelClassName="text-normal font-normal"
                 simpleSwitch
                 />
             </td>

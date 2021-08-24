@@ -22,13 +22,13 @@ export default function TagsPickerPopover( props ) {
 
   return (
     <div className="row mb-auto">
-      <button className="btn-link m-b-10 h-20px btn-distance" id={`edit-tags-${taskID}`} onClick={ () => setTagsOpen(true) } >
+      <button className="btn-link m-b-10 h-20-f btn-distance" id={`edit-tags-${taskID}`} onClick={ () => setTagsOpen(true) } >
         <i className="fa fa-plus" />
         Tags
       </button>
       <GeneralPopover
         placement="bottom-start"
-        className="overflow-auto mh-400"
+        className="overflow-auto max-height-400"
         target={`edit-tags-${taskID}`}
         header="Select tags"
         reset={() => {}}

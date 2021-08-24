@@ -27,7 +27,7 @@ export default function EmailRender( props ) {
           />
         <div className="flex" >
           <p>
-            <span className="media-meta pull-right text-muted">{timestampToString(comment.createdAt)}</span>
+            <span className="media-meta pull-right color-muted">{timestampToString(comment.createdAt)}</span>
             <h2 className="font-13 m-0"><Label>From: {comment.user !== null ? `${comment.user.fullName} (${comment.user.email})` : 'Unknown user'}</Label></h2>
             <h2 className="font-13 m-0"><Label>To: {comment.tos.toString()}</Label></h2>
           </p>
@@ -60,7 +60,7 @@ export default function EmailRender( props ) {
               </label>
             </DropdownMenu>
           </Dropdown>
-          <p className="m-b-0">Subject: <span className="text-muted">{comment.subject}</span></p>
+          <p className="m-b-0">Subject: <span className="color-muted">{comment.subject}</span></p>
           <div
             className="ignore-css"
             dangerouslySetInnerHTML={{

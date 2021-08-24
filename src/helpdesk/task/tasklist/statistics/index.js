@@ -110,7 +110,7 @@ export default function Statistics( props ) {
       <CommandBar
         {...props}
         />
-      <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
+      <div className="full-width scroll-visible fit-with-header-and-commandbar-list task-container">
         <div className="statistics">
           <table className="table m-t-20">
             <thead>
@@ -150,13 +150,13 @@ export default function Statistics( props ) {
               <tr>
                 <td className="m-l-8 m-t-5 h2">Hodiny</td>
                 { statistics.map((item) => (
-                  <td key={item.status.id} className="v-a-b" style={{borderTop: "none"}}>
+                  <td key={item.status.id} className="ver-align-bottom" style={{borderTop: "none"}}>
                     <div style={{ paddingTop: 'inherit' }}>
                       hod.
                     </div>
                   </td>
                 ) ) }
-                <td className="v-a-b" style={{borderTop: "none"}}>
+                <td className="ver-align-bottom" style={{borderTop: "none"}}>
                   hod.
                 </td>
               </tr>
@@ -207,13 +207,13 @@ export default function Statistics( props ) {
               <tr>
                 <td className="m-l-8 m-t-5 h2">Výjazdy</td>
                 { statistics.map((item) => (
-                  <td key={item.status.id} className="v-a-b" style={{borderTop: "none"}}>
+                  <td key={item.status.id} className="ver-align-bottom" style={{borderTop: "none"}}>
                     <div style={{ paddingTop: 'inherit' }}>
                       ks.
                     </div>
                   </td>
                 ) ) }
-                <td className="v-a-b" style={{borderTop: "none"}}>
+                <td className="ver-align-bottom" style={{borderTop: "none"}}>
                   ks.
                 </td>
               </tr>
@@ -264,13 +264,13 @@ export default function Statistics( props ) {
               <tr>
                 <td className="m-l-8 m-t-5 h2">Materiál</td>
                 { statistics.map((item) => (
-                  <td key={item.status.id} className="v-a-b" style={{borderTop: "none"}}>
+                  <td key={item.status.id} className="ver-align-bottom" style={{borderTop: "none"}}>
                     <div style={{ paddingTop: 'inherit' }}>
                       ks.
                     </div>
                   </td>
                 ) ) }
-                <td className="v-a-b" style={{borderTop: "none"}}>
+                <td className="ver-align-bottom" style={{borderTop: "none"}}>
                   ks.
                 </td>
               </tr>
@@ -323,7 +323,7 @@ export default function Statistics( props ) {
               <tr>
                 <td className="m-l-8 m-t-5 h2">Voľné položky</td>
                 { statistics.map((item) => (
-                  <td key={item.status.id} className="v-a-b" style={{borderTop: "none"}}>
+                  <td key={item.status.id} className="ver-align-bottom" style={{borderTop: "none"}}>
                     <div style={{ paddingTop: 'inherit' }}>
                       ks.
                     </div>

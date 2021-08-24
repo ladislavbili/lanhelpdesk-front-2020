@@ -1,0 +1,55 @@
+.popover {
+  display: none;
+}
+.popover-toggler:hover{
+  .popover{
+    padding: 15px 0px;
+    display: block;
+    position: absolute;
+    background-color: white;
+    width: 270px;
+    left: 55px;
+
+    i, img{
+      height: 1.5em;
+      font-size: 1.5em;
+      color: $basic-button-color;
+      padding-left: 0px !important;
+      margin-right: 5px;
+    }
+
+    .sidebar-btn{
+      background-color: $basic-button-color;
+      margin-top: 15px;
+      width: calc(100% - 30px);
+      margin-left: 15px !important;
+      margin-right: 15px !important;
+      margin: 0px;
+      color: white;
+      i{
+        color: white !important;
+        height: 1em;
+        font-size: 1em;
+      }
+    }
+    .btn-link {
+      margin-left: 0px !important;
+      padding-left: 15px !important;
+      i {
+        height: 1em;
+        font-size: 1em;
+      }
+    }
+
+    .sidebar-label {
+      padding: 0px 15px;
+      .fa, .fas{
+        color: black;
+      }
+    }
+    .sidebar-menu-item{
+      font-size: 14px;
+    }
+
+  }
+}

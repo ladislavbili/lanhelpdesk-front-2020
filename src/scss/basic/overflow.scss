@@ -8,16 +8,8 @@
   overflow-x: hidden;
 }
 
-.scroll-x-auto {
-  overflow-x: auto !important;
-}
-
-.overflowX-hidden {
-  overflow-x: hidden;
-}
-
-.overflow-x {
-  overflow-x: auto;
+.overflow-auto {
+  overflow: auto;
 }
 
 .no-scrolling {
@@ -27,10 +19,15 @@
   overflow: hidden;
 }
 
-.overflow-auto {
-  overflow: auto;
+//scroll X
+.overflow-x {
+  overflow-x: auto;
 }
 
-.overflowX {
-  overflow-x: auto;
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.overflow-x-auto {
+  overflow-x: auto !important;
 }

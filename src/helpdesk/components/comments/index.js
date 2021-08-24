@@ -257,7 +257,7 @@ export default function Comments( props ) {
 
             <div className='center-hor'>
               <button
-                className="btn-link v-a-m"
+                className="btn-link ver-align-middle"
                 htmlFor="uploadCommentAttachments"
                 >
                 <i className="fa fa-plus" />

@@ -1,0 +1,82 @@
+.page-header {
+  background-color: #004578 !important;
+  height: $header-height;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  border-right: 2px solid #004578;
+  //margin-right: -2px;
+
+  .lansystems-title {
+    display: flex !important;
+    height: 100%;
+
+    h1, i {
+      color: #fff;
+      font-size: 27px;
+      margin-top: 2px;
+    }
+    i{
+      margin-top: auto;
+      margin-bottom: auto;
+      margin-left: 15px;
+      cursor: pointer;
+    }
+  }
+}
+
+.header-link {
+  color: white;
+  margin-right: 10px;
+}
+.header-link:hover,
+.header-link:focus {
+  text-decoration: none;
+  border-bottom: 1px solid white;
+  color: white;
+}
+.header-link-active {
+  border-bottom: 1px solid white;
+}
+
+.header-dropdown,
+.header-dropdown:hover {
+  background-color: transparent !important;
+  border-width: 0px;
+  padding: 0px;
+  width: 30px;
+}
+
+.header-with-text, .header-with-text:hover, .header-with-text:focus{
+  margin-right: 5px !important;
+}
+
+
+.header-icon,
+.header-icon:active,
+.header-icon:focus {
+  font-size: 15px;
+  background-color: transparent !important;
+  border-width: 0;
+  margin-right: 5px;
+  color: white;
+}
+
+.header-icon-with-text,
+.header-icon-with-text:hover,
+.header-icon-with-text:active,
+.header-icon-with-text:focus {
+  font-size: 15px;
+  background-color: transparent !important;
+  border-width: 0;
+  margin-right: -4px;
+  color: white;
+}
+
+.header-icon-text {
+  font-size: 10px;
+  margin-top: auto;
+  margin-left: -5px;
+  padding-bottom: 4px;
+  color: #f2f1f1;
+}

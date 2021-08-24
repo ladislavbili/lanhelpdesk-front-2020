@@ -99,7 +99,7 @@ export default function NoteEdit( props ) {
 
       <div className="note-tags-edit group">
         <Label>Tags</Label>
-        <div className="f-1 select">
+        <div className="flex select">
           <Select
             value={tags}
             isMulti

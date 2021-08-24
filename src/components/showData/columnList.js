@@ -21,8 +21,8 @@ export default function ColumnDisplay( props ) {
       <CommandBar {...props} />
       <ListHeader {...props} multiselect={false} />
       <div className="row p-0 task-container">
-        <div className="p-0 golden-ratio-382">
-          <div className="scroll-visible fit-with-header-and-commandbar-2 task-list">
+        <div className="p-0 ">
+          <div className="scroll-visible fit-with-header-and-commandbar-list task-list">
             {
               data.map((item, index) =>
               <ul

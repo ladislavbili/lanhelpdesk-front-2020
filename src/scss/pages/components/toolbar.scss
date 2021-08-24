@@ -1,0 +1,7 @@
+.toolbar-item {
+  border: 1px solid $muted-gray;
+  border-right: 0px;
+}
+.toolbar-item:last-child {
+  border: 1px solid $muted-gray;
+}

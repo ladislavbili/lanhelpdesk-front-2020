@@ -40,13 +40,13 @@ const defaultCols = [
     key: 'scheduled',
     width: "15%",
     headerClassnames: "",
-    columnClassnames: "p-l-8 center-hor mw-160",
+    columnClassnames: "p-l-8 center-hor min-width-160",
   },
   {
     header: 'Mn.',
     key: 'quantity',
     width: "50",
-    headerClassnames: "t-a-r",
+    headerClassnames: "text-right",
     columnClassnames: "p-l-5",
   },
   {
@@ -61,7 +61,7 @@ const defaultCols = [
     key: 'assigned',
     width: "12%",
     headerClassnames: "",
-    columnClassnames: "p-l-8 mw-150",
+    columnClassnames: "p-l-8 min-width-150",
   },
   {
     header: 'Faktúrovať',
@@ -74,30 +74,30 @@ const defaultCols = [
     header: 'Akcie',
     key: 'actions',
     width: "93",
-    headerClassnames: "t-a-r",
-    columnClassnames: "t-a-r",
+    headerClassnames: "text-right",
+    columnClassnames: "text-right",
   },
   //advanced
   {
     header: 'Cenník/ks',
     key: 'price',
     width: "93",
-    headerClassnames: "t-a-r",
-    columnClassnames: "p-l-8 mw-100",
+    headerClassnames: "text-right",
+    columnClassnames: "p-l-8 min-width-100",
   },
   {
     header: 'Zľava',
     key: 'discount',
     width: "93",
-    headerClassnames: "t-a-r",
+    headerClassnames: "text-right",
     columnClassnames: "p-l-8",
   },
   {
     header: 'Cena',
     key: 'priceAfterDiscount',
     width: "93",
-    headerClassnames: "t-a-r",
-    columnClassnames: "p-l-8 mw-100",
+    headerClassnames: "text-right",
+    columnClassnames: "p-l-8 min-width-100",
   },
 ]
 
@@ -309,7 +309,7 @@ export default function WorksTable( props ) {
             disabled={disabled || !canAddSubtasksAndTrips}
             type="text"
             pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
+            className="form-control hidden-input h-30 text-right segoe-blue-text"
             value={
               subtask.id === focusedSubtask
               ? editedSubtaskQuantity.toString()
@@ -545,7 +545,7 @@ export default function WorksTable( props ) {
             disabled={disabled || !canAddSubtasksAndTrips}
             type="text"
             pattern="([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]"
-            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
+            className="form-control hidden-input h-30 text-right segoe-blue-text"
             value={
               trip.id === focusedTrip ?
               editedTripQuantity.toString() :
@@ -805,7 +805,7 @@ export default function WorksTable( props ) {
                 setNewSubtaskScheduledTo(moment(newSubtaskScheduledFrom).add( parseFloat(e.target.value.replace(',', '.')) ,'hours'))
               }
             }}
-            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
+            className="form-control hidden-input h-30 text-right segoe-blue-text"
             id="inlineFormInput"
             placeholder=""
             />
@@ -1007,7 +1007,7 @@ export default function WorksTable( props ) {
                 setNewTripScheduledTo(moment(newTripScheduledFrom).add( parseFloat(e.target.value.replace(',', '.')) ,'hours'))
               }
             }}
-            className="form-control hidden-input h-30 t-a-r segoe-blue-text"
+            className="form-control hidden-input h-30 text-right segoe-blue-text"
             id="inlineFormInput"
             placeholder=""
             />

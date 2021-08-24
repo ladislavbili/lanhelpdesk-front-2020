@@ -200,7 +200,7 @@ export default function PricelistEdit( props ) {
         }}
         />
 
-      <Nav tabs className="b-0 m-b-25 m-t-20">
+      <Nav tabs className="no-border m-b-25 m-t-20">
         <NavItem>
           <NavLink
             className={classnames({ active: openedTab === 'taskTypes'}, "clickable", "")}

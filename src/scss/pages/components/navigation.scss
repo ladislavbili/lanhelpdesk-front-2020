@@ -1,0 +1,81 @@
+//TABY
+.nav-link:not(.sidebar-menu-item) {
+  font-family: $main-font-color;
+  height: 28px;
+  font-size: 14px;
+}
+.nav > li > a:not(.sidebar-menu-item) {
+  padding: 2px 0px 5px 2px;
+  color: #979797 !important;
+  border-radius: 0px !important;
+  border: none !important;
+  //  border-right: 2px solid #333 !important;
+}
+.nav > li:last-child > a:not(.sidebar-menu-item) {
+  border-right: 0px !important;
+}
+.nav > li:first-child > a:not(.sidebar-menu-item) {
+  padding-left: 0px;
+}
+.nav > li > a:not(.sidebar-menu-item):hover {
+  background-color: transparent;
+  border: none;
+  color: #333 !important;
+}
+.nav-link:not(.sidebar-menu-item).active {
+  font-family: Segoe UI Semibold;
+  height: 208x !important;
+  color: #333 !important;
+  font-weight: 600;
+  border-bottom: 1px solid $basic-button-color !important;
+  background-color: transparent !important;
+}
+
+//sidebar
+.nav:not(.nav-tabs) a.active {
+  font-weight: 900;
+  color: #0078d4 !important;
+  background-color: #deeaf3;
+  text-decoration: none !important;
+}
+
+.nav:not(.nav-tabs) a:focus {
+  font-weight: 900;
+  color: #0078d4 !important;
+  text-decoration: none !important;
+}
+
+.nav:not(.nav-tabs) a:hover {
+  //background-color: inherit;
+  color: #0078d4 !important;
+  text-decoration: none !important;
+}
+
+.nav:not(.nav-tabs) a.visited {
+  background-color: #f6f6f6;
+}
+
+.nav-item:hover {
+  //  background-color: rgb(238,238,238);
+  color: $basic-button-color;
+}
+
+.nav:not(.nav-tabs) a.active + .sidebar-menu-item-btn {
+  .hidden-button {
+    color: $basic-button-color;
+    background-color: #f6f6f6;
+  }
+}
+
+.nav:not(.nav-tabs) a.active:hover + .sidebar-menu-item-btn {
+  .hidden-button {
+    color: $basic-button-color;
+  }
+}
+
+.nav:not(.nav-tabs) a:hover + .sidebar-menu-item-btn {
+  .hidden-button {
+    background-color: rgb(238, 238, 238);
+    color: $basic-button-color;
+  }
+}

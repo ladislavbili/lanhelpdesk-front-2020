@@ -54,7 +54,7 @@ export default function ItemList( props ) {
 
       <div className="full-width scroll-visible fit-with-header-and-commandbar task-container">
 
-        <div className="d-flex h-60px flex-row m-l-30">
+        <div className="d-flex h-60 flex-row m-l-30">
         <div className="search-row">
           <div className="search btn-distance">
             <input
@@ -84,7 +84,7 @@ export default function ItemList( props ) {
 
           <select
             value={orderBy}
-            className="invisible-select text-bold text-highlight"
+            className="invisible-select font-bold text-highlight"
             onChange={(e)=>setOrderBy(e.target.value)}>
             {
               [{value:'title',label:'Title'},{value:'company',label:'Company'},{value:'IP',label:'IP'},{value:'status',label:'Status'}].map((item,index) => (

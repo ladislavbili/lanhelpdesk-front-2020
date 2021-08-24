@@ -27,7 +27,7 @@ export default function SettingsInput( props ) {
     <FormGroup>
       <Label className="row" htmlFor={ id }>
         { label }
-        { required && <span className="warning-big">*</span> }
+        { required && <span className="warning-big m-l-5">*</span> }
         { error && <span className="ml-auto message error-message m-r-0">{errorMessage}</span> }
       </Label>
       <div className='row'>

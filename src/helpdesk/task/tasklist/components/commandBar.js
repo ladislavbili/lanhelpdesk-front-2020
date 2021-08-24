@@ -166,13 +166,13 @@ export default function CommandBar( props ) {
               <div className={classnames( "d-flex", "flex-row", "align-items-center", "ml-auto" )} >
                 { showSort &&
                   <Empty>
-                    <div className="text-basic m-r-5 m-l-5">
+                    <div className="color-basic m-r-5 m-l-5">
                       Sort by
                     </div>
 
                     <select
                       value={orderBy}
-                      className="invisible-select text-bold text-highlight"
+                      className="invisible-select font-bold text-highlight"
                       onChange={(e)=>setOrderBy(e.target.value)}>
                       { orderByValues.map((item,index) =>
                         <option value={item.value} key={index}>{item.label}</option>
@@ -237,7 +237,7 @@ export default function CommandBar( props ) {
               </button>
               <GeneralPopover
                 placement="bottom-start"
-                className="overflow-auto mh-100 mw-0"
+                className="overflow-auto max-height-100 min-width-0"
                 target={`commandbar-layout-switch`}
                 useLegacy
                 reset={() => {}}
@@ -249,41 +249,41 @@ export default function CommandBar( props ) {
                 <div className="btn-group-vertical" data-toggle="buttons">
                   {
                     /*
-                    <label className={classnames({'active':tasklistLayout === 0}, "btn btn-link t-a-l")}>
+                    <label className={classnames({'active':tasklistLayout === 0}, "btn btn-link text-left")}>
                     <input type="radio" name="options" onChange={() => setTasklistLayout(0)} checked={tasklistLayout === 0}/>
                     <i className="fa fa-columns"/>
                     {` Trojstlpec`}
                     </label>
                     */
                   }
-                  <label className={classnames({'active':tasklistLayout === 1 || tasklistLayout === 0}, "btn btn-link t-a-l")}>
+                  <label className={classnames({'active':tasklistLayout === 1 || tasklistLayout === 0}, "btn btn-link text-left")}>
                     <input type="radio" name="options" checked={tasklistLayout === 1 || ( tasklistLayout === 2 && localProject.id === null ) } onChange={() => {setTasklistLayout(1); setLayoutOpen(false); }}/>
                     <i className="fa fa-list m-r-5"/>
                     Zoznam
                   </label>
                   { localProject.id &&
-                    <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link t-a-l")}>
+                    <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link text-left")}>
                       <input type="radio" name="options" onChange={() => {setTasklistLayout(2); setLayoutOpen(false); }} checked={tasklistLayout === 2}/>
                       <i className="fa fa-map m-r-5"/>
                       DnD
                     </label>
                   }
                   { canViewCalendar &&
-                    <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link t-a-l")}>
+                    <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link text-left")}>
                       <input type="radio" name="options" onChange={() => {setTasklistLayout(3); setLayoutOpen(false); }} checked={tasklistLayout === 3}/>
                       <i className="fa fa-calendar-alt m-r-5"/>
                       Kalendár
                     </label>
                   }
                   { localProject.id &&
-                    <label className={classnames({'active':tasklistLayout === 4}, "btn btn-link t-a-l")}>
+                    <label className={classnames({'active':tasklistLayout === 4}, "btn btn-link text-left")}>
                       <input type="radio" name="options" onChange={() => {setTasklistLayout(4); setLayoutOpen(false); }} checked={tasklistLayout === 4}/>
                       <i className="fa fa-project-diagram m-r-5"/>
                       Project management
                     </label>
                   }
                   { localProject.id &&
-                    <label className={classnames({'active':tasklistLayout === 5}, "btn btn-link t-a-l")}>
+                    <label className={classnames({'active':tasklistLayout === 5}, "btn btn-link text-left")}>
                       <input
                         type="radio"
                         name="options"

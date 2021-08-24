@@ -127,7 +127,7 @@ export default function SimpleRepeat( props ) {
             <FormGroup>
               <Label>Repeat every *</Label>
               <div className="row">
-                <div className="w-50 p-r-20">
+                <div className="width-50-p p-r-20">
                   <Input type="number"
                     className={(parseInt(repeatEvery) < 0 ) ? "form-control-warning form-control-secondary" : "form-control-secondary"}
                     placeholder="Enter number"
@@ -135,7 +135,7 @@ export default function SimpleRepeat( props ) {
                     onChange={(e)=> setRepeatEvery(e.target.value)}
                     />
                 </div>
-                <div className="w-50">
+                <div className="width-50-p">
                   <Select
                     value={repeatInterval}
                     onChange={setRepeatInterval}

@@ -90,12 +90,12 @@ export default function PublicFilterList( props ) {
 
   const PublicFiltersSort = (
     <div className="d-flex flex-row align-items-center ml-auto">
-      <div className="text-basic m-r-5 m-l-5">
+      <div className="color-basic m-r-5 m-l-5">
         Sort by
       </div>
       <select
         value={roleFilter}
-        className="invisible-select text-bold text-highlight"
+        className="invisible-select font-bold text-highlight"
         onChange={ (e) => setRoleFilter(e.target.value) }
         >
         <option value='all'>All filters</option>

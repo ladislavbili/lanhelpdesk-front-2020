@@ -1,0 +1,21 @@
+.content {
+  margin-bottom: 0px;
+  margin-top: 0px;
+  padding: 0px;
+  min-height: 300px;
+}
+
+.main {
+  background-color: $content-background-color;
+  width: calc(100% - #{$sidebar-width} - 2px);
+  flex: 1 1;
+}
+.ignore-css {
+  all: initial !important;
+  font-family: $main-font !important;
+  font-size: 14px !important;
+  color: #797979 !important;
+  blockquote {
+    font-size: 14px !important;
+  }
+}

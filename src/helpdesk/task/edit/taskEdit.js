@@ -76,7 +76,6 @@ import {
 
 import {
   defaultVykazyChanges,
-  invoicedAttributes,
   noTaskType
 } from '../constants';
 import 'scss/direct/task-ckeditor.scss';
@@ -127,9 +126,7 @@ export default function TaskEdit( props ) {
     addShortSubtask,
     updateShortSubtask,
     deleteShortSubtask,
-    canEditInvoiced,
     updateTask,
-    updateInvoicedTask,
     client,
     setTaskLayout,
   } = props;
@@ -173,8 +170,6 @@ export default function TaskEdit( props ) {
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
   const [ vykazyChanged, setVykazyChanged ] = React.useState( false );
 
-  const invoicedTask = task.invoiced ? task.invoicedTasks[ 0 ] : null;
-
   // sync
   React.useEffect( () => {
     const project = task.project === null ? null : projects.find( ( project ) => project.id === task.project.id );
@@ -183,12 +178,8 @@ export default function TaskEdit( props ) {
     setChanges( {} );
     setTagsOpen( false );
     setVykazyChanges( defaultVykazyChanges );
-    if ( task.invoiced ) {
-      setAssignedTo( toSelArr( invoicedTask.assignedTo ) );
-    } else {
-      setAssignedTo( toSelArr( task.assignedTo, 'email' )
-        .filter( ( user ) => assignableUserIds.includes( user.id ) ) );
-    }
+    setAssignedTo( toSelArr( task.assignedTo, 'email' )
+      .filter( ( user ) => assignableUserIds.includes( user.id ) ) );
     setCloseDate( task.closeDate ? moment( parseInt( task.closeDate ) ) : null );
     setStartsAt( task.startsAt ? moment( parseInt( task.startsAt ) ) : null );
     setDeadline( task.deadline ? moment( parseInt( task.deadline ) ) : null );
@@ -202,34 +193,19 @@ export default function TaskEdit( props ) {
     setPendingDate( task.pendingDate ? moment( parseInt( task.pendingDate ) ) : null );
     const status = ( task.status ? toSelItem( task.status ) : null )
     setStatus( status );
-    if ( task.invoiced ) {
-      setTags( toSelArr( invoicedTask.tags ) );
-      setTaskType( createSelectInvoicedItem( task.taskType, invoicedTask.taskType ) );
-      setCompany( createSelectInvoicedItem( task.company, invoicedTask.company ) );
-      setMilestone( milestone === undefined ? noMilestone : {
-        ...milestone,
-        label: invoicedTask.milestone
-      } );
-      setRequester( createSelectInvoicedItem( task.requester, invoicedTask.requester ) );
-      setProject( {
-        ...project,
-        label: invoicedTask.project
-      } );
-    } else {
-      setTags( toSelArr( task.tags ) );
-      setTaskType( ( task.taskType ? toSelItem( task.taskType ) : noTaskType ) );
-      setCompany( ( task.company ? toSelItem( task.company ) : null ) );
-      setMilestone( milestone === undefined ? noMilestone : milestone );
-      setRequester(
-        task.requester ? {
-          ...task.requester,
-          value: task.requester.id,
-          label: task.requester.fullName
-        } :
-        null
-      );
-      setProject( project );
-    }
+    setTags( toSelArr( task.tags ) );
+    setTaskType( ( task.taskType ? toSelItem( task.taskType ) : noTaskType ) );
+    setCompany( ( task.company ? toSelItem( task.company ) : null ) );
+    setMilestone( milestone === undefined ? noMilestone : milestone );
+    setRequester(
+      task.requester ? {
+        ...task.requester,
+        value: task.requester.id,
+        label: task.requester.fullName
+      } :
+      null
+    );
+    setProject( project );
     setTaskTripPausal( task.company ? task.company.taskTripPausal : 0 );
     setTaskWorkPausal( task.company ? task.company.taskWorkPausal : 0 );
     setTitle( task.title );
@@ -415,18 +391,8 @@ export default function TaskEdit( props ) {
     )
   }
 
-  const createSelectInvoicedItem = ( original, invoiced ) => (
-    original ? {
-      ...original,
-      value: original.id,
-      label: invoiced
-    } : {
-      value: invoiced,
-      label: invoiced
-    }
-  )
   const autoUpdateTask = ( change ) => {
-    if ( getCantSave( change ) || task.invoiced ) {
+    if ( getCantSave( change ) ) {
       setChanges( {
         ...changes,
         ...change
@@ -525,345 +491,23 @@ export default function TaskEdit( props ) {
     setSaving( false );
   }
 
-  const submitInvoicedTask = ( cancelInvoiced ) => {
-    const stmcChanges = {
-      subtasks: {
-        ADD: vykazyChanges.subtask.ADD.map( ( newSubtask ) => ( {
-          title: newSubtask.title,
-          order: newSubtask.order,
-          quantity: toFloatOrZero( newSubtask.quantity ),
-          discount: toFloatOrZero( newSubtask.discount ),
-          type: newSubtask.type.id,
-          assignedTo: newSubtask.assignedTo.id,
-        } ) ),
-        EDIT: vykazyChanges.subtask.EDIT.map( ( subtask ) => {
-          let subtaskChanges = {};
-          Object.keys( subtask )
-            .forEach( ( key ) => {
-              switch ( key ) {
-                case 'assignedTo': {
-                  subtaskChanges[ key ] = subtask[ key ].id;
-                  break;
-                }
-                case 'type': {
-                  subtaskChanges[ key ] = subtask[ key ].id;
-                  break;
-                }
-                case 'discount': {
-                  subtaskChanges[ key ] = toFloatOrZero( subtask[ key ] );
-                  break;
-                }
-                case 'quantity': {
-                  subtaskChanges[ key ] = toFloatOrZero( subtask[ key ] );
-                  break;
-                }
-                default: {
-                  subtaskChanges[ key ] = subtask[ key ];
-                  break;
-                }
-              }
-            } )
-          return subtaskChanges;
-        } ),
-        DELETE: vykazyChanges.subtask.DELETE,
-      },
-      trips: {
-        ADD: vykazyChanges.trip.ADD.map( ( newTrip ) => ( {
-          order: newTrip.order,
-          quantity: toFloatOrZero( newTrip.quantity ),
-          discount: toFloatOrZero( newTrip.discount ),
-          type: newTrip.type.id,
-          assignedTo: newTrip.assignedTo.id,
-        } ) ),
-        EDIT: vykazyChanges.trip.EDIT.map( ( trip ) => {
-          let tripChanges = {};
-          Object.keys( trip )
-            .forEach( ( key ) => {
-              switch ( key ) {
-                case 'discount': {
-                  tripChanges[ key ] = toFloatOrZero( trip[ key ] );
-                  break;
-                }
-                case 'quantity': {
-                  tripChanges[ key ] = toFloatOrZero( trip[ key ] );
-                  break;
-                }
-                case 'assignedTo': {
-                  tripChanges[ key ] = trip[ key ].id;
-                  break;
-                }
-                case 'type': {
-                  tripChanges[ key ] = trip[ key ].id;
-                  break;
-                }
-                default: {
-                  tripChanges[ key ] = trip[ key ];
-                  break;
-                }
-              }
-            } )
-          return tripChanges;
-        } ),
-        DELETE: vykazyChanges.trip.DELETE,
-      },
-      materials: {
-        ADD: vykazyChanges.material.ADD.map( ( newMaterial ) => ( {
-          title: newMaterial.title,
-          order: newMaterial.order,
-          quantity: toFloatOrZero( newMaterial.quantity ),
-          margin: toFloatOrZero( newMaterial.margin ),
-          price: toFloatOrZero( newMaterial.price ),
-        } ) ),
-        EDIT: vykazyChanges.material.EDIT.map( ( material ) => {
-          let materialChanges = {};
-          Object.keys( material )
-            .forEach( ( key ) => {
-              switch ( key ) {
-                case 'quantity': {
-                  materialChanges[ key ] = toFloatOrZero( material[ key ] );
-                  break;
-                }
-                case 'margin': {
-                  materialChanges[ key ] = toFloatOrZero( material[ key ] );
-                  break;
-                }
-                case 'price': {
-                  materialChanges[ key ] = toFloatOrZero( material[ key ] );
-                  break;
-                }
-                default: {
-                  materialChanges[ key ] = material[ key ];
-                  break;
-                }
-              }
-            } )
-          return materialChanges;
-        } ),
-        DELETE: vykazyChanges.material.DELETE,
-      },
-      customItems: {
-        ADD: vykazyChanges.customItem.ADD.map( ( newCustomItem ) => ( {
-          title: newCustomItem.title,
-          order: newCustomItem.order,
-          quantity: toFloatOrZero( newCustomItem.quantity ),
-          price: toFloatOrZero( newCustomItem.price ),
-        } ) ),
-        EDIT: vykazyChanges.customItem.EDIT.map( ( customItem ) => {
-          let customItemChanges = {};
-          Object.keys( customItem )
-            .forEach( ( key ) => {
-              switch ( key ) {
-                case 'quantity': {
-                  customItemChanges[ key ] = toFloatOrZero( customItem[ key ] );
-                  break;
-                }
-                case 'price': {
-                  customItemChanges[ key ] = toFloatOrZero( customItem[ key ] );
-                  break;
-                }
-                default: {
-                  customItemChanges[ key ] = customItem[ key ];
-                  break;
-                }
-              }
-            } )
-          return customItemChanges;
-        } ),
-        DELETE: vykazyChanges.customItem.DELETE,
-      },
-    };
-    updateInvoicedTask( {
-        variables: {
-          id,
-          cancelInvoiced,
-          taskChanges: changes,
-          stmcChanges,
-        }
-      } )
-      .then( ( response ) => {
-        setChanges( {} );
-        setVykazyChanges( defaultVykazyChanges );
-        const originalTask = client.readQuery( {
-            query: GET_TASK,
-            variables: {
-              id
-            },
-          } )
-          .task;
-
-        const updatedTask = {
-          ...originalTask,
-          ...response.data.updateInvoicedTask
-        }
-
-        client.writeQuery( {
-          query: GET_TASK,
-          variables: {
-            id
-          },
-          data: {
-            task: updatedTask
-          }
-        } );
-      } )
-      .catch( ( error ) => {
-        addLocalError( error );
-      } )
-  }
-
-  const saveVykazyChanges = ( data, dataType, action ) => {
-    let newChanges = {
-      ...vykazyChanges
-    };
-    switch ( action ) {
-      case 'ADD': {
-        let invoicedData = {};
-        invoicedAttributes[ dataType ].forEach( ( attribute ) => {
-          invoicedData[ attribute ] = data[ attribute ];
-        } );
-        newChanges[ dataType ][ action ].push( {
-          ...data,
-          id: fakeID--,
-          invoicedData
-        } );
-        break;
-      }
-      case 'EDIT': {
-        if ( data.id < 0 ) {
-          const index = newChanges[ dataType ][ 'ADD' ].findIndex( ( item ) => item.id === data.id );
-          newChanges[ dataType ][ 'ADD' ][ index ] = {
-            ...newChanges[ dataType ][ 'ADD' ][ index ],
-            ...data.newData
-          }
-          Object.keys( data.newData )
-            .forEach( ( key ) => {
-              if ( invoicedAttributes[ dataType ].includes( key ) ) {
-                newChanges[ dataType ][ 'ADD' ][ index ].invoicedData[ key ] = data.newData[ key ];
-              }
-            } )
-        } else {
-          const index = newChanges[ dataType ][ 'EDIT' ].findIndex( ( item ) => item.id === data.id );
-          if ( index !== -1 ) {
-            newChanges[ dataType ][ 'EDIT' ][ index ] = {
-              ...newChanges[ dataType ][ 'EDIT' ][ index ],
-              ...data.newData
-            }
-          } else {
-            newChanges[ dataType ][ 'EDIT' ].push( {
-              id: data.id,
-              ...data.newData,
-            } )
-          }
-        }
-        break;
-      }
-      case 'DELETE': {
-        if ( data < 0 ) {
-          newChanges[ dataType ][ 'ADD' ].splice( newChanges[ dataType ][ 'ADD' ].findIndex( ( item ) => item.id === data ), 1 );
-        } else {
-          newChanges[ dataType ][ 'EDIT' ].splice( newChanges[ dataType ][ 'EDIT' ].findIndex( ( item ) => item.id === data ), 1 );
-          newChanges[ dataType ][ action ].push( data );
-        }
-        break;
-      }
-      default: {}
-    }
-    setVykazyChanges( newChanges );
-  }
-
-  const modifyInvoicedVykazy = ( data, type ) => {
-    if ( !task.invoiced ) {
-      return data;
-    }
-    //vykazyChanges, setVykazyChanges
-    let newData = data.filter( ( item ) => !vykazyChanges[ type ][ 'DELETE' ].includes( item.id ) );
-    newData = newData.map( ( item ) => {
-      switch ( type ) {
-        case 'subtask': {
-          return ( {
-            ...item,
-            invoicedData: {
-              ...item.invoicedData,
-              assignedTo: {
-                label: item.invoicedData.assignedTo,
-                value: item.assignedTo ? item.assignedTo.id : null
-              },
-              type: {
-                label: item.invoicedData.type,
-                value: item.type ? item.type.id : null
-              },
-            }
-          } )
-          break;
-        }
-        case 'trip': {
-          return ( {
-            ...item,
-            invoicedData: {
-              ...item.invoicedData,
-              assignedTo: {
-                label: item.invoicedData.assignedTo,
-                value: item.assignedTo ? item.assignedTo.id : null
-              },
-              type: {
-                label: item.invoicedData.type,
-                value: item.type ? item.type.id : null
-              },
-            }
-          } )
-          break;
-        }
-        default: {
-          return item
-          break;
-        }
-
-      }
-    } )
-    newData = newData.map( ( item ) => {
-      const change = vykazyChanges[ type ][ 'EDIT' ].find( ( item2 ) => item.id === item2.id );
-      if ( !change ) {
-        return item;
-      }
-      let newItem = {
-        ...item,
-        invoicedData: {
-          ...item.invoicedData
-        }
-      };
-      Object.keys( change )
-        .forEach( ( key ) => {
-          newItem[ key ] = change[ key ];
-          if ( invoicedAttributes[ type ].includes( key ) ) {
-            newItem.invoicedData[ key ] = change[ key ];
-          }
-        } )
-      return newItem;
-    } )
-    return newData.concat( vykazyChanges[ type ][ 'ADD' ] );
-  }
-
 
   //vykazyTable
   const subtasks = task.subtasks.map( item => ( {
     ...item,
-    invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
     assignedTo: toSelItem( item.assignedTo, 'email' ),
     type: item.type ? toSelItem( item.type ) : null,
   } ) );
   const workTrips = task.workTrips.map( item => ( {
     ...item,
-    invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
     assignedTo: toSelItem( item.assignedTo, 'email' ),
     type: toSelItem( item.type )
   } ) );
   const materials = task.materials.map( ( item ) => ( {
     ...item,
-    invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
   } ) );
   const customItems = task.customItems.map( ( item ) => ( {
     ...item,
-    invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
   } ) );
   const canCopy = userRights.addTasks && !getCantSave();
 
@@ -1015,22 +659,20 @@ export default function TaskEdit( props ) {
             Back
           </button>
         }
-        { task.invoiced && accessRights.vykazy && canEditInvoiced &&
+        { false &&
           <button
             type="button"
             disabled={getCantSave()}
             className="btn-danger task-add-layout-button btn-distance"
-            onClick={() => submitInvoicedTask(true)}
             >
             Re-open
           </button>
         }
-        { task.invoiced && accessRights.vykazy && canEditInvoiced &&
+        { false &&
           <button
             type="button"
             disabled={getCantSave()}
             className="btn-link task-add-layout-button btn-distance"
-            onClick={() => submitInvoicedTask(false)}
             >
             <i className="far fa-save" />
             Save invoiced task
@@ -1051,7 +693,6 @@ export default function TaskEdit( props ) {
             createdAt={task.createdAt}
             taskWorks={task.subtasks.map( item => ( {
               ...item,
-              invoicedData: item.invoicedData ? item.invoicedData[ 0 ] : item.invoicedData,
               assignedTo: toSelItem( item.assignedTo, 'email' ),
               type: toSelItem( item.type )
             } ) )}
@@ -1070,37 +711,6 @@ export default function TaskEdit( props ) {
             <i className="far fa-trash-alt" />
             Delete
           </button>
-        }
-        {false &&
-          <button
-            type="button"
-            className="btn-link task-add-layout-button btn-distance"
-            onClick={() => setTaskLayout(currentUser.taskLayout === 1 ? 2 : 1)}
-            >
-            <i className="fas fa-retweet "/>
-            Layout
-          </button>
-        }
-
-        { false && !task.invoiced && userRights.statusWrite &&
-          (project ? toSelArr(project.project.statuses) : [])
-          .filter((status) => !['Invoiced'].includes(status.action) )
-          .map((possibleStatus) => (
-            <button
-              type="button"
-              key={possibleStatus.id}
-              className="btn-link task-add-layout-button btn-distance"
-              style={ possibleStatus.id === status.id ? { color: status.color } : {}}
-              onClick={() => setPossibleStatus(possibleStatus) }
-              >
-              { possibleStatus.icon.length > 3 &&
-                <i
-                  className={`${possibleStatus.icon} commandbar-command-icon`}
-                  />
-              }
-              {possibleStatus.title}
-            </button>
-          ))
         }
         <span className="ml-auto">
           { inModal &&
@@ -1274,7 +884,7 @@ export default function TaskEdit( props ) {
     Project: (
       <Select
         placeholder="Zadajte projekt"
-        isDisabled={ !userRights.projectWrite || task.invoiced }
+        isDisabled={ !userRights.projectWrite }
         value={ project }
         onChange={ changeProject }
         options={ availableProjects }
@@ -1317,17 +927,17 @@ export default function TaskEdit( props ) {
     ),
     Status: (
       <div>
-        { (defaultFields.status.fixed || !userRights.statusWrite || task.invoiced) &&
+        { (defaultFields.status.fixed || !userRights.statusWrite ) &&
           <div className="disabled-info">{status ? status.label : "None"}</div>
         }
-        { !defaultFields.status.fixed && userRights.statusWrite && !task.invoiced &&
+        { !defaultFields.status.fixed && userRights.statusWrite &&
           <Select
             placeholder="Status required"
             value={status}
-            isDisabled={defaultFields.status.fixed || !userRights.statusWrite || task.invoiced}
+            isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
             styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
             onChange={ changeStatus }
-            options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action!=='Invoiced')}
+            options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action !== 'Invoiced')}
             />
         }
       </div>
@@ -1387,7 +997,7 @@ export default function TaskEdit( props ) {
           <Select
             placeholder="Zadajte firmu"
             value={company}
-            isDisabled={defaultFields.company.fixed || !userRights.companyWrite || task.invoiced}
+            isDisabled={ defaultFields.company.fixed || !userRights.companyWrite }
             onChange={changeCompany}
             options={(canAddCompany ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
             styles={pickSelectStyle([ 'noArrow', 'required', ])}
@@ -1640,7 +1250,7 @@ export default function TaskEdit( props ) {
 
   const renderSelectsLayout2Side = () => {
     return (
-      <div className={classnames("task-edit-right", {"w-250px": columns})}>
+      <div className={classnames("task-edit-right", {"width-250": columns})}>
         <div>
           { inModal &&
             <div className="task-edit-buttons row m-b-10">
@@ -2015,19 +1625,15 @@ export default function TaskEdit( props ) {
           showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
           autoApproved={project ? project.project.autoApproved : false}
           canAddSubtasksAndTrips={assignedTo.length !== 0}
-          canEditInvoiced={canEditInvoiced}
+          canEditInvoiced={false}
           taskAssigned={assignedTo.filter((user) => user.id !== null )}
 
           taskTypes={taskTypes}
           defaultType={taskType}
-          subtasks={ task.invoiced ? modifyInvoicedVykazy(subtasks, 'subtask') : subtasks }
+          subtasks={ subtasks }
           addSubtask={(newSubtask, price) => {
-            if(task.invoiced){
-              saveVykazyChanges({...newSubtask, price}, 'subtask', 'ADD' );
-            }else{
               addSubtaskFunc(newSubtask);
               setVykazyChanged(true);
-            }
           }}
           updateSubtask={(id,newData)=>{
             let originalSubtask = subtasks.find((item)=>item.id===id);
@@ -2040,19 +1646,10 @@ export default function TaskEdit( props ) {
               } :
               null
             }
-            if(task.invoiced){
-              saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
-            }else{
               updateSubtaskFunc({...originalSubtask,...newData});
               setVykazyChanged(true);
-            }
           }}
           updateSubtasks={(multipleSubtasks)=>{
-            if(task.invoiced){
-              multipleSubtasks.forEach(({id, newData}) => {
-                saveVykazyChanges({id,newData}, 'subtask', 'EDIT' );
-              })
-            } else {
               multipleSubtasks.forEach(({id, newData})=>{
                 let originalSubtask = subtasks.find((item)=>item.id===id);
                 originalSubtask = {
@@ -2067,26 +1664,17 @@ export default function TaskEdit( props ) {
                 updateSubtaskFunc({...originalSubtask,...newData});
                 setVykazyChanged(true);
               });
-            }
           }}
           removeSubtask={(id)=>{
-            if(task.invoiced){
-              saveVykazyChanges( id, 'subtask', 'DELETE' );
-            }else{
               deleteSubtaskFunc(id);
               setVykazyChanged(true);
-            }
           }}
 
-          workTrips={ task.invoiced ? modifyInvoicedVykazy(workTrips, 'trip') : workTrips }
+          workTrips={ workTrips }
           tripTypes={tripTypes}
           addTrip={(newTrip, price)=>{
-            if(task.invoiced){
-              saveVykazyChanges( { ...newTrip, price }, 'trip', 'ADD' );
-            }else{
               addWorkTripFunc(newTrip);
               setVykazyChanged(true);
-            }
           }}
           updateTrip={(id,newData)=>{
             let originalTrip = workTrips.find((item)=>item.id===id);
@@ -2099,12 +1687,8 @@ export default function TaskEdit( props ) {
               } :
               null
             }
-            if(task.invoiced){
-              saveVykazyChanges( {id, newData}, 'trip', 'EDIT' );
-            }else{
               updateWorkTripFunc({...originalTrip,...newData});
               setVykazyChanged(true);
-            }
           }}
           updateTrips={(multipleTrips)=>{
             const originalTrips = workTrips.map((item)=>({
@@ -2114,11 +1698,6 @@ export default function TaskEdit( props ) {
                 to: item.scheduled.to,
               }
             }));
-            if(task.invoiced){
-              multipleTrips.forEach(({id, newData}) => {
-                saveVykazyChanges({id,newData}, 'trip', 'EDIT' );
-              })
-            } else {
               multipleTrips.forEach(({id, newData})=>{
                 let originalTrip = workTrips.find((item)=>item.id===id);
                 originalTrip = {
@@ -2133,15 +1712,10 @@ export default function TaskEdit( props ) {
                 updateWorkTripFunc({...originalTrip,...newData});
                 setVykazyChanged(true);
               });
-            }
           }}
           removeTrip={(id)=>{
-            if(task.invoiced){
-              saveVykazyChanges( id, 'trip', 'DELETE' );
-            }else{
               deleteWorkTripFunc(id);
               setVykazyChanged(true);
-            }
           }}
           />
         {renderCompanyPausalInfo()}
@@ -2152,38 +1726,20 @@ export default function TaskEdit( props ) {
           userRights={userRights}
           currentUser={currentUser}
           company={company}
-          materials={ task.invoiced ? modifyInvoicedVykazy(materials, 'material') : materials }
+          materials={ materials }
           addMaterial={(newMaterial)=>{
-            if(task.invoiced){
-              saveVykazyChanges( newMaterial, 'material', 'ADD' );
-            }else{
-              addMaterialFunc(newMaterial);
-            }
+            addMaterialFunc(newMaterial);
           }}
           updateMaterial={(id,newData)=>{
-            if(task.invoiced){
-              saveVykazyChanges( {id,newData}, 'material', 'EDIT' );
-            }else{
               updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-            }
           }}
           updateMaterials={(multipleMaterials)=>{
-            if(task.invoiced){
-              multipleMaterials.forEach(({id, newData}) => {
-                saveVykazyChanges({id,newData}, 'material', 'EDIT' );
-              })
-            } else {
               multipleMaterials.forEach(({id, newData})=>{
                 updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
               });
-            }
           }}
           removeMaterial={(id)=>{
-            if(task.invoiced){
-              saveVykazyChanges( id, 'material', 'DELETE' );
-            }else{
               deleteMaterialFunc(id);
-            }
           }}
           />
       </Empty>
@@ -2197,7 +1753,7 @@ export default function TaskEdit( props ) {
     return (
       <div className="form-section">
         <div className="form-section-rest">
-          <Nav tabs className="b-0 m-b-10">
+          <Nav tabs className="no-border m-b-10">
             { userRights.viewComments &&
               <NavItem>
                 <NavLink
@@ -2344,7 +1900,7 @@ export default function TaskEdit( props ) {
           'task-edit-width': !inModal
         },
         "flex",
-        "min-height-400",
+        "max-height-400",
         {
           "basic-border-top": layout === 1
         }
@@ -2356,7 +1912,7 @@ export default function TaskEdit( props ) {
           {"fit-with-header": !columns && !inModal},
           {"fit-with-header-and-commandbar": columns && !inModal},
           {"scroll-visible": !inModal},
-          {"scroll-x-auto": inModal},
+          {"overflow-x-auto": inModal},
         )}
         >
         { !inModal && renderCommandbar() }

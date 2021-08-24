@@ -166,7 +166,7 @@ export default function TableList( props ) {
           />
       </th>
     } else if ( display.type === 'date' ) {
-      return <th key={display.value} width="40" className={(last ? "w-175px" : "w-125px")}>
+      return <th key={display.value} width="40" className={(last ? "width-175" : "width-125")}>
         <div className={(last ? "row" : "")}>
           <div style={last ? {flex: "1"} : {}}>
             <DatePicker
@@ -303,7 +303,7 @@ export default function TableList( props ) {
         showSort
         showPreferences
         />
-      <div className="full-width scroll-visible fit-with-header-and-commandbar-4 task-container">
+      <div className="full-width scroll-visible fit-with-header-and-commandbar-list task-container">
         <table className="table">
           <thead>
             <tr>

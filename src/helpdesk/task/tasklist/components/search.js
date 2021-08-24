@@ -53,7 +53,7 @@ export default function Search( props ) {
 
   return (
     <div
-      className={classnames( "d-flex h-60px flex-row m-l-30 m-r-30 sticky", "search-row" )}
+      className={classnames( "d-flex h-60 flex-row m-l-30 m-r-30 sticky", "search-row" )}
       >
       <div id="global-search" className={classnames("search", { "search-focused": searchFocused })}>
         <button className="btn btn-link search-btn">

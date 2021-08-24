@@ -68,7 +68,7 @@ export default function CustomAttributes( props ) {
             <th> Write </th>
             <th> Default value </th>
             <th> Required </th>
-            <th className="t-a-c"></th>
+            <th className="text-center"></th>
           </tr>
         </thead>
         <tbody>

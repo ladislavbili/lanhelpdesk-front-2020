@@ -1,0 +1,35 @@
+.minimal-select {
+  min-width: 120px;
+}
+
+.invisible-select {
+  width: 100px;
+  min-height: 30px;
+  background-color: inherit;
+  border-width: 0px;
+  border-radius: 0px;
+  box-shadow: none;
+}
+.invisible-select:focus {
+  background-color: white;
+  border: 1px solid $basic-button-color;
+  outline: none !important;
+  box-shadow: none;
+}
+
+.multiselect-header {
+  font-weight: bolder;
+  font-size: 14px;
+  padding: 5px 10px;
+}
+
+.multiselect-item {
+  font-size: 13px;
+  font-weight: bolder;
+  padding: 5px 5px;
+}
+
+.multiselect-item:hover {
+  cursor: pointer;
+  background-color: #deeaf3;
+}

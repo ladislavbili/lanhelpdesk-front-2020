@@ -44,7 +44,7 @@ export default function Scheduled( props ) {
       <div className="row">
         <Label className={classnames({"m-l-0 m-t-5 m-r-10": layout === 1})} >Scheduled</Label>
         <button
-          className={classnames("btn-link m-r-0 h-f-c", {"ml-auto": layout === 2}, {"center-hor": layout === 1})}
+          className={classnames("btn-link m-r-0 h-fit-content", {"ml-auto": layout === 2}, {"center-hor": layout === 1})}
           id="scheduledPopover"
           disabled={disabled}
           onClick={()=>{
@@ -103,9 +103,9 @@ export default function Scheduled( props ) {
           <h2 className="center-hor">Add scheduled</h2>
           <PopoverBody>
             <FormGroup>
-              <Label className="w-100">From</Label>
+              <Label className="width-100-p">From</Label>
               <DatePicker
-                className="form-control w-100"
+                className="form-control width-100-p"
                 selected={newFrom}
                 disabled={disabled}
                 onChange={date => {
@@ -118,9 +118,9 @@ export default function Scheduled( props ) {
                 />
             </FormGroup>
             <FormGroup>
-              <Label className="w-100">To</Label>
+              <Label className="width-100-p">To</Label>
               <DatePicker
-                className="form-control w-100"
+                className="form-control width-100-p"
                 selected={newTo}
                 disabled={disabled}
                 popperPlacement="auto-left"

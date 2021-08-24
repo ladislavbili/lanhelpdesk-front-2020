@@ -119,12 +119,6 @@ subtasks {
     from
     to
   }
-  invoicedData{
-    price
-    quantity
-    type
-    assignedTo
-  }
   id
   title
   order
@@ -153,12 +147,6 @@ workTrips {
     from
     to
   }
-  invoicedData{
-    price
-    quantity
-    type
-    assignedTo
-  }
   id
   order
   done
@@ -182,13 +170,6 @@ workTrips {
   }
 }
 materials {
-  invoicedData{
-    title
-    quantity
-    price
-    totalPrice
-    margin
-  }
   id
   title
   order
@@ -203,12 +184,6 @@ materials {
   price
 }
 customItems {
-  invoicedData{
-    title
-    quantity
-    price
-    totalPrice
-  }
   id
   title
   order
@@ -220,22 +195,6 @@ customItems {
   }
   quantity
   price
-}
-invoicedTasks {
-  assignedTo {
-    title
-    UserId
-  }
-  tags {
-    title
-    color
-    TagId
-  }
-  project
-  requester
-  taskType
-  company
-  milestone
 }
 `
 
@@ -397,19 +356,6 @@ mutation deleteTaskAttachment($id: Int!) {
     id: $id,
   ){
     id
-  }
-}
-`;
-
-export const UPDATE_INVOICED_TASK = gql `
-mutation updateInvoicedTask($id: Int!, $taskChanges: TaskChangeInput, $stmcChanges: SMTCChangesInput, $cancelInvoiced: Boolean!) {
-  updateInvoicedTask(
-    id: $id,
-    cancelInvoiced: $cancelInvoiced,
-    taskChanges: $taskChanges,
-    stmcChanges: $stmcChanges,
-  ){
-    ${responseTask}
   }
 }
 `;

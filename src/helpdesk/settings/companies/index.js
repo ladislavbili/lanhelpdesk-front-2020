@@ -51,12 +51,12 @@ export default function CompanysList( props ) {
 
   const CompanySort = (
     <div className="d-flex flex-row align-items-center ml-auto">
-      <div className="text-basic m-r-5 m-l-5">
+      <div className="color-basic m-r-5 m-l-5">
         Sort by
       </div>
       <select
         value={sortBy}
-        className="invisible-select text-bold text-highlight"
+        className="invisible-select font-bold text-highlight"
         onChange={(e) => setSortBy(e.target.value)}>
         <option value={0} key={0}>All</option>
         <option value={1} key={1}>Contracted</option>

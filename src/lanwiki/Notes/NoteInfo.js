@@ -34,7 +34,7 @@ export default function NoteInfo( props ) {
       </div>
 
       <div className="group ">
-        <div className="row rest h-30px"  style={{alignItems: "baseline"}}>
+        <div className="row rest h-30-f"  style={{alignItems: "baseline"}}>
           <Label className="btn-distance">Description</Label>
           <button className="btn-link btn-distance" onClick={openEdit}><i className="fa fa-pen" /> Edit</button>
           <div>

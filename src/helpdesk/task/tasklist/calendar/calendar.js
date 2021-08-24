@@ -408,8 +408,8 @@ export default function TaskCalendar( props ) {
               className={classnames(
                 "task-stack scroll-visible",
                 {
-                  'fit-with-header-and-commandbar-5': activeSearchHidden,
-                  'fit-with-header-and-commandbar-7': !activeSearchHidden,
+                  'fit-with-header-and-commandbar-calendar': activeSearchHidden,
+                  'fit-with-header-and-commandbar-calendar-search': !activeSearchHidden,
                 }
               )}
               >
@@ -430,8 +430,8 @@ export default function TaskCalendar( props ) {
             className={classnames(
               "calendar",
               {
-                'fit-with-header-and-commandbar-5': activeSearchHidden,
-                'fit-with-header-and-commandbar-7': !activeSearchHidden,
+                'fit-with-header-and-commandbar-calendar': activeSearchHidden,
+                'fit-with-header-and-commandbar-calendar-search': !activeSearchHidden,
               }
             )}
             {...taskCalendarDefaults}

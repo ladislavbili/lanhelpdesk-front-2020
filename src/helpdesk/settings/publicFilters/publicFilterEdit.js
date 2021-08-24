@@ -12,8 +12,9 @@ import {
   Input,
 } from 'reactstrap';
 import Select from 'react-select';
-import Loading from 'components/loading';
 import Checkbox from 'components/checkbox';
+import Loading from 'components/loading';
+import RequiredLabel from 'components/requiredLabel';
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
 import SettingsInput from '../components/settingsInput';
 
@@ -457,7 +458,7 @@ export default function PublicFilterEdit( props ) {
           />
       </FormGroup>
 
-      <Label  className="m-t-15">Show filter <span className="warning-big">*</span></Label>
+      <RequiredLabel className="m-t-15">Show filter</RequiredLabel>
       <hr className="m-t-5 m-b-10"/>
       {/* Global */}
       <FormGroup className="m-t-5">
@@ -469,12 +470,13 @@ export default function PublicFilterEdit( props ) {
             setGlobal(!global);
             setDataChanged( true );
           }}
-          addition={ <span className="one-of-big">*</span>}
+          addition={ <span className="warning-big m-l-5">*</span>}
           />
       </FormGroup>
 
       {/* Project */}
       <FormGroup>
+        <RequiredLabel>Projekt</RequiredLabel>
         <Select
           placeholder="Vyberte projekt"
           value={project}

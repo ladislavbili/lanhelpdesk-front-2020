@@ -44,7 +44,7 @@ export default function ErrorIcon( props ) {
 
   return (
     <div className="header-icon center-hor header-with-text clickable" id="page-header-notifications" onClick={() => history.push(`${location}/errorMessages/`)}>
-      <i className={classnames({ "danger-color": errorMessageCountData.errorMessageCount > 0 }, "fas fa-exclamation-triangle header-icon-with-text m-l-5" )}/>
+      <i className={classnames({ "color-danger": errorMessageCountData.errorMessageCount > 0 }, "fas fa-exclamation-triangle header-icon-with-text m-l-5" )}/>
       <span className="m-l-2 header-icon-text">{ errorMessageCountData.errorMessageCount }</span>
     </div>
   );

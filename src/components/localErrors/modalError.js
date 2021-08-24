@@ -86,7 +86,7 @@ export default function ModalError( props ) {
   }
 
   return (
-    <Modal isOpen={ opened } className="task-add-container" modalClassName="scroll-x-auto" >
+    <Modal isOpen={ opened } className="task-add-container" modalClassName="overflow-x-auto" >
       <ModalBody>
         <Card>
           <CardHeader tag="h3">Error message(s)</CardHeader>

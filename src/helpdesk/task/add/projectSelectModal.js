@@ -59,9 +59,9 @@ export default function ProjectSelectModal( props ) {
             </FormGroup>
             <ErrorMessage className="m-t-5" message="Can't create tasks, no available project with rights." show={projects.length === 0} />
             <div className="task-add-layout-2 p-l-0 row ">
-              <Button className="btn-link-cancel a-s-c" onClick={closeModal}>Cancel</Button>
+              <Button className="btn-link-cancel align-self-center" onClick={closeModal}>Cancel</Button>
               <button
-                className="btn ml-auto a-s-c"
+                className="btn ml-auto align-self-center"
                 disabled={ project === null }
                 onClick={() => { onSubmit(project.id) }}
                 > Select
