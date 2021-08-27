@@ -21,13 +21,15 @@ import {
 } from "configs/components/select";
 import Select from 'react-select';
 import Switch from "react-switch";
+import Empty from 'components/Empty';
 import Loading from 'components/loading';
 import SettingsInput from '../components/settingsInput';
 import CompanyRents from './companyRents';
 import {
   toSelArr,
   toSelItem,
-  isEmail
+  isEmail,
+  getMyData,
 } from 'helperFunctions';
 import {
   addLocalError,
@@ -41,6 +43,7 @@ import {
 
 import {
   ADD_COMPANY,
+  GET_COMPANY_DEFAULTS,
 } from './queries';
 
 const newPricelist = {
@@ -67,6 +70,14 @@ export default function CompanyAdd( props ) {
     loading: pricelistsLoading,
     refetch: pricelistsRefetch,
   } = useQuery( GET_PRICELISTS, {
+    fetchPolicy: 'network-only'
+  } );
+
+  const {
+    data: companyDefaultsData,
+    loading: companyDefaultsLoading,
+    refetch: companyDefaultsRefetch,
+  } = useQuery( GET_COMPANY_DEFAULTS, {
     fetchPolicy: 'network-only'
   } );
 
@@ -108,10 +119,19 @@ export default function CompanyAdd( props ) {
   const [ openedTab, setOpenedTab ] = React.useState( "company" );
   const [ clearCompanyRents, setClearCompanyRents ] = React.useState( false );
 
+  const myRights = getMyData()
+    .role.accessRights;
+
   //sync
   React.useEffect( () => {
     setData( true );
   }, [ pricelistsLoading ] );
+
+  React.useEffect( () => {
+    if ( !companyDefaultsLoading ) {
+      setDph( companyDefaultsData.companyDefaults.dph );
+    }
+  }, [ companyDefaultsLoading ] );
 
   //functions
   const setData = ( initial ) => {
@@ -249,19 +269,23 @@ export default function CompanyAdd( props ) {
               Faktúračné údaje
             </NavLink>
           </NavItem>
-          <NavItem>
-            <NavLink>
-              |
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: openedTab === 'contract' }, "clickable", "")}
-              onClick={() => setOpenedTab('contract') }
-              >
-              Zmluva
-            </NavLink>
-          </NavItem>
+          { myRights.pausals &&
+            <Empty>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'contract' }, "clickable", "")}
+                  onClick={() => setOpenedTab('contract') }
+                  >
+                  Zmluva
+                </NavLink>
+              </NavItem>
+            </Empty>
+          }
         </Nav>
 
         <TabContent activeTab={openedTab}>
@@ -393,108 +417,110 @@ export default function CompanyAdd( props ) {
               }}
               />
           </TabPane>
-          <TabPane tabId={'contract'}>
-            <FormGroup>
-              <Label for="pricelist">Pricelist</Label>
-              <Select
-                id="pricelist"
-                name="pricelist"
-                styles={pickSelectStyle()}
-                options={pricelists}
-                value={pricelist}
-                onChange={e => {
-                  setOldPricelist({...pricelist});
-                  setPricelist( e );
-                  setNewData(true);
+          { myRights.pausals &&
+            <TabPane tabId={'contract'}>
+              <FormGroup>
+                <Label for="pricelist">Pricelist</Label>
+                <Select
+                  id="pricelist"
+                  name="pricelist"
+                  styles={pickSelectStyle()}
+                  options={pricelists}
+                  value={pricelist}
+                  onChange={e => {
+                    setOldPricelist({...pricelist});
+                    setPricelist( e );
+                    setNewData(true);
+                  }}
+                  />
+              </FormGroup>
+              <div className="row m-t-20 m-b-20">
+                <label>
+                  <Switch
+                    checked={monthly}
+                    onChange={()=> {
+                      setMonthly(!monthly);
+                      setNewData( true );
+                    }}
+                    height={22}
+                    checkedIcon={<span className="switchLabel">YES</span>}
+                    uncheckedIcon={<span className="switchLabel">NO</span>}
+                    onColor={"#0078D4"}
+                    />
+                  <span className="m-l-10"></span>
+                </label>
+                <span className="m-r-5">
+                  Mesačný paušál
+                </span>
+              </div>
+              <SettingsInput
+                id="monthlyPausal"
+                label="Mesačná"
+                type="number"
+                value={monthlyPausal}
+                disabled={!monthly}
+                onChange={(e) => {
+                  setMonthlyPausal(e.target.value);
+                  setNewData( true );
+                }}
+                >
+                <div className="m-l-10">
+                  <Label for="monthlyPausal">EUR bez DPH/mesiac</Label>
+                </div>
+              </SettingsInput>
+
+              <SettingsInput
+                id="taskWorkPausal"
+                label="Paušál práce"
+                type="number"
+                value={taskWorkPausal}
+                disabled={!monthly}
+                onChange={(e) => {
+                  setTaskWorkPausal(e.target.value);
+                  setNewData( true );
                 }}
                 />
-            </FormGroup>
-            <div className="row m-t-20 m-b-20">
-              <label>
-                <Switch
-                  checked={monthly}
-                  onChange={()=> {
-                    setMonthly(!monthly);
+
+              <SettingsInput
+                id="taskTripPausal"
+                label="Paušál výjazdy"
+                type="number"
+                value={taskTripPausal}
+                disabled={!monthly}
+                onChange={(e)=> {
+                  setTaskTripPausal(e.target.value);
+                  setNewData( true );
+                }}
+                />
+
+              {!props.addCompany &&
+                <CompanyRents
+                  clearForm={clearCompanyRents}
+                  setClearForm={()=>setClearCompanyRents(false)}
+                  data={rents}
+                  disabled={!monthly}
+                  updateRent={(rent)=>{
+                    let newRents=[...rents];
+                    newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
+                    setRents( newRents );
                     setNewData( true );
                   }}
-                  height={22}
-                  checkedIcon={<span className="switchLabel">YES</span>}
-                  uncheckedIcon={<span className="switchLabel">NO</span>}
-                  onColor={"#0078D4"}
+                  addRent={(rent)=>{
+                    let newRents=[...rents];
+                    newRents.push({...rent, id: getFakeID()})
+                    setRents( newRents );
+                    setNewData( true );
+                  }}
+                  removeRent={(rent)=>{
+                    let newRents=[...rents];
+                    newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
+                    setRents( newRents );
+                    setNewData( true );
+                  }}
                   />
-                <span className="m-l-10"></span>
-              </label>
-              <span className="m-r-5">
-                Mesačný paušál
-              </span>
-            </div>
-            <SettingsInput
-              id="monthlyPausal"
-              label="Mesačná"
-              type="number"
-              value={monthlyPausal}
-              disabled={!monthly}
-              onChange={(e) => {
-                setMonthlyPausal(e.target.value);
-                setNewData( true );
-              }}
-              >
-              <div className="m-l-10">
-                <Label for="monthlyPausal">EUR bez DPH/mesiac</Label>
-              </div>
-            </SettingsInput>
-
-            <SettingsInput
-              id="taskWorkPausal"
-              label="Paušál práce"
-              type="number"
-              value={taskWorkPausal}
-              disabled={!monthly}
-              onChange={(e) => {
-                setTaskWorkPausal(e.target.value);
-                setNewData( true );
-              }}
-              />
-
-            <SettingsInput
-              id="taskTripPausal"
-              label="Paušál výjazdy"
-              type="number"
-              value={taskTripPausal}
-              disabled={!monthly}
-              onChange={(e)=> {
-                setTaskTripPausal(e.target.value);
-                setNewData( true );
-              }}
-              />
-
-            {!props.addCompany &&
-              <CompanyRents
-                clearForm={clearCompanyRents}
-                setClearForm={()=>setClearCompanyRents(false)}
-                data={rents}
-                disabled={!monthly}
-                updateRent={(rent)=>{
-                  let newRents=[...rents];
-                  newRents[newRents.findIndex((item)=>item.id===rent.id)]={...newRents.find((item)=>item.id===rent.id),...rent};
-                  setRents( newRents );
-                  setNewData( true );
-                }}
-                addRent={(rent)=>{
-                  let newRents=[...rents];
-                  newRents.push({...rent, id: getFakeID()})
-                  setRents( newRents );
-                  setNewData( true );
-                }}
-                removeRent={(rent)=>{
-                  let newRents=[...rents];
-                  newRents.splice(newRents.findIndex((item)=>item.id===rent.id),1);
-                  setRents( newRents );
-                  setNewData( true );
-                }}
-                />
-            }
-          </TabPane>
+              }
+            </TabPane>
+          }
         </TabContent>
 
         <div className="form-buttons-row p-l-20 p-r-20">

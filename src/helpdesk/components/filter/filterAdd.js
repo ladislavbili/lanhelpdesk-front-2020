@@ -116,13 +116,22 @@ export default function FilterAdd( props ) {
     }
   }, [ id, dataLoading ] );
 
+
+  const currentUser = getMyData();
+  if ( dataLoading ) {
+    return <Loading />
+  }
+
+  const canCreatePublicFilters = currentUser.role.accessRights.publicFilters;
+  const canCreateCustomFilters = currentUser.role.accessRights.customFilters;
+
   const addFilterFunc = () => {
     setSaving( true );
     if ( id === null || id === undefined ) {
       addFilter( {
           variables: {
             title,
-            pub,
+            pub: pub || !canCreateCustomFilters,
             global,
             dashboard,
             projectId,
@@ -199,13 +208,6 @@ export default function FilterAdd( props ) {
     setSaving( false );
   }
 
-  const currentUser = getMyData();
-  if ( dataLoading ) {
-    return <Loading />
-  }
-
-  const canCreatePublicFilters = currentUser.role.accessRights.publicFilters;
-
   return (
     <div className="filter-add-btn">
       <button className="btn-link inner m-l-19" onClick={() => setOpened(!opened)}>
@@ -235,13 +237,14 @@ export default function FilterAdd( props ) {
             <Checkbox
               className = "m-l-5 m-r-5"
               label = "Public (everyone see this filter)"
-              value = { pub }
+              value = { pub || !canCreateCustomFilters }
+              blocked = { !canCreateCustomFilters }
               onChange={(e)=> setPub(!pub)}
               />
           }
 
           {/* ROLES - what role in case of public */}
-          { canCreatePublicFilters && pub &&
+          { canCreatePublicFilters && ( pub || !canCreateCustomFilters ) &&
             <FormGroup>{/* Roles */}
               <Label className="">Roles</Label>
               <Select

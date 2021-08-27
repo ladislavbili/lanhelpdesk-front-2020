@@ -354,8 +354,11 @@ export default function RepeatForm( props ) {
       active: originalRepeat.active,
     } )
     const project = projects.find( ( project ) => project.id === data.project.id );
+    /*
     const milestone = project && data.milestone ? toSelArr( project.milestones )
-      .find( ( milestone ) => milestone.id === data.milestone.id ) : undefined;
+    .find( ( milestone ) => milestone.id === data.milestone.id ) : undefined;
+    setMilestone( milestone === undefined ? noMilestone : milestone );
+    */
     setOvertime( ( data.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPausal( ( data.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPendingChangable( data.pendingChangable );
@@ -366,7 +369,6 @@ export default function RepeatForm( props ) {
     setTaskType( ( data.taskType ? toSelItem( data.taskType ) : noTaskType ) );
 
     setCompany( ( data.company ? toSelItem( data.company ) : null ) );
-    setMilestone( milestone === undefined ? noMilestone : milestone );
     setRequester(
       data.requester ? {
         ...data.requester,
@@ -408,7 +410,7 @@ export default function RepeatForm( props ) {
     setTaskType( duplicateTask.taskType );
 
     setCompany( duplicateTask.company );
-    setMilestone( duplicateTask.milestone );
+    //setMilestone( duplicateTask.milestone );
     setRequester( duplicateTask.requester );
     setProject( projects.find( ( project ) => duplicateTask.project.project.id === project.id ) );
     setTitle( duplicateTask.title );
@@ -525,7 +527,7 @@ export default function RepeatForm( props ) {
               deadline: deadline ? deadline.valueOf()
                 .toString() : null,
               description,
-              milestone: milestone ? milestone.id : null,
+              milestone: /*milestone ? milestone.id :*/ null,
               overtime: overtime.value,
               pausal: pausal.value,
               pendingChangable,
@@ -766,7 +768,7 @@ export default function RepeatForm( props ) {
     setProject( project );
     let newAssignedTo = assignedTo.filter( ( user ) => project.users.some( ( projectUser ) => projectUser.assignable && projectUser.user.id === user.id ) );
     setAssignedTo( newAssignedTo );
-    setMilestone( noMilestone );
+    //setMilestone( noMilestone );
     setTags( [] );
     setStatus( null );
     if ( editMode ) {
@@ -775,7 +777,7 @@ export default function RepeatForm( props ) {
         tags: [],
         status: null,
         assignedTo: newAssignedTo.map( ( user ) => user.id ),
-        milestone: null
+        //milestone: null
       } )
     }
   }
@@ -808,35 +810,36 @@ export default function RepeatForm( props ) {
       } )
     }
   }
-
+  /*
   const changeMilestone = ( milestone ) => {
-    if ( status.action === 'PendingDate' ) {
-      if ( milestone.startsAt !== null ) {
-        setMilestone( milestone );
-        setPendingDate( moment( milestone.startsAt ) );
-        setPendingChangable( false );
-        saveChange( {
-          milestone: milestone.id,
-          pendingDate: moment( milestone.startsAt )
-            .valueOf()
-            .toString(),
-          pendingChangable: false
-        } )
-      } else {
-        setMilestone( milestone );
-        setPendingChangable( true );
-        saveChange( {
-          milestone: milestone.id,
-          pendingChangable: true
-        } )
-      }
-    } else {
-      setMilestone( milestone );
-      saveChange( {
-        milestone: milestone.id
-      } )
-    }
+  if ( status.action === 'PendingDate' ) {
+  if ( milestone.startsAt !== null ) {
+  setMilestone( milestone );
+  setPendingDate( moment( milestone.startsAt ) );
+  setPendingChangable( false );
+  saveChange( {
+  milestone: milestone.id,
+  pendingDate: moment( milestone.startsAt )
+  .valueOf()
+  .toString(),
+  pendingChangable: false
+  } )
+  } else {
+  setMilestone( milestone );
+  setPendingChangable( true );
+  saveChange( {
+  milestone: milestone.id,
+  pendingChangable: true
+  } )
   }
+  } else {
+  setMilestone( milestone );
+  saveChange( {
+  milestone: milestone.id
+  } )
+  }
+  }
+  */
 
   const changeRepeat = ( repeat ) => {
     if ( !userRights.repeatWrite ) {
@@ -1072,22 +1075,6 @@ export default function RepeatForm( props ) {
         options={taskTypes}
         />
     ),
-    Milestone: (
-      <div>
-        { !userRights.milestoneWrite &&
-          <div className="disabled-info">{milestone ? milestone.label : "None"}</div>
-        }
-        { userRights.milestoneWrite &&
-          <Select
-            isDisabled={!userRights.milestoneWrite}
-            value={milestone}
-            onChange={changeMilestone}
-            options={ project ? [noMilestone, ...toSelArr(project.milestones)] : [noMilestone] }
-            styles={pickSelectStyle( [ 'noArrow', ] )}
-            />
-        }
-      </div>
-    ),
     Requester: (
       <div>
         { (defaultFields.requester.fixed || !userRights.requesterWrite) &&
@@ -1240,14 +1227,7 @@ export default function RepeatForm( props ) {
                   </div>
                 </div>
               }
-              { userRights.milestoneRead &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Milestone</Label>
-                  <div className="col-9">
-                    { layoutComponents.Milestone }
-                  </div>
-                </div>
-              }
+
             </div>
 
             <div className="col-4">
@@ -1326,12 +1306,6 @@ export default function RepeatForm( props ) {
             { layoutComponents.Status }
           </div>
         }
-        { userRights.milestoneRead &&
-          <div className="col-2">
-            <Label className="col-form-label">Milestone</Label>
-            { layoutComponents.Milestone }
-          </div>
-        }
         { userRights.requesterRead &&
           <div className="col-2">
             <Label className="col-form-label">Zadal</Label>
@@ -1362,14 +1336,6 @@ export default function RepeatForm( props ) {
             <Label>Status <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Status }
-            </div>
-          </div>
-        }
-        { userRights.milestoneRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Milestone</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Milestone }
             </div>
           </div>
         }
@@ -1853,7 +1819,7 @@ export default function RepeatForm( props ) {
       <div
         className={classnames(
           "scrollable",
-          "max-height-400",
+          "min-height-400",
           { "row": layout === 2}
         )}
         >

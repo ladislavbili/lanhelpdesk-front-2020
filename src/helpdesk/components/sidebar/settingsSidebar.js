@@ -1,8 +1,5 @@
 import React from 'react';
 import {
-  useQuery
-} from "@apollo/client";
-import {
   Nav,
   NavItem
 } from 'reactstrap';
@@ -14,6 +11,7 @@ import settings from 'configs/constants/settings';
 import {
   getMyData,
 } from 'helperFunctions';
+import DefaultCompany from './defaultCompany';
 
 export default function SettingsSidebar( props ) {
   //data & queries
@@ -26,6 +24,7 @@ export default function SettingsSidebar( props ) {
 
   return (
     <Nav vertical>
+      { accessRights.companies && <DefaultCompany {...props} accessRights={accessRights} /> }
 				{settings.filter((setting) => accessRights[setting.value]).map((setting)=>
 					<NavItem key={setting.link}>
 						<Link className={classnames("sidebar-align", "sidebar-menu-item" , {"active" : location.pathname.includes(setting.link)})}

@@ -21,6 +21,7 @@ import {
 } from "configs/components/select";
 import Select from 'react-select';
 import Switch from "react-switch";
+import Empty from 'components/Empty';
 import Loading from 'components/loading';
 import SettingsInput from '../components/settingsInput';
 import CompanyRents from './companyRents';
@@ -28,7 +29,8 @@ import DeleteReplacement from 'components/deleteReplacement';
 
 import {
   toSelArr,
-  isEmail
+  isEmail,
+  getMyData,
 } from 'helperFunctions';
 import {
   addLocalError,
@@ -45,6 +47,8 @@ import {
   UPDATE_COMPANY,
   DELETE_COMPANY,
   GET_COMPANIES,
+  GET_COMPANY_DEFAULTS,
+  UPDATE_COMPANY_DEFAULTS,
 } from './queries';
 
 const newPricelist = {
@@ -63,13 +67,6 @@ export default function CompanyEdit( props ) {
     match
   } = props;
   const client = useApolloClient();
-
-  const allCompanies = toSelArr( client.readQuery( {
-      query: GET_COMPANIES
-    } )
-    .companies );
-  const filteredCompanies = allCompanies.filter( comp => comp.id !== parseInt( match.params.id ) );
-  const theOnlyOneLeft = allCompanies.length < 2;
 
   const {
     data: companyData,
@@ -90,6 +87,20 @@ export default function CompanyEdit( props ) {
     fetchPolicy: 'network-only'
   } );
 
+  const {
+    data: companiesData,
+    loading: companiesLoading,
+  } = useQuery( GET_COMPANIES, {
+    fetchPolicy: 'network-only'
+  } );
+
+  const {
+    data: companyDefaultsData,
+    loading: companyDefaultsLoading,
+  } = useQuery( GET_COMPANY_DEFAULTS, {
+    fetchPolicy: 'network-only'
+  } );
+
   useSubscription( PRICELISTS_SUBSCRIPTION, {
     onSubscriptionData: () => {
       pricelistsRefetch()
@@ -99,6 +110,7 @@ export default function CompanyEdit( props ) {
 
   const [ updateCompany ] = useMutation( UPDATE_COMPANY );
   const [ deleteCompany ] = useMutation( DELETE_COMPANY );
+  const [ updateCompanyDefaults ] = useMutation( UPDATE_COMPANY_DEFAULTS );
   const [ addPricelist ] = useMutation( ADD_PRICELIST );
 
   //state
@@ -163,10 +175,17 @@ export default function CompanyEdit( props ) {
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
   const [ openedTab, setOpenedTab ] = React.useState( "company" );
 
+  const [ defDph, setDefDph ] = React.useState( 0 );
+  const [ defChanged, setDefChanged ] = React.useState( false );
+
+  const myRights = getMyData()
+    .role.accessRights;
 
   const dataLoading = (
     companyLoading ||
-    pricelistsLoading
+    pricelistsLoading ||
+    companyDefaultsLoading ||
+    companiesLoading
   )
 
   //sync
@@ -175,12 +194,19 @@ export default function CompanyEdit( props ) {
   }, [ companyLoading ] );
 
   React.useEffect( () => {
+    if ( !companyDefaultsLoading ) {
+      setDefDph( companyDefaultsData.companyDefaults.dph );
+    }
+  }, [ companyDefaultsLoading ] );
+
+  React.useEffect( () => {
     companyRefetch( {
         variables: {
           id: parseInt( match.params.id )
         }
       } )
       .then( setData );
+    setDefChanged( false );
   }, [ match.params.id ] );
 
   // functions
@@ -239,7 +265,7 @@ export default function CompanyEdit( props ) {
       }
     } )
     setRents( r );
-
+    setDefChanged( false );
     setDataChanged( false );
   }
 
@@ -258,6 +284,17 @@ export default function CompanyEdit( props ) {
       }
       return newRent;
     } );
+
+    if ( defChanged ) {
+      updateCompanyDefaults( {
+        variables: {
+          dph: isNaN( parseInt( defDph ) ) ? 0 : parseInt( defDph )
+        }
+      } );
+      if ( isNaN( parseInt( defDph ) ) ) {
+        setDefDph( 0 );
+      }
+    }
 
     updateCompany( {
         variables: {
@@ -378,6 +415,10 @@ export default function CompanyEdit( props ) {
     return <Loading />
   }
 
+  const filteredCompanies = companiesData.companies.filter( comp => comp.id !== parseInt( match.params.id ) );
+  const theOnlyOneLeft = companiesData.companies.length < 2;
+
+
   const pricelists = [
     newPricelist,
     ...toSelArr( pricelistsData.pricelists )
@@ -409,19 +450,23 @@ export default function CompanyEdit( props ) {
               Faktúračné údaje
             </NavLink>
           </NavItem>
-          <NavItem>
-            <NavLink>
-              |
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink
-              className={classnames({ active: openedTab === 'contract' }, "clickable", "")}
-              onClick={() => setOpenedTab('contract') }
-              >
-              Zmluva
-            </NavLink>
-          </NavItem>
+          { myRights.pausals &&
+            <Empty>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'contract' }, "clickable", "")}
+                  onClick={() => setOpenedTab('contract') }
+                  >
+                  Zmluva
+                </NavLink>
+              </NavItem>
+            </Empty>
+          }
         </Nav>
         <TabContent activeTab={openedTab}>
           <TabPane tabId={'company'}>
@@ -551,109 +596,126 @@ export default function CompanyEdit( props ) {
               }}
               />
           </TabPane>
-          <TabPane tabId={'contract'}>
-            <FormGroup>
-              <Label for="pricelist">Pricelist</Label>
-              <Select
-                id="pricelist"
-                name="pricelist"
-                styles={pickSelectStyle()}
-                options={pricelists}
-                value={pricelist}
+          { myRights.pausals &&
+            <TabPane tabId={'contract'}>
+              <FormGroup>
+                <Label for="pricelist">Pricelist</Label>
+                <Select
+                  id="pricelist"
+                  name="pricelist"
+                  styles={pickSelectStyle()}
+                  options={pricelists}
+                  value={pricelist}
+                  disabled={!monthly}
+                  onChange={e => {
+                    setOldPricelist({...pricelist});
+                    setPricelist( e );
+                    setDataChanged(true);
+                  }}
+                  />
+              </FormGroup>
+              <div className="row m-t-20 m-b-20">
+                <label>
+                  <Switch
+                    checked={monthly}
+                    onChange={()=> {
+                      setMonthly(!monthly);
+                      setDataChanged( true );
+                    }}
+                    height={22}
+                    checkedIcon={<span className="switchLabel">YES</span>}
+                    uncheckedIcon={<span className="switchLabel">NO</span>}
+                    onColor={"#0078D4"}
+                    />
+                  <span className="m-l-10"></span>
+                </label>
+                <span className="m-r-5">
+                  Mesačný paušál
+                </span>
+              </div>
+              <SettingsInput
+                id="monthlyPausal"
+                label="Mesačná"
+                type="number"
+                value={monthlyPausal}
                 disabled={!monthly}
-                onChange={e => {
-                  setOldPricelist({...pricelist});
-                  setPricelist( e );
-                  setDataChanged(true);
+                onChange={(e) => {
+                  setMonthlyPausal(e.target.value);
+                  setDataChanged( true );
+                }}
+                >
+                <div className="m-l-10">
+                  <Label for="monthlyPausal">EUR bez DPH/mesiac</Label>
+                </div>
+              </SettingsInput>
+
+              <SettingsInput
+                id="taskWorkPausal"
+                label="Paušál práce"
+                type="number"
+                value={taskWorkPausal}
+                disabled={!monthly}
+                onChange={(e) => {
+                  setTaskWorkPausal(e.target.value);
+                  setDataChanged( true );
                 }}
                 />
-            </FormGroup>
-            <div className="row m-t-20 m-b-20">
-              <label>
-                <Switch
-                  checked={monthly}
-                  onChange={()=> {
-                    setMonthly(!monthly);
-                    setDataChanged( true );
-                  }}
-                  height={22}
-                  checkedIcon={<span className="switchLabel">YES</span>}
-                  uncheckedIcon={<span className="switchLabel">NO</span>}
-                  onColor={"#0078D4"}
-                  />
-                <span className="m-l-10"></span>
-              </label>
-              <span className="m-r-5">
-                Mesačný paušál
-              </span>
-            </div>
-            <SettingsInput
-              id="monthlyPausal"
-              label="Mesačná"
-              type="number"
-              value={monthlyPausal}
-              disabled={!monthly}
-              onChange={(e)=>{
-                setMonthlyPausal(e.target.value);
-                setDataChanged( true );
-              }}
-              >
-              <div className="m-l-10">
-                <Label for="monthlyPausal">EUR bez DPH/mesiac</Label>
-              </div>
-            </SettingsInput>
 
-            <SettingsInput
-              id="taskWorkPausal"
-              label="Paušál práce"
-              type="number"
-              value={taskWorkPausal}
-              disabled={!monthly}
-              onChange={(e) => {
-                setTaskWorkPausal(e.target.value);
-                setDataChanged( true );
-              }}
-              />
+              <SettingsInput
+                id="taskTripPausal"
+                label="Paušál výjazdy"
+                type="number"
+                value={taskTripPausal}
+                disabled={!monthly}
+                onChange={(e)=> {
+                  setTaskTripPausal(e.target.value);
+                  setDataChanged( true );
+                }}
+                />
 
-            <SettingsInput
-              id="taskTripPausal"
-              label="Paušál výjazdy"
-              type="number"
-              value={taskTripPausal}
-              disabled={!monthly}
-              onChange={(e)=> {
-                setTaskTripPausal(e.target.value);
-                setDataChanged( true );
-              }}
-              />
-
-            <CompanyRents
-              clearForm={clearCompanyRents}
-              setClearForm={()=>setClearCompanyRents(false)}
-              data={rents}
-              disabled={!monthly}
-              updateRent={(rent)=>{
-                let newRents=[...rents];
-                newRents[newRents.findIndex( (item) => item.id === rent.id )] = { ...newRents.find( (item) => item.id === rent.id ), ...rent };
-                setRents( newRents );
-                setDataChanged( true );
-              }}
-              addRent={(rent)=>{
-                let newRents=[...rents];
-                newRents.push({...rent, id: getFakeID()})
-                setRents( newRents );
-                setDataChanged( true );
-              }}
-              removeRent={(rent)=>{
-                let newRents=[...rents];
-                newRents.splice( newRents.findIndex( (item) => item.id === rent.id ) ,1 );
-                setRents( newRents );
-                setDataChanged( true );
-              }}
-              />
-          </TabPane>
+              <CompanyRents
+                clearForm={clearCompanyRents}
+                setClearForm={()=>setClearCompanyRents(false)}
+                data={rents}
+                disabled={!monthly}
+                updateRent={(rent)=>{
+                  let newRents=[...rents];
+                  newRents[newRents.findIndex( (item) => item.id === rent.id )] = { ...newRents.find( (item) => item.id === rent.id ), ...rent };
+                  setRents( newRents );
+                  setDataChanged( true );
+                }}
+                addRent={(rent)=>{
+                  let newRents=[...rents];
+                  newRents.push({...rent, id: getFakeID()})
+                  setRents( newRents );
+                  setDataChanged( true );
+                }}
+                removeRent={(rent)=>{
+                  let newRents=[...rents];
+                  newRents.splice( newRents.findIndex( (item) => item.id === rent.id ) ,1 );
+                  setRents( newRents );
+                  setDataChanged( true );
+                }}
+                />
+            </TabPane>
+          }
         </TabContent>
 
+        { companyData.company.def &&
+          <SettingsInput
+            id="description"
+            className="m-t-20"
+            label="Default DPH for all Companies"
+            labelClassName="color-danger"
+            type="number"
+            value={defDph}
+            onChange={(e) => {
+              setDefDph(e.target.value);
+              setDefChanged(true);
+              setDataChanged( true );
+            }}
+            />
+        }
 
       </div>
 
@@ -673,13 +735,15 @@ export default function CompanyEdit( props ) {
             Cancel changes
           </button>
         }
-        <button
-          className="btn-red btn-distance"
-          disabled={saving || deleting || theOnlyOneLeft}
-          onClick={() => setDeleteOpen(true)}
-          >
-          Delete
-        </button>
+        { !dataLoading && !companyData.company.def &&
+          <button
+            className="btn-red btn-distance"
+            disabled={saving || deleting || theOnlyOneLeft}
+            onClick={() => setDeleteOpen(true)}
+            >
+            Delete
+          </button>
+        }
 
         <div className = "ml-auto message m-r-10">
           { dataChanged &&

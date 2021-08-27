@@ -88,8 +88,8 @@ export default function PublicFilterAdd( props ) {
   const [ addPublicFilter ] = useMutation( ADD_PUBLIC_FILTER );
 
   // state
-  const [ global, setGlobal ] = React.useState( false );
-  const [ dashboard, setDashboard ] = React.useState( false );
+  const [ global, setGlobal ] = React.useState( true );
+  const [ dashboard, setDashboard ] = React.useState( true );
   const [ order, setOrder ] = React.useState( 0 );
   const [ roles, setRoles ] = React.useState( [] );
   const [ title, setTitle ] = React.useState( '' );
@@ -321,39 +321,7 @@ export default function PublicFilterAdd( props ) {
           styles={pickSelectStyle()}
           />
       </FormGroup>
-
-      <RequiredLabel className="m-t-15">Show filter</RequiredLabel>
-      <hr className="m-t-5 m-b-10"/>
-      {/* Global */}
-      <Checkbox
-        className = "m-l-5 m-r-5"
-        label = "Global (shown in all projects)"
-        value = { global }
-        onChange={(e) => setGlobal(!global)}
-        addition={ <span className="warning-big m-l-5">*</span>}
-        />
-
-      {/* Project */}
-      <div className="m-b-10">
-        <RequiredLabel>Projekt</RequiredLabel>
-        <Select
-          placeholder="Vyberte projekt"
-          value={project}
-          isDisabled={global}
-          onChange={(project) => setProject(project)}
-          options={toSelArr(projectsData.projects)}
-          styles={pickSelectStyle()}
-          />
-      </div>
-
-      {/* Dashboard */}
-      <Checkbox
-        className = "m-l-5 m-r-5"
-        label = "Dashboard (shown in dashboard)"
-        value = { dashboard }
-        onChange={(e) => setDashboard(!dashboard)}
-        />
-
+      
       <Label className="m-t-15">Filter attributes</Label>
       <hr className="m-t-5 m-b-10"/>
 

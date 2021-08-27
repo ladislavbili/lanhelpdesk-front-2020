@@ -129,6 +129,9 @@ export default function TableListLoader( props ) {
 
   const tasks = dataLoading ? [] : tasksData.tasks.tasks;
   const createPreferences = () => {
+    if ( !currentUser || !currentUser.role.accessRights.tasklistPreferences ) {
+      return defaultTasklistColumnPreference;
+    }
     let preference = defaultTasklistColumnPreference;
     if ( preferencesData && preferencesData.tasklistColumnPreference ) {
       preference = {
@@ -139,6 +142,7 @@ export default function TableListLoader( props ) {
     if ( localProject.project.id === null ) {
       return preference;
     }
+    preference.project = false;
     attributeLimitingRights.forEach( ( limitingRight ) => {
       if ( !localProject.right[ limitingRight.right ] ) {
         preference[ limitingRight.preference ] = false;
@@ -243,7 +247,7 @@ export default function TableListLoader( props ) {
 
   const tableProps = {
     ...props,
-    displayValues: createDisplayValues( createPreferences() ),
+    displayValues: createDisplayValues( createPreferences(), localProject.project.id !== null ),
     preference: createPreferences(),
     setPreference,
     tasks: processTasks( tasks )

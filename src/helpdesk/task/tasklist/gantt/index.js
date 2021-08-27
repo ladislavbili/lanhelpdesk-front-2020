@@ -135,6 +135,9 @@ export default function GanttListLoader( props ) {
     tasksData.tasks.totals;
 
   const createGanttPreferences = () => {
+    if ( !currentUser || !currentUser.role.accessRights.tasklistPreferences ) {
+      return defaultTasklistGanttColumnPreference;
+    }
     let ganttPreference = defaultTasklistGanttColumnPreference;
     if ( ganttPreferencesData && ganttPreferencesData.tasklistGanttColumnPreference ) {
       ganttPreference = {

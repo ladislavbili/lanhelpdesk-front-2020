@@ -1,6 +1,9 @@
 import {
   gql
 } from '@apollo/client';
+import {
+  accessRights
+} from 'helpdesk/settings/roles/queries';
 
 export const USER_DATA_SUBSCRIPTION = gql `
 subscription userDataSubscription {
@@ -47,23 +50,7 @@ query {
       order
       level
       accessRights {
-        login
-        testSections
-        vykazy
-        publicFilters
-        addProjects
-        viewErrors
-        users
-        companies
-        pausals
-        projects
-        statuses
-        prices
-        roles
-        taskTypes
-        tripTypes
-        imaps
-        smtps
+        ${accessRights}
       }
     }
   }

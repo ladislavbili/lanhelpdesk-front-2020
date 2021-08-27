@@ -9,7 +9,9 @@ export default function SettingsInput( props ) {
   //data
   const {
     id,
+    className,
     label,
+    labelClassName,
     type,
     error,
     errorMessage,
@@ -24,8 +26,8 @@ export default function SettingsInput( props ) {
   } = props;
 
   return (
-    <FormGroup>
-      <Label className="row" htmlFor={ id }>
+    <FormGroup className={ className ? className : '' }>
+      <Label className={`row ${ labelClassName ? labelClassName : '' }`} htmlFor={ id }>
         { label }
         { required && <span className="warning-big m-l-5">*</span> }
         { error && <span className="ml-auto message error-message m-r-0">{errorMessage}</span> }

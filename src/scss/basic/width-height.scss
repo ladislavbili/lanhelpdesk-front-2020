@@ -30,6 +30,9 @@
   .max-height-#{increment-by-5($margin)} {
     max-height: #{increment-by-5($margin)}px;
   }
+  .min-height-#{increment-by-5($margin)} {
+    min-height: #{increment-by-5($margin)}px;
+  }
 }
 
 .h-fit-content {

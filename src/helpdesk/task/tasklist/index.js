@@ -148,13 +148,14 @@ export default function TasksLoader( props ) {
     } )
   }
 
-  const canViewCalendar = localProject.id === null || localProject.right.assignedRead;
 
   if ( !currentUser ) {
     return (
       <Loading />
     )
   }
+
+  const canViewCalendar = localProject.id === null || localProject.right.assignedRead || !currentUser.role.accessRights.tasklistCalendar;
 
   return (
     <TasklistSwitch

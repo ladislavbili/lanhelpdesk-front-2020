@@ -28,7 +28,7 @@ import {
   PRICELISTS_SUBSCRIPTION
 } from '../pricelists/queries';
 import {
-  GET_COMPANY,
+  GET_PAUSAL_COMPANY,
   UPDATE_COMPANY
 } from '../companies/queries';
 
@@ -47,10 +47,10 @@ export default function PausalEdit( props ) {
   } = props;
 
   const {
-    data: companyData,
-    loading: companyLoading,
-    refetch: companyRefetch
-  } = useQuery( GET_COMPANY, {
+    data: pausalCompanyData,
+    loading: pausalCompanyLoading,
+    refetch: pausalCompanyRefetch
+  } = useQuery( GET_PAUSAL_COMPANY, {
     variables: {
       id: parseInt( match.params.id )
     },
@@ -88,19 +88,19 @@ export default function PausalEdit( props ) {
   const [ dataChanged, setDataChanged ] = React.useState( false );
 
   const dataLoading = (
-    companyLoading ||
+    pausalCompanyLoading ||
     pricelistsLoading
   )
 
   //sync
   React.useEffect( () => {
-    if ( !companyLoading ) {
+    if ( !pausalCompanyLoading ) {
       setData();
     }
-  }, [ companyLoading ] );
+  }, [ pausalCompanyLoading ] );
 
   React.useEffect( () => {
-    companyRefetch( {
+    pausalCompanyRefetch( {
         variables: {
           id: parseInt( match.params.id )
         }
@@ -110,10 +110,10 @@ export default function PausalEdit( props ) {
 
   // functions
   const setData = () => {
-    if ( companyLoading ) {
+    if ( pausalCompanyLoading ) {
       return;
     }
-    const company = companyData.company;
+    const company = pausalCompanyData.pausalCompany;
     setMonthlyPausal( company.monthlyPausal );
     setTaskWorkPausal( company.taskWorkPausal );
     setTaskTripPausal( company.taskTripPausal );
@@ -217,7 +217,7 @@ export default function PausalEdit( props ) {
   return (
     <div className="scroll-visible p-20 fit-with-header">
 
-      <h2>Edit service level agreement - {companyData.company.title}</h2>
+      <h2>Edit service level agreement - {pausalCompanyData.pausalCompany.title}</h2>
 
       <h3 className="m-t-10 m-b-10" >Paušál</h3>
         <SettingsInput

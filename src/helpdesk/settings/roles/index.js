@@ -39,7 +39,7 @@ export default function RolesList( props ) {
 
   useSubscription( ROLES_SUBSCRIPTION, {
     onSubscriptionData: () => {
-      refetch();
+      rolesRefetch();
     }
   } );
 

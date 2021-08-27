@@ -2,6 +2,30 @@ import {
   gql
 } from '@apollo/client';
 
+export const accessRights = `
+  login
+  testSections
+  vykazy
+  publicFilters
+  addProjects
+  viewErrors
+  users
+  companies
+  pausals
+  projects
+  statuses
+  prices
+  roles
+  taskTypes
+  tripTypes
+  imaps
+  smtps
+  tasklistLayout
+  tasklistCalendar
+  tasklistPreferences
+  customFilters
+`;
+
 export const GET_ROLES = gql `
 query {
   roles {
@@ -50,23 +74,7 @@ query role($id: Int!) {
     order
     level
     accessRights {
-      login
-      testSections
-      vykazy
-      publicFilters
-      addProjects
-      viewErrors
-      users
-      companies
-      pausals
-      projects
-      statuses
-      prices
-      roles
-      taskTypes
-      tripTypes
-      imaps
-      smtps
+      ${accessRights}
     }
   }
 }

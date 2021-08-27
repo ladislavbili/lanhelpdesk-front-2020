@@ -15,7 +15,7 @@ import {
 import PausalEdit from './pausalEdit';
 
 import {
-  GET_COMPANIES,
+  GET_BASIC_COMPANIES,
   COMPANIES_SUBSCRIPTION,
 } from '../companies/queries';
 
@@ -26,10 +26,10 @@ export default function CompaniesList( props ) {
   } = props;
 
   const {
-    data: companiesData,
-    loading: companiesLoading,
-    refetch: companiesRefetch,
-  } = useQuery( GET_COMPANIES, {
+    data: basicCompaniesData,
+    loading: basicCompaniesLoading,
+    refetch: basicCompaniesRefetch,
+  } = useQuery( GET_BASIC_COMPANIES, {
     fetchPolicy: 'network-only'
   } );
 
@@ -38,16 +38,15 @@ export default function CompaniesList( props ) {
 
   useSubscription( COMPANIES_SUBSCRIPTION, {
     onSubscriptionData: () => {
-      companiesRefetch();
+      basicCompaniesRefetch();
     }
   } );
 
-  if ( companiesLoading ) {
+  if ( basicCompaniesLoading ) {
     return ( <SettingLoading match={match} /> );
   }
 
-  const companies = companiesData.companies;
-
+  const companies = basicCompaniesData.basicCompanies;
   const RightSideComponent = (
     <Empty>
       { match.params.id && companies.some((item)=>item.id === parseInt(match.params.id)) &&

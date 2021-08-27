@@ -347,7 +347,7 @@ export default function TableList( props ) {
       <CommandBar
         {...props}
         showSort
-        showPreferences
+        showPreferences={currentUser.role.accessRights.tasklistPreferences}
         gantt
         />
       <div className="full-width scroll-visible fit-with-header-and-commandbar-list task-container">

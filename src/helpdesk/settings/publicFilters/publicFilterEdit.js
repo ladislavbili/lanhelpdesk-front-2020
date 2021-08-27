@@ -116,8 +116,8 @@ export default function PublicFilterEdit( props ) {
   const [ deleteFilter ] = useMutation( DELETE_FILTER );
 
   // state
-  const [ global, setGlobal ] = React.useState( false );
-  const [ dashboard, setDashboard ] = React.useState( false );
+  const [ global, setGlobal ] = React.useState( true );
+  const [ dashboard, setDashboard ] = React.useState( true );
   const [ order, setOrder ] = React.useState( 0 );
   const [ roles, setRoles ] = React.useState( [] );
   const [ title, setTitle ] = React.useState( '' );
@@ -222,8 +222,6 @@ export default function PublicFilterEdit( props ) {
       return;
     }
     let filter = publicFilterData.filter;
-    setGlobal( filter.global );
-    setDashboard( filter.dashboard );
     setRoles( filter.roles ? toSelArr( filter.roles ) : [] );
     setTitle( filter.title )
 
@@ -457,54 +455,6 @@ export default function PublicFilterEdit( props ) {
           styles={pickSelectStyle()}
           />
       </FormGroup>
-
-      <RequiredLabel className="m-t-15">Show filter</RequiredLabel>
-      <hr className="m-t-5 m-b-10"/>
-      {/* Global */}
-      <FormGroup className="m-t-5">
-        <Checkbox
-          className = "m-l-5 m-r-5 "
-          label = "Global (shown in all projects) or choose project"
-          value = { global }
-          onChange={(e) => {
-            setGlobal(!global);
-            setDataChanged( true );
-          }}
-          addition={ <span className="warning-big m-l-5">*</span>}
-          />
-      </FormGroup>
-
-      {/* Project */}
-      <FormGroup>
-        <RequiredLabel>Projekt</RequiredLabel>
-        <Select
-          placeholder="Vyberte projekt"
-          value={project}
-          isDisabled={global}
-          onChange={(project) => {
-            setProject(project);
-            setDataChanged( true );
-          }}
-          options={toSelArr(projectsData.projects)}
-          styles={pickSelectStyle()}
-          />
-
-      </FormGroup>
-
-      {/* Dashboard */}
-      <FormGroup className="m-t-5">
-        <Checkbox
-          className = "m-l-5 m-r-5 "
-          label = "Dashboard (shown in dashboard)"
-          value = { dashboard }
-          onChange={(e) => {
-            setDashboard(!dashboard);
-            setDataChanged( true );
-          }}
-          />
-      </FormGroup>
-
-
 
       <Label className="m-t-15">Filter attributes</Label>
       <hr className="m-t-5 m-b-10"/>

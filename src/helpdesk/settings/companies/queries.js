@@ -2,6 +2,56 @@ import {
   gql
 } from '@apollo/client';
 
+const companyData = `
+id
+title
+def
+dph
+ico
+dic
+ic_dph
+country
+city
+street
+zip
+email
+phone
+description
+pricelist {
+  id
+  title
+  order
+  afterHours
+  def
+  materialMargin
+  materialMarginExtra
+  prices {
+    id
+    type
+    price
+    taskType {
+      id
+      title
+    }
+    tripType {
+      id
+      title
+    }
+  }
+}
+monthly
+monthlyPausal
+taskWorkPausal
+taskTripPausal
+companyRents {
+  id
+  title
+  quantity
+  cost
+  price
+}
+`;
+
 export const GET_COMPANIES = gql `
 query {
   companies {
@@ -60,28 +110,7 @@ mutation addCompany($title: String!, $dph: Int!, $ico: String!, $dic: String!, $
     taskTripPausal: $taskTripPausal,
     rents: $rents,
   ){
-    id
-    title
-    monthly
-    monthlyPausal
-    taskWorkPausal
-    taskTripPausal
-    dph
-    pricelist {
-      id
-      title
-      materialMargin
-      prices {
-        type
-        price
-        taskType {
-          id
-        }
-        tripType {
-          id
-        }
-      }
-    }
+    ${companyData}
   }
 }
 `;
@@ -91,52 +120,8 @@ query company($id: Int!) {
   company (
     id: $id
   ) {
-      title
-      dph
-      ico
-      dic
-      ic_dph
-      country
-      city
-      street
-      zip
-      email
-      phone
-      description
-      pricelist {
-        id
-        title
-        order
-        afterHours
-        def
-        materialMargin
-        materialMarginExtra
-        prices {
-          id
-          type
-          price
-          taskType {
-            id
-            title
-          }
-          tripType {
-            id
-            title
-          }
-        }
-      }
-      monthly
-      monthlyPausal
-      taskWorkPausal
-      taskTripPausal
-      companyRents {
-        id
-        title
-        quantity
-        cost
-        price
-      }
-    }
+    ${companyData}
+  }
 }
 `;
 
@@ -183,8 +168,77 @@ mutation deleteCompany($id: Int!, $newId: Int!) {
 }
 `;
 
-export const COMPANIES_SUBSCRIPTION = gql `
-  subscription companiesSubscription {
-    companiesSubscription
+export const GET_PAUSAL_COMPANY = gql `
+query pausalCompany($id: Int!) {
+  pausalCompany (
+    id: $id
+  ) {
+    title
+    pricelist {
+      id
+      title
+      order
+      afterHours
+      def
+      materialMargin
+      materialMarginExtra
+      prices {
+        id
+        type
+        price
+        taskType {
+          id
+          title
+        }
+        tripType {
+          id
+          title
+        }
+      }
+    }
+    monthly
+    monthlyPausal
+    taskWorkPausal
+    taskTripPausal
+    companyRents {
+      id
+      title
+      quantity
+      cost
+      price
+    }
   }
+}
+`;
+
+export const GET_DEF_COMPANY = gql `
+query defCompany {
+  defCompany {
+    ${companyData}
+  }
+}
+`;
+
+export const GET_COMPANY_DEFAULTS = gql `
+query companyDefaults {
+  companyDefaults {
+    dph
+  }
+}
+`;
+
+export const UPDATE_COMPANY_DEFAULTS = gql `
+mutation updateCompanyDefaults($dph: Int!) {
+  updateCompanyDefaults(
+    dph: $dph
+  ){
+    dph
+  }
+}
+`;
+
+export const COMPANIES_SUBSCRIPTION = gql `
+subscription companiesSubscription {
+  companiesSubscription
+}
 `;

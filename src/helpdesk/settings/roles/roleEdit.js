@@ -158,6 +158,28 @@ export default function RoleEdit( props ) {
       label: "SMTPs"
     },
   ];
+  const helpdesk = [
+    {
+      state: React.useState( false ),
+      key: 'tasklistLayout',
+      label: "Set tasklist layout (all tasks)"
+    },
+    {
+      state: React.useState( false ),
+      key: 'tasklistCalendar',
+      label: "Tasklist calendar (all tasks)"
+    },
+    {
+      state: React.useState( false ),
+      key: 'tasklistPreferences',
+      label: "Tasklist column preferences"
+    },
+    {
+      state: React.useState( false ),
+      key: 'customFilters',
+      label: "Create custom filters"
+    },
+  ];
 
   const [ dataChanged, setDataChanged ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
@@ -188,14 +210,14 @@ export default function RoleEdit( props ) {
     setTitle( role.title );
     setOrder( role.order );
     setLevel( role.level );
-    [ ...generalRights, ...settings ].forEach( ( right ) => right.state[ 1 ]( role.accessRights[ right.key ] ) );
+    [ ...generalRights, ...settings, ...helpdesk ].forEach( ( right ) => right.state[ 1 ]( role.accessRights[ right.key ] ) );
     setDataChanged( false );
   }
 
   const updateRoleFunc = () => {
     setSaving( true );
     let accessRights = {};
-    [ ...generalRights, ...settings ].forEach( ( right ) => accessRights[ right.key ] = right.state[ 0 ] );
+    [ ...generalRights, ...settings, ...helpdesk ].forEach( ( right ) => accessRights[ right.key ] = right.state[ 0 ] );
     updateRole( {
         variables: {
           id: parseInt( match.params.id ),
@@ -323,6 +345,36 @@ export default function RoleEdit( props ) {
           </thead>
           <tbody>
             { settings.map( (right) => (
+              <RightRow
+                key={[right.key,right.state[0]].toString()}
+                onChange={(e) => {
+                  right.state[1](e);
+                  setDataChanged( true );
+                }}
+                label={right.label}
+                disabled={disabled}
+                value={right.state[0]}
+                />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="">
+        <h2>Helpdesk rights</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th  width={"90%"} key={1}>
+                Name
+              </th>
+              <th className="text-center" key={2}>
+                Granted
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            { helpdesk.map( (right) => (
               <RightRow
                 key={[right.key,right.state[0]].toString()}
                 onChange={(e) => {

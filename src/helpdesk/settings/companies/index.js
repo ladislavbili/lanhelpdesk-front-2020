@@ -19,7 +19,7 @@ import {
   COMPANIES_SUBSCRIPTION,
 } from './queries';
 
-export default function CompanysList( props ) {
+export default function CompaniesList( props ) {
   const {
     history,
     match
@@ -85,7 +85,7 @@ export default function CompanysList( props ) {
       filter={companyFilter}
       setFilter={setCompanyFilter}
       history={history}
-      addURL="/helpdesk/settings/companies/add"
+      addURL={`.${match.params.id === undefined ? '/companies' : '' }/add`}
       addLabel="Company"
       RightFilterComponent={CompanySort}
       RightSideComponent={RightSideComponent}
@@ -116,7 +116,7 @@ export default function CompanysList( props ) {
                   "active": parseInt(match.params.id) === company.id
                 }
               )}
-              onClick={ () => history.push(`/helpdesk/settings/companies/${company.id}`) }>
+              onClick={ () => history.push(`.${match.params.id === undefined ? '/companies' : '' }/${company.id}`) }>
               <td>
                 {company.title}
               </td>

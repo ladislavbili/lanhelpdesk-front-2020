@@ -22,10 +22,6 @@ import ProjectSelectModal from './projectSelectModal';
 import classnames from 'classnames';
 
 import {
-  noMilestone
-} from 'configs/constants/sidebar';
-
-import {
   GET_TASK_TYPES,
   TASK_TYPES_SUBSCRIPTION,
 } from 'helpdesk/settings/taskTypes/queries';
@@ -240,7 +236,6 @@ export default function TaskAddContainer( props ) {
               taskTypes={ toSelArr(taskTypesData.taskTypes) }
               tripTypes={ toSelArr(tripTypesData.tripTypes) }
               currentUser={ currentUser }
-              milestones={[noMilestone]}
               defaultUnit={null}
               closeModal={ (clearProject = false) => {
                 setOpenAddTaskModal(false);

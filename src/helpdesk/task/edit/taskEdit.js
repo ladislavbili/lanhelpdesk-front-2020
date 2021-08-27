@@ -185,8 +185,10 @@ export default function TaskEdit( props ) {
     setDeadline( task.deadline ? moment( parseInt( task.deadline ) ) : null );
     setDescription( task.description );
     setImportant( task.important );
+    /*
     const milestone = project && task.milestone ? toSelArr( project.project.milestones )
       .find( ( milestone ) => milestone.id === task.milestone.id ) : undefined;
+      */
     setOvertime( ( task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPausal( ( task.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPendingChangable( task.pendingChangable );
@@ -196,7 +198,7 @@ export default function TaskEdit( props ) {
     setTags( toSelArr( task.tags ) );
     setTaskType( ( task.taskType ? toSelItem( task.taskType ) : noTaskType ) );
     setCompany( ( task.company ? toSelItem( task.company ) : null ) );
-    setMilestone( milestone === undefined ? noMilestone : milestone );
+    //setMilestone( milestone === undefined ? noMilestone : milestone );
     setRequester(
       task.requester ? {
         ...task.requester,
@@ -366,7 +368,7 @@ export default function TaskEdit( props ) {
   const assignedTos = project ? users.filter( ( user ) => project.usersWithRights.some( ( userData ) => userData.assignable && userData.user.id === user.id ) ) : [];
 
   const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights.map( ( userWithRights ) => userWithRights.user ), 'fullName' ) : users );
-  const milestones = [ noMilestone ].concat( ( project ? toSelArr( project.project.milestones ) : [] ) );
+  //const milestones = [ noMilestone ].concat( ( project ? toSelArr( project.project.milestones ) : [] ) );
 
   const layout = 2; //currentUser.taskLayout
 
@@ -552,7 +554,7 @@ export default function TaskEdit( props ) {
     let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.assignable && projectUser.user.id === user.id ) );
     setProject( project );
     setAssignedTo( newAssignedTo );
-    setMilestone( noMilestone );
+    //setMilestone( noMilestone );
     setTags( [] );
     setStatus( null );
     autoUpdateTask( {
@@ -566,9 +568,19 @@ export default function TaskEdit( props ) {
 
   const changeStatus = ( status ) => {
     if ( status.action === 'PendingDate' ) {
+      setStatus( status );
       setPendingDate( moment()
         .add( 1, 'days' ) );
       setPotentialPendingStatus( status );
+      setPendingChangable( true );
+      autoUpdateTask( {
+        status: status.id,
+        pendingDate: moment()
+          .add( 1, 'days' )
+          .valueOf()
+          .toString(),
+        pendingChangable: true,
+      } );
     } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
       setStatus( status );
       setImportant( false );
@@ -587,35 +599,36 @@ export default function TaskEdit( props ) {
       } );
     }
   }
-
-  const changeMilestone = ( milestone ) => {
-    if ( status.action === 'PendingDate' ) {
-      if ( milestone.startsAt !== null ) {
-        setMilestone( milestone );
-        setPendingDate( moment( milestone.startsAt ) );
-        setPendingChangable( false );
-        autoUpdateTask( {
-          milestone: milestone.id,
-          pendingDate: moment( milestone.startsAt )
-            .valueOf()
-            .toString(),
-          pendingChangable: false
-        } );
+  /*
+    const changeMilestone = ( milestone ) => {
+      if ( status.action === 'PendingDate' ) {
+        if ( milestone.startsAt !== null ) {
+          setMilestone( milestone );
+          setPendingDate( moment( milestone.startsAt ) );
+          setPendingChangable( false );
+          autoUpdateTask( {
+            milestone: milestone.id,
+            pendingDate: moment( milestone.startsAt )
+              .valueOf()
+              .toString(),
+            pendingChangable: false
+          } );
+        } else {
+          setMilestone( milestone );
+          setPendingChangable( true );
+          autoUpdateTask( {
+            milestone: milestone.id,
+            pendingChangable: true
+          } );
+        }
       } else {
         setMilestone( milestone );
-        setPendingChangable( true );
         autoUpdateTask( {
-          milestone: milestone.id,
-          pendingChangable: true
+          milestone: milestone.id
         } );
       }
-    } else {
-      setMilestone( milestone );
-      autoUpdateTask( {
-        milestone: milestone.id
-      } );
     }
-  }
+  */
 
   const changeRequester = ( requester ) => {
     if ( requester.id === -1 ) {
@@ -803,7 +816,6 @@ export default function TaskEdit( props ) {
     if ( !userRights.statusRead ) {
       return null;
     }
-
     if ( status && status.action === 'PendingDate' ) {
       const datepickerDisabled = !status || status.action !== 'PendingDate' || !userRights.statusWrite || !pendingChangable;
       return (
@@ -814,7 +826,7 @@ export default function TaskEdit( props ) {
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
-                { closeDate ? (timestampToString(pendingDate.valueOf())) : '' }
+                { pendingDate ? (timestampToString(pendingDate.valueOf())) : '' }
               </span>
             ):
             (
@@ -954,22 +966,6 @@ export default function TaskEdit( props ) {
         }}
         options={[noTaskType, ...taskTypes]}
         />
-    ),
-    Milestone: (
-      <div>
-        { !userRights.milestoneWrite &&
-          <div className="disabled-info">{milestone ? milestone.label : "None"}</div>
-        }
-        { userRights.milestoneWrite &&
-          <Select
-            isDisabled={!userRights.milestoneWrite}
-            value={milestone}
-            onChange={changeMilestone}
-            options={milestones}
-            styles={pickSelectStyle( [ 'noArrow', ] )}
-            />
-        }
-      </div>
     ),
     Requester: (
       <div>
@@ -1132,14 +1128,6 @@ export default function TaskEdit( props ) {
                   </div>
                 </div>
               }
-              { userRights.milestoneRead &&
-                <div className="p-r-10">
-                  <Label className="col-form-label  col-3">Milestone</Label>
-                  <div className="col-9">
-                    { layoutComponents.Milestone }
-                  </div>
-                </div>
-              }
             </div>
 
             <div className="col-3">
@@ -1226,12 +1214,6 @@ export default function TaskEdit( props ) {
             { layoutComponents.Status }
           </div>
         }
-        { userRights.milestoneRead &&
-          <div className="col-2">
-            <Label className="col-form-label">Milestone</Label>
-            { layoutComponents.Milestone }
-          </div>
-        }
         { userRights.requesterRead &&
           <div className="col-2">
             <Label className="col-form-label">Zadal</Label>
@@ -1296,14 +1278,6 @@ export default function TaskEdit( props ) {
               <Label>Status <span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Status }
-              </div>
-            </div>
-          }
-          { userRights.milestoneRead &&
-            <div className="form-selects-entry-column" >
-              <Label>Milestone</Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Milestone }
               </div>
             </div>
           }
@@ -1571,22 +1545,22 @@ export default function TaskEdit( props ) {
       <PendingPicker
         open={pendingOpen}
         prefferedMilestone={milestone}
-        milestonesBlocked={userRights.milestoneWrite}
-        milestones={ milestones }
+        milestonesBlocked={true}
+        milestones={ [noMilestone] }
         closeModal={() => {
           setPendingOpen(false);
           setPotentialPendingStatus(null);
         }}
         savePending={(pending)=>{
           if(pending.pendingDate === null){
-            setPendingDate( moment( parseInt(pending.milestone.endsAt) ) );
-            setMilestone( pending.milestone );
+            //setPendingDate( moment( parseInt(pending.milestone.endsAt) ) );
+            //setMilestone( pending.milestone );
             autoUpdateTask( {
               status: potentialPendingStatus.id,
               pendingChangable: false,
               important: false,
-              milestone: pending.milestone.id,
-              pendingDate: pending.milestone.endsAt ? pending.milestone.endsAt : moment().add(1,'day').valueOf().toString()
+              //milestone: pending.milestone.id,
+              //pendingDate: pending.milestone.endsAt ? pending.milestone.endsAt : moment().add(1,'day').valueOf().toString()
             } );
           }else{
             setPendingDate( pending.pendingDate );

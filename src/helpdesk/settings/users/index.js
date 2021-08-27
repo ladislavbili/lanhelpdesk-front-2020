@@ -151,7 +151,7 @@ export default function UserListContainer( props ) {
       filter={userFilter}
       setFilter={setUserFilter}
       history={history}
-      addURL="/helpdesk/settings/users/add"
+      addURL={`.${match.params.id === undefined ? '/users' : '' }/add`}
       addLabel="User"
       RightFilterComponent={UserRoleFilter}
       RightSideComponent={RightSideComponent}
@@ -176,7 +176,7 @@ export default function UserListContainer( props ) {
                   }
                 )}
                 style={{whiteSpace: "nowrap",  overflow: "hidden"}}
-                onClick={()=>history.push(`/helpdesk/settings/users/${user.id}`)}>
+                onClick={ () => history.push(`.${match.params.id === undefined ? '/users' : '' }/${user.id}`) }>
                 <td
                   style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
                   {user.username}

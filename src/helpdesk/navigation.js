@@ -29,6 +29,9 @@ import NotificationList from 'components/notifications';
 
 import Loading from 'components/loading';
 import RepeatsList from 'helpdesk/components/repeat/repeatsList';
+import CompanyList from 'helpdesk/settings/companies';
+import CompanyEdit from 'helpdesk/settings/companies/companyEdit';
+import UserList from 'helpdesk/settings/users';
 
 import {
   getMyData,
@@ -69,11 +72,17 @@ export default function Navigation( props ) {
           <Route exact path="/helpdesk/taskList/i/:listID/p/:page/:taskID" component={TaskList} />
           <Route exact path="/helpdesk/notifications" component={NotificationList} />
           <Route exact path="/helpdesk/notifications/:notificationID" component={NotificationList} />
-          <Route exact path="/helpdesk/project/add" component={ProjectAdd} />
+          { accessRights.addProjects ? <Route exact path="/helpdesk/project/add" component={ProjectAdd} /> : <Route exact path="/helpdesk/project/add" component={AccessDenied} /> }
           <Route exact path="/helpdesk/project/:projectID" component={ProjectEdit} />
           <Route exact path="/helpdesk/repeats" component={RepeatsList} />
+          <Route exact path="/helpdesk/companies" component={CompanyList} />
+          { accessRights.companies ? <Route exact path="/helpdesk/companies" component={CompanyList} /> : <Route exact path="/helpdesk/companies" component={AccessDenied} /> }
+          { accessRights.companies ? <Route exact path="/helpdesk/companies/:id" component={CompanyList} /> : <Route exact path="/helpdesk/companies/:id" component={AccessDenied} /> }
+          { accessRights.users ? <Route exact path="/helpdesk/users" component={UserList} /> : <Route exact path="/helpdesk/users" component={AccessDenied} /> }
+          { accessRights.users ? <Route exact path="/helpdesk/users/:id" component={UserList} /> : <Route exact path="/helpdesk/users/:id" component={AccessDenied} /> }
 
           { /* SETTINGS */ }
+          { accessRights.companies && <Route exact key='defCompany' path="/helpdesk/settings/company/:id" component={ CompanyEdit } /> }
           { settings.map( (item) => {
             if (accessRights[item.value]){
               return (<Route exact key={item.link} path={`/helpdesk/settings/${item.link}`} component={item.component} />);

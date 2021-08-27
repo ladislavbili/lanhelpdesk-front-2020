@@ -73,7 +73,6 @@ export default function TaskAdd( props ) {
     users,
     taskTypes,
     tripTypes,
-    milestones,
     companies,
     defaultUnit,
     closeModal,
@@ -174,7 +173,7 @@ export default function TaskAdd( props ) {
       } else {
         setTags( [] );
         setStatus( null );
-        setMilestone( noMilestone );
+        //setMilestone( noMilestone );
         setProject( projects[ 0 ] );
         if ( closeModal ) {
           closeModal( true );
@@ -353,7 +352,7 @@ export default function TaskAdd( props ) {
           deadline: deadline ? deadline.valueOf()
             .toString() : null,
           description,
-          milestone: milestone ? milestone.id : null,
+          milestone: /*milestone ? milestone.id : */ null,
           overtime: overtime.value,
           pausal: pausal.value,
           pendingChangable,
@@ -588,7 +587,7 @@ export default function TaskAdd( props ) {
         onChange={(project)=>{
           setTags([]);
           setStatus(null);
-          setMilestone(noMilestone);
+          //setMilestone(noMilestone);
           setProject(project);
         }}
         options={projects.filter((project) => currentUser.role.level === 0 || project.right.addTasks )}
@@ -660,36 +659,6 @@ export default function TaskAdd( props ) {
         }}
         options={taskTypes}
         />
-    ),
-    Milestone: (
-      <div>
-        { !userRights.milestoneWrite &&
-          <div className="disabled-info">{milestone ? milestone.label : "None"}</div>
-        }
-        { userRights.milestoneWrite &&
-          <Select
-            isDisabled={!userRights.milestoneWrite}
-            placeholder="None"
-            value={milestone}
-            onChange={(milestone)=> {
-              if(status.action==='PendingDate'){
-                if(milestone.startsAt !== null){
-                  setMilestone(milestone);
-                  setPendingDate(moment(milestone.startsAt));
-                  setPendingChangable(false);
-                }else{
-                  setMilestone(milestone);
-                  setPendingChangable(true);
-                }
-              }else{
-                setMilestone(milestone);
-              }
-            }}
-            options={milestones.filter((milestone)=>milestone.id===null || (project !== null && milestone.project === project.id))}
-            styles={ pickSelectStyle([ 'noArrow', ]) }
-            />
-        }
-      </div>
     ),
     Requester: (
       <div>
@@ -871,14 +840,6 @@ export default function TaskAdd( props ) {
                   </div>
                 </div>
               }
-              { userRights.milestoneRead &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Milestone</Label>
-                  <div className="col-9">
-                    { layoutComponents.Milestone }
-                  </div>
-                </div>
-              }
             </div>
 
             <div className="col-4">
@@ -972,12 +933,6 @@ export default function TaskAdd( props ) {
             { layoutComponents.Status }
           </div>
         }
-        { userRights.milestoneRead &&
-          <div className="col-2">
-            <Label className="col-form-label">Milestone</Label>
-            { layoutComponents.Milestone }
-          </div>
-        }
         { userRights.requesterRead &&
           <div className="col-2">
             <Label className="col-form-label">Zadal</Label>
@@ -1008,14 +963,6 @@ export default function TaskAdd( props ) {
             <Label>Status<span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Status }
-            </div>
-          </div>
-        }
-        { userRights.milestoneRead &&
-          <div className="form-selects-entry-column" >
-            <Label>Milestone</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Milestone }
             </div>
           </div>
         }

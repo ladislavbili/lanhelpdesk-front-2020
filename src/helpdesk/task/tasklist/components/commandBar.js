@@ -39,6 +39,7 @@ export default function CommandBar( props ) {
     gantt,
     showSort,
     showPreferences,
+    currentUser,
   } = props;
   //prop constants
   const displayValues = (
@@ -55,6 +56,7 @@ export default function CommandBar( props ) {
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
   const [ columnPreferencesOpen, setColumnPreferencesOpen ] = React.useState( false );
 
+  const myRights = currentUser.role.accessRights;
   //fucs
   const openColumnPreferences = () => setColumnPreferencesOpen( !columnPreferencesOpen );
 
@@ -229,77 +231,69 @@ export default function CommandBar( props ) {
 
               </div>
             </div>
-
-            <Empty>
-              <button className="btn btn-link center-hor m-l-5" id={`commandbar-layout-switch`} onClick={ () => setLayoutOpen(true) } >
-                <i className={"m-r-5 fa " + getLayoutIcon()}/>
-                {getLayoutTitle()}
-              </button>
-              <GeneralPopover
-                placement="bottom-start"
-                className="overflow-auto max-height-100 min-width-0"
-                target={`commandbar-layout-switch`}
-                useLegacy
-                reset={() => {}}
-                submit={() => {}}
-                open={ layoutOpen }
-                close={() => setLayoutOpen(false)}
-                hideButtons
-                >
-                <div className="btn-group-vertical" data-toggle="buttons">
-                  {
-                    /*
-                    <label className={classnames({'active':tasklistLayout === 0}, "btn btn-link text-left")}>
-                    <input type="radio" name="options" onChange={() => setTasklistLayout(0)} checked={tasklistLayout === 0}/>
-                    <i className="fa fa-columns"/>
-                    {` Trojstlpec`}
+            { (myRights.tasklistCalendar || myRights.tasklistLayout) &&
+              <Empty>
+                <button className="btn btn-link center-hor m-l-5" id={`commandbar-layout-switch`} onClick={ () => setLayoutOpen(true) } >
+                  <i className={"m-r-5 fa " + getLayoutIcon()}/>
+                  {getLayoutTitle()}
+                </button>
+                <GeneralPopover
+                  placement="bottom-start"
+                  className="overflow-auto max-height-100 min-width-0"
+                  target={`commandbar-layout-switch`}
+                  useLegacy
+                  reset={() => {}}
+                  submit={() => {}}
+                  open={ layoutOpen }
+                  close={() => setLayoutOpen(false)}
+                  hideButtons
+                  >
+                  <div className="btn-group-vertical" data-toggle="buttons">
+                    <label className={classnames({'active':tasklistLayout === 1 || tasklistLayout === 0}, "btn btn-link text-left")}>
+                      <input type="radio" name="options" checked={tasklistLayout === 1 || ( tasklistLayout === 2 && localProject.id === null ) } onChange={() => {setTasklistLayout(1); setLayoutOpen(false); }}/>
+                      <i className="fa fa-list m-r-5"/>
+                      Zoznam
                     </label>
-                    */
-                  }
-                  <label className={classnames({'active':tasklistLayout === 1 || tasklistLayout === 0}, "btn btn-link text-left")}>
-                    <input type="radio" name="options" checked={tasklistLayout === 1 || ( tasklistLayout === 2 && localProject.id === null ) } onChange={() => {setTasklistLayout(1); setLayoutOpen(false); }}/>
-                    <i className="fa fa-list m-r-5"/>
-                    Zoznam
-                  </label>
-                  { localProject.id &&
-                    <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link text-left")}>
-                      <input type="radio" name="options" onChange={() => {setTasklistLayout(2); setLayoutOpen(false); }} checked={tasklistLayout === 2}/>
-                      <i className="fa fa-map m-r-5"/>
-                      DnD
-                    </label>
-                  }
-                  { canViewCalendar &&
-                    <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link text-left")}>
-                      <input type="radio" name="options" onChange={() => {setTasklistLayout(3); setLayoutOpen(false); }} checked={tasklistLayout === 3}/>
-                      <i className="fa fa-calendar-alt m-r-5"/>
-                      Kalendár
-                    </label>
-                  }
-                  { localProject.id &&
-                    <label className={classnames({'active':tasklistLayout === 4}, "btn btn-link text-left")}>
-                      <input type="radio" name="options" onChange={() => {setTasklistLayout(4); setLayoutOpen(false); }} checked={tasklistLayout === 4}/>
-                      <i className="fa fa-project-diagram m-r-5"/>
-                      Project management
-                    </label>
-                  }
-                  { localProject.id &&
-                    <label className={classnames({'active':tasklistLayout === 5}, "btn btn-link text-left")}>
-                      <input
-                        type="radio"
-                        name="options"
-                        onChange={() =>{
-                          setTasklistLayout(5);
-                          setLayoutOpen(false);
-                        }}
-                        checked={tasklistLayout === 5}
-                        />
-                      <i className="fa fa-chart-bar m-r-5"/>
-                      Statistics
-                    </label>
-                  }
-                </div>
-              </GeneralPopover>
-            </Empty>
+                    { localProject.id && myRights.tasklistLayout &&
+                      <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link text-left")}>
+                        <input type="radio" name="options" onChange={() => {setTasklistLayout(2); setLayoutOpen(false); }} checked={tasklistLayout === 2}/>
+                        <i className="fa fa-map m-r-5"/>
+                        DnD
+                      </label>
+                    }
+                    { canViewCalendar &&
+                      <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link text-left")}>
+                        <input type="radio" name="options" onChange={() => {setTasklistLayout(3); setLayoutOpen(false); }} checked={tasklistLayout === 3}/>
+                        <i className="fa fa-calendar-alt m-r-5"/>
+                        Kalendár
+                      </label>
+                    }
+                    { localProject.id && myRights.tasklistLayout &&
+                      <label className={classnames({'active':tasklistLayout === 4}, "btn btn-link text-left")}>
+                        <input type="radio" name="options" onChange={() => {setTasklistLayout(4); setLayoutOpen(false); }} checked={tasklistLayout === 4}/>
+                        <i className="fa fa-project-diagram m-r-5"/>
+                        Project management
+                      </label>
+                    }
+                    { localProject.id && myRights.tasklistLayout &&
+                      <label className={classnames({'active':tasklistLayout === 5}, "btn btn-link text-left")}>
+                        <input
+                          type="radio"
+                          name="options"
+                          onChange={() =>{
+                            setTasklistLayout(5);
+                            setLayoutOpen(false);
+                          }}
+                          checked={tasklistLayout === 5}
+                          />
+                        <i className="fa fa-chart-bar m-r-5"/>
+                        Statistics
+                      </label>
+                    }
+                  </div>
+                </GeneralPopover>
+              </Empty>
+            }
           </div>
         </div>
       </div>

@@ -132,6 +132,28 @@ export default function RoleAdd( props ) {
       label: "SMTPs"
     },
   ];
+  const helpdesk = [
+    {
+      state: React.useState( false ),
+      key: 'tasklistLayout',
+      label: "Set tasklist layout (all tasks)"
+    },
+    {
+      state: React.useState( false ),
+      key: 'tasklistCalendar',
+      label: "Tasklist calendar (all tasks)"
+    },
+    {
+      state: React.useState( false ),
+      key: 'tasklistPreferences',
+      label: "Tasklist column preferences"
+    },
+    {
+      state: React.useState( false ),
+      key: 'customFilters',
+      label: "Create custom filters"
+    },
+  ];
 
   const [ saving, setSaving ] = React.useState( false );
 
@@ -139,7 +161,7 @@ export default function RoleAdd( props ) {
   const addRoleFunc = () => {
     setSaving( true );
     let accessRights = {};
-    [ ...generalRights, ...settings ].forEach( ( right ) => accessRights[ right.key ] = right.state[ 0 ] );
+    [ ...generalRights, ...settings, ...helpdesk ].forEach( ( right ) => accessRights[ right.key ] = right.state[ 0 ] );
     addRole( {
         variables: {
           title,
@@ -252,6 +274,33 @@ export default function RoleAdd( props ) {
           </thead>
           <tbody>
             { settings.map( (right) => (
+              <RightRow
+                key={[right.key,right.state[0]].toString()}
+                onChange={right.state[1]}
+                label={right.label}
+                disabled={false}
+                value={right.state[0]}
+                />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h2>Helpdesk rights</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th width={"90%"} key={1}>
+                Name
+              </th>
+              <th className="text-center" key={2}>
+                Granted
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            { helpdesk.map( (right) => (
               <RightRow
                 key={[right.key,right.state[0]].toString()}
                 onChange={right.state[1]}

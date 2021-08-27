@@ -423,7 +423,7 @@ export default function WorksTable( props ) {
       case 'price': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe-blue-text">
               €
             </div>
             <input
@@ -438,7 +438,7 @@ export default function WorksTable( props ) {
       }
       case 'discount': {
         return (
-          <span className="text p-l-8">
+          <span className="text p-l-8 segoe-blue-text">
             -
             <input
               disabled={disabled || !canAddSubtasksAndTrips}
@@ -466,7 +466,7 @@ export default function WorksTable( props ) {
       case 'priceAfterDiscount': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe-blue-text">
               €
             </div>
             <input
@@ -664,7 +664,7 @@ export default function WorksTable( props ) {
       case 'price': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe-blue-text">
               €
             </div>
             <input
@@ -679,7 +679,7 @@ export default function WorksTable( props ) {
       }
       case 'discount': {
         return (
-          <span className="text p-l-8">
+          <span className="text p-l-8 segoe-blue-text">
             -
             <input
               disabled={disabled || !canAddSubtasksAndTrips}
@@ -907,14 +907,14 @@ export default function WorksTable( props ) {
       case 'price': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe-blue-text">
               €
             </div>
             <input
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control h-30 segoe"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={ newSubtaskType ? getPrice(newSubtaskType) : 0 }
               />
           </span>
@@ -922,13 +922,13 @@ export default function WorksTable( props ) {
       }
       case 'discount': {
         return (
-          <span className="text p-l-8 segoe">
+          <span className="text p-l-8 segoe-blue-text">
             -
             <input
               disabled={disabled || !canAddSubtasksAndTrips}
               style={{display: "inline", width: "60%"}}
               type="number"
-              className="form-control m-l-5 m-r-5 input h-30 segoe"
+              className="form-control m-l-5 m-r-5 input h-30 segoe-blue-text"
               value={newSubtaskDiscount}
               onChange={(e)=>setNewSubtaskDiscount(e.target.value)}
               />
@@ -939,14 +939,14 @@ export default function WorksTable( props ) {
       case 'priceAfterDiscount': {
         return (
           <span className="text" style={{float: "right"}}>
-            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe">
+            <div style={{float: "right"}} className="p-t-8 p-r-8 segoe-blue-text">
               €
             </div>
             <input
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control hidden-input h-30 segoe"
+              className="form-control hidden-input h-30 segoe-blue-text"
               value={ newSubtaskType ? getDiscountPrice({type: newSubtaskType, discount: newSubtaskDiscount }) : 0 }
               />
           </span>
@@ -1109,7 +1109,7 @@ export default function WorksTable( props ) {
               disabled={true}
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
-              className="form-control h-30 segoe-blue-text"
+              className="form-control h-30 hidden-input segoe-blue-text"
               value={ newTripType ? getPrice(newTripType) : 0 }
               />
           </span>
@@ -1183,7 +1183,6 @@ export default function WorksTable( props ) {
     return getDiscountPrice( item ) * quantity;
   }
 
-
   return (
     <div className="vykazyTable form-section">
       <table className="table form-section-rest">
@@ -1196,7 +1195,7 @@ export default function WorksTable( props ) {
                 >
                 Práca
               </span>
-              { userRights.vykazyRead &&
+              { userRights.vykazRead &&
                 <Empty>
                   <span className='m-l-7 m-r-7'>
                     |
