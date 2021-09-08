@@ -399,6 +399,13 @@ export const emptyCompanyValue = {
   title: "Task Creator's company"
 }
 
+export const emptyAssigned = {
+  id: null,
+  value: null,
+  label: 'Nepriradený/Zadávateľ má assigned edit právo',
+  title: 'Nepriradený/Zadávateľ má assigned edit právo',
+};
+
 export const emptyStatus = {
   title: 'New (first with new action)',
   id: null,

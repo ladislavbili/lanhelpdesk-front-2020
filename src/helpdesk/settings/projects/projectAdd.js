@@ -254,6 +254,7 @@ export default function ProjectAdd( props ) {
           description,
           lockedRequester,
           autoApproved,
+          hideApproved,
           archived,
           def: newDef,
           groups: newGroups,
@@ -605,6 +606,32 @@ export default function ProjectAdd( props ) {
           labelClassName="text-normal font-normal"
           simpleSwitch
           />
+
+        <FormGroup tag="fieldset" className="bkg-white" onChange={() => setAutoApproved(!autoApproved) }>
+          <FormGroup check className="p-b-10 p-t-10">
+            <Input type="radio" checked={autoApproved} className="center-hor" name="autoApproved" id="autoApprovedOn" />
+            <Label check className="center-hor m-l-5" htmlFor="autoApprovedOn" >
+              Invoice On
+            </Label>
+          </FormGroup>
+          <FormGroup check className="p-b-10 p-t-10">
+            <Input type="radio" checked={!autoApproved} className="center-hor" name="autoApproved"  id="autoApprovedOff" />
+            <Label check className="center-hor m-l-5" htmlFor="autoApprovedOff" >
+              Invoice Off
+            </Label>
+          </FormGroup>
+        </FormGroup>
+
+        <Switch
+          value={hideApproved}
+          onChange={() => {
+            setHideApproved(!hideApproved);
+          }}
+          label="Don't show invoice"
+          labelClassName="text-normal font-normal"
+          simpleSwitch
+          />
+
       </TabPane>
 
       <TabPane tabId={'statuses'}>

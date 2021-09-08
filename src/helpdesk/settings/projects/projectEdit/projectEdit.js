@@ -38,6 +38,7 @@ import Groups from '../components/group';
 import GroupAdd from '../components/group/groupAdd';
 import ProjectAcl from "../components/acl";
 import CustomAttributes from "../components/customAttributes";
+import ProjectFilters from "../components/projectFilters";
 import ACLErrors from '../components/aclErrors';
 import Attachments from '../components/attachments';
 import {
@@ -51,11 +52,32 @@ import {
   remapRightsToBackend,
   remapRightsFromBackend
 } from '../helpers';
+import {
+  attributesNames,
+} from '../components/attributes/constants';
 
 import {
   GET_PROJECT,
 } from '../queries';
 let fakeID = -1;
+
+let attributeRights = {};
+let defaultAttributes = {};
+attributesNames.forEach( ( attribute ) => {
+  attributeRights[ attribute ] = {
+    required: false,
+    add: false,
+    view: false,
+    edit: false,
+  }
+  if ( attribute !== 'repeat' ) {
+    defaultAttributes[ attribute ] = {
+      fixed: false,
+      value: [ 'tags', 'assigned' ].includes( attribute ) ? [] : null,
+    }
+  }
+} )
+
 
 export default function ProjectEdit( props ) {
   //data & queries
@@ -94,12 +116,15 @@ export default function ProjectEdit( props ) {
   const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
   const [ autoApproved, setAutoApproved ] = React.useState( true );
+  const [ hideApproved, setHideApproved ] = React.useState( false );
   const [ archived, setArchived ] = React.useState( false );
   const [ groups, setGroups ] = React.useState( [] );
+  const [ attributes, setAttributes ] = React.useState( defaultAttributes );
   const [ userGroups, setUserGroups ] = React.useState( [] );
   const [ addTags, setAddTags ] = React.useState( [] );
   const [ updateTags, setUpdateTags ] = React.useState( [] );
   const [ deleteTags, setDeleteTags ] = React.useState( [] );
+  const [ projectFilters, setProjectFilters ] = React.useState( [] );
 
   const [ assignedTo, setAssignedTo ] = React.useState( defList( noDef.assignedTo.required ) );
   const [ company, setCompany ] = React.useState( defItem( noDef.company.required ) );
@@ -158,6 +183,7 @@ export default function ProjectEdit( props ) {
     setDescription( project.description );
     setLockedRequester( project.lockedRequester );
     setAutoApproved( project.autoApproved );
+    setHideApproved( project.hideApproved );
     setArchived( project.archived );
 
     //STATUS
@@ -231,7 +257,10 @@ export default function ProjectEdit( props ) {
       groups,
       userGroups
     } = getDefaultGroupData();
-    setGroups( groups );
+    setGroups( groups.map( ( group ) => ( {
+      ...group,
+      attributeRights
+    } ) ) );
     setUserGroups( userGroups );
     setDataChanged( false );
 
@@ -442,6 +471,7 @@ export default function ProjectEdit( props ) {
           description,
           lockedRequester,
           autoApproved,
+          hideApproved,
           archived,
           def: newDef,
           addTags,
@@ -826,6 +856,19 @@ export default function ProjectEdit( props ) {
                   Custom attributes
                 </NavLink>
               </NavItem>
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: openedTab === 'projectFilters' }, "clickable", "")}
+                  onClick={() => setOpenedTab('projectFilters') }
+                  >
+                  Project filters
+                </NavLink>
+              </NavItem>
             </Empty>
           }
         </Nav>
@@ -863,6 +906,34 @@ export default function ProjectEdit( props ) {
                   labelClassName="text-normal font-normal"
                   simpleSwitch
                   />
+                <FormGroup tag="fieldset" className="bkg-white" onChange={() => {
+                    setAutoApproved(!autoApproved);
+                    setDataChanged( true );
+                  }}>
+                    <FormGroup check className="p-b-10 p-t-10 clickable">
+                      <Input type="radio" checked={autoApproved} onChange={ () => {} } className="center-hor" name="autoApproved" id="autoApprovedOn" />
+                      <Label check className="center-hor m-l-5 clickable noselect" htmlFor="autoApprovedOn" >
+                        Invoice On
+                      </Label>
+                    </FormGroup>
+                    <FormGroup check className="p-b-10 p-t-10 clickable">
+                      <Input type="radio" checked={!autoApproved} onChange={ () => {} } className="center-hor" name="autoApproved"  id="autoApprovedOff" />
+                      <Label check className="center-hor m-l-5 clickable noselect" htmlFor="autoApprovedOff" >
+                        Invoice Off
+                      </Label>
+                    </FormGroup>
+                  </FormGroup>
+                  <Switch
+                    value={hideApproved}
+                    onChange={() => {
+                      setHideApproved(!hideApproved);
+                      setDataChanged( true );
+                    }}
+                    label="Don't show invoice"
+                    labelClassName="text-normal font-normal"
+                    simpleSwitch
+                    />
+
                 { myRights.projectPrimaryWrite &&
                   <button className="btn btn-full-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
                     DELETE PROJECT
@@ -949,7 +1020,7 @@ export default function ProjectEdit( props ) {
                 <Groups
                   groups={groups}
                   addGroup={(newGroup) => {
-                    setGroups([...groups, newGroup]);
+                    setGroups([...groups, { ...newGroup, attributeRights }]);
                     setDataChanged( true );
                   }}
                   updateGroup={(newGroup) => {
@@ -1051,6 +1122,10 @@ export default function ProjectEdit( props ) {
                     setAutoApproved(autoApproved)
                     setDataChanged( true );
                   }}
+                  groups={groups}
+                  setGroups={setGroups}
+                  attributes={attributes}
+                  setAttributes={setAttributes}
                   />
               </TabPane>
               <TabPane tabId={'custom'}>
@@ -1072,6 +1147,14 @@ export default function ProjectEdit( props ) {
                     setCustomAttributes(customAttributes.filter((customAttribute) => customAttribute.id !== id ));
                     setDataChanged( true );
                   }}
+                  />
+              </TabPane>
+              <TabPane tabId={'projectFilters'}>
+                <ProjectFilters
+                  groups={groups}
+                  statuses={allStatuses}
+                  projectFilters={projectFilters}
+                  setProjectFilters={setProjectFilters}
                   />
               </TabPane>
             </Empty>

@@ -1,100 +1,45 @@
 import React from 'react';
 import {
-  useMutation,
-  useQuery,
-  useApolloClient,
-} from "@apollo/client";
-import classnames from 'classnames';
-
-import {
   FormGroup,
   Label,
-  Input,
 } from 'reactstrap';
+import Switch from "components/switch";
+import classnames from 'classnames';
 import Select from 'react-select';
-import Checkbox from 'components/checkbox';
-import Loading from 'components/loading';
-import RequiredLabel from 'components/requiredLabel';
-import SettingsInput from '../components/settingsInput';
+import SettingsInput from 'helpdesk/settings/components/settingsInput';
 import FilterDatePickerInCalendar from 'components/filterDatePickerInCalendar';
-
-import {
-  oneOfOptions,
-  emptyFilter,
-  booleanSelectOptions,
-} from 'configs/constants/filter';
 import {
   pickSelectStyle
 } from 'configs/components/select';
 import {
+  emptyFilter,
+  booleanSelectOptions,
+} from 'configs/constants/filter';
+import {
   toSelArr,
   fromObjectToState,
 } from 'helperFunctions';
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
 
-import {
-  ADD_PUBLIC_FILTER,
-  GET_PUBLIC_FILTERS
-} from './queries';
-import {
-  GET_TASK_TYPES,
-} from '../taskTypes/queries';
-import {
-  GET_BASIC_USERS,
-} from '../users/queries';
-import {
-  GET_BASIC_COMPANIES,
-} from '../companies/queries';
-import {
-  GET_PROJECTS,
-} from '../projects/queries';
-import {
-  GET_ROLES,
-} from '../roles/queries';
-
-export default function PublicFilterAdd( props ) {
+export default function ProjectFilterForm( props ) {
+  //props
   const {
-    history
+    edit,
+    allGroups,
+    allStatuses,
+    allTaskTypes,
+    allUsers,
+    allCompanies,
+    filter,
+    submit,
+    isOpened,
+    closeModal,
   } = props;
-  const client = useApolloClient();
 
-  const {
-    data: taskTypesData,
-    loading: taskTypesLoading
-  } = useQuery( GET_TASK_TYPES );
-
-  const {
-    data: usersData,
-    loading: usersLoading
-  } = useQuery( GET_BASIC_USERS );
-
-  const {
-    data: companiesData,
-    loading: companiesLoading
-  } = useQuery( GET_BASIC_COMPANIES );
-
-  const {
-    data: projectsData,
-    loading: projectsLoading
-  } = useQuery( GET_PROJECTS );
-
-  const {
-    data: rolesData,
-    loading: rolesLoading
-  } = useQuery( GET_ROLES );
-
-  const [ addPublicFilter ] = useMutation( ADD_PUBLIC_FILTER );
-
-  // state
-  const [ global, setGlobal ] = React.useState( true );
-  const [ dashboard, setDashboard ] = React.useState( true );
-  const [ order, setOrder ] = React.useState( 0 );
-  const [ roles, setRoles ] = React.useState( [] );
+  const [ active, setActive ] = React.useState( true );
   const [ title, setTitle ] = React.useState( '' );
-  const [ project, setProject ] = React.useState( null );
-  const [ saving, setSaving ] = React.useState( null );
+  const [ order, setOrder ] = React.useState( 0 );
+  const [ description, setDescription ] = React.useState( '' );
+  const [ groups, setGroups ] = React.useState( [] );
   const {
     requesters,
     setRequesters,
@@ -104,6 +49,8 @@ export default function PublicFilterAdd( props ) {
     setAssignedTos,
     taskTypes,
     setTaskTypes,
+    statuses,
+    setStatuses,
     statusDateFrom,
     setStatusDateFrom,
     statusDateFromNow,
@@ -160,117 +107,87 @@ export default function PublicFilterAdd( props ) {
     setPausal,
     overtime,
     setOvertime,
-    oneOf,
-    setOneOf,
   } = fromObjectToState( emptyFilter );
 
-  const dataLoading = (
-    taskTypesLoading ||
-    usersLoading ||
-    companiesLoading ||
-    projectsLoading ||
-    rolesLoading
-  )
+  const [ saving, setSaving ] = React.useState( false );
+
+  React.useEffect( () => {
+    if ( edit && isOpened ) {
+      setData();
+    }
+  }, [ isOpened ] );
+
+  const setData = () => {
+    setActive( filter.active );
+    setTitle( filter.title );
+    setDescription( filter.description );
+    setGroups( allGroups.filter( ( group ) => filter.groups.includes( group.id ) ) );
+  }
+
+  const submitForm = () => {
+    if ( edit ) {
+      submit( {
+        ...filter,
+        active,
+        title,
+        description,
+        groups: groups.map( ( group ) => group.id ),
+      } )
+      closeModal();
+    } else {
+      submit( {
+        active,
+        title,
+        description,
+        groups: groups.map( ( group ) => group.id ),
+      } )
+      setTitle( '' );
+      setDescription( '' );
+      setGroups( [] );
+      closeModal();
+    }
+  }
 
   const cannotSave = () => (
-    dataLoading ||
     saving ||
     title === "" ||
-    ( !global && project === null ) ||
+    groups.length === 0 ||
     isNaN( parseInt( order ) )
   )
 
-  const submitPublicFilter = () => {
-    setSaving( true );
-    let variables = {
-      title,
-      global,
-      dashboard,
-      order: isNaN( parseInt( order ) ) ? 0 : parseInt( order ),
-      roles: roles.map( ( role ) => role.id ),
-      projectId: global ? null : project.id,
-      filter: {
-        assignedToCur: assignedTos.some( ( assignedTo ) => assignedTo.id === 'cur' ),
-        assignedTos: assignedTos.filter( ( assignedTo ) => assignedTo.id !== 'cur' )
-          .map( ( item ) => item.id ),
-        requesterCur: requesters.some( ( requester ) => requester.id === 'cur' ),
-        requesters: requesters.filter( ( requester ) => requester.id !== 'cur' )
-          .map( ( item ) => item.id ),
-        companyCur: companies.some( ( company ) => company.id === 'cur' ),
-        companies: companies.filter( ( company ) => company.id !== 'cur' )
-          .map( ( item ) => item.id ),
-        taskTypes: taskTypes.map( ( item ) => item.id ),
-        oneOf: oneOf.map( ( oneOf ) => oneOf.value ),
+  const UsersCantUseFilter = () => {
 
-        statusDateFrom: statusDateFrom === null ? null : statusDateFrom.valueOf()
-          .toString(),
-        statusDateFromNow,
-        statusDateTo: statusDateTo === null ? null : statusDateTo.valueOf()
-          .toString(),
-        statusDateToNow,
-        pendingDateFrom: pendingDateFrom === null ? null : pendingDateFrom.valueOf()
-          .toString(),
-        pendingDateFromNow,
-        pendingDateTo: pendingDateTo === null ? null : pendingDateTo.valueOf()
-          .toString(),
-        pendingDateToNow,
-        closeDateFrom: closeDateFrom === null ? null : closeDateFrom.valueOf()
-          .toString(),
-        closeDateFromNow,
-        closeDateTo: closeDateTo === null ? null : closeDateTo.valueOf()
-          .toString(),
-        closeDateToNow,
-        deadlineFrom: deadlineFrom === null ? null : deadlineFrom.valueOf()
-          .toString(),
-        deadlineFromNow,
-        deadlineTo: deadlineTo === null ? null : deadlineTo.valueOf()
-          .toString(),
-        deadlineToNow,
-        scheduledFrom: scheduledFrom === null ? null : scheduledFrom.valueOf()
-          .toString(),
-        scheduledFromNow,
-        scheduledTo: scheduledTo === null ? null : scheduledTo.valueOf()
-          .toString(),
-        scheduledToNow,
-        createdAtFrom: createdAtFrom === null ? null : createdAtFrom.valueOf()
-          .toString(),
-        createdAtFromNow,
-        createdAtTo: createdAtTo === null ? null : createdAtTo.valueOf()
-          .toString(),
-        createdAtToNow,
-        important: important.value,
-        invoiced: invoiced.value,
-        pausal: pausal.value,
-        overtime: overtime.value,
-      },
-    }
-    addPublicFilter( {
-        variables
-      } )
-      .then( ( response ) => {
-        history.push( `./${response.data.addPublicFilter.id}` );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-        setSaving( false );
-      } )
-  }
+    const checkAttributes = [];
 
-  if ( dataLoading ) {
-    return <Loading />
+    const troubledGroups = groups.map( ( group ) => {
+        return {
+          group,
+          troubledAttributes: [ 'Statuses' ]
+        }
+      } )
+      .filter( ( groupData ) => groupData.troubledAttributes.length !== 0 );
+    return (
+      <div>
+        { troubledGroups.map((troubledGroup) => (
+          <div className="error-message" key={troubledGroup.group.id}>
+            {`Group ${troubledGroup.group.title} can't use this filter! Attributes that they can't see are: ${troubledGroup.troubledAttributes.join(', ')}`}
+          </div>
+        ) ) }
+      </div>
+    )
   }
 
   return (
-    <div
-      className={classnames(
-        "p-20",
-        "scroll-visible fit-with-header"
-      )}
-      >
-      <h2 className="m-b-20" >
-        Add public filter
-      </h2>
-
+    <div>
+      <Switch
+        value={active}
+        onChange={() => {
+          setArchived(!active);
+        }}
+        label="Active"
+        labelClassName="text-normal font-normal"
+        simpleSwitch
+        />
       <SettingsInput
         required
         id="title"
@@ -293,33 +210,43 @@ export default function PublicFilterAdd( props ) {
         }}
         />
 
-      {/* Roles */}
+      <SettingsInput
+        id="description"
+        type="textarea"
+        label="Filter description"
+        value={description}
+        onChange={(e) => {
+          setDescription(e.target.value);
+        }}
+        />
+
       <FormGroup>
-        <Label className="">Roles</Label>
+        <Label className="">Groups</Label>
         <Select
-          placeholder="Choose roles"
-          value={roles}
+          placeholder="Choose groups"
+          value={groups}
           isMulti
-          onChange={ (newRoles) => {
-            if(newRoles.some((role) => role.id === 'all' )){
-              if( roles.length === rolesData.roles.length ){
-                setRoles([]);
+          onChange={ (newGroups) => {
+            if(newGroups.some((role) => role.id === 'all' )){
+              if( allGroups.length === groups.length ){
+                setGroups([]);
               }else{
-                setRoles(toSelArr(rolesData.roles));
+                setGroups(allGroups);
               }
             }else{
-              setRoles(newRoles);
+              setGroups(newGroups);
             }
           }}
           options={toSelArr([
-            { id: 'all', title: roles.length === rolesData.roles.length ? 'Clear' : 'All' },
-            ...rolesData.roles
+            { id: 'all', title: groups.length === allGroups.length ? 'Clear' : 'All' },
+            ...allGroups
           ])}
           styles={pickSelectStyle()}
           />
       </FormGroup>
 
       <Label className="m-t-15">Filter attributes</Label>
+
       <hr className="m-t-5 m-b-10"/>
 
       {/* Requester */}
@@ -328,7 +255,7 @@ export default function PublicFilterAdd( props ) {
         <Select
           id="select-requester"
           isMulti
-          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(allUsers, 'email'))}
           onChange={ (requesters) => {
             setRequesters(requesters) ;
           }}
@@ -342,7 +269,7 @@ export default function PublicFilterAdd( props ) {
         <label>Firma</label>
         <Select
           isMulti
-          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
+          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(allCompanies))}
           onChange={ (companies) => {
             setCompanies(companies);
           }}
@@ -354,7 +281,7 @@ export default function PublicFilterAdd( props ) {
       <FormGroup>
         <label>Riesi</label>
         <Select
-          options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(usersData.basicUsers, 'email'))}
+          options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(allUsers, 'email'))}
           isMulti
           onChange={(newValue)=>{
             setAssignedTos(newValue);
@@ -364,11 +291,25 @@ export default function PublicFilterAdd( props ) {
           />
       </FormGroup>
 
+      {/* Status */}
+      <FormGroup>
+        <label>Status</label>
+        <Select
+          options={toSelArr(allStatuses)}
+          isMulti
+          onChange={(newValue)=>{
+            setStatuses(newValue);
+          }}
+          value={statuses}
+          styles={pickSelectStyle(['colored'])}
+          />
+      </FormGroup>
+
       {/* Task type */}
       <FormGroup>
         <label>Typ práce</label>
         <Select
-          options={toSelArr(taskTypesData.taskTypes)}
+          options={toSelArr(allTaskTypes)}
           isMulti
           onChange={(newValue)=>{
             setTaskTypes(newValue);
@@ -568,21 +509,25 @@ export default function PublicFilterAdd( props ) {
         </div>
       </div>
 
+      {UsersCantUseFilter()}
+
       <div className="form-buttons-row">
-        { cannotSave() &&
-          <div className="message error-message ml-auto">
-            Fill in all the required information!
-          </div>
-        }
         <button
           className={classnames(
-            "btn",
-            {"ml-auto": !cannotSave()}
+            "btn"
+          )}
+          onClick={closeModal}
+          >
+          Close
+        </button>
+        <button
+          className={classnames(
+            'ml-auto', "btn"
           )}
           disabled={cannotSave()}
-          onClick={submitPublicFilter}
+          onClick={submitForm}
           >
-          { saving ? 'Adding...' : 'Add filter' }
+          {`${edit ? 'Save' : 'Add' } filter`}
         </button>
       </div>
     </div>

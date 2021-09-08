@@ -1,0 +1,1 @@
+export const attributesNames = [ 'status', 'tags', 'assigned', 'requester', 'company', 'taskType', 'pausal', 'overtime', 'startsAt', 'deadline', 'repeat' ];

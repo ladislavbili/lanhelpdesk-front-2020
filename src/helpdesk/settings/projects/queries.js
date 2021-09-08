@@ -128,6 +128,7 @@ query {
       title
       lockedRequester
       autoApproved
+      hideApproved
       archived
       milestones {
         id
@@ -184,6 +185,7 @@ title
 description
 lockedRequester
 autoApproved
+hideApproved
 archived
 statuses{
   id
@@ -231,6 +233,7 @@ mutation addProject(
   $description: String!,
   $lockedRequester: Boolean!,
   $autoApproved: Boolean!,
+  $hideApproved: Boolean!,
   $archived: Boolean!,
   $def: ProjectDefaultsInput!,
   $tags: [NewTagInput]!,
@@ -243,6 +246,7 @@ mutation addProject(
     description: $description,
     lockedRequester: $lockedRequester,
     autoApproved: $autoApproved,
+    hideApproved: $hideApproved,
     archived: $archived,
     def: $def,
     tags: $tags,
@@ -272,6 +276,7 @@ mutation updateProject(
   $description: String,
   $lockedRequester: Boolean,
   $autoApproved: Boolean,
+  $hideApproved: Boolean!,
   $archived: Boolean,
   $def: ProjectDefaultsInput,
   $deleteTags: [Int]!,
@@ -291,6 +296,7 @@ mutation updateProject(
     description: $description
     lockedRequester: $lockedRequester
     autoApproved: $autoApproved
+    hideApproved: $hideApproved
     archived: $archived
     def: $def
     deleteTags: $deleteTags

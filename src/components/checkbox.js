@@ -5,6 +5,7 @@ export default function Checkbox( props ) {
 
   const {
     right,
+    id,
     centerHor,
     centerVer,
     highlighted,
@@ -30,10 +31,10 @@ export default function Checkbox( props ) {
         checked={ value || blocked === true }
         disabled={ disabled || blocked }
         onChange={ blocked ? () => {} : onChange }
-        id={ name }
+        id={ id ? id : name }
         />
       <label
-        htmlFor={ name }
+        htmlFor={ id ? id : name }
         className={classnames(
           {
             'center-hor': centerHor,
@@ -49,7 +50,7 @@ export default function Checkbox( props ) {
         )}
         />
       <label
-        htmlFor={ name }
+        htmlFor={ id ? id : name }
         className={classnames(
           {
             'm-l-5': !right && label && label.length > 0,

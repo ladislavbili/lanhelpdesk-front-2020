@@ -51,6 +51,19 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           minHeight: 32,
         }
       }
+
+      if (
+        required &&
+        ( state.getValue().length === 0 || state.getValue().some( ( item ) => item.value === null ) )
+      ) {
+        newStyle = {
+          ...newStyle,
+          borderColor: 'red',
+          borderWidth: 1,
+          color: 'red',
+        }
+      }
+
       if ( noPadding ) {
         newStyle = {
           ...newStyle,

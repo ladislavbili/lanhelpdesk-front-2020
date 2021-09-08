@@ -133,8 +133,6 @@ export default function PublicFilterEdit( props ) {
     setAssignedTos,
     taskTypes,
     setTaskTypes,
-    tags,
-    setTags,
     statusDateFrom,
     setStatusDateFrom,
     statusDateFromNow,
@@ -249,14 +247,6 @@ export default function PublicFilterEdit( props ) {
       toSelArr( taskTypesData.taskTypes )
       .filter( ( taskType ) => filter.taskTypes.some( ( taskType2 ) => taskType.id === taskType2.id ) )
     );
-    if ( projectId ) {
-      setTags(
-        toSelArr( localProjectData.localProject.project.tags )
-        .filter( ( tag1 ) => filter.tags.some( ( tag2 ) => tag1.id === tag2.id ) )
-      );
-    } else {
-      setTags( [] );
-    }
 
     setStatusDateFromNow( filter.statusDateFromNow );
     setStatusDateFrom( filter.statusDateFrom === null ? null : moment( parseInt( filter.statusDateFrom ) ) );
@@ -312,7 +302,6 @@ export default function PublicFilterEdit( props ) {
         companies: companies.filter( ( company ) => company.id !== 'cur' )
           .map( ( item ) => item.id ),
         taskTypes: taskTypes.map( ( item ) => item.id ),
-        tags: tags.map( ( item ) => item.id ),
         oneOf: oneOf.map( ( oneOf ) => oneOf.value ),
 
         statusDateFrom: statusDateFrom === null ? null : statusDateFrom.valueOf()
