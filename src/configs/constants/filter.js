@@ -145,10 +145,10 @@ export const booleanSelectOptions = [ {
   id: null
 }, {
   label: 'Ano',
-  value: 'ano',
+  value: true,
   id: 'ano'
 }, {
   label: 'Nie',
-  value: 'nie',
+  value: false,
   id: 'nie'
 } ]

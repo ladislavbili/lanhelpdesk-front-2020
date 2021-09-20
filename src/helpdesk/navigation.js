@@ -73,7 +73,7 @@ export default function Navigation( props ) {
           <Route exact path="/helpdesk/notifications" component={NotificationList} />
           <Route exact path="/helpdesk/notifications/:notificationID" component={NotificationList} />
           { accessRights.addProjects ? <Route exact path="/helpdesk/project/add" component={ProjectAdd} /> : <Route exact path="/helpdesk/project/add" component={AccessDenied} /> }
-          <Route exact path="/helpdesk/project/:projectID" component={ProjectEdit} />
+          <Route exact path="/helpdesk/project/:projectID/:tabId" component={ProjectEdit} />
           <Route exact path="/helpdesk/repeats" component={RepeatsList} />
           <Route exact path="/helpdesk/companies" component={CompanyList} />
           { accessRights.companies ? <Route exact path="/helpdesk/companies" component={CompanyList} /> : <Route exact path="/helpdesk/companies" component={AccessDenied} /> }

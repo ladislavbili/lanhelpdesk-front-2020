@@ -8,6 +8,9 @@ import {
 import ProjectFilterEdit from './projectFilterEdit';
 import ProjectFilterAdd from './projectFilterAdd';
 import {
+  getGroupsProblematicAttributes,
+} from '../../helpers';
+import {
   GET_TASK_TYPES,
 } from 'helpdesk/settings/taskTypes/queries';
 import {
@@ -24,8 +27,10 @@ export default function ProjectFilters( props ) {
   const {
     groups,
     statuses,
-    projectFilters,
-    setProjectFilters,
+    filters,
+    addFilter,
+    deleteFilter,
+    updateFilter,
   } = props;
 
   const {
@@ -63,7 +68,7 @@ export default function ProjectFilters( props ) {
           </tr>
         </thead>
         <tbody>
-          { projectFilters.map((projectFilter) => (
+          { filters.map((projectFilter) => (
             <tr key={projectFilter.id}>
               <td>
                 {projectFilter.title}
@@ -72,7 +77,8 @@ export default function ProjectFilters( props ) {
                 {projectFilter.description}
               </td>
               <td>
-                {groups.filter((group) => projectFilter.groups.some((groupId) => group.id === groupId )).map((group) => group.title ).join(', ')}
+                { getGroupsProblematicAttributes( groups, projectFilter ).length !== 0 && <i className="text-danger font-size-16 m-l-10 m-t-10 fa fa-exclamation-circle" /> }
+                { groups.filter((group) => projectFilter.groups.some((groupId) => group.id === groupId )).map((group) => group.title ).join(', ') }
               </td>
               <td>
                 <ProjectFilterEdit
@@ -83,11 +89,11 @@ export default function ProjectFilters( props ) {
                   allCompanies={ dataLoading ? [] : companiesData.basicCompanies }
                   disabled={ dataLoading }
                   filter={ projectFilter }
-                  updateFilter={ (updatedFilter) => setProjectFilters( updateArrayItem(projectFilters, updatedFilter ) ) }
+                  updateFilter={ (updatedFilter) => updateFilter( updatedFilter ) }
                   />
                 <button
                   className="btn btn-link-red"
-                  onClick={() => setProjectFilters(projectFilters.filter((projectFilter1) => projectFilter1.id !== projectFilter.id ))}
+                  onClick={() => deleteFilter(projectFilter.id)}
                   >
                   <i className="fa fa-times" />
                 </button>
@@ -103,8 +109,7 @@ export default function ProjectFilters( props ) {
         allUsers={ dataLoading ? [] : usersData.basicUsers }
         allCompanies={ dataLoading ? [] : companiesData.basicCompanies }
         disabled={ dataLoading }
-        setProjectFilters={ setProjectFilters }
-        projectFilters={ projectFilters }
+        addProjectFilter={ addFilter }
         />
     </div>
   );

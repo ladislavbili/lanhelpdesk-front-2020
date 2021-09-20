@@ -34,7 +34,7 @@ export default function ProjectFilterEdit( props ) {
       </button>
       <Modal isOpen={open}>
         <ModalHeader>
-          Add project filter
+          Edit project filter
         </ModalHeader>
         <ModalBody>
           <ProjectFilterForm

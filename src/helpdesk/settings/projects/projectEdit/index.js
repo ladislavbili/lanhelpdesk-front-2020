@@ -38,10 +38,12 @@ export default function ProjectEditLoader( props ) {
     match,
     closeModal,
     projectDeleted,
-    projectID
+    projectID,
+    tabID
   } = props;
 
   const id = closeModal ? projectID : parseInt( match.params.id );
+  const tabId = closeModal ? tabID : parseInt( match.params.tabId );
 
   const {
     data: projectData,
@@ -148,6 +150,7 @@ export default function ProjectEditLoader( props ) {
     currentUser,
     dataLoading,
     id,
+    tabId,
   }
 
   return (

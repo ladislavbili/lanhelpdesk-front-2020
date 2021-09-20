@@ -9,7 +9,7 @@ import {
 import Checkbox from 'components/checkbox';
 import ProjectSingleAttribute from './singleAttribute';
 import Switch from "components/switch";
-import booleanSelects from 'configs/constants/boolSelect'
+import booleanSelects from 'configs/constants/boolSelect';
 import {
   emptyUserValue,
   emptyCompanyValue,
@@ -27,30 +27,12 @@ export const noSelect = {
 export default function ProjectAttributes( props ) {
   //data
   const {
-    assignedTo,
-    setAssignedTo,
-    company,
-    setCompany,
-    status,
-    setStatus,
-    requester,
-    setRequester,
-    type,
-    setType,
-    tag,
-    setTag,
-    pausal,
-    setPausal,
-    overtime,
-    setOvertime,
     statuses,
     users,
     assignableUsers,
     allTags,
     companies,
     taskTypes,
-    autoApproved,
-    setAutoApproved,
     groups,
     setGroups,
     attributes,

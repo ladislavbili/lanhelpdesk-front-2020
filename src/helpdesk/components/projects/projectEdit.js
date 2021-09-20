@@ -55,7 +55,9 @@ export default function ProjectEditFull( props ) {
 
   return (
     <ProjectEdit
+      match={match}
       projectID={ currentProject.id }
+      tabID={match.params.tabId}
       projectDeleted={() => {
         setProject(dashboard);
         refetchMyProjects();

@@ -320,7 +320,7 @@ export default function TasksSidebar( props ) {
           { localProject.id !== null &&
             <Button
               className='btn-link ml-auto center-hor'
-              onClick={() => history.push( `/helpdesk/project/${localProject.id}` )}
+              onClick={() => history.push( `/helpdesk/project/${localProject.id}/description` )}
               >
               <i className="fa fa-cog"/>
             </Button>
@@ -384,7 +384,7 @@ export default function TasksSidebar( props ) {
                 { canEditProject &&  localProject.id !== null &&  localProject.id === project.id &&
                   <Button
                     className='btn btn-link ml-auto m-r-15'
-                    onClick={() => history.push( `/helpdesk/project/${localProject.id}` )}
+                    onClick={() => history.push( `/helpdesk/project/${localProject.id}/description` )}
                     >
                     <i className="fa fa-cog"/>
                   </Button>

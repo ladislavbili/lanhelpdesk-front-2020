@@ -2,7 +2,7 @@ import {
   gql
 } from '@apollo/client';
 
-const filter = `
+export const filter = `
 filter {
   oneOf
   assignedToCur

@@ -7,7 +7,6 @@ import {
 import Empty from 'components/Empty';
 import ProjectFilterForm from './projectFilterForm';
 
-let fakeID = -1;
 export default function ProjectFilterAdd( props ) {
   //props
   const {
@@ -16,8 +15,7 @@ export default function ProjectFilterAdd( props ) {
     allTaskTypes,
     allUsers,
     allCompanies,
-    setProjectFilters,
-    projectFilters,
+    addProjectFilter
   } = props;
 
   const [ open, setOpen ] = React.useState( false );
@@ -37,7 +35,7 @@ export default function ProjectFilterAdd( props ) {
         </ModalHeader>
         <ModalBody>
           <ProjectFilterForm
-            submit={(projectFilter) => setProjectFilters([ ...projectFilters, { id: fakeID--, ...projectFilter } ]) }
+            submit={(projectFilter) => addProjectFilter(projectFilter) }
             closeModal={ () => setOpen(false) }
             allGroups={allGroups}
             allStatuses={allStatuses}

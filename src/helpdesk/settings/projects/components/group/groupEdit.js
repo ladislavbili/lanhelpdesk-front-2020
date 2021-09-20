@@ -1,100 +1,91 @@
 import React from 'react';
 import {
-  Popover,
-  PopoverHeader,
-  PopoverBody,
+  Modal,
+  ModalHeader,
+  ModalBody,
   Label,
   Input,
   FormGroup,
 } from 'reactstrap';
-import Empty from 'components/Empty';
-import ProjectAdd from 'helpdesk/settings/projects/projectAdd';
-import {
-  setProject,
-} from 'apollo/localSchema/actions';
 import {
   defaultGroups,
-  createRandomRights
 } from 'configs/constants/projects';
-
-let fakeID = -( defaultGroups.length + 1 );
 
 export default function ProjectGroups( props ) {
   //props
   const {
-    updateGroup,
-    disabled,
+    open,
+    closeModal,
     group,
+    updateGroup,
   } = props;
 
-  const [ open, setOpen ] = React.useState( false );
-  const [ title, setTitle ] = React.useState( group.title );
-  const [ description, setDescription ] = React.useState( group.description );
-  const [ order, setOrder ] = React.useState( group.order );
+  const [ title, setTitle ] = React.useState( '' );
+  const [ description, setDescription ] = React.useState( '' );
+  const [ order, setOrder ] = React.useState( '' );
+
+  React.useEffect( () => {
+    if ( group !== null ) {
+      setTitle( group.title );
+      setDescription( group.description );
+      setOrder( group.order );
+    }
+  }, [ group ] );
 
   return (
-    <Empty>
-      <button
-        className="btn btn-link btn-distance"
-        disabled={disabled}
-        id={`edit-project-group-${group.id}`}
-        onClick={ () => setOpen(true) }
-        >
-        EDIT
-      </button>
-      <Popover
-        placement="right"
-        target={`edit-project-group-${group.id}`}
-        toggle={() => setOpen(false) }
-        isOpen={ open }
-        >
-        <PopoverHeader><span className="h5 p-l-10">Edit group</span></PopoverHeader>
-        <PopoverBody className="m-10">
-          <FormGroup>
-            <Label for="group-title">Group name</Label>
-            <Input placeholder="Enter group name" value={title} onChange={(e) => setTitle(e.target.value)}/>
-          </FormGroup>
-          <FormGroup>
-            <Label for="group-title">Group description</Label>
-            <Input placeholder="Enter group description" value={description} onChange={(e) => setDescription(e.target.value)}/>
-          </FormGroup>
-          <FormGroup>
-            <Label for="role">Order</Label>
-            <Input placeholder="Set order" value={order} onChange={(e) => setOrder(e.target.value)}/>
-          </FormGroup>
+    <Modal isOpen={open}>
+      <ModalHeader>
+        Edit group
+      </ModalHeader>
+      <ModalBody>
+        <FormGroup>
+          <Label for="group-title">Group name</Label>
+          <Input placeholder="Enter group name" value={title} onChange={(e) => setTitle(e.target.value)}/>
+        </FormGroup>
+        <FormGroup>
+          <Label for="group-title">Group description</Label>
+          <Input placeholder="Enter group description" value={description} onChange={(e) => setDescription(e.target.value)}/>
+        </FormGroup>
+        <FormGroup>
+          <Label for="role">Order</Label>
+          <Input placeholder="Set order" type="number" value={order} onChange={(e) => setOrder(e.target.value)}/>
+        </FormGroup>
+        <div className="form-buttons-row m-b-10">
           <button
             className="btn btn-link-cancel"
             onClick={ () => {
               setTitle(group.title);
               setDescription(group.description);
               setOrder(group.order);
-              setOpen(false);
+              closeModal();
             } }
             >
             Close
           </button>
-          <button
-            className="btn btn-distance"
-            onClick={ () => {
-              setTitle(group.title);
-              setDescription(group.description);
-              setOrder(group.order);
-            } }
-            >
-            Restore
-          </button>
-          <button
-            className="btn"
-            disabled={ title.length === 0 || isNaN(parseInt(order)) }
-            onClick={ () => {
-              updateGroup({ title, description, id: group.id, order })
-              setOpen(false);
-            } }
-            >
-            Update
-          </button>
-        </PopoverBody>
-      </Popover>
-    </Empty>
+          <div className="ml-auto">
+            <button
+              className="btn btn-distance"
+              onClick={ () => {
+                setTitle(group.title);
+                setDescription(group.description);
+                setOrder(group.order);
+              } }
+              >
+              Restore
+            </button>
+            <button
+              className="btn"
+              disabled={ title.length === 0 || isNaN(parseInt(order)) }
+              onClick={ () => {
+                updateGroup({ title, description, id: group.id, order })
+                closeModal();
+              } }
+              >
+              Update
+            </button>
+          </div>
+        </div>
+      </ModalBody>
+    </Modal>
   );
 }

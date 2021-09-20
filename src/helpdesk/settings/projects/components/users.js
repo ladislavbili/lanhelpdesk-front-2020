@@ -5,6 +5,7 @@ import {
 } from 'reactstrap';
 import Select from "react-select";
 import Checkbox from 'components/checkbox';
+import Radio from 'components/radio';
 import {
   pickSelectStyle
 } from "configs/components/select";
@@ -12,31 +13,47 @@ import {
 export default function ProjectUsers( props ) {
   //data
   const {
-    users,
-    addRight,
-    updateRight,
-    deleteRight,
+    addUserRight,
+    deleteUserRight,
+    updateUserRight,
+    addCompanyRight,
+    deleteCompanyRight,
+    updateCompanyRight,
     groups,
-    permissions,
+    users,
+    userGroups,
+    companies,
+    companyGroups,
     disabled,
     lockedRequester,
     setLockedRequester,
   } = props;
 
   const [ chosenUser, setChosenUser ] = React.useState( null );
-  const [ group, setGroup ] = React.useState( null );
+  const [ userGroup, setUserGroup ] = React.useState( null );
+  const [ chosenCompany, setChosenCompany ] = React.useState( null );
+  const [ companyGroup, setCompanyGroup ] = React.useState( null );
   return (
     <div>
-      <Checkbox
-        className="m-b-5 m-t-20 p-5 bkg-white"
-        labelClassName="text-normal font-normal"
-        label="A requester can be only a user with rights to this project."
-        centerHor
+      <Radio
+        className="m-t-20"
+        options={ [
+          {
+            key: 'lockedRequesterOff',
+            value: !lockedRequester,
+            label: 'A requester can be ALL helpdesk users',
+          },
+          {
+            key: 'lockedRequesterOn',
+            value: lockedRequester,
+            label: 'A requester can be only one of PROJECT users.',
+          },
+        ] }
+        name="lockedRequester"
         disabled={ disabled }
-        value={ lockedRequester }
-        onChange={() => {
+        onChange={ () => {
           setLockedRequester( !lockedRequester );
-        }}
+        } }
         />
       {/* USER RIGHTS */}
       <table className="table m-t-10">
@@ -54,23 +71,23 @@ export default function ProjectUsers( props ) {
                 value={chosenUser}
                 styles={pickSelectStyle()}
                 onChange={(e)=> setChosenUser(e)}
-                options={users.filter((user)=> !permissions.map((permission)=>permission.user.id).includes(user.id))}
+                options={users.filter((user) => !userGroups.map((permission) => permission.user.id).includes(user.id))}
                 />
             </td>
             <td>
               <Select
-                value={group}
+                value={userGroup}
                 styles={pickSelectStyle()}
-                onChange={(e)=> setGroup(e)}
+                onChange={(e)=> setUserGroup(e)}
                 options={groups}
                 />
             </td>
             <td>
               <button
                 className="btn min-width-100"
-                disabled={ chosenUser === null || group === null }
+                disabled={ chosenUser === null || userGroup === null }
                 onClick={() => {
-                  addRight({ user: chosenUser, group });
+                  addUserRight({ user: chosenUser, group: userGroup });
                   setChosenUser(null);
                 }}
                 >
@@ -80,6 +97,7 @@ export default function ProjectUsers( props ) {
           </tr>
         </tbody>
       </table>
+
       <table className="table bkg-white m-t-10">
         <thead>
           <tr>
@@ -90,7 +108,7 @@ export default function ProjectUsers( props ) {
         </thead>
 
         <tbody>
-          { permissions.sort(( userGroup1, userGroup2 ) => {
+          { userGroups.sort(( userGroup1, userGroup2 ) => {
             if( userGroup1.group.order === userGroup2.group.order ){
               return (userGroup1.user.email < userGroup2.user.email) ? -1 : 1;
             }
@@ -103,7 +121,7 @@ export default function ProjectUsers( props ) {
                 <Select
                   value={permission.group}
                   styles={pickSelectStyle()}
-                  onChange={(e)=> updateRight({ ...permission, group: e })}
+                  onChange={(e)=> updateUserRight({ ...permission, group: e })}
                   options={groups}
                   />
               </td>
@@ -112,7 +130,7 @@ export default function ProjectUsers( props ) {
                   className="btn-link"
                   disabled={disabled}
                   onClick={()=>{
-                    deleteRight(permission)
+                    deleteUserRight(permission)
                   }}
                   >
                   <i className="fa fa-times"  />
@@ -136,27 +154,27 @@ export default function ProjectUsers( props ) {
           <tr>
             <td>
               <Select
-                value={chosenUser}
+                value={chosenCompany}
                 styles={pickSelectStyle()}
-                onChange={(e)=> setChosenUser(e)}
-                options={users.filter((user)=> !permissions.map((permission)=>permission.user.id).includes(user.id))}
+                onChange={(e)=> setChosenCompany(e)}
+                options={companies.filter((company) => !companyGroups.map((permission) => permission.company.id).includes(company.id))}
                 />
             </td>
             <td>
               <Select
-                value={group}
+                value={companyGroup}
                 styles={pickSelectStyle()}
-                onChange={(e)=> setGroup(e)}
+                onChange={(e)=> setCompanyGroup(e)}
                 options={groups}
                 />
             </td>
             <td>
               <button
                 className="btn min-width-100"
-                disabled={ chosenUser === null || group === null }
+                disabled={ chosenCompany === null || companyGroup === null }
                 onClick={() => {
-                  addRight({ user: chosenUser, group });
-                  setChosenUser(null);
+                  addCompanyRight({ company: chosenCompany, group: companyGroup });
+                  setChosenCompany(null);
                 }}
                 >
                 Add
@@ -175,14 +193,14 @@ export default function ProjectUsers( props ) {
         </thead>
 
         <tbody>
-          { [].map( permission => (
-            <tr key={permission.user.id}>
-              <td> {permission.user.email} </td>
+          { companyGroups.map( permission => (
+            <tr key={permission.company.id}>
+              <td> {permission.company.title} </td>
               <td>
                 <Select
                   value={permission.group}
                   styles={pickSelectStyle()}
-                  onChange={(e)=> updateRight({ ...permission, group: e })}
+                  onChange={(e)=> updateCompanyRight({ ...permission, group: e })}
                   options={groups}
                   />
               </td>
@@ -191,86 +209,7 @@ export default function ProjectUsers( props ) {
                   className="btn-link"
                   disabled={disabled}
                   onClick={()=>{
-                    deleteRight(permission)
-                  }}
-                  >
-                  <i className="fa fa-times"  />
-                </button>
-              </td>
-            </tr>
-          )) }
-        </tbody>
-      </table>
-
-      {/* ROLE RIGHTS */}
-      <table className="table m-t-10">
-        <thead>
-          <tr className="font-bold">
-            <th width="50%">Helpdesk role</th>
-            <th>Project Group</th>
-            <th width="100px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <Select
-                value={chosenUser}
-                styles={pickSelectStyle()}
-                onChange={(e)=> setChosenUser(e)}
-                options={users.filter((user)=> !permissions.map((permission)=>permission.user.id).includes(user.id))}
-                />
-            </td>
-            <td>
-              <Select
-                value={group}
-                styles={pickSelectStyle()}
-                onChange={(e)=> setGroup(e)}
-                options={groups}
-                />
-            </td>
-            <td>
-              <button
-                className="btn min-width-100"
-                disabled={ chosenUser === null || group === null }
-                onClick={() => {
-                  addRight({ user: chosenUser, group });
-                  setChosenUser(null);
-                }}
-                >
-                Add
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <table className="table bkg-white m-t-10">
-        <thead>
-          <tr>
-            <th width="50%">Helpdesk role</th>
-            <th>Project Group</th>
-            <th width="50px">Akcie</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          { [].map(permission => (
-            <tr key={permission.user.id}>
-              <td> {permission.user.email} </td>
-              <td>
-                <Select
-                  value={permission.group}
-                  styles={pickSelectStyle()}
-                  onChange={(e)=> updateRight({ ...permission, group: e })}
-                  options={groups}
-                  />
-              </td>
-              <td>
-                <button
-                  className="btn-link"
-                  disabled={disabled}
-                  onClick={()=>{
-                    deleteRight(permission)
+                    deleteCompanyRight(permission)
                   }}
                   >
                   <i className="fa fa-times"  />

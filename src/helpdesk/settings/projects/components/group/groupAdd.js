@@ -1,83 +1,90 @@
 import React from 'react';
 import {
-  Popover,
-  PopoverHeader,
-  PopoverBody,
+  Modal,
+  ModalHeader,
+  ModalBody,
   Label,
   Input,
   FormGroup,
 } from 'reactstrap';
-import ProjectAdd from 'helpdesk/settings/projects/projectAdd';
-import {
-  setProject,
-} from 'apollo/localSchema/actions';
+import Empty from 'components/Empty';
 import {
   defaultGroups,
-  createCleanRights
+  createCleanRights,
+  getEmptyAttributeRights,
 } from 'configs/constants/projects';
-
-let fakeID = -( defaultGroups.length + 1 );
 
 export default function ProjectGroups( props ) {
   //props
   const {
-    addGroup
+    submit,
+    getFakeId,
+    reccomendedOrder,
   } = props;
 
   const [ open, setOpen ] = React.useState( false );
   const [ title, setTitle ] = React.useState( '' );
-  const [ order, setOrder ] = React.useState( 0 );
+  const [ description, setDescription ] = React.useState( '' );
+  const [ order, setOrder ] = React.useState( '' );
+
+  React.useEffect( () => {
+    if ( open ) {
+      setTitle( '' );
+      setDescription( '' );
+      setOrder( '' );
+    }
+  }, [ open ] );
 
   return (
-    <div className="row">
+    <Empty>
       <button
-        id={`add-project-group`}
-        className="btn center-hor"
-        onClick={ () => setOpen(true) }
+        className="btn btn-link"
+        onClick={() => setOpen(true)}
         >
         <i className="fa fa-plus" />
-        Add group
+        Group
       </button>
-      <Popover
-        placement="right"
-        target={`add-project-group`}
-        toggle={() => setOpen(false) }
-        isOpen={ open }
-        >
-        <PopoverHeader><span className="h5 p-l-10">Create group</span></PopoverHeader>
-        <PopoverBody className="m-10">
+      <Modal isOpen={open}>
+        <ModalHeader>
+          Edit group
+        </ModalHeader>
+        <ModalBody>
           <FormGroup>
             <Label for="group-title">Group name</Label>
             <Input placeholder="Enter group name" value={title} onChange={(e) => setTitle(e.target.value)}/>
           </FormGroup>
           <FormGroup>
-            <Label for="role">Order</Label>
-            <Input placeholder="Set order" value={order} onChange={(e) => setOrder(e.target.value)}/>
+            <Label for="group-title">Group description</Label>
+            <Input placeholder="Enter group description" value={description} onChange={(e) => setDescription(e.target.value)}/>
           </FormGroup>
-          <button
-            className="btn btn-link-cancel"
-            onClick={ () => {
-              setTitle('');
-              setOrder(0);
-              setOpen(false);
-            } }
-            >
-            Close
-          </button>
-          <button
-            className='btn'
-            disabled={ title.length === 0 || isNaN(parseInt(order)) }
-            onClick={ () => {
-              addGroup({ title, id: fakeID--, order, rights: createCleanRights() })
-              setTitle('');
-              setOrder(0);
-              setOpen(false);
-            } }
-            >
-            Add new group
-          </button>
-        </PopoverBody>
-      </Popover>
-    </div>
+          <FormGroup>
+            <Label for="role">Order</Label>
+            <Input placeholder="Set order" type="number" value={order} onChange={(e) => setOrder(e.target.value)}/>
+          </FormGroup>
+          <div className="form-buttons-row m-b-10">
+            <button
+              className="btn btn-link-cancel"
+              onClick={ () => {
+                setOpen(false);
+              } }
+              >
+              Close
+            </button>
+            <div className="ml-auto">
+              <button
+                className="btn"
+                disabled={ title.length === 0 || isNaN(parseInt(order)) }
+                onClick={ () => {
+                  submit({ title, description, id: getFakeId(), order, rights: createCleanRights(), attributeRights: getEmptyAttributeRights() })
+                  setOpen(false);
+                } }
+                >
+                Add
+              </button>
+            </div>
+          </div>
+        </ModalBody>
+      </Modal>
+    </Empty>
   );
 }

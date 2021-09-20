@@ -11,21 +11,23 @@ export const allACLs = [
     header: true
   },
   {
-    id: 'projectPrimary',
-    title: 'Project name & description VIEW/EDIT',
-    disabled: [ {
-      key: 'projectSecondary',
-      values: 'read'
-    } ],
-    both: true
+    id: 'projectRead',
+    title: 'View project name & description',
+    disabled: [
+      {
+        key: 'projectWrite',
+      }
+    ],
+    both: false
   },
   {
-    id: 'projectSecondary',
-    title: 'Project settings & ACL - write and edit  VIEW + EDIT',
-    dependancy: [ {
-      key: 'projectPrimary',
-      affect: 'read'
-    } ],
+    id: 'projectWrite',
+    title: 'Project settings',
+    dependancy: [
+      {
+        key: 'projectRead',
+      }
+    ],
     both: false
   },
   {
@@ -45,9 +47,9 @@ export const allACLs = [
     value: true,
     disabled: [
       {
-        key: 'myTasks'
-    }
-  ]
+        key: 'myTasks',
+      }
+    ]
   },
   {
     id: 'companyTasks',
@@ -56,26 +58,62 @@ export const allACLs = [
     disabled: [
       {
         key: 'allTasks'
-    }
-  ]
+      }
+    ]
   },
   {
     id: 'allTasks',
-    title: 'View all tasks',
+    title: 'View all tasks in this project',
     dependancy: [
       {
         key: 'companyTasks',
-    }
-  ],
+      }
+    ],
     both: false
   },
   {
-    id: 'statistics',
-    title: 'View statistics',
+    id: 'separator2',
+    separator: true,
+  },
+  {
+    id: 'headerTaskList',
+    title: 'Task list view',
+    header: true,
+  },
+  {
+    id: 'taskTable',
+    title: 'Task table',
+    both: false,
+    fake: true,
+    value: true,
+    disabled: [
+      {
+        key: 'taskTable',
+      }
+    ]
+  },
+  {
+    id: 'tasklistDnD',
+    title: 'Drag & Drop',
     both: false,
   },
   {
-    id: 'separator2',
+    id: 'tasklistKalendar',
+    title: 'Calendar',
+    both: false,
+  },
+  {
+    id: 'tasklistGantt',
+    title: 'Project management',
+    both: false,
+  },
+  {
+    id: 'tasklistStatistics',
+    title: 'Statistics',
+    both: false,
+  },
+  {
+    id: 'separator3',
     separator: true,
   },
   {
@@ -84,32 +122,37 @@ export const allACLs = [
     header: true,
   },
   {
-    id: 'addTasks',
-    title: 'Add Tasks (can be requester)',
+    id: 'addTask',
+    title: 'Add Task ( title, description, attachments )',
     both: false
   },
   {
-    id: 'separator3',
+    id: 'separator4',
     separator: true,
   },
   {
-    id: 'headerEdit',
+    id: 'headerTaskEdit',
     title: 'Edit task',
     header: true,
   },
   {
-    id: 'deleteTasks',
-    title: 'Delete Tasks',
+    id: 'deleteTask',
+    title: 'Delete Task',
     both: false
   },
   {
-    id: 'important',
+    id: 'taskImportant',
     title: 'Mark tasks as important',
     both: false
   },
   {
-    id: 'taskTitleEdit',
+    id: 'taskTitleWrite',
     title: 'Task title edit',
+    both: false
+  },
+  {
+    id: 'taskProjectWrite',
+    title: 'Change task project',
     both: false
   },
   {
@@ -118,115 +161,37 @@ export const allACLs = [
     both: true
   },
   {
-    id: 'taskShortSubtasks',
+    id: 'taskAttachments',
+    title: 'Task attachments',
+    both: true
+  },
+  {
+    id: 'taskSubtasks',
     title: 'Task subtasks VIEW/EDIT',
     both: true
   },
   {
-    id: 'taskAttachments',
-    title: 'Task attachments VIEW/EDIT',
+    id: 'taskWorks',
+    title: 'Task works VIEW/EDIT',
     both: true
   },
   {
-    id: 'pausalInfo',
+    id: 'taskWorksAdvanced',
+    title: 'Task works advanced VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'taskMaterials',
+    title: 'Task materials VIEW/EDIT',
+    both: true
+  },
+  {
+    id: 'taskPausalInfo',
     title: 'Task pausal info VIEW/EDIT',
     both: false
   },
   {
-    id: 'vykaz',
-    title: 'Vykaz VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'rozpocet',
-    title: 'Rozpočet VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'separator4',
-    separator: true,
-  },
-  {
-    id: 'header3',
-    title: 'Task default attributes',
-    header: true
-  },
-  {
-    id: 'status',
-    title: 'Status VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'tags',
-    title: 'Tags VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'assigned',
-    title: 'Assigned to VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'requester',
-    title: 'Requester VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'company',
-    title: 'Company VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'project',
-    title: 'Project VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'milestone',
-    title: 'Milestone VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'deadline',
-    title: 'Deadline VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'scheduled',
-    title: 'Scheduled VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'repeat',
-    title: 'Repeat VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'type',
-    title: 'Type VIEW/EDIT',
-    both: true
-  },
-  {
     id: 'separator5',
-    separator: true,
-  },
-  {
-    id: 'headerSLA',
-    title: 'Pausal',
-    header: true,
-  },
-  {
-    id: 'pausal',
-    title: 'Pausal VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'overtime',
-    title: 'Mimo pracovných hodín VIEW/EDIT',
-    both: true
-  },
-  {
-    id: 'separator6',
     separator: true,
   },
   {
@@ -278,16 +243,20 @@ export const allACLs = [
 
 ];
 
-export const createCleanRights = ( access = false ) => {
+export const createCleanRights = ( access = false, admin = false ) => {
   let rights = {};
-  allACLs.filter( ( acl ) => !acl.header && !acl.fake ).forEach( ( acl ) => {
-    if ( acl.both ) {
-      rights[ acl.id ] = {
-        read: access,
-        write: access
-      };
+  allACLs.filter( ( acl ) => !acl.header && !acl.fake && !acl.separator ).forEach( ( acl ) => {
+    if ( admin && [ 'projectRead', 'projectWrite' ].includes( acl.id ) ) {
+      rights[ acl.id ] = true;
     } else {
-      rights[ acl.id ] = access;
+      if ( acl.both ) {
+        rights[ acl.id ] = {
+          read: access,
+          write: access
+        };
+      } else {
+        rights[ acl.id ] = access;
+      }
     }
   } )
   return rights;
@@ -302,12 +271,50 @@ export const backendCleanRights = ( access = false ) => {
   } ).rights
 }
 
-export const defaultGroups = [ 'Admin', 'Manager', 'Agent', 'Customer' ].map( ( name, index ) => ( {
+export const attributesNames = [ 'status', 'tags', 'assigned', 'requester', 'company', 'taskType', 'pausal', 'overtime', 'startsAt', 'deadline', 'repeat' ];
+export const getEmptyAttributeRights = () => {
+  let attributeRights = {};
+  attributesNames.forEach( ( attribute ) => {
+    if ( attribute !== 'repeat' ) {
+      attributeRights[ attribute ] = {
+        required: false,
+        add: false,
+        view: false,
+        edit: false,
+      };
+    } else {
+      attributeRights[ attribute ] = {
+        add: false,
+        view: false,
+        edit: false,
+      };
+    }
+  } )
+  return attributeRights;
+}
+
+export const getEmptyAttributes = () => {
+  let defaultAttributes = {};
+  attributesNames.forEach( ( attribute ) => {
+    if ( attribute !== 'repeat' ) {
+      defaultAttributes[ attribute ] = {
+        fixed: false,
+        value: [ 'tags', 'assigned' ].includes( attribute ) ? [] : null,
+      }
+    }
+  } )
+  return defaultAttributes;
+}
+
+export const defaultGroups = [ 'Admin', 'Agent', 'Customer' ].map( ( name, index ) => ( {
   title: name,
   description: `${name} role`,
-  id: fakeID--,
+  id: -( index + 1 ),
+  def: true,
+  admin: index === 0,
   order: index,
-  rights: createCleanRights( index === 0 )
+  attributeRights: getEmptyAttributeRights(),
+  rights: createCleanRights( false, index === 0 )
 } ) )
 
 export const noDef = {

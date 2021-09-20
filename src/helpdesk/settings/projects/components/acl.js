@@ -108,7 +108,8 @@ export default function ProjectACL( props ) {
                     <span className='center-hor row' style={{width: 'fit-content'}}>
                       <Checkbox
                         className = "m-l-5 m-r-5"
-                        disabled = { acl.fake || rightDisabled(acl, group.rights) }
+                        blocked = { acl.fake || (group.admin && ['projectRead', 'projectWrite'].includes(acl.id)) }
+                        disabled = { acl.fake || rightDisabled(acl, group.rights) || (group.admin && ['projectRead', 'projectWrite'].includes(acl.id)) }
                         value = { acl.fake ? acl.value : (acl.both ? group.rights[acl.id].read : group.rights[acl.id]) }
                         onChange={() => {
                           if(acl.fake){

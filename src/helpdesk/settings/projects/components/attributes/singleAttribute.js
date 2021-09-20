@@ -1,6 +1,5 @@
 import React from 'react';
 import Select from 'react-select';
-import Empty from 'components/Empty';
 import Checkbox from 'components/checkbox';
 import DatePicker from 'components/DatePicker';
 import {
@@ -75,71 +74,71 @@ export default function ProjectSingleAttribute( props ) {
       </thead>
       <tbody>
         { !noDef &&
-          <Empty>
-            <tr>
-              <td>
-                Default value
-              </td>
-              {['Deadline', 'Starts at'].includes(label) &&
-                <td colSpan="4">
-                  <DatePicker
-                    className="form-control hidden-input bolder"
-                    selected={value}
-                    isClearable={attribute.fixed}
-                    onChange={ (date) => {
-                      if(!date.isValid()){
-                        onChangeAttribute({ ...attribute, value: null })
-                      }else{
-                        onChangeAttribute({ ...attribute, value: date })
-                      }
-                    }}
-                    placeholderText="No default date"
-                    />
-                </td>
-              }
-              {!['Deadline', 'Starts at'].includes(label) &&
-                <td colSpan="4">
-                  <Select
-                    value={ value }
-                    isMulti={ defIsMulti }
-                    options={ defEmptyValue && !attribute.fixed ? defSelectValues.concat(defEmptyValue) : defSelectValues }
-                    onChange={(e) => {
-                      if( defEmptyValue && ( (!defIsMulti && e.id === defEmptyValue.id) || (defIsMulti && attribute.value.length !== 0 && e.some((item) => item.id === defEmptyValue.id ) ) ) ){
-                        if( defIsMulti ){
-                          onChangeAttribute({ ...attribute, value: [] })
-                        }else{
-                          onChangeAttribute({ ...attribute, value: null })
-                        }
-                      }else{
-                        if( defIsMulti ){
-                          onChangeAttribute({ ...attribute, value: e.filter( (item) => item.value !== null ) })
-                        }else{
-                          onChangeAttribute({ ...attribute, value: e })
-                        }
-                      }
-                    }}
-                    styles={pickSelectStyle( selectStyle )}
-                    />
-                </td>
-              }
-            </tr>
-            <tr>
+          <tr>
+            <td>
+              Default value
+            </td>
+            {['Deadline', 'Starts at'].includes(label) &&
               <td colSpan="4">
-                <label className="font-normal text-normal clickable noselect" htmlFor={`fixed-${label}`}>
-                  Fixed
-                </label>
-              </td>
-              <td>
-                <Checkbox
-                  className="m-t-5"
-                  centerVer
-                  id={`fixed-${label}`}
-                  value={ attribute.fixed }
-                  onChange={ (e) => onChangeAttribute({ ...attribute, fixed: !attribute.fixed }) }
+                <DatePicker
+                  className="form-control hidden-input bolder"
+                  selected={value}
+                  isClearable={!attribute.fixed}
+                  onChange={ (date) => {
+                    if(!date.isValid()){
+                      onChangeAttribute({ ...attribute, value: null })
+                    }else{
+                      onChangeAttribute({ ...attribute, value: date })
+                    }
+                  }}
+                  placeholderText="No default date"
                   />
               </td>
-            </tr>
-          </Empty>
+            }
+            {!['Deadline', 'Starts at'].includes(label) &&
+              <td colSpan="4">
+                <Select
+                  value={ value }
+                  isMulti={ defIsMulti }
+                  options={ defEmptyValue && !attribute.fixed ? defSelectValues.concat(defEmptyValue) : defSelectValues }
+                  onChange={(e) => {
+                    if( defEmptyValue && ( (!defIsMulti && e.id === defEmptyValue.id) || (defIsMulti && attribute.value.length !== 0 && e.some((item) => item.id === defEmptyValue.id ) ) ) ){
+                      if( defIsMulti ){
+                        onChangeAttribute({ ...attribute, value: [] })
+                      }else{
+                        onChangeAttribute({ ...attribute, value: null })
+                      }
+                    }else{
+                      if( defIsMulti ){
+                        onChangeAttribute({ ...attribute, value: e.filter( (item) => item.value !== null ) })
+                      }else{
+                        onChangeAttribute({ ...attribute, value: e })
+                      }
+                    }
+                  }}
+                  styles={pickSelectStyle( selectStyle )}
+                  />
+              </td>
+            }
+          </tr>
+        }
+        { !noDef &&
+          <tr>
+            <td colSpan="4">
+              <label className="font-normal text-normal clickable noselect" htmlFor={`fixed-${label}`}>
+                Fixed
+              </label>
+            </td>
+            <td>
+              <Checkbox
+                className="m-t-5"
+                centerVer
+                id={`fixed-${label}`}
+                value={ attribute.fixed }
+                onChange={ (e) => onChangeAttribute({ ...attribute, fixed: !attribute.fixed }) }
+                />
+            </td>
+          </tr>
         }
         <tr>
           <td>
@@ -199,7 +198,7 @@ export default function ProjectSingleAttribute( props ) {
                 className="m-t-5"
                 centerVer
                 value={ role.attributeRights[right].view }
-                blocked={ role.attributeRights[right].edit && !noDef && !attribute.fixed }
+                blocked={ role.attributeRights[right].edit && (noDef || !attribute.fixed) }
                 onChange={ (e) => onChangeRightFunc( role, 'view' ) }
                 />
             </td>

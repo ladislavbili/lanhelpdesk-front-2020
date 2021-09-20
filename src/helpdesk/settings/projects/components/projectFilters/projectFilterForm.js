@@ -14,11 +14,17 @@ import {
 import {
   emptyFilter,
   booleanSelectOptions,
+  ofCurrentUser,
 } from 'configs/constants/filter';
+import {
+  getGroupsProblematicAttributes,
+} from '../../helpers';
 import {
   toSelArr,
   fromObjectToState,
+  setDefaultFromObject,
 } from 'helperFunctions';
+import moment from 'moment';
 
 export default function ProjectFilterForm( props ) {
   //props
@@ -122,26 +128,192 @@ export default function ProjectFilterForm( props ) {
     setTitle( filter.title );
     setDescription( filter.description );
     setGroups( allGroups.filter( ( group ) => filter.groups.includes( group.id ) ) );
+    setFilterState( filter.filter );
+  }
+
+  const setFilterState = ( filter ) => {
+    //filter data
+    setCompanies( [
+      ...( filter.companyCur ? [ ofCurrentUser ] : [] ),
+      ...toSelArr( allCompanies )
+      .filter( ( company ) => filter.companies.includes( company.id ) )
+    ] );
+
+    setRequesters( [
+      ...( filter.requesterCur ? [ ofCurrentUser ] : [] ),
+      ...toSelArr( allUsers, "fullName" )
+      .filter( ( user ) => filter.requesters.includes( user.id ) )
+    ] );
+
+    setAssignedTos( [
+      ...( filter.assignedToCur ? [ ofCurrentUser ] : [] ),
+      ...toSelArr( allUsers, "fullName" )
+      .filter( ( user ) => filter.assignedTos.includes( user.id ) )
+    ] );
+
+    setTaskTypes(
+      toSelArr( allTaskTypes )
+      .filter( ( taskType ) => filter.taskTypes.includes( taskType.id ) )
+    );
+    setStatuses(
+      toSelArr( allStatuses )
+      .filter( ( status ) => filter.statuses.includes( status.id ) )
+    );
+
+    setStatusDateFromNow( filter.statusDateFromNow );
+    setStatusDateFrom( filter.statusDateFrom === null ? null : moment( parseInt( filter.statusDateFrom ) ) );
+    setStatusDateToNow( filter.statusDateToNow );
+    setStatusDateTo( filter.statusDateTo === null ? null : moment( parseInt( filter.statusDateTo ) ) );
+    setCloseDateFromNow( filter.closeDateFromNow );
+    setCloseDateFrom( filter.closeDateFrom === null ? null : moment( parseInt( filter.closeDateFrom ) ) );
+    setCloseDateToNow( filter.closeDateToNow );
+    setCloseDateTo( filter.closeDateTo === null ? null : moment( parseInt( filter.closeDateTo ) ) );
+    setPendingDateFromNow( filter.pendingDateFromNow );
+    setPendingDateFrom( filter.pendingDateFrom === null ? null : moment( parseInt( filter.pendingDateFrom ) ) );
+    setPendingDateToNow( filter.pendingDateToNow );
+    setPendingDateTo( filter.pendingDateTo === null ? null : moment( parseInt( filter.pendingDateTo ) ) );
+    setDeadlineFromNow( filter.deadlineFromNow );
+    setDeadlineFrom( filter.deadlineFrom === null ? null : moment( parseInt( filter.deadlineFrom ) ) );
+    setDeadlineToNow( filter.deadlineToNow );
+    setDeadlineTo( filter.deadlineTo === null ? null : moment( parseInt( filter.deadlineTo ) ) );
+    setScheduledFromNow( filter.scheduledFromNow );
+    setScheduledFrom( filter.scheduledFrom === null ? null : moment( parseInt( filter.scheduledFrom ) ) );
+    setScheduledToNow( filter.scheduledToNow );
+    setScheduledTo( filter.scheduledTo === null ? null : moment( parseInt( filter.scheduledTo ) ) );
+    setCreatedAtFromNow( filter.createdAtFromNow );
+    setCreatedAtFrom( filter.createdAtFrom === null ? null : moment( parseInt( filter.createdAtFrom ) ) );
+    setCreatedAtToNow( filter.createdAtToNow );
+    setCreatedAtTo( filter.createdAtTo === null ? null : moment( parseInt( filter.createdAtTo ) ) );
+    setImportant( booleanSelectOptions.find( ( option ) => option.value === filter.important ) );
+    setInvoiced( booleanSelectOptions.find( ( option ) => option.value === filter.invoiced ) );
+    setPausal( booleanSelectOptions.find( ( option ) => option.value === filter.pausal ) );
+    setOvertime( booleanSelectOptions.find( ( option ) => option.value === filter.overtime ) );
+  }
+
+  const getCurrentFilter = () => ( {
+    assignedToCur: assignedTos.some( ( assignedTo ) => assignedTo.id === 'cur' ),
+    assignedTos: assignedTos.filter( ( assignedTo ) => assignedTo.id !== 'cur' ),
+    requesterCur: requesters.some( ( requester ) => requester.id === 'cur' ),
+    requesters: requesters.filter( ( requester ) => requester.id !== 'cur' ),
+    companyCur: companies.some( ( company ) => company.id === 'cur' ),
+    companies: companies.filter( ( company ) => company.id !== 'cur' ),
+    taskTypes,
+    statuses,
+
+    statusDateFrom: statusDateFrom === null ? null : statusDateFrom.valueOf()
+      .toString(),
+    statusDateFromNow,
+    statusDateTo: statusDateTo === null ? null : statusDateTo.valueOf()
+      .toString(),
+    statusDateToNow,
+    pendingDateFrom: pendingDateFrom === null ? null : pendingDateFrom.valueOf()
+      .toString(),
+    pendingDateFromNow,
+    pendingDateTo: pendingDateTo === null ? null : pendingDateTo.valueOf()
+      .toString(),
+    pendingDateToNow,
+    closeDateFrom: closeDateFrom === null ? null : closeDateFrom.valueOf()
+      .toString(),
+    closeDateFromNow,
+    closeDateTo: closeDateTo === null ? null : closeDateTo.valueOf()
+      .toString(),
+    closeDateToNow,
+    deadlineFrom: deadlineFrom === null ? null : deadlineFrom.valueOf()
+      .toString(),
+    deadlineFromNow,
+    deadlineTo: deadlineTo === null ? null : deadlineTo.valueOf()
+      .toString(),
+    deadlineToNow,
+    scheduledFrom: scheduledFrom === null ? null : scheduledFrom.valueOf()
+      .toString(),
+    scheduledFromNow,
+    scheduledTo: scheduledTo === null ? null : scheduledTo.valueOf()
+      .toString(),
+    scheduledToNow,
+    createdAtFrom: createdAtFrom === null ? null : createdAtFrom.valueOf()
+      .toString(),
+    createdAtFromNow,
+    createdAtTo: createdAtTo === null ? null : createdAtTo.valueOf()
+      .toString(),
+    createdAtToNow,
+    important: important.value,
+    invoiced: invoiced.value,
+    pausal: pausal.value,
+    overtime: overtime.value,
+  } )
+
+  const resetFilter = () => {
+    if ( !filter ) {
+      setTitle( '' );
+      setDefaultFromObject( {
+        setRequesters,
+        setCompanies,
+        setAssignedTos,
+        setTaskTypes,
+        setStatuses,
+        setStatusDateFrom,
+        setStatusDateFromNow,
+        setStatusDateTo,
+        setStatusDateToNow,
+        setCloseDateFrom,
+        setCloseDateFromNow,
+        setCloseDateTo,
+        setCloseDateToNow,
+        setPendingDateFrom,
+        setPendingDateFromNow,
+        setPendingDateTo,
+        setPendingDateToNow,
+        setDeadlineFrom,
+        setDeadlineFromNow,
+        setDeadlineTo,
+        setDeadlineToNow,
+        setScheduledFrom,
+        setScheduledFromNow,
+        setScheduledTo,
+        setScheduledToNow,
+        setCreatedAtFrom,
+        setCreatedAtFromNow,
+        setCreatedAtTo,
+        setCreatedAtToNow,
+        setImportant,
+        setInvoiced,
+        setPausal,
+        setOvertime,
+      }, emptyFilter );
+    } else {
+      setFilterState( filter );
+    }
+  }
+
+  const getCleanCurrentFilter = () => {
+    const filter = getCurrentFilter();
+    return ( {
+      ...filter,
+      assignedTos: filter.assignedTos.map( ( item ) => item.id ),
+      requesters: filter.requesters.map( ( item ) => item.id ),
+      companies: filter.companies.map( ( item ) => item.id ),
+      taskTypes: filter.taskTypes.map( ( item ) => item.id ),
+      statuses: filter.statuses.map( ( item ) => item.id ),
+    } )
   }
 
   const submitForm = () => {
+    const filterData = {
+      filter: getCleanCurrentFilter(),
+      active,
+      title,
+      description,
+      groups: groups.map( ( group ) => group.id ),
+    }
     if ( edit ) {
       submit( {
-        ...filter,
-        active,
-        title,
-        description,
-        groups: groups.map( ( group ) => group.id ),
+        id: filter.id,
+        ...filterData,
       } )
       closeModal();
     } else {
-      submit( {
-        active,
-        title,
-        description,
-        groups: groups.map( ( group ) => group.id ),
-      } )
-      setTitle( '' );
+      submit( filterData )
+      resetFilter();
       setDescription( '' );
       setGroups( [] );
       closeModal();
@@ -156,21 +328,23 @@ export default function ProjectFilterForm( props ) {
   )
 
   const UsersCantUseFilter = () => {
+    const troubledGroups = getGroupsProblematicAttributes( groups, {
+      filter: getCleanCurrentFilter(),
+      active,
+      title,
+      description,
+      groups: groups.map( ( group ) => group.id ),
+    } );
 
-    const checkAttributes = [];
+    if ( troubledGroups.length === 0 ) {
+      return null;
+    }
 
-    const troubledGroups = groups.map( ( group ) => {
-        return {
-          group,
-          troubledAttributes: [ 'Statuses' ]
-        }
-      } )
-      .filter( ( groupData ) => groupData.troubledAttributes.length !== 0 );
     return (
       <div>
         { troubledGroups.map((troubledGroup) => (
           <div className="error-message" key={troubledGroup.group.id}>
-            {`Group ${troubledGroup.group.title} can't use this filter! Attributes that they can't see are: ${troubledGroup.troubledAttributes.join(', ')}`}
+            {`Group ${troubledGroup.group.title} can't use this filter! Attributes that they can't see are: ${troubledGroup.attributes.join(', ')}`}
           </div>
         ) ) }
       </div>
@@ -182,7 +356,7 @@ export default function ProjectFilterForm( props ) {
       <Switch
         value={active}
         onChange={() => {
-          setArchived(!active);
+          setActive(!active);
         }}
         label="Active"
         labelClassName="text-normal font-normal"
@@ -281,7 +455,7 @@ export default function ProjectFilterForm( props ) {
       <FormGroup>
         <label>Riesi</label>
         <Select
-          options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(allUsers, 'email'))}
+          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(allUsers, 'email'))}
           isMulti
           onChange={(newValue)=>{
             setAssignedTos(newValue);

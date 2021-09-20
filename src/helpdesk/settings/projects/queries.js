@@ -1,122 +1,178 @@
 import {
   gql
 } from '@apollo/client';
+import {
+  filter,
+} from 'helpdesk/components/filter/queries';
 
 export const groupRights = `
-  assignedRead
-  assignedWrite
-  companyRead
-  companyWrite
-  deadlineRead
-  deadlineWrite
-  milestoneRead
-  milestoneWrite
-  overtimeRead
-  overtimeWrite
-  pausalRead
-  pausalWrite
-  projectRead
-  projectWrite
-  projectPrimaryRead
-  projectPrimaryWrite
-  repeatRead
-  repeatWrite
-  requesterRead
-  requesterWrite
-  rozpocetRead
-  rozpocetWrite
-  scheduledRead
-  scheduledWrite
-  statusRead
-  statusWrite
-  tagsRead
-  tagsWrite
-  taskAttachmentsRead
-  taskAttachmentsWrite
-  taskDescriptionRead
-  taskDescriptionWrite
-  taskShortSubtasksRead
-  taskShortSubtasksWrite
-  typeRead
-  typeWrite
-  vykazRead
-  vykazWrite
-  companyTasks
-  allTasks
-  addTasks
-  deleteTasks
-  important
-  addComments
-  emails
-  history
-  internal
-  projectSecondary
-  pausalInfo
-  taskTitleEdit
-  viewComments
-  statistics
+projectRead
+projectWrite
+
+companyTasks
+allTasks
+
+tasklistDnD
+tasklistKalendar
+tasklistGantt
+tasklistStatistics
+
+addTask
+
+deleteTask
+taskImportant
+taskTitleWrite
+taskProjectWrite
+taskDescriptionRead
+taskDescriptionWrite
+taskAttachmentsRead
+taskAttachmentsWrite
+
+taskSubtasksRead
+taskSubtasksWrite
+taskWorksRead
+taskWorksWrite
+taskWorksAdvancedRead
+taskWorksAdvancedWrite
+taskMaterialsRead
+taskMaterialsWrite
+taskPausalInfo
+
+viewComments
+addComments
+internal
+emails
+history
 `;
 
-const def = `
-assignedTo {
-  def
-  fixed
+export const projectAttributeRights = `
+status {
   required
+  add
+  view
+  edit
+}
+tags {
+  required
+  add
+  view
+  edit
+}
+assigned {
+  required
+  add
+  view
+  edit
+}
+requester {
+  required
+  add
+  view
+  edit
+}
+company {
+  required
+  add
+  view
+  edit
+}
+taskType {
+  required
+  add
+  view
+  edit
+}
+pausal {
+  required
+  add
+  view
+  edit
+}
+overtime {
+  required
+  add
+  view
+  edit
+}
+startsAt {
+  required
+  add
+  view
+  edit
+}
+deadline {
+  required
+  add
+  view
+  edit
+}
+repeat {
+  add
+  view
+  edit
+}
+`;
+
+export const projectAttributes = `
+status {
+  fixed
   value {
     id
+    title
+  }
+}
+tags {
+  fixed
+  value {
+    id
+    title
+  }
+}
+assigned {
+  fixed
+  value {
+    id
+    email
+    fullName
+  }
+}
+requester {
+  fixed
+  value {
+    id
+    email
+    fullName
   }
 }
 company {
-  def
   fixed
-  required
   value {
     id
+    title
   }
 }
-overtime {
-  def
+taskType {
   fixed
-  required
-  value
+  value {
+    id
+    title
+  }
 }
 pausal {
-  def
   fixed
-  required
   value
 }
-requester {
-  def
+overtime {
   fixed
-  required
-  value {
-    id
-  }
+  value
 }
-type {
-  def
+startsAt {
   fixed
-  required
-  value {
-    id
-  }
+  value
 }
-status {
-  def
+deadline {
   fixed
-  required
-  value {
-    id
-  }
-}
-tag {
-  def
-  fixed
-  required
-  value {
-    id
-  }
+  value
 }
 `;
 
@@ -149,12 +205,20 @@ query {
         icon
         action
       }
-      def {
-        ${def}
+      projectAttributes {
+        ${projectAttributes}
+      }
+      projectFilters {
+        id
+        title
+        ${filter}
       }
     }
     right {
       ${groupRights}
+    }
+    attributeRights {
+      ${projectAttributeRights}
     }
     usersWithRights {
       user{
@@ -187,7 +251,7 @@ lockedRequester
 autoApproved
 hideApproved
 archived
-statuses{
+statuses {
   id
   title
   order
@@ -195,24 +259,33 @@ statuses{
   icon
   action
 }
-attachments{
+attachments {
   id
   path
   filename
   size
   mimetype
 }
-groups{
+groups {
   id
   title
+  def
+  admin
   description
   order
   rights{
     ${groupRights}
   }
-  users{
+  attributeRights {
+    ${projectAttributeRights}
+  }
+  users {
     id
     email
+  }
+  companies {
+    id
+    title
   }
 }
 tags {
@@ -221,38 +294,53 @@ tags {
   order
   color
 }
-
-def {
-  ${def}
+projectFilters {
+  id
+  title
+  description
+  active
+  order
+  ${filter}
+  groups {
+    id
+    title
+  }
+}
+projectAttributes {
+  ${projectAttributes}
 }
 `
 
 export const ADD_PROJECT = gql `
 mutation addProject(
-  $title: String!,
-  $description: String!,
-  $lockedRequester: Boolean!,
-  $autoApproved: Boolean!,
-  $hideApproved: Boolean!,
-  $archived: Boolean!,
-  $def: ProjectDefaultsInput!,
-  $tags: [NewTagInput]!,
+  $title: String!
+  $description: String!
+  $lockedRequester: Boolean!
+  $autoApproved: Boolean!
+  $hideApproved: Boolean!
+  $archived: Boolean!
+  $projectAttributes: ProjectAttributesInput!
+  $tags: [NewTagInput]!
   $statuses: [NewStatusInput]!
-  $groups: [ProjectGroupInput]!
+  $filters: [ProjectFilterInput]!
   $userGroups: [UserGroupInput]!
+  $companyGroups: [CompanyGroupInput]!
+  $groups: [ProjectGroupInput]!
 ) {
   addProject(
-    title: $title,
-    description: $description,
-    lockedRequester: $lockedRequester,
-    autoApproved: $autoApproved,
-    hideApproved: $hideApproved,
-    archived: $archived,
-    def: $def,
-    tags: $tags,
-    statuses: $statuses,
-    groups: $groups,
+    title: $title
+    description: $description
+    lockedRequester: $lockedRequester
+    autoApproved: $autoApproved
+    hideApproved: $hideApproved
+    archived: $archived
+    projectAttributes: $projectAttributes
+    tags: $tags
+    statuses: $statuses
+    filters: $filters
     userGroups: $userGroups
+    companyGroups: $companyGroups
+    groups: $groups
   ){
     ${responseProject}
   }
@@ -262,7 +350,7 @@ mutation addProject(
 export const GET_PROJECT = gql `
 query project($id: Int!) {
   project(
-    id: $id,
+    id: $id
   ){
     ${responseProject}
   }
@@ -271,24 +359,33 @@ query project($id: Int!) {
 
 export const UPDATE_PROJECT = gql `
 mutation updateProject(
-  $id: Int!,
-  $title: String,
-  $description: String,
-  $lockedRequester: Boolean,
-  $autoApproved: Boolean,
-  $hideApproved: Boolean!,
-  $archived: Boolean,
-  $def: ProjectDefaultsInput,
-  $deleteTags: [Int]!,
-  $updateTags: [TagUpdateInput]!,
-  $addTags: [NewTagInput]!,
-  $deleteStatuses: [Int]!,
-  $updateStatuses: [UpdateStatusInput]!,
-  $addStatuses: [NewStatusInput]!,
-  $userGroups: [UserGroupUpdateInput]!,
-  $addGroups: [ProjectGroupInput]!,
-  $updateGroups: [ProjectGroupInput]!,
-  $deleteGroups: [Int]!,
+  $id: Int!
+  $title: String
+  $description: String
+  $lockedRequester: Boolean
+  $autoApproved: Boolean
+  $hideApproved: Boolean!
+  $archived: Boolean
+  $projectAttributes: ProjectAttributesInput
+
+  $addTags: [NewTagInput]!
+  $updateTags: [TagUpdateInput]!
+  $deleteTags: [Int]!
+
+  $addStatuses: [NewStatusInput]!
+  $updateStatuses: [UpdateStatusInput]!
+  $deleteStatuses: [Int]!
+
+  $addFilters: [ProjectFilterInput]!
+  $updateFilters: [ProjectFilterInput]!
+  $deleteFilters: [Int]!
+
+  $userGroups: [UserGroupUpdateInput]!
+  $companyGroups: [CompanyGroupUpdateInput]!
+
+  $addGroups: [ProjectGroupInput]!
+  $updateGroups: [ProjectGroupInput]!
+  $deleteGroups: [Int]!
 ) {
   updateProject(
     id: $id
@@ -298,14 +395,23 @@ mutation updateProject(
     autoApproved: $autoApproved
     hideApproved: $hideApproved
     archived: $archived
-    def: $def
-    deleteTags: $deleteTags
-    updateTags: $updateTags
+    projectAttributes: $projectAttributes
+
     addTags: $addTags
-    deleteStatuses: $deleteStatuses
-    updateStatuses: $updateStatuses
+    updateTags: $updateTags
+    deleteTags: $deleteTags
+
     addStatuses: $addStatuses
+    updateStatuses: $updateStatuses
+    deleteStatuses: $deleteStatuses
+
+    addFilters: $addFilters
+    updateFilters: $updateFilters
+    deleteFilters: $deleteFilters
+
     userGroups: $userGroups
+    companyGroups: $companyGroups
+
     addGroups: $addGroups
     updateGroups: $updateGroups
     deleteGroups: $deleteGroups
@@ -316,10 +422,10 @@ mutation updateProject(
 `;
 
 export const DELETE_PROJECT = gql `
-mutation deleteProject($id: Int!, $newId: Int!) {
+mutation deleteProject($id: Int! $newId: Int!) {
   deleteProject(
-    id: $id,
-    newId: $newId,
+    id: $id
+    newId: $newId
   ){
     id
   }
@@ -329,7 +435,7 @@ mutation deleteProject($id: Int!, $newId: Int!) {
 export const DELETE_PROJECT_ATTACHMENT = gql `
 mutation deleteProjectAttachment($id: Int!) {
   deleteProjectAttachment(
-    id: $id,
+    id: $id
   ){
     id
   }
@@ -339,14 +445,14 @@ mutation deleteProjectAttachment($id: Int!) {
 export const GET_NUMBER_OF_TASKS = gql `
 query getNumberOfTasks($projectId: Int!) {
   getNumberOfTasks(
-    projectId: $projectId,
+    projectId: $projectId
   )
 }
 `;
 
 export const ADD_USER_TO_PROJECT_GROUP = gql `
 mutation addUserToProjectGroup(
-  $id: Int!,
+  $id: Int!
   $userId: Int!
 ) {
   addUserToProjectGroup(
@@ -359,15 +465,15 @@ mutation addUserToProjectGroup(
 `;
 
 export const PROJECTS_SUBSCRIPTION = gql `
-  subscription projectsSubscription {
-    projectsSubscription
-  }
+subscription projectsSubscription {
+  projectsSubscription
+}
 `;
 
 export const GET_PROJECT_GROUPS = gql `
 query projectGroups($id: Int!) {
   projectGroups(
-    id: $id,
+    id: $id
   ){
     id
     title
@@ -380,7 +486,7 @@ query projectGroups($id: Int!) {
 
 
 export const PROJECT_GROUPS_SUBSCRIPTION = gql `
-  subscription projectGroupsSubscription($projectId: Int!) {
-    projectGroupsSubscription(projectId: $projectId)
-  }
+subscription projectGroupsSubscription($projectId: Int!) {
+  projectGroupsSubscription(projectId: $projectId)
+}
 `;

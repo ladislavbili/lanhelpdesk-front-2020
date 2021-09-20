@@ -4,6 +4,7 @@ import {
   useQuery,
   useSubscription,
 } from "@apollo/client";
+import axios from 'axios';
 import moment from 'moment';
 import Empty from 'components/Empty';
 import {
@@ -25,17 +26,13 @@ import {
   getMyData,
 } from 'helperFunctions';
 import {
-  defList,
-  defBool,
-  defItem,
   defaultGroups,
-  noDef,
+  getEmptyAttributes,
 } from 'configs/constants/projects';
 import classnames from 'classnames';
-import axios from 'axios';
 import Loading from 'components/loading';
 import Switch from "components/switch";
-import Checkbox from 'components/checkbox';
+import Radio from "components/radio";
 
 import Users from "./components/users";
 import CustomAttributes from "./components/customAttributes";
@@ -46,12 +43,16 @@ import Attributes from "./components/attributes";
 import ProjectAcl from "./components/acl";
 import ACLErrors from './components/aclErrors';
 import Attachments from './components/attachments';
+import ProjectFilters from "./components/projectFilters";
+import ProjectErrorDisplay from './components/errorDisplay';
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
 import {
-  remapRightsToBackend
+  remapRightsToBackend,
+  getGroupsProblematicAttributes,
 } from './helpers';
+
 import {
   REST_URL,
 } from 'configs/restAPI';
@@ -82,9 +83,8 @@ export default function ProjectAdd( props ) {
     match,
     closeModal,
   } = props;
-  const [ addProject, {
-    client
-  } ] = useMutation( ADD_PROJECT );
+
+  const [ addProject ] = useMutation( ADD_PROJECT );
 
   const {
     data: statusesData,
@@ -128,18 +128,14 @@ export default function ProjectAdd( props ) {
   const [ description, setDescription ] = React.useState( "" );
   const [ lockedRequester, setLockedRequester ] = React.useState( true );
   const [ autoApproved, setAutoApproved ] = React.useState( true );
+  const [ hideApproved, setHideApproved ] = React.useState( false );
   const [ archived, setArchived ] = React.useState( false );
   const [ groups, setGroups ] = React.useState( defaultGroups );
+  const [ attributes, setAttributes ] = React.useState( getEmptyAttributes() );
   const [ userGroups, setUserGroups ] = React.useState( [] );
+  const [ companyGroups, setCompanyGroups ] = React.useState( [] );
 
-  const [ assignedTo, setAssignedTo ] = React.useState( defList( noDef.assignedTo.required ) );
-  const [ company, setCompany ] = React.useState( defItem( noDef.company.required ) );
-  const [ overtime, setOvertime ] = React.useState( defBool( noDef.overtime.required ) );
-  const [ pausal, setPausal ] = React.useState( defBool( noDef.pausal.required ) );
-  const [ requester, setRequester ] = React.useState( defItem( noDef.requester.required ) );
-  const [ type, setType ] = React.useState( defItem( noDef.type.required ) );
-  const [ status, setStatus ] = React.useState( defItem( noDef.status.required ) );
-  const [ defTag, setDefTag ] = React.useState( defList( noDef.tag.required ) );
+  const [ filters, setFilters ] = React.useState( [] );
 
   const [ tags, setTags ] = React.useState( [] );
   const [ attachments, setAttachments ] = React.useState( [] );
@@ -148,9 +144,8 @@ export default function ProjectAdd( props ) {
   const [ saving, setSaving ] = React.useState( false );
   const [ openedTab, setOpenedTab ] = React.useState( "description" );
   const [ editingDescription, setEditingDescription ] = React.useState( false );
-  const [ addTaskErrors, setAddTaskErrors ] = React.useState( false );
+  const [ showProjectErrors, setShowProjectErrors ] = React.useState( false );
   const [ statuses, setStatuses ] = React.useState( [] );
-
 
   const dataLoading = (
     statusesLoading ||
@@ -166,15 +161,25 @@ export default function ProjectAdd( props ) {
   }, [ dataLoading ] );
 
   React.useEffect( () => {
-    updateDefAssigned();
-  }, [ userGroups ] );
-
+    if ( !usersLoading ) {
+      updateDefAssigned();
+    }
+  }, [ userGroups, companyGroups, usersLoading ] );
   const updateDefAssigned = () => {
-    const assignableUsers = userGroups.filter( ( userGroup ) => userGroup.group.rights.assigned.write )
-      .map( ( userGroup ) => userGroup.user );
-    setAssignedTo( {
-      ...assignedTo,
-      value: assignedTo.value.filter( ( user1 ) => assignableUsers.some( ( user2 ) => user1.id === user2.id ) )
+    const companyIds = companyGroups.filter( ( companyGroup ) => companyGroup.group.attributeRights.assigned.write )
+      .map( ( companyGroup ) => companyGroup.company.id );
+    const assignableUsers = [
+      ...userGroups.filter( ( userGroup ) => userGroup.group.attributeRights.assigned.write )
+      .map( ( userGroup ) => userGroup.user ),
+      ...toSelArr( usersData.basicUsers, 'email' )
+      .filter( ( user ) => companyIds.includes( user.company.id ) )
+    ]
+    setAttributes( {
+      ...attributes,
+      assigned: {
+        ...attributes.assigned,
+        value: attributes.assigned.value.filter( ( user1 ) => assignableUsers.some( ( user2 ) => user1.id === user2.id ) )
+      }
     } )
   }
 
@@ -207,46 +212,59 @@ export default function ProjectAdd( props ) {
   //functions
   const addProjectFunc = () => {
     setSaving( true );
-
-    let newDef = {
-      assignedTo: {
-        ...assignedTo,
-        value: assignedTo.value.map( u => u.id )
-      },
-      company: {
-        ...company,
-        value: ( company.value ? company.value.id : null )
-      },
-      overtime: {
-        ...overtime,
-        value: overtime.value.value
-      },
-      pausal: {
-        ...pausal,
-        value: pausal.value.value
-      },
-      requester: {
-        ...requester,
-        value: ( requester.value ? requester.value.id : null )
-      },
-      type: {
-        ...type,
-        value: ( type.value ? type.value.id : null )
-      },
-      status: {
-        ...status,
-        value: ( status.value ? status.value.id : null )
-      },
-      tag: {
-        ...defTag,
-        value: defTag.value.map( u => u.id )
-      },
-    }
     let newGroups = groups.map( ( group ) => remapRightsToBackend( group ) )
     let newUserGroups = userGroups.map( ( userGroup ) => ( {
       userId: userGroup.user.id,
       groupId: userGroup.group.id
     } ) );
+    let newCompanyGroups = companyGroups.map( ( companyGroup ) => ( {
+      companyId: companyGroup.company.id,
+      groupId: companyGroup.group.id
+    } ) );
+    let projectAttributes = {
+      assigned: {
+        ...attributes.assigned,
+        value: attributes.assigned.value.map( user => user.id )
+      },
+      company: {
+        ...attributes.company,
+        value: attributes.company.value ? attributes.company.value.id : null,
+      },
+      deadline: {
+        ...attributes.deadline,
+        value: attributes.deadline.value ? attributes.deadline.value.valueOf()
+          .toString() : null,
+      },
+      overtime: {
+        ...attributes.overtime,
+        value: attributes.overtime.value ? attributes.overtime.value.value : null,
+      },
+      pausal: {
+        ...attributes.pausal,
+        value: attributes.pausal.value ? attributes.pausal.value.value : null,
+      },
+      requester: {
+        ...attributes.requester,
+        value: ( attributes.requester.value ? attributes.requester.value.id : null )
+      },
+      startsAt: {
+        ...attributes.startsAt,
+        value: attributes.startsAt.value ? attributes.startsAt.value.valueOf()
+          .toString() : null,
+      },
+      status: {
+        ...attributes.status,
+        value: ( attributes.status.value ? attributes.status.value.id : null )
+      },
+      tags: {
+        ...attributes.tags,
+        value: attributes.tags.value.map( tag => tag.id )
+      },
+      taskType: {
+        ...attributes.taskType,
+        value: ( attributes.taskType.value ? attributes.taskType.value.id : null )
+      },
+    }
 
     addProject( {
         variables: {
@@ -256,14 +274,17 @@ export default function ProjectAdd( props ) {
           autoApproved,
           hideApproved,
           archived,
-          def: newDef,
-          groups: newGroups,
-          userGroups: newUserGroups,
+          projectAttributes,
           tags,
-          statuses
+          statuses,
+          filters,
+          userGroups: newUserGroups,
+          companyGroups: newCompanyGroups,
+          groups: newGroups,
         }
       } )
       .then( ( response ) => {
+        return;
         if ( attachments.length > 0 ) {
           const formData = new FormData();
           attachments.map( ( attachment ) => attachment.data )
@@ -277,14 +298,44 @@ export default function ProjectAdd( props ) {
             } )
             .then( ( response2 ) => {
               if ( closeModal ) {
-                const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
-                const myRights = myUserGroup === undefined ? createCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
+                let myUserGroup1 = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
+                let myUserGroup2 = companyGroups.find( ( companyGroup ) => companyGroup.company.id === currentUser.company.id );
+                let myRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
                   .rights;
-                if ( myUserGroup ) {
+                let myAttributeRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
+                  .attributeRights;
+                if ( myUserGroup1 !== undefined && myUserGroup2 !== undefined ) {
+                  myRights = mergeGroupRights(
+                    remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                    .rights,
+                    remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+                    .rights
+                  );
+                  myAttributeRights = mergeGroupAttributeRights(
+                    remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                    .attributeRights,
+                    remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+                    .attributeRights
+                  );
+                } else if ( myUserGroup1 !== undefined ) {
+                  myRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                    .rights;
+                  myAttributeRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                    .attributeRights;
+                } else if ( myUserGroup2 !== undefined ) {
+                  myRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+                    .rights;
+                  myAttributeRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+                    .attributeRights;
+                }
+                if ( myUserGroup1 || myUserGroup2 ) {
                   closeModal( {
-                    ...response.data.addProject,
-                    __typename: "Project"
-                  }, myRights );
+                      ...response.data.addProject,
+                      __typename: "Project"
+                    },
+                    myRights,
+                    myAttributeRights,
+                  );
                 } else {
                   closeModal( null, null );
                 }
@@ -301,18 +352,46 @@ export default function ProjectAdd( props ) {
             } );
         } else {
           if ( closeModal ) {
-            const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
-            const myRights = myUserGroup === undefined ? createCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
+            let myUserGroup1 = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
+            let myUserGroup2 = companyGroups.find( ( companyGroup ) => companyGroup.company.id === currentUser.company.id );
+            let myRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
               .rights;
-            if ( myUserGroup ) {
+            let myAttributeRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
+              .attributeRights;
+            if ( myUserGroup1 !== undefined && myUserGroup2 !== undefined ) {
+              myRights = mergeGroupRights(
+                remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                .rights,
+                remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+                .rights
+              );
+              myAttributeRights = mergeGroupAttributeRights(
+                remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                .attributeRights,
+                remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+                .attributeRights
+              );
+            } else if ( myUserGroup1 !== undefined ) {
+              myRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                .rights;
+              myAttributeRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                .attributeRights;
+            } else if ( myUserGroup2 !== undefined ) {
+              myRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+                .rights;
+              myAttributeRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+                .attributeRights;
+            }
+            if ( myUserGroup1 || myUserGroup2 ) {
               closeModal( {
                   ...response.data.addProject,
                   __typename: "Project"
                 },
-                myRights
+                myRights,
+                myAttributeRights,
               );
             } else {
-              closeModal( null, null );
+              closeModal( null, null, null );
             }
           } else {
             if ( match.path.includes( 'settings' ) ) {
@@ -329,43 +408,14 @@ export default function ProjectAdd( props ) {
     setSaving( false );
   }
 
-  const addTaskIssue = (
-    groups.filter( ( group ) => group.rights.addTasks )
-    .some( ( group ) => (
-      ( !group.rights.status.write && !status.def ) ||
-      ( !group.rights.tags.write && !defTag.def && defTag.required ) ||
-      //( !group.rights.assigned.write && !assignedTo.def ) ||
-      ( !group.rights.requester.write && !requester.def && requester.required ) ||
-      ( !group.rights.type.write && !type.def && type.required ) ||
-      ( !group.rights.company.write && !company.def )
-    ) )
-  )
-
-  const doesDefHasValue = () => {
-    return (
-    [
-      type,
-    ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
-      defTag,
-      //assignedTo,
-    ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
-    )
+  const fixedNotDef = () => {
+    return [ 'deadline', 'overtime', 'pausal', 'startsAt', 'status', 'taskType' ].some( ( attr ) => attributes[ attr ].fixed && attributes[ attr ].value === null );
   }
 
   const cannotSave = (
     saving ||
-    !doesDefHasValue() ||
     title === "" ||
-    currentUser &&
-    ( company.value === null && company.fixed ) ||
-    ( status.value === null && status.fixed ) ||
-    ( assignedTo.value.length === 0 && assignedTo.fixed ) ||
-    !groups.some( ( group ) => (
-      group.rights.projectPrimary.read &&
-      group.rights.projectPrimary.write &&
-      group.rights.projectSecondary &&
-      userGroups.some( ( userGroup ) => userGroup.group.id === group.id )
-    ) ) ||
+    fixedNotDef() ||
     tags.some( ( tag ) => (
       tag.title.length === 0 ||
       !tag.color.includes( '#' ) ||
@@ -373,7 +423,16 @@ export default function ProjectAdd( props ) {
     ) ) ||
     !statuses.some( ( status ) => status.action === 'IsNew' ) ||
     !statuses.some( ( status ) => status.action === 'CloseDate' ) ||
-    addTaskIssue
+    !groups.some( ( group ) => (
+      group.rights.projectRead &&
+      group.rights.projectWrite &&
+      (
+        userGroups.some( ( userGroup ) => userGroup.group.id === group.id ) ||
+        companyGroups.some( ( companyGroup ) => companyGroup.group.id === group.id )
+      )
+    ) ) ||
+    filters.some( ( filter ) => filter.active && getGroupsProblematicAttributes( groups, filter )
+      .length !== 0 )
   )
 
   const renderAttachments = () => {
@@ -559,8 +618,8 @@ export default function ProjectAdd( props ) {
       </NavItem>
       <NavItem>
         <NavLink
-          className={classnames({ active: openedTab === 'def' }, "clickable", "")}
-          onClick={() => setOpenedTab('def') }
+          className={classnames({ active: openedTab === 'attributes' }, "clickable", "")}
+          onClick={() => setOpenedTab('attributes') }
           >
           Attributes
         </NavLink>
@@ -576,6 +635,19 @@ export default function ProjectAdd( props ) {
           onClick={() => setOpenedTab('custom') }
           >
           Custom attributes
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink>
+          |
+        </NavLink>
+      </NavItem>
+      <NavItem>
+        <NavLink
+          className={classnames({ active: openedTab === 'projectFilters' }, "clickable", "")}
+          onClick={() => setOpenedTab('projectFilters') }
+          >
+          Project filters
         </NavLink>
       </NavItem>
     </Nav>
@@ -607,20 +679,24 @@ export default function ProjectAdd( props ) {
           simpleSwitch
           />
 
-        <FormGroup tag="fieldset" className="bkg-white" onChange={() => setAutoApproved(!autoApproved) }>
-          <FormGroup check className="p-b-10 p-t-10">
-            <Input type="radio" checked={autoApproved} className="center-hor" name="autoApproved" id="autoApprovedOn" />
-            <Label check className="center-hor m-l-5" htmlFor="autoApprovedOn" >
-              Invoice On
-            </Label>
-          </FormGroup>
-          <FormGroup check className="p-b-10 p-t-10">
-            <Input type="radio" checked={!autoApproved} className="center-hor" name="autoApproved"  id="autoApprovedOff" />
-            <Label check className="center-hor m-l-5" htmlFor="autoApprovedOff" >
-              Invoice Off
-            </Label>
-          </FormGroup>
-        </FormGroup>
+          <Radio
+            options={ [
+              {
+                key: 'autoApprovedOn',
+                value: autoApproved,
+                label: 'Invoice On',
+              },
+              {
+                key: 'autoApprovedOff',
+                value: !autoApproved,
+                label: 'Invoice Off',
+              },
+            ] }
+            name="autoApproved"
+            onChange={ () => {
+              setAutoApproved(!autoApproved);
+            } }
+            />
 
         <Switch
           value={hideApproved}
@@ -684,10 +760,16 @@ export default function ProjectAdd( props ) {
               userGroup :
               ({...userGroup, group: {...userGroup.group,...newGroup}})
             ) ))
+            setCompanyGroups(companyGroups.map((companyGroup) => (
+              (companyGroup.group.id !== newGroup.id) ?
+              companyGroup :
+              ({...companyGroup, group: {...companyGroup.group,...newGroup}})
+            ) ));
           }}
           deleteGroup={(id) => {
             setGroups( groups.filter((group) => group.id !== id ) );
             setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
+            setcompanyGroups( companyGroups.filter((companyGroup) => companyGroup.group.id !== id ) );
           }}
           />
       </TabPane>
@@ -705,6 +787,13 @@ export default function ProjectAdd( props ) {
                 return userGroup;
               }
             } ));
+            setCompanyGroups(companyGroups.map((companyGroup) => {
+              if(companyGroup.group.id === groupID){
+                return {...companyGroup, group: toSelItem(newGroups[index])  }
+              }else{
+                return companyGroup;
+              }
+            } ));
             setGroups(newGroups);
           }}
           />
@@ -712,45 +801,42 @@ export default function ProjectAdd( props ) {
       <TabPane tabId={'users'}>
         <Users
           users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-          permissions={ userGroups }
-          disabled={ false }
+          userGroups={ userGroups }
+          companies={ companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) }
+          companyGroups={ companyGroups }
           groups={ toSelArr(groups) }
           lockedRequester={ lockedRequester }
           setLockedRequester={(lockedRequester) => {
             setLockedRequester(lockedRequester);
           }}
-          addRight={ (userGroup) => {
+          addUserRight={ (userGroup) => {
             setUserGroups([...userGroups, userGroup]);
           }}
-          deleteRight={ (userGroup) => {
+          deleteUserRight={ (userGroup) => {
             setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
           }}
-          updateRight={ (userGroup) => {
+          updateUserRight={ (userGroup) => {
             let newUserGroups = [...userGroups];
             let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
             newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
             setUserGroups(newUserGroups);
           }}
+          addCompanyRight={ (companyGroup) => {
+            setCompanyGroups([...companyGroups, companyGroup]);
+          }}
+          deleteCompanyRight={ (companyGroup) => {
+            setCompanyGroups(companyGroups.filter((oldGroup) => oldGroup.company.id !== companyGroup.company.id ));
+          }}
+          updateCompanyRight={ (companyGroup) => {
+            let newCompanyGroups = [...companyGroups];
+            let index = newCompanyGroups.findIndex((companyG) => companyG.company.id === companyGroup.company.id );
+            newCompanyGroups[index] = { ...newCompanyGroups[index], ...companyGroup }
+            setCompanyGroups(newCompanyGroups);
+          }}
           />
       </TabPane>
-      <TabPane tabId={'def'}>
+      <TabPane tabId={'attributes'}>
         <Attributes
-          assignedTo={assignedTo}
-          setAssignedTo={setAssignedTo}
-          company={company}
-          setCompany={setCompany}
-          overtime={overtime}
-          setOvertime={setOvertime}
-          pausal={pausal}
-          setPausal={setPausal}
-          requester={requester}
-          setRequester={setRequester}
-          type={type}
-          setType={setType}
-          status={status}
-          setStatus={setStatus}
-          tag={defTag}
-          setTag={setDefTag}
           statuses={toSelArr(statuses)}
           companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
           users={
@@ -758,13 +844,18 @@ export default function ProjectAdd( props ) {
             userGroups.map( (userGroup) => userGroup.user ) :
             (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
           }
-          assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
+          assignableUsers={[
+            ...userGroups.filter((userGroup) => userGroup.group.attributeRights.assigned.write ).map( (userGroup) => userGroup.user ),
+            ...companyGroups.reduce((acc, companyGroup) => {
+              return [...acc, ...(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email')).filter((user) => user.company.id === companyGroup.company.id ) ]
+            },[])
+          ]}
           allTags={toSelArr(tags)}
           taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
-          autoApproved={autoApproved}
-          setAutoApproved={(autoApproved) => {
-            setAutoApproved(autoApproved)
-          }}
+          groups={groups}
+          setGroups={setGroups}
+          attributes={attributes}
+          setAttributes={setAttributes}
           />
       </TabPane>
       <TabPane tabId={'custom'}>
@@ -785,47 +876,41 @@ export default function ProjectAdd( props ) {
           }}
           />
       </TabPane>
-    </TabContent>
-    { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed) ) &&
-      <div className="red" style={{color:'red'}}>
-        Status, assigned to and company can't be empty if they are fixed!
-      </div>
-    }
+      <TabPane tabId={'projectFilters'}>
+        <ProjectFilters
+          groups={groups}
+          statuses={statuses}
+          filters={filters}
+          addFilter={(newFilter) => {
+            setFilters([ ...filters, {...newFilter, id: fakeID -- } ]);
+          }}
+          deleteFilter={(id) => {
+              setFilters(filters.filter((filter) => filter.id !== id ));
+          }}
+          updateFilter={(newFilter) => {
+            let newFilters = [...filters];
+            let index = newFilters.findIndex((filter) => filter.id === newFilter.id );
+            newFilters[index] = { ...newFilters[index], ...newFilter }
+            setFilters(newFilters);
+          }}
+          />
+      </TabPane>
 
-    { addTaskErrors && addTaskIssue &&
-      <ACLErrors
-        {
-          ...{
-            groups,
-            status,
-            defTag,
-            assignedTo,
-            requester,
-            type,
-            company
-          }
-        }
-        />
-    }
+    </TabContent>
+
     <div className="row form-buttons-row">
       {  closeModal &&
         <button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </button>
       }
 
-      { cannotSave && addTaskErrors &&
-        <div className="ml-auto message error-message" style={{ minWidth: 220 }}>
-          Fill in all the required information!
-        </div>
-      }
-
       <button className={classnames(
           "btn",
-          {"ml-auto": !(cannotSave && addTaskErrors)}
+          "ml-auto",
         )}
-        disabled={ addTaskErrors && cannotSave }
+        disabled={ showProjectErrors && cannotSave }
         onClick={() => {
           if(cannotSave){
-            setAddTaskErrors(true);
+            setShowProjectErrors(true);
             return;
           }else{
             addProjectFunc();
@@ -835,6 +920,17 @@ export default function ProjectAdd( props ) {
         { saving ? 'Adding...' : 'Add project' }
       </button>
     </div>
+    { showProjectErrors &&
+      <ProjectErrorDisplay
+        attributes={attributes}
+        title={title}
+        allTags={tags}
+        allStatuses={statuses}
+        groups={groups}
+        userGroups={userGroups}
+        filters={filters}
+        />
+    }
   </div>
   );
 }

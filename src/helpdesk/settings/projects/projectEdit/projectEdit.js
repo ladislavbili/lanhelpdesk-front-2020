@@ -18,17 +18,19 @@ import {
   toSelItem,
 } from 'helperFunctions';
 import {
-  defList,
-  defBool,
-  defItem,
   allACLs,
-  backendCleanRights,
   noDef,
+  getEmptyAttributes,
 } from 'configs/constants/projects';
+import booleanSelects from 'configs/constants/boolSelect';
+import {
+  noSelect
+} from "../components/attributes";
 import classnames from 'classnames';
 import DeleteReplacement from 'components/deleteReplacement';
 import Loading from 'components/loading';
 import Switch from "components/switch";
+import Radio from "components/radio";
 
 import Attributes from "../components/attributes";
 import Tags from '../components/tags';
@@ -39,51 +41,35 @@ import GroupAdd from '../components/group/groupAdd';
 import ProjectAcl from "../components/acl";
 import CustomAttributes from "../components/customAttributes";
 import ProjectFilters from "../components/projectFilters";
-import ACLErrors from '../components/aclErrors';
 import Attachments from '../components/attachments';
+import ProjectErrorDisplay from '../components/errorDisplay';
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
 import axios from 'axios';
+import moment from 'moment';
+import {
+  remapRightsToBackend,
+  remapRightsFromBackend,
+  getGroupsProblematicAttributes,
+  mergeGroupRights,
+  mergeGroupAttributeRights,
+} from '../helpers';
+
 import {
   REST_URL,
 } from 'configs/restAPI';
 import {
-  remapRightsToBackend,
-  remapRightsFromBackend
-} from '../helpers';
-import {
-  attributesNames,
-} from '../components/attributes/constants';
-
-import {
   GET_PROJECT,
 } from '../queries';
 let fakeID = -1;
-
-let attributeRights = {};
-let defaultAttributes = {};
-attributesNames.forEach( ( attribute ) => {
-  attributeRights[ attribute ] = {
-    required: false,
-    add: false,
-    view: false,
-    edit: false,
-  }
-  if ( attribute !== 'repeat' ) {
-    defaultAttributes[ attribute ] = {
-      fixed: false,
-      value: [ 'tags', 'assigned' ].includes( attribute ) ? [] : null,
-    }
-  }
-} )
-
 
 export default function ProjectEdit( props ) {
   //data & queries
   const {
     history,
     match,
+    tabId,
     closeModal,
     projectDeleted,
     projectData,
@@ -119,21 +105,17 @@ export default function ProjectEdit( props ) {
   const [ hideApproved, setHideApproved ] = React.useState( false );
   const [ archived, setArchived ] = React.useState( false );
   const [ groups, setGroups ] = React.useState( [] );
-  const [ attributes, setAttributes ] = React.useState( defaultAttributes );
+  const [ attributes, setAttributes ] = React.useState( getEmptyAttributes() );
   const [ userGroups, setUserGroups ] = React.useState( [] );
+  const [ companyGroups, setCompanyGroups ] = React.useState( [] );
+
+  const [ addFilters, setAddFilters ] = React.useState( [] );
+  const [ updateFilters, setUpdateFilters ] = React.useState( [] );
+  const [ deleteFilters, setDeleteFilters ] = React.useState( [] );
+
   const [ addTags, setAddTags ] = React.useState( [] );
   const [ updateTags, setUpdateTags ] = React.useState( [] );
   const [ deleteTags, setDeleteTags ] = React.useState( [] );
-  const [ projectFilters, setProjectFilters ] = React.useState( [] );
-
-  const [ assignedTo, setAssignedTo ] = React.useState( defList( noDef.assignedTo.required ) );
-  const [ company, setCompany ] = React.useState( defItem( noDef.company.required ) );
-  const [ overtime, setOvertime ] = React.useState( defBool( noDef.overtime.required ) );
-  const [ pausal, setPausal ] = React.useState( defBool( noDef.pausal.required ) );
-  const [ requester, setRequester ] = React.useState( defItem( noDef.requester.required ) );
-  const [ type, setType ] = React.useState( defItem( noDef.type.required ) );
-  const [ status, setStatus ] = React.useState( defItem( noDef.status.required ) );
-  const [ defTag, setDefTag ] = React.useState( defList( noDef.tag.required ) );
 
   const [ addStatuses, setAddStatuses ] = React.useState( [] );
   const [ updateStatuses, setUpdateStatuses ] = React.useState( [] );
@@ -142,9 +124,9 @@ export default function ProjectEdit( props ) {
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
-  const [ openedTab, setOpenedTab ] = React.useState( "description" );
+  const [ openedTab, setOpenedTab ] = React.useState( tabId );
   const [ editingDescription, setEditingDescription ] = React.useState( false );
-  const [ addTaskErrors, setAddTaskErrors ] = React.useState( false );
+  const [ showProjectErrors, setShowProjectErrors ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
   const [ dataChanged, setDataChanged ] = React.useState( false );
@@ -171,7 +153,7 @@ export default function ProjectEdit( props ) {
     if ( !dataLoading ) {
       updateDefAssigned();
     }
-  }, [ userGroups ] );
+  }, [ userGroups, companyGroups ] );
 
   const setData = () => {
     if ( dataLoading ) {
@@ -186,131 +168,84 @@ export default function ProjectEdit( props ) {
     setHideApproved( project.hideApproved );
     setArchived( project.archived );
 
-    //STATUS
-    let newStatus = {
-      def: true,
-      fixed: project.def.status.fixed,
-      required: true,
-      value: ( project.def.status.value ? project.statuses.find( c => c.id === project.def.status.value.id ) : null )
-    };
-    setStatus( newStatus );
-    setDataChanged( false );
-
-    let newOvertime = {
-      def: true,
-      fixed: project.def.overtime.fixed,
-      required: true,
-      value: ( project.def.overtime.value ? {
-        value: true,
-        label: 'Yes'
-      } : {
-        value: false,
-        label: 'No'
-      } )
-    };
-    setOvertime( newOvertime );
-
-    let newPausal = {
-      def: true,
-      fixed: project.def.pausal.fixed,
-      required: true,
-      value: ( project.def.pausal.value ? {
-        value: true,
-        label: 'Yes'
-      } : {
-        value: false,
-        label: 'No'
-      } )
-    };
-    setPausal( newPausal );
-
-    //TAGS
-    let tags = toSelArr( getAllTags() );
-    let tagIds = project.def.tag.value.map( v => v.id );
-    let newValue = tags.filter( t => tagIds.includes( t.id ) );
-    let newDefTag = {
-      def: project.def.tag.def || project.def.tag.required,
-      fixed: project.def.tag.fixed,
-      required: project.def.tag.required,
-      value: newValue
-    };
-    setDefTag( newDefTag );
-    setDataChanged( false );
-
-    //USERS
+    //ATTRIBUTES
+    const attributes = project.projectAttributes;
+    let tagsIds = attributes.tags.value.map( v => v.id );
     let users = toSelArr( usersData.basicUsers, 'email' );
-    let newAssignedTo = {
-      def: true,
-      fixed: project.def.assignedTo.fixed,
-      required: true,
-      value: project.def.assignedTo.value.map( user => users.find( u => u.id === user.id ) )
-    };
-    setAssignedTo( newAssignedTo );
-    let newRequester = {
-      def: project.def.requester.def || project.def.requester.required,
-      fixed: project.def.requester.fixed,
-      required: project.def.requester.required,
-      value: ( project.def.requester.value ? users.find( u => u.id === project.def.requester.value.id ) : null )
-    };
-    setRequester( newRequester );
+    let companies = toSelArr( companiesData.basicCompanies );
+    let taskTypes = toSelArr( taskTypesData.taskTypes );
+    setAttributes( {
+      assigned: {
+        fixed: attributes.assigned.fixed,
+        value: attributes.assigned.value.map( user1 => users.find( user2 => user2.id === user1.id ) ),
+      },
+      company: {
+        fixed: attributes.company.fixed,
+        value: ( attributes.company.value ? companies.find( company => company.id === attributes.company.value ) : null ),
+      },
+      deadline: {
+        fixed: attributes.deadline.fixed,
+        value: attributes.deadline.value ? moment( parseInt( attributes.deadline.value ) ) : null,
+      },
+      overtime: {
+        fixed: attributes.overtime.fixed,
+        value: attributes.overtime.value === null ? null : [ ...booleanSelects, noSelect ].find( ( selectVal ) => selectVal.value === attributes.overtime.value ),
+      },
+      pausal: {
+        fixed: attributes.pausal.fixed,
+        value: attributes.pausal.value === null ? null : [ ...booleanSelects, noSelect ].find( ( selectVal ) => selectVal.value === attributes.pausal.value ),
+      },
+      requester: {
+        fixed: attributes.requester.fixed,
+        value: attributes.requester.value,
+        value: attributes.requester.value ? users.find( user => user.id === attributes.requester.value ) : null,
+      },
+      startsAt: {
+        fixed: attributes.startsAt.fixed,
+        value: attributes.startsAt.value ? moment( parseInt( attributes.startsAt.value ) ) : null,
+      },
+      status: {
+        fixed: attributes.status.fixed,
+        value: attributes.status.value ? project.statuses.find( status => status.id === attributes.status.value ) : null,
+      },
+      tags: {
+        fixed: attributes.tags.fixed,
+        value: toSelArr( getAllTags() )
+          .filter( t => tagsIds.includes( t.id ) ),
+      },
+      taskType: {
+        fixed: attributes.taskType.fixed,
+        value: attributes.taskType.value,
+        value: ( attributes.taskType.value ? taskTypes.find( type => type.id === attributes.taskType.value ) : null ),
+      },
+    } )
+    setDataChanged( false );
+    //groups
     const {
       groups,
-      userGroups
+      userGroups,
+      companyGroups,
     } = getDefaultGroupData();
-    setGroups( groups.map( ( group ) => ( {
-      ...group,
-      attributeRights
-    } ) ) );
+    setGroups( groups );
     setUserGroups( userGroups );
-    setDataChanged( false );
-
-    //COMPANY
-    let companies = toSelArr( companiesData.basicCompanies );
-    let newCompany = {
-      def: true,
-      fixed: project.def.company.fixed,
-      required: true,
-      value: ( project.def.company.value ? companies.find( c => c.id === project.def.company.value.id ) : null )
-    };
-    setCompany( newCompany );
-
-    //TASK TYPE
-    let taskTypes = toSelArr( taskTypesData.taskTypes );
-    let newType = {
-      def: project.def.type.def || project.def.type.required,
-      fixed: project.def.type.fixed,
-      required: project.def.type.required,
-      value: ( project.def.type.value ? taskTypes.find( type => type.id === project.def.type.value.id ) : null )
-    };
-    setType( newType );
-
-    if ( ![
-      !project.def.type.required || project.def.type.def,
-      !project.def.tag.required || project.def.tag.def,
-      !project.def.requester.required || project.def.requester.def,
-      [
-        project.def.status.required,
-        project.def.status.def,
-        project.def.assignedTo.required,
-        project.def.assignedTo.def,
-        project.def.company.required,
-        project.def.company.def,
-        project.def.pausal.required,
-        project.def.pausal.def,
-        project.def.overtime.required,
-        project.def.overtime.def,
-      ].every( ( bool ) => bool )
-    ].every( ( bool ) => bool ) ) {
-      setDataChanged( true );
-    }
+    setCompanyGroups( companyGroups );
   }
 
   const updateDefAssigned = () => {
-    const assignableUsers = userGroups.filter( ( userGroup ) => userGroup.group.rights.assigned.write )
-      .map( ( userGroup ) => userGroup.user );
-    setAssignedTo( {
-      ...assignedTo,
-      value: assignedTo.value.filter( ( user1 ) => assignableUsers.some( ( user2 ) => user1.id === user2.id ) )
+    const companyIds = companyGroups.filter( ( companyGroup ) => companyGroup.group.attributeRights.assigned.write )
+      .map( ( companyGroup ) => companyGroup.company.id );
+    const assignableUsers = [
+      ...userGroups.filter( ( userGroup ) => userGroup.group.attributeRights.assigned.write )
+      .map( ( userGroup ) => userGroup.user ),
+      ...toSelArr( usersData.basicUsers, 'email' )
+      .filter( ( user ) => companyIds.includes( user.company.id ) )
+    ];
+    setAttributes( {
+      ...attributes,
+      assigned: {
+        ...attributes.assigned,
+        value: attributes.assigned.value.filter( ( user1 ) => assignableUsers.some( ( user2 ) => user1.id === user2.id ) )
+      }
     } )
   }
 
@@ -328,9 +263,39 @@ export default function ProjectEdit( props ) {
     return allTags.concat( addTags );
   }
 
+  const getAllFilters = () => {
+    let allFilters = projectData.project.projectFilters.filter( ( projectFilter ) => !deleteFilters.includes( projectFilter.id ) )
+      .map( ( filterData ) => {
+        return {
+          ...filterData,
+          groups: filterData.groups.map( ( group ) => group.id ),
+          filter: {
+            ...filterData.filter,
+            assignedTos: filterData.filter.assignedTos.map( ( user ) => user.id ),
+            companies: filterData.filter.companies.map( ( company ) => company.id ),
+            requesters: filterData.filter.requesters.map( ( user ) => user.id ),
+            statuses: filterData.filter.statuses.map( ( status ) => status.id ),
+            tags: filterData.filter.tags.map( ( tag ) => tag.id ),
+            taskTypes: filterData.filter.taskTypes.map( ( taskType ) => taskType.id ),
+          }
+        }
+      } );
+    updateFilters.map( ( filterChange ) => {
+      let index = allFilters.findIndex( ( projectFilter ) => projectFilter.id === filterChange.id );
+      if ( index !== -1 ) {
+        allFilters[ index ] = {
+          ...allFilters[ index ],
+          ...filterChange
+        };
+      }
+    } );
+    return allFilters.concat( addFilters );
+  }
+
   const getDefaultGroupData = () => {
     const project = projectData.project;
     const users = toSelArr( usersData.basicUsers, 'email' );
+    const companies = toSelArr( companiesData.basicCompanies );
     const groups = toSelArr( project.groups.map( ( group ) => remapRightsFromBackend( group ) ) );
     const userGroups = project.groups.reduce( ( acc, cur ) => {
       let group = groups.find( ( group ) => group.id === cur.id );
@@ -340,9 +305,20 @@ export default function ProjectEdit( props ) {
       } ) )
       return [ ...acc, ...userGroups ]
     }, [] )
+
+    const companyGroups = project.groups.reduce( ( acc, cur ) => {
+      let group = groups.find( ( group ) => group.id === cur.id );
+      let companyGroups = cur.companies.map( ( company1 ) => ( {
+        company: companies.find( ( company2 ) => company2.id === company1.id ),
+        group,
+      } ) )
+      return [ ...acc, ...companyGroups ]
+    }, [] )
+
     return {
       groups,
-      userGroups
+      userGroups,
+      companyGroups
     }
   }
 
@@ -367,7 +343,6 @@ export default function ProjectEdit( props ) {
   const filterGroupChanges = () => {
     const {
       groups: originalGroups,
-      userGroups: originalUserGroups
     } = getDefaultGroupData();
     const addGroups = groups.filter( ( group ) => group.id < 0 )
       .map( ( group ) => remapRightsToBackend( group ) );
@@ -376,12 +351,14 @@ export default function ProjectEdit( props ) {
         const originalGroup = originalGroups.find( ( orGroup ) => orGroup.id === group.id );
         const rights = group.rights;
         const originalRights = originalGroup.rights;
+        const attributeRights = group.attributeRights;
+        const originalAttributeRights = originalGroup.attributeRights;
         return (
           group.title !== originalGroup.title ||
           group.description !== originalGroup.description ||
           group.order !== originalGroup.order ||
           (
-            allACLs.filter( ( acl ) => !acl.separator )
+            allACLs.filter( ( acl ) => !acl.separator && !acl.header && !acl.fake )
             .some( ( acl ) => {
               if ( acl.both ) {
                 return ( rights[ acl.id ].read !== originalRights[ acl.id ].read || rights[ acl.id ].write !== originalRights[ acl.id ].write )
@@ -389,7 +366,12 @@ export default function ProjectEdit( props ) {
                 return rights[ acl.id ] !== originalRights[ acl.id ];
               }
             } )
-          )
+          ) || [ 'assigned', 'company', 'deadline', 'overtime', 'pausal', 'requester', 'startsAt', 'status', 'tags', 'taskType', 'repeat' ].some( ( right ) => (
+            attributeRights[ right ].required !== originalAttributeRights[ right ].required ||
+            attributeRights[ right ].add !== originalAttributeRights[ right ].add ||
+            attributeRights[ right ].view !== originalAttributeRights[ right ].view ||
+            attributeRights[ right ].edit !== originalAttributeRights[ right ].edit
+          ) )
         )
       } )
       .map( ( group ) => remapRightsToBackend( group ) );
@@ -427,41 +409,80 @@ export default function ProjectEdit( props ) {
     return compactUserGroups;
   }
 
+  const compactCompanyGroups = () => {
+    let compactCompanyGroups = [];
+    companyGroups.forEach( ( companyGroup ) => {
+      const index = compactCompanyGroups.findIndex( ( compactCompanyGroup ) => compactCompanyGroup.groupId === companyGroup.group.id );
+      if ( index === -1 ) {
+        compactCompanyGroups.push( {
+          groupId: companyGroup.group.id,
+          companyIds: [ companyGroup.company.id ]
+        } );
+      } else {
+        compactCompanyGroups[ index ].companyIds.push( companyGroup.company.id );
+      }
+    } )
+    groups.filter( ( group ) => group.id > -1 )
+      .forEach( ( group ) => {
+        if ( !compactCompanyGroups.some( ( companyGroup ) => companyGroup.groupId === group.id ) ) {
+          compactCompanyGroups.push( {
+            groupId: group.id,
+            companyIds: []
+          } );
+        }
+      } )
+    return compactCompanyGroups;
+  }
+
+  //TODO: apply rights to everywhere
+  //TODO: load project filters
+  //TODO: project filters no wheel in sidebar
+
   const updateProjectFunc = () => {
     setSaving( true );
 
-    let newDef = {
-      assignedTo: {
-        ...assignedTo,
-        value: assignedTo.value.map( u => u.id )
+    let projectAttributes = {
+      assigned: {
+        ...attributes.assigned,
+        value: attributes.assigned.value.map( user => user.id )
       },
       company: {
-        ...company,
-        value: ( company.value ? company.value.id : null )
+        ...attributes.company,
+        value: attributes.company.value ? attributes.company.value.id : null,
+      },
+      deadline: {
+        ...attributes.deadline,
+        value: attributes.deadline.value ? attributes.deadline.value.valueOf()
+          .toString() : null,
       },
       overtime: {
-        ...overtime,
-        value: overtime.value.value
+        ...attributes.overtime,
+        value: attributes.overtime.value ? attributes.overtime.value.value : null,
       },
       pausal: {
-        ...pausal,
-        value: pausal.value.value
+        ...attributes.pausal,
+        value: attributes.pausal.value ? attributes.pausal.value.value : null,
       },
       requester: {
-        ...requester,
-        value: ( requester.value ? requester.value.id : null )
+        ...attributes.requester,
+        value: ( attributes.requester.value ? attributes.requester.value.id : null )
       },
-      type: {
-        ...type,
-        value: ( type.value ? type.value.id : null )
+      startsAt: {
+        ...attributes.startsAt,
+        value: attributes.startsAt.value ? attributes.startsAt.value.valueOf()
+          .toString() : null,
       },
       status: {
-        ...status,
-        value: ( status.value ? status.value.id : null )
+        ...attributes.status,
+        value: ( attributes.status.value ? attributes.status.value.id : null )
       },
-      tag: {
-        ...defTag,
-        value: defTag.value.map( u => u.id )
+      tags: {
+        ...attributes.tags,
+        value: attributes.tags.value.map( tag => tag.id )
+      },
+      taskType: {
+        ...attributes.taskType,
+        value: ( attributes.taskType.value ? attributes.taskType.value.id : null )
       },
     }
     updateProject( {
@@ -473,29 +494,62 @@ export default function ProjectEdit( props ) {
           autoApproved,
           hideApproved,
           archived,
-          def: newDef,
+          projectAttributes,
           addTags,
           updateTags,
           deleteTags,
           deleteStatuses,
           updateStatuses,
           addStatuses,
-          ...filterGroupChanges(),
+          addFilters,
+          updateFilters,
+          deleteFilters,
           userGroups: compactUserGroups(),
+          companyGroups: compactCompanyGroups(),
+          ...filterGroupChanges(),
         }
       } )
       .then( ( response ) => {
+        return;
         setAddTags( [] );
         setUpdateTags( [] );
         setDeleteTags( [] );
         if ( closeModal ) {
-          const myUserGroup = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
-          const myRights = myUserGroup === undefined ? backendCleanRights() : remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup.group.id ) )
+          let myUserGroup1 = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
+          let myUserGroup2 = companyGroups.find( ( companyGroup ) => companyGroup.company.id === currentUser.company.id );
+          let myRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
             .rights;
-          if ( myUserGroup ) {
-            closeModal( response.data.updateProject, myRights );
+          let myAttributeRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
+            .attributeRights;
+          if ( myUserGroup1 !== undefined && myUserGroup2 !== undefined ) {
+            myRights = mergeGroupRights(
+              remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+              .rights,
+              remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+              .rights
+            );
+            myAttributeRights = mergeGroupAttributeRights(
+              remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+              .attributeRights,
+              remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+              .attributeRights
+            );
+          } else if ( myUserGroup1 !== undefined ) {
+            myRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+              .rights;
+            myAttributeRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+              .attributeRights;
+          } else if ( myUserGroup2 !== undefined ) {
+            myRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+              .rights;
+            myAttributeRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+              .attributeRights;
+          }
+
+          if ( myUserGroup1 || myUserGroup2 ) {
+            closeModal( response.data.updateProject, myRights, myAttributeRights );
           } else {
-            closeModal( null, null );
+            closeModal( null, null, null );
           }
         }
       } )
@@ -530,26 +584,9 @@ export default function ProjectEdit( props ) {
     }
   };
 
-  const doesDefHasValue = () => {
-    return (
-      [
-        type,
-      ].every( ( defAttr ) => !defAttr.required || defAttr.value !== null ) && [
-        defTag,
-        //assignedTo,
-      ].every( ( defAttr ) => !defAttr.required || defAttr.value.length !== 0 )
-    )
+  const fixedNotDef = () => {
+    return [ 'deadline', 'overtime', 'pausal', 'startsAt', 'status', 'taskType' ].some( ( attr ) => attributes[ attr ].fixed && attributes[ attr ].value === null );
   }
-
-  const addTaskIssue = groups.filter( ( group ) => group.rights.addTasks )
-    .some( ( group ) => (
-      ( !group.rights.status.write && !status.def ) ||
-      ( !group.rights.tags.write && !defTag.def && defTag.required ) ||
-      //( !group.rights.assigned.write && !assignedTo.def ) ||
-      ( !group.rights.requester.write && !requester.def && requester.required ) ||
-      ( !group.rights.type.write && !type.def && type.required ) ||
-      ( !group.rights.company.write && !company.def )
-    ) )
 
   const addAttachments = ( attachments ) => {
     const formData = new FormData();
@@ -622,10 +659,7 @@ export default function ProjectEdit( props ) {
   const cannotSave = (
     saving ||
     title === "" ||
-    !doesDefHasValue() ||
-    ( company && company.value === null && company.fixed ) ||
-    ( status && status.value === null && status.fixed ) ||
-    ( assignedTo && assignedTo.value.length === 0 && assignedTo.fixed ) ||
+    fixedNotDef() ||
     addTags.some( ( tag ) => (
       tag.title.length === 0 ||
       !tag.color.includes( '#' ) ||
@@ -641,15 +675,21 @@ export default function ProjectEdit( props ) {
     !getAllStatuses()
     .some( ( status ) => status.action === 'CloseDate' ) ||
     !groups.some( ( group ) => (
-      group.rights.projectPrimary.read &&
-      group.rights.projectPrimary.write &&
-      group.rights.projectSecondary &&
-      userGroups.some( ( userGroup ) => userGroup.group.id === group.id )
+      group.rights.projectRead &&
+      group.rights.projectWrite &&
+      (
+        userGroups.some( ( userGroup ) => userGroup.group.id === group.id ) ||
+        companyGroups.some( ( companyGroup ) => companyGroup.group.id === group.id )
+      )
     ) ) ||
-    addTaskIssue
+    getAllFilters()
+    .some( ( filter ) => filter.active && getGroupsProblematicAttributes( groups, filter )
+      .length !== 0 )
   )
+
   const myRights = currentUser.role.accessRights.projects ?
-    backendCleanRights( true ) :
+    projectData.project.groups.find( ( group ) => group.def && group.admin )
+    .rights :
     projectData.project.groups.find( ( group ) => group.users.some( ( user ) => user.id === currentUser.id ) )
     .rights;
   const allTags = getAllTags();
@@ -658,7 +698,7 @@ export default function ProjectEdit( props ) {
   const renderAttachments = () => {
     return (
       <Attachments
-        disabled={myRights.projectPrimaryWrite}
+        disabled={!myRights.projectWrite}
         projectId={id}
         type="project"
         top={false}
@@ -671,7 +711,7 @@ export default function ProjectEdit( props ) {
 
   const renderDescription = () => {
     let RenderDescription = null;
-    if ( !myRights.projectPrimaryWrite ) {
+    if ( !myRights.projectWrite ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
@@ -713,7 +753,7 @@ export default function ProjectEdit( props ) {
           <Label>
             Popis
           </Label>
-          { myRights.projectPrimaryWrite &&
+          { myRights.projectWrite &&
             <button
               className="btn-link btn-distance m-l-5"
               style={{height: "20px"}}
@@ -725,7 +765,7 @@ export default function ProjectEdit( props ) {
               { !editingDescription ? 'edit' : 'save' }
             </button>
           }
-          { myRights.projectPrimaryWrite &&
+          { myRights.projectWrite &&
             <label htmlFor={`upload-project-attachment-${id}`} className="btn-link btn-distance m-l-0 clickable" >
               <i className="fa fa-plus" />
               Attachment
@@ -763,7 +803,7 @@ export default function ProjectEdit( props ) {
               Description
             </NavLink>
           </NavItem>
-          { myRights.projectSecondary &&
+          { myRights.projectWrite &&
             <Empty>
               <NavItem>
                 <NavLink>
@@ -837,8 +877,8 @@ export default function ProjectEdit( props ) {
               </NavItem>
               <NavItem>
                 <NavLink
-                  className={classnames({ active: openedTab === 'def' }, "clickable", "")}
-                  onClick={() => setOpenedTab('def') }
+                  className={classnames({ active: openedTab === 'attributes' }, "clickable", "")}
+                  onClick={() => setOpenedTab('attributes') }
                   >
                   Attributes
                 </NavLink>
@@ -876,12 +916,12 @@ export default function ProjectEdit( props ) {
         <TabContent activeTab={openedTab}>
 
           <TabPane tabId={'description'}>
-            { myRights.projectPrimaryRead &&
+            { myRights.projectRead &&
               <Empty>
                 <FormGroup className="m-b-25">
                   <Label for="name">Project name <span className="warning-big">*</span></Label>
                   <Input
-                    disabled={!myRights.projectPrimaryWrite}
+                    disabled={!myRights.projectWrite}
                     type="text"
                     className="medium-input m-t-15"
                     id="name"
@@ -898,6 +938,7 @@ export default function ProjectEdit( props ) {
 
                 <Switch
                   value={archived}
+                  disabled={!myRights.projectWrite}
                   onChange={() => {
                     setArchived(!archived)
                     setDataChanged( true );
@@ -906,35 +947,40 @@ export default function ProjectEdit( props ) {
                   labelClassName="text-normal font-normal"
                   simpleSwitch
                   />
-                <FormGroup tag="fieldset" className="bkg-white" onChange={() => {
+                <Radio
+                  options={ [
+                    {
+                      key: 'autoApprovedOn',
+                      value: autoApproved,
+                      label: 'Invoice On',
+                    },
+                    {
+                      key: 'autoApprovedOff',
+                      value: !autoApproved,
+                      label: 'Invoice Off',
+                    },
+                  ] }
+                  name="autoApproved"
+                  disabled={ !myRights.projectWrite }
+                  onChange={ () => {
                     setAutoApproved(!autoApproved);
                     setDataChanged( true );
-                  }}>
-                    <FormGroup check className="p-b-10 p-t-10 clickable">
-                      <Input type="radio" checked={autoApproved} onChange={ () => {} } className="center-hor" name="autoApproved" id="autoApprovedOn" />
-                      <Label check className="center-hor m-l-5 clickable noselect" htmlFor="autoApprovedOn" >
-                        Invoice On
-                      </Label>
-                    </FormGroup>
-                    <FormGroup check className="p-b-10 p-t-10 clickable">
-                      <Input type="radio" checked={!autoApproved} onChange={ () => {} } className="center-hor" name="autoApproved"  id="autoApprovedOff" />
-                      <Label check className="center-hor m-l-5 clickable noselect" htmlFor="autoApprovedOff" >
-                        Invoice Off
-                      </Label>
-                    </FormGroup>
-                  </FormGroup>
-                  <Switch
-                    value={hideApproved}
-                    onChange={() => {
-                      setHideApproved(!hideApproved);
-                      setDataChanged( true );
-                    }}
-                    label="Don't show invoice"
-                    labelClassName="text-normal font-normal"
-                    simpleSwitch
-                    />
+                  } }
+                  />
 
-                { myRights.projectPrimaryWrite &&
+                <Switch
+                  value={hideApproved}
+                  onChange={() => {
+                    setHideApproved(!hideApproved);
+                    setDataChanged( true );
+                  }}
+                  disabled={!myRights.projectWrite}
+                  label="Don't show invoice"
+                  labelClassName="text-normal font-normal"
+                  simpleSwitch
+                  />
+
+                { myRights.projectWrite &&
                   <button className="btn btn-full-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
                     DELETE PROJECT
                   </button>
@@ -942,7 +988,7 @@ export default function ProjectEdit( props ) {
               </Empty>
             }
           </TabPane>
-          { myRights.projectSecondary &&
+          { myRights.projectWrite &&
             <Empty>
               <TabPane tabId={'statuses'}>
                 <Statuses
@@ -1020,7 +1066,7 @@ export default function ProjectEdit( props ) {
                 <Groups
                   groups={groups}
                   addGroup={(newGroup) => {
-                    setGroups([...groups, { ...newGroup, attributeRights }]);
+                    setGroups([...groups, newGroup ]);
                     setDataChanged( true );
                   }}
                   updateGroup={(newGroup) => {
@@ -1033,11 +1079,17 @@ export default function ProjectEdit( props ) {
                       userGroup :
                       ({...userGroup, group: {...userGroup.group,...newGroup}})
                     ) ));
+                    setCompanyGroups(companyGroups.map((companyGroup) => (
+                      (companyGroup.group.id !== newGroup.id) ?
+                      companyGroup :
+                      ({...companyGroup, group: {...companyGroup.group,...newGroup}})
+                    ) ));
                     setDataChanged( true );
                   }}
                   deleteGroup={(id) => {
                     setGroups( groups.filter((group) => group.id !== id ) );
                     setUserGroups( userGroups.filter((userGroup) => userGroup.group.id !== id ) );
+                    setCompanyGroups( companyGroups.filter((companyGroup) => companyGroup.group.id !== id ) );
                     setDataChanged( true );
                   }}
                   />
@@ -1056,6 +1108,13 @@ export default function ProjectEdit( props ) {
                         return userGroup;
                       }
                     } ));
+                    setCompanyGroups(companyGroups.map((companyGroup) => {
+                      if(companyGroup.group.id === groupID){
+                        return {...companyGroup, group: toSelItem(newGroups[index])  }
+                      }else{
+                        return companyGroup;
+                      }
+                    } ));
                     setGroups(newGroups);
                     setDataChanged( true );
                   }}
@@ -1064,49 +1123,49 @@ export default function ProjectEdit( props ) {
               <TabPane tabId={'users'}>
                 <Users
                   users={(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))}
-                  permissions={ userGroups }
-                  disabled={ !myRights.projectSecondary }
+                  userGroups={ userGroups }
+                  companies={ companiesLoading ? [] : toSelArr( companiesData.basicCompanies ) }
+                  companyGroups={ companyGroups }
                   groups={ toSelArr(groups) }
                   lockedRequester={ lockedRequester }
                   setLockedRequester={(lockedRequester) => {
                     setLockedRequester(lockedRequester);
                     setDataChanged( true );
                   }}
-                  addRight={ (userGroup) => {
+                  addUserRight={ (userGroup) => {
                     setUserGroups([...userGroups, userGroup]);
                     setDataChanged( true );
                   }}
-                  deleteRight={ (userGroup) => {
+                  deleteUserRight={ (userGroup) => {
                     setUserGroups(userGroups.filter((oldGroup) => oldGroup.user.id !== userGroup.user.id ));
                     setDataChanged( true );
                   }}
-                  updateRight={ (userGroup) => {
+                  updateUserRight={ (userGroup) => {
                     let newUserGroups = [...userGroups];
                     let index = newUserGroups.findIndex((userG) => userG.user.id === userGroup.user.id );
                     newUserGroups[index] = { ...newUserGroups[index], ...userGroup }
                     setUserGroups(newUserGroups);
                     setDataChanged( true );
                   }}
+                  addCompanyRight={ (companyGroup) => {
+                    setCompanyGroups([...companyGroups, companyGroup]);
+                    setDataChanged( true );
+                  }}
+                  deleteCompanyRight={ (companyGroup) => {
+                    setCompanyGroups(companyGroups.filter((oldGroup) => oldGroup.company.id !== companyGroup.company.id ));
+                    setDataChanged( true );
+                  }}
+                  updateCompanyRight={ (companyGroup) => {
+                    let newCompanyGroups = [...companyGroups];
+                    let index = newCompanyGroups.findIndex((companyG) => companyG.company.id === companyGroup.company.id );
+                    newCompanyGroups[index] = { ...newCompanyGroups[index], ...companyGroup }
+                    setCompanyGroups(newCompanyGroups);
+                    setDataChanged( true );
+                  }}
                   />
               </TabPane>
-              <TabPane tabId={'def'}>
+              <TabPane tabId={'attributes'}>
                 <Attributes
-                  assignedTo={assignedTo}
-                  setAssignedTo={(value) => {setAssignedTo(value); setDataChanged(true);}}
-                  company={company}
-                  setCompany={(value) => {setCompany(value); setDataChanged(true);}}
-                  overtime={overtime}
-                  setOvertime={(value) => {setOvertime(value); setDataChanged(true);}}
-                  pausal={pausal}
-                  setPausal={(value) => {setPausal(value); setDataChanged(true);}}
-                  requester={requester}
-                  setRequester={(value) => {setRequester(value); setDataChanged(true);}}
-                  type={type}
-                  setType={(value) => {setType(value); setDataChanged(true);}}
-                  status={status}
-                  setStatus={(value) => {setStatus(value); setDataChanged(true);}}
-                  tag={defTag}
-                  setTag={(value) => {setDefTag(value); setDataChanged(true);}}
                   statuses={toSelArr(allStatuses)}
                   companies={(companiesLoading ? [] : toSelArr(companiesData.basicCompanies))}
                   users={
@@ -1114,14 +1173,14 @@ export default function ProjectEdit( props ) {
                     userGroups.map( (userGroup) => userGroup.user ) :
                     (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
                   }
-                  assignableUsers={userGroups.filter((userGroup) => userGroup.group.rights.assigned.write ).map( (userGroup) => userGroup.user )}
+                  assignableUsers={[
+                    ...userGroups.filter((userGroup) => userGroup.group.attributeRights.assigned.write ).map( (userGroup) => userGroup.user ),
+                    ...companyGroups.reduce((acc, companyGroup) => {
+                      return [...acc, ...(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email')).filter((user) => user.company.id === companyGroup.company.id ) ]
+                    },[])
+                  ]}
                   allTags={toSelArr(allTags)}
                   taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
-                  autoApproved={autoApproved}
-                  setAutoApproved={(autoApproved) => {
-                    setAutoApproved(autoApproved)
-                    setDataChanged( true );
-                  }}
                   groups={groups}
                   setGroups={setGroups}
                   attributes={attributes}
@@ -1153,34 +1212,44 @@ export default function ProjectEdit( props ) {
                 <ProjectFilters
                   groups={groups}
                   statuses={allStatuses}
-                  projectFilters={projectFilters}
-                  setProjectFilters={setProjectFilters}
+                  filters={getAllFilters()}
+                  addFilter={(newFilter) => {
+                    setAddFilters([ ...addFilters, {...newFilter, id: fakeID -- } ]);
+                    setDataChanged( true );
+                  }}
+                  deleteFilter={(id) => {
+                    if(id > -1){
+                      setUpdateFilters(updateFilters.filter((filter) => filter.id !== id ));
+                      setDeleteFilters([ ...deleteFilters, id ]);
+                    }else{
+                      setAddFilters(addFilters.filter((filter) => filter.id !== id ));
+                    }
+                    setDataChanged( true );
+                  }}
+                  updateFilter={(newFilter) => {
+                    if(newFilter.id > -1){
+                      let newFilters = [...updateFilters];
+                      let index = newFilters.findIndex((filter) => filter.id === newFilter.id );
+                      if(index === -1){
+                        newFilters = newFilters.concat(newFilter);
+                      }else{
+                        newFilters[index] = { ...newFilters[index], ...newFilter }
+                      }
+                      setUpdateFilters(newFilters);
+                    }else{
+                      let newFilters = [...addFilters];
+                      let index = newFilters.findIndex((filter) => filter.id === newFilter.id );
+                      newFilters[index] = { ...newFilters[index], ...newFilter }
+                      setAddFilters(newFilters);
+                    }
+                    setDataChanged( true );
+                  }}
                   />
               </TabPane>
             </Empty>
           }
         </TabContent>
 
-        { (( company.value === null && company.fixed) || ( status.value === null && status.fixed) || ( assignedTo.value.length === 0 && assignedTo.fixed)) &&
-          <div className="red" style={{color:'red'}}>
-            Status, assigned to and company can't be empty if they are fixed!
-          </div>
-        }
-        { addTaskErrors && addTaskIssue &&
-          <ACLErrors
-            {
-              ...{
-                groups,
-                status,
-                defTag,
-                assignedTo,
-                requester,
-                type,
-                company
-              }
-            }
-            />
-        }
         <div className="form-buttons-row">
           { !numberOfTasksLoading && !numberOfTasksError &&
             <div className="ml-auto center-hor p-r-5">
@@ -1188,7 +1257,7 @@ export default function ProjectEdit( props ) {
             </div>
           }
 
-          { (myRights.projectPrimaryWrite || myRights.projectSecondary) &&
+          { myRights.projectWrite &&
             <button
               className={classnames(
                 {
@@ -1196,10 +1265,10 @@ export default function ProjectEdit( props ) {
                 }
                 ,"btn"
               )}
-              disabled={addTaskErrors && cannotSave}
+              disabled={showProjectErrors && cannotSave}
               onClick={() => {
                 if(cannotSave){
-                  setAddTaskErrors(true);
+                  setShowProjectErrors(true);
                   return;
                 }else{
                   updateProjectFunc();
@@ -1210,6 +1279,17 @@ export default function ProjectEdit( props ) {
             </button>
           }
         </div>
+        { showProjectErrors &&
+          <ProjectErrorDisplay
+            attributes={attributes}
+            title={title}
+            allTags={getAllTags()}
+            allStatuses={getAllStatuses()}
+            groups={groups}
+            userGroups={userGroups}
+            filters={getAllFilters()}
+            />
+        }
         <DeleteReplacement
           isOpen={deleteOpen}
           label="project"
