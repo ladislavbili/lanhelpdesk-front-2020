@@ -36,6 +36,8 @@ export default function Statuses( props ) {
   const [ color, setColor ] = React.useState( defaultTagColor );
   const [ editColorID, setEditColorID ] = React.useState( null );
 
+  const firstNewStatus = statuses.find( ( status ) => status.action === 'IsNew' );
+  const firstNewStatusId = firstNewStatus ? firstNewStatus.id : null;
   return (
     <div>
       <table className="table m-t-10 vykazyTable">
@@ -82,6 +84,7 @@ export default function Statuses( props ) {
                   styles={pickSelectStyle()}
                   options={actions}
                   value={actions.find((action) => action.value === status.action )}
+                  isDisabled={status.id === firstNewStatusId}
                   onChange={e => updateStatus({ id: status.id, action: e.value }) }
                   />
               </td>
@@ -106,26 +109,28 @@ export default function Statuses( props ) {
                       color={status.color}
                       onChangeComplete={value => updateStatus({ id: status.id, color: value.hex })}
                       />
-                      <div className="p-t-5 row">
-                        <button
-                          className="btn-link-cancel btn-distance"
-                          onClick={() => {
-                            setEditColorID(null);
-                          }}
-                          >
-                          Close
-                        </button>
-                      </div>
+                    <div className="p-t-5 row">
+                      <button
+                        className="btn-link-cancel btn-distance"
+                        onClick={() => {
+                          setEditColorID(null);
+                        }}
+                        >
+                        Close
+                      </button>
+                    </div>
                   </PopoverBody>
                 </Popover>
               </td>
               <td>
-                <button
-                  className="btn m-r-5"
-                  onClick={() => deleteStatus(status.id) }
-                  >
-                  <i className="fa fa-times" />
-                </button>
+                { status.id !== firstNewStatusId &&
+                  <button
+                    className="btn m-r-5"
+                    onClick={() => deleteStatus(status.id) }
+                    >
+                    <i className="fa fa-times" />
+                  </button>
+                }
               </td>
             </tr>
           ) }
@@ -183,16 +188,16 @@ export default function Statuses( props ) {
                     color={color}
                     onChangeComplete={value => setColor( value.hex )}
                     />
-                    <div className="p-t-5 row">
-                      <button
-                        className="btn-link-cancel btn-distance"
-                        onClick={() => {
-                          setEditColorID(null);
-                        }}
-                        >
-                        Close
-                      </button>
-                    </div>
+                  <div className="p-t-5 row">
+                    <button
+                      className="btn-link-cancel btn-distance"
+                      onClick={() => {
+                        setEditColorID(null);
+                      }}
+                      >
+                      Close
+                    </button>
+                  </div>
                 </PopoverBody>
               </Popover>
             </td>

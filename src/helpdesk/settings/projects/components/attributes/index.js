@@ -50,7 +50,11 @@ export default function ProjectAttributes( props ) {
         defEmptyValue={emptyStatus}
         attribute={ attributes.status }
         onChangeAttribute={(value) => {
-          setAttributes( { ...attributes, status: value } )
+          if(!attributes.status.fixed && value.fixed && value.value === null ){
+            setAttributes( { ...attributes, status: {...value, value: statuses.find((status) => status.action === 'IsNew' ) } } )
+          }else{
+            setAttributes( { ...attributes, status: value } )
+          }
         } }
         onChangeRight={(roles) => setGroups(roles) }
         />

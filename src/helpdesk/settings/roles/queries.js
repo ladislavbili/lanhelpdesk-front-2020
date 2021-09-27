@@ -4,8 +4,6 @@ import {
 
 export const accessRights = `
   login
-  testSections
-  vykazy
   publicFilters
   addProjects
   viewErrors

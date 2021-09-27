@@ -47,7 +47,7 @@ export default function CompaniesList( props ) {
     return ( <SettingLoading match={match} /> );
   }
 
-  const companies = companiesData.companies;
+  const companies = companiesData.companies.filter( ( company ) => !company.def );
 
   const CompanySort = (
     <div className="d-flex flex-row align-items-center ml-auto">

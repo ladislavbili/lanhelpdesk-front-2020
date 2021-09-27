@@ -13,6 +13,7 @@ import {
 import Loading from 'components/loading';
 import Select from 'react-select';
 import Checkbox from 'components/checkbox';
+import Switch from "components/switch";
 import PasswordChange from './passChange';
 import SettingsInput from '../components/settingsInput';
 
@@ -158,6 +159,9 @@ export default function UserEdit( props ) {
       companyId: company.id,
       language: language.value,
     }
+    if ( active !== userData.user.active ) {
+      deactivateUser( active );
+    }
     if ( password !== null && password.length >= 6 ) {
       data.password = password;
     }
@@ -190,14 +194,13 @@ export default function UserEdit( props ) {
     }
   };
 
-  const deactivateUser = ( active ) => {
+  const deactivateUser = () => {
     setUserActive( {
       variables: {
         id,
-        active: !active
+        active
       }
     } );
-    setActive( !active );
   }
 
   const dataLoading = ( userLoading || rolesLoading || companiesLoading || !currentUser );
@@ -219,6 +222,18 @@ export default function UserEdit( props ) {
       <h2 className="m-b-20" >
         Edit user
       </h2>
+
+      <Switch
+        value={active}
+        onChange={() => {
+          setActive(!active);
+          setDataChanged( true );
+        }}
+        label="Active"
+        disabled={id === currentUser.id}
+        labelClassName="text-normal font-normal"
+        simpleSwitch
+        />
 
       <FormGroup>
         <Label for="role">Role <span className="warning-big">*</span></Label>
@@ -344,15 +359,6 @@ export default function UserEdit( props ) {
               onClick={deleteUserFunc}
               >
               Delete
-            </button>
-          }
-
-          { id !== currentUser.id &&
-            <button
-              className={ active ? "btn btn-grey btn-distance" : "btn btn-green btn-distance"}
-              onClick={() => deactivateUser(active)}
-              >
-              {active ? 'Deactivate user' : 'Activate user'}
             </button>
           }
 

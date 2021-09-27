@@ -170,10 +170,11 @@ export default function ProjectEdit( props ) {
 
     //ATTRIBUTES
     const attributes = project.projectAttributes;
-    let tagsIds = attributes.tags.value.map( v => v.id );
-    let users = toSelArr( usersData.basicUsers, 'email' );
-    let companies = toSelArr( companiesData.basicCompanies );
-    let taskTypes = toSelArr( taskTypesData.taskTypes );
+    const tagsIds = attributes.tags.value.map( v => v.id );
+    const users = toSelArr( usersData.basicUsers, 'email' );
+    const companies = toSelArr( companiesData.basicCompanies );
+    const taskTypes = toSelArr( taskTypesData.taskTypes );
+    const statuses = toSelArr( project.statuses );
     setAttributes( {
       assigned: {
         fixed: attributes.assigned.fixed,
@@ -181,7 +182,7 @@ export default function ProjectEdit( props ) {
       },
       company: {
         fixed: attributes.company.fixed,
-        value: ( attributes.company.value ? companies.find( company => company.id === attributes.company.value ) : null ),
+        value: ( attributes.company.value ? companies.find( company => company.id === attributes.company.value.id ) : null ),
       },
       deadline: {
         fixed: attributes.deadline.fixed,
@@ -198,7 +199,7 @@ export default function ProjectEdit( props ) {
       requester: {
         fixed: attributes.requester.fixed,
         value: attributes.requester.value,
-        value: attributes.requester.value ? users.find( user => user.id === attributes.requester.value ) : null,
+        value: attributes.requester.value ? users.find( user => user.id === attributes.requester.value.id ) : null,
       },
       startsAt: {
         fixed: attributes.startsAt.fixed,
@@ -206,7 +207,7 @@ export default function ProjectEdit( props ) {
       },
       status: {
         fixed: attributes.status.fixed,
-        value: attributes.status.value ? project.statuses.find( status => status.id === attributes.status.value ) : null,
+        value: attributes.status.value ? statuses.find( status => status.id === attributes.status.value.id ) : null,
       },
       tags: {
         fixed: attributes.tags.fixed,
@@ -216,7 +217,7 @@ export default function ProjectEdit( props ) {
       taskType: {
         fixed: attributes.taskType.fixed,
         value: attributes.taskType.value,
-        value: ( attributes.taskType.value ? taskTypes.find( type => type.id === attributes.taskType.value ) : null ),
+        value: ( attributes.taskType.value ? taskTypes.find( type => type.id === attributes.taskType.value.id ) : null ),
       },
     } )
     setDataChanged( false );

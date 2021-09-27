@@ -124,7 +124,7 @@ export default function TaskAdd( props ) {
   const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
-  const [ actionAfterAdd, setActionAfterAdd ] = React.useState( actionsAfterAdd.find( ( action ) => action.id === afterTaskCreate ) );
+  const [ actionAfterAdd, setActionAfterAdd ] = React.useState( actionsAfterAdd.find( ( action ) => action.action === 'open_tasklist' ) );
   const [ showLocalCreationError, setShowLocalCreationError ] = React.useState( false );
 
   const userRights = (
@@ -403,7 +403,7 @@ export default function TaskAdd( props ) {
             repeatInterval: repeat.repeatInterval.value,
             startsAt: repeat.startsAt.valueOf()
               .toString(),
-            repeatEvery: repeat.repeatEvery.toString()
+            repeatEvery: parseInt( repeat.repeatEvery )
           } : null,
           subtasks: subtasks.map( item => ( {
             title: item.title,
@@ -656,7 +656,7 @@ export default function TaskAdd( props ) {
     Status: (
       <div>
         { (projectAttributes.status.fixed || !userRights.attributeRights.status.add) &&
-          <div className="disabled-info">{status ? status.label : "None"}</div>
+          <div className={`disabled-info`} style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }>{status ? status.label : "None"}</div>
         }
         { !projectAttributes.status.fixed && userRights.attributeRights.status.add &&
           <Select
@@ -762,7 +762,6 @@ export default function TaskAdd( props ) {
           <DatePicker
             className={classnames("form-control")}
             selected={deadline}
-            disabled={!userRights.deadlineWrite}
             onChange={date => setDeadline( isNaN(date.valueOf()) ? null : date )}
             hideTime
             isClearable
@@ -1344,17 +1343,6 @@ export default function TaskAdd( props ) {
         }
         <div className="pull-right row">
           {showLocalCreationErrorFunc()}
-          <div style={{ width: 100 }} className="m-r-5">
-            <Select
-              placeholder="Vyberte akciu"
-              value={actionAfterAdd}
-              onChange={(actionAfterAdd)=>{
-                setActionAfterAdd(actionAfterAdd);
-              }}
-              options={ actionsAfterAdd }
-              styles={pickSelectStyle( [ 'invisible' ] )}
-              />
-          </div>
           <button
             className="btn"
             onClick={() => {

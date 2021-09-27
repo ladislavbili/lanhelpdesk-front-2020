@@ -14,7 +14,7 @@ import {
   getEmptyAttributeRights,
 } from 'configs/constants/projects';
 
-export default function ProjectGroups( props ) {
+export default function ProjectGroupAdd( props ) {
   //props
   const {
     submit,

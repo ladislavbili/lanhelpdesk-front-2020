@@ -11,7 +11,7 @@ import {
   defaultGroups,
 } from 'configs/constants/projects';
 
-export default function ProjectGroups( props ) {
+export default function ProjectGroupEdit( props ) {
   //props
   const {
     open,

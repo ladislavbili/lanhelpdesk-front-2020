@@ -438,7 +438,7 @@ export default function CompanyEdit( props ) {
         >
 
         <h2 className="m-b-20" >
-          Edit company
+          {companyData.company.def ? "Edit Helpdesk Company" : "Edit company"}
         </h2>
 
         <Nav tabs className="no-border m-b-25">

@@ -23,8 +23,12 @@ import {
 
 export default function RepeatList( props ) {
   // state
-  const [ repeatFilter, setRepeatFilter ] = React.useState( "" );
   const [ openRepeat, setOpenRepeat ] = React.useState( null );
+
+  const [ statusFilter, setStatusFilter ] = React.useState( '' );
+  const [ repeatTemplateFilter, setRepeatTemplateFilter ] = React.useState( '' );
+  const [ repeatingFilter, setRepeatingFilter ] = React.useState( '' );
+  const [ projectFilter, setProjectFilter ] = React.useState( '' );
 
   //data
   const {
@@ -57,6 +61,29 @@ export default function RepeatList( props ) {
     return ( <Loading /> )
   }
 
+  const filterForRepeats = ( repeat ) => {
+    return (
+      (
+        repeat.repeatTemplate.status ?
+        repeat.repeatTemplate.status.title :
+        "No status"
+      )
+      .toLowerCase()
+      .includes( statusFilter.toLowerCase() ) &&
+
+      repeat.repeatTemplate.title.toLowerCase()
+      .includes( repeatTemplateFilter.toLowerCase() ) &&
+
+      ( "Opakovať každý " + repeat.repeatEvery + ' ' + intervals.find( ( interval ) => interval.value === repeat.repeatInterval )
+        .title )
+      .toLowerCase()
+      .includes( repeatingFilter.toLowerCase() ) &&
+
+      repeat.repeatTemplate.project.title.toLowerCase()
+      .includes( projectFilter.toLowerCase() )
+    );
+  }
+
   /*  */
   return (
     <div className="content-page">
@@ -68,7 +95,7 @@ export default function RepeatList( props ) {
               <div className="breadcrum-bar center-hor">
                 <div className="breadcrumbs">
                   <h2>
-                    Repeats
+                    Repetitive tasks
                   </h2>
                 </div>
               </div>
@@ -76,42 +103,63 @@ export default function RepeatList( props ) {
 
             <div className="full-width scroll-visible fit-with-header-and-commandbar-list task-container">
 
-              <div className={classnames("d-flex", "h-60", "flex-row")}>
-                <div
-                  className={classnames(
-                    "m-l-30",
-                    "search-row",
-                  )}
-                  >
-                  <div className="search">
-                    <button className="search-btn" type="button">
-                      <i className="fa fa-search flip" />
-                    </button>
-                    <input
-                      type="text"
-                      className="form-control search-text"
-                      value={repeatFilter}
-                      onChange={(e)=>setRepeatFilter(e.target.value)}
-                      placeholder="Search"
-                      />
-                  </div>
-                </div>
-              </div>
-
               <table className = "table" >
                 <thead>
                   <tr>
                     <th width="5%">Status</th>
                     <th>Title</th>
-                    <th >Repeat timing</th>
-                    <th >Project</th>
+                    <th>Repeat timing</th>
+                    <th>Project</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {
-                    repeatsData.repeats.filter( ( repeat ) => repeat.repeatTemplate.title.toLowerCase()
-                    .includes( repeatFilter.toLowerCase() ) )
-                    .map( ( repeat ) =>
+                  <tr>
+                    <th width="5%">
+                      <input
+                        type="text"
+                        value={ statusFilter }
+                        className="form-control"
+                        style={{fontSize: "12px", marginRight: "10px"}}
+                        onChange={(e) => {
+                          setStatusFilter(e.target.value);
+                        }}
+                        />
+                    </th>
+                    <th>
+                      <input
+                        type="text"
+                        value={ repeatTemplateFilter }
+                        className="form-control"
+                        style={{fontSize: "12px", marginRight: "10px"}}
+                        onChange={(e) => {
+                          setRepeatTemplateFilter(e.target.value);
+                        }}
+                        />
+                    </th>
+                    <th >
+                      <input
+                        type="text"
+                        value={ repeatingFilter }
+                        className="form-control"
+                        style={{fontSize: "12px", marginRight: "10px"}}
+                        onChange={(e) => {
+                          setRepeatingFilter(e.target.value);
+                        }}
+                        />
+                    </th>
+                    <th >
+                      <input
+                        type="text"
+                        value={ projectFilter }
+                        className="form-control"
+                        style={{fontSize: "12px", marginRight: "10px"}}
+                        onChange={(e) => {
+                          setProjectFilter(e.target.value);
+                        }}
+                        />
+                    </th>
+                  </tr>
+                  { repeatsData.repeats.filter( filterForRepeats ).map( ( repeat ) =>
                     <tr key={repeat.id}
                       className="clickable"
                       onClick={()=>{ setOpenRepeat(repeat) }}

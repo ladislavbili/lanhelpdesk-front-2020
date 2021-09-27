@@ -58,6 +58,7 @@ query {
     title
     id
     monthly
+    def
   }
 }
 `;

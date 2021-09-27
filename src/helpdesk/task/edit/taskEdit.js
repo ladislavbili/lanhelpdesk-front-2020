@@ -952,7 +952,7 @@ export default function TaskEdit( props ) {
     Status: (
       <div>
         { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit) &&
-          <div className="disabled-info">{status ? status.label : "None"}</div>
+          <div className={`disabled-info`} style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }>{status ? status.label : "None"}</div>
         }
         { !projectAttributes.status.fixed && userRights.attributeRights.status.edit &&
           <Select

@@ -3,6 +3,8 @@ import React from 'react';
 import {
   FormGroup,
 } from 'reactstrap';
+import UserAdd from './userAdd';
+import CompanyAdd from './companyAdd';
 import Select from "react-select";
 import Checkbox from 'components/checkbox';
 import Radio from 'components/radio';
@@ -56,49 +58,7 @@ export default function ProjectUsers( props ) {
         } }
         />
       {/* USER RIGHTS */}
-      <table className="table m-t-10">
-        <thead>
-          <tr className="font-bold">
-            <th width="50%">Helpdesk system user</th>
-            <th>Project Group</th>
-            <th width="100px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <Select
-                value={chosenUser}
-                styles={pickSelectStyle()}
-                onChange={(e)=> setChosenUser(e)}
-                options={users.filter((user) => !userGroups.map((permission) => permission.user.id).includes(user.id))}
-                />
-            </td>
-            <td>
-              <Select
-                value={userGroup}
-                styles={pickSelectStyle()}
-                onChange={(e)=> setUserGroup(e)}
-                options={groups}
-                />
-            </td>
-            <td>
-              <button
-                className="btn min-width-100"
-                disabled={ chosenUser === null || userGroup === null }
-                onClick={() => {
-                  addUserRight({ user: chosenUser, group: userGroup });
-                  setChosenUser(null);
-                }}
-                >
-                Add
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table className="table bkg-white m-t-10">
+      <table className="table bkg-white m-t-20">
         <thead>
           <tr>
             <th width="50%">Helpdesk system user</th>
@@ -140,49 +100,9 @@ export default function ProjectUsers( props ) {
           )) }
         </tbody>
       </table>
+      <UserAdd submit={addUserRight} users={ users.filter((user) => !userGroups.map((permission) => permission.user.id).includes(user.id)) } groups={groups} />
 
       {/* COMPANY RIGHTS */}
-      <table className="table m-t-10">
-        <thead>
-          <tr className="font-bold">
-            <th width="50%">Company</th>
-            <th>Project Group</th>
-            <th width="100px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <Select
-                value={chosenCompany}
-                styles={pickSelectStyle()}
-                onChange={(e)=> setChosenCompany(e)}
-                options={companies.filter((company) => !companyGroups.map((permission) => permission.company.id).includes(company.id))}
-                />
-            </td>
-            <td>
-              <Select
-                value={companyGroup}
-                styles={pickSelectStyle()}
-                onChange={(e)=> setCompanyGroup(e)}
-                options={groups}
-                />
-            </td>
-            <td>
-              <button
-                className="btn min-width-100"
-                disabled={ chosenCompany === null || companyGroup === null }
-                onClick={() => {
-                  addCompanyRight({ company: chosenCompany, group: companyGroup });
-                  setChosenCompany(null);
-                }}
-                >
-                Add
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
       <table className="table bkg-white m-t-10">
         <thead>
           <tr>
@@ -219,6 +139,7 @@ export default function ProjectUsers( props ) {
           )) }
         </tbody>
       </table>
+      <CompanyAdd submit={addCompanyRight} companies={companies.filter((company) => !companyGroups.map((permission) => permission.company.id).includes(company.id))} groups={groups} />
 
       <div className="m-t-20 m-b-20">
         Helpdesk users with the administrator role have all project rights.

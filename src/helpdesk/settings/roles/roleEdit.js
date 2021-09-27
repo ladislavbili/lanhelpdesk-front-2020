@@ -77,16 +77,6 @@ export default function RoleEdit( props ) {
     },
     {
       state: React.useState( false ),
-      key: 'testSections',
-      label: "Test sections - Navody, CMDB, Hesla, Naklady, Projekty, Monitoring"
-    },
-    {
-      state: React.useState( false ),
-      key: 'vykazy',
-      label: "Výkazy"
-    },
-    {
-      state: React.useState( false ),
       key: 'publicFilters',
       label: "Public Filters"
     },
