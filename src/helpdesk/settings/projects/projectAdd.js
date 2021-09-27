@@ -284,7 +284,7 @@ export default function ProjectAdd( props ) {
         }
       } )
       .then( ( response ) => {
-        return;
+        setSaving( false );
         if ( attachments.length > 0 ) {
           const formData = new FormData();
           attachments.map( ( attachment ) => attachment.data )
@@ -341,9 +341,9 @@ export default function ProjectAdd( props ) {
                 }
               } else {
                 if ( match.path.includes( 'settings' ) ) {
-                  history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
+                  history.push( '/helpdesk/settings/projects/' + response.data.addProject.id + '/description' );
                 } else {
-                  history.push( '/helpdesk/project/' + response.data.addProject.id );
+                  history.push( '/helpdesk/project/' + response.data.addProject.id + '/description' );
                 }
               }
             } )
@@ -394,18 +394,35 @@ export default function ProjectAdd( props ) {
               closeModal( null, null, null );
             }
           } else {
+            let myUserGroup1 = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
+            let myUserGroup2 = companyGroups.find( ( companyGroup ) => companyGroup.company.id === currentUser.company.id );
+            let myRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
+              .rights;
+            if ( myUserGroup1 !== undefined && myUserGroup2 !== undefined ) {
+              myRights = mergeGroupRights(
+                remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                .rights,
+                remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup2.group.id ) )
+                .rights
+              );
+            } else if ( myUserGroup1 !== undefined ) {
+              myRights = remapRightsToBackend( groups.find( ( group ) => group.id === myUserGroup1.group.id ) )
+                .rights;
+            }
             if ( match.path.includes( 'settings' ) ) {
-              history.push( '/helpdesk/settings/projects/' + response.data.addProject.id );
+              history.push( '/helpdesk/settings/projects/' + response.data.addProject.id + '/description' );
+            } else if ( myRights.projectWrite ) {
+              history.push( '/helpdesk/project/' + response.data.addProject.id + '/description' );
             } else {
-              history.push( '/helpdesk/project/' + response.data.addProject.id );
+              history.push( 'helpdesk/taskList/i/all' );
             }
           }
         }
       } )
       .catch( ( err ) => {
+        setSaving( false );
         addLocalError( err );
       } );
-    setSaving( false );
   }
 
   const fixedNotDef = () => {

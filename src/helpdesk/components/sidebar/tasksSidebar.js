@@ -576,7 +576,7 @@ export default function TasksSidebar( props ) {
       usersToRender = localProject.usersWithRights.filter( ( userWithRights ) => userWithRights.assignable );
     } else {
       usersToRender = myProjects
-        .filter( ( myProject ) => myProject.right.assignedRead )
+        .filter( ( myProject ) => myProject.attributeRights.assigned.view )
         .reduce( ( acc, cur ) => {
           const usersToAdd = cur.usersWithRights.filter( ( userWithRights ) => userWithRights.assignable );
           return [ ...acc, ...usersToAdd ]
@@ -826,7 +826,7 @@ export default function TasksSidebar( props ) {
             { renderFilters() }
 
 
-            {  (localProject.id === null || localProject.right.assignedRead) && currentUser.tasklistLayout === 3 && (
+            {  (localProject.id === null || localProject.attributeRights.assigned.view) && currentUser.tasklistLayout === 3 && (
               <Empty>
                 <hr className = "m-l-15 m-r-15 m-t-11" />
                 {renderCalendarUsers()}
@@ -915,7 +915,7 @@ export default function TasksSidebar( props ) {
             {renderFilterContainer()}
           </span>
 
-          { ( localProject.id === null || localProject.right.assignedRead) && currentUser.tasklistLayout === 3 &&
+          { ( localProject.id === null || localProject.attributeRights.assigned.view) && currentUser.tasklistLayout === 3 &&
             <span
               className='btn popover-toggler'
               >

@@ -237,7 +237,12 @@ query {
     title
     id
     right{
-      assignedRead
+      projectWrite
+    }
+    attributeRights{
+      assigned {
+        view
+      }
     }
   }
 }

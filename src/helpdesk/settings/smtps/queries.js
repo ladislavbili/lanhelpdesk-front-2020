@@ -107,7 +107,7 @@ mutation updateSmtp($id: Int!, $title: String, $order: Int, $def: Boolean, $host
 `;
 
 export const DELETE_SMTP = gql `
-mutation deleteSmtp($id: Int!, $newDefId: Int!, $newId: Int!) {
+mutation deleteSmtp($id: Int!, $newDefId: Int, $newId: Int!) {
   deleteSmtp(
     id: $id,
     newDefId: $newDefId,

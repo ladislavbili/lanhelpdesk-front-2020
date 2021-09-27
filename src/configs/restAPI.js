@@ -1,7 +1,8 @@
 const testing = true;
 const production = false;
 const port = production ? 8080 : 8081;
-
+//https://nodejs02.lanhelpdesk.com
+//173.212.231.78
 const protectedREST = `https://nodejs02.lanhelpdesk.com:${port}`;
 const localREST = `http://localhost:4000`;
 const protectedSocket = `wss://nodejs02.lanhelpdesk.com:${port}`;

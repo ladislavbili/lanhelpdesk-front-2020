@@ -216,6 +216,7 @@ export default function TaskAddContainer( props ) {
           />
       )
     }
+
     return (
       <Modal isOpen={openAddTaskModal} className="task-add-container" modalClassName="overflow-x-auto" >
         <ModalBody>

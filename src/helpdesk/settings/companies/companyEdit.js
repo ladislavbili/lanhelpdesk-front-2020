@@ -776,7 +776,7 @@ export default function CompanyEdit( props ) {
       <DeleteReplacement
         isOpen = { deleteOpen }
         label = "company"
-        options = { filteredCompanies }
+        options = { toSelArr(filteredCompanies) }
         close = { () => setDeleteOpen( false ) }
         finishDelete = { deleteCompanyFunc }
         />

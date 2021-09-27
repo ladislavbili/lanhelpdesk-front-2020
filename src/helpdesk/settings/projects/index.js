@@ -52,7 +52,7 @@ export default function ProjectsList( props ) {
     let color = 'red';
     let text = 'No';
     let iconName = 'far fa-times-circle';
-    if ( project.right !== null ) {
+    if ( project.right && project.right.projectWrite ) {
       color = 'green';
       text = 'Yes';
       iconName = 'far fa-check-circle';

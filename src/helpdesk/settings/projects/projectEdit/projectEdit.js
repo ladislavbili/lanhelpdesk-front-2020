@@ -124,7 +124,7 @@ export default function ProjectEdit( props ) {
   const [ customAttributes, setCustomAttributes ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
-  const [ openedTab, setOpenedTab ] = React.useState( tabId );
+  const [ openedTab, setOpenedTab ] = React.useState( tabId ? tabId : 'description' );
   const [ editingDescription, setEditingDescription ] = React.useState( false );
   const [ showProjectErrors, setShowProjectErrors ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );

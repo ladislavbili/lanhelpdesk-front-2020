@@ -4,13 +4,13 @@ export const getCreationError = ( newSubtaskType, newSubtaskAssigned, company, u
   let noAssigned = newSubtaskAssigned.length === 0;
   let noCompany = company === null;
   let messages = [];
-  if ( noAssigned && userRights.assignedRead ) {
+  if ( noAssigned && userRights.attributeRights.assigned.view ) {
     messages.push( 'assign the task to someone' );
   }
-  if ( noType && userRights.typeRead ) {
+  if ( noType && userRights.attributeRights.taskType.view ) {
     messages.push( 'pick task type' );
   }
-  if ( noCompany && userRights.companyRead ) {
+  if ( noCompany && userRights.attributeRights.company.view ) {
     messages.push( 'pick company' );
   }
 

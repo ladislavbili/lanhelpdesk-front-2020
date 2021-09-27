@@ -43,7 +43,7 @@ export default function ProjectEditLoader( props ) {
   } = props;
 
   const id = closeModal ? projectID : parseInt( match.params.id );
-  const tabId = closeModal ? tabID : parseInt( match.params.tabId );
+  const tabId = closeModal ? tabID : match.params.tabId;
 
   const {
     data: projectData,
