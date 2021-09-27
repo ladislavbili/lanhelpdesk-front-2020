@@ -4,7 +4,8 @@ import {
 
 
 import {
-  groupRights
+  groupRights,
+  projectAttributeRights,
 } from 'helpdesk/settings/projects/queries';
 
 const listTasks = `
@@ -21,10 +22,13 @@ tasks {
   pausal
   pendingChangable
   statusChange
-  rights{
+  attributeRights {
+    ${projectAttributeRights}
+  }
+  rights {
     ${groupRights}
   }
-  metadata{
+  metadata {
     subtasksApproved
     subtasksPending
     tripsApproved
@@ -132,7 +136,6 @@ createdAtV
 startsAt
 deadline
 project
-milestone
 taskType
 overtime
 pausal
@@ -235,7 +238,6 @@ mutation addOrUpdateTasklistColumnPreference(
   $startsAt: Boolean
   $deadline: Boolean
   $project: Boolean
-  $milestone: Boolean
   $taskType: Boolean
   $overtime: Boolean
   $pausal: Boolean
@@ -259,7 +261,6 @@ mutation addOrUpdateTasklistColumnPreference(
     startsAt: $startsAt
     deadline: $deadline
     project: $project
-    milestone: $milestone
     taskType: $taskType
     overtime: $overtime
     pausal: $pausal

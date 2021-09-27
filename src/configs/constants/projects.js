@@ -267,8 +267,9 @@ export const backendCleanRights = ( access = false ) => {
     title: '',
     id: 0,
     order: 0,
-    rights: createCleanRights( access )
-  } ).rights
+    rights: createCleanRights( access ),
+    attributeRights: getEmptyAttributeRights()
+  } )
 }
 
 export const attributesNames = [ 'status', 'tags', 'assigned', 'requester', 'company', 'taskType', 'pausal', 'overtime', 'startsAt', 'deadline', 'repeat' ];

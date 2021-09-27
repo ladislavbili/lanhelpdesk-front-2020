@@ -145,9 +145,9 @@ export default function WorksTable( props ) {
 
   let defaultTab = '0';
 
-  if ( userRights.vykazRead ) {
+  if ( userRights.rights.taskWorksRead ) {
     defaultTab = '1';
-  } else if ( userRights.rozpocetRead ) {
+  } else if ( userRights.rights.taskWorksAdvancedRead ) {
     defaultTab = '2';
   }
 
@@ -191,7 +191,7 @@ export default function WorksTable( props ) {
   const [ newTripScheduledFrom, setNewTripScheduledFrom ] = React.useState( null );
   const [ newTripScheduledTo, setNewTripScheduledTo ] = React.useState( null );
 
-  const shownColumns = getShownData( toggleTab === "2" && userRights.rozpocetRead ? showAdvancedColumns : showColumns, autoApproved, newColumnDefinitions ? newColumnDefinitions : [] );
+  const shownColumns = getShownData( toggleTab === "2" && userRights.rights.taskWorksRead ? showAdvancedColumns : showColumns, autoApproved, newColumnDefinitions ? newColumnDefinitions : [] );
 
   React.useEffect( () => {
     let defaultAssigned = taskAssigned.length > 0 ? taskAssigned[ 0 ] : null;
@@ -229,9 +229,9 @@ export default function WorksTable( props ) {
   let sortedSubtasks = subtasks.sort( ( work1, work2 ) => work1.order - work2.order );
   let sortedTrips = workTrips.sort( ( trip1, trip2 ) => trip1.order - trip2.order );
   let disabled = !(
-    ( userRights.taskShortSubtasksWrite && toggleTab === '0' ) ||
-    ( userRights.vykazWrite && toggleTab === '1' ) ||
-    ( userRights.rozpocetWrite && toggleTab === '2' )
+    ( userRights.rights.taskSubtasksWrite && toggleTab === '0' ) ||
+    ( userRights.rights.taskWorksWrite && toggleTab === '1' ) ||
+    ( userRights.rights.taskWorksAdvancedWrite && toggleTab === '2' )
   )
 
   const getDPH = () => {
@@ -282,7 +282,7 @@ export default function WorksTable( props ) {
             className="form-control hidden-input segoe-blue-text"
             isClearable
             selected={subtask.scheduled ? moment( parseInt( subtask.scheduled.from ) ) : null}
-            disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
+            disabled={disabled || !canAddSubtasksAndTrips || !userRights.attributeRights.assigned.edit}
             onChange={date => {
               const newDate = isNaN(date.valueOf()) ? null : date;
               if( newDate === null ){
@@ -518,7 +518,7 @@ export default function WorksTable( props ) {
             className="form-control hidden-input segoe-blue-text"
             isClearable
             selected={trip.scheduled ? moment( parseInt( trip.scheduled.from ) ) : null}
-            disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
+            disabled={disabled || !canAddSubtasksAndTrips || !userRights.attributeRights.assigned.edit}
             onChange={date => {
               const newDate = isNaN(date.valueOf()) ? null : date;
               if( newDate === null ){
@@ -777,7 +777,7 @@ export default function WorksTable( props ) {
             className="form-control hidden-input segoe-blue-text"
             isClearable
             selected={ newSubtaskScheduledFrom }
-            disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
+            disabled={disabled || !canAddSubtasksAndTrips || !userRights.attributeRights.assigned.edit}
             onChange={date => {
               const newDate = isNaN(date.valueOf()) ? null : date;
               if( newDate === null ){
@@ -979,7 +979,7 @@ export default function WorksTable( props ) {
             className="form-control hidden-input segoe-blue-text"
             isClearable
             selected={ newTripScheduledFrom }
-            disabled={disabled || !canAddSubtasksAndTrips || !userRights.assignedWrite}
+            disabled={disabled || !canAddSubtasksAndTrips || !userRights.attributeRights.assigned.edit}
             onChange={date => {
               const newDate = isNaN(date.valueOf()) ? null : date;
               if( newDate === null ){
@@ -1195,7 +1195,7 @@ export default function WorksTable( props ) {
                 >
                 Práca
               </span>
-              { userRights.vykazRead &&
+              { userRights.rights.taskWorksAdvancedRead &&
                 <Empty>
                   <span className='m-l-7 m-r-7'>
                     |

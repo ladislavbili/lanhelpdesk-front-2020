@@ -93,17 +93,6 @@ export default function Rozpocet( props ) {
 
   const shownColumns = getShownData( showColumns, autoApproved, newColumnDefinitions ? newColumnDefinitions : [] );
 
-  let defaultTab = '0';
-
-  if ( userRights.vykazRead || userRights.rozpocetRead ) {
-    defaultTab = '1';
-  } else if ( userRights.rozpocetRead ) {
-    defaultTab = '2';
-  }
-
-  //state
-  const [ toggleTab, setToggleTab ] = React.useState( defaultTab );
-
   //Materials
   const [ showAddMaterial, setShowAddMaterial ] = React.useState( false );
   const [ focusedMaterial, setFocusedMaterial ] = React.useState( null );
@@ -156,10 +145,7 @@ export default function Rozpocet( props ) {
   }
 
   let sortedMaterials = materials.sort( ( material1, material2 ) => material1.order - material2.order );
-  let disabled = !(
-    ( userRights.vykazWrite && toggleTab === '1' ) ||
-    ( userRights.rozpocetWrite && toggleTab === '2' )
-  )
+  let disabled = !userRights.rights.taskMaterialsWrite;
 
   const getColRender = ( key, material, index ) => {
     switch ( key ) {
@@ -397,7 +383,6 @@ export default function Rozpocet( props ) {
                 setNewMaterialPrice((parseFloat(e.target.value) / parseFloat(newMaterialQuantity)).toFixed(2) );
               }
             }}
-            clas
             className="form-control h-30 segoe-blue-text"
             placeholder="Celková cena"
             />
@@ -477,8 +462,7 @@ export default function Rozpocet( props ) {
         <tr>
           <th>
             <span
-              onClick={() => setToggleTab('1')}
-              className={classnames("clickable vykazyTableNav", {active: toggleTab === '1'})}
+              className={classnames("clickable vykazyTableNav active")}
               >
               Materiál
             </span>

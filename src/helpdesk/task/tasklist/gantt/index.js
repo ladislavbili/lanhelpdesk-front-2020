@@ -149,7 +149,7 @@ export default function GanttListLoader( props ) {
       return ganttPreference;
     }
     ganttAttributeLimitingRights.forEach( ( limitingRight ) => {
-      if ( !localProject.right[ limitingRight.right ] ) {
+      if ( !limitingRight.right( localProject ) ) {
         ganttPreference[ limitingRight.preference ] = false;
       }
     } )

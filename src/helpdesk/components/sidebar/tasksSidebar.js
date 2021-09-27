@@ -192,7 +192,7 @@ export default function TasksSidebar( props ) {
         }
       }
     }
-  }, [ myProjectsData ] );
+  }, [ myProjectsData, myProjectsLoading ] );
 
   const currentUser = getMyData();
   const setLocalFilter = () => {
@@ -289,6 +289,13 @@ export default function TasksSidebar( props ) {
       return myFiltersData.myFilters.filter( ( myFilter ) => myFilter.global || ( myFilter.project && myFilter.project.id === localProject.id ) );
     }
     return [];
+  }
+
+  const getProjectFilters = () => {
+    if ( localProject.id === null ) {
+      return [];
+    }
+    return localProject.project.projectFilters;
   }
 
   const renderProjects = () => {
@@ -640,6 +647,16 @@ export default function TasksSidebar( props ) {
             }
           </NavItem>
         )) }
+        { getProjectFilters().map((filter) => (
+          <NavItem key={filter.id} className={classnames("row full-width sidebar-item", { "active": filter.id === parseInt(match.params.filterID) }) }>
+            <span
+              className={ classnames("clickable sidebar-menu-item link", { "active": filter.id === parseInt(match.params.filterID) }) }
+              onClick={() => history.push(`/helpdesk/taskList/i/${filter.id}`)}
+              >
+              {filter.title}
+            </span>
+          </NavItem>
+        )) }
         <NavItem key='repeats' className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/helpdesk/repeats' ) }) }>
           <span
             className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/repeats' ) }) }
@@ -746,7 +763,7 @@ export default function TasksSidebar( props ) {
         history={history}
         match={match}
         disabled={ !canAddTask }
-        projectID={ localProject.id !== null && localProject.right.addTasks ? localProject.id : null }
+        projectID={ localProject.id !== null && localProject.right.addTask ? localProject.id : null }
         />
     )
   }

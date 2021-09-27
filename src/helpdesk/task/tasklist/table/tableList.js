@@ -103,9 +103,9 @@ export default function TableList( props ) {
       return null;
     } else if ( display.type === 'checkbox' ) {
       return <th
-        width="40"
+        className={`row ${display.className ? display.className : '' }` }
+        width={display.width ? display.width : '' }
         key={display.value}
-        className="row"
         style={{color: '#0078D4', paddingLeft: "1px", paddingRight: "1px" }}
         >
         <div
@@ -143,7 +143,9 @@ export default function TableList( props ) {
       <th
         style={(display.value === "createdAt" ? {textAlign: "right"} : {})}
         key={display.value}
-        width={display.value === 'title' ? "30%" : ((display.value === "id" || display.value === "status") ? "50px" : '')}>
+        className={` ${display.className ? display.className : '' }` }
+        width={display.width ? display.width : '' }
+        >
         {display.label}
       </th>
     )
@@ -153,9 +155,9 @@ export default function TableList( props ) {
     if ( display.type === 'important' || display.type === 'invoiced' ) {
       return null;
     } else if ( [ 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
-      return ( <th key={display.value} width="40" /> );
+      return ( <th key={display.value} width={display.width ? display.width : '' } className={` ${display.className ? display.className : '' }` } /> );
     } else if ( display.type === 'checkbox' ) {
-      return <th key={display.value} width="40" >
+      return <th key={display.value} width={display.width ? display.width : '' } className={` ${display.className ? display.className : '' }` } >
         <Checkbox
           className = "m-l-7 m-t-6 p-l-0"
           disabled={loading}
@@ -166,7 +168,7 @@ export default function TableList( props ) {
           />
       </th>
     } else if ( display.type === 'date' ) {
-      return <th key={display.value} width="40" className={(last ? "width-175" : "width-125")}>
+      return <th key={display.value} width={display.width ? display.width : '' } className={` ${ last ? 'width-175' : 'width-125' } ${ display.className ? display.className : '' }` }>
         <div className={(last ? "row" : "")}>
           <div style={last ? {flex: "1"} : {}}>
             <DatePicker
@@ -196,7 +198,7 @@ export default function TableList( props ) {
       </th>
     } else {
       const value = ( localStringFilter[ display.value ] === "cur" ? currentUser.fullName : localStringFilter[ display.value ] );
-      return <th key={display.value} >
+      return <th key={display.value} width={display.width ? display.width : '' } className={` ${display.className ? display.className : '' }` } >
         <div className={(last ? "row" : "")}>
           <div style={last ? {flex: "1"} : {}}>
             <input
@@ -294,7 +296,6 @@ export default function TableList( props ) {
       </tr>
     )
   }
-
 
   return (
     <div>

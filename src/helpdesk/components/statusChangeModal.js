@@ -104,7 +104,7 @@ export default function StatusChangeModal( props ) {
               <Label>
                 Comment change
               </Label>
-              <Input type="textarea" disabled={!userRights.addComments} placeholder="Enter comment" rows="4" value={comment} onChange={(e)=>setComment(e.target.value)}/>
+              <Input type="textarea" disabled={!userRights.rights.addComments} placeholder="Enter comment" rows="4" value={comment} onChange={(e)=>setComment(e.target.value)}/>
             </FormGroup>
 
           <div className="row m-t-30">

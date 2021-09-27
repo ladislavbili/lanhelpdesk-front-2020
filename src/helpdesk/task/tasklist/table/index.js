@@ -144,7 +144,7 @@ export default function TableListLoader( props ) {
     }
     preference.project = false;
     attributeLimitingRights.forEach( ( limitingRight ) => {
-      if ( !localProject.right[ limitingRight.right ] ) {
+      if ( !limitingRight.right( localProject ) ) {
         preference[ limitingRight.preference ] = false;
       }
     } )
@@ -207,7 +207,7 @@ export default function TableListLoader( props ) {
   const deleteTaskFunc = () => {
     if ( window.confirm( "Are you sure you want to delete checked tasks?" ) ) {
       let tasksForDelete = tasks.filter( ( task ) => markedTasks.includes( task.id ) );
-      const [ canDeleteTasks, cantDeleteTasks ] = splitArrayByFilter( tasksForDelete, ( task ) => currentUser.role.level === 0 || task.rights.deleteTasks );
+      const [ canDeleteTasks, cantDeleteTasks ] = splitArrayByFilter( tasksForDelete, ( task ) => currentUser.role.level === 0 || task.rights.deleteTask );
       Promise.all(
           canDeleteTasks.map( task => {
             deleteTask( {

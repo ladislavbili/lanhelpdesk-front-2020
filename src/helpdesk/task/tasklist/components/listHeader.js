@@ -44,7 +44,7 @@ export default function ListHeader( props ) {
       return displayValues;
     }
     let notAllowedColumns = ( gantt ? ganttAttributeLimitingRights : attributeLimitingRights )
-      .filter( ( limitingRight ) => !localProject.right[ limitingRight.right ] )
+      .filter( ( limitingRight ) => !limitingRight.right( localProject ) )
       .map( ( limitingRight ) => limitingRight.preference );
     return displayValues.filter( ( column ) => !notAllowedColumns.includes( column.value ) );
   }

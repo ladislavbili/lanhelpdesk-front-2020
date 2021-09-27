@@ -14,7 +14,11 @@ export default function RenderTaskStackItemRender( props ) {
     scheduledUserId,
     openTask,
   } = props;
-  const cantBeAdded = ( !task.rights.assignedWrite || !task.rights.vykazWrite || !task.usersWithRights.some( ( userWithRights ) => userWithRights.user.id === scheduledUserId && userWithRights.assignable ) );
+  const cantBeAdded = (
+    !task.attributeRights.assigned.edit ||
+    !task.rights.taskWorksRead ||
+    !task.usersWithRights.some( ( userWithRights ) => userWithRights.user.id === scheduledUserId && userWithRights.assignable )
+  );
 
   const backgroundColor = (
     !task.status ?
@@ -60,7 +64,7 @@ export default function RenderTaskStackItemRender( props ) {
       >
       <button
         className="btn btn-link"
-        style={{color: 'white'}}
+        style={{color: cantBeAdded ? 'grey': 'white'}}
         onClick={() => { openTask(task) }}
         >
         <i

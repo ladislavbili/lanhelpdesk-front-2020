@@ -71,7 +71,8 @@ import {
 } from '../queries';
 
 import {
-  backendCleanRights
+  getEmptyAttributeRights,
+  backendCleanRights,
 } from 'configs/constants/projects';
 
 import {
@@ -160,7 +161,6 @@ export default function TaskEdit( props ) {
   const [ title, setTitle ] = React.useState( "" );
   const [ ganttOrder, setGanttOrder ] = React.useState( 0 );
 
-  const [ toggleTab, setToggleTab ] = React.useState( 1 );
   const [ usedSubtaskPausal, setUsedSubtaskPausal ] = React.useState( 0 );
   const [ usedTripPausal, setUsedTripPausal ] = React.useState( 0 );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
@@ -169,6 +169,22 @@ export default function TaskEdit( props ) {
   const [ changes, setChanges ] = React.useState( {} );
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
   const [ vykazyChanged, setVykazyChanged ] = React.useState( false );
+
+  const userRights = (
+    project ? {
+      rights: project.right,
+      attributeRights: project.attributeRights
+    } :
+    backendCleanRights()
+  );
+
+  const [ toggleTab, setToggleTab ] = React.useState( userRights.rights.viewComments ? 1 : 2 );
+
+  const projectAttributes = (
+    project ?
+    project.project.projectAttributes :
+    getEmptyAttributeRights()
+  );
 
   // sync
   React.useEffect( () => {
@@ -187,8 +203,8 @@ export default function TaskEdit( props ) {
     setImportant( task.important );
     /*
     const milestone = project && task.milestone ? toSelArr( project.project.milestones )
-      .find( ( milestone ) => milestone.id === task.milestone.id ) : undefined;
-      */
+    .find( ( milestone ) => milestone.id === task.milestone.id ) : undefined;
+    */
     setOvertime( ( task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPausal( ( task.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
     setPendingChangable( task.pendingChangable );
@@ -225,33 +241,32 @@ export default function TaskEdit( props ) {
       return;
     }
 
-    const userRights = project.right;
+    const userRights = {
+      rights: project.right,
+      attributeRights: project.attributeRights
+    };
+
+    const projectAttributes = project.project.projectAttributes;
+
     const projectUsers = users.filter( ( user ) => project.usersWithRights.some( ( userData ) => userData.user.id === user.id ) );
     const assignableUsers = users.filter( ( user ) => project.usersWithRights.some( ( userData ) => userData.assignable && userData.user.id === user.id ) );
     const projectRequesters = ( project.lockedRequester ? projectUsers : users );
-    const def = project.project.def;
     const statuses = toSelArr( project.project.statuses );
     //check def required and fixed and change is needed (CHECK IF IT ALREADY ISNT SET) and can see the attribute
     let changes = {};
     //Status
-    if ( userRights.statusRead ) {
-      if ( def.status.fixed ) {
-        if ( def.status.value && status.id !== def.status.value.id ) {
-          changeStatus( statuses.find( ( status ) => status.id === def.status.value.id ) );
+    if ( userRights.attributeRights.status.view ) {
+      if ( projectAttributes.status.fixed ) {
+        if ( projectAttributes.status.value && status.id !== projectAttributes.status.value.id ) {
+          changeStatus( statuses.find( ( status ) => status.id === projectAttributes.status.value.id ) );
         }
-      } else if ( def.status.required && status === null ) {
-        let potentialStatus = statuses.find( ( status ) => status.action.toLowerCase() === 'isnew' );
-        if ( !potentialStatus ) {
-          potentialStatus = statuses[ 0 ];
-        }
-        changeStatus( potentialStatus );
       }
     }
 
     //Tags
-    if ( userRights.tagsRead ) {
-      if ( def.tag.fixed || ( def.tag.required && tags.length === 0 ) ) {
-        let tagIds = def.tag.value.map( t => t.id );
+    if ( userRights.attributeRights.tags.view ) {
+      if ( projectAttributes.tags.fixed ) {
+        let tagIds = projectAttributes.tags.value.map( t => t.id );
         if ( tags.length !== tagIds.length || tags.some( ( tag ) => !tagsIds.includes( tag.id ) ) ) {
           setTags( project.tags.filter( ( item ) => tagIds.includes( item.id ) ) );
           changes.tags = tagIds;
@@ -260,31 +275,25 @@ export default function TaskEdit( props ) {
     }
 
     //Assigned to
-    if ( userRights.assignedRead ) {
-      if ( def.assignedTo.fixed ) {
-        let newAssignedTo = assignableUsers.filter( ( user1 ) => def.assignedTo.value.some( ( user2 ) => user1.id === user2.id ) );
-        if ( newAssignedTo.length === 0 && userRights.assignedWrite ) {
+    if ( userRights.attributeRights.assigned.view ) {
+      if ( projectAttributes.assigned.fixed ) {
+        let newAssignedTo = assignableUsers.filter( ( user1 ) => projectAttributes.assigned.value.some( ( user2 ) => user1.id === user2.id ) );
+        if ( newAssignedTo.length === 0 && userRights.attributeRights.assigned.edit ) {
           newAssignedTo = assignableUsers.filter( ( user ) => user.id === currentUser.id );
         }
         if ( newAssignedTo.length !== assignedTo.length || newAssignedTo.some( ( user1 ) => assignedTo.some( ( user2 ) => user1.id !== user2.id ) ) ) {
           changes.assignedTo = newAssignedTo.map( ( user ) => user.id );
         }
         setAssignedTo( newAssignedTo );
-      } else if ( def.assignedTo.required && assignedTo.length === 0 ) {
-        const newAssignedTo = assignableUsers.filter( ( user ) => user.id === currentUser.id );
-        if ( newAssignedTo > 1 ) {
-          changes.assignedTo = [ currentUser.id ];
-          setAssignedTo( newAssignedTo );
-        }
       }
     }
 
     //Requester
     let potentialRequester = null;
-    if ( userRights.requesterRead ) {
-      if ( def.requester.fixed || ( def.requester.required && requester === null ) ) {
-        if ( def.requester.value ) {
-          potentialRequester = projectRequesters.find( ( user ) => user.id === def.requester.value.id );
+    if ( userRights.attributeRights.requester.view ) {
+      if ( projectAttributes.requester.fixed ) {
+        if ( projectAttributes.requester.value ) {
+          potentialRequester = projectRequesters.find( ( user ) => user.id === projectAttributes.requester.value.id );
         } else {
           potentialRequester = projectRequesters.find( ( user ) => user.id === currentUser.id );
         }
@@ -297,9 +306,9 @@ export default function TaskEdit( props ) {
 
     //Company
     let potentialCompany = null;
-    if ( userRights.companyRead ) {
-      if ( def.company.fixed || ( def.company.required && company === null ) ) {
-        if ( def.company.value ) {
+    if ( userRights.attributeRights.company.view ) {
+      if ( projectAttributes.company.fixed ) {
+        if ( projectAttributes.company.value ) {
           potentialCompany = companies.find( ( company ) => company.id === def.company.value.id );
         } else if ( potentialRequester ) {
           potentialCompany = companies.find( ( company ) => company.id === potentialRequester.company.id );
@@ -307,7 +316,7 @@ export default function TaskEdit( props ) {
         if ( potentialCompany && ( company === null || company.id !== potentialCompany.id ) ) {
           setCompany( potentialCompany );
           changes.company = company.id;
-          if ( !def.pausal.fixed ) {
+          if ( !projectAttributes.pausal.fixed ) {
             setPausal( parseInt( company.taskWorkPausal ) > 0 ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
             changes.pausal = parseInt( company.taskWorkPausal ) > 0
           }
@@ -316,9 +325,9 @@ export default function TaskEdit( props ) {
     }
 
     //Task type
-    if ( userRights.typeRead ) {
-      if ( def.type.fixed || ( def.type.required && taskType === null ) ) {
-        const newTaskType = taskTypes.find( ( type ) => type.id === def.type.value.id );
+    if ( userRights.attributeRights.taskType.view ) {
+      if ( projectAttributes.taskType.fixed ) {
+        const newTaskType = taskTypes.find( ( type ) => type.id === projectAttributes.taskType.value.id );
         if ( newTaskType && ( taskType === null || taskType.id !== newTaskType.id ) ) {
           setTaskType( newTaskType );
           changes.taskType = newTaskType.id;
@@ -326,19 +335,37 @@ export default function TaskEdit( props ) {
       }
     }
 
+    //Starts at
+    if ( userRights.attributeRights.startsAt.view ) {
+      if ( projectAttributes.startsAt.fixed && startsAt.valueOf()
+        .toString() !== projectAttributes.startsAt.value ) {
+        setDeadline( projectAttributes.startsAt.value ? moment( parseInt( projectAttributes.startsAt.value ) ) : null );
+        changes.startsAt = projectAttributes.startsAt.value;
+      }
+    }
+
+    //Deadline
+    if ( userRights.attributeRights.deadline.view ) {
+      if ( projectAttributes.deadline.fixed && deadline.valueOf()
+        .toString() !== projectAttributes.deadline.value ) {
+        setDeadline( projectAttributes.deadline.value ? moment( parseInt( projectAttributes.deadline.value ) ) : null );
+        changes.deadline = projectAttributes.deadline.value;
+      }
+    }
+
     //Pausal
-    if ( userRights.pausalRead ) {
-      if ( def.pausal.fixed && pausal.value !== def.pausal.value ) {
-        setPausal( booleanSelects.find( ( option ) => option.value === def.pausal.value ) );
-        changes.pausal = def.pausal.value;
+    if ( userRights.attributeRights.pausal.view ) {
+      if ( projectAttributes.pausal.fixed && pausal.value !== projectAttributes.pausal.value ) {
+        setPausal( booleanSelects.find( ( option ) => option.value === projectAttributes.pausal.value ) );
+        changes.pausal = projectAttributes.pausal.value;
       }
     }
 
     //Overtime
-    if ( userRights.overtimeRead ) {
-      if ( def.overtime.fixed && overtime.value !== def.overtime.value ) {
-        setOvertime( booleanSelects.find( ( option ) => option.value === def.overtime.value ) );
-        changes.overtime = def.overtime.value;
+    if ( userRights.attributeRights.overtime.view ) {
+      if ( projectAttributes.overtime.fixed && overtime.value !== projectAttributes.overtime.value ) {
+        setOvertime( booleanSelects.find( ( option ) => option.value === projectAttributes.overtime.value ) );
+        changes.overtime = projectAttributes.overtime.value;
       }
     }
     //save all
@@ -349,22 +376,9 @@ export default function TaskEdit( props ) {
   }
 
   //constants
-  const defaultFields = project === null ? noDef : {
-    ...noDef,
-    ...project.project.def
-  };
-  const userRights = (
-    currentUser.role.level === 0 ?
-    backendCleanRights( true ) :
-    (
-      project ?
-      project.right :
-      backendCleanRights()
-    )
-  );
   const canAddUser = accessRights.users;
   const canAddCompany = accessRights.companies;
-  const availableProjects = projects.filter( ( project ) => project.right.projectWrite || currentUser.role.level === 0 );
+  const availableProjects = projects.filter( ( project ) => project.right.taskProjectWrite || currentUser.role.level === 0 );
   const assignedTos = project ? users.filter( ( user ) => project.usersWithRights.some( ( userData ) => userData.assignable && userData.user.id === user.id ) ) : [];
 
   const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights.map( ( userWithRights ) => userWithRights.user ), 'fullName' ) : users );
@@ -386,10 +400,9 @@ export default function TaskEdit( props ) {
     return (
       compare.title === "" ||
       compare.status === null ||
-      ( compare.project === null && userRights.projectRead ) ||
-      ( compare.assignedTo.length === 0 && userRights.assignedRead && defaultFields.assignedTo.fixed ) ||
-      compare.saving ||
-      ( defaultFields.tag.required && compare.tags.length === 0 && userRights.tagsRead )
+      compare.project === null ||
+      ( compare.assignedTo.length === 0 && userRights.attributeRights.assigned.view && !projectAttributes.assigned.fixed ) ||
+      compare.saving
     )
   }
 
@@ -511,7 +524,7 @@ export default function TaskEdit( props ) {
   const customItems = task.customItems.map( ( item ) => ( {
     ...item,
   } ) );
-  const canCopy = userRights.addTasks && !getCantSave();
+  const canCopy = userRights.rights.addTask && !getCantSave();
 
   const getTaskData = () => ( {
     shortSubtasks: task.shortSubtasks,
@@ -600,34 +613,34 @@ export default function TaskEdit( props ) {
     }
   }
   /*
-    const changeMilestone = ( milestone ) => {
-      if ( status.action === 'PendingDate' ) {
-        if ( milestone.startsAt !== null ) {
-          setMilestone( milestone );
-          setPendingDate( moment( milestone.startsAt ) );
-          setPendingChangable( false );
-          autoUpdateTask( {
-            milestone: milestone.id,
-            pendingDate: moment( milestone.startsAt )
-              .valueOf()
-              .toString(),
-            pendingChangable: false
-          } );
-        } else {
-          setMilestone( milestone );
-          setPendingChangable( true );
-          autoUpdateTask( {
-            milestone: milestone.id,
-            pendingChangable: true
-          } );
-        }
-      } else {
-        setMilestone( milestone );
-        autoUpdateTask( {
-          milestone: milestone.id
-        } );
-      }
-    }
+  const changeMilestone = ( milestone ) => {
+  if ( status.action === 'PendingDate' ) {
+  if ( milestone.startsAt !== null ) {
+  setMilestone( milestone );
+  setPendingDate( moment( milestone.startsAt ) );
+  setPendingChangable( false );
+  autoUpdateTask( {
+  milestone: milestone.id,
+  pendingDate: moment( milestone.startsAt )
+  .valueOf()
+  .toString(),
+  pendingChangable: false
+  } );
+  } else {
+  setMilestone( milestone );
+  setPendingChangable( true );
+  autoUpdateTask( {
+  milestone: milestone.id,
+  pendingChangable: true
+  } );
+  }
+  } else {
+  setMilestone( milestone );
+  autoUpdateTask( {
+  milestone: milestone.id
+  } );
+  }
+  }
   */
 
   const changeRequester = ( requester ) => {
@@ -715,7 +728,7 @@ export default function TaskEdit( props ) {
             isLoaded={true}
             />
         }
-        { userRights.deleteTasks &&
+        { userRights.rights.deleteTask &&
           <button
             type="button"
             className="btn-link task-add-layout-button btn-distance"
@@ -741,15 +754,16 @@ export default function TaskEdit( props ) {
   }
 
   const canCreateVykazyError = () => {
+    const error = getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company, userRights );
     if (
-      ( !userRights.vykazRead && !userRights.rozpocetRead ) ||
-      getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company, userRights ) === ''
+      ( !userRights.rights.taskWorksRead && !userRights.rights.taskWorksAdvancedRead ) ||
+      error === ''
     ) {
       return null;
     }
     return (
       <div className="center-hor" style={{color: "#FF4500", height: "20px"}}>
-        {getVykazyError(taskType, assignedTo.filter((user) => user.id !== null ), company, userRights )}
+        {error}
       </div>
     )
   }
@@ -757,11 +771,10 @@ export default function TaskEdit( props ) {
   const renderTitle = () => {
     return (
       <div className="d-flex">
-        { userRights.important &&
+        { userRights.rights.taskImportant &&
           <button
             type="button"
             style={{color: '#ffc107'}}
-            disabled={ !userRights.important }
             className="btn-link center-hor m-r-10"
             onClick={()=>{
               setImportant(!important);
@@ -774,7 +787,7 @@ export default function TaskEdit( props ) {
         <h2 className="center-hor">{id}: </h2>
         <span className="center-hor flex m-r-15">
           <input type="text"
-            disabled={ !userRights.taskTitleEdit }
+            disabled={ !userRights.taskTitleWrite }
             value={title}
             className="task-title-input text-extra-slim hidden-input form-control"
             onChange={(e)=> {
@@ -813,11 +826,11 @@ export default function TaskEdit( props ) {
   }
 
   const renderStatusDate = () => {
-    if ( !userRights.statusRead ) {
+    if ( !userRights.attributeRights.status.view || !status ) {
       return null;
     }
     if ( status && status.action === 'PendingDate' ) {
-      const datepickerDisabled = !status || status.action !== 'PendingDate' || !userRights.statusWrite || !pendingChangable;
+      const datepickerDisabled = !userRights.attributeRights.status.edit || !pendingChangable;
       return (
         <div className="task-info ml-auto">
           <span className="center-hor">
@@ -853,7 +866,7 @@ export default function TaskEdit( props ) {
         status.action === 'Invoiced' ||
         status.action === 'CloseInvalid'
       ) ) {
-      const datepickerDisabled = !status || ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.statusWrite;
+      const datepickerDisabled = ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.attributeRights.status.edit;
       return (
         <div className="task-info ml-auto">
           <span className="center-hor">
@@ -896,7 +909,7 @@ export default function TaskEdit( props ) {
     Project: (
       <Select
         placeholder="Zadajte projekt"
-        isDisabled={ !userRights.projectWrite }
+        isDisabled={ !userRights.rights.taskProjectWrite }
         value={ project }
         onChange={ changeProject }
         options={ availableProjects }
@@ -905,7 +918,7 @@ export default function TaskEdit( props ) {
     ),
     Assigned: (
       <div>
-        { (defaultFields.assignedTo.fixed || !userRights.assignedWrite) &&
+        { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit) &&
           <div> {assignedTo.map((user) =>
               <div className="disabled-info">{user.label}</div>
             )}
@@ -914,12 +927,11 @@ export default function TaskEdit( props ) {
             }
           </div>
         }
-        { userRights.assignedWrite &&
+        { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit &&
           <Select
             value={assignedTo}
             placeholder="Select reccomended"
             isMulti
-            isDisabled={defaultFields.assignedTo.fixed || !userRights.assignedWrite}
             onChange={(users)=> {
               if (users.some(u => u.id === -1)){
                 setOpenUserAdd(true);
@@ -939,14 +951,13 @@ export default function TaskEdit( props ) {
     ),
     Status: (
       <div>
-        { (defaultFields.status.fixed || !userRights.statusWrite ) &&
+        { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit) &&
           <div className="disabled-info">{status ? status.label : "None"}</div>
         }
-        { !defaultFields.status.fixed && userRights.statusWrite &&
+        { !projectAttributes.status.fixed && userRights.attributeRights.status.edit &&
           <Select
             placeholder="Status required"
             value={status}
-            isDisabled={defaultFields.status.fixed || !userRights.statusWrite }
             styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
             onChange={ changeStatus }
             options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action !== 'Invoiced')}
@@ -958,8 +969,8 @@ export default function TaskEdit( props ) {
       <Select
         placeholder="Zadajte typ"
         value={taskType}
-        isDisabled={ defaultFields.type.fixed || !userRights.typeWrite }
-        styles={pickSelectStyle( [ 'noArrow', defaultFields.type.required ? 'required' : ''] )}
+        isDisabled={ projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit }
+        styles={pickSelectStyle( [ 'noArrow', ] )}
         onChange={(type)=> {
           setTaskType(type);
           autoUpdateTask({ taskType: type.id })
@@ -969,14 +980,14 @@ export default function TaskEdit( props ) {
     ),
     Requester: (
       <div>
-        { (defaultFields.requester.fixed || !userRights.requesterWrite) &&
+        { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit) &&
           <div className="disabled-info">{requester ? requester.label : "None"}</div>
         }
-        { !defaultFields.requester.fixed && userRights.requesterWrite &&
+        { !projectAttributes.requester.fixed && userRights.attributeRights.requester.edit &&
           <Select
             placeholder="Zadajte žiadateľa"
             value={requester}
-            isDisabled={defaultFields.requester.fixed || !userRights.requesterWrite}
+            isDisabled={ projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit }
             onChange={changeRequester}
             options={(canAddUser?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(requesters)}
             styles={ pickSelectStyle([ 'noArrow', 'required', ])}
@@ -986,14 +997,13 @@ export default function TaskEdit( props ) {
     ),
     Company: (
       <div>
-        { (defaultFields.company.fixed || !userRights.companyWrite) &&
+        { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit) &&
           <div className="disabled-info">{company ? company.label : "None"}</div>
         }
-        { !defaultFields.company.fixed && userRights.companyWrite &&
+        { !projectAttributes.company.fixed && userRights.attributeRights.company.edit &&
           <Select
             placeholder="Zadajte firmu"
             value={company}
-            isDisabled={ defaultFields.company.fixed || !userRights.companyWrite }
             onChange={changeCompany}
             options={(canAddCompany ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
             styles={pickSelectStyle([ 'noArrow', 'required', ])}
@@ -1003,13 +1013,12 @@ export default function TaskEdit( props ) {
     ),
     Pausal: (
       <div>
-        { (!userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed ) &&
+        { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed ) &&
           <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
         }
-        { userRights.pausalWrite && company && company.monthly && !defaultFields.pausal.fixed &&
+        { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed &&
           <Select
             value={ pausal }
-            isDisabled={!userRights.pausalWrite || !company || !company.monthly || defaultFields.pausal.fixed}
             styles={pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(pausal)=> {
               autoUpdateTask({ pausal: pausal.value })
@@ -1022,14 +1031,13 @@ export default function TaskEdit( props ) {
     ),
     StartsAt: (
       <div>
-        { !userRights.deadlineWrite &&
+        { (projectAttributes.startsAt.fixed || !userRights.attributeRights.startsAt.edit) &&
           <div className="disabled-info">{startsAt}</div>
         }
-        { userRights.deadlineWrite &&
+        { !projectAttributes.startsAt.fixed && userRights.attributeRights.startsAt.edit &&
           <DatePicker
             className={classnames("form-control")}
             selected={startsAt}
-            disabled={!userRights.deadlineWrite}
             hideTime
             isClearable
             onChange={date => {
@@ -1043,14 +1051,13 @@ export default function TaskEdit( props ) {
     ),
     Deadline: (
       <div>
-        { !userRights.deadlineWrite &&
+        { (projectAttributes.deadline.fixed || !userRights.attributeRights.deadline.edit) &&
           <div className="disabled-info">{deadline}</div>
         }
-        { userRights.deadlineWrite &&
+        { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit &&
           <DatePicker
             className={classnames("form-control")}
             selected={deadline}
-            disabled={!userRights.deadlineWrite}
             hideTime
             isClearable
             onChange={date => {
@@ -1064,10 +1071,10 @@ export default function TaskEdit( props ) {
     ),
     Overtime: (
       <div>
-        { (!userRights.overtimeWrite || defaultFields.overtime.fixed) &&
+        { (projectAttributes.overtime.fixed || !userRights.attributeRights.overtime.edit) &&
           <div className="disabled-info">{overtime.label}</div>
         }
-        { userRights.overtimeWrite && !defaultFields.overtime.fixed &&
+        { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.edit &&
           <Select
             value={overtime}
             isDisabled={!userRights.overtimeWrite || defaultFields.overtime.fixed}
@@ -1088,17 +1095,15 @@ export default function TaskEdit( props ) {
       <div className = "form-section form-selects-entries" >
         <div className="form-section-rest">
           <div className="col-12 row">
-            { userRights.projectRead &&
-              <div className="col-3">
-                <div className="p-r-10">
-                  <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Project }
-                  </div>
+            <div className="col-3">
+              <div className="p-r-10">
+                <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
+                <div className="col-9">
+                  { layoutComponents.Project }
                 </div>
               </div>
-            }
-            { userRights.assignedRead &&
+            </div>
+            { userRights.attributeRights.assigned.view &&
               <div className="col-9" style={{border: "none"}}>
                 <div className="p-r-10">
                   <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
@@ -1112,7 +1117,7 @@ export default function TaskEdit( props ) {
 
           <div className="row">
             <div className="col-3">
-              {userRights.statusRead &&
+              { userRights.attributeRights.status.view &&
                 <div className="p-r-10">
                   <Label className="col-form-label col-3 ">Status <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1120,7 +1125,7 @@ export default function TaskEdit( props ) {
                   </div>
                 </div>
               }
-              { userRights.typeRead &&
+              { userRights.attributeRights.taskType.view &&
                 <div className="p-r-10">
                   <Label className="col-form-label  col-3">Typ <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1131,7 +1136,7 @@ export default function TaskEdit( props ) {
             </div>
 
             <div className="col-3">
-              {userRights.requesterRead &&
+              { userRights.attributeRights.requester.view &&
                 <div className="p-r-10">
                   <Label className="col-form-label col-3 ">Zadal <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1139,7 +1144,7 @@ export default function TaskEdit( props ) {
                   </div>
                 </div>
               }
-              {userRights.companyRead &&
+              { userRights.attributeRights.company.view &&
                 <div className="p-r-10">
                   <Label className="col-form-label col-3 ">Firma <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1150,7 +1155,7 @@ export default function TaskEdit( props ) {
             </div>
 
             <div className="col-3">
-              {userRights.pausalRead &&
+              { userRights.attributeRights.pausal.view &&
                 <div className="p-r-10">
                   <Label className="col-form-label col-3 ">Paušál <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1158,7 +1163,7 @@ export default function TaskEdit( props ) {
                   </div>
                 </div>
               }
-              { userRights.deadlineRead &&
+              { userRights.attributeRights.startsAt.view &&
                 <div className="p-r-10">
                   <Label className="col-form-label col-3">Starts at</Label>
                   <div className="col-9">
@@ -1166,7 +1171,7 @@ export default function TaskEdit( props ) {
                   </div>
                 </div>
               }
-              { userRights.deadlineRead &&
+              { userRights.attributeRights.deadline.view &&
                 <div className="p-r-10">
                   <Label className="col-form-label col-3">Deadline</Label>
                   <div className="col-9">
@@ -1176,9 +1181,9 @@ export default function TaskEdit( props ) {
               }
             </div>
             <div className="col-3">
-              { userRights.repeatRead &&
+              { userRights.attributeRights.repeat.view &&
                 <Repeat
-                  disabled={!userRights.repeatWrite}
+                  disabled={!userRights.attributeRights.repeat.edit}
                   taskID={id}
                   duplicateTask={ !task.repeat ? getTaskData() : null}
                   repeat={task.repeat}
@@ -1186,7 +1191,7 @@ export default function TaskEdit( props ) {
                   repeatTime={task.repeatTime}
                   />
               }
-              { userRights.overtimeRead &&
+              { userRights.attributeRights.overtime.view &&
                 <div className="p-r-10">
                   <Label className="col-form-label col-4">Mimo PH <span className="warning-big">*</span></Label>
                   <div className="col-9">
@@ -1208,19 +1213,19 @@ export default function TaskEdit( props ) {
           <Label className="col-form-label">Projekt</Label>
           { layoutComponents.Project }
         </div>
-        { userRights.statusRead &&
+        { userRights.attributeRights.status.view &&
           <div className="col-2" >
             <Label className="col-form-label">Status</Label>
             { layoutComponents.Status }
           </div>
         }
-        { userRights.requesterRead &&
+        { userRights.attributeRights.requester.view &&
           <div className="col-2">
             <Label className="col-form-label">Zadal</Label>
             { layoutComponents.Requester }
           </div>
         }
-        { userRights.companyRead &&
+        { userRights.attributeRights.company.view &&
           <div className="col-2">
             <Label className="col-form-label">Firma</Label>
             { layoutComponents.Company }
@@ -1238,7 +1243,7 @@ export default function TaskEdit( props ) {
             <div className="task-edit-buttons row m-b-10">
               <span className="ml-auto center-hor">
 
-                { userRights.deleteTasks &&
+                { userRights.rights.deleteTask &&
                   <button
                     type="button"
                     className="btn-link-red btn-distance p-0"
@@ -1265,15 +1270,13 @@ export default function TaskEdit( props ) {
               </span>
             </div>
           }
-          { userRights.projectRead &&
-            <div className="form-selects-entry-column" >
-              <Label>Projekt <span className="warning-big">*</span></Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Project }
-              </div>
+          <div className="form-selects-entry-column" >
+            <Label>Projekt <span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Project }
             </div>
-          }
-          { userRights.statusRead &&
+          </div>
+          { userRights.attributeRights.status.view &&
             <div className="form-selects-entry-column" >
               <Label>Status <span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
@@ -1281,7 +1284,7 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.requesterRead &&
+          { userRights.attributeRights.requester.view &&
             <div className="form-selects-entry-column" >
               <Label>Zadal <span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
@@ -1289,7 +1292,7 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.companyRead &&
+          { userRights.attributeRights.company.view &&
             <div className="form-selects-entry-column" >
               <Label>Firma <span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
@@ -1297,7 +1300,7 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.assignedRead &&
+          { userRights.attributeRights.assigned.view &&
             <div className="form-selects-entry-column" >
               <Label>Assigned <span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
@@ -1305,7 +1308,7 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.deadlineRead &&
+          { userRights.attributeRights.deadline.view &&
             <div className="form-selects-entry-column" >
               <Label>Starts at</Label>
               <div className="form-selects-entry-column-rest" >
@@ -1313,7 +1316,7 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.deadlineRead &&
+          { userRights.attributeRights.deadline.view &&
             <div className="form-selects-entry-column" >
               <Label>Deadline</Label>
               <div className="form-selects-entry-column-rest" >
@@ -1321,10 +1324,10 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.repeatRead &&
+          { userRights.attributeRights.repeat.view &&
             <Repeat
               vertical
-              disabled={!userRights.repeatWrite}
+              disabled={!userRights.attributeRights.repeat.edit}
               duplicateTask={ !task.repeat ? getTaskData() : null}
               taskID={id}
               repeat={task.repeat}
@@ -1332,7 +1335,7 @@ export default function TaskEdit( props ) {
               layout={layout}
               />
           }
-          { userRights.typeRead &&
+          { userRights.attributeRights.taskType.view &&
             <div className="form-selects-entry-column" >
               <Label>Task Type <span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
@@ -1340,7 +1343,7 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.pausalRead &&
+          { userRights.attributeRights.pausal.view &&
             <div className="form-selects-entry-column" >
               <Label>Paušál <span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
@@ -1348,7 +1351,7 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.overtimeRead &&
+          { userRights.attributeRights.overtime.view &&
             <div className="form-selects-entry-column" >
               <Label>Mimo PH <span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
@@ -1364,10 +1367,10 @@ export default function TaskEdit( props ) {
   const renderMultiSelectTags = () => {
     return (
       <Empty>
-        { userRights.tagsRead && userRights.tagsWrite &&
+        { userRights.attributeRights.tags.edit &&
           <TagsPickerPopover
             taskID={id}
-            disabled={ defaultFields.tag.fixed || !userRights.tagsWrite }
+            disabled={ projectAttributes.tags.fixed }
             items={toSelArr(project === null ? [] : project.project.tags)}
             className="center-hor"
             selected={tags}
@@ -1378,8 +1381,8 @@ export default function TaskEdit( props ) {
             />
         }
 
-        { userRights.tagsRead && tags
-          .sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+        { userRights.attributeRights.tags.view &&
+          tags.sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
           .map( ( tag ) => (
             <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
               {tag.title}
@@ -1391,11 +1394,11 @@ export default function TaskEdit( props ) {
   }
 
   const renderDescription = () => {
-    if ( !userRights.taskDescriptionRead && !userRights.taskAttachmentsRead ) {
+    if ( !userRights.rights.taskDescriptionRead && !userRights.rights.taskAttachmentsRead ) {
       return null;
     }
     let RenderDescription = null;
-    if ( !userRights.taskDescriptionWrite ) {
+    if ( !userRights.rights.taskDescriptionWrite ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
@@ -1437,7 +1440,7 @@ export default function TaskEdit( props ) {
           <Label className="m-r-10">
             Popis úlohy
           </Label>
-          { userRights.taskDescriptionWrite &&
+          { userRights.rights.taskDescriptionWrite &&
             <button
               className="btn-link btn-distance"
               style={{height: "20px"}}
@@ -1452,7 +1455,7 @@ export default function TaskEdit( props ) {
               { !showDescription ? 'edit' : 'save' }
             </button>
           }
-          { userRights.taskAttachmentsWrite &&
+          { userRights.rights.taskAttachmentsWrite &&
             <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0 clickable" >
               <i className="fa fa-plus" />
               Attachment
@@ -1469,7 +1472,7 @@ export default function TaskEdit( props ) {
   }
 
   const renderCompanyPausalInfo = () => {
-    if ( !company || !company.monthlyPausal || !userRights.pausalRead ) {
+    if ( !company || !company.monthlyPausal || !userRights.rights.taskPausalInfo ) {
       return null;
     }
     return (
@@ -1496,13 +1499,13 @@ export default function TaskEdit( props ) {
 
   const renderSimpleSubtasks = () => {
     //hidden
-    if ( !userRights.taskShortSubtasksRead ) {
+    if ( !userRights.rights.taskSubtasksRead ) {
       return null;
     }
 
     return (
       <CheckboxList
-        disabled={!userRights.taskShortSubtasksWrite}
+        disabled={!userRights.rights.taskSubtasksWrite}
         items={task.shortSubtasks}
         onChange={(simpleSubtask) => {
           updateShortSubtask(simpleSubtask);
@@ -1521,12 +1524,12 @@ export default function TaskEdit( props ) {
   }
 
   const renderAttachments = ( top ) => {
-    if ( !userRights.taskAttachmentsRead ) {
+    if ( !userRights.rights.taskAttachmentsRead ) {
       return null;
     }
     return (
       <Attachments
-        disabled={!userRights.taskAttachmentsWrite}
+        disabled={!userRights.rights.taskAttachmentsWrite }
         taskID={id}
         type="task"
         top={top}
@@ -1538,7 +1541,7 @@ export default function TaskEdit( props ) {
   }
 
   const renderPendingPicker = () => {
-    if ( userRights.statusWrite ) {
+    if ( userRights.attributeRights.status.edit ) {
       return null;
     }
     return (
@@ -1581,14 +1584,20 @@ export default function TaskEdit( props ) {
 
   const renderVykazyTable = () => {
     if (
-      !userRights.rozpocetRead &&
-      !userRights.vykazRead
+      !userRights.rights.taskWorksRead &&
+      !userRights.rights.taskWorksAdvancedRead &&
+      !userRights.rights.taskMaterialsRead &&
+      !userRights.rights.taskPausalInfo
     ) {
       return null
     }
 
     return (
       <Empty>
+        { (
+          userRights.rights.taskWorksRead ||
+          userRights.rights.taskWorksAdvancedRead
+        ) &&
         <WorksTable
           userID={currentUser.id}
           userRights={userRights}
@@ -1606,8 +1615,8 @@ export default function TaskEdit( props ) {
           defaultType={taskType}
           subtasks={ subtasks }
           addSubtask={(newSubtask, price) => {
-              addSubtaskFunc(newSubtask);
-              setVykazyChanged(true);
+            addSubtaskFunc(newSubtask);
+            setVykazyChanged(true);
           }}
           updateSubtask={(id,newData)=>{
             let originalSubtask = subtasks.find((item)=>item.id===id);
@@ -1620,35 +1629,35 @@ export default function TaskEdit( props ) {
               } :
               null
             }
-              updateSubtaskFunc({...originalSubtask,...newData});
-              setVykazyChanged(true);
+            updateSubtaskFunc({...originalSubtask,...newData});
+            setVykazyChanged(true);
           }}
           updateSubtasks={(multipleSubtasks)=>{
-              multipleSubtasks.forEach(({id, newData})=>{
-                let originalSubtask = subtasks.find((item)=>item.id===id);
-                originalSubtask = {
-                  ...originalSubtask,
-                  scheduled: originalSubtask.scheduled ?
-                  {
-                    from: originalSubtask.scheduled.from,
-                    to: originalSubtask.scheduled.to,
-                  } :
-                  null
-                }
-                updateSubtaskFunc({...originalSubtask,...newData});
-                setVykazyChanged(true);
-              });
+            multipleSubtasks.forEach(({id, newData})=>{
+              let originalSubtask = subtasks.find((item)=>item.id===id);
+              originalSubtask = {
+                ...originalSubtask,
+                scheduled: originalSubtask.scheduled ?
+                {
+                  from: originalSubtask.scheduled.from,
+                  to: originalSubtask.scheduled.to,
+                } :
+                null
+              }
+              updateSubtaskFunc({...originalSubtask,...newData});
+              setVykazyChanged(true);
+            });
           }}
           removeSubtask={(id)=>{
-              deleteSubtaskFunc(id);
-              setVykazyChanged(true);
+            deleteSubtaskFunc(id);
+            setVykazyChanged(true);
           }}
 
           workTrips={ workTrips }
           tripTypes={tripTypes}
           addTrip={(newTrip, price)=>{
-              addWorkTripFunc(newTrip);
-              setVykazyChanged(true);
+            addWorkTripFunc(newTrip);
+            setVykazyChanged(true);
           }}
           updateTrip={(id,newData)=>{
             let originalTrip = workTrips.find((item)=>item.id===id);
@@ -1661,8 +1670,8 @@ export default function TaskEdit( props ) {
               } :
               null
             }
-              updateWorkTripFunc({...originalTrip,...newData});
-              setVykazyChanged(true);
+            updateWorkTripFunc({...originalTrip,...newData});
+            setVykazyChanged(true);
           }}
           updateTrips={(multipleTrips)=>{
             const originalTrips = workTrips.map((item)=>({
@@ -1672,27 +1681,31 @@ export default function TaskEdit( props ) {
                 to: item.scheduled.to,
               }
             }));
-              multipleTrips.forEach(({id, newData})=>{
-                let originalTrip = workTrips.find((item)=>item.id===id);
-                originalTrip = {
-                  ...originalTrip,
-                  scheduled: originalTrip.scheduled ?
-                  {
-                    from: originalTrip.scheduled.from,
-                    to: originalTrip.scheduled.to,
-                  } :
-                  null
-                }
-                updateWorkTripFunc({...originalTrip,...newData});
-                setVykazyChanged(true);
-              });
+            multipleTrips.forEach(({id, newData})=>{
+              let originalTrip = workTrips.find((item)=>item.id===id);
+              originalTrip = {
+                ...originalTrip,
+                scheduled: originalTrip.scheduled ?
+                {
+                  from: originalTrip.scheduled.from,
+                  to: originalTrip.scheduled.to,
+                } :
+                null
+              }
+              updateWorkTripFunc({...originalTrip,...newData});
+              setVykazyChanged(true);
+            });
           }}
           removeTrip={(id)=>{
-              deleteWorkTripFunc(id);
-              setVykazyChanged(true);
+            deleteWorkTripFunc(id);
+            setVykazyChanged(true);
           }}
           />
-        {renderCompanyPausalInfo()}
+      }
+
+      { userRights.rights.taskPausalInfo && renderCompanyPausalInfo()}
+
+      { userRights.rights.taskMaterialsRead &&
         <Materials
           showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
           showTotals={true}
@@ -1705,59 +1718,61 @@ export default function TaskEdit( props ) {
             addMaterialFunc(newMaterial);
           }}
           updateMaterial={(id,newData)=>{
-              updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+            updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
           }}
           updateMaterials={(multipleMaterials)=>{
-              multipleMaterials.forEach(({id, newData})=>{
-                updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-              });
+            multipleMaterials.forEach(({id, newData})=>{
+              updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
+            });
           }}
           removeMaterial={(id)=>{
-              deleteMaterialFunc(id);
+            deleteMaterialFunc(id);
           }}
           />
-      </Empty>
+      }
+    </Empty>
     )
   }
 
   const renderComments = () => {
-    if ( !userRights.history && !userRights.viewComments ) {
+    if ( !userRights.rights.history && !userRights.rights.viewComments ) {
       return null;
     }
     return (
       <div className="form-section">
-        <div className="form-section-rest">
-          <Nav tabs className="no-border m-b-10">
-            { userRights.viewComments &&
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: toggleTab === 1}, "clickable", "")}
-                  onClick={() => setToggleTab(1) }
-                  >
-                  Komentáre
-                </NavLink>
-              </NavItem>
-            }
-            { userRights.history && userRights.viewComments &&
-              <NavItem>
-                <NavLink>
-                  |
-                </NavLink>
-              </NavItem>
-            }
-            { userRights.history &&
-              <NavItem>
-                <NavLink
-                  className={classnames({ active: toggleTab === 2 }, "clickable", "")}
-                  onClick={() => setToggleTab(2) }
-                  >
-                  História
-                </NavLink>
-              </NavItem>
-            }
-          </Nav>
-          <TabContent activeTab={toggleTab}>
-            <TabPane tabId={1}>
+      <div className="form-section-rest">
+        <Nav tabs className="no-border m-b-10">
+          { userRights.rights.viewComments &&
+            <NavItem>
+              <NavLink
+                className={classnames({ active: toggleTab === 1}, "clickable", "")}
+                onClick={() => setToggleTab(1) }
+                >
+                Komentáre
+              </NavLink>
+            </NavItem>
+          }
+          { userRights.rights.history && userRights.rights.viewComments &&
+            <NavItem>
+              <NavLink>
+                |
+              </NavLink>
+            </NavItem>
+          }
+          { userRights.rights.history &&
+            <NavItem>
+              <NavLink
+                className={classnames({ active: toggleTab === 2 }, "clickable", "")}
+                onClick={() => setToggleTab(2) }
+                >
+                História
+              </NavLink>
+            </NavItem>
+          }
+        </Nav>
+        <TabContent activeTab={toggleTab}>
+          <TabPane tabId={1}>
+            { userRights.rights.viewComments &&
               <Comments
                 id={id}
                 submitComment={ submitComment }
@@ -1765,185 +1780,188 @@ export default function TaskEdit( props ) {
                 userRights={ userRights }
                 users={users}
                 />
-            </TabPane>
-            {	userRights.history &&
-              <TabPane tabId={2}>
-                <TaskHistory task={task} />
-              </TabPane>
             }
-          </TabContent>
-        </div>
+          </TabPane>
+          {	userRights.rights.history &&
+            <TabPane tabId={2}>
+              { userRights.rights.history &&
+                <TaskHistory task={task} />
+              }
+            </TabPane>
+          }
+        </TabContent>
       </div>
+    </div>
     )
   }
 
   const renderStatusChangeModal = () => {
     return (
       <StatusChangeModal
-        open={possibleStatus !== null}
-        userRights={ userRights }
-        statuses={project ? toSelArr(project.project.statuses) : []}
-        newStatus={possibleStatus}
-        closeModal={ () => {
-          setPossibleStatus(null);
-        } }
-        submit={(status, comment, date ) => {
-          setPossibleStatus(null);
-          setStatus( status );
-          if ( status.action === 'PendingDate' ) {
-            setPendingDate( date );
-            autoUpdateTask( {
-              status: status.id,
-              pendingDate: date
-              .valueOf()
-              .toString(),
-              pendingChangable: true,
-            } );
-          } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
-            setCloseDate( date );
-            autoUpdateTask( {
-              status: status.id,
-              closeDate: date
-              .valueOf()
-              .toString(),
-            } );
-          } else {
-            autoUpdateTask( {
-              status: status.id
-            } );
-          }
-          if(comment.length > 0 ){
-            submitComment({
-              id,
-              message: comment,
-              attachments: [],
-              parentCommentId: null,
-              internal: false,
-            })
-          }
-        }}
-        />
+      open={possibleStatus !== null}
+      userRights={ userRights }
+      statuses={project ? toSelArr(project.project.statuses) : []}
+      newStatus={possibleStatus}
+      closeModal={ () => {
+        setPossibleStatus(null);
+      } }
+      submit={(status, comment, date ) => {
+        setPossibleStatus(null);
+        setStatus( status );
+        if ( status.action === 'PendingDate' ) {
+          setPendingDate( date );
+          autoUpdateTask( {
+            status: status.id,
+            pendingDate: date
+            .valueOf()
+            .toString(),
+            pendingChangable: true,
+          } );
+        } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
+          setCloseDate( date );
+          autoUpdateTask( {
+            status: status.id,
+            closeDate: date
+            .valueOf()
+            .toString(),
+          } );
+        } else {
+          autoUpdateTask( {
+            status: status.id
+          } );
+        }
+        if(comment.length > 0 ){
+          submitComment({
+            id,
+            message: comment,
+            attachments: [],
+            parentCommentId: null,
+            internal: false,
+          })
+        }
+      }}
+      />
     )
   }
 
   const renderModalUserAdd = () => {
     return (
       <Empty>
-        <Modal isOpen={openUserAdd} className="modal-without-borders" >
-          <ModalHeader>
-            Add user
-          </ModalHeader>
-          <ModalBody>
-            <UserAdd
-              closeModal={() => setOpenUserAdd(false)}
-              addUserToList={(user) => {
-                setNewAddedUser(user);
-              }}
-              />
-          </ModalBody>
-        </Modal>
-        { project && project.id &&
-          <AddUserToGroup
-            user={newAddedUser}
-            disabled={ !userRights.projectSecondary }
-            projectID={project.id}
-            finish={() => setNewAddedUser(null)}
+      <Modal isOpen={openUserAdd} className="modal-without-borders" >
+        <ModalHeader>
+          Add user
+        </ModalHeader>
+        <ModalBody>
+          <UserAdd
+            closeModal={() => setOpenUserAdd(false)}
+            addUserToList={(user) => {
+              setNewAddedUser(user);
+            }}
             />
-        }
-      </Empty>
+        </ModalBody>
+      </Modal>
+      { project && project.id &&
+        <AddUserToGroup
+          user={newAddedUser}
+          disabled={ !userRights.rights.projectWrite }
+          projectID={project.id}
+          finish={() => setNewAddedUser(null)}
+          />
+      }
+    </Empty>
     )
   }
 
   const renderModalCompanyAdd = () => {
     return (
       <Modal isOpen={openCompanyAdd} className="modal-without-borders">
-        <ModalBody>
-          <CompanyAdd
-            closeModal={() => setOpenCompanyAdd(false)}
-            addCompanyToList={addCompanyToList}
-            />
-        </ModalBody>
-      </Modal>
+      <ModalBody>
+        <CompanyAdd
+          closeModal={() => setOpenCompanyAdd(false)}
+          addCompanyToList={addCompanyToList}
+          />
+      </ModalBody>
+    </Modal>
     )
   }
 
   return (
     <div
+    className={classnames(
+      {
+        'task-edit-width': !inModal
+      },
+      "flex",
+      "max-height-400",
+      {
+        "basic-border-top": layout === 1
+      }
+    )}
+    >
+
+    <div
       className={classnames(
-        {
-          'task-edit-width': !inModal
-        },
-        "flex",
-        "max-height-400",
-        {
-          "basic-border-top": layout === 1
-        }
+        {"fit-with-header": !columns && !inModal},
+        {"fit-with-header-and-commandbar": columns && !inModal},
+        {"scroll-visible": !inModal},
+        {"overflow-x-auto": inModal},
       )}
       >
-
+      { !inModal && renderCommandbar() }
       <div
         className={classnames(
-          {"fit-with-header": !columns && !inModal},
-          {"fit-with-header-and-commandbar": columns && !inModal},
-          {"scroll-visible": !inModal},
-          {"overflow-x-auto": inModal},
+          {
+            "row":  layout === 2,
+          },
         )}
+        style={{minHeight: "calc(100% - 70px)"}}
         >
-        { !inModal && renderCommandbar() }
         <div
           className={classnames(
             {
-              "row":  layout === 2,
+              "task-edit-left":  layout === 2 && !columns,
+              "task-edit-left-columns": (layout === 2 && columns) || layout === 1 || layout === 3,
             },
           )}
-          style={{minHeight: "calc(100% - 70px)"}}
           >
-          <div
-            className={classnames(
-              {
-                "task-edit-left":  layout === 2 && !columns,
-                "task-edit-left-columns": (layout === 2 && columns) || layout === 1 || layout === 3,
-              },
-            )}
-            >
 
-            <div className="" >
-              { renderTitle() }
-              { layout === 2 && <hr className="m-t-5 m-b-2"/> }
-              {renderTaskInfoAndDates()}
+          <div className="" >
+            { renderTitle() }
+            { layout === 2 && <hr className="m-t-5 m-b-2"/> }
+            {renderTaskInfoAndDates()}
 
-              {canCreateVykazyError()}
+            {canCreateVykazyError()}
 
-              { layout === 1 && renderSelectsLayout1() }
+            { layout === 1 && renderSelectsLayout1() }
 
-              { renderDescription() }
+            { renderDescription() }
 
-              { renderSimpleSubtasks() }
+            { renderSimpleSubtasks() }
 
 
 
-              { renderPendingPicker() }
+            { renderPendingPicker() }
 
-              { renderVykazyTable() }
+            { renderVykazyTable() }
 
-              { renderComments() }
+            { renderComments() }
 
-              { currentUser.role.accessRights.users && renderModalUserAdd() }
+            { currentUser.role.accessRights.users && renderModalUserAdd() }
 
-              { currentUser.role.accessRights.companies && renderModalCompanyAdd() }
+            { currentUser.role.accessRights.companies && renderModalCompanyAdd() }
 
-              { renderStatusChangeModal() }
+            { renderStatusChangeModal() }
 
-              <div className="form-section"></div>
-
-            </div>
-
+            <div className="form-section"></div>
 
           </div>
 
-          { layout === 2 && renderSelectsLayout2Side() }
+
         </div>
+
+        { layout === 2 && renderSelectsLayout2Side() }
       </div>
     </div>
+  </div>
   );
 }

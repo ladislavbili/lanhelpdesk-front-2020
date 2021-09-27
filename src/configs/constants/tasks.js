@@ -16,7 +16,6 @@ export const defaultTasksAttributesFilter = {
   deadline: null,
   project: "",
   taskType: "",
-  milestone: "",
   assignedTo: "",
   tags: "",
   overtime: "",
@@ -69,7 +68,6 @@ export const defaultTasklistColumnPreference = {
   startsAt: false,
   deadline: false,
   project: true,
-  milestone: false,
   taskType: false,
   overtime: false,
   pausal: false,
@@ -165,127 +163,138 @@ export const orderByValues = [
     type: 'date'
   },
 ]
+
+const checkAttributeRight = ( project, right ) => {
+  if ( !project ) {
+    return false;
+  }
+  return project.attributeRights[ right ].view
+}
+
+const checkRight = ( project, right ) => {
+  if ( !project ) {
+    return false;
+  }
+  return project.right[ right ]
+}
+
 export const attributeLimitingRights = [
   {
-    right: 'assignedRead',
+    right: ( project ) => checkAttributeRight( project, 'assigned' ),
     preference: 'assignedTo'
   },
   {
-    right: 'companyRead',
+    right: ( project ) => checkAttributeRight( project, 'company' ),
     preference: 'company'
   },
   {
-    right: 'overtimeRead',
+    right: ( project ) => checkAttributeRight( project, 'overtime' ),
     preference: 'overtime'
   },
   {
-    right: 'pausalRead',
+    right: ( project ) => checkAttributeRight( project, 'pausal' ),
     preference: 'pausal'
   },
   {
-    right: 'requesterRead',
+    right: ( project ) => checkAttributeRight( project, 'requester' ),
     preference: 'requester'
   },
   {
-    right: 'statusRead',
+    right: ( project ) => checkAttributeRight( project, 'status' ),
     preference: 'status'
   },
   {
-    right: 'tagsRead',
+    right: ( project ) => checkAttributeRight( project, 'tags' ),
     preference: 'tags'
   },
   {
-    right: 'deadlineRead',
+    right: ( project ) => checkAttributeRight( project, 'startsAt' ),
     preference: 'startsAt'
   },
   {
-    right: 'deadlineRead',
+    right: ( project ) => checkAttributeRight( project, 'deadline' ),
     preference: 'deadline'
   },
   {
-    right: 'milestoneRead',
-    preference: 'milestone'
-  },
-  {
-    right: 'typeRead',
+    right: ( project ) => checkAttributeRight( project, 'taskType' ),
     preference: 'taskType'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskWorksRead' ),
     preference: 'works'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskWorksRead' ),
     preference: 'trips'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskMaterialsRead' ),
     preference: 'materialsWithoutDPH'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskMaterialsRead' ),
     preference: 'materialsWithDPH'
   },
 ]
 export const ganttAttributeLimitingRights = [
   {
-    right: 'assignedRead',
+    right: ( project ) => checkAttributeRight( project, 'assigned' ),
     preference: 'assignedTo'
   },
   {
-    right: 'companyRead',
+    right: ( project ) => checkAttributeRight( project, 'company' ),
     preference: 'company'
   },
   {
-    right: 'overtimeRead',
+    right: ( project ) => checkAttributeRight( project, 'overtime' ),
     preference: 'overtime'
   },
   {
-    right: 'pausalRead',
+    right: ( project ) => checkAttributeRight( project, 'pausal' ),
     preference: 'pausal'
   },
   {
-    right: 'requesterRead',
+    right: ( project ) => checkAttributeRight( project, 'requester' ),
     preference: 'requester'
   },
   {
-    right: 'statusRead',
+    right: ( project ) => checkAttributeRight( project, 'status' ),
     preference: 'status'
   },
   {
-    right: 'tagsRead',
+    right: ( project ) => checkAttributeRight( project, 'tags' ),
     preference: 'tags'
   },
   {
-    right: 'typeRead',
+    right: ( project ) => checkAttributeRight( project, 'taskType' ),
     preference: 'taskType'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskWorksRead' ),
     preference: 'works'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskWorksRead' ),
     preference: 'trips'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskMaterialsRead' ),
     preference: 'materialsWithoutDPH'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskMaterialsRead' ),
     preference: 'materialsWithDPH'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskWorksRead' ),
     preference: 'subtasks'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskWorksRead' ),
     preference: 'subtaskAssigned'
   },
   {
-    right: 'vykazRead',
+    right: ( project ) => checkRight( project, 'taskWorksRead' ),
     preference: 'subtasksHours'
   },
 ]
@@ -307,7 +316,7 @@ export const allFilterAttributes = [
   {
     value: 'status',
     label: 'Status',
-    right: 'statusRead',
+    right: ( project ) => checkAttributeRight( project, 'status' ),
   },
   {
     value: 'project',
@@ -315,34 +324,29 @@ export const allFilterAttributes = [
     right: null,
   },
   {
-    value: 'milestone',
-    label: 'Milestone',
-    right: 'milestoneRead',
-  },
-  {
     value: 'requester',
     label: 'Requester',
-    right: 'requesterRead',
+    right: ( project ) => checkAttributeRight( project, 'requester' ),
   },
   {
     value: 'company',
     label: 'Company',
-    right: 'companyRead',
+    right: ( project ) => checkAttributeRight( project, 'company' ),
   },
   {
     value: 'assignedTo',
     label: 'Assigned',
-    right: 'assignedRead',
+    right: ( project ) => checkAttributeRight( project, 'assigned' ),
   },
   {
     value: 'tags',
     label: 'Tags',
-    right: 'tagsRead',
+    right: ( project ) => checkAttributeRight( project, 'tags' ),
   },
   {
     value: 'taskType',
     label: 'Task Type',
-    right: 'typeRead',
+    right: ( project ) => checkAttributeRight( project, 'taskType' ),
   },
   {
     value: 'createdAt',
@@ -352,22 +356,22 @@ export const allFilterAttributes = [
   {
     value: 'startsAt',
     label: 'Starts at',
-    right: 'deadlineRead',
+    right: ( project ) => checkAttributeRight( project, 'startsAt' ),
   },
   {
     value: 'deadline',
     label: 'Deadline',
-    right: 'deadlineRead',
+    right: ( project ) => checkAttributeRight( project, 'deadline' ),
   },
   {
     value: 'pausal',
     label: 'Pausal',
-    right: 'pausalRead',
+    right: ( project ) => checkAttributeRight( project, 'pausal' ),
   },
   {
     value: 'overtime',
     label: 'Overtime',
-    right: 'overtimeRead',
+    right: ( project ) => checkAttributeRight( project, 'overtime' ),
   },
 ]
 
@@ -405,7 +409,7 @@ export const createDisplayValues = ( preference, withoutProject ) => {
       label: 'Title',
       type: 'text',
       show: preference[ 'title' ],
-      width: '30%',
+      className: 'min-width-150',
     },
     {
       value: 'status',
@@ -413,12 +417,6 @@ export const createDisplayValues = ( preference, withoutProject ) => {
       type: 'object',
       show: preference[ 'status' ],
       width: '50',
-    },
-    {
-      value: 'milestone',
-      label: 'Milestone',
-      type: 'object',
-      show: preference[ 'milestone' ]
     },
     {
       value: 'requester',
@@ -617,7 +615,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
       type: 'text',
       show: true,
       permanent: true,
-      width: '30%',
+      className: 'min-width-150',
     },
     {
       value: 'id',

@@ -77,9 +77,14 @@ export default function TasksLoader( props ) {
 
   const currentUser = getMyData();
 
+
+  const localFilter = filterData.localFilter;
+  const localProject = projectData.localProject;
+  const localMilestone = milestoneData.localMilestone;
+
   const getSort = () => {
     let realLayout = currentUser ? currentUser.tasklistLayout : 0;
-    if ( ( [ 2, 4 ].includes( realLayout ) && localProject.id === null ) || ( realLayout === 3 && !( localProject.id === null || localProject.right.assignedRead ) ) ) {
+    if ( ( [ 2, 4 ].includes( realLayout ) && localProject.id === null ) || ( realLayout === 3 && !( localProject.id === null || localProject.attributeRights.assigned.view ) ) ) {
       realLayout = 0;
     }
     let sort = defaultSorts[ 0 ];
@@ -90,10 +95,6 @@ export default function TasksLoader( props ) {
     }
     return sort;
   }
-
-  const localFilter = filterData.localFilter;
-  const localProject = projectData.localProject;
-  const localMilestone = milestoneData.localMilestone;
   const sort = getSort();
 
 
@@ -155,7 +156,13 @@ export default function TasksLoader( props ) {
     )
   }
 
-  const canViewCalendar = localProject.id === null || localProject.right.assignedRead || !currentUser.role.accessRights.tasklistCalendar;
+  const canViewCalendar = (
+    (
+      localProject.id !== null &&
+      localProject.right.tasklistCalendar
+    ) ||
+    currentUser.role.accessRights.tasklistCalendar
+  );
 
   return (
     <TasklistSwitch

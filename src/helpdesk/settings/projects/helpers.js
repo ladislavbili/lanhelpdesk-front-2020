@@ -272,31 +272,31 @@ export const mergeGroupRights = ( right1, right2 ) => {
 export const mergeGroupAttributeRights = ( right1, right2 ) => {
   return {
     assigned: {
-      required: right1.assigned.required || right2.assigned.required,
+      required: right1.assigned.required && right2.assigned.required,
       add: right1.assigned.add || right2.assigned.add,
       view: right1.assigned.view || right2.assigned.view,
       edit: right1.assigned.edit || right2.assigned.edit,
     },
     company: {
-      required: right1.company.required || right2.company.required,
+      required: right1.company.required && right2.company.required,
       add: right1.company.add || right2.company.add,
       view: right1.company.view || right2.company.view,
       edit: right1.company.edit || right2.company.edit,
     },
     deadline: {
-      required: right1.deadline.required || right2.deadline.required,
+      required: right1.deadline.required && right2.deadline.required,
       add: right1.deadline.add || right2.deadline.add,
       view: right1.deadline.view || right2.deadline.view,
       edit: right1.deadline.edit || right2.deadline.edit,
     },
     overtime: {
-      required: right1.overtime.required || right2.overtime.required,
+      required: right1.overtime.required && right2.overtime.required,
       add: right1.overtime.add || right2.overtime.add,
       view: right1.overtime.view || right2.overtime.view,
       edit: right1.overtime.edit || right2.overtime.edit,
     },
     pausal: {
-      required: right1.pausal.required || right2.pausal.required,
+      required: right1.pausal.required && right2.pausal.required,
       add: right1.pausal.add || right2.pausal.add,
       view: right1.pausal.view || right2.pausal.view,
       edit: right1.pausal.edit || right2.pausal.edit,
@@ -307,25 +307,25 @@ export const mergeGroupAttributeRights = ( right1, right2 ) => {
       edit: right1.repeat.edit || right2.repeat.edit,
     },
     requester: {
-      required: right1.requester.required || right2.requester.required,
+      required: right1.requester.required && right2.requester.required,
       add: right1.requester.add || right2.requester.add,
       view: right1.requester.view || right2.requester.view,
       edit: right1.requester.edit || right2.requester.edit,
     },
     startsAt: {
-      required: right1.startsAt.required || right2.startsAt.required,
+      required: right1.startsAt.required && right2.startsAt.required,
       add: right1.startsAt.add || right2.startsAt.add,
       view: right1.startsAt.view || right2.startsAt.view,
       edit: right1.startsAt.edit || right2.startsAt.edit,
     },
     status: {
-      required: right1.status.required || right2.status.required,
+      required: right1.status.required && right2.status.required,
       add: right1.status.add || right2.status.add,
       view: right1.status.view || right2.status.view,
       edit: right1.status.edit || right2.status.edit,
     },
     tags: {
-      required: right1.tags.required || right2.tags.required,
+      required: right1.tags.required && right2.tags.required,
       add: right1.tags.add || right2.tags.add,
       view: right1.tags.view || right2.tags.view,
       edit: right1.tags.edit || right2.tags.edit,

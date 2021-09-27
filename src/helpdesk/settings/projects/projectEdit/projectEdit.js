@@ -434,10 +434,6 @@ export default function ProjectEdit( props ) {
     return compactCompanyGroups;
   }
 
-  //TODO: apply rights to everywhere
-  //TODO: load project filters
-  //TODO: project filters no wheel in sidebar
-
   const updateProjectFunc = () => {
     setSaving( true );
 
@@ -510,7 +506,6 @@ export default function ProjectEdit( props ) {
         }
       } )
       .then( ( response ) => {
-        return;
         setAddTags( [] );
         setUpdateTags( [] );
         setDeleteTags( [] );

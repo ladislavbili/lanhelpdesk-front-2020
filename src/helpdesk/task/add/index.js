@@ -202,8 +202,9 @@ export default function TaskAddContainer( props ) {
             toSelArr(projectsData.myProjects.map((myProject) => ({
               ...myProject.project,
               right: myProject.right,
+              attributeRights: myProject.attributeRights,
               users: myProject.usersWithRights.map((userWithRights) => userWithRights.user.id)
-            }) )).filter((project) => project.right.addTasks )
+            }) )).filter((project) => project.right.addTask )
           }
           onSubmit= {(projectID) => {
             setProjectID(projectID);
@@ -227,8 +228,9 @@ export default function TaskAddContainer( props ) {
                 toSelArr(projectsData.myProjects.map((myProject) => ({
                   ...myProject.project,
                   right: myProject.right,
+                  attributeRights: myProject.attributeRights,
                   users: myProject.usersWithRights
-                }) )).filter((project) => project.right.addTasks )
+                }) )).filter((project) => project.right.addTask )
               }
               myProjects={loading ? [] : projectsData.myProjects}
               users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }

@@ -86,7 +86,7 @@ export default function Comments( props ) {
   const [ attachments, setAttachments ] = React.useState( [] );
   const [ emailBody, setEmailBody ] = React.useState( "" );
   const [ hasError ] = React.useState( false );
-  const [ isEmail, setIsEmail ] = React.useState( !userRights.addComments );
+  const [ isEmail, setIsEmail ] = React.useState( !userRights.rights.addComments );
   const [ isInternal, setIsInternal ] = React.useState( false );
   const [ newComment, setNewComment ] = React.useState( "" );
   const [ saving, setSaving ] = React.useState( false );
@@ -96,7 +96,7 @@ export default function Comments( props ) {
 
   React.useEffect( () => {
     setOpenedComments( [] )
-    setIsEmail( !userRights.addComments );
+    setIsEmail( !userRights.rights.addComments );
     setPage( 1 );
     commentsRefetch( {
       variables: {
@@ -151,7 +151,7 @@ export default function Comments( props ) {
 
   return (
     <div>
-      { (userRights.addComments || userRights.emails) &&
+      { (userRights.rights.addComments || userRights.rights.emails) &&
         <div>
           { isEmail &&
             <FormGroup className="row m-b-10">
@@ -235,17 +235,17 @@ export default function Comments( props ) {
               >
               {`Add ${ isEmail ? 'e-mail' : 'comment'}`}
             </button>
-            { userRights.emails && userRights.addComments &&
+            { userRights.rights.emails && userRights.rights.addComments &&
               <Checkbox
                 className = "m-r-15 center-hor "
                 centerHor
-                disabled={ !userRights.emails || !userRights.addComments }
+                disabled={ !userRights.rights.emails || !userRights.rights.addComments }
                 label = "E-mail"
                 value = { isEmail }
                 onChange={() => setIsEmail(!isEmail) }
                 />
             }
-            {userRights.internal && !isEmail &&
+            {userRights.rights.internal && !isEmail &&
               <Checkbox
                 className = "m-r-15 center-hor"
                 centerHor

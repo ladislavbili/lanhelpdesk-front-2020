@@ -240,7 +240,7 @@ export default function CalendarLoader( props ) {
     setFakeEvents( fakeEvents.filter( ( fakeEvent ) => fakeEvent.type !== 'repeatTime' || repeatTimes.some( ( repeatTime ) => repeatTime.id !== fakeEvent.repeatTime.id ) ) );
   }, [ repeatTimes ] );
 
-  const canSeeStack = localProject.id === null || localProject.right.assignedWrite;
+  const canSeeStack = localProject.id === null || localProject.attributeRights.assigned.edit;
 
   const getRepeatMilisecs = ( repeatEvery, repeatInterval ) => {
     let multiplier = multipliers[ repeatInterval ];
