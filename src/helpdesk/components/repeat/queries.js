@@ -332,6 +332,13 @@ mutation deleteRepeat($id: Int!) {
 }
 `;
 
+export const REPEATS_SUBSCRIPTION = gql `
+subscription repeatsSubscription {
+  repeatsSubscription
+}
+`;
+
+
 //short subtasks
 export const ADD_SHORT_SUBTASK = gql `
 mutation addRepeatTemplateShortSubtask($title: String!, $done: Boolean!, $repeatTemplate: Int!) {

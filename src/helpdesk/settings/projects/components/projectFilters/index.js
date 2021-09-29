@@ -4,6 +4,7 @@ import {
 } from "@apollo/client";
 import {
   updateArrayItem,
+  sortBy,
 } from 'helperFunctions';
 import ProjectFilterEdit from './projectFilterEdit';
 import ProjectFilterAdd from './projectFilterAdd';
@@ -64,11 +65,12 @@ export default function ProjectFilters( props ) {
             <th>Project filter name</th>
             <th>Description</th>
             <th>Groups</th>
+            <th>Order</th>
             <th width="100">Action</th>
           </tr>
         </thead>
         <tbody>
-          { filters.map((projectFilter) => (
+          { sortBy(filters,[{ asc: true, key: 'order' }]).map((projectFilter) => (
             <tr key={projectFilter.id}>
               <td>
                 {projectFilter.title}
@@ -79,6 +81,9 @@ export default function ProjectFilters( props ) {
               <td>
                 { getGroupsProblematicAttributes( groups, projectFilter ).length !== 0 && <i className="text-danger font-size-16 m-l-10 m-t-10 fa fa-exclamation-circle" /> }
                 { groups.filter((group) => projectFilter.groups.some((groupId) => group.id === groupId )).map((group) => group.title ).join(', ') }
+              </td>
+              <td>
+                { projectFilter.order }
               </td>
               <td>
                 <ProjectFilterEdit

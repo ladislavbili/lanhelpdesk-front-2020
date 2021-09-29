@@ -7,21 +7,29 @@ export const orderArr = ( array, attribute = 'order', order = 1 ) => {
   ) );
 }
 
-export const sortBy = ( array, byAttributes = [ 'title' ] ) => {
-  if ( byAttributes === [] ) {
+const defaultByAttributes = [ {
+  key: 'title',
+  asc: true
+} ];
+
+export const sortBy = ( originalArray, byAttributes = defaultByAttributes ) => {
+  let array = [ ...originalArray ];
+  if ( byAttributes.length === 0 ) {
     return array;
   }
+
   return array.sort( ( item1, item2 ) => {
     const results = byAttributes.map( ( attribute ) => {
-      if ( item1[ attribute ] > item2[ attribute ] ) {
-        return 1;
+      const value = attribute.asc ? 1 : -1;
+      if ( item1[ attribute.key ] > item2[ attribute.key ] ) {
+        return value;
       }
-      if ( item1[ attribute ] < item2[ attribute ] ) {
-        return -1;
+      if ( item1[ attribute.key ] < item2[ attribute.key ] ) {
+        return -1 * value;
       }
       return 0;
-    } )
-    let result = results.find( ( res ) => res !== 0 );
+    } );
+    const result = results.find( ( res ) => res !== 0 );
     return result || 0;
   } );
 }

@@ -60,7 +60,7 @@ export default function ProjectGroupEdit( props ) {
               closeModal();
             } }
             >
-            Close
+            Cancel
           </button>
           <div className="ml-auto">
             <button

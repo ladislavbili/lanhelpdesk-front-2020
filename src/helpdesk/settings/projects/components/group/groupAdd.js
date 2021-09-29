@@ -68,7 +68,7 @@ export default function ProjectGroupAdd( props ) {
                 setOpen(false);
               } }
               >
-              Close
+              Cancel
             </button>
             <div className="ml-auto">
               <button

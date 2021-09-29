@@ -53,7 +53,7 @@ export default function Statuses( props ) {
         </thead>
 
         <tbody>
-          { sortBy(statuses,['order', 'title']).map(status =>
+          { sortBy(statuses,[{key: 'order', asc: true }, {key: 'title', asc: true }]).map(status =>
             <tr key={status.id}>
               <td>
                 <input

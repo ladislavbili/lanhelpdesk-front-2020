@@ -211,6 +211,7 @@ query {
       projectFilters {
         id
         title
+        order
         ${filter}
       }
     }
@@ -234,8 +235,8 @@ query {
 export const GET_PROJECTS = gql `
 query {
   projects {
-    title
     id
+    title
     right{
       projectWrite
     }

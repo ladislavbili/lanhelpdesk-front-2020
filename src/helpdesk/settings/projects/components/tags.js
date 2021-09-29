@@ -40,7 +40,7 @@ export default function Tags( props ) {
         </thead>
 
         <tbody>
-          { sortBy(tags,['order', 'title']).map(tag =>
+          { sortBy(tags,[{key: 'order', asc: true }, {key: 'title', asc: true }]).map(tag =>
             <tr key={tag.id}>
               <td>
                 <input

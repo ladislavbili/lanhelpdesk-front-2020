@@ -286,6 +286,7 @@ export default function ProjectAdd( props ) {
       .then( ( response ) => {
         setSaving( false );
         if ( attachments.length > 0 ) {
+          console.log( 'attachments' );
           const formData = new FormData();
           attachments.map( ( attachment ) => attachment.data )
             .forEach( ( file ) => formData.append( `file`, file ) );
@@ -298,6 +299,7 @@ export default function ProjectAdd( props ) {
             } )
             .then( ( response2 ) => {
               if ( closeModal ) {
+                console.log( 'a' );
                 let myUserGroup1 = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
                 let myUserGroup2 = companyGroups.find( ( companyGroup ) => companyGroup.company.id === currentUser.company.id );
                 let myRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
@@ -340,10 +342,12 @@ export default function ProjectAdd( props ) {
                   closeModal( null, null );
                 }
               } else {
+                console.log( 'b' );
                 if ( match.path.includes( 'settings' ) ) {
                   history.push( '/helpdesk/settings/projects/' + response.data.addProject.id + '/description' );
                 } else {
-                  history.push( '/helpdesk/project/' + response.data.addProject.id + '/description' );
+                  history.push( 'helpdesk/taskList/i/all' );
+                  //history.push( '/helpdesk/project/' + response.data.addProject.id + '/description' );
                 }
               }
             } )
@@ -351,7 +355,9 @@ export default function ProjectAdd( props ) {
               addLocalError( err );
             } );
         } else {
+          console.log( 'no attachments' );
           if ( closeModal ) {
+            console.log( 'a' );
             let myUserGroup1 = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
             let myUserGroup2 = companyGroups.find( ( companyGroup ) => companyGroup.company.id === currentUser.company.id );
             let myRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
@@ -394,6 +400,7 @@ export default function ProjectAdd( props ) {
               closeModal( null, null, null );
             }
           } else {
+            console.log( 'b' );
             let myUserGroup1 = userGroups.find( ( userGroup ) => userGroup.user.id === currentUser.id );
             let myUserGroup2 = companyGroups.find( ( companyGroup ) => companyGroup.company.id === currentUser.company.id );
             let myRights = remapRightsToBackend( groups.find( ( group ) => group.admin && group.def ) )
@@ -411,8 +418,6 @@ export default function ProjectAdd( props ) {
             }
             if ( match.path.includes( 'settings' ) ) {
               history.push( '/helpdesk/settings/projects/' + response.data.addProject.id + '/description' );
-            } else if ( myRights.projectWrite ) {
-              history.push( '/helpdesk/project/' + response.data.addProject.id + '/description' );
             } else {
               history.push( 'helpdesk/taskList/i/all' );
             }

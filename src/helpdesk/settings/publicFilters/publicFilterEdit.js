@@ -237,7 +237,7 @@ export default function PublicFilterEdit( props ) {
       .filter( ( user ) => filter.requesters.some( ( user2 ) => user.id === user2.id ) )
     ] );
 
-    setRequesters( [
+    setAssignedTos( [
       ...( filter.assignedToCur ? [ ofCurrentUser ] : [] ),
       ...toSelArr( usersData.basicUsers, "fullName" )
       .filter( ( user ) => filter.assignedTos.some( ( user2 ) => user.id === user2.id ) )

@@ -449,7 +449,6 @@ export default function RepeatForm( props ) {
           } )
           .then( ( response ) => {
             updateTask( response, 'delete' );
-            updateRepeatList( response, 'delete' );
             closeModal( true, true );
           } )
           .catch( ( err ) => {
@@ -490,7 +489,6 @@ export default function RepeatForm( props ) {
         } )
         .then( ( response ) => {
           updateTask( response, 'update' );
-          updateRepeatList( response, 'update' );
           setChanges( {} );
           setSaving( false );
           //update repeat
@@ -706,51 +704,6 @@ export default function RepeatForm( props ) {
           }
         }
       } );
-    }
-  }
-
-  const updateRepeatList = ( response, type ) => {
-    if ( type === 'update' ) {
-      try {
-        const repeat = response.data.updateRepeat;
-        let repeats = [
-          ...client.readQuery( {
-            query: GET_REPEATS
-          } )
-          .repeats
-        ];
-        let index = repeats.findIndex( ( OrgRepeat ) => OrgRepeat.id === repeat.id );
-        repeats[ index ] = {
-          ...repeats[ index ],
-          ...repeat
-        }
-        client.writeQuery( {
-          query: GET_REPEATS,
-          data: {
-            repeats
-          }
-        } );
-      } catch ( err ) {
-
-      }
-    } else if ( type === 'delete' ) {
-      try {
-        let repeats = [
-          ...client.readQuery( {
-            query: GET_REPEATS
-          } )
-          .repeats
-        ];
-
-        client.writeQuery( {
-          query: GET_REPEATS,
-          data: {
-            repeats: repeats.filter( ( repeat ) => repeat.id !== response.data.deleteRepeat.id )
-          }
-        } );
-      } catch ( err ) {
-
-      }
     }
   }
 

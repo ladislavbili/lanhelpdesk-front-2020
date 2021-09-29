@@ -126,6 +126,7 @@ export default function ProjectFilterForm( props ) {
   const setData = () => {
     setActive( filter.active );
     setTitle( filter.title );
+    setOrder( filter.order );
     setDescription( filter.description );
     setGroups( allGroups.filter( ( group ) => filter.groups.includes( group.id ) ) );
     setFilterState( filter.filter );
@@ -300,6 +301,7 @@ export default function ProjectFilterForm( props ) {
   const submitForm = () => {
     const filterData = {
       filter: getCleanCurrentFilter(),
+      order: parseInt( order ),
       active,
       title,
       description,
@@ -395,7 +397,7 @@ export default function ProjectFilterForm( props ) {
         />
 
       <FormGroup>
-        <Label className="">Groups</Label>
+        <Label className="">Groups <span className="warning-big">*</span> </Label>
         <Select
           placeholder="Choose groups"
           value={groups}
@@ -415,7 +417,7 @@ export default function ProjectFilterForm( props ) {
             { id: 'all', title: groups.length === allGroups.length ? 'Clear' : 'All' },
             ...allGroups
           ])}
-          styles={pickSelectStyle()}
+          styles={pickSelectStyle(['required'])}
           />
       </FormGroup>
 
@@ -692,7 +694,7 @@ export default function ProjectFilterForm( props ) {
           )}
           onClick={closeModal}
           >
-          Close
+          Cancel
         </button>
         <button
           className={classnames(

@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-  useQuery
+  useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import Loading from 'components/loading';
@@ -18,7 +19,8 @@ import {
 } from 'apollo/localSchema/queries';
 
 import {
-  GET_REPEATS
+  GET_REPEATS,
+  REPEATS_SUBSCRIPTION,
 } from './queries';
 
 export default function RepeatList( props ) {
@@ -48,7 +50,8 @@ export default function RepeatList( props ) {
 
   const {
     data: repeatsData,
-    loading: repeatsLoading
+    loading: repeatsLoading,
+    refetch: repeatsRefetch,
   } = useQuery( GET_REPEATS, {
     variables: {
       projectId: projectData.localProject.id,
@@ -57,9 +60,16 @@ export default function RepeatList( props ) {
     fetchPolicy: 'network-only',
   } );
 
+  useSubscription( REPEATS_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      repeatsRefetch();
+    }
+  } );
+
   if ( repeatsLoading ) {
     return ( <Loading /> )
   }
+  const projectSelected = projectData.localProject.id !== null;
 
   const filterForRepeats = ( repeat ) => {
     return (
@@ -77,14 +87,52 @@ export default function RepeatList( props ) {
       ( "Opakovať každý " + repeat.repeatEvery + ' ' + intervals.find( ( interval ) => interval.value === repeat.repeatInterval )
         .title )
       .toLowerCase()
-      .includes( repeatingFilter.toLowerCase() ) &&
-
-      repeat.repeatTemplate.project.title.toLowerCase()
-      .includes( projectFilter.toLowerCase() )
+      .includes( repeatingFilter.toLowerCase() ) && (
+        repeat.repeatTemplate.project.title.toLowerCase()
+        .includes( projectFilter.toLowerCase() ) ||
+        projectSelected
+      )
     );
   }
 
-  /*  */
+  const renderRepeat = ( repeat ) => {
+    const template = repeat.repeatTemplate;
+    return (
+      <tr key={repeat.id}
+        className="clickable"
+        onClick={()=>{ setOpenRepeat(repeat) }}
+        >
+        <td>
+          {template.title}
+        </td>
+        <td>
+          {("Opakovať každý " + repeat.repeatEvery + ' ' + intervals.find((interval) => interval.value === repeat.repeatInterval ).title)}
+        </td>
+        <td>
+          <span
+            className="label label-info"
+            style={{
+              backgroundColor: template.status
+              ? template.status.color
+              : "white"
+            }}
+            >
+            {
+              template.status
+              ? template.status.title
+              : "No status"
+            }
+          </span>
+        </td>
+        { !projectSelected &&
+        <td>
+          {template.project.title}
+        </td>
+        }
+      </tr>
+    );
+  }
+
   return (
     <div className="content-page">
       <div className="content" style={{ paddingTop: 0 }}>
@@ -106,25 +154,14 @@ export default function RepeatList( props ) {
               <table className = "table" >
                 <thead>
                   <tr>
-                    <th width="5%">Status</th>
                     <th>Title</th>
                     <th>Repeat timing</th>
-                    <th>Project</th>
+                    <th width="5%">Status</th>
+                    { !projectSelected && <th>Project</th> }
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <th width="5%">
-                      <input
-                        type="text"
-                        value={ statusFilter }
-                        className="form-control"
-                        style={{fontSize: "12px", marginRight: "10px"}}
-                        onChange={(e) => {
-                          setStatusFilter(e.target.value);
-                        }}
-                        />
-                    </th>
                     <th>
                       <input
                         type="text"
@@ -136,7 +173,7 @@ export default function RepeatList( props ) {
                         }}
                         />
                     </th>
-                    <th >
+                    <th>
                       <input
                         type="text"
                         value={ repeatingFilter }
@@ -147,7 +184,19 @@ export default function RepeatList( props ) {
                         }}
                         />
                     </th>
-                    <th >
+                    <th width="5%">
+                      <input
+                        type="text"
+                        value={ statusFilter }
+                        className="form-control"
+                        style={{fontSize: "12px", marginRight: "10px"}}
+                        onChange={(e) => {
+                          setStatusFilter(e.target.value);
+                        }}
+                        />
+                    </th>
+                    { !projectSelected &&
+                    <th>
                       <input
                         type="text"
                         value={ projectFilter }
@@ -158,51 +207,22 @@ export default function RepeatList( props ) {
                         }}
                         />
                     </th>
+                    }
                   </tr>
                   { repeatsData.repeats.filter( filterForRepeats ).map( ( repeat ) =>
-                    <tr key={repeat.id}
-                      className="clickable"
-                      onClick={()=>{ setOpenRepeat(repeat) }}
-                      >
-                      <td>
-                        <span
-                          className="label label-info"
-                          style={{
-                            backgroundColor: repeat.repeatTemplate.status
-                            ? repeat.repeatTemplate.status.color
-                            : "white"
-                          }}
-                          >
-                          {
-                            repeat.repeatTemplate.status
-                            ? repeat.repeatTemplate.status.title
-                            : "No status"
-                          }
-                        </span>
-                      </td>
-                      <td>
-                        {repeat.repeatTemplate.title}
-                      </td>
-                      <td>
-                        {("Opakovať každý " + repeat.repeatEvery + ' ' + intervals.find((interval) => interval.value === repeat.repeatInterval ).title)}
-                      </td>
-                      <td>
-                        {repeat.repeatTemplate.project.title}
-                      </td>
-                    </tr>
-                  )
-                }
-              </tbody>
-            </table>
-            <Repeat
-              isOpen={openRepeat !== null}
-              repeat={openRepeat}
-              closeModal={ () => setOpenRepeat( null ) }
-              />
+                    renderRepeat(repeat)
+                  ) }
+                </tbody>
+              </table>
+              <Repeat
+                isOpen={openRepeat !== null}
+                repeat={openRepeat}
+                closeModal={ () => setOpenRepeat( null ) }
+                />
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   );
 }

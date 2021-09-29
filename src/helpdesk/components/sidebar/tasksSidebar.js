@@ -295,7 +295,10 @@ export default function TasksSidebar( props ) {
     if ( localProject.id === null ) {
       return [];
     }
-    return localProject.project.projectFilters;
+    return sortBy( localProject.project.projectFilters, [ {
+      key: 'order',
+      asc: true
+    } ] );
   }
 
   const renderProjects = () => {
@@ -324,7 +327,7 @@ export default function TasksSidebar( props ) {
               Project
             </Label>
           </div>
-          { localProject.id !== null &&
+          { localProject.id !== null && localProject.right.projectRead &&
             <Button
               className='btn-link ml-auto center-hor'
               onClick={() => history.push( `/helpdesk/project/${localProject.id}/description` )}
@@ -582,7 +585,10 @@ export default function TasksSidebar( props ) {
           return [ ...acc, ...usersToAdd ]
         }, [] )
     }
-    usersToRender = sortBy( filterUnique( usersToRender.map( ( userToRender ) => userToRender.user ), 'id' ), [ 'fullName' ] )
+    usersToRender = sortBy( filterUnique( usersToRender.map( ( userToRender ) => userToRender.user ), 'id' ), [ {
+      key: 'fullName',
+      asc: true
+    } ] )
 
     return (
       <Nav vertical>

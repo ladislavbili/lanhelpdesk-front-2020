@@ -354,7 +354,7 @@ export default function PublicFilterAdd( props ) {
       <FormGroup>
         <label>Riesi</label>
         <Select
-          options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(usersData.basicUsers, 'email'))}
+          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
           isMulti
           onChange={(newValue)=>{
             setAssignedTos(newValue);
