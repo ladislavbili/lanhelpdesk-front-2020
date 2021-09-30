@@ -178,7 +178,7 @@ export default function TaskEdit( props ) {
     backendCleanRights()
   );
 
-  const [ toggleTab, setToggleTab ] = React.useState( userRights.rights.viewComments ? 1 : 2 );
+  const [ toggleTab, setToggleTab ] = React.useState( userRights.rights.viewComments ? 0 : 1 );
 
   const projectAttributes = (
     project ?
@@ -787,7 +787,7 @@ export default function TaskEdit( props ) {
         <h2 className="center-hor">{id}: </h2>
         <span className="center-hor flex m-r-15">
           <input type="text"
-            disabled={ !userRights.taskTitleWrite }
+            disabled={ !userRights.rights.taskTitleWrite }
             value={title}
             className="task-title-input text-extra-slim hidden-input form-control"
             onChange={(e)=> {

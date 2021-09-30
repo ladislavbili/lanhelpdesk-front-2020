@@ -24,6 +24,9 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
   const bordered = wantedAttributes.includes( 'bordered' );
   const sidebar = wantedAttributes.includes( 'sidebar' );
   const segoe = wantedAttributes.includes( 'segoe' );
+  const right = wantedAttributes.includes( 'right' );
+  const bolder = wantedAttributes.includes( 'bolder' );
+  const basic = wantedAttributes.includes( 'basic' );
 
   return {
     control: ( base, state ) => {
@@ -350,6 +353,25 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           },
         };
       }
+      if ( right ) {
+        newStyle = {
+          ...newStyle,
+          textAlign: 'right',
+        }
+      }
+      if ( basic ) {
+        newStyle = {
+          ...newStyle,
+          padding: '2px 5px',
+        }
+      }
+
+      if ( bolder ) {
+        newStyle = {
+          ...newStyle,
+          fontWeight: 'bolder',
+        }
+      }
       return newStyle;
     },
     singleValue: ( base, aditionalParams ) => {
@@ -382,6 +404,20 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           minHeight: '19px', //potencially breaking
           backgroundColor: data.color
         };
+      }
+      if ( right ) {
+        newStyle = {
+          ...newStyle,
+          textAlign: 'right',
+          width: '100%',
+          paddingRight: 5,
+        }
+      }
+      if ( bolder ) {
+        newStyle = {
+          ...newStyle,
+          fontWeight: 'bolder',
+        }
       }
       return newStyle;
     },

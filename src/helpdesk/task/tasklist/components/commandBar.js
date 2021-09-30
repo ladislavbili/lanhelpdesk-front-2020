@@ -1,8 +1,15 @@
 import React from 'react';
+import classnames from 'classnames';
+
+import Checkbox from 'components/checkbox';
+import Switch from "react-switch";
 import MultiSelect from 'components/MultiSelectNew';
 import GeneralPopover from 'components/generalPopover';
 import Empty from 'components/Empty';
-import classnames from 'classnames';
+import Select from 'react-select';
+import {
+  pickSelectStyle,
+} from 'configs/components/select';
 import {
   getEmptyGeneralFilter
 } from 'configs/constants/filter';
@@ -15,8 +22,6 @@ import {
   ganttAttributeLimitingRights,
 } from 'configs/constants/tasks';
 
-import Checkbox from 'components/checkbox';
-import Switch from "react-switch";
 
 // breadcrums, layout switch
 export default function CommandBar( props ) {
@@ -51,6 +56,7 @@ export default function CommandBar( props ) {
       id: displayValue.value
     } ) ) : []
   );
+
 
   //state
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
@@ -144,6 +150,21 @@ export default function CommandBar( props ) {
   const filteredBreadcrums = getBreadcrumsData()
     .filter( ( breadcrum ) => breadcrum.show );
 
+  const showTasklistLayout = (
+    myRights.tasklistCalendar ||
+    myRights.tasklistLayout ||
+    (
+      localProject.id !== null &&
+      (
+        localProject.right.tasklistDnD ||
+        localProject.right.tasklistGantt ||
+        localProject.right.tasklistKalendar ||
+        localProject.right.tasklistStatistics
+      )
+    )
+  );
+
+
   return (
     <div className="task-list-commandbar m-l-30 m-r-45">
       <div className="breadcrum-bar center-hor">
@@ -171,33 +192,33 @@ export default function CommandBar( props ) {
                     <div className="color-basic m-r-5 m-l-5">
                       Sort by
                     </div>
-
-                    <select
-                      value={orderBy}
-                      className="invisible-select font-bold text-highlight"
-                      onChange={(e)=>setOrderBy(e.target.value)}>
-                      { orderByValues.map((item,index) =>
-                        <option value={item.value} key={index}>{item.label}</option>
-                      ) }
-                    </select>
+                    <div className="min-width-90 m-r-5">
+                    <Select
+                      placeholder="Sort"
+                      value={ orderByValues.find((order) => order.value === orderBy ) }
+                      onChange={ (order) => setOrderBy(order.value) }
+                      options={ orderByValues }
+                      styles={pickSelectStyle([ 'noArrow', 'invisible', 'bolder', 'basic', 'right', 'segoe' ])}
+                      />
+                  </div>
 
                     { ascending &&
                       <button type="button" className="btn-link" onClick={()=>setAscending(false)}>
-                        <i className="fas fa-arrow-up" />
+                        <i className="fas fa-chevron-up" />
                       </button>
                     }
 
                     { !ascending &&
                       <button type="button" className="btn-link" onClick={()=>setAscending(true)}>
-                        <i className="fas fa-arrow-down" />
+                        <i className="fas fa-chevron-down" />
                       </button>
                     }
                   </Empty>
                 }
                 { showPreferences &&
                   <div className="row">
-                    <button className="btn-link m-l-10" id="commandbar-column-preferences" onClick={ openColumnPreferences } >
-                      <i className="fa fa-cog" />
+                    <button className="btn-link m-l-5" id="commandbar-column-preferences" onClick={ openColumnPreferences } >
+                      <i className="fa fa-table" />
                     </button>
                     <MultiSelect
                       disabled={loading}
@@ -228,26 +249,13 @@ export default function CommandBar( props ) {
                       />
                   </div>
                 }
-
               </div>
             </div>
-            { (
-              myRights.tasklistCalendar ||
-              myRights.tasklistLayout ||
-              (
-                localProject.id !== null &&
-                (
-                  localProject.right.tasklistDnD ||
-                  localProject.right.tasklistGantt ||
-                  localProject.right.tasklistKalendar ||
-                  localProject.right.tasklistStatistics
-                )
-              )
-            ) &&
+
+            { showTasklistLayout &&
               <Empty>
                 <button className="btn btn-link center-hor m-l-5" id={`commandbar-layout-switch`} onClick={ () => setLayoutOpen(true) } >
                   <i className={"m-r-5 fa " + getLayoutIcon()}/>
-                  {getLayoutTitle()}
                 </button>
                 <GeneralPopover
                   placement="bottom-start"

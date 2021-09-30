@@ -59,6 +59,7 @@ import {
   addUser,
   addCompany,
 } from 'configs/constants/sidebar';
+import settings from 'configs/constants/settings';
 import moment from 'moment';
 
 import {
@@ -195,9 +196,35 @@ export default function TasksSidebar( props ) {
   }, [ myProjectsData, myProjectsLoading ] );
 
   const currentUser = getMyData();
+  const localProject = projectData.localProject;
+
+  const getApplicableFilters = () => {
+    if ( myFiltersLoading || projectLoading ) {
+      return [];
+    }
+    if ( localProject.id === null ) {
+      return myFiltersData.myFilters.filter( ( myFilter ) => myFilter.dashboard );
+    }
+    if ( localProject.id ) {
+      return myFiltersData.myFilters.filter( ( myFilter ) => myFilter.global || ( myFilter.project && myFilter.project.id === localProject.id ) );
+    }
+    return [];
+  }
+
+  const getProjectFilters = () => {
+    if ( localProject.id === null ) {
+      return [];
+    }
+    return sortBy( localProject.project.projectFilters, [ {
+      key: 'order',
+      asc: true
+    } ] );
+  }
+
   const setLocalFilter = () => {
     if ( location.pathname.length > 12 ) {
-      const newFilter = myFiltersData.myFilters.find( item => item.id === parseInt( match.params.filterID ) );
+      const allAvailableFilters = [ ...getApplicableFilters(), ...getProjectFilters() ];
+      const newFilter = allAvailableFilters.find( item => item.id === parseInt( match.params.filterID ) );
       if ( newFilter ) {
         setFilter( newFilter )
       } else {
@@ -226,7 +253,6 @@ export default function TasksSidebar( props ) {
 
   //Constants
   const myRights = currentUser.role.accessRights;
-  const localProject = projectData.localProject;
   const myProjects = myProjectsData.myProjects;
 
   const canEditProject = (
@@ -251,6 +277,7 @@ export default function TasksSidebar( props ) {
   const projects = [ dashboard, ...myProjects ];
   const milestones = [ allMilestones ];
   //const milestones = [ allMilestones, ...( localProject.project.id !== null ? localProject.project.milestones : [] ) ]
+  const tasklistPage = ![ '/helpdesk/repeats', '/helpdesk/companies', '/helpdesk/users' ].some( ( url ) => window.location.pathname.includes( url ) );
 
   const DropdownIndicator = ( {
     innerProps,
@@ -278,28 +305,6 @@ export default function TasksSidebar( props ) {
         />
     </div>
   )
-
-  const tasklistPage = ![ '/helpdesk/repeats', '/helpdesk/companies', '/helpdesk/users' ].some( ( url ) => window.location.pathname.includes( url ) );
-
-  const getApplicableFilters = () => {
-    if ( localProject.id === null ) {
-      return myFiltersData.myFilters.filter( ( myFilter ) => myFilter.dashboard );
-    }
-    if ( localProject.id ) {
-      return myFiltersData.myFilters.filter( ( myFilter ) => myFilter.global || ( myFilter.project && myFilter.project.id === localProject.id ) );
-    }
-    return [];
-  }
-
-  const getProjectFilters = () => {
-    if ( localProject.id === null ) {
-      return [];
-    }
-    return sortBy( localProject.project.projectFilters, [ {
-      key: 'order',
-      asc: true
-    } ] );
-  }
 
   const renderProjects = () => {
     let selectProjects = toSelArr( projects.map( ( project ) => ( {
@@ -807,6 +812,41 @@ export default function TasksSidebar( props ) {
     )
   }
 
+  const renderSettings = () => {
+    return (
+      <div>
+        <div className="sidebar-label row" onClick={() => history.push('/helpdesk/settings') }>
+          <div className="clickable noselect">
+            <i className="fa fa-cog" />
+            <Label className="clickable">
+              Settings
+            </Label>
+          </div>
+        </div>
+        { myRights.users &&
+          <NavItem key='users' className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/helpdesk/users' ) }) }>
+            <span
+              className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/users' ) }) }
+              onClick={() => history.push(`/helpdesk/users`)}
+              >
+              Users
+            </span>
+          </NavItem>
+        }
+        { myRights.companies &&
+          <NavItem key='companies' className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/helpdesk/companies' ) }) }>
+            <span
+              className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/companies' ) }) }
+              onClick={() => history.push(`/helpdesk/companies`)}
+              >
+              Companies
+            </span>
+          </NavItem>
+        }
+      </div>
+    )
+  }
+
   const renderAddButtons = () => {
     return (
       <div className="popover">
@@ -819,6 +859,7 @@ export default function TasksSidebar( props ) {
     )
   }
   const renderOpenSidebar = () => {
+    const canSeeSettings = settings.some( ( setting ) => myRights[ setting.value ] )
     return (
       <div>
         { renderTaskAddBtn() }
@@ -845,37 +886,9 @@ export default function TasksSidebar( props ) {
         { showFilterAdd && ( myRights.customFilters || myRights.publicFilters ) && renderFilterAdd() }
 
 
-        { ( showFilterAdd || myRights.companies || myRights.users ) && <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" /> }
-        {
-          !showFilterAdd &&
-          <Empty>
-            <div className='p-l-15 p-r-15'>
-              { myRights.companies && renderCompanyAddBtn() }
-              { myRights.users && renderUserAddBtn() }
-
-            </div>
-            <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" />
-            { myRights.users &&
-              <NavItem key='users' className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/helpdesk/users' ) }) }>
-                <span
-                  className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/users' ) }) }
-                  onClick={() => history.push(`/helpdesk/users`)}
-                  >
-                  Users
-                </span>
-              </NavItem>
-            }
-            { myRights.companies &&
-              <NavItem key='companies' className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/helpdesk/companies' ) }) }>
-                <span
-                  className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/companies' ) }) }
-                  onClick={() => history.push(`/helpdesk/companies`)}
-                  >
-                  Companies
-                </span>
-              </NavItem>
-            }
-          </Empty>
+        { ( showFilterAdd || canSeeSettings ) && <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" /> }
+        { !showFilterAdd && canSeeSettings &&
+          renderSettings()
         }
       </div>
     )

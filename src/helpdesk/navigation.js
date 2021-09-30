@@ -51,9 +51,8 @@ export default function Navigation( props ) {
     <div>
       <div className="page-header">
         <div className="center-ver row center flex">
-          <SelectPage sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
-          <PageHeader {...props}
-            settings={settings} />
+          <SelectPage sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} history={props.history} />
+          <PageHeader {...props} />
         </div>
       </div>
 

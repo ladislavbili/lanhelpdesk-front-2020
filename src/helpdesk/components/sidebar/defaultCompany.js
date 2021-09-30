@@ -36,17 +36,17 @@ export default function DefaultCompany( props ) {
     }
   } );
 
-  if ( companyLoading && !companyData ) {
+  if ( !companyLoading && !companyData ) {
     return null;
   }
 
-  const company = companyData.defCompany;
+  const company = companyLoading ? null : companyData.defCompany;
 
   return (
     <NavItem key='defCompany'>
       <Link
         className={classnames("sidebar-align", "sidebar-menu-item" , {"active" : location.pathname.includes('settings/company')})}
-        to={{ pathname:`/helpdesk/settings/company/${company.id}` }}>
+        to={{ pathname:`/helpdesk/settings${ companyLoading ? '' : `/company/${company.id}`}` }}>
         Helpdesk Company
       </Link>
     </NavItem>

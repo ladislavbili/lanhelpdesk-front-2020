@@ -35,7 +35,6 @@ export default function PageHeader( props ) {
   const {
     match,
     history,
-    settings,
   } = props;
 
   const [ logoutUser ] = useMutation( LOGOUT_USER );
@@ -43,75 +42,75 @@ export default function PageHeader( props ) {
   const client = useApolloClient();
   //state
   const [ layoutOpen, setLayoutOpen ] = React.useState( false );
-  const [ settingsOpen, setSettingsOpen ] = React.useState( false );
   const [ modalUserProfileOpen, setModalUserProfileOpen ] = React.useState( false );
 
   const currentUser = getMyData();
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
-  const filteredSettings = settings.filter( ( setting ) => accessRights[ setting.value ] );
 
   const URL = getLocation( history );
   return (
     <div className={classnames("page-header flex m-l-30")}>
       <div className="d-flex full-height">
-        <div className="center-hor">
-          <Link
-            to={{ pathname: `/helpdesk/taskList/i/all` }}
-            className={
-              "header-link" +
-              (
-                URL.includes("helpdesk/taskList") ?
-                " header-link-active" :
-                ""
-              )
+        { false &&
+          <div className="center-hor">
+            <Link
+              to={{ pathname: `/helpdesk/taskList/i/all` }}
+              className={
+                "header-link" +
+                (
+                  URL.includes("helpdesk/taskList") ?
+                  " header-link-active" :
+                  ""
+                )
+              }
+              >
+              Úlohy
+            </Link>
+            { accessRights.vykazy &&
+              <Empty>
+                <Link
+                  to={{ pathname: `/reports` }}
+                  className={
+                    "header-link" +
+                    (
+                      URL.includes("reports") ?
+                      " header-link-active" :
+                      ""
+                    )
+                  }
+                  >
+                  Vykazy
+                </Link>
+                <Link
+                  to={{ pathname: `/lanwiki` }}
+                  className={
+                    "header-link" +
+                    (
+                      URL.includes("lanwiki") ?
+                      " header-link-active" :
+                      ""
+                    )
+                  }
+                  >
+                  LanWiki
+                </Link>
+                <Link
+                  to={{ pathname: `/cmdb` }}
+                  className={
+                    "header-link" +
+                    (
+                      URL.includes("cmdb") ?
+                      " header-link-active" :
+                      ""
+                    )
+                  }
+                  >
+                  CMDB
+                </Link>
+              </Empty>
             }
-            >
-            Úlohy
-          </Link>
-          { accessRights.vykazy &&
-            <Empty>
-              <Link
-                to={{ pathname: `/reports` }}
-                className={
-                  "header-link" +
-                  (
-                    URL.includes("reports") ?
-                    " header-link-active" :
-                    ""
-                  )
-                }
-                >
-                Vykazy
-              </Link>
-              <Link
-                to={{ pathname: `/lanwiki` }}
-                className={
-                  "header-link" +
-                  (
-                    URL.includes("lanwiki") ?
-                    " header-link-active" :
-                    ""
-                  )
-                }
-                >
-                LanWiki
-              </Link>
-              <Link
-                to={{ pathname: `/cmdb` }}
-                className={
-                  "header-link" +
-                  (
-                    URL.includes("cmdb") ?
-                    " header-link-active" :
-                    ""
-                  )
-                }
-                >
-                CMDB
-              </Link>
-            </Empty>
-          }
-        </div>
+          </div>
+        }
         <div className="ml-auto center-hor row m-r-30">
           <div className=" header-icon center-hor clickable" onClick={() => setModalUserProfileOpen(true)}>
             { !currentUser ? `Loading...` : `${currentUser.name} ${currentUser.surname}`}
@@ -124,43 +123,6 @@ export default function PageHeader( props ) {
           }
 
           <NotificationIcon history={history} location={URL} />
-
-          { currentUser &&
-            filteredSettings &&
-            filteredSettings.length > 0 &&
-            <Empty>
-              <div className="header-icon center-hor clickable" id="page-header-settings" onClick={() => setSettingsOpen(!settingsOpen)}>
-                  <i className="header-icon fa fa-cog m-l-5"/>
-              </div>
-              <GeneralPopover
-                placement="bottom-start"
-                className="overflow-auto"
-                headerClassName="header-font custom-popover-header"
-                target="page-header-settings"
-                header="Settings"
-                useLegacy
-                reset={() => {}}
-                submit={() => {}}
-                open={ settingsOpen }
-                closeOnly
-                hideButtons
-                close={() => setSettingsOpen(false)}
-                >
-                {filteredSettings.map((item, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      history.push(getLocation(history) + '/settings/' + item.link);
-                      setSettingsOpen(false);
-                    }}
-                    className="segoe-semi-text clickable custom-popover-item"
-                    >
-                    {item.title}
-                  </div>
-                ))}
-              </GeneralPopover>
-            </Empty>
-          }
           <i
             className="header-icon clickable fa fa-sign-out-alt center-hor"
             onClick={() => {
