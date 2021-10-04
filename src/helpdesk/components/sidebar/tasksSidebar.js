@@ -312,7 +312,7 @@ export default function TasksSidebar( props ) {
       id: project.project.id,
       title: project.project.title
     } ) ) );
-    if ( myRights.addProjects ) {
+    if ( myRights.addProjects && false ) {
       selectProjects.push( {
         label: '+ Project',
         value: -1
@@ -340,6 +340,14 @@ export default function TasksSidebar( props ) {
               <i className="fa fa-cog"/>
             </Button>
           }
+          { localProject.id === null && myRights.addProjects &&
+            <Button
+              className='btn-link ml-auto center-hor'
+              onClick={() => history.push( `/helpdesk/project/add` ) }
+              >
+              <i className="fa fa-plus"/>
+            </Button>
+          }
         </div>
         <div className="sidebar-menu-item">
           <Select
@@ -362,7 +370,6 @@ export default function TasksSidebar( props ) {
       </div>
     )
   }
-
   const renderProjectsPopover = () => {
     const URLprefix = `/helpdesk/taskList/i/all`;
 
@@ -412,7 +419,6 @@ export default function TasksSidebar( props ) {
       </div>
     )
   }
-
   const renderProjectAddBtn = () => {
     if ( !myRights.addProjects ) {
       return null;
@@ -819,7 +825,7 @@ export default function TasksSidebar( props ) {
           <div className="clickable noselect">
             <i className="fa fa-cog" />
             <Label className="clickable">
-              Settings
+              All Settings
             </Label>
           </div>
         </div>
@@ -859,7 +865,7 @@ export default function TasksSidebar( props ) {
     )
   }
   const renderOpenSidebar = () => {
-    const canSeeSettings = settings.some( ( setting ) => myRights[ setting.value ] )
+    const canSeeSettings = settings.some( ( setting ) => myRights[ setting.value ] );
     return (
       <div>
         { renderTaskAddBtn() }

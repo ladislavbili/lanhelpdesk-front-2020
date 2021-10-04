@@ -135,10 +135,11 @@ export default function RepeatForm( props ) {
 
   const [ project, setProject ] = React.useState( null );
   const projectUsers = users.filter( ( user ) => project && project.users.some( ( user2 ) => user2.id === user.id ) );
+  const assignableUsers = users.filter( ( user ) => project && project.users.some( ( user2 ) => user2.user.id === user.id && user2.assignable ) );
   const [ changes, setChanges ] = React.useState( {} );
   const [ important, setImportant ] = React.useState( false );
   const [ attachments, setAttachments ] = React.useState( [] );
-  const [ assignedTo, setAssignedTo ] = React.useState( projectUsers.filter( ( user ) => user.id === currentUser.id ) );
+  const [ assignedTo, setAssignedTo ] = React.useState( assignableUsers.filter( ( user ) => user.id === currentUser.id ) );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
   const [ customItems, setCustomItems ] = React.useState( [] );
@@ -786,7 +787,7 @@ export default function RepeatForm( props ) {
   */
 
   const changeRepeat = ( repeat ) => {
-    if ( !userRights.repeatWrite ) {
+    if ( !userRights.attributeRights.repeat.edit ) {
       return;
     }
     setRepeat( repeat );
@@ -861,7 +862,6 @@ export default function RepeatForm( props ) {
         { editMode && <h2 className="center-hor">{originalRepeat.id}: </h2> }
         <span className="center-hor flex m-r-15">
           <input type="text"
-            disabled={ !userRights.rights.taskTitleWrite }
             value={title}
             className="task-title-input text-extra-slim hidden-input form-control"
             onChange={(e)=> {
@@ -981,7 +981,7 @@ export default function RepeatForm( props ) {
               setAssignedTo(users);
               saveChange({ assignedTo: users.map((user) => user.id) })
             }}
-            options={projectUsers}
+            options={assignableUsers}
             styles={pickSelectStyle( [ 'noArrow', ] )}
             />
         }

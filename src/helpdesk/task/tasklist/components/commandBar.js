@@ -151,15 +151,18 @@ export default function CommandBar( props ) {
     .filter( ( breadcrum ) => breadcrum.show );
 
   const showTasklistLayout = (
-    myRights.tasklistCalendar ||
-    myRights.tasklistLayout ||
+    (
+      localProject.id === null &&
+      (
+        myRights.tasklistCalendar ||
+        myRights.tasklistLayout
+      )
+    ) ||
     (
       localProject.id !== null &&
       (
         localProject.right.tasklistDnD ||
-        localProject.right.tasklistGantt ||
-        localProject.right.tasklistKalendar ||
-        localProject.right.tasklistStatistics
+        localProject.right.tasklistKalendar
       )
     )
   );
@@ -274,7 +277,7 @@ export default function CommandBar( props ) {
                       <i className="fa fa-list m-r-5"/>
                       Zoznam
                     </label>
-                    { localProject.id && (myRights.tasklistLayout || localProject.right.tasklistDnD ) &&
+                    { localProject.id !== null && localProject.right.tasklistDnD &&
                       <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link text-left")}>
                         <input type="radio" name="options" onChange={() => {setTasklistLayout(2); setLayoutOpen(false); }} checked={tasklistLayout === 2}/>
                         <i className="fa fa-map m-r-5"/>
@@ -288,14 +291,14 @@ export default function CommandBar( props ) {
                         Kalendár
                       </label>
                     }
-                    { localProject.id && (myRights.tasklistLayout || localProject.right.tasklistGantt ) &&
+                    { localProject.id && (myRights.tasklistLayout || localProject.right.tasklistGantt ) && false &&
                       <label className={classnames({'active':tasklistLayout === 4}, "btn btn-link text-left")}>
                         <input type="radio" name="options" onChange={() => {setTasklistLayout(4); setLayoutOpen(false); }} checked={tasklistLayout === 4}/>
                         <i className="fa fa-project-diagram m-r-5"/>
                         Project management
                       </label>
                     }
-                    { localProject.id && (myRights.tasklistLayout || localProject.right.tasklistStatistics ) &&
+                    { localProject.id && (myRights.tasklistLayout || localProject.right.tasklistStatistics ) && false &&
                       <label className={classnames({'active':tasklistLayout === 5}, "btn btn-link text-left")}>
                         <input
                           type="radio"

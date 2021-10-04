@@ -333,7 +333,7 @@ export default function TaskEditContainer( props ) {
           approved: sub.approved,
           discount: sub.discount,
           quantity: sub.quantity,
-          type: sub.type.id,
+          //type: sub.type.id,
           task: parseInt( id ),
           assignedTo: sub.assignedTo.id,
           scheduled: sub.scheduled,
@@ -361,7 +361,7 @@ export default function TaskEditContainer( props ) {
           approved: sub.approved,
           discount: sub.discount,
           quantity: sub.quantity,
-          type: sub.type.id,
+          //type: sub.type.id,
           assignedTo: sub.assignedTo.id,
           scheduled: sub.scheduled,
         }

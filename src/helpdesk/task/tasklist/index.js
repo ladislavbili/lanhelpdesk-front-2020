@@ -53,7 +53,6 @@ export default function TasksLoader( props ) {
   } = props;
   const page = match.params.page ? parseInt( match.params.page ) : 1;
   const limit = 30;
-
   //local
   const {
     data: filterData,
@@ -82,11 +81,39 @@ export default function TasksLoader( props ) {
   const localProject = projectData.localProject;
   const localMilestone = milestoneData.localMilestone;
 
-  const getSort = () => {
-    let realLayout = currentUser ? currentUser.tasklistLayout : 0;
-    if ( ( [ 2, 4 ].includes( realLayout ) && localProject.id === null ) || ( realLayout === 3 && !( localProject.id === null || localProject.attributeRights.assigned.view ) ) ) {
-      realLayout = 0;
+
+
+  const getCurrentLayout = () => {
+    //1 - table, 2 - dnd, 3 - calendar
+    const userGroupRights = localProject.id === null ? null : localProject.right;
+    const userRights = currentUser ? currentUser.role.accessRights : null;
+    let realLayout = currentUser ? currentUser.tasklistLayout : 1;
+    if (
+      !currentUser ||
+      realLayout > 3 ||
+      realLayout < 1 ||
+      ( //DnD
+        realLayout === 2 &&
+        (
+          localProject.id === null ||
+          ( localProject.id !== null && !userGroupRights.tasklistDnD )
+        )
+      ) ||
+      ( //Calendar
+        realLayout === 3 &&
+        (
+          ( localProject.id === null && !userRights.tasklistCalendar ) ||
+          ( localProject.id !== null && !userGroupRights.tasklistKalendar )
+        )
+      )
+    ) {
+      realLayout = 1;
     }
+    return realLayout;
+  }
+
+  const getSort = () => {
+    let realLayout = getCurrentLayout();
     let sort = defaultSorts[ 0 ];
     if ( currentUser && currentUser.tasklistSorts.some( ( sort ) => sort.layout === realLayout ) ) {
       sort = currentUser.tasklistSorts.find( ( sort ) => sort.layout === realLayout );
@@ -96,7 +123,6 @@ export default function TasksLoader( props ) {
     return sort;
   }
   const sort = getSort();
-
 
   const filterVariables = deleteAttributes(
     localFilterToValues( localFilter ),
@@ -159,9 +185,12 @@ export default function TasksLoader( props ) {
   const canViewCalendar = (
     (
       localProject.id !== null &&
-      localProject.right.tasklistCalendar
+      localProject.right.tasklistKalendar
     ) ||
-    currentUser.role.accessRights.tasklistCalendar
+    (
+      localProject.id === null &&
+      currentUser.role.accessRights.tasklistCalendar
+    )
   );
 
   return (
@@ -192,7 +221,7 @@ export default function TasksLoader( props ) {
       setAscending={(ascending) => {
         setTasklistSortFunc( ascending, sort.sort )
       }}
-      tasklistLayout={currentUser.tasklistLayout}
+      tasklistLayout={getCurrentLayout()}
       setTasklistLayout={setTasklistLayoutFunc}
 
       taskSearch={localSearchData.localTaskSearch}

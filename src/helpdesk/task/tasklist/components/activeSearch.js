@@ -75,7 +75,6 @@ export default function ActiveSearch( props ) {
     ]
   }
 
-
   const renderSearch = () => (
     <div
       className={classnames( "search-row" )}

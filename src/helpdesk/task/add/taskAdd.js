@@ -259,7 +259,29 @@ export default function TaskAdd( props ) {
     }
   }, [ users ] );
 
+  React.useEffect( () => {
+    updateWorks( assignedTo );
+  }, [ assignedTo ] );
+
   //functions
+  const updateWorks = ( assignedTo ) => {
+    const defAssigned = assignedTo.length > 0 ? users.find( ( user2 ) => user2.id === assignedTo[ 0 ].id ) : null;
+    setSubtasks( subtasks.map( ( subtask ) => {
+      const updatedUser = assignedTo.some( ( user2 ) => user2.id === subtask.assignedTo.id )
+      return {
+        ...subtask,
+        assignedTo: updatedUser ? subtask.assignedTo : defAssigned,
+      }
+    } ) );
+    setWorkTrips( workTrips.map( ( trip ) => {
+      const updatedUser = assignedTo.some( ( user2 ) => user2.id === trip.assignedTo.id )
+      return {
+        ...trip,
+        assignedTo: updatedUser ? trip.assignedTo : defAssigned,
+      }
+    } ) );
+  }
+
   const setDefaults = ( project, forced ) => {
     if ( project === null || !project.projectAttributes ) {
       return;
@@ -456,6 +478,7 @@ export default function TaskAdd( props ) {
             .forEach( ( file ) => formData.append( `file`, file ) );
           formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
           formData.append( "taskId", response.data.addTask.id );
+          formData.append( "newTask", true );
           axios.post( `${REST_URL}/upload-attachments`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
@@ -469,6 +492,7 @@ export default function TaskAdd( props ) {
                     .forEach( ( file ) => formData.append( `file`, file ) );
                   formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
                   formData.append( "repeatTemplateId", response.data.addTask.repeat.repeatTemplate.id );
+                  formData.append( "newTask", true );
                   await axios.post( `${REST_URL}/upload-repeat-template-attachments`, formData, {
                     headers: {
                       'Content-Type': 'multipart/form-data'
@@ -723,7 +747,6 @@ export default function TaskAdd( props ) {
             isClearable
             onChange={date => {
               setStartsAt( isNaN(date.valueOf()) ? null : date );
-              autoUpdateTask({ startsAt: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
             }}
             placeholderText="No start date"
             />

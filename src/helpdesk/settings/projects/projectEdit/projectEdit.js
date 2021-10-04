@@ -16,6 +16,7 @@ import ck5config from 'configs/components/ck5config';
 import {
   toSelArr,
   toSelItem,
+  filterUnique,
 } from 'helperFunctions';
 import {
   allACLs,
@@ -691,6 +692,19 @@ export default function ProjectEdit( props ) {
   const allTags = getAllTags();
   const allStatuses = getAllStatuses();
 
+
+  const assignableGroupIds = groups.filter( ( group ) => group.attributeRights.assigned.edit )
+    .map( ( group ) => group.id );
+  const assignableUsers = filterUnique( [
+    ...userGroups.filter( ( userGroup ) => assignableGroupIds.includes( userGroup.group.id ) )
+      .map( ( userGroup ) => userGroup.user ),
+    ...companyGroups.filter( ( companyGroup ) => assignableGroupIds.includes( companyGroup.group.id ) )
+      .reduce( ( acc, companyGroup ) => {
+      return [ ...acc, ...( usersLoading ? [] : toSelArr( usersData.basicUsers, 'email' ) )
+          .filter( ( user ) => user.company.id === companyGroup.company.id ) ]
+    }, [] )
+  ], 'id' );
+
   const renderAttachments = () => {
     return (
       <Attachments
@@ -1169,12 +1183,7 @@ export default function ProjectEdit( props ) {
                     userGroups.map( (userGroup) => userGroup.user ) :
                     (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
                   }
-                  assignableUsers={[
-                    ...userGroups.filter((userGroup) => userGroup.group.attributeRights.assigned.write ).map( (userGroup) => userGroup.user ),
-                    ...companyGroups.reduce((acc, companyGroup) => {
-                      return [...acc, ...(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email')).filter((user) => user.company.id === companyGroup.company.id ) ]
-                    },[])
-                  ]}
+                  assignableUsers={assignableUsers}
                   allTags={toSelArr(allTags)}
                   taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
                   groups={groups}

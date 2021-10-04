@@ -256,13 +256,13 @@ export default function Comments( props ) {
             }
 
             <div className='center-hor'>
-              <button
-                className="btn-link ver-align-middle"
+              <label
+                className="btn-link ver-align-middle clickable center-hor m-t-7"
                 htmlFor="uploadCommentAttachments"
                 >
                 <i className="fa fa-plus" />
                 Attachement
-              </button>
+              </label>
               <input
                 type="file"
                 id="uploadCommentAttachments"
@@ -278,7 +278,7 @@ export default function Comments( props ) {
             </div>
             { attachments.map((attachment,index) =>
               <div className="comment-attachment"
-                style={{    height: "25px", marginTop: "11px", marginRight:"5px"}}
+                style={{    height: "25px", marginTop: "7px", marginRight:"5px"}}
                 >
                 <span style={{color: "#0078D4"}}>
                   {`${attachment.name} (${Math.round(parseInt(attachment.size)/1024)}kB)`}

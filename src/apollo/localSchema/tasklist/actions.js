@@ -51,7 +51,6 @@ export function setGlobalTaskStringFilter() {
     deadlineTo: localSearch.deadline === null ? null : getDayRange( localSearch.deadline ).end.toString(),
     project: localSearch.project,
     taskType: localSearch.taskType,
-    milestone: localSearch.milestone,
     assignedTo: localSearch.assignedTo,
     tags: localSearch.tags,
     overtime: localSearch.overtime,

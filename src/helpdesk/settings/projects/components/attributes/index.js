@@ -39,6 +39,18 @@ export default function ProjectAttributes( props ) {
     setAttributes,
   } = props;
 
+  React.useEffect( () => {
+    if ( attributes.assigned.value.some( ( user1 ) => !assignableUsers.some( ( user2 ) => user1.id === user2.id ) ) ) {
+      setAttributes( {
+        ...attributes,
+        assigned: {
+          ...attributes.assigned,
+          value: attributes.assigned.value.filter( ( user1 ) => assignableUsers.some( ( user2 ) => user1.id === user2.id ) ),
+        }
+      } )
+    }
+  }, [ assignableUsers ] );
+
   return (
     <div>
       <ProjectSingleAttribute
@@ -84,7 +96,9 @@ export default function ProjectAttributes( props ) {
         onChangeAttribute={(value) => {
           setAttributes( { ...attributes, assigned: value } )
         } }
-        onChangeRight={(roles) => setGroups(roles) }
+        onChangeRight={(roles) => {
+          setGroups(roles);
+        }}
         />
 
       <ProjectSingleAttribute

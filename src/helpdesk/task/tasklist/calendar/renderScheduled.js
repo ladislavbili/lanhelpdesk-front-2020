@@ -9,10 +9,11 @@ export default function CalendarRenderScheduled( task, start, end, canEdit, done
 
   return (
     <div>
-      <p className="m-0">
+      <div className="m-0">
         <Checkbox
           className = "p-l-0 min-width-20 m-t-5 m-l-5"
           value = { done }
+          disableLabel
           disabled={ !canEdit }
           onChange={ () => {
             update(!done);
@@ -20,11 +21,11 @@ export default function CalendarRenderScheduled( task, start, end, canEdit, done
           labelClassName="color-white text-normal"
           label={`${ task.title } | #${ task.id }`}
           />
-      </p>
+      </div>
       { start && end &&
-        <p className="m-l-3 m-t-5">
+        <div className="m-l-3 m-t-5">
           { `${getDateClock(start)} - ${getDateClock(end)}` }
-        </p>
+        </div>
       }
     </div>
   )

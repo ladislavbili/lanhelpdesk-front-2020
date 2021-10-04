@@ -16,6 +16,7 @@ export default function Checkbox( props ) {
     addition,
     value,
     disabled,
+    disableLabel,
     blocked,
     onChange,
   } = props;
@@ -50,7 +51,7 @@ export default function Checkbox( props ) {
         )}
         />
       <label
-        htmlFor={ id ? id : name }
+        htmlFor={ disableLabel ? null : (id ? id : name) }
         className={classnames(
           {
             'm-l-5': !right && label && label.length > 0,

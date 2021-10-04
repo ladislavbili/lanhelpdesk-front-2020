@@ -381,7 +381,7 @@ mutation deleteRepeatTemplateShortSubtask($id: Int!) {
 
 //table
 export const ADD_SUBTASK = gql `
-mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $repeatTemplate: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput) {
+mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $repeatTemplate: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput) {
   addRepeatTemplateSubtask(
     title: $title,
     order: $order,
@@ -389,7 +389,6 @@ mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!
     approved: $approved,
     quantity: $quantity,
     discount: $discount,
-    type: $type,
     repeatTemplate: $repeatTemplate,
     assignedTo: $assignedTo,
     scheduled: $scheduled,
@@ -425,7 +424,7 @@ mutation addRepeatTemplateSubtask($title: String!, $order: Int!, $done: Boolean!
 `;
 
 export const UPDATE_SUBTASK = gql `
-mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
+mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
   updateRepeatTemplateSubtask(
     id: $id,
     title: $title,
@@ -434,7 +433,6 @@ mutation updateRepeatTemplateSubtask($id: Int!, $title: String, $order: Int, $do
     approved: $approved,
     quantity: $quantity,
     discount: $discount,
-    type: $type,
     assignedTo: $assignedTo,
     scheduled: $scheduled,
   ){

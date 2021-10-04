@@ -41,19 +41,6 @@ export default function TasklistSwitch( props ) {
     link
   }
 
-  const myRights = currentUser.role.accessRights;
-
-  let layout = 1;
-  if ( tasklistLayout === 2 && localProject.id && myRights.tasklistLayout ) {
-    layout = 2;
-  } else if ( tasklistLayout === 3 && canViewCalendar && myRights.tasklistCalendar ) {
-    layout = 3;
-  } else if ( tasklistLayout === 4 && localProject.id && myRights.tasklistLayout ) {
-    layout = 4;
-  } else if ( tasklistLayout === 5 && localProject.id && myRights.tasklistLayout ) {
-    layout = 5;
-  }
-
   return (
     <div className="content-page">
       <div className="content" style={{ paddingTop: 0 }}>
@@ -64,7 +51,7 @@ export default function TasklistSwitch( props ) {
             </div>
           }
 
-          { layout === 1 &&
+          { tasklistLayout === 1 &&
             <div className="flex" >
               { taskID && <TaskEdit match={match} columns={false} history={history} /> }
               { !taskID &&
@@ -73,7 +60,7 @@ export default function TasklistSwitch( props ) {
             </div>
           }
 
-          {layout === 2 &&
+          {tasklistLayout === 2 &&
             <div className="col-xl-12" >
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
@@ -81,7 +68,7 @@ export default function TasklistSwitch( props ) {
               }
             </div>
           }
-          {layout === 3 &&
+          {tasklistLayout === 3 &&
             <div className='col-xl-12'>
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
@@ -89,7 +76,7 @@ export default function TasklistSwitch( props ) {
               }
             </div>
           }
-          {layout === 4 &&
+          {tasklistLayout === 4 &&
             <div className="col-xl-12" >
               {taskID && <TaskEdit match={match} columns={false} history={history} />}
               {!taskID &&
@@ -97,7 +84,7 @@ export default function TasklistSwitch( props ) {
               }
             </div>
           }
-          {layout === 5 &&
+          {tasklistLayout === 5 &&
             <div className='col-xl-12'>
               <Statistics {...generalProps} />
             </div>

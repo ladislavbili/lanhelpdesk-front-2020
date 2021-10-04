@@ -143,7 +143,7 @@ export default function TaskListDnD( props ) {
             { statuses
               .filter( (status) => status.action !== 'Invoiced' )
               .map( (status) =>
-              <StatusColumn {...props} change={changedTask} status={status} key={status.id} limit={limit} />
+              <StatusColumn {...props} disabled={!localProject.attributeRights.status.edit} change={changedTask} status={status} key={status.id} limit={limit} />
             ) }
           </DragDropContext>
           { statuses

@@ -16,6 +16,7 @@ import {
 } from 'react-beautiful-dnd';
 import Pagination from './pagination';
 import Loading from 'components/loading';
+import Empty from 'components/Empty';
 import ItemRender from '../components/columnItemRender';
 import ModalTaskEdit from 'helpdesk/task/edit/modalEdit';
 
@@ -31,6 +32,7 @@ export default function DnDStatusColumn( props ) {
     history,
     change,
     limit,
+    disabled,
     link,
     localFilter,
     localProject,
@@ -106,34 +108,54 @@ export default function DnDStatusColumn( props ) {
                 background: snapshot.isDraggingOver ? 'lightblue' : 'inherit',
               }}
               >
-              { tasks.map((task, index) => (
-                <Draggable
-                  key={task.id}
-                  draggableId={task.id.toString()}
-                  extraData={'aaaa'}
-                  index={index}
-                  >
-                  { (provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      >
-                      <ul
-                        className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item")}
-                        style={{borderLeft: "3px solid " + status.color}}
-                        onClick={(e)=>{
-                          //history.push(link+'/'+task.id);
-                          setEditedTask(task);
-                        }}
-                        key={task.id}
+              <Empty>
+                { !disabled && tasks.map((task, index) => (
+                  <Draggable
+                    key={task.id}
+                    draggableId={task.id.toString()}
+                    extraData={'aaaa'}
+                    index={index}
+                    >
+                    { (provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
                         >
-                        <ItemRender task={task} />
-                      </ul>
-                    </div>
-                  ) }
-                </Draggable>
-              ))}
+                        <ul
+                          className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item", "noselect")}
+                          style={{borderLeft: "3px solid " + status.color}}
+                          onClick={(e)=>{
+                            //history.push(link+'/'+task.id);
+                            setEditedTask(task);
+                          }}
+                          key={task.id}
+                          >
+                          <ItemRender task={task} />
+                        </ul>
+                      </div>
+                    ) }
+                  </Draggable>
+                ))}
+                { disabled && tasks.map((task, index) => (
+                  <div
+                    key={task.id}
+                    >
+                    <ul
+                      className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item", "noselect")}
+                      style={{borderLeft: "3px solid " + status.color}}
+                      onClick={(e)=>{
+                        //history.push(link+'/'+task.id);
+                        setEditedTask(task);
+                      }}
+                      key={task.id}
+                      >
+                      <ItemRender task={task} />
+                    </ul>
+                  </div>
+                ))}
+
+              </Empty>
 
               { tasks.length === 0 &&
                 <div className="center-ver" style={{textAlign:'center'}}>

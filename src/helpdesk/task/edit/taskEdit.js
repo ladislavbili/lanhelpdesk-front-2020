@@ -1077,7 +1077,6 @@ export default function TaskEdit( props ) {
         { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.edit &&
           <Select
             value={overtime}
-            isDisabled={!userRights.overtimeWrite || defaultFields.overtime.fixed}
             styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(overtime)=> {
               setOvertime(overtime);
@@ -1661,6 +1660,7 @@ export default function TaskEdit( props ) {
           }}
           updateTrip={(id,newData)=>{
             let originalTrip = workTrips.find((item)=>item.id===id);
+            console.log(originalTrip.scheduled);
             originalTrip = {
               ...originalTrip,
               scheduled: originalTrip.scheduled ?
@@ -1674,13 +1674,6 @@ export default function TaskEdit( props ) {
             setVykazyChanged(true);
           }}
           updateTrips={(multipleTrips)=>{
-            const originalTrips = workTrips.map((item)=>({
-              ...item,
-              scheduled:{
-                from: item.scheduled.from,
-                to: item.scheduled.to,
-              }
-            }));
             multipleTrips.forEach(({id, newData})=>{
               let originalTrip = workTrips.find((item)=>item.id===id);
               originalTrip = {

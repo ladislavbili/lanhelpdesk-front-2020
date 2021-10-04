@@ -45,7 +45,7 @@ export default function DefaultCompany( props ) {
   return (
     <NavItem key='defCompany'>
       <Link
-        className={classnames("sidebar-align", "sidebar-menu-item" , {"active" : location.pathname.includes('settings/company')})}
+        className={classnames("sidebar-menu-item" , {"active" : location.pathname.includes('settings/company')})}
         to={{ pathname:`/helpdesk/settings${ companyLoading ? '' : `/company/${company.id}`}` }}>
         Helpdesk Company
       </Link>

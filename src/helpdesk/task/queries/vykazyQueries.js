@@ -43,7 +43,7 @@ mutation deleteShortSubtask($id: Int!) {
 
 //table
 export const ADD_SUBTASK = gql `
-mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $type: Int!, $task: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput ) {
+mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $task: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput ) {
   addSubtask(
     title: $title,
     order: $order,
@@ -51,7 +51,6 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: B
     approved: $approved,
     quantity: $quantity,
     discount: $discount,
-    type: $type,
     task: $task,
     assignedTo: $assignedTo,
     scheduled: $scheduled,
@@ -87,7 +86,7 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: B
 `;
 
 export const UPDATE_SUBTASK = gql `
-mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
+mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
   updateSubtask(
     id: $id,
     title: $title,
@@ -96,7 +95,6 @@ mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $
     approved: $approved,
     quantity: $quantity,
     discount: $discount,
-    type: $type,
     assignedTo: $assignedTo,
     scheduled: $scheduled,
   ){
@@ -183,7 +181,7 @@ mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantit
 `;
 
 export const UPDATE_WORKTRIP = gql `
-mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
+mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $discount: Float, $type: Int!, $assignedTo: Int, $scheduled: ScheduledWorkInput) {
   updateWorkTrip(
     id: $id,
     order: $order,
