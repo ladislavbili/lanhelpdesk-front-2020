@@ -407,7 +407,7 @@ export default function ProjectFilterForm( props ) {
               if( allGroups.length === groups.length ){
                 setGroups([]);
               }else{
-                setGroups(allGroups);
+                setGroups(toSelArr(allGroups));
               }
             }else{
               setGroups(newGroups);

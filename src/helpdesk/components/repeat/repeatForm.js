@@ -8,32 +8,33 @@ import Select from 'react-select';
 import {
   Label,
 } from 'reactstrap';
+import CKEditor from '@ckeditor/ckeditor5-react';
+import ck5config from 'configs/components/ck5config';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
+import axios from 'axios';
+import moment from 'moment';
+import classnames from "classnames";
+
 import DatePicker from 'components/DatePicker';
 import MultiSelect from 'components/MultiSelectNew';
 import Empty from 'components/Empty';
 import SimpleRepeat from 'helpdesk/components/repeat/simpleRepeat';
-import TagsPickerPopover from 'helpdesk/components/tags';
-import moment from 'moment';
 
-import Attachments from 'helpdesk/components/attachments';
+import Attachments from 'helpdesk/task/components/attachments';
+import TagsPickerPopover from 'helpdesk/task/components/tags';
+import ShortSubtasks from 'helpdesk/task/components/shortSubtasks';
+import Materials from 'helpdesk/task/components/vykazy/materialsTable';
+import WorksTable from 'helpdesk/task/components/vykazy/worksTable';
+import {
+  getCreationError as getVykazyError
+} from 'helpdesk/task/components/vykazy/errors';
 
-import Materials from 'helpdesk/components/vykazy/materialsTable';
-import WorksTable from 'helpdesk/components/vykazy/worksTable';
 
-import classnames from "classnames";
-
-import CKEditor from '@ckeditor/ckeditor5-react';
-import ck5config from 'configs/components/ck5config';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import axios from 'axios';
 import {
   pickSelectStyle,
 } from 'configs/components/select';
-import booleanSelects from 'configs/constants/boolSelect'
-import CheckboxList from 'helpdesk/components/checkboxList';
-import {
-  getCreationError as getVykazyError
-} from 'helpdesk/components/vykazy/vykazyTable';
+import booleanSelects from 'configs/constants/boolSelect';
 import {
   noMilestone
 } from 'configs/constants/sidebar';
@@ -1455,7 +1456,7 @@ export default function RepeatForm( props ) {
       return null;
     }
     return (
-      <CheckboxList
+      <ShortSubtasks
         disabled={!userRights.rights.taskSubtasksWrite}
         items={simpleSubtasks}
         onChange={(simpleSubtask) => {

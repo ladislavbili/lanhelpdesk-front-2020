@@ -59,6 +59,7 @@ export default function Comments( props ) {
     data: commentsData,
     loading: commentsLoading,
     refetch: commentsRefetch,
+    error: commentsError,
   } = useQuery( GET_COMMENTS, {
     variables: {
       task: id,
@@ -147,7 +148,7 @@ export default function Comments( props ) {
   if ( commentsLoading ) {
     return <Loading />
   }
-  const comments = commentsData.comments;
+  const comments = commentsError ? [] : commentsData.comments;
 
   return (
     <div>

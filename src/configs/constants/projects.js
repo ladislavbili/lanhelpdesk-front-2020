@@ -421,3 +421,10 @@ export const emptyStatus = {
   value: null,
   color: 'green'
 };
+
+export const emptyPausal = {
+  title: 'Set by tasks company',
+  id: null,
+  label: 'Set by tasks company',
+  value: null,
+};

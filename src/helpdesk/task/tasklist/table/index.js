@@ -207,7 +207,7 @@ export default function TableListLoader( props ) {
   const deleteTaskFunc = () => {
     if ( window.confirm( "Are you sure you want to delete checked tasks?" ) ) {
       let tasksForDelete = tasks.filter( ( task ) => markedTasks.includes( task.id ) );
-      const [ canDeleteTasks, cantDeleteTasks ] = splitArrayByFilter( tasksForDelete, ( task ) => currentUser.role.level === 0 || task.rights.deleteTask );
+      const [ canDeleteTasks, cantDeleteTasks ] = splitArrayByFilter( tasksForDelete, ( task ) => task.rights.deleteTask );
       Promise.all(
           canDeleteTasks.map( task => {
             deleteTask( {

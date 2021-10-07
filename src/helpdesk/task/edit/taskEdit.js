@@ -13,15 +13,15 @@ import {
   ListGroup,
   ListGroupItem,
 } from 'reactstrap';
-import moment from 'moment';
-import classnames from "classnames";
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
+import ck5config from 'configs/components/ck5config';
 import DatePicker from 'components/DatePicker';
 import Empty from 'components/Empty';
 
-import ck5config from 'configs/components/ck5config';
+import classnames from "classnames";
+import moment from 'moment';
+
 import {
   pickSelectStyle,
 } from 'configs/components/select';
@@ -33,19 +33,17 @@ import {
   noDef
 } from 'configs/constants/projects';
 
-import Attachments from 'helpdesk/components/attachments';
-import Comments from 'helpdesk/components/comments';
 import Repeat from 'helpdesk/components/repeat/repeatFormInput';
-import TaskHistory from 'helpdesk/components/taskHistory';
-import TagsPickerPopover from 'helpdesk/components/tags';
-import {
-  getCreationError as getVykazyError,
-} from 'helpdesk/components/vykazy/errors';
-import Materials from 'helpdesk/components/vykazy/materialsTable';
-import WorksTable from 'helpdesk/components/vykazy/worksTable';
-import CheckboxList from 'helpdesk/components/checkboxList';
-import StatusChangeModal from 'helpdesk/components/statusChangeModal';
-import PendingPicker from 'helpdesk/components/pendingPicker';
+
+import Attachments from '../components/attachments';
+import TagsPickerPopover from '../components/tags';
+import ShortSubtasks from '../components/shortSubtasks';
+import Materials from '../components/vykazy/materialsTable';
+import WorksTable from '../components/vykazy/worksTable';
+import Comments from '../components/comments';
+import TaskHistory from '../components/taskHistory';
+import ErrorDisplay from '../components/errorDisplay/editTaskErrorDisplay';
+
 import AddUserToGroup from 'helpdesk/settings/projects/addUserToGroup';
 
 import TaskAdd from '../add';
@@ -378,7 +376,7 @@ export default function TaskEdit( props ) {
   //constants
   const canAddUser = accessRights.users;
   const canAddCompany = accessRights.companies;
-  const availableProjects = projects.filter( ( project ) => project.right.taskProjectWrite || currentUser.role.level === 0 );
+  const availableProjects = projects.filter( ( project ) => project.right.taskProjectWrite );
   const assignedTos = project ? users.filter( ( user ) => project.usersWithRights.some( ( userData ) => userData.assignable && userData.user.id === user.id ) ) : [];
 
   const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights.map( ( userWithRights ) => userWithRights.user ), 'fullName' ) : users );
@@ -406,7 +404,7 @@ export default function TaskEdit( props ) {
     )
   }
 
-  const autoUpdateTask = ( change ) => {
+  const autoUpdateTask = ( change, passFunc = null ) => {
     if ( getCantSave( change ) ) {
       setChanges( {
         ...changes,
@@ -493,7 +491,7 @@ export default function TaskEdit( props ) {
           }
 
         } catch {}
-
+        passFunc && passFunc();
       } )
       .catch( ( err ) => {
         setChanges( {
@@ -505,7 +503,6 @@ export default function TaskEdit( props ) {
 
     setSaving( false );
   }
-
 
   //vykazyTable
   const subtasks = task.subtasks.map( item => ( {
@@ -560,7 +557,7 @@ export default function TaskEdit( props ) {
     taskType,
     title,
     ganttOrder,
-  } )
+  } );
 
   //Value Change
   const changeProject = ( project ) => {
@@ -576,7 +573,7 @@ export default function TaskEdit( props ) {
       status: null,
       assignedTo: newAssignedTo.map( ( user ) => user.id ),
       milestone: null
-    } )
+    } );
   }
 
   const changeStatus = ( status ) => {
@@ -612,36 +609,6 @@ export default function TaskEdit( props ) {
       } );
     }
   }
-  /*
-  const changeMilestone = ( milestone ) => {
-  if ( status.action === 'PendingDate' ) {
-  if ( milestone.startsAt !== null ) {
-  setMilestone( milestone );
-  setPendingDate( moment( milestone.startsAt ) );
-  setPendingChangable( false );
-  autoUpdateTask( {
-  milestone: milestone.id,
-  pendingDate: moment( milestone.startsAt )
-  .valueOf()
-  .toString(),
-  pendingChangable: false
-  } );
-  } else {
-  setMilestone( milestone );
-  setPendingChangable( true );
-  autoUpdateTask( {
-  milestone: milestone.id,
-  pendingChangable: true
-  } );
-  }
-  } else {
-  setMilestone( milestone );
-  autoUpdateTask( {
-  milestone: milestone.id
-  } );
-  }
-  }
-  */
 
   const changeRequester = ( requester ) => {
     if ( requester.id === -1 ) {
@@ -749,21 +716,6 @@ export default function TaskEdit( props ) {
             </button>
           }
         </span>
-      </div>
-    )
-  }
-
-  const canCreateVykazyError = () => {
-    const error = getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company, userRights );
-    if (
-      ( !userRights.rights.taskWorksRead && !userRights.rights.taskWorksAdvancedRead ) ||
-      error === ''
-    ) {
-      return null;
-    }
-    return (
-      <div className="center-hor" style={{color: "#FF4500", height: "20px"}}>
-        {error}
       </div>
     )
   }
@@ -920,7 +872,7 @@ export default function TaskEdit( props ) {
       <div>
         { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit) &&
           <div> {assignedTo.map((user) =>
-              <div className="disabled-info">{user.label}</div>
+              <div className="disabled-info" key={user.id}>{user.label}</div>
             )}
             { assignedTo.length === 0 &&
               <div className="message error-message">Úloha nepriradená</div>
@@ -944,7 +896,7 @@ export default function TaskEdit( props ) {
               ( canAddUser ? [{id:-1, title:'+ Add user',body:'add', label:'+ Add user',value:null}] : [])
               .concat(assignedTos)
             }
-            styles={pickSelectStyle( [ 'noArrow', ] )}
+            styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
             />
         }
       </div>
@@ -970,7 +922,7 @@ export default function TaskEdit( props ) {
         placeholder="Zadajte typ"
         value={taskType}
         isDisabled={ projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit }
-        styles={pickSelectStyle( [ 'noArrow', ] )}
+        styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
         onChange={(type)=> {
           setTaskType(type);
           autoUpdateTask({ taskType: type.id })
@@ -1192,7 +1144,7 @@ export default function TaskEdit( props ) {
               }
               { userRights.attributeRights.overtime.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label col-4">Mimo PH <span className="warning-big">*</span></Label>
+                  <Label className="col-form-label col-4">After working hours <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     {layoutComponents.Overtime}
                   </div>
@@ -1352,7 +1304,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.overtime.view &&
             <div className="form-selects-entry-column" >
-              <Label>Mimo PH <span className="warning-big">*</span></Label>
+              <Label>After working hours <span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Overtime }
               </div>
@@ -1503,7 +1455,7 @@ export default function TaskEdit( props ) {
     }
 
     return (
-      <CheckboxList
+      <ShortSubtasks
         disabled={!userRights.rights.taskSubtasksWrite}
         items={task.shortSubtasks}
         onChange={(simpleSubtask) => {
@@ -1535,48 +1487,6 @@ export default function TaskEdit( props ) {
         attachments={task.taskAttachments}
         addAttachments={addAttachments}
         removeAttachment={removeAttachment}
-        />
-    )
-  }
-
-  const renderPendingPicker = () => {
-    if ( userRights.attributeRights.status.edit ) {
-      return null;
-    }
-    return (
-      <PendingPicker
-        open={pendingOpen}
-        prefferedMilestone={milestone}
-        milestonesBlocked={true}
-        milestones={ [noMilestone] }
-        closeModal={() => {
-          setPendingOpen(false);
-          setPotentialPendingStatus(null);
-        }}
-        savePending={(pending)=>{
-          if(pending.pendingDate === null){
-            //setPendingDate( moment( parseInt(pending.milestone.endsAt) ) );
-            //setMilestone( pending.milestone );
-            autoUpdateTask( {
-              status: potentialPendingStatus.id,
-              pendingChangable: false,
-              important: false,
-              //milestone: pending.milestone.id,
-              //pendingDate: pending.milestone.endsAt ? pending.milestone.endsAt : moment().add(1,'day').valueOf().toString()
-            } );
-          }else{
-            setPendingDate( pending.pendingDate );
-            autoUpdateTask( {
-              status: potentialPendingStatus.id,
-              pendingChangable: true,
-              important: false,
-              pendingDate: pending.pendingDate.valueOf().toString()
-            });
-          }
-          setStatus( potentialPendingStatus );
-          setPendingOpen(false);
-          setPotentialPendingStatus(null);
-        }}
         />
     )
   }
@@ -1660,7 +1570,6 @@ export default function TaskEdit( props ) {
           }}
           updateTrip={(id,newData)=>{
             let originalTrip = workTrips.find((item)=>item.id===id);
-            console.log(originalTrip.scheduled);
             originalTrip = {
               ...originalTrip,
               scheduled: originalTrip.scheduled ?
@@ -1787,56 +1696,6 @@ export default function TaskEdit( props ) {
     </div>
     )
   }
-
-  const renderStatusChangeModal = () => {
-    return (
-      <StatusChangeModal
-      open={possibleStatus !== null}
-      userRights={ userRights }
-      statuses={project ? toSelArr(project.project.statuses) : []}
-      newStatus={possibleStatus}
-      closeModal={ () => {
-        setPossibleStatus(null);
-      } }
-      submit={(status, comment, date ) => {
-        setPossibleStatus(null);
-        setStatus( status );
-        if ( status.action === 'PendingDate' ) {
-          setPendingDate( date );
-          autoUpdateTask( {
-            status: status.id,
-            pendingDate: date
-            .valueOf()
-            .toString(),
-            pendingChangable: true,
-          } );
-        } else if ( status.action === 'CloseDate' || status.action === 'Invalid' ) {
-          setCloseDate( date );
-          autoUpdateTask( {
-            status: status.id,
-            closeDate: date
-            .valueOf()
-            .toString(),
-          } );
-        } else {
-          autoUpdateTask( {
-            status: status.id
-          } );
-        }
-        if(comment.length > 0 ){
-          submitComment({
-            id,
-            message: comment,
-            attachments: [],
-            parentCommentId: null,
-            internal: false,
-          })
-        }
-      }}
-      />
-    )
-  }
-
   const renderModalUserAdd = () => {
     return (
       <Empty>
@@ -1923,29 +1782,25 @@ export default function TaskEdit( props ) {
             { layout === 2 && <hr className="m-t-5 m-b-2"/> }
             {renderTaskInfoAndDates()}
 
-            {canCreateVykazyError()}
-
             { layout === 1 && renderSelectsLayout1() }
 
             { renderDescription() }
 
             { renderSimpleSubtasks() }
 
-
-
-            { renderPendingPicker() }
-
             { renderVykazyTable() }
 
             { renderComments() }
 
+            <ErrorDisplay
+              {...getTaskData()}
+              userRights={userRights}
+              projectAttributes={projectAttributes}
+              />
+
             { currentUser.role.accessRights.users && renderModalUserAdd() }
 
             { currentUser.role.accessRights.companies && renderModalCompanyAdd() }
-
-            { renderStatusChangeModal() }
-
-            <div className="form-section"></div>
 
           </div>
 

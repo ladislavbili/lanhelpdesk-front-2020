@@ -12,6 +12,13 @@ const noValueMandatory = {
   font: '14px Segoe UI',
 }
 
+export const pickSelectStyleWithRequired = ( defaultStyles, requiredStyles, required ) => {
+  if ( required ) {
+    return pickSelectStyle( [ ...defaultStyles, ...requiredStyles ] )
+  }
+  return pickSelectStyle( defaultStyles )
+}
+
 export const pickSelectStyle = ( wantedAttributes = [] ) => {
   const invisible = wantedAttributes.includes( 'invisible' );
   const noArrow = wantedAttributes.includes( 'noArrow' );

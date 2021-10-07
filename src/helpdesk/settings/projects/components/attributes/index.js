@@ -15,6 +15,7 @@ import {
   emptyCompanyValue,
   emptyStatus,
   emptyAssigned,
+  emptyPausal,
 } from 'configs/constants/projects';
 
 export const noSelect = {
@@ -179,7 +180,7 @@ export default function ProjectAttributes( props ) {
         roles={ groups }
         right="pausal"
         canBeRequired
-        defEmptyValue={ noSelect }
+        defEmptyValue={ emptyPausal }
         defSelectValues={ booleanSelects }
         attribute={ attributes.pausal }
         onChangeAttribute={(value) => {
@@ -189,7 +190,7 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Overtime"
+        label="After working hours"
         roles={ groups }
         right="overtime"
         canBeRequired

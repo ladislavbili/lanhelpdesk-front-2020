@@ -41,7 +41,6 @@ import Statuses from './components/statuses';
 import Groups from './components/group';
 import Attributes from "./components/attributes";
 import ProjectAcl from "./components/acl";
-import ACLErrors from './components/aclErrors';
 import Attachments from './components/attachments';
 import ProjectFilters from "./components/projectFilters";
 import ProjectErrorDisplay from './components/errorDisplay';
@@ -51,6 +50,7 @@ import {
 import {
   remapRightsToBackend,
   getGroupsProblematicAttributes,
+  mergeGroupAttributeRights,
 } from './helpers';
 
 import {

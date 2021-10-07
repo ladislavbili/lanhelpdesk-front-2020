@@ -1,8 +1,5 @@
 import React from 'react';
 
-import moment from 'moment';
-import classnames from "classnames";
-import axios from 'axios';
 
 import Select from 'react-select';
 import {
@@ -10,23 +7,27 @@ import {
 } from 'reactstrap';
 import CKEditor5 from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-
 import DatePicker from 'components/DatePicker';
 import MultiSelect from 'components/MultiSelectNew';
 import Empty from 'components/Empty';
-
 import Repeat from 'helpdesk/components/repeat/simpleRepeat';
-import Attachments from 'helpdesk/components/attachments';
-import CheckboxList from 'helpdesk/components/checkboxList';
-import {
-  getCreationError as getVykazyError
-} from 'helpdesk/components/vykazy/vykazyTable';
-import Materials from 'helpdesk/components/vykazy/materialsTable';
-import WorksTable from 'helpdesk/components/vykazy/worksTable';
+
+import moment from 'moment';
+import classnames from "classnames";
+import axios from 'axios';
+
+import Attachments from '../components/attachments';
+import ShortSubtasks from '../components/shortSubtasks';
+import WorksTable from '../components/vykazy/worksTable';
+import Materials from '../components/vykazy/materialsTable';
+import ErrorDisplay, {
+  hasAddTaskIssues
+} from '../components/errorDisplay/addTaskErrorDisplay';
 
 import ck5config from 'configs/components/ck5config';
 import {
   pickSelectStyle,
+  pickSelectStyleWithRequired,
 } from 'configs/components/select';
 import booleanSelects from 'configs/constants/boolSelect'
 import {
@@ -57,8 +58,6 @@ import {
 import 'scss/direct/task-ckeditor.scss';
 
 let fakeID = -1;
-
-const localCreationError = "Please fill in all required information.";
 
 export default function TaskAdd( props ) {
   //data & queries
@@ -120,7 +119,6 @@ export default function TaskAdd( props ) {
   const [ taskType, setTaskType ] = React.useState( null );
   const [ title, setTitle ] = React.useState( "" );
   const [ workTrips, setWorkTrips ] = React.useState( [] );
-
   const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
@@ -146,43 +144,43 @@ export default function TaskAdd( props ) {
     return fakeID--;
   }
 
+  const getTaskData = () => ( {
+    shortSubtasks: simpleSubtasks,
+    subtasks,
+    workTrips,
+    materials,
+    customItems,
+    assignedTo,
+    closeDate,
+    company,
+    startsAt,
+    deadline,
+    description,
+    important,
+    milestone,
+    overtime,
+    pausal,
+    pendingChangable,
+    pendingDate,
+    project,
+    requester,
+    status,
+    tags,
+    taskType,
+    title,
+  } );
+
+
   //assignedTo je fixne a nie dlzky 0 a nie je to identicke alebo je dlzky 0 a bud to nie je user alebo prazdne
   //ak je nieco required a empty
   const cannotSave = (
     saving ||
     loading ||
-    title.length === 0 ||
-    //assignedTo fixed
-    (
-      projectAttributes.assigned.fixed &&
-      (
-        (
-          projectAttributes.assigned.value.length !== 0 &&
-          (
-            projectAttributes.assigned.value.length !== assignedTo.length ||
-            !projectAttributes.assigned.value.every( ( user1 ) => assignedTo.some( ( user2 ) => user1.id === user2.id ) )
-          )
-        ) ||
-        projectAttributes.assigned.value.length === 0 &&
-        (
-          assignedTo.length > 1 ||
-          (
-            assignedTo.length === 1 &&
-            assignedTo[ 0 ].id !== currentUser.id
-          )
-        )
-      )
-    ) ||
-    //all required
-    ( project.projectAttributes.status.required && !status ) ||
-    ( project.projectAttributes.assigned.required && assignedTo.length === 0 ) ||
-    ( project.projectAttributes.requester.required && !requester ) ||
-    ( project.projectAttributes.company.required && !company ) ||
-    ( project.projectAttributes.taskType.required && !taskType ) ||
-    ( project.projectAttributes.deadline.required && !deadline ) ||
-    ( project.projectAttributes.startsAt.required && !startsAt ) ||
-    ( project.projectAttributes.pausal.required && !pausal ) ||
-    ( project.projectAttributes.overtime.required && !overtime )
+    hasAddTaskIssues( {
+      ...getTaskData(),
+      userRights,
+      projectAttributes
+    } )
   );
 
   //reactions
@@ -309,7 +307,7 @@ export default function TaskAdd( props ) {
 
     let maybeRequester = null;
     if ( users ) {
-      if ( project.lockedRequester ) {
+      if ( project.lockedRequester && currentUser.role.level !== 0 ) {
         maybeRequester = potencialUser;
       } else {
         maybeRequester = users.find( ( user ) => user.id === currentUser.id );
@@ -565,6 +563,13 @@ export default function TaskAdd( props ) {
       } );
   }
 
+  const pickDatepickerStyles = ( value, required ) => {
+    if ( required && ( value === null || !value.isValid() ) ) {
+      return "form-control datepicker-required"
+    }
+    return "form-control"
+  }
+
   //RENDERS
   const renderHeader = () => {
     return (
@@ -592,7 +597,7 @@ export default function TaskAdd( props ) {
       <div className="form-section row">
         <div className="flex">
           <Label>Task name<span className="warning-big m-l-5">*</span> </Label>
-          <div className={classnames( "row m-l-10", {"placeholder-highlight": showLocalCreationError })}>
+          <div className={classnames( "row m-l-10", {"placeholder-highlight": showLocalCreationError && title.length === 0 })}>
             { userRights.rights.taskImportant &&
               <button
                 type="button"
@@ -662,7 +667,7 @@ export default function TaskAdd( props ) {
               setAssignedTo(users);
             }}
             options={assignableUsers}
-            styles={pickSelectStyle([ 'noArrow' ])}
+            styles={pickSelectStyleWithRequired([ 'noArrow' ],['required'], userRights.attributeRights.assigned.required)}
             />
         }
       </div>
@@ -673,7 +678,7 @@ export default function TaskAdd( props ) {
           <Select
             placeholder="Select required"
             value={status}
-            styles={showLocalCreationError ? pickSelectStyle( [ 'noArrow', 'colored', 'required', 'highlight', ] ) : pickSelectStyle([ 'noArrow', 'colored', 'required', ])}
+            styles={ pickSelectStyle([ 'noArrow', 'colored', 'required', ]) }
             onChange={(status)=>{
               if(status.action==='PendingDate'){
                 setStatus(status);
@@ -695,7 +700,7 @@ export default function TaskAdd( props ) {
       <Select
         placeholder="Zadajte typ"
         value={taskType}
-        styles={ (showLocalCreationError && userRights.attributeRights.taskType.required) ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', userRights.attributeRights.taskType.required ? 'required' : ''  ]) }
+        styles={ pickSelectStyleWithRequired([ 'noArrow'], ['required'], userRights.attributeRights.taskType.required ) }
         onChange={(taskType)=> {
           setTaskType(taskType);
         }}
@@ -716,7 +721,7 @@ export default function TaskAdd( props ) {
               }
             }}
             options={projectRequesters}
-            styles={ pickSelectStyle([ 'noArrow', ]) }
+            styles={ pickSelectStyleWithRequired([ 'noArrow'], ['required'], userRights.attributeRights.requester.required ) }
             />
         }
       </div>
@@ -732,7 +737,7 @@ export default function TaskAdd( props ) {
               setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
             }}
             options={companies}
-            styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle( ['noArrow', 'required' ] ) }
+            styles={ pickSelectStyle( ['noArrow', 'required' ] ) }
             />
         }
       </div>
@@ -741,7 +746,7 @@ export default function TaskAdd( props ) {
       <div>
         { !projectAttributes.startsAt.fixed && userRights.attributeRights.startsAt.add &&
           <DatePicker
-            className={classnames("form-control")}
+            className={pickDatepickerStyles(startsAt, userRights.attributeRights.startsAt.required )}
             selected={startsAt}
             hideTime
             isClearable
@@ -757,7 +762,7 @@ export default function TaskAdd( props ) {
       <div>
         { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.add &&
           <DatePicker
-            className={classnames("form-control")}
+            className={pickDatepickerStyles(deadline, userRights.attributeRights.deadline.required )}
             selected={deadline}
             onChange={date => setDeadline( isNaN(date.valueOf()) ? null : date )}
             hideTime
@@ -773,7 +778,7 @@ export default function TaskAdd( props ) {
           <Select
             value={pausal}
             placeholder="Select required"
-            styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', 'required', ]) }
+            styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(pausal)=> setPausal(pausal)}
             options={booleanSelects}
             />
@@ -786,7 +791,7 @@ export default function TaskAdd( props ) {
           <Select
             placeholder="Select required"
             value={overtime}
-            styles={ showLocalCreationError ? pickSelectStyle([ 'noArrow', 'required', 'highlight', ])  : pickSelectStyle([ 'noArrow', 'required', ]) }
+            styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(overtime) => setOvertime(overtime)}
             options={booleanSelects}
             />
@@ -906,7 +911,7 @@ export default function TaskAdd( props ) {
               }
               { userRights.attributeRights.overtime.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Outside PH{ userRights.attributeRights.overtime.required && <span className="warning-big">*</span> }</Label>
+                  <Label className="col-3 col-form-label">After working hours{ userRights.attributeRights.overtime.required && <span className="warning-big">*</span> }</Label>
                   <div className="col-9">
                     {layoutComponents.Overtime}
                   </div>
@@ -1042,7 +1047,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.overtime.add &&
           <div className="form-selects-entry-column" >
-            <Label>Outside PH { userRights.attributeRights.overtime.required && <span className="warning-big">*</span> }</Label>
+            <Label>After working hours { userRights.attributeRights.overtime.required && <span className="warning-big">*</span> }</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Overtime }
             </div>
@@ -1127,7 +1132,7 @@ export default function TaskAdd( props ) {
       return null;
     }
     return (
-      <CheckboxList
+      <ShortSubtasks
         items={simpleSubtasks}
         onChange={(simpleSubtask) => {
           let newSimpleSubtasks = [...simpleSubtasks];
@@ -1314,13 +1319,11 @@ export default function TaskAdd( props ) {
 
   const renderButtons = () => {
     return (
-      <div className="form-section task-edit-buttons">
-      <div className="row form-section-rest">
+      <div className="row m-b-20 m-l-10 m-t-10">
         {closeModal &&
           <button className="btn-link-cancel" onClick={() => closeModal()}>Cancel</button>
         }
-        <div className="pull-right row">
-          {showLocalCreationErrorFunc()}
+        <div className="ml-auto">
           <button
             className="btn"
             onClick={() => {
@@ -1337,37 +1340,7 @@ export default function TaskAdd( props ) {
           </button>
         </div>
       </div>
-    </div>
     )
-  }
-
-  const canCreateVykazyError = () => {
-    const error = getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company, userRights );
-    if ( error === '' ) {
-      return (
-        <span className="center-hor ml-auto">
-      </span>
-      );
-    }
-    return (
-      <span className="message error-message center-hor ml-auto">
-      {error}
-    </span>
-    );
-  }
-
-  const showLocalCreationErrorFunc = () => {
-    if ( !cannotSave || !showLocalCreationError ) {
-      return (
-        <span className="center-hor ml-auto">
-      </span>
-      );
-    }
-    return (
-      <span className="message error-message center-hor ml-auto">
-      {localCreationError}
-    </span>
-    );
   }
 
   return (
@@ -1395,13 +1368,19 @@ export default function TaskAdd( props ) {
 
         { renderDescription() }
 
-
         { renderSimpleSubtasks() }
 
         { renderVykazyTable(subtasks, workTrips, materials, customItems) }
 
-        <div className="task-add-layout-2"></div>
         { renderButtons() }
+
+        { showLocalCreationError &&
+          <ErrorDisplay
+            {...getTaskData()}
+            userRights={userRights}
+            projectAttributes={projectAttributes}
+            />
+        }
       </div>
 
       { layout === 2 && renderSelectsLayout2Side() }

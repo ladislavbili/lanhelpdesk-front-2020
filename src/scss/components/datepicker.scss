@@ -94,3 +94,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     z-index: 9999;
   }
 }
+
+.datepicker-required {
+  border: 1px solid red !important;
+}
+
+.datepicker-required::placeholder{
+  color: red !important;
+}

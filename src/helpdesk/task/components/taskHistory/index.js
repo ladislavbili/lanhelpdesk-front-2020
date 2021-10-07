@@ -25,6 +25,7 @@ export default function TaskHistory( props ) {
     data: taskChangesData,
     loading: taskChangesLoading,
     refetch: taskChangesRefetch,
+    error: taskChangesError,
   } = useQuery( GET_TASK_CHANGES, {
     variables: {
       taskId: task.id
@@ -87,22 +88,23 @@ export default function TaskHistory( props ) {
   }
 
   const getHistory = () => {
-    return taskChangesData.taskChanges.map( ( taskChange ) => {
-      let event = {
-        user: taskChange.user ? taskChange.user : {
-          fullName: 'Unknown user',
-          id: -1
-        },
-        createdAt: parseInt( taskChange.createdAt ),
-        id: taskChange.id
-      }
-      if ( taskChange.taskChangeMessages.length === 0 ) {
-        event.messages = [ 'Unspecified change was made.' ]
-      } else {
-        event.messages = taskChange.taskChangeMessages.map( ( taskChangeMessage ) => taskChangeMessage.message )
-      }
-      return event;
-    } )
+    return ( taskChangesError ? [] : taskChangesData.taskChanges )
+      .map( ( taskChange ) => {
+        let event = {
+          user: taskChange.user ? taskChange.user : {
+            fullName: 'Unknown user',
+            id: -1
+          },
+          createdAt: parseInt( taskChange.createdAt ),
+          id: taskChange.id
+        }
+        if ( taskChange.taskChangeMessages.length === 0 ) {
+          event.messages = [ 'Unspecified change was made.' ]
+        } else {
+          event.messages = taskChange.taskChangeMessages.map( ( taskChangeMessage ) => taskChangeMessage.message )
+        }
+        return event;
+      } )
   }
 
   const renderMultipleMessages = ( event ) => {

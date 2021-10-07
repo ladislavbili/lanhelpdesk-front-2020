@@ -25,8 +25,7 @@
 .btn-link,
 .btn-link:hover,
 .btn-link:active,
-.btn-link:focus,
-.btn-link:disabled {
+.btn-link:focus {
 //,.btn-secondary:not(:disabled):not(.disabled):active:not(.sidebar-btn)
   background-color: inherit;
   height: $button-height;
@@ -40,6 +39,23 @@
   margin-left: 0px;
   margin-right: 0px;
   outline: none;
+  cursor: pointer;
+}
+
+.btn-link:disabled {
+  background-color: inherit;
+  height: $button-height;
+  border: 0px;
+  border-radius: 0px;
+  padding: 0px;
+  font: $font-value;
+  color: $color-disabled;
+  text-decoration: none;
+  box-shadow: none;
+  margin-left: 0px;
+  margin-right: 0px;
+  outline: none;
+  cursor: not-allowed;
 }
 
 .btn-distance {

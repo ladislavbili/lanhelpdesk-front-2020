@@ -128,6 +128,7 @@ export default function PageHeader( props ) {
             onClick={() => {
               if (window.confirm('Are you sure you want to log out?')) {
                 logoutUser().then(() => {
+                  history.push('/helpdesk/taskList/i/all');
                   location.reload(false);
                 } );
               }

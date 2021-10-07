@@ -13,13 +13,13 @@ import {
 import DatePicker from 'components/DatePicker';
 import moment from 'moment';
 import lodash from 'lodash';
+import classnames from "classnames";
 
-import Attachments from 'helpdesk/components/attachments';
-import Comments from 'helpdesk/components/comments';
+import Attachments from '../components/attachments';
+import Comments from '../components/comments';
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
-import classnames from "classnames";
 import {
   toSelArr,
   sameStringForms
