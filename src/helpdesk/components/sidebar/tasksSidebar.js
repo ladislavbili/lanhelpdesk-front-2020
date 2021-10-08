@@ -253,7 +253,7 @@ export default function TasksSidebar( props ) {
 
   //Constants
   const myRights = currentUser.role.accessRights;
-  const myProjects = myProjectsData.myProjects;
+  const myProjects = [ ...myProjectsData.myProjects ].sort( ( project1, project2 ) => project1.project.title > project2.project.title ? 1 : -1 );
 
   const canEditProject = (
     localProject.id !== null &&

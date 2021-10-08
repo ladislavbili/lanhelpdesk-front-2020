@@ -273,10 +273,10 @@ export default function PublicFilterEdit( props ) {
     setCreatedAtToNow( filter.createdAtToNow );
     setCreatedAtTo( filter.createdAtTo === null ? null : moment( parseInt( filter.createdAtTo ) ) );
     setOneOf( oneOfOptions.filter( ( oneOf ) => filter.oneOf.includes( oneOf.value ) ) );
-    setImportant( booleanSelectOptions.find( ( option ) => option.id === filter.important ) );
-    setInvoiced( booleanSelectOptions.find( ( option ) => option.id === filter.invoiced ) );
-    setPausal( booleanSelectOptions.find( ( option ) => option.id === filter.pausal ) );
-    setOvertime( booleanSelectOptions.find( ( option ) => option.id === filter.overtime ) );
+    setImportant( booleanSelectOptions.find( ( option ) => option.value === filter.important ) );
+    setInvoiced( booleanSelectOptions.find( ( option ) => option.value === filter.invoiced ) );
+    setPausal( booleanSelectOptions.find( ( option ) => option.value === filter.pausal ) );
+    setOvertime( booleanSelectOptions.find( ( option ) => option.value === filter.overtime ) );
 
     setDataChanged( false );
   }
@@ -454,7 +454,7 @@ export default function PublicFilterEdit( props ) {
         <Select
           id="select-requester"
           isMulti
-          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(usersData.basicUsers, 'email'))}
+          options={[ofCurrentUser].concat(toSelArr(usersData.basicUsers, 'email'))}
           onChange={ (requesters) => {
             setRequesters(requesters) ;
             setDataChanged( true );
@@ -469,7 +469,7 @@ export default function PublicFilterEdit( props ) {
         <label>Firma</label>
         <Select
           isMulti
-          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(companiesData.basicCompanies))}
+          options={[ofCurrentUser].concat(toSelArr(companiesData.basicCompanies))}
           onChange={ (companies) => {
             setCompanies(companies);
             setDataChanged( true );
@@ -482,7 +482,7 @@ export default function PublicFilterEdit( props ) {
       <FormGroup>
         <label>Riesi</label>
         <Select
-          options={[{label:'Žiadny',value:null,id:null}].concat(toSelArr(usersData.basicUsers, 'email'))}
+          options={[ofCurrentUser].concat(toSelArr(usersData.basicUsers, 'email'))}
           isMulti
           onChange={(newValue)=>{
             setAssignedTos(newValue);

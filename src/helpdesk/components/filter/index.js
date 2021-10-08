@@ -422,6 +422,8 @@ export default function FilterForm( props ) {
       setTags( [] );
       setStatuses( [] );
     }
+    console.log( filter.important );
+    console.log( booleanSelectOptions );
 
     setStatusDateFromNow( filter.statusDateFromNow );
     setStatusDateFrom( filter.statusDateFrom === null ? null : moment( parseInt( filter.statusDateFrom ) ) );
@@ -448,10 +450,10 @@ export default function FilterForm( props ) {
     setCreatedAtToNow( filter.createdAtToNow );
     setCreatedAtTo( filter.createdAtTo === null ? null : moment( parseInt( filter.createdAtTo ) ) );
     setOneOf( oneOfOptions.filter( ( oneOf ) => filter.oneOf.includes( oneOf.value ) ) );
-    setImportant( booleanSelectOptions.find( ( option ) => option.id === filter.important ) );
-    setInvoiced( booleanSelectOptions.find( ( option ) => option.id === filter.invoiced ) );
-    setPausal( booleanSelectOptions.find( ( option ) => option.id === filter.pausal ) );
-    setOvertime( booleanSelectOptions.find( ( option ) => option.id === filter.overtime ) );
+    setImportant( booleanSelectOptions.find( ( option ) => option.value === filter.important ) );
+    setInvoiced( booleanSelectOptions.find( ( option ) => option.value === filter.invoiced ) );
+    setPausal( booleanSelectOptions.find( ( option ) => option.value === filter.pausal ) );
+    setOvertime( booleanSelectOptions.find( ( option ) => option.value === filter.overtime ) );
   }
 
   if ( dataLoading ) {
