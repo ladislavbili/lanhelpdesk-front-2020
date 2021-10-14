@@ -28,7 +28,7 @@ export default function SettingsSidebar( props ) {
     <Nav vertical>
       <NavItem key="back-to-tasks" className="p-t-3 p-b-3">
         <button className="btn-link sidebar-align full-width text-left" onClick={() => { history.push('/helpdesk/taskList/i/all') } }>
-            <i className="fa fa-chevron-left m-r-5" />
+          <i className="fa fa-chevron-left m-r-5" />
           Back to tasks
         </button>
       </NavItem>

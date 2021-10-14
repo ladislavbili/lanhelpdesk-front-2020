@@ -4,10 +4,10 @@ import {
 import moment from 'moment';
 
 import {
-  reportTypes
-} from 'configs/constants/reports';
+  actions
+} from 'configs/constants/statuses';
 
-export const reportsTypeVar = makeVar( reportTypes[ 0 ] );
+export const reportsStatusActionsVar = makeVar( [ actions.find( ( action ) => action.value === 'CloseDate' ) ] );
 export const reportsFromDateVar = makeVar( moment().startOf( 'month' ) );
 export const reportsToDateVar = makeVar( moment().endOf( 'month' ) );
 export const reportsAgentStatusesVar = makeVar( [] );

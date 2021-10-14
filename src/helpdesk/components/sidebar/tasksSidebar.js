@@ -818,17 +818,19 @@ export default function TasksSidebar( props ) {
     )
   }
 
-  const renderSettings = () => {
+  const renderSettings = ( canSeeSettings ) => {
     return (
       <div>
-        <div className="sidebar-label row" onClick={() => history.push('/helpdesk/settings') }>
-          <div className="clickable noselect">
-            <i className="fa fa-cog" />
-            <Label className="clickable">
-              All Settings
-            </Label>
+        { canSeeSettings &&
+          <div className="sidebar-label row" onClick={() => history.push('/helpdesk/settings') }>
+            <div className="clickable noselect">
+              <i className="fa fa-cog" />
+              <Label className="clickable">
+                All Settings
+              </Label>
+            </div>
           </div>
-        </div>
+        }
         { myRights.users &&
           <NavItem key='users' className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/helpdesk/users' ) }) }>
             <span
@@ -846,6 +848,16 @@ export default function TasksSidebar( props ) {
               onClick={() => history.push(`/helpdesk/companies`)}
               >
               Companies
+            </span>
+          </NavItem>
+        }
+        { myRights.vykazy &&
+          <NavItem key='vykazy' className={classnames("row full-width sidebar-item") }>
+            <span
+              className={ classnames("clickable sidebar-menu-item link") }
+              onClick={() => history.push(`/reports`)}
+              >
+              Výkazy
             </span>
           </NavItem>
         }
@@ -891,10 +903,10 @@ export default function TasksSidebar( props ) {
 
         { showFilterAdd && ( myRights.customFilters || myRights.publicFilters ) && renderFilterAdd() }
 
+        { ( showFilterAdd || canSeeSettings || myRights.vykazy ) && <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" /> }
 
-        { ( showFilterAdd || canSeeSettings ) && <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" /> }
-        { !showFilterAdd && canSeeSettings &&
-          renderSettings()
+        { !showFilterAdd && ( canSeeSettings || myRights.vykazy ) &&
+          renderSettings(canSeeSettings)
         }
       </div>
     )

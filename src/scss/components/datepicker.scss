@@ -53,8 +53,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
 }
 
-
-
 .datepicker-input-button {
   @extend .btn-link-reversed, .center-hor;
   color: inherit !important;

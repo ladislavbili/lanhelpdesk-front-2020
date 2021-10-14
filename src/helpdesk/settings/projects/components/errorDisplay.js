@@ -25,6 +25,7 @@ export default function ProjectErrorDisplay( props ) {
     userGroups.some( ( userGroup ) => userGroup.group.id === group.id )
   ) );
   const attributesWithError = [ 'deadline', 'overtime', 'pausal', 'startsAt', 'status', 'taskType' ].filter( ( attr ) => attributes[ attr ].fixed && attributes[ attr ].value === null );
+  const projectMustHaveTaskType = attributes.taskType.value === null;
 
   const problematicFilters = filters.map( ( filter ) => ( {
       filter,
@@ -84,7 +85,7 @@ export default function ProjectErrorDisplay( props ) {
           ))}
         </div>
       }
-      { attributesWithError.length !== 0 &&
+      { (attributesWithError.length !== 0 || projectMustHaveTaskType) &&
         <div className="p-10 m-t-10 bkg-white">
           <h4>Attributes errors</h4>
           { attributesWithError.map((attribute) => (
@@ -92,6 +93,11 @@ export default function ProjectErrorDisplay( props ) {
               {`Attribute ${attribute} is fixed, but needs to be set to specific value.`}
             </div>
           ))}
+          { projectMustHaveTaskType &&
+            <div className="error-message m-t-5">
+              {`Attribute task type MUST have specific value.`}
+            </div>
+          }
         </div>
       }
       { problematicFilters.length !== 0 &&

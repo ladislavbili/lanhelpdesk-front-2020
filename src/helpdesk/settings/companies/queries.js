@@ -89,6 +89,39 @@ query {
 }
 `;
 
+export const GET_BASIC_COMPANIES_WITH_RENTS = gql `
+query {
+  basicCompanies {
+    id
+    title
+    dph
+    monthly
+    companyRents {
+      id
+      title
+      quantity
+      cost
+      price
+    }
+    pricelist {
+      id
+      title
+      materialMargin
+      prices {
+        type
+        price
+        taskType {
+          id
+        }
+        tripType {
+          id
+        }
+      }
+    }
+  }
+}
+`;
+
 export const ADD_COMPANY = gql `
 mutation addCompany($title: String!, $dph: Int!, $ico: String!, $dic: String!, $ic_dph: String!, $country: String!, $city: String!, $street: String!, $zip: String!, $email: String, $phone: String!, $description: String!, $pricelistId: Int!, $monthly: Boolean!, $monthlyPausal: Float!, $taskWorkPausal: Float!, $taskTripPausal: Float!, $rents: [CompanyRentCreateInput]!) {
   addCompany(

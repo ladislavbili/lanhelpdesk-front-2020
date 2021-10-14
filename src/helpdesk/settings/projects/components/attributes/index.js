@@ -133,7 +133,6 @@ export default function ProjectAttributes( props ) {
         roles={ groups }
         right="taskType"
         canBeRequired
-        defEmptyValue={ noSelect }
         defSelectValues={ taskTypes }
         attribute={ attributes.taskType }
         onChangeAttribute={(value) => {

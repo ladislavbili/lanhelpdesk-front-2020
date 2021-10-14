@@ -10,20 +10,24 @@ import {
 import {
   getMyData,
 } from 'helperFunctions';
-import RerouteToMonthlyCompany from './rerouteToMonthlyCompany';
+import Reroute from './reroute';
 
-import Sidebar from './Sidebar';
-import ErrorMessages from 'components/errorMessages';
-import PageHeader from '../components/PageHeader';
-import SelectPage from '../components/SelectPage';
-import CompanyMonthlyReport from './monthly/company';
-import AssignedMonthlyReport from './monthly/assigned';
-import CompanyInvoices from './invoices/company';
 import AccessDenied from 'components/accessDenied';
 
-import settings from 'configs/constants/settings';
+import SelectPage from '../components/SelectPage';
+import PageHeader from '../components/PageHeader';
+import Sidebar from './components/sidebar';
+import ErrorMessages from 'components/errorMessages';
+import NotificationList from 'components/notifications';
+
+import AgentMonthlyReport from './monthly/agent';
+import CompanyMonthlyReport from './monthly/company';
+import Invoices from './invoices';
 
 export default function Navigation( props ) {
+
+
+  const [ sidebarOpen, setSidebarOpen ] = React.useState( true );
 
   const currentUser = getMyData();
   const accessRights = currentUser ? currentUser.role.accessRights : {};
@@ -31,11 +35,8 @@ export default function Navigation( props ) {
     <div>
       <div className="page-header">
         <div className="center-ver row center flex">
-          <SelectPage />
-          <PageHeader
-            {...props}
-            settings={settings}
-            />
+          <SelectPage  sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} history={props.history} />
+          <PageHeader {...props} />
         </div>
       </div>
 
@@ -43,26 +44,13 @@ export default function Navigation( props ) {
         <Sidebar {...props} canSeeVykazy={accessRights.vykazy} />
         <div className="main">
 
-          { accessRights.vykazy && <Route exact path="/reports" component={RerouteToMonthlyCompany} /> }
+          { accessRights.vykazy && <Route exact path="/reports" component={Reroute} /> }
           { accessRights.vykazy && accessRights.viewErrors && <Route exact path="/reports/errorMessages" component={ErrorMessages} /> }
           { accessRights.vykazy && <Route exact path="/reports/monthly/companies" component={CompanyMonthlyReport} /> }
-          { accessRights.vykazy && <Route exact path="/reports/monthly/requester" component={AssignedMonthlyReport} /> }
-          { accessRights.vykazy && <Route exact path="/reports/company_invoices" component={CompanyInvoices} /> }
-
-
-          { /* SETTINGS */ }
-          { settings.map( (item) => {
-            if (accessRights[item.value]){
-              return (<Route exact key={item.link} path={`/reports/settings/${item.link}`} component={item.component} />);
-            }
-            return (<Route exact key={item.link} path={`/reports/settings/${item.link}`} component={AccessDenied} />);
-          })}
-          { settings.map( (item) =>{
-            if (accessRights[item.value]){
-              return (<Route exact key={item.link} path={`/reports/settings/${item.link}/:id`} component={item.component} />);
-            }
-            return (<Route exact key={item.link} path={`/reports/settings/${item.link}/:id`} component={AccessDenied} />);
-          })}
+          { accessRights.vykazy && <Route exact path="/reports/monthly/agents" component={AgentMonthlyReport} /> }
+          { accessRights.vykazy && <Route exact path="/reports/invoices" component={Invoices} /> }
+          <Route exact path="/helpdesk/notifications" component={NotificationList} />
+          <Route exact path="/helpdesk/notifications/:notificationID" component={NotificationList} />
         </div>
       </div>
     </div>

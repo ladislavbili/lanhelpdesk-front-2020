@@ -17,6 +17,9 @@ import {
   allMilestones
 } from 'configs/constants/sidebar';
 import {
+  testing
+} from 'configs/restAPI';
+import {
   orderByValues,
   attributeLimitingRights,
   ganttAttributeLimitingRights,
@@ -277,14 +280,14 @@ export default function CommandBar( props ) {
                       <i className="fa fa-list m-r-5"/>
                       Zoznam
                     </label>
-                    { localProject.id !== null && localProject.right.tasklistDnD &&
+                    { localProject.id !== null && localProject.right.tasklistDnD && testing &&
                       <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link text-left")}>
                         <input type="radio" name="options" onChange={() => {setTasklistLayout(2); setLayoutOpen(false); }} checked={tasklistLayout === 2}/>
                         <i className="fa fa-map m-r-5"/>
                         DnD
                       </label>
                     }
-                    { canViewCalendar &&
+                    { canViewCalendar && testing &&
                       <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link text-left")}>
                         <input type="radio" name="options" onChange={() => {setTasklistLayout(3); setLayoutOpen(false); }} checked={tasklistLayout === 3}/>
                         <i className="fa fa-calendar-alt m-r-5"/>

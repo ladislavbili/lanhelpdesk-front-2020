@@ -73,6 +73,9 @@
   .min-width-#{increment-by-5($i)} {
     min-width: #{increment-by-5($i)}px !important;
   }
+  .max-width-#{increment-by-5($i)} {
+    max-width: #{increment-by-5($i)}px !important;
+  }
 }
 
 //pixels

@@ -1,4 +1,4 @@
-const testing = true;
+export const testing = true;
 const production = false;
 const port = production ? 8080 : 8081;
 //https://nodejs02.lanhelpdesk.com

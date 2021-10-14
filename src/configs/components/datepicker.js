@@ -6,5 +6,4 @@ export default function config( time ) {
     timeIntervals: 15,
     dateFormat: `${time ? ' HH:mm' : ''} dd.MM.yyyy`,
   }
-
 }

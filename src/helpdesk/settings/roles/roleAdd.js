@@ -51,6 +51,11 @@ export default function RoleAdd( props ) {
     },
     {
       state: React.useState( false ),
+      key: 'vykazy',
+      label: "Reports"
+    },
+    {
+      state: React.useState( false ),
       key: 'publicFilters',
       label: "Public Filters"
     },

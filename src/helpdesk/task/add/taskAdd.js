@@ -88,15 +88,13 @@ export default function TaskAdd( props ) {
   const layout = 2; //currentUser.taskLayout
   const initialProject = projectID ? projects.find( p => p.id === projectID ) : null;
 
-  const projectUsers = users.filter( ( user ) => initialProject && initialProject.users.some( ( userData ) => userData.user.id === user.id ) );
-  const assignableUsers = users.filter( ( user ) => initialProject && initialProject.users.some( ( userData ) => userData.assignable && userData.user.id === user.id ) );
-  const projectRequesters = initialProject && initialProject.lockedRequester ? projectUsers : users;
+  const initialAssignableUsers = users.filter( ( user ) => initialProject && initialProject.users.some( ( userData ) => userData.assignable && userData.user.id === user.id ) );
   //state
   const [ project, setProject ] = React.useState( initialProject );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
 
   const [ attachments, setAttachments ] = React.useState( [] );
-  const [ assignedTo, setAssignedTo ] = React.useState( assignableUsers.filter( ( user ) => user.id === currentUser.id ) );
+  const [ assignedTo, setAssignedTo ] = React.useState( initialAssignableUsers.filter( ( user ) => user.id === currentUser.id ) );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
   const [ customItems, setCustomItems ] = React.useState( [] );
@@ -124,6 +122,10 @@ export default function TaskAdd( props ) {
   const [ saving, setSaving ] = React.useState( false );
   const [ actionAfterAdd, setActionAfterAdd ] = React.useState( actionsAfterAdd.find( ( action ) => action.action === 'open_tasklist' ) );
   const [ showLocalCreationError, setShowLocalCreationError ] = React.useState( false );
+
+  const projectUsers = users.filter( ( user ) => project && project.users.some( ( userData ) => userData.user.id === user.id ) );
+  const assignableUsers = users.filter( ( user ) => project && project.users.some( ( userData ) => userData.assignable && userData.user.id === user.id ) );
+  const projectRequesters = project && project.lockedRequester ? projectUsers : users;
 
   const userRights = (
     project ? {

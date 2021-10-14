@@ -61,6 +61,12 @@ td {
   background-color: $sidebar-item-color;
 }
 
+.row-highlight {
+  tbody tr:hover{
+    background-color: $sidebar-item-color;
+  }
+}
+
 .table-checkbox {
   padding-top: 15px !important;
   padding-right: 0px;

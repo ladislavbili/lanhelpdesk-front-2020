@@ -217,8 +217,15 @@ export default function ProjectEdit( props ) {
       },
       taskType: {
         fixed: attributes.taskType.fixed,
-        value: attributes.taskType.value,
-        value: ( attributes.taskType.value ? taskTypes.find( type => type.id === attributes.taskType.value.id ) : null ),
+        value: (
+          attributes.taskType.value ?
+          taskTypes.find( type => type.id === attributes.taskType.value.id ) :
+          (
+            taskTypes.length === 0 ?
+            null :
+            taskTypes.sort( ( taskType1, taskType2 ) => taskType1.order > taskType2.order ? 1 : -1 )[ 0 ]
+          )
+        ),
       },
     } )
     setDataChanged( false );
@@ -681,7 +688,8 @@ export default function ProjectEdit( props ) {
     ) ) ||
     getAllFilters()
     .some( ( filter ) => filter.active && getGroupsProblematicAttributes( groups, filter )
-      .length !== 0 )
+      .length !== 0 ) ||
+    attributes.taskType.value === null
   )
 
   const myRights = currentUser.role.accessRights.projects ?

@@ -23,7 +23,6 @@ import Search from '../components/search';
 import renderScheduled from './renderScheduled';
 import ActiveSearch from '../components/activeSearch';
 import Pagination from '../components/pagination';
-import TaskEdit from 'helpdesk/task/edit';
 import Repeat from 'helpdesk/components/repeat/repeatFormModal';
 import DragRepeatContextMenu from './dragRepeatContextMenu';
 import DragRepeatTimeContextMenu from './dragRepeatTimeContextMenu';

@@ -201,6 +201,16 @@ export default function ProjectAdd( props ) {
       user: toSelArr( usersData.basicUsers, 'email' )
         .find( ( user ) => user.id === currentUser.id )
     } ] );
+    if ( taskTypesData.taskTypes.length > 0 ) {
+      setAttributes( {
+        ...attributes,
+        taskType: {
+          ...attributes.taskType,
+          value: toSelArr( taskTypesData.taskTypes )
+            .sort( ( taskType1, taskType2 ) => taskType1.order > taskType2.order ? 1 : -1 )[ 0 ]
+        }
+      } )
+    }
   }
 
   if (
@@ -449,7 +459,8 @@ export default function ProjectAdd( props ) {
       )
     ) ) ||
     filters.some( ( filter ) => filter.active && getGroupsProblematicAttributes( groups, filter )
-      .length !== 0 )
+      .length !== 0 ) ||
+    attributes.taskType.value === null
   )
 
   const renderAttachments = () => {

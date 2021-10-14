@@ -2,9 +2,9 @@ import {
   gql
 } from "@apollo/client";
 
-export const GET_REPORTS_TYPE = gql `
-  query reportsType {
-    reportsType @client
+export const GET_REPORTS_STATUS_ACTIONS = gql `
+  query reportsStatusActions {
+    reportsStatusActions @client
   }
 `;
 

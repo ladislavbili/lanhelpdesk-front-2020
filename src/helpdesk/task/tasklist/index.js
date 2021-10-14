@@ -15,6 +15,10 @@ import {
   defaultSorts,
 } from 'configs/constants/tasks';
 
+import {
+  testing
+} from 'configs/restAPI';
+
 import Loading from 'components/loading';
 import TasklistSwitch from './layoutSwitch';
 
@@ -92,6 +96,7 @@ export default function TasksLoader( props ) {
       !currentUser ||
       realLayout > 3 ||
       realLayout < 1 ||
+      !testing ||
       ( //DnD
         realLayout === 2 &&
         (

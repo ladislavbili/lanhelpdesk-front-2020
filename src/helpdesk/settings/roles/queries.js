@@ -4,9 +4,11 @@ import {
 
 export const accessRights = `
   login
+  vykazy
   publicFilters
   addProjects
   viewErrors
+
   users
   companies
   pausals
