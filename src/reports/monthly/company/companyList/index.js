@@ -7,8 +7,8 @@ import Loading from 'components/loading';
 import CompanyList from './companyList';
 
 import {
-  GET_BASIC_COMPANIES_WITH_RENTS,
-} from 'helpdesk/settings/companies/queries';
+  INVOICE_COMPANIES,
+} from 'reports/queries/companyQueries';
 
 import {
   GET_REPORTS_FROM_DATE,
@@ -32,7 +32,8 @@ export default function CompanyListLoader( props ) {
     data: companiesData,
     loading: companiesLoading,
     refetch: companiesRefetch,
-  } = useQuery( GET_BASIC_COMPANIES_WITH_RENTS, {
+  } = useQuery( INVOICE_COMPANIES, {
+    variables: filterData,
     fetchPolicy: 'network-only'
   } );
 
@@ -46,8 +47,8 @@ export default function CompanyListLoader( props ) {
     );
   }
 
-  const companies = companiesData.basicCompanies;
-
+  const companies = companiesData.invoiceCompanies;
+  console.log( companiesData );
   return (
     <CompanyList
       companies={companies}

@@ -83,7 +83,7 @@ export default function MonthSelector( props ) {
                 let lastDay = moment({ year: year.value, month: month.value-1}).endOf('month');
                 onChangeFromDate(firstDay);
                 onChangeToDate(lastDay);
-                onTrigger();
+                onTrigger(firstDay, lastDay);
               }}
               >
               Show
@@ -122,7 +122,7 @@ export default function MonthSelector( props ) {
                     ( fromDate.valueOf() > toDate.valueOf() )
                   )
                 }
-                onClick={onTrigger}
+                onClick={() => onTrigger(fromDate, toDate)}
                 >
                 Show
               </Button>
