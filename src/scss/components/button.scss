@@ -215,6 +215,11 @@
   background-color: red;
 }
 
+.btn-danger:disabled {
+  background-color: $muted-font-color;
+  color: white;
+}
+
 .btn-grey {
   background-color: lightGrey;
 }

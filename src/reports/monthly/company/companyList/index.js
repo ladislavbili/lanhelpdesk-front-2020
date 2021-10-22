@@ -48,7 +48,6 @@ export default function CompanyListLoader( props ) {
   }
 
   const companies = companiesData.invoiceCompanies;
-  console.log( companiesData );
   return (
     <CompanyList
       companies={companies}

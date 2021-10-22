@@ -28,7 +28,7 @@ export default function CompanyReportsLoader( props ) {
       }}
       />
     { filterData !== null && <CompanyList filterData={filterData} setCompany={setCompany} /> }
-    { company !== null && <CompanyInvoice company={company} /> }
+    { company !== null && <CompanyInvoice filterData={filterData} company={company} /> }
     </div>
   );
 }

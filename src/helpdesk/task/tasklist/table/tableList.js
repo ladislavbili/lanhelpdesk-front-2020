@@ -43,7 +43,7 @@ export default function TableList( props ) {
     setGlobalTaskStringFilter,
   } = props;
 
-  let path = `/helpdesk/taskList/i/${match.params.listID}`;
+  let path = `/helpdesk/taskList/i/${match.params.listID ? match.params.listID : 'all' }`;
   if ( match.params.page ) {
     path = `${path}/p/${match.params.page}`
   }

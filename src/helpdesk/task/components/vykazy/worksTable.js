@@ -431,7 +431,7 @@ export default function WorksTable( props ) {
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
               className="form-control hidden-input h-30 segoe-blue-text"
-              value={ getPrice(subtask.type) }
+              value={ subtask.type ? getPrice(subtask.type) : getPrice(defaultType) }
               />
           </span>
         )
@@ -474,7 +474,7 @@ export default function WorksTable( props ) {
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
               className="form-control hidden-input h-30 segoe-blue-text"
-              value={ getDiscountPrice(subtask) }
+              value={ getDiscountPrice({...subtask, type: subtask.type ? subtask.type : defaultType}) }
               />
           </span>
         )

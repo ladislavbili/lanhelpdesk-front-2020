@@ -1,9 +1,9 @@
 export const columnsToShowPausalSubtasks = [
+  'checkbox',
   'id',
   'title',
   'requester',
   'assignedTo',
-  'status',
   'closeDate',
   'description',
   'taskType',
@@ -11,53 +11,53 @@ export const columnsToShowPausalSubtasks = [
 ];
 
 export const columnsToShowPausalWorkTrips = [
+  'checkbox',
   'id',
   'title',
   'requester',
   'assignedTo',
-  'status',
   'closeDate',
   'tripType',
   'quantity',
 ];
 
 export const columnsToShowOverPausalSubtasks = [
+  'checkbox',
   'id',
   'title',
   'requester',
   'assignedTo',
-  'status',
   'closeDate',
   'description',
   'taskType',
   'hours',
   'pricePerHour',
-  'totalPrice'
+  'total'
 ];
 
 export const columnsToShowOverPausalWorkTrips = [
+  'checkbox',
   'id',
   'title',
   'requester',
   'assignedTo',
-  'status',
   'closeDate',
   'tripType',
   'quantity',
   'pricePerUnit',
-  'totalPrice'
+  'total'
 ];
 
 export const columnsToShowMaterials = [
+  'checkbox',
   'id',
   'title',
   'requester',
   'assignedTo',
-  'status',
-  'statusChange',
+  'closeDate',
   'material',
   'quantity',
   'unit',
   'pricePerQuantity',
-  'totalPrice'
+  'total'
 ];

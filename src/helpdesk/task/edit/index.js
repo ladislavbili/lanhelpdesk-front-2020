@@ -800,7 +800,6 @@ export default function TaskEditContainer( props ) {
     return ( <Loading /> );
   }
 
-
   return (
     <TaskEdit
       {...props}

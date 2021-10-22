@@ -422,8 +422,6 @@ export default function FilterForm( props ) {
       setTags( [] );
       setStatuses( [] );
     }
-    console.log( filter.important );
-    console.log( booleanSelectOptions );
 
     setStatusDateFromNow( filter.statusDateFromNow );
     setStatusDateFrom( filter.statusDateFrom === null ? null : moment( parseInt( filter.statusDateFrom ) ) );
