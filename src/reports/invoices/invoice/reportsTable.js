@@ -16,13 +16,16 @@ import {
 
 import moment from 'moment';
 import Loading from 'components/loading';
+import Checkbox from 'components/checkbox';
 
 export default function ReportsTable( props ) {
 
   const {
     tasks,
     columnsToShow,
-    onClickTask
+    onClickTask,
+    markedTasks,
+    markTask,
   } = props;
 
   const displayPausalSubtasks = (
@@ -30,14 +33,14 @@ export default function ReportsTable( props ) {
     columnsToShow.includes( 'taskType' ) &&
     columnsToShow.includes( 'hours' ) &&
     !columnsToShow.includes( 'pricePerHour' ) &&
-    !columnsToShow.includes( 'totalPrice' )
+    !columnsToShow.includes( 'total' )
   );
 
   const displayPausalWorkTrips = (
     columnsToShow.includes( 'tripType' ) &&
     columnsToShow.includes( 'quantity' ) &&
     !columnsToShow.includes( 'pricePerUnit' ) &&
-    !columnsToShow.includes( 'totalPrice' )
+    !columnsToShow.includes( 'total' )
   );
 
   const displayOverPausalSubtasks = (
@@ -45,14 +48,14 @@ export default function ReportsTable( props ) {
     columnsToShow.includes( 'taskType' ) &&
     columnsToShow.includes( 'hours' ) &&
     columnsToShow.includes( 'pricePerHour' ) &&
-    columnsToShow.includes( 'totalPrice' )
+    columnsToShow.includes( 'total' )
   );
 
   const displayOverPausalWorkTrips = (
     columnsToShow.includes( 'tripType' ) &&
     columnsToShow.includes( 'quantity' ) &&
     columnsToShow.includes( 'pricePerUnit' ) &&
-    columnsToShow.includes( 'totalPrice' )
+    columnsToShow.includes( 'total' )
   );
 
   const displayMaterials = (
@@ -60,13 +63,14 @@ export default function ReportsTable( props ) {
     columnsToShow.includes( 'quantity' ) &&
     columnsToShow.includes( 'unit' ) &&
     columnsToShow.includes( 'pricePerQuantity' ) &&
-    columnsToShow.includes( 'totalPrice' )
+    columnsToShow.includes( 'total' )
   );
 
   return (
     <table className="table m-b-10 bkg-white row-highlight">
       <thead>
         <tr>
+          { columnsToShow.includes('checkbox') && <th width="30"/> }
           { columnsToShow.includes('id') && <th>ID</th> }
           { columnsToShow.includes('title') && <th>Názov úlohy</th> }
           { columnsToShow.includes('requester') && <th>Zadal</th> }
@@ -84,13 +88,19 @@ export default function ReportsTable( props ) {
           { columnsToShow.includes('pricePerHour') && <th style={{width:'70px'}}>Cena/hodna</th> }
           { columnsToShow.includes('pricePerQuantity') && <th style={{width:'100px'}}>Cena/Mn.</th> }
           { columnsToShow.includes('pricePerUnit') && <th style={{width:'50px'}}>Cena/ks</th> }
-          { columnsToShow.includes('totalPrice') && <th style={{width:'70px'}}>Cena spolu</th> }
+          { columnsToShow.includes('total') && <th style={{width:'70px'}}>Cena spolu</th> }
         </tr>
       </thead>
       <tbody>
-        {
-          tasks.map((task)=>
+        { tasks.map((task) =>
           <tr key={task.id}>
+            { columnsToShow.includes('checkbox') &&
+              <Checkbox
+                className = "m-l-5 m-r-5 m-t-7"
+                value = { markedTasks.includes(task.id) }
+                onChange={() => { markTask(task.id) }}
+                />
+            }
             { columnsToShow.includes('id') && <td>{task.id}</td> }
 
             { columnsToShow.includes('title') && <td className="clickable" style={{ color: "#1976d2" }} onClick={() => onClickTask(task)}>{task.title}</td> }
@@ -122,7 +132,7 @@ export default function ReportsTable( props ) {
                     { task.subtasks.map(subtask =>
                       <tr key={subtask.id}>
                         <td key={subtask.id + '-title'} style={{paddingLeft:0}}>{subtask.title}</td>
-                        <td key={subtask.id + '-type'} style={{width:'150px'}}>{subtask.type.title}</td>
+                        <td key={subtask.id + '-type'} style={{width:'150px'}}>{task.taskType ? task.taskType.title : 'Chýba'}</td>
                         <td key={subtask.id + '-time'} style={{width:'50px'}}>{subtask.quantity}</td>
                       </tr>
                     )}
@@ -153,10 +163,10 @@ export default function ReportsTable( props ) {
                     { task.subtasks.map(subtask =>
                       <tr key={subtask.id}>
                         <td key={subtask.id + '-title'} style={{paddingLeft:0}}>{subtask.title}</td>
-                        <td key={subtask.id + '-type'} style={{width:'150px'}}>{subtask.type.title}</td>
+                        <td key={subtask.id + '-type'} style={{width:'150px'}}>{task.taskType.title}</td>
                         <td key={subtask.id + '-time'} style={{width:'50px'}}>{subtask.quantity}</td>
                         <td key={subtask.id + '-pricePerUnit'} style={{width:'70px'}}>{subtask.price.toFixed(2)}</td>
-                        <td key={subtask.id + '-totalPrice'} style={{width:'70px'}}>{(subtask.price*subtask.quantity).toFixed(2)}</td>
+                        <td key={subtask.id + '-totalPrice'} style={{width:'70px'}}>{subtask.total.toFixed(2)}</td>
                       </tr>
                     )}
                   </tbody>
@@ -173,7 +183,7 @@ export default function ReportsTable( props ) {
                         <td key={trip.id + '-type'} style={{width:'150px'}}>{trip.type.title}</td>
                         <td key={trip.id + '-time'} style={{width:'50px'}}>{trip.quantity}</td>
                         <td key={trip.id + '-pricePerUnit'} style={{width:'70px'}}> {trip.price}</td>
-                        <td key={trip.id + '-totalPrice'} style={{width:'70px'}}>{(trip.price*trip.quantity).toFixed(2)}</td>
+                        <td key={trip.id + '-totalPrice'} style={{width:'70px'}}>{(trip.total).toFixed(2)}</td>
                       </tr>
                     )}
                   </tbody>
@@ -191,7 +201,7 @@ export default function ReportsTable( props ) {
                         <td key={material.id + '-quantity'} style={{width:'50px'}}>{material.quantity}</td>
                         <td key={material.id + '-unit'} style={{width:'100px'}}>ks</td>
                         <td key={material.id + '-unitPrice'} style={{width:'100px'}}>{material.price}</td>
-                        <td key={material.id + '-totalPrice'} style={{width:'100px'}}>{material.totalPrice}</td>
+                        <td key={material.id + '-totalPrice'} style={{width:'100px'}}>{material.total}</td>
                       </tr>
                     )}
                   </tbody>

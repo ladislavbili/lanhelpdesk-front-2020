@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   useQuery,
+  useMutation,
 } from "@apollo/client";
 
 import Loading from 'components/loading';
@@ -8,7 +9,8 @@ import CompanyInvoice from './companyInvoice';
 
 import {
   COMPANY_INVOICE,
-} from 'reports/queries/companyQueries';
+  INVOICE_TASKS,
+} from 'reports/queries';
 
 import {
   GET_REPORTS_FROM_DATE,
@@ -38,6 +40,7 @@ export default function CompanyInvoiceLoader( props ) {
   const {
     data: toDateData,
   } = useQuery( GET_REPORTS_TO_DATE );
+  const [ invoiceTasksFunc ] = useMutation( INVOICE_TASKS );
 
   React.useEffect( () => {
     invoiceRefetch( {
@@ -48,11 +51,32 @@ export default function CompanyInvoiceLoader( props ) {
     } );
   }, [ company ] );
 
+  const invoiceTasks = ( companyId, taskIds, setInvoiceTriggered ) => {
+    if ( window.confirm( 'Please confirm your choice to invoice these tasks.' ) ) {
+      setInvoiceTriggered( true );
+      invoiceTasksFunc( {
+        variables: {
+          ...filterData,
+          companyId,
+          taskIds
+        }
+      } );
+      invoiceRefetch( {
+        variables: {
+          ...filterData,
+          companyId: company.id,
+        },
+      } );
+      setInvoiceTriggered( false );
+    }
+  }
+
   if ( invoiceLoading ) {
     return (
       <Loading />
     );
   }
+
 
   return (
     <CompanyInvoice
@@ -60,6 +84,8 @@ export default function CompanyInvoiceLoader( props ) {
       companyData={company}
       fromDate={fromDateData.reportsFromDate}
       toDate={toDateData.reportsToDate}
+      invoiceTasks={invoiceTasks}
+      invoiceRefetch={invoiceRefetch}
       />
   );
 }

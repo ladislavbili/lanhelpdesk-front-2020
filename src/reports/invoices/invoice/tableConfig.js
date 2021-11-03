@@ -29,7 +29,7 @@ export const columnsToShowOverPausalSubtasks = [
   'taskType',
   'hours',
   'pricePerHour',
-  'totalPrice'
+  'total'
 ];
 
 export const columnsToShowOverPausalWorkTrips = [
@@ -41,7 +41,7 @@ export const columnsToShowOverPausalWorkTrips = [
   'tripType',
   'quantity',
   'pricePerUnit',
-  'totalPrice'
+  'total'
 ];
 
 export const columnsToShowMaterials = [
@@ -49,10 +49,10 @@ export const columnsToShowMaterials = [
   'title',
   'requester',
   'assignedTo',
-  'statusChange',
+  'closeDate',
   'material',
   'quantity',
   'unit',
   'pricePerQuantity',
-  'totalPrice'
+  'total'
 ];

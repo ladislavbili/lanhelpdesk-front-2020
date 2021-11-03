@@ -7,13 +7,13 @@ import Loading from 'components/loading';
 import ListOfCompanies from './listOfCompanies';
 
 import {
-  GET_BASIC_COMPANIES_WITH_RENTS,
-} from 'helpdesk/settings/companies/queries';
-
-import {
   GET_REPORTS_FROM_DATE,
   GET_REPORTS_TO_DATE,
 } from 'apollo/localSchema/queries';
+
+import {
+  COMPANIES_WITH_INVOICE,
+} from 'reports/queries';
 
 export default function InvoicesListOfCompaniesLoader( props ) {
   const {
@@ -28,28 +28,31 @@ export default function InvoicesListOfCompaniesLoader( props ) {
   } = useQuery( GET_REPORTS_TO_DATE );
 
   const {
-    data: companiesData,
-    loading: companiesLoading,
-    refetch: companiesRefetch,
-  } = useQuery( GET_BASIC_COMPANIES_WITH_RENTS, {
-    fetchPolicy: 'network-only'
+    data: companiesWithInvoiceData,
+    loading: companiesWithInvoiceLoading,
+    refetch: companiesWithInvoiceRefetch,
+  } = useQuery( COMPANIES_WITH_INVOICE, {
+    variables: {
+      fromDate: fromDateData.reportsFromDate.valueOf()
+        .toString(),
+      toDate: toDateData.reportsToDate.valueOf()
+        .toString(),
+    },
   } );
 
   React.useEffect( () => {
-    companiesRefetch();
+    companiesWithInvoiceRefetch();
   }, [ fromDateData.reportsFromDate, toDateData.reportsToDate ] );
 
-  if ( companiesLoading ) {
+  if ( companiesWithInvoiceLoading ) {
     return (
       <Loading />
     );
   }
 
-  const companies = companiesData.basicCompanies;
-
   return (
     <ListOfCompanies
-      companies={companies}
+      companies={companiesWithInvoiceData.companiesWithInvoice}
       setInvoiceFilter={setInvoiceFilter}
       fromDate={fromDateData.reportsFromDate}
       toDate={toDateData.reportsToDate}

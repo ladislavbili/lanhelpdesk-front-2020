@@ -2,6 +2,8 @@ import React from 'react';
 import {
   months
 } from 'configs/constants/reports';
+import PrintInvoice from 'reports/invoices/print';
+import DownloadExcel from 'reports/invoices/excelExport';
 
 export default function InvoicesListOfDates( props ) {
 
@@ -51,20 +53,30 @@ export default function InvoicesListOfDates( props ) {
             <td className="clickable" onClick={ () => openInvoice(company) }>{company.title}</td>
             <td className="clickable" onClick={ () => openInvoice(company) }>{`${months.find((month) => month.value === fromDate.month() + 1 ).label} ${fromDate.year()}`}</td>
             <td>
-              <button className="btn-link m-r-10"
-                onClick={() => {} }
-                >
-                PDF
-              </button>
-              <button className="btn-link"
-                onClick={() => {} }
-                >
-                Excel
-              </button>
+              <PrintInvoice
+                company={company}
+                variables={{
+                  companyId: company.id,
+                  fromDate: fromDate.valueOf()
+                  .toString(),
+                  toDate: toDate.valueOf()
+                  .toString(),
+                }}
+                />
+              <DownloadExcel
+                  company={company}
+                  variables={{
+                    companyId: company.id,
+                    fromDate: fromDate.valueOf()
+                    .toString(),
+                    toDate: toDate.valueOf()
+                    .toString(),
+                  }}
+                  />
             </td>
           </tr>
         ))}
-        { companies.length !== 0 &&
+        { companies.length === 0 &&
           <tr key='No company'>
             <td colSpan="3">This range of dates has no invoiced tasks</td>
           </tr>

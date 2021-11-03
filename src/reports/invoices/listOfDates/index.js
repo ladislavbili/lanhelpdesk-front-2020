@@ -4,40 +4,47 @@ import {
 } from "@apollo/client";
 import moment from 'moment';
 
+import Loading from 'components/loading';
 import InvoiceListOfDates from './listOfDates';
 
 import {
   months
 } from 'configs/constants/reports';
 
-let years = [];
-for ( let i = moment()
-    .year(); i >= 2012; i-- ) {
-  years.push( {
-    value: i,
-    label: i
-  } );
-}
-
-const allValidDates = years.reduce( ( acc, year ) => {
-    return [
-    ...acc,
-    ...months.map( ( month ) => ( {
-        month,
-        year
-      } ) )
-  ]
-  }, [] )
-  .filter( ( date ) => Math.random() < 0.3 );
+import {
+  INVOICE_DATES_OF_COMPANY,
+} from 'reports/queries';
 
 export default function InvoicesListOfDatesLoader( props ) {
-
   const {
     company,
   } = props;
 
+  const {
+    data: invoiceDatesOfCompanyData,
+    loading: invoiceDatesOfCompanyLoading,
+    refetch: invoiceDatesOfCompanyRefetch,
+  } = useQuery( INVOICE_DATES_OF_COMPANY, {
+    variables: {
+      companyId: company.id,
+    },
+  } );
+
+  React.useEffect( () => {
+    invoiceDatesOfCompanyRefetch( {
+      variables: {
+        companyId: company.id,
+      },
+    } );
+  }, [ company.id ] );
+
+  if ( invoiceDatesOfCompanyLoading ) {
+    return (
+      <Loading />
+    );
+  }
 
   return (
-    <InvoiceListOfDates dates={allValidDates} {...props} />
+    <InvoiceListOfDates dates={invoiceDatesOfCompanyData.invoiceDatesOfCompany.map((date) => ({ ...date, month: months.find((month) => month.value === date.month )  }) )} {...props} />
   );
 }

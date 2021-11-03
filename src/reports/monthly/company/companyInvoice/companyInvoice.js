@@ -1,5 +1,8 @@
 import React from 'react';
 
+import {
+  Spinner,
+} from 'reactstrap';
 import Loading from 'components/loading';
 import ReportsTable from './reportsTable';
 import ModalTaskEdit from 'helpdesk/task/edit/modalEdit';
@@ -23,9 +26,10 @@ export default function CompanyInvoice( props ) {
     companyData,
     fromDate,
     toDate,
+    invoiceTasks,
   } = props;
   const company = companyData.company;
-  const totals = invoice.totals
+  const totals = invoice.totals;
   const allTasksIds = filterUnique( [
     ...invoice.pausalTasks,
     ...invoice.overPausalTasks,
@@ -35,12 +39,16 @@ export default function CompanyInvoice( props ) {
 
   const [ editedTask, setEditedTask ] = React.useState( null );
   const [ markedTasks, setMarkedTasks ] = React.useState( allTasksIds );
+  const [ invoiceTriggered, setInvoiceTriggered ] = React.useState( false );
 
   React.useEffect( () => {
     setMarkedTasks( allTasksIds );
   }, [ company.id, fromDate, toDate ] );
 
   const onClickTask = ( task ) => {
+    if ( invoiceTriggered ) {
+      return;
+    }
     setEditedTask( task );
   }
 
@@ -73,9 +81,11 @@ export default function CompanyInvoice( props ) {
       <div className="flex-row m-b-30">
         <button
           className="btn btn-danger btn-distance"
-          disabled={markedTasks.length === 0}
+          disabled={markedTasks.length === 0 || invoiceTriggered }
+          onClick={ () => invoiceTasks(company.id, markedTasks, setInvoiceTriggered) }
           >
-          {`Faktúrovať vybrané úlohy (${markedTasks.length})`}
+          {invoiceTriggered && <Spinner className="m-r-5" />}
+          {`${invoiceTriggered ? 'Faktúrujú sa' : 'Faktúrovať'} vybrané úlohy (${markedTasks.length})`}
         </button>
         <button
           className="btn btn-distance"
@@ -152,7 +162,7 @@ export default function CompanyInvoice( props ) {
         <p className="m-0">
           { `Spolu počet hodín mimo pracovný čas: ${ invoice.overPausalTotals.workOvertime } ( Čísla úloh: ${ invoice.overPausalTotals.workOvertimeTasks.join(',') })` }
         </p>
-        <p className="m-0">
+        <p className="m-0 m-b-10">
           { `Spolu prirážka za práce mimo pracovných hodín: ${invoice.overPausalTotals.workExtraPrice.toFixed(2)} eur` }
         </p>
         <p className="m-0">
@@ -205,7 +215,7 @@ export default function CompanyInvoice( props ) {
         <p className="m-0">
           { `Spolu počet hodín mimo pracovný čas: ${ invoice.projectTotals.workOvertime } ( Čísla úloh: ${ invoice.projectTotals.workOvertimeTasks.join(',') })` }
         </p>
-        <p className="m-0">
+        <p className="m-0 m-b-10">
           { `Spolu prirážka za práce mimo pracovných hodín: ${invoice.projectTotals.workExtraPrice.toFixed(2)} eur` }
         </p>
         <p className="m-0">

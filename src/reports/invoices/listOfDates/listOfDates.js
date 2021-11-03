@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import PrintInvoice from 'reports/invoices/print';
 
 export default function InvoicesListOfDates( props ) {
 
@@ -13,12 +14,12 @@ export default function InvoicesListOfDates( props ) {
 
   const openInvoice = ( date ) => {
     let fromDate = moment( {
-        year: date.year.value,
+        year: date.year,
         month: date.month.value - 1
       } )
       .startOf( 'month' );
     let toDate = moment( {
-        year: date.year.value,
+        year: date.year,
         month: date.month.value - 1
       } )
       .endOf( 'month' );
@@ -54,15 +55,28 @@ export default function InvoicesListOfDates( props ) {
       </thead>
       <tbody>
         { (hideResults ? [] : dates ).map((date) => (
-          <tr key={`${date.year.value}-${date.month.value}`}>
+          <tr key={`${date.year}-${date.month.value}`}>
             <td className="clickable" onClick={ () => openInvoice(date) }>{company.title}</td>
-            <td className="clickable" onClick={ () => openInvoice(date) }>{`${date.month.label} ${date.year.label}`}</td>
+            <td className="clickable" onClick={ () => openInvoice(date) }>{`${date.month.label} ${date.year}`}</td>
             <td>
-              <button className="btn-link m-r-10"
-                onClick={() => {} }
-                >
-                PDF
-              </button>
+              <PrintInvoice
+                company={company}
+                variables={{
+                  companyId: company.id,
+                  fromDate: moment( {
+                      year: date.year,
+                      month: date.month.value - 1
+                    } )
+                    .startOf( 'month' ).valueOf()
+                  .toString(),
+                  toDate: moment( {
+                      year: date.year,
+                      month: date.month.value - 1
+                    } )
+                    .endOf( 'month' ).valueOf()
+                  .toString(),
+                }}
+                />
               <button className="btn-link"
                 onClick={() => {} }
                 >
@@ -71,7 +85,7 @@ export default function InvoicesListOfDates( props ) {
             </td>
           </tr>
         ))}
-        { dates.length !== 0 &&
+        { dates.length === 0 &&
           <tr key='No date'>
             <td colSpan="3">This company has no invoiced tasks</td>
           </tr>

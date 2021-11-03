@@ -14,8 +14,8 @@ import Loading from 'components/loading';
 import Invoice from './invoice';
 
 import {
-  GET_TASKS,
-} from 'helpdesk/task/queries/listQueries.js';
+  INVOICE,
+} from 'reports/queries';
 
 import {
   GET_REPORTS_FROM_DATE,
@@ -28,28 +28,31 @@ export default function InvoiceLoader( props ) {
   } = props;
 
   const {
-    company,
-  } = invoiceFilter;
-
-  const {
-    data: tasksData,
-    loading: tasksLoading,
-    refetch: tasksRefetch,
-  } = useQuery( GET_TASKS, {
+    data: invoiceData,
+    loading: invoiceLoading,
+    refetch: invoiceRefetch,
+  } = useQuery( INVOICE, {
     variables: {
-      filter: {
-        ...localFilterToValues( getEmptyGeneralFilter() ),
-        companies: [ company.id ],
-      },
-      sort: {
-        asc: false,
-        key: 'title'
-      },
-      page: 1,
-      limit: 20,
+      companyId: invoiceFilter.company.id,
+      fromDate: invoiceFilter.fromDate.valueOf()
+        .toString(),
+      toDate: invoiceFilter.toDate.valueOf()
+        .toString()
     },
-    notifyOnNetworkStatusChange: true,
   } );
+
+  React.useEffect( () => {
+    invoiceRefetch( {
+      variables: {
+        companyId: invoiceFilter.company.id,
+        fromDate: invoiceFilter.fromDate.valueOf()
+          .toString(),
+        toDate: invoiceFilter.toDate.valueOf()
+          .toString()
+      },
+    } );
+
+  }, [ invoiceFilter ] );
 
   const {
     data: fromDateData,
@@ -58,90 +61,19 @@ export default function InvoiceLoader( props ) {
     data: toDateData,
   } = useQuery( GET_REPORTS_TO_DATE );
 
-  React.useEffect( () => {
-    tasksRefetch( {
-      variables: {
-        filter: {
-          ...localFilterToValues( getEmptyGeneralFilter() ),
-          companies: [ company.id ],
-        },
-        sort: {
-          asc: false,
-          key: 'title'
-        },
-        page: 1,
-        limit: 20,
-      },
-    } );
-  }, [ company ] );
-
-  if ( tasksLoading ) {
+  if ( invoiceLoading ) {
     return (
       <Loading />
     );
   }
 
-  const generateRandomArray = () => {
-    const randomLimit = Math.floor( Math.random() * 4 );
-    let array = [];
-    for ( let i = 0; i < randomLimit; i++ ) {
-      array.push( i );
-    }
-    return array;
-  }
-
-  const generateRandomDate = () => {
-    const start = new Date( 2012, 0, 1 );
-    const end = new Date();
-    return ( new Date( start.getTime() + Math.random() * ( end.getTime() - start.getTime() ) ) )
-      .valueOf()
-      .toString();
-  }
-
-  const fakeTaskData = {
-    ...tasksData.tasks,
-    tasks: tasksData.tasks.tasks.map( ( task ) => ( {
-      ...task,
-      closeDate: generateRandomDate(),
-      subtasks: task.subtasks.map( ( subtask, index ) => ( {
-        ...subtask,
-        type: {
-          title: `Task type ${index}`
-        },
-        price: parseFloat( ( Math.floor( Math.random() * 15 ) )
-          .toFixed() ),
-      } ) ),
-      workTrips: generateRandomArray()
-        .map( ( index ) => ( {
-          id: index,
-          type: {
-            title: `Trip type ${index}`
-          },
-          quantity: parseFloat( ( Math.floor( Math.random() * 15 ) )
-            .toFixed() ),
-          price: parseFloat( ( Math.floor( Math.random() * 15 ) )
-            .toFixed() ),
-        } ) ),
-      materials: generateRandomArray()
-        .map( ( index ) => ( {
-          id: index,
-          title: `Material ${index}`,
-          quantity: parseFloat( ( Math.floor( Math.random() * 15 ) )
-            .toFixed() ),
-          price: parseFloat( ( Math.floor( Math.random() * 15 ) )
-            .toFixed() ),
-          totalPrice: parseFloat( ( Math.floor( Math.random() * 150 ) )
-            .toFixed() ),
-        } ) ),
-    } ) )
-  }
-
   return (
     <Invoice
-      tasksData={fakeTaskData}
-      company={company}
+      invoice={invoiceData.invoice}
+      company={invoiceFilter.company}
       fromDate={fromDateData.reportsFromDate}
       toDate={toDateData.reportsToDate}
+      invoiceRefetch={invoiceRefetch}
       />
   );
 }

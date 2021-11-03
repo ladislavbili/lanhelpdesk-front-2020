@@ -8,7 +8,7 @@ import CompanyList from './companyList';
 
 import {
   INVOICE_COMPANIES,
-} from 'reports/queries/companyQueries';
+} from 'reports/queries';
 
 import {
   GET_REPORTS_FROM_DATE,

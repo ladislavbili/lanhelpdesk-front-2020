@@ -234,6 +234,13 @@ export const remapRightsFromBackend = ( group ) => {
 }
 
 export const mergeGroupRights = ( right1, right2 ) => {
+  if ( !right1 ) {
+    right1 = right2;
+  }
+  if ( !right2 ) {
+    right2 = right1;
+  }
+
   return {
     projectRead: right1.projectRead || right2.projectRead,
     projectWrite: right1.projectWrite || right2.projectWrite,

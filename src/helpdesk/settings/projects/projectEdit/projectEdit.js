@@ -692,11 +692,11 @@ export default function ProjectEdit( props ) {
     attributes.taskType.value === null
   )
 
+  const allMyGroups = projectData.project.groups.filter( ( group ) => group.users.some( ( user ) => user.id === currentUser.id ) || group.companies.some( ( company ) => company.id === currentUser.company.id ) );
   const myRights = currentUser.role.accessRights.projects ?
     projectData.project.groups.find( ( group ) => group.def && group.admin )
     .rights :
-    projectData.project.groups.find( ( group ) => group.users.some( ( user ) => user.id === currentUser.id ) )
-    .rights;
+    mergeGroupRights( allMyGroups.length > 0 ? allMyGroups[ 0 ].rights : null, allMyGroups.length > 1 ? allMyGroups[ 1 ].rights : null );
   const allTags = getAllTags();
   const allStatuses = getAllStatuses();
 

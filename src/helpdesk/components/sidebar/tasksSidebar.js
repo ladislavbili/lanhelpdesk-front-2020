@@ -826,7 +826,7 @@ export default function TasksSidebar( props ) {
             <div className="clickable noselect">
               <i className="fa fa-cog" />
               <Label className="clickable">
-                All Settings
+                Settings
               </Label>
             </div>
           </div>
@@ -837,6 +837,7 @@ export default function TasksSidebar( props ) {
               className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/users' ) }) }
               onClick={() => history.push(`/helpdesk/users`)}
               >
+              <i class="fas fa-users m-r-1 m-t-3" />
               Users
             </span>
           </NavItem>
@@ -847,9 +848,13 @@ export default function TasksSidebar( props ) {
               className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/companies' ) }) }
               onClick={() => history.push(`/helpdesk/companies`)}
               >
+              <i class="far fa-building m-r-5 m-t-3" />
               Companies
             </span>
           </NavItem>
+        }
+        { myRights.vykazy &&
+          <hr className = "m-l-15 m-r-15 m-t-11" />
         }
         { myRights.vykazy &&
           <NavItem key='vykazy' className={classnames("row full-width sidebar-item") }>

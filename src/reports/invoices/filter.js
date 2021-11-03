@@ -32,8 +32,8 @@ import {
 } from 'apollo/localSchema/queries';
 
 import {
-  GET_BASIC_COMPANIES_WITH_RENTS,
-} from 'helpdesk/settings/companies/queries';
+  ALL_INVOICE_COMPANIES,
+} from 'reports/queries';
 
 export default function InvoicesFilter( props ) {
   const {
@@ -53,14 +53,14 @@ export default function InvoicesFilter( props ) {
   } = useQuery( GET_REPORTS_TO_DATE );
 
   const {
-    data: companiesData,
-    loading: companiesLoading,
-    refetch: companiesRefetch,
-  } = useQuery( GET_BASIC_COMPANIES_WITH_RENTS, {
+    data: allInvoiceCompaniesData,
+    loading: allInvoiceCompaniesLoading,
+    refetch: allInvoiceCompaniesRefetch,
+  } = useQuery( ALL_INVOICE_COMPANIES, {
     fetchPolicy: 'network-only'
   } );
 
-  if ( companiesLoading ) {
+  if ( allInvoiceCompaniesLoading ) {
     return (
       <div className="max-width-850 m-t-10 m-b-20">
         <Loading />
@@ -68,7 +68,7 @@ export default function InvoicesFilter( props ) {
     );
   }
 
-  const companies = toSelArr( companiesData.basicCompanies );
+  const companies = toSelArr( allInvoiceCompaniesData.allInvoiceCompanies );
 
   return (
     <div className="max-width-850 m-t-10 m-b-20">

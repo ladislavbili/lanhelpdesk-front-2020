@@ -18,20 +18,15 @@ import {
 
 export default function Invoice( props ) {
   const {
+    invoice,
     company,
-    tasksData,
     fromDate,
     toDate,
   } = props;
-  const totals = tasksData.totals;
-  const tasks = tasksData.tasks;
 
+  const totals = invoice.totals;
 
   const [ editedTask, setEditedTask ] = React.useState( null );
-
-  //TODO: company rents isnt covered by rights
-  console.log( '----' );
-  console.log( tasks );
 
   const onClickTask = ( task ) => {
     setEditedTask( task );
@@ -40,16 +35,16 @@ export default function Invoice( props ) {
   return (
     <div>
       <h2>Fakturačný výkaz firmy</h2>
-      <div className="flex-row m-b-30">
+      <div className="flex-row m-b-10">
         <div>
           Firma {company.title}
           <br/>
           Obdobie od: {timestampToDate(fromDate)} do: {timestampToDate(toDate)}
         </div>
         <div className="m-l-10">
-          Počet prác vrámci paušálu: {totals.approvedSubtasks + totals.pendingSubtasks}
+          Počet prác vrámci paušálu: {invoice.pausalTotals.workHours}
           <br/>
-          Počet výjazdov vrámci paušálu: {totals.approvedMaterials + totals.pendingMaterials}
+          Počet výjazdov vrámci paušálu: {invoice.pausalTotals.tripHours}
         </div>
       </div>
 
@@ -58,36 +53,36 @@ export default function Invoice( props ) {
         <h4>Práce</h4>
         <hr />
         <ReportsTable
-          tasks={tasks.filter((task) => task.subtasks.length > 0 )}
+          tasks={invoice.pausalTasks.filter((task) => task.subtasks.length > 0 )}
           columnsToShow={columnsToShowPausalSubtasks}
           onClickTask={onClickTask}
           />
 
         <p className="m-0">
-          { `Spolu počet hodín: ${ totals.approvedSubtasks }` }
+          { `Spolu počet hodín: ${ invoice.pausalTotals.workHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet hodín mimo pracovný čas: ${ totals.pendingSubtasks } ( Čísla úloh: ${ tasks.filter((task) => Math.random() > 0.5 ).map((task) => task.id ).join(',') })` }
+          { `Spolu počet hodín mimo pracovný čas: ${ invoice.pausalTotals.workOvertime } ( Čísla úloh: ${ invoice.pausalTotals.workOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za práce mimo pracovných hodín: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu prirážka za práce mimo pracovných hodín: ${invoice.pausalTotals.workExtraPrice.toFixed(2)} eur` }
         </p>
 
         <h4>Výjazdy</h4>
         <hr />
         <ReportsTable
-          tasks={tasks.filter((task) => task.workTrips.length > 0 )}
+          tasks={invoice.pausalTasks.filter((task) => task.workTrips.length > 0 )}
           columnsToShow={columnsToShowPausalWorkTrips}
           onClickTask={onClickTask}
           />
         <p className="m-0">
-          { `Spolu počet výjazdov: ${ totals.approvedMaterials }` }
+          { `Spolu počet výjazdov: ${ invoice.pausalTotals.tripHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet výjazdov mimo pracovný čas: ${ totals.pendingMaterials } ( Čísla úloh: ${ tasks.filter((task) => Math.random() > 0.5 ).map((task) => task.id ).join(',') })` }
+          { `Spolu počet výjazdov mimo pracovný čas: ${ invoice.pausalTotals.tripOvertime } ( Čísla úloh: ${ invoice.pausalTotals.tripOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za výjazdy mimo pracovných hodín: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu prirážka za výjazdy mimo pracovných hodín: ${invoice.pausalTotals.tripExtraPrice.toFixed(2)} eur` }
         </p>
       </div>
 
@@ -96,48 +91,48 @@ export default function Invoice( props ) {
         <h4>Práce</h4>
         <hr />
         <ReportsTable
-          tasks={tasks.filter((task) => task.subtasks.length > 0 )}
+          tasks={invoice.overPausalTasks.filter((task) => task.subtasks.length > 0 )}
           columnsToShow={columnsToShowOverPausalSubtasks}
           onClickTask={onClickTask}
           />
 
         <p className="m-0">
-          { `Spolu počet hodín: ${ totals.approvedSubtasks }` }
+          { `Spolu počet hodín: ${ invoice.overPausalTotals.workHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet hodín mimo pracovný čas: ${ totals.pendingSubtasks } ( Čísla úloh: ${ tasks.filter((task) => Math.random() > 0.5 ).map((task) => task.id ).join(',') })` }
-        </p>
-        <p className="m-0">
-          { `Spolu prirážka za práce mimo pracovných hodín: ${(Math.random() * 1000).toFixed(2)} eur` }
-        </p>
-        <p className="m-0">
-          { `Spolu cena bez DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu počet hodín mimo pracovný čas: ${ invoice.overPausalTotals.workOvertime } ( Čísla úloh: ${ invoice.overPausalTotals.workOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu prirážka za práce mimo pracovných hodín: ${invoice.overPausalTotals.workExtraPrice.toFixed(2)} eur` }
+        </p>
+        <p className="m-0">
+          { `Spolu cena bez DPH: ${invoice.overPausalTotals.workTotalPrice.toFixed(2)} eur` }
+        </p>
+        <p className="m-0 m-b-10">
+          { `Spolu cena s DPH: ${invoice.overPausalTotals.workTotalPriceWithDPH.toFixed(2)} eur` }
         </p>
 
         <h4>Výjazdy</h4>
         <hr />
         <ReportsTable
-          tasks={tasks.filter((task) => task.workTrips.length > 0 )}
+          tasks={invoice.overPausalTasks.filter((task) => task.workTrips.length > 0 )}
           columnsToShow={columnsToShowOverPausalWorkTrips}
           onClickTask={onClickTask}
           />
         <p className="m-0">
-          { `Spolu počet výjazdov: ${ totals.approvedMaterials }` }
+          { `Spolu počet výjazdov: ${ invoice.overPausalTotals.tripHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet výjazdov mimo pracovný čas: ${ totals.pendingMaterials } ( Čísla úloh: ${ tasks.filter((task) => Math.random() > 0.5 ).map((task) => task.id ).join(',') })` }
+          { `Spolu počet výjazdov mimo pracovný čas: ${ invoice.overPausalTotals.tripOvertime } ( Čísla úloh: ${ invoice.overPausalTotals.tripOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za výjazdy mimo pracovných hodín: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu prirážka za výjazdy mimo pracovných hodín: ${invoice.overPausalTotals.tripExtraPrice.toFixed(2)} eur` }
         </p>
         <p className="m-0">
-          { `Spolu cena bez DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu cena bez DPH: ${invoice.overPausalTotals.tripTotalPrice.toFixed(2)} eur` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu cena s DPH: ${invoice.overPausalTotals.tripTotalPriceWithDPH.toFixed(2)} eur` }
         </p>
       </div>
 
@@ -146,48 +141,48 @@ export default function Invoice( props ) {
         <h4>Práce</h4>
         <hr />
         <ReportsTable
-          tasks={tasks.filter((task) => task.subtasks.length > 0 )}
+          tasks={invoice.projectTasks.filter((task) => task.subtasks.length > 0 )}
           columnsToShow={columnsToShowOverPausalSubtasks}
           onClickTask={onClickTask}
           />
         <p className="m-0">
-          { `Spolu počet hodín: ${ totals.approvedSubtasks }` }
+          { `Spolu počet hodín: ${ invoice.projectTotals.workHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet hodín mimo pracovný čas: ${ totals.pendingSubtasks } ( Čísla úloh: ${ tasks.filter((task) => Math.random() > 0.5 ).map((task) => task.id ).join(',') })` }
-        </p>
-        <p className="m-0">
-          { `Spolu prirážka za práce mimo pracovných hodín: ${(Math.random() * 1000).toFixed(2)} eur` }
-        </p>
-        <p className="m-0">
-          { `Spolu cena bez DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu počet hodín mimo pracovný čas: ${ invoice.projectTotals.workOvertime } ( Čísla úloh: ${ invoice.projectTotals.workOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu prirážka za práce mimo pracovných hodín: ${invoice.projectTotals.workExtraPrice.toFixed(2)} eur` }
+        </p>
+        <p className="m-0">
+          { `Spolu cena bez DPH: ${invoice.projectTotals.workTotalPrice.toFixed(2)} eur` }
+        </p>
+        <p className="m-0 m-b-10">
+          { `Spolu cena s DPH: ${invoice.projectTotals.workTotalPriceWithDPH.toFixed(2)} eur` }
         </p>
 
         <h4>Výjazdy</h4>
         <hr />
         <ReportsTable
-          tasks={tasks.filter((task) => task.workTrips.length > 0 )}
+          tasks={invoice.projectTasks.filter((task) => task.workTrips.length > 0 )}
           columnsToShow={columnsToShowOverPausalWorkTrips}
           onClickTask={onClickTask}
           />
 
         <p className="m-0">
-          { `Spolu počet výjazdov: ${ totals.approvedMaterials }` }
+          { `Spolu počet výjazdov: ${ invoice.projectTotals.tripHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet výjazdov mimo pracovný čas: ${ totals.pendingMaterials } ( Čísla úloh: ${ tasks.filter((task) => Math.random() > 0.5 ).map((task) => task.id ).join(',') })` }
+          { `Spolu počet výjazdov mimo pracovný čas: ${ invoice.projectTotals.tripOvertime } ( Čísla úloh: ${ invoice.projectTotals.tripOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za výjazdy mimo pracovných hodín: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu prirážka za výjazdy mimo pracovných hodín: ${invoice.projectTotals.tripExtraPrice.toFixed(2)} eur` }
         </p>
         <p className="m-0">
-          { `Spolu cena bez DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu cena bez DPH: ${invoice.projectTotals.tripTotalPrice.toFixed(2)} eur` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu cena s DPH: ${invoice.projectTotals.tripTotalPriceWithDPH.toFixed(2)} eur` }
         </p>
       </div>
 
@@ -196,49 +191,16 @@ export default function Invoice( props ) {
         <hr />
 
         <ReportsTable
-          tasks={tasks.filter((task) => task.materials.length > 0 )}
+          tasks={invoice.materialTasks}
           columnsToShow={columnsToShowMaterials}
           onClickTask={onClickTask}
           />
 
         <p className="m-0">
-          { `Spolu cena bez DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu cena bez DPH: ${invoice.materialTotals.price.toFixed(2)} eur` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
-        </p>
-      </div>
-
-      <div className="m-b-30">
-        <h3>Mesačný prenájom služieb a harware</h3>
-        <hr />
-        <table className="table m-b-10 bkg-white row-highlight">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Názov</th>
-              <th>Mn.</th>
-              <th>Cena/ks/mesiac</th>
-              <th>Cena spolu/mesiac</th>
-            </tr>
-          </thead>
-          <tbody>
-            { company.companyRents.map((rentedItem) => (
-              <tr key={rentedItem.id}>
-                <td>{rentedItem.id}</td>
-                <td>{rentedItem.title}</td>
-                <td>{rentedItem.quantity}</td>
-                <td>{rentedItem.price}</td>
-                <td>{rentedItem.total}</td>
-              </tr>
-            )) }
-          </tbody>
-        </table>
-        <p className="m-0">
-          { `Spolu cena bez DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
-        </p>
-        <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${(Math.random() * 1000).toFixed(2)} eur` }
+          { `Spolu cena s DPH: ${invoice.materialTotals.priceWithDPH.toFixed(2)} eur` }
         </p>
       </div>
 

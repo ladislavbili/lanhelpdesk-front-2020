@@ -28,181 +28,34 @@ query invoiceCompanies($fromDate: String!, $toDate: String! ) {
 }
 `;
 
-export const COMPANY_INVOICE = gql `
-query companyInvoice($fromDate: String!, $toDate: String!, $companyId: Int! ) {
-  companyInvoice(
+export const ALL_INVOICE_COMPANIES = gql `
+query allInvoiceCompanies {
+  allInvoiceCompanies {
+    title
+    id
+  }
+}
+`;
+
+export const COMPANIES_WITH_INVOICE = gql `
+query companiesWithInvoice($fromDate: String!, $toDate: String! ) {
+  companiesWithInvoice (
     fromDate: $fromDate
     toDate: $toDate
+  ) {
+    title
+    id
+  }
+}
+`;
+
+export const INVOICE_DATES_OF_COMPANY = gql `
+query invoiceDatesOfCompany( $companyId: Int! ) {
+  invoiceDatesOfCompany (
     companyId: $companyId
   ) {
-    pausalTasks {
-      id
-      title
-      requester {
-        id
-        email
-        fullName
-      }
-      assignedTo {
-        id
-        email
-        fullName
-      }
-      closeDate
-      taskType{
-        id
-        title
-      }
-      subtasks {
-        id
-        title
-        quantity
-      }
-      workTrips {
-        id
-        type {
-          id
-          title
-        }
-        quantity
-      }
-    }
-    overPausalTasks {
-      id
-      title
-      requester {
-        id
-        email
-        fullName
-      }
-      assignedTo {
-        id
-        email
-        fullName
-      }
-      closeDate
-      taskType{
-        id
-        title
-      }
-      subtasks {
-        id
-        title
-        quantity
-        price
-        total
-      }
-      workTrips {
-        id
-        type {
-          id
-          title
-        }
-        quantity
-        price
-        total
-      }
-    }
-    projectTasks {
-      id
-      title
-      requester {
-        id
-        email
-        fullName
-      }
-      assignedTo {
-        id
-        email
-        fullName
-      }
-      closeDate
-      taskType{
-        id
-        title
-      }
-      subtasks {
-        id
-        title
-        quantity
-        price
-        total
-      }
-      workTrips {
-        id
-        type {
-          id
-          title
-        }
-        quantity
-        price
-        total
-      }
-    }
-    materialTasks {
-      id
-      title
-      requester {
-        id
-        email
-        fullName
-      }
-      assignedTo {
-        id
-        email
-        fullName
-      }
-      closeDate
-      materials{
-        id
-        title
-        quantity
-        price
-        total
-      }
-    }
-    pausalTotals {
-      workHours
-      workOvertime
-      workOvertimeTasks
-      workExtraPrice
-      tripHours
-      tripOvertime
-      tripOvertimeTasks
-      tripExtraPrice
-    }
-    overPausalTotals {
-      workHours
-      workOvertime
-      workOvertimeTasks
-      workExtraPrice
-      workTotalPrice
-      workTotalPriceWithDPH
-      tripHours
-      tripOvertime
-      tripOvertimeTasks
-      tripExtraPrice
-      tripTotalPrice
-      tripTotalPriceWithDPH
-    }
-    projectTotals {
-      workHours
-      workOvertime
-      workOvertimeTasks
-      workExtraPrice
-      workTotalPrice
-      workTotalPriceWithDPH
-      tripHours
-      tripOvertime
-      tripOvertimeTasks
-      tripExtraPrice
-      tripTotalPrice
-      tripTotalPriceWithDPH
-    }
-    materialTotals {
-      price
-      priceWithDPH
-    }
+    month
+    year
   }
 }
 `;
