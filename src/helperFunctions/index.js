@@ -102,6 +102,12 @@ export {
 from './navigationFunctions';
 
 export {
+  randomString,
+  randomPassword,
+}
+from './stringManipulations';
+
+export {
   getMyData
 }
 from './userData';

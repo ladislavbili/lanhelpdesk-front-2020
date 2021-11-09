@@ -70,9 +70,6 @@ import {
   ADD_MATERIAL,
   UPDATE_MATERIAL,
   DELETE_MATERIAL,
-  ADD_CUSTOM_ITEM,
-  UPDATE_CUSTOM_ITEM,
-  DELETE_CUSTOM_ITEM,
   DELETE_TASK_ATTACHMENT,
 } from '../queries';
 
@@ -169,9 +166,6 @@ export default function TaskEditContainer( props ) {
   const [ addMaterial ] = useMutation( ADD_MATERIAL );
   const [ updateMaterial ] = useMutation( UPDATE_MATERIAL );
   const [ deleteMaterial ] = useMutation( DELETE_MATERIAL );
-  const [ addCustomItem ] = useMutation( ADD_CUSTOM_ITEM );
-  const [ updateCustomItem ] = useMutation( UPDATE_CUSTOM_ITEM );
-  const [ deleteCustomItem ] = useMutation( DELETE_CUSTOM_ITEM );
   const [ deleteTaskAttachment ] = useMutation( DELETE_TASK_ATTACHMENT );
 
   useSubscription( TASK_TYPES_SUBSCRIPTION, {
@@ -525,69 +519,6 @@ export default function TaskEditContainer( props ) {
       } );
   }
 
-  const addCustomItemFunc = ( item ) => {
-    setSaving( true );
-    addCustomItem( {
-        variables: {
-          title: item.title,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          quantity: parseFloat( item.quantity ),
-          price: parseFloat( item.price ),
-          task: parseInt( id ),
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.addCustomItem, 'customItems', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const updateCustomItemFunc = ( item ) => {
-    setSaving( true );
-
-    updateCustomItem( {
-        variables: {
-          id: item.id,
-          title: item.title,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          quantity: parseFloat( item.quantity ),
-          price: parseFloat( item.price ),
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.updateCustomItem, 'customItems', 'UPDATE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const deleteCustomItemFunc = ( id ) => {
-    deleteCustomItem( {
-        variables: {
-          id,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'customItems', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-  }
-
   const deleteTaskFunc = () => {
     if ( window.confirm( "Are you sure?" ) ) {
       deleteTask( {
@@ -833,9 +764,6 @@ export default function TaskEditContainer( props ) {
       addMaterialFunc={addMaterialFunc}
       updateMaterialFunc={updateMaterialFunc}
       deleteMaterialFunc={deleteMaterialFunc}
-      addCustomItemFunc={addCustomItemFunc}
-      updateCustomItemFunc={updateCustomItemFunc}
-      deleteCustomItemFunc={deleteCustomItemFunc}
       addShortSubtask={addShortSubtaskFunc}
       updateShortSubtask={updateShortSubtaskFunc}
       deleteShortSubtask={deleteShortSubtaskFunc}

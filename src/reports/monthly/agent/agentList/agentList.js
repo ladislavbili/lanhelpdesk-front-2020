@@ -1,14 +1,12 @@
 import React from 'react';
 
-import Loading from 'components/loading';
-
 import {
   timestampToString,
 } from 'helperFunctions';
 
-export default function CompanyList( props ) {
+export default function AgentList( props ) {
   const {
-    users,
+    agents,
     fromDate,
     toDate,
     setAgent,
@@ -26,18 +24,18 @@ export default function CompanyList( props ) {
           </tr>
         </thead>
         <tbody>
-          { users.slice(0,30).map( (user) => (
+          { agents.map( (agent) => (
             <tr
-              key={user.id}
+              key={agent.user.id}
               className="clickable"
-              onClick={() => setAgent(user) }
+              onClick={() => setAgent(agent.user) }
               >
-              <td>{`${user.fullName} (${user.email})`}</td>
-              <td>{(Math.random()*100).toFixed(1)}</td>
-              <td>{(Math.random()*100).toFixed(1)}</td>
+              <td>{`${agent.user.fullName} (${agent.user.email})`}</td>
+              <td>{agent.works}</td>
+              <td>{agent.trips}</td>
             </tr>
           )) }
-          { users.length !== 0 &&
+          { agents.length === 0 &&
             <tr
               key="no-items"
               >

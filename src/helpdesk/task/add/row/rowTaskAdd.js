@@ -100,7 +100,6 @@ export default function RowTaskAdd( props ) {
   const [ assignedTo, setAssignedTo ] = React.useState( USERS_WITH_PERMISSIONS.find( ( user ) => user.id === currentUser.id ) );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
-  const [ customItems, setCustomItems ] = React.useState( [] );
   const [ deadline, setDeadline ] = React.useState( null );
   const [ description, setDescription ] = React.useState( "" );
   const [ descriptionVisible, setDescriptionVisible ] = React.useState( false );
@@ -248,7 +247,6 @@ export default function RowTaskAdd( props ) {
           subtasks: [],
           workTrips: [],
           materials: [],
-          customItems: [],
         }
       } )
       .then( ( response ) => {

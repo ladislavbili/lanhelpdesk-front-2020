@@ -14,11 +14,6 @@ export const defaultVykazyChanges = {
     EDIT: [],
     DELETE: []
   },
-  customItem: {
-    ADD: [],
-    EDIT: [],
-    DELETE: []
-  },
 }
 
 

@@ -7,18 +7,17 @@ import Loading from 'components/loading';
 import AgentList from './agentList';
 
 import {
-  GET_BASIC_USERS,
-} from 'helpdesk/settings/users/queries';
+  INVOICE_AGENTS,
+} from 'reports/queries';
 
 import {
   GET_REPORTS_FROM_DATE,
   GET_REPORTS_TO_DATE,
 } from 'apollo/localSchema/queries';
 
-export default function CompanyListLoader( props ) {
+export default function AgentListLoader( props ) {
   const {
     filterData,
-    invoiced,
     setAgent,
   } = props;
 
@@ -30,28 +29,31 @@ export default function CompanyListLoader( props ) {
   } = useQuery( GET_REPORTS_TO_DATE );
 
   const {
-    data: usersData,
-    loading: usersLoading,
-    refetch: usersRefetch,
-  } = useQuery( GET_BASIC_USERS, {
-    fetchPolicy: 'network-only'
+    data: agentsData,
+    loading: agentsLoading,
+    refetch: agentsRefetch,
+  } = useQuery( INVOICE_AGENTS, {
+    variables: filterData,
+    fetchPolicy: 'network-only',
   } );
 
   React.useEffect( () => {
-    usersRefetch();
+    agentsRefetch( {
+      variables: filterData,
+    } );
   }, [ filterData ] );
 
-  if ( usersLoading ) {
+  if ( agentsLoading ) {
     return (
       <Loading />
     );
   }
 
-  const users = usersData.basicUsers;
+  const agents = agentsData.invoiceAgents;
 
   return (
     <AgentList
-      users={users}
+      agents={agents}
       setAgent={setAgent}
       fromDate={fromDateData.reportsFromDate}
       toDate={toDateData.reportsToDate}

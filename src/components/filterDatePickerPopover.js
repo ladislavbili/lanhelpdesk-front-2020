@@ -159,7 +159,7 @@ export default function FilterDatePickerPopover( props ) {
                       hideTime={true}
                       selected={newDateFrom}
                       onChange={(e)=>{
-                        seNewDateFrom(e);
+                        setNewDateFrom(e);
                       }}
                       placeholderText="No date"
                       />

@@ -25,6 +25,7 @@ import {
   isEmail,
   toSelArr,
   getMyData,
+  randomPassword,
 } from 'helperFunctions';
 import {
   addLocalError,
@@ -76,7 +77,7 @@ export default function UserAdd( props ) {
   const [ email, setEmail ] = React.useState( "" );
   const [ name, setName ] = React.useState( "" );
   const [ surname, setSurname ] = React.useState( "" );
-  const [ password, setPassword ] = React.useState( "" );
+  const [ password, setPassword ] = React.useState( randomPassword() );
   const [ receiveNotifications, setReceiveNotifications ] = React.useState( false );
   const [ signature, setSignature ] = React.useState( "" );
   const [ signatureChanged, setSignatureChanged ] = React.useState( false );
@@ -119,6 +120,7 @@ export default function UserAdd( props ) {
         }
       } )
       .then( ( response ) => {
+        setPassword( randomPassword() );
         let newUser = {
           ...response.data.registerUser,
           __typename: "BasicUser"
@@ -150,7 +152,7 @@ export default function UserAdd( props ) {
           {" scroll-visible fit-with-header": !closeModal},
         )}
         >
-        
+
         <h2 className="m-b-20" >
           Add user
         </h2>
@@ -211,7 +213,7 @@ export default function UserAdd( props ) {
           required
           label="E-mail"
           type="email"
-          id="email"
+          id="new-email"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -221,7 +223,7 @@ export default function UserAdd( props ) {
         <SettingsHiddenInput
           required
           label="Password"
-          id="password"
+          id="new-password"
           value={password}
           onChange={(e)=> {
             setPassword(e.target.value);

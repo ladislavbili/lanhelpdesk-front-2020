@@ -97,7 +97,6 @@ export default function TaskAdd( props ) {
   const [ assignedTo, setAssignedTo ] = React.useState( initialAssignableUsers.filter( ( user ) => user.id === currentUser.id ) );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
-  const [ customItems, setCustomItems ] = React.useState( [] );
   const [ deadline, setDeadline ] = React.useState( null );
   const [ startsAt, setStartsAt ] = React.useState( null );
   const [ description, setDescription ] = React.useState( "" );
@@ -151,7 +150,6 @@ export default function TaskAdd( props ) {
     subtasks,
     workTrips,
     materials,
-    customItems,
     assignedTo,
     closeDate,
     company,
@@ -455,14 +453,6 @@ export default function TaskAdd( props ) {
             approved: item.approved,
             quantity: item.quantity,
             margin: item.margin,
-            price: parseFloat( item.price )
-          } ) ),
-          customItems: customItems.map( item => ( {
-            title: item.title,
-            order: item.order,
-            done: item.done,
-            approved: item.approved,
-            quantity: item.quantity,
             price: parseFloat( item.price )
           } ) ),
           shortSubtasks: simpleSubtasks.map( ( item ) => ( {
@@ -1189,7 +1179,7 @@ export default function TaskAdd( props ) {
     )
   }
 
-  const renderVykazyTable = ( subtasks, workTrips, materials, customItems ) => {
+  const renderVykazyTable = ( subtasks, workTrips, materials ) => {
     if (
       !userRights.rights.taskWorksWrite &&
       !userRights.rights.taskWorksAdvancedWrite &&
@@ -1372,7 +1362,7 @@ export default function TaskAdd( props ) {
 
         { renderSimpleSubtasks() }
 
-        { renderVykazyTable(subtasks, workTrips, materials, customItems) }
+        { renderVykazyTable(subtasks, workTrips, materials) }
 
         { renderButtons() }
 

@@ -38,7 +38,9 @@ export default function CompanyListLoader( props ) {
   } );
 
   React.useEffect( () => {
-    companiesRefetch();
+    companiesRefetch( {
+      variables: filterData
+    } );
   }, [ filterData ] );
 
   if ( companiesLoading ) {

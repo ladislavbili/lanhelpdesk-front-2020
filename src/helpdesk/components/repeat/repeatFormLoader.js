@@ -59,9 +59,6 @@ import {
   ADD_MATERIAL,
   UPDATE_MATERIAL,
   DELETE_MATERIAL,
-  ADD_CUSTOM_ITEM,
-  UPDATE_CUSTOM_ITEM,
-  DELETE_CUSTOM_ITEM,
   DELETE_REPEAT_TEMPLATE_ATTACHMENT,
 } from './queries';
 
@@ -132,9 +129,6 @@ export default function RepeatFormLoader( props ) {
   const [ addMaterial ] = useMutation( ADD_MATERIAL );
   const [ updateMaterial ] = useMutation( UPDATE_MATERIAL );
   const [ deleteMaterial ] = useMutation( DELETE_MATERIAL );
-  const [ addCustomItem ] = useMutation( ADD_CUSTOM_ITEM );
-  const [ updateCustomItem ] = useMutation( UPDATE_CUSTOM_ITEM );
-  const [ deleteCustomItem ] = useMutation( DELETE_CUSTOM_ITEM );
   const [ deleteRepeatTemplateAttachment ] = useMutation( DELETE_REPEAT_TEMPLATE_ATTACHMENT );
 
   const [ saving, setSaving ] = React.useState( false );
@@ -441,70 +435,6 @@ export default function RepeatFormLoader( props ) {
       } );
   }
 
-  const addCustomItemFunc = ( item, saveItem ) => {
-    setSaving( true );
-    addCustomItem( {
-        variables: {
-          title: item.title,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          quantity: parseFloat( item.quantity ),
-          price: parseFloat( item.price ),
-          repeatTemplate: repeatTemplateId,
-        }
-      } )
-      .then( ( response ) => {
-        saveItem( response.data.addRepeatTemplateCustomItem.id );
-        updateCasheStorage( response.data.addRepeatTemplateCustomItem, 'customItems', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const updateCustomItemFunc = ( item ) => {
-    setSaving( true );
-
-    updateCustomItem( {
-        variables: {
-          id: item.id,
-          title: item.title,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          quantity: parseFloat( item.quantity ),
-          price: parseFloat( item.price ),
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.updateRepeatTemplateCustomItem, 'customItems', 'UPDATE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const deleteCustomItemFunc = ( id ) => {
-    deleteCustomItem( {
-        variables: {
-          id,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'customItems', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-  }
-
   const addAttachments = ( attachments ) => {
     const formData = new FormData();
     attachments.forEach( ( file ) => formData.append( `file`, file ) );
@@ -632,9 +562,6 @@ export default function RepeatFormLoader( props ) {
       addMaterialFunc={addMaterialFunc}
       updateMaterialFunc={updateMaterialFunc}
       deleteMaterialFunc={deleteMaterialFunc}
-      addCustomItemFunc={addCustomItemFunc}
-      updateCustomItemFunc={updateCustomItemFunc}
-      deleteCustomItemFunc={deleteCustomItemFunc}
       addAttachments={addAttachments}
       removeAttachment={removeAttachment}
       />

@@ -183,19 +183,6 @@ materials {
   margin
   price
 }
-customItems {
-  id
-  title
-  order
-  done
-  approved
-  approvedBy{
-    id
-    fullName
-  }
-  quantity
-  price
-}
 `
 
 export const ADD_TASK = gql `
@@ -223,7 +210,6 @@ mutation addTask(
   $subtasks: [SubtaskInput],
   $workTrips: [WorkTripInput],
   $materials: [MaterialInput],
-  $customItems: [CustomItemInput],
   $shortSubtasks: [ShortSubtaskInput],
 ){
   addTask(
@@ -250,7 +236,6 @@ mutation addTask(
     subtasks: $subtasks,
     workTrips: $workTrips,
     materials: $materials,
-    customItems: $customItems,
     shortSubtasks: $shortSubtasks,
   ){
     id

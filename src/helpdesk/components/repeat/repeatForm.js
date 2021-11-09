@@ -106,9 +106,6 @@ export default function RepeatForm( props ) {
     addMaterialFunc,
     updateMaterialFunc,
     deleteMaterialFunc,
-    addCustomItemFunc,
-    updateCustomItemFunc,
-    deleteCustomItemFunc,
     addAttachments,
     removeAttachment,
     directSaving,
@@ -143,7 +140,6 @@ export default function RepeatForm( props ) {
   const [ assignedTo, setAssignedTo ] = React.useState( assignableUsers.filter( ( user ) => user.id === currentUser.id ) );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
-  const [ customItems, setCustomItems ] = React.useState( [] );
   const [ deadline, setDeadline ] = React.useState( null );
   const [ showDescription, setShowDescription ] = React.useState( false );
   const [ description, setDescription ] = React.useState( "" );
@@ -385,7 +381,6 @@ export default function RepeatForm( props ) {
       type: toSelItem( item.type )
     } ) ) );
     setMaterials( data.materials );
-    setCustomItems( data.customItems );
   }
 
   const setTaskData = () => {
@@ -420,10 +415,6 @@ export default function RepeatForm( props ) {
       id: fakeID--
     } ) ) );
     setMaterials( duplicateTask.materials.map( ( item ) => ( {
-      ...item,
-      id: fakeID--
-    } ) ) );
-    setCustomItems( duplicateTask.customItems.map( ( item ) => ( {
       ...item,
       id: fakeID--
     } ) ) );
@@ -552,13 +543,6 @@ export default function RepeatForm( props ) {
                 done: item.done,
                 quantity: item.quantity,
                 margin: item.margin,
-                price: parseFloat( item.price )
-              } ) ),
-              customItems: customItems.map( item => ( {
-                title: item.title,
-                order: item.order,
-                done: item.done,
-                quantity: item.quantity,
                 price: parseFloat( item.price )
               } ) ),
               shortSubtasks: simpleSubtasks.map( ( item ) => ( {
@@ -1544,7 +1528,7 @@ export default function RepeatForm( props ) {
     )
   }
 
-  const renderVykazyTable = ( subtasks, workTrips, materials, customItems ) => {
+  const renderVykazyTable = ( subtasks, workTrips, materials ) => {
     if (
       !userRights.rights.taskWorksRead &&
       !userRights.rights.taskWorksAdvancedRead &&
@@ -1790,7 +1774,7 @@ export default function RepeatForm( props ) {
 
         { renderSimpleSubtasks() }
 
-        { renderVykazyTable(subtasks, workTrips, materials, customItems) }
+        { renderVykazyTable(subtasks, workTrips, materials) }
 
         <div className="task-add-layout-2"></div>
         { renderButtons() }

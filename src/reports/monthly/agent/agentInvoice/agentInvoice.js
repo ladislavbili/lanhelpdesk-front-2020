@@ -9,16 +9,21 @@ import {
 
 export default function AgentInvoice( props ) {
   const {
+    invoice,
+    invoiced,
     agent,
-    tasksData,
     fromDate,
     toDate,
-    fakeTaskTypes,
-    fakeTripTypes,
+    invoiceRefetch,
   } = props;
 
-  const tasks = tasksData.tasks;
-
+  const {
+    workTasks,
+    taskTypeTotals,
+    tripTasks,
+    tripTypeTotals,
+    totals,
+  } = invoice;
 
   const [ editedTask, setEditedTask ] = React.useState( null );
 
@@ -53,7 +58,7 @@ export default function AgentInvoice( props ) {
           </tr>
         </thead>
         <tbody>
-          { tasks.filter((task) => task.subtasks.length > 0 ).map((task) => (
+          { workTasks.map((task) => (
             <tr key={task.id}>
               <td>{task.id}</td>
               <td className="clickable" onClick={() => onClickTask(task)}>{task.title}</td>
@@ -64,14 +69,14 @@ export default function AgentInvoice( props ) {
                   {task.status.title}
                 </span>
               </td>
-              <td>{timestampToDate(parseInt(task.closeDate))}</td>
+              <td>{isNaN(parseInt(task.closeDate)) ? 'Not closed yet' : timestampToDate(parseInt(task.closeDate))}</td>
               <td colSpan="3" style={{padding:0}}>
                 <table className="table-borderless full-width">
                   <tbody>
                     {task.subtasks.map( (subtask) => (
                       <tr key={subtask.id}>
                         <td key={subtask.id+ '-title'} style={{}}>{subtask.title}</td>
-                        <td key={subtask.id+ '-type'} style={{width:'150px', }}>{subtask.type.title}</td>
+                        <td key={subtask.id+ '-type'} style={{width:'150px', }}>{task.taskType.title}</td>
                         <td key={subtask.id+ '-time'} style={{width:'50px', }}>{subtask.quantity}</td>
                       </tr>
                     ))}
@@ -91,7 +96,7 @@ export default function AgentInvoice( props ) {
           </tr>
         </thead>
         <tbody>
-          { fakeTaskTypes.map((taskType) => (
+          { taskTypeTotals.map((taskType) => (
             <tr key={taskType.id}>
               <td>{taskType.title}</td>
               <td>{taskType.quantity}</td>
@@ -100,10 +105,10 @@ export default function AgentInvoice( props ) {
         </tbody>
       </table>
       <p className="m-0">
-        {`Spolu počet hodín: ${ Math.floor( Math.random() * 450 ) }`}
+        {`Spolu počet hodín: ${ totals.workHours }`}
       </p>
       <p className="m-0 m-b-10">
-        { `Spolu počet hodín mimo pracovný čas: ${ Math.floor(Math.random() * 45 ) } ( Čísla úloh: ${ tasks.filter((task) => Math.random() > 0.5 ).map((task) => task.id ).join(',') })` }
+        { `Spolu počet hodín mimo pracovný čas: ${ totals.workOvertime } ( Čísla úloh: ${ totals.workOvertimeTasks.join(',') })` }
       </p>
 
       <h3>Výjazdy</h3>
@@ -122,7 +127,7 @@ export default function AgentInvoice( props ) {
           </tr>
         </thead>
         <tbody>
-          { tasks.filter((task) => task.workTrips.length > 0 ).map((task) =>
+          { tripTasks.map((task) =>
             <tr key={task.id}>
               <td>{task.id}</td>
               <td className="clickable" onClick={() => onClickTask(task)}>{task.title}</td>
@@ -133,7 +138,7 @@ export default function AgentInvoice( props ) {
                   {task.status.title}
                 </span>
               </td>
-              <td>{timestampToDate(parseInt(task.closeDate))}</td>
+              <td>{isNaN(parseInt(task.closeDate)) ? 'Not closed yet' : timestampToDate(parseInt(task.closeDate))}</td>
               <td colSpan="2" style={{padding:0}}>
                 <table className="table-borderless full-width">
                   <tbody>
@@ -158,7 +163,7 @@ export default function AgentInvoice( props ) {
           </tr>
         </thead>
         <tbody>
-          { fakeTripTypes.map((tripType) => (
+          { tripTypeTotals.map((tripType) => (
             <tr key={tripType.id}>
               <td>{tripType.title}</td>
               <td>{tripType.quantity}</td>
@@ -167,38 +172,59 @@ export default function AgentInvoice( props ) {
         </tbody>
       </table>
       <p className="m-0">
-        {`Spolu počet výjazdov: ${ Math.floor( Math.random() * 450 ) }`}
+        {`Spolu počet výjazdov: ${ totals.tripHours }`}
       </p>
       <p className="m-0 m-b-10">
-        { `Spolu počet výjazdov mimo pracovný čas: ${ Math.floor(Math.random() * 45 ) } ( Čísla úloh: ${ tasks.filter((task) => Math.random() > 0.5 ).map((task) => task.id ).join(',') })` }
+        { `Spolu počet výjazdov mimo pracovný čas: ${ totals.tripOvertime } ( Čísla úloh: ${ totals.tripOvertimeTasks.join(',') })` }
       </p>
 
       <h3>Sumár podľa typu práce a výjazdov - v rámci paušálu, nad rámec paušálu, projektových</h3>
       <table className="table m-b-10 bkg-white row-highlight max-width-700">
         <tbody>
-          <tr>
-            <td>Počet prác vrámci paušálu</td>
-            <td>{ Math.floor(Math.random() * 160 ) }</td>
-          </tr>
+          { invoiced &&
+            <tr>
+              <td>Počet prác vrámci paušálu</td>
+              <td>{ totals.pausalWorkHours }</td>
+            </tr>
+          }
+          { invoiced &&
           <tr>
             <td>Počet prác nad rámec paušálu</td>
-            <td>{ Math.floor(Math.random() * 160 ) }</td>
+            <td>{ totals.overPausalWorkHours }</td>
           </tr>
+        }
+        { !invoiced &&
+          <tr>
+            <td>Počet prác vrámci a nad rámec paušálu</td>
+            <td>{ totals.pausalWorkHours }</td>
+          </tr>
+        }
           <tr>
             <td>Projektové práce</td>
-            <td>{ Math.floor(Math.random() * 160 ) }</td>
+            <td>{ totals.projectWorkHours }</td>
           </tr>
+
+        { invoiced &&
           <tr>
             <td>Výjazdy vrámci paušálu</td>
-            <td>{ Math.floor(Math.random() * 160 ) }</td>
+            <td>{ totals.pausalTripHours }</td>
           </tr>
+        }
+        { invoiced &&
           <tr>
             <td>Výjazdy nad rámec paušálu</td>
-            <td>{ Math.floor(Math.random() * 160 ) }</td>
+            <td>{ totals.overPausalTripHours }</td>
           </tr>
+        }
+        { !invoiced &&
+          <tr>
+            <td>Výjazdy vrámci nad rámec paušálu</td>
+            <td>{ totals.pausalTripHours }</td>
+          </tr>
+        }
           <tr>
             <td>Výjazdy pri projektových prácach</td>
-            <td>{ Math.floor(Math.random() * 160 ) }</td>
+            <td>{ totals.projectTripHours }</td>
           </tr>
         </tbody>
       </table>

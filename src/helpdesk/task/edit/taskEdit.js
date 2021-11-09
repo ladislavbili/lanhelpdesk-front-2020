@@ -119,9 +119,6 @@ export default function TaskEdit( props ) {
     addMaterialFunc,
     updateMaterialFunc,
     deleteMaterialFunc,
-    addCustomItemFunc,
-    updateCustomItemFunc,
-    deleteCustomItemFunc,
     addShortSubtask,
     updateShortSubtask,
     deleteShortSubtask,
@@ -518,9 +515,6 @@ export default function TaskEdit( props ) {
   const materials = task.materials.map( ( item ) => ( {
     ...item,
   } ) );
-  const customItems = task.customItems.map( ( item ) => ( {
-    ...item,
-  } ) );
   const canCopy = userRights.rights.addTask && !getCantSave();
 
   const getTaskData = () => ( {
@@ -536,7 +530,6 @@ export default function TaskEdit( props ) {
       type: toSelItem( item.type )
     } ) ),
     materials: task.materials,
-    customItems: task.customItems,
     assignedTo,
     closeDate,
     company,
@@ -691,7 +684,6 @@ export default function TaskEdit( props ) {
             } ) )}
             workTrips={workTrips}
             taskMaterials={materials}
-            customItems={customItems}
             isLoaded={true}
             />
         }

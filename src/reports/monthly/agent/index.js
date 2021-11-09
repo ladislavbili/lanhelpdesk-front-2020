@@ -31,28 +31,29 @@ export default function AgentReportsLoader( props ) {
 
   const [ filterData, setFilterData ] = React.useState( null );
   const [ agent, setAgent ] = React.useState( null );
-  const [ invoiced, setInvoiced ] = React.useState( null );
+  const [ invoiced, setInvoiced ] = React.useState( true );
 
   return (
     <div className="scrollable fit-with-header p-20">
       <h2>Agenti</h2>
 
       <StatusAndDateFilter
-        onTrigger={ () => {
+        onTrigger={ (fromDate, toDate) => {
           setFilterData({
-            fromDate: fromDateData.reportsFromDate.valueOf()
-            .toString(),
-            toDate: toDateData.reportsToDate.valueOf()
-            .toString(),
+            fromDate: fromDate.valueOf()
+              .toString(),
+            toDate: toDate.valueOf()
+              .toString(),
             statusActions: statusActionsData.reportsStatusActions.map((statusAction) => statusAction.value ),
+            invoiced,
           })
           setAgent(null);
         }}
         invoiced={invoiced}
         setInvoiced={setInvoiced}
         />
-      { filterData !== null && <AgentList filterData={filterData} invoiced={invoiced} setAgent={setAgent} /> }
-      { agent !== null && <AgentInvoice agent={agent} filterData={filterData} invoiced={invoiced} /> }
+      { filterData !== null && <AgentList filterData={filterData} setAgent={setAgent} /> }
+      { agent !== null && <AgentInvoice agent={agent} filterData={filterData} /> }
     </div>
   );
 }

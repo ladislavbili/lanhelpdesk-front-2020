@@ -169,19 +169,6 @@ repeatTemplate{
     margin
     price
   }
-  customItems {
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    price
-  }
 }
 `
 
@@ -629,68 +616,6 @@ mutation updateRepeatTemplateMaterial($id: Int!, $title: String, $order: Int, $d
 export const DELETE_MATERIAL = gql `
 mutation deleteRepeatTemplateMaterial($id: Int!) {
   deleteRepeatTemplateMaterial(
-    id: $id,
-  ){
-    id
-  }
-}
-`;
-
-export const ADD_CUSTOM_ITEM = gql `
-mutation addRepeatTemplateCustomItem($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $price: Float!, $repeatTemplate: Int!) {
-  addRepeatTemplateCustomItem(
-    title: $title,
-    order: $order,
-    done: $done,
-    approved: $approved,
-    quantity: $quantity,
-    price: $price,
-    repeatTemplate: $repeatTemplate,
-  ){
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    price
-  }
-}
-`;
-
-export const UPDATE_CUSTOM_ITEM = gql `
-mutation updateRepeatTemplateCustomItem($id: Int!, $title: String, $order: Int, $done: Boolean, $approved: Boolean, $quantity: Float, $price: Float) {
-  updateRepeatTemplateCustomItem(
-    id: $id,
-    title: $title,
-    order: $order,
-    done: $done,
-    approved: $approved,
-    quantity: $quantity,
-    price: $price,
-  ){
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    price
-  }
-}
-`;
-
-export const DELETE_CUSTOM_ITEM = gql `
-mutation deleteRepeatTemplateCustomItem($id: Int!) {
-  deleteRepeatTemplateCustomItem(
     id: $id,
   ){
     id

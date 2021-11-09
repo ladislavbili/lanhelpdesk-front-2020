@@ -35,6 +35,7 @@ export default function SettingsInput( props ) {
       <div className='row'>
         <div className='flex'>
           <Input
+            autoComplete="off"
             id={ id }
             type={ type }
             placeholder={ placeholder ? placeholder : `Enter ${label.toLowerCase()}` }
