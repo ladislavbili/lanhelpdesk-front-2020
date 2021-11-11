@@ -127,6 +127,8 @@ export default function TaskEdit( props ) {
     setTaskLayout,
   } = props;
 
+  const invoiced = task.invoiced;
+
   //state
   const [ assignedTo, setAssignedTo ] = React.useState( [] );
   const [ closeDate, setCloseDate ] = React.useState( null );
@@ -396,6 +398,7 @@ export default function TaskEdit( props ) {
       compare.title === "" ||
       compare.status === null ||
       compare.project === null ||
+      invoiced ||
       ( compare.assignedTo.length === 0 && userRights.attributeRights.assigned.view && !projectAttributes.assigned.fixed ) ||
       compare.saving
     )
@@ -645,25 +648,6 @@ export default function TaskEdit( props ) {
             Back
           </button>
         }
-        { false &&
-          <button
-            type="button"
-            disabled={getCantSave()}
-            className="btn-danger task-add-layout-button btn-distance"
-            >
-            Re-open
-          </button>
-        }
-        { false &&
-          <button
-            type="button"
-            disabled={getCantSave()}
-            className="btn-link task-add-layout-button btn-distance"
-            >
-            <i className="far fa-save" />
-            Save invoiced task
-          </button>
-        }
         { project && canCopy &&
           <TaskAdd
             project={project.id}
@@ -687,7 +671,7 @@ export default function TaskEdit( props ) {
             isLoaded={true}
             />
         }
-        { userRights.rights.deleteTask &&
+        { userRights.rights.deleteTask && !invoiced &&
           <button
             type="button"
             className="btn-link task-add-layout-button btn-distance"
@@ -696,6 +680,9 @@ export default function TaskEdit( props ) {
             <i className="far fa-trash-alt" />
             Delete
           </button>
+        }
+        { invoiced &&
+          <div className="inline-warning-message center-hor">Úloha vykázaná</div>
         }
         <span className="ml-auto">
           { inModal &&
@@ -720,6 +707,7 @@ export default function TaskEdit( props ) {
             type="button"
             style={{color: '#ffc107'}}
             className="btn-link center-hor m-r-10"
+            disabled={invoiced}
             onClick={()=>{
               setImportant(!important);
               autoUpdateTask({ important: !important });
@@ -731,7 +719,7 @@ export default function TaskEdit( props ) {
         <h2 className="center-hor">{id}: </h2>
         <span className="center-hor flex m-r-15">
           <input type="text"
-            disabled={ !userRights.rights.taskTitleWrite }
+            disabled={ !userRights.rights.taskTitleWrite || invoiced }
             value={title}
             className="task-title-input text-extra-slim hidden-input form-control"
             onChange={(e)=> {
@@ -774,7 +762,7 @@ export default function TaskEdit( props ) {
       return null;
     }
     if ( status && status.action === 'PendingDate' ) {
-      const datepickerDisabled = !userRights.attributeRights.status.edit || !pendingChangable;
+      const datepickerDisabled = !userRights.attributeRights.status.edit || !pendingChangable || invoiced;
       return (
         <div className="task-info ml-auto">
           <span className="center-hor">
@@ -810,7 +798,7 @@ export default function TaskEdit( props ) {
         status.action === 'Invoiced' ||
         status.action === 'CloseInvalid'
       ) ) {
-      const datepickerDisabled = ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.attributeRights.status.edit;
+      const datepickerDisabled = ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.attributeRights.status.edit || invoiced;
       return (
         <div className="task-info ml-auto">
           <span className="center-hor">
@@ -853,7 +841,7 @@ export default function TaskEdit( props ) {
     Project: (
       <Select
         placeholder="Zadajte projekt"
-        isDisabled={ !userRights.rights.taskProjectWrite }
+        isDisabled={ !userRights.rights.taskProjectWrite || invoiced }
         value={ project }
         onChange={ changeProject }
         options={ availableProjects }
@@ -862,7 +850,7 @@ export default function TaskEdit( props ) {
     ),
     Assigned: (
       <div>
-        { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit) &&
+        { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit || invoiced) &&
           <div> {assignedTo.map((user) =>
               <div className="disabled-info" key={user.id}>{user.label}</div>
             )}
@@ -871,7 +859,7 @@ export default function TaskEdit( props ) {
             }
           </div>
         }
-        { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit &&
+        { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit && !invoiced &&
           <Select
             value={assignedTo}
             placeholder="Select reccomended"
@@ -895,10 +883,10 @@ export default function TaskEdit( props ) {
     ),
     Status: (
       <div>
-        { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit) &&
+        { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit || invoiced) &&
           <div className={`disabled-info`} style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }>{status ? status.label : "None"}</div>
         }
-        { !projectAttributes.status.fixed && userRights.attributeRights.status.edit &&
+        { !projectAttributes.status.fixed && userRights.attributeRights.status.edit && !invoiced &&
           <Select
             placeholder="Status required"
             value={status}
@@ -910,24 +898,30 @@ export default function TaskEdit( props ) {
       </div>
     ),
     Type: (
-      <Select
-        placeholder="Zadajte typ"
-        value={taskType}
-        isDisabled={ projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit }
-        styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
-        onChange={(type)=> {
-          setTaskType(type);
-          autoUpdateTask({ taskType: type.id })
-        }}
-        options={[noTaskType, ...taskTypes]}
-        />
+      <div>
+        { (projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit || invoiced) &&
+          <div className="disabled-info">{taskType ? taskType.label : "None"}</div>
+        }
+        { !projectAttributes.taskType.fixed && userRights.attributeRights.taskType.edit && !invoiced &&
+        <Select
+          placeholder="Zadajte typ"
+          value={taskType}
+          styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
+          onChange={(type)=> {
+            setTaskType(type);
+            autoUpdateTask({ taskType: type.id })
+          }}
+          options={[noTaskType, ...taskTypes]}
+          />
+        }
+      </div>
     ),
     Requester: (
       <div>
-        { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit) &&
+        { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit || invoiced) &&
           <div className="disabled-info">{requester ? requester.label : "None"}</div>
         }
-        { !projectAttributes.requester.fixed && userRights.attributeRights.requester.edit &&
+        { !projectAttributes.requester.fixed && userRights.attributeRights.requester.edit && !invoiced &&
           <Select
             placeholder="Zadajte žiadateľa"
             value={requester}
@@ -941,10 +935,10 @@ export default function TaskEdit( props ) {
     ),
     Company: (
       <div>
-        { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit) &&
+        { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit || invoiced) &&
           <div className="disabled-info">{company ? company.label : "None"}</div>
         }
-        { !projectAttributes.company.fixed && userRights.attributeRights.company.edit &&
+        { !projectAttributes.company.fixed && userRights.attributeRights.company.edit && !invoiced &&
           <Select
             placeholder="Zadajte firmu"
             value={company}
@@ -957,10 +951,10 @@ export default function TaskEdit( props ) {
     ),
     Pausal: (
       <div>
-        { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed ) &&
+        { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed || invoiced ) &&
           <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
         }
-        { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed &&
+        { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed && !invoiced &&
           <Select
             value={ pausal }
             styles={pickSelectStyle([ 'noArrow', 'required', ]) }
@@ -975,10 +969,10 @@ export default function TaskEdit( props ) {
     ),
     StartsAt: (
       <div>
-        { (projectAttributes.startsAt.fixed || !userRights.attributeRights.startsAt.edit) &&
+        { (projectAttributes.startsAt.fixed || !userRights.attributeRights.startsAt.edit || invoiced) &&
           <div className="disabled-info">{startsAt}</div>
         }
-        { !projectAttributes.startsAt.fixed && userRights.attributeRights.startsAt.edit &&
+        { !projectAttributes.startsAt.fixed && userRights.attributeRights.startsAt.edit && !invoiced &&
           <DatePicker
             className={classnames("form-control")}
             selected={startsAt}
@@ -995,10 +989,10 @@ export default function TaskEdit( props ) {
     ),
     Deadline: (
       <div>
-        { (projectAttributes.deadline.fixed || !userRights.attributeRights.deadline.edit) &&
+        { (projectAttributes.deadline.fixed || !userRights.attributeRights.deadline.edit || invoiced) &&
           <div className="disabled-info">{deadline}</div>
         }
-        { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit &&
+        { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit && !invoiced &&
           <DatePicker
             className={classnames("form-control")}
             selected={deadline}
@@ -1015,10 +1009,10 @@ export default function TaskEdit( props ) {
     ),
     Overtime: (
       <div>
-        { (projectAttributes.overtime.fixed || !userRights.attributeRights.overtime.edit) &&
+        { (projectAttributes.overtime.fixed || !userRights.attributeRights.overtime.edit || invoiced) &&
           <div className="disabled-info">{overtime.label}</div>
         }
-        { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.edit &&
+        { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.edit && !invoiced &&
           <Select
             value={overtime}
             styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
@@ -1126,7 +1120,7 @@ export default function TaskEdit( props ) {
             <div className="col-3">
               { userRights.attributeRights.repeat.view &&
                 <Repeat
-                  disabled={!userRights.attributeRights.repeat.edit}
+                  disabled={!userRights.attributeRights.repeat.edit || invoiced}
                   taskID={id}
                   duplicateTask={ !task.repeat ? getTaskData() : null}
                   repeat={task.repeat}
@@ -1186,7 +1180,7 @@ export default function TaskEdit( props ) {
             <div className="task-edit-buttons row m-b-10">
               <span className="ml-auto center-hor">
 
-                { userRights.rights.deleteTask &&
+                { userRights.rights.deleteTask && !invoiced &&
                   <button
                     type="button"
                     className="btn-link-red btn-distance p-0"
@@ -1270,7 +1264,7 @@ export default function TaskEdit( props ) {
           { userRights.attributeRights.repeat.view &&
             <Repeat
               vertical
-              disabled={!userRights.attributeRights.repeat.edit}
+              disabled={!userRights.attributeRights.repeat.edit || invoiced}
               duplicateTask={ !task.repeat ? getTaskData() : null}
               taskID={id}
               repeat={task.repeat}
@@ -1310,10 +1304,10 @@ export default function TaskEdit( props ) {
   const renderMultiSelectTags = () => {
     return (
       <Empty>
-        { userRights.attributeRights.tags.edit &&
+        { userRights.attributeRights.tags.edit && !invoiced &&
           <TagsPickerPopover
             taskID={id}
-            disabled={ projectAttributes.tags.fixed }
+            disabled={ projectAttributes.tags.fixed || invoiced }
             items={toSelArr(project === null ? [] : project.project.tags)}
             className="center-hor"
             selected={tags}
@@ -1341,14 +1335,14 @@ export default function TaskEdit( props ) {
       return null;
     }
     let RenderDescription = null;
-    if ( !userRights.rights.taskDescriptionWrite ) {
+    if ( !userRights.rights.taskDescriptionWrite || invoiced ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
         RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
       }
     } else {
-      if ( showDescription ) {
+      if ( showDescription && !invoiced ) {
         RenderDescription = <div>
           <CKEditor
             editor={ ClassicEditor }
@@ -1383,7 +1377,7 @@ export default function TaskEdit( props ) {
           <Label className="m-r-10">
             Popis úlohy
           </Label>
-          { userRights.rights.taskDescriptionWrite &&
+          { userRights.rights.taskDescriptionWrite && !invoiced &&
             <button
               className="btn-link btn-distance"
               style={{height: "20px"}}
@@ -1398,7 +1392,7 @@ export default function TaskEdit( props ) {
               { !showDescription ? 'edit' : 'save' }
             </button>
           }
-          { userRights.rights.taskAttachmentsWrite &&
+          { userRights.rights.taskAttachmentsWrite && !invoiced &&
             <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0 clickable" >
               <i className="fa fa-plus" />
               Attachment
@@ -1448,7 +1442,7 @@ export default function TaskEdit( props ) {
 
     return (
       <ShortSubtasks
-        disabled={!userRights.rights.taskSubtasksWrite}
+        disabled={!userRights.rights.taskSubtasksWrite || invoiced}
         items={task.shortSubtasks}
         onChange={(simpleSubtask) => {
           updateShortSubtask(simpleSubtask);
@@ -1472,7 +1466,7 @@ export default function TaskEdit( props ) {
     }
     return (
       <Attachments
-        disabled={!userRights.rights.taskAttachmentsWrite }
+        disabled={!userRights.rights.taskAttachmentsWrite || invoiced }
         taskID={id}
         type="task"
         top={top}
@@ -1500,6 +1494,7 @@ export default function TaskEdit( props ) {
           userRights.rights.taskWorksAdvancedRead
         ) &&
         <WorksTable
+          invoiced={invoiced}
           userID={currentUser.id}
           userRights={userRights}
           currentUser={currentUser}
@@ -1601,6 +1596,7 @@ export default function TaskEdit( props ) {
 
       { userRights.rights.taskMaterialsRead &&
         <Materials
+          invoiced={invoiced}
           showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
           showTotals={true}
           autoApproved={project ? project.project.autoApproved : false}
@@ -1668,6 +1664,7 @@ export default function TaskEdit( props ) {
           <TabPane tabId={1}>
             { userRights.rights.viewComments &&
               <Comments
+                disabled={invoiced}
                 id={id}
                 submitComment={ submitComment }
                 submitEmail={ submitEmail }
@@ -1688,6 +1685,7 @@ export default function TaskEdit( props ) {
     </div>
     )
   }
+
   const renderModalUserAdd = () => {
     return (
       <Empty>
@@ -1704,7 +1702,7 @@ export default function TaskEdit( props ) {
             />
         </ModalBody>
       </Modal>
-      { project && project.id &&
+      { project && project.id && userRights.rights.projectWrite &&
         <AddUserToGroup
           user={newAddedUser}
           disabled={ !userRights.rights.projectWrite }
@@ -1790,9 +1788,9 @@ export default function TaskEdit( props ) {
               projectAttributes={projectAttributes}
               />
 
-            { currentUser.role.accessRights.users && renderModalUserAdd() }
+            { currentUser.role.accessRights.users && !invoiced && renderModalUserAdd() }
 
-            { currentUser.role.accessRights.companies && renderModalCompanyAdd() }
+            { currentUser.role.accessRights.companies && !invoiced && renderModalCompanyAdd() }
 
           </div>
 

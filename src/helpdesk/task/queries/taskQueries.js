@@ -141,6 +141,7 @@ subtasks {
       id
     }
   }
+  price
 }
 workTrips {
   scheduled {
@@ -168,6 +169,7 @@ workTrips {
       id
     }
   }
+  price
 }
 materials {
   id

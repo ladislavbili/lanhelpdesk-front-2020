@@ -74,9 +74,10 @@ const getShownData = ( cols, autoApproved, newDefs = [] ) => {
   return shownData;
 }
 
-export default function Rozpocet( props ) {
+export default function MaterialsTable( props ) {
   //data & queries
   const {
+    invoiced,
     showColumns,
     newColumnDefinitions,
     showTotals,
@@ -145,7 +146,7 @@ export default function Rozpocet( props ) {
   }
 
   let sortedMaterials = materials.sort( ( material1, material2 ) => material1.order - material2.order );
-  let disabled = !userRights.rights.taskMaterialsWrite;
+  let disabled = !userRights.rights.taskMaterialsWrite || invoiced;
 
   const getColRender = ( key, material, index ) => {
     switch ( key ) {

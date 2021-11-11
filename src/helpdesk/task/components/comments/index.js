@@ -52,6 +52,7 @@ export default function Comments( props ) {
     userRights,
     submitComment,
     submitEmail,
+    disabled,
   } = props;
   const [ page, setPage ] = React.useState( 1 );
 
@@ -152,7 +153,7 @@ export default function Comments( props ) {
 
   return (
     <div>
-      { (userRights.rights.addComments || userRights.rights.emails) &&
+      { (userRights.rights.addComments || userRights.rights.emails) && !disabled &&
         <div>
           { isEmail &&
             <FormGroup className="row m-b-10">

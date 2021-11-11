@@ -116,6 +116,7 @@ const getShownData = ( cols, autoApproved, newDefs = [] ) => {
 export default function WorksTable( props ) {
   //data & queries
   const {
+    invoiced,
     userID,
     userRights,
     currentUser,
@@ -232,7 +233,7 @@ export default function WorksTable( props ) {
     ( userRights.rights.taskSubtasksWrite && toggleTab === '0' ) ||
     ( userRights.rights.taskWorksWrite && toggleTab === '1' ) ||
     ( userRights.rights.taskWorksAdvancedWrite && toggleTab === '2' )
-  )
+  ) || invoiced;
 
   const getDPH = () => {
     let dph = 20;
@@ -431,7 +432,7 @@ export default function WorksTable( props ) {
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
               className="form-control hidden-input h-30 segoe-blue-text"
-              value={ subtask.type ? getPrice(subtask.type) : getPrice(defaultType) }
+              value={ invoiced ? ((subtask.price / (100 - subtask.discount))*100 ) : (subtask.type ? getPrice(subtask.type) : getPrice(defaultType)) }
               />
           </span>
         )
@@ -474,7 +475,7 @@ export default function WorksTable( props ) {
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
               className="form-control hidden-input h-30 segoe-blue-text"
-              value={ getDiscountPrice({...subtask, type: subtask.type ? subtask.type : defaultType}) }
+              value={ invoiced ? subtask.price : getDiscountPrice({...subtask, type: subtask.type ? subtask.type : defaultType}) }
               />
           </span>
         )
@@ -672,7 +673,7 @@ export default function WorksTable( props ) {
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
               className="form-control hidden-input h-30 segoe-blue-text"
-              value={ getPrice(trip.type) }
+              value={ invoiced ? ((trip.price / (100 - trip.discount))*100 ) : getPrice(trip.type) }
               />
           </span>
         )
@@ -715,7 +716,7 @@ export default function WorksTable( props ) {
               type="number"
               style={{display: "inline", width: "70%", float: "right"}}
               className="form-control hidden-input h-30 segoe-blue-text"
-              value={ getDiscountPrice(trip) }
+              value={ invoiced ? trip.price : getDiscountPrice(trip) }
               />
           </span>
         )
