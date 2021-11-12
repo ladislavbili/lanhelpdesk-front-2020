@@ -89,7 +89,8 @@ export default function TaskEditContainer( props ) {
     match,
     taskID,
     closeModal,
-    history
+    history,
+    fromInvoice,
   } = props;
 
   const inModal = props.inModal === true;
@@ -129,6 +130,9 @@ export default function TaskEditContainer( props ) {
     loading: myProjectsLoading,
     refetch: myProjectsRefetch,
   } = useQuery( GET_MY_PROJECTS, {
+    variables: {
+      fromInvoice,
+    },
     fetchPolicy: 'network-only'
   } );
   const {
@@ -138,7 +142,8 @@ export default function TaskEditContainer( props ) {
     error: taskError
   } = useQuery( GET_TASK, {
     variables: {
-      id
+      id,
+      fromInvoice,
     },
   } );
   //local
@@ -215,7 +220,8 @@ export default function TaskEditContainer( props ) {
   React.useEffect( () => {
     taskRefetch( {
       variables: {
-        id
+        id,
+        fromInvoice,
       }
     } );
   }, [ id ] );
@@ -228,7 +234,8 @@ export default function TaskEditContainer( props ) {
     const task = client.readQuery( {
         query: GET_TASK,
         variables: {
-          id
+          id,
+          fromInvoice
         },
       } )
       .task;
@@ -256,7 +263,8 @@ export default function TaskEditContainer( props ) {
     client.writeQuery( {
       query: GET_TASK,
       variables: {
-        id
+        id,
+        fromInvoice,
       },
       data: {
         task: newTask
@@ -268,7 +276,10 @@ export default function TaskEditContainer( props ) {
     setSaving( true );
 
     addShortSubtask( {
-        variables: sub
+        variables: {
+          ...sub,
+          fromInvoice
+        }
       } )
       .then( ( response ) => {
         updateCasheStorage( response.data.addShortSubtask, 'shortSubtasks', 'ADD' );
@@ -288,6 +299,7 @@ export default function TaskEditContainer( props ) {
           id: sub.id,
           title: sub.title,
           done: sub.done,
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -304,6 +316,7 @@ export default function TaskEditContainer( props ) {
     deleteShortSubtask( {
         variables: {
           id,
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -331,6 +344,7 @@ export default function TaskEditContainer( props ) {
           task: parseInt( id ),
           assignedTo: sub.assignedTo.id,
           scheduled: sub.scheduled,
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -358,6 +372,7 @@ export default function TaskEditContainer( props ) {
           //type: sub.type.id,
           assignedTo: sub.assignedTo.id,
           scheduled: sub.scheduled,
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -374,6 +389,7 @@ export default function TaskEditContainer( props ) {
     deleteSubtask( {
         variables: {
           id,
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -400,6 +416,7 @@ export default function TaskEditContainer( props ) {
           task: parseInt( id ),
           assignedTo: wt.assignedTo.id,
           scheduled: wt.scheduled,
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -426,6 +443,7 @@ export default function TaskEditContainer( props ) {
           type: item.type.id,
           assignedTo: item.assignedTo.id,
           scheduled: item.scheduled,
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -442,6 +460,7 @@ export default function TaskEditContainer( props ) {
     deleteWorkTrip( {
         variables: {
           id,
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -466,6 +485,7 @@ export default function TaskEditContainer( props ) {
           margin: parseFloat( item.margin ),
           price: parseFloat( item.price ),
           task: parseInt( id ),
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -491,6 +511,7 @@ export default function TaskEditContainer( props ) {
           quantity: parseFloat( item.quantity ),
           margin: parseFloat( item.margin ),
           price: parseFloat( item.price ),
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -507,6 +528,7 @@ export default function TaskEditContainer( props ) {
     deleteMaterial( {
         variables: {
           id,
+          fromInvoice,
         }
       } )
       .then( ( response ) => {
@@ -524,6 +546,7 @@ export default function TaskEditContainer( props ) {
       deleteTask( {
           variables: {
             id,
+            fromInvoice,
           }
         } )
         .then( ( response ) => {
@@ -581,6 +604,7 @@ export default function TaskEditContainer( props ) {
     formData.append( "message", message );
     formData.append( "parentCommentId", parentCommentId );
     formData.append( "internal", internal );
+    formData.append( "fromInvoice", fromInvoice );
     axios.post( `${REST_URL}/send-comment`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -612,6 +636,7 @@ export default function TaskEditContainer( props ) {
     formData.append( "taskId", id );
     formData.append( "message", emailBody );
     formData.append( "subject", subject );
+    formData.append( "fromInvoice", fromInvoice );
     tos.forEach( ( to ) => formData.append( `tos`, to.email ) );
     axios.post( `${REST_URL}/send-email`, formData, {
         headers: {
@@ -633,6 +658,7 @@ export default function TaskEditContainer( props ) {
     attachments.forEach( ( file ) => formData.append( `file`, file ) );
     formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
     formData.append( "taskId", id );
+    formData.append( "fromInvoice", fromInvoice );
     axios.post( `${REST_URL}/upload-attachments`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -672,20 +698,23 @@ export default function TaskEditContainer( props ) {
       deleteTaskAttachment( {
           variables: {
             id: attachment.id,
+            fromInvoice,
           }
         } )
         .then( ( response ) => {
           const oldTask = client.readQuery( {
               query: GET_TASK,
               variables: {
-                id
+                id,
+                fromInvoice,
               }
             } )
             .task;
           client.writeQuery( {
             query: GET_TASK,
             variables: {
-              id
+              id,
+              fromInvoice,
             },
             data: {
               task: {
@@ -735,6 +764,7 @@ export default function TaskEditContainer( props ) {
     <TaskEdit
       {...props}
       id={id}
+      fromInvoice={fromInvoice}
       task={taskData.task}
       inModal={inModal}
       closeModal={closeModal}

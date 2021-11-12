@@ -177,8 +177,8 @@ deadline {
 `;
 
 export const GET_MY_PROJECTS = gql `
-query {
-  myProjects {
+query myProjects( $fromInvoice: Boolean ) {
+  myProjects( fromInvoice: $fromInvoice ) {
     project {
       id
       title

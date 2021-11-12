@@ -125,6 +125,7 @@ export default function TaskEdit( props ) {
     updateTask,
     client,
     setTaskLayout,
+    fromInvoice,
   } = props;
 
   const invoiced = task.invoiced;
@@ -416,7 +417,8 @@ export default function TaskEdit( props ) {
     let variables = {
       id,
       ...changes,
-      ...change
+      ...change,
+      fromInvoice,
     };
 
     updateTask( {
@@ -428,7 +430,8 @@ export default function TaskEdit( props ) {
         const originalTask = client.readQuery( {
             query: GET_TASK,
             variables: {
-              id
+              id,
+              fromInvoice,
             },
           } )
           .task;
@@ -440,7 +443,8 @@ export default function TaskEdit( props ) {
         client.writeQuery( {
           query: GET_TASK,
           variables: {
-            id
+            id,
+            fromInvoice,
           },
           data: {
             task: updatedTask
@@ -1670,13 +1674,14 @@ export default function TaskEdit( props ) {
                 submitEmail={ submitEmail }
                 userRights={ userRights }
                 users={users}
+                fromInvoice={fromInvoice}
                 />
             }
           </TabPane>
           {	userRights.rights.history &&
             <TabPane tabId={2}>
               { userRights.rights.history &&
-                <TaskHistory task={task} />
+                <TaskHistory task={task} fromInvoice={fromInvoice} />
               }
             </TabPane>
           }

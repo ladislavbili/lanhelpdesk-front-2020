@@ -27,6 +27,7 @@ export default function CompanyInvoice( props ) {
     fromDate,
     toDate,
     invoiceTasks,
+    invoiceRefetch,
   } = props;
   const company = companyData.company;
   const totals = invoice.totals;
@@ -310,8 +311,10 @@ export default function CompanyInvoice( props ) {
         taskID={ editedTask ? editedTask.id : null }
         closeModal={ (vykazyUpdated) => {
           setEditedTask(null);
+          invoiceRefetch();
           //refresh if changed
         } }
+        fromInvoice={true}
         />
     </div>
   );

@@ -19,6 +19,7 @@ import {
 export default function Invoice( props ) {
   const {
     invoice,
+    invoiceRefetch,
     company,
     fromDate,
     toDate,
@@ -210,7 +211,9 @@ export default function Invoice( props ) {
         closeModal={ (vykazyUpdated) => {
           setEditedTask(null);
           //refresh if changed
+          invoiceRefetch();
         } }
+        fromInvoice={true}
         />
     </div>
   );

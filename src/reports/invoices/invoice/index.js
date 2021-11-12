@@ -73,7 +73,15 @@ export default function InvoiceLoader( props ) {
       company={invoiceFilter.company}
       fromDate={fromDateData.reportsFromDate}
       toDate={toDateData.reportsToDate}
-      invoiceRefetch={invoiceRefetch}
+      invoiceRefetch={() => invoiceRefetch( {
+        variables: {
+          companyId: invoiceFilter.company.id,
+          fromDate: invoiceFilter.fromDate.valueOf()
+            .toString(),
+          toDate: invoiceFilter.toDate.valueOf()
+            .toString()
+        },
+      } )}
       />
   );
 }

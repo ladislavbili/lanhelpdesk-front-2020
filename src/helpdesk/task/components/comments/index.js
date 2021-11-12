@@ -53,6 +53,7 @@ export default function Comments( props ) {
     submitComment,
     submitEmail,
     disabled,
+    fromInvoice,
   } = props;
   const [ page, setPage ] = React.useState( 1 );
 
@@ -65,7 +66,8 @@ export default function Comments( props ) {
     variables: {
       task: id,
       page,
-      limit
+      limit,
+      fromInvoice,
     },
     fetchPolicy: 'network-only'
   } );
@@ -79,7 +81,8 @@ export default function Comments( props ) {
         variables: {
           task: id,
           page,
-          limit
+          limit,
+          fromInvoice,
         }
       } );
     }
@@ -104,7 +107,8 @@ export default function Comments( props ) {
       variables: {
         task: id,
         page: 1,
-        limit
+        limit,
+        fromInvoice
       }
     } );
   }, [ id ] );
@@ -115,7 +119,8 @@ export default function Comments( props ) {
       variables: {
         task: id,
         page,
-        limit
+        limit,
+        fromInvoice,
       }
     } );
   }, [ page ] );
@@ -124,7 +129,8 @@ export default function Comments( props ) {
     axios.get( `${REST_URL}/get-attachments`, {
         params: {
           type: "comment",
-          path: attachment.path
+          path: attachment.path,
+          fromInvoice,
         },
         headers: {
           'authorization': `Bearer ${sessionStorage.getItem('acctok')}`
@@ -207,7 +213,7 @@ export default function Comments( props ) {
                       attachments,
                       emailBody,
                       subject,
-                      tos
+                      tos,
                     },
                     setSaving,
                     () => {

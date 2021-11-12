@@ -252,9 +252,10 @@ mutation addTask(
 `;
 
 export const DELETE_TASK = gql `
-mutation deleteTask($id: Int!) {
+mutation deleteTask($id: Int!, $fromInvoice: Boolean) {
   deleteTask(
     id: $id,
+    fromInvoice: $fromInvoice,
   ){
     id
   }
@@ -262,9 +263,10 @@ mutation deleteTask($id: Int!) {
 `;
 
 export const GET_TASK = gql `
-query task($id: Int!){
+query task($id: Int!, $fromInvoice: Boolean){
   task(
     id: $id
+    fromInvoice: $fromInvoice
   )  {
     ${responseTask}
   }
@@ -293,6 +295,7 @@ mutation updateTask(
   $status: Int,
   $tags: [Int],
   $taskType: Int,
+  $fromInvoice: Boolean
 ) {
   updateTask(
     id: $id,
@@ -315,6 +318,7 @@ mutation updateTask(
     status: $status,
     tags: $tags,
     taskType: $taskType,
+    fromInvoice: $fromInvoice
   ){
     ${responseTask}
   }

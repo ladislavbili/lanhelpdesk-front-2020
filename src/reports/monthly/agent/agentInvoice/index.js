@@ -61,7 +61,12 @@ export default function AgentInvoiceLoader( props ) {
       agent={agent}
       fromDate={fromDateData.reportsFromDate}
       toDate={toDateData.reportsToDate}
-      invoiceRefetch={invoiceRefetch}
+      invoiceRefetch={() => invoiceRefetch( {
+        variables: {
+          ...filterData,
+          userId: agent.id,
+        },
+      } )}
       />
   );
 }

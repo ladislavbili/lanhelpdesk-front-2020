@@ -234,7 +234,9 @@ export default function AgentInvoice( props ) {
         closeModal={ (vykazyUpdated) => {
           setEditedTask(null);
           //refresh if changed
+          invoiceRefetch();
         } }
+        fromInvoice={true}
         />
     </div>
   );

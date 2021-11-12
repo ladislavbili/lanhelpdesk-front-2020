@@ -3,9 +3,10 @@ import {
 } from '@apollo/client';
 
 export const GET_TASK_CHANGES = gql `
-query taskChanges($taskId: Int!){
+query taskChanges($taskId: Int!, $fromInvoice: Boolean){
 	taskChanges(
 		taskId: $taskId
+    fromInvoice: $fromInvoice
 	)  {
     id
     createdAt

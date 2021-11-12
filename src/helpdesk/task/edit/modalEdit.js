@@ -11,6 +11,7 @@ export default function TaskModalEdit( props ) {
     opened,
     closeModal,
     taskID,
+    fromInvoice,
   } = props;
 
   if ( !opened ) {
@@ -24,6 +25,7 @@ export default function TaskModalEdit( props ) {
           closeModal={closeModal}
           inModal
           taskID={taskID}
+          fromInvoice={fromInvoice === true}
           />
       </ModalBody>
     </Modal>

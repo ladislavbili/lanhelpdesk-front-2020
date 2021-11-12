@@ -18,7 +18,8 @@ import Loading from 'components/loading';
 
 export default function TaskHistory( props ) {
   const {
-    task
+    task,
+    fromInvoice,
   } = props;
 
   const {
@@ -28,7 +29,8 @@ export default function TaskHistory( props ) {
     error: taskChangesError,
   } = useQuery( GET_TASK_CHANGES, {
     variables: {
-      taskId: task.id
+      taskId: task.id,
+      fromInvoice,
     },
     fetchPolicy: 'network-only'
   } );
@@ -40,7 +42,8 @@ export default function TaskHistory( props ) {
     onSubscriptionData: () => {
       taskChangesRefetch( {
         variables: {
-          task: task.id
+          task: task.id,
+          fromInvoice,
         }
       } );
     }
@@ -50,7 +53,8 @@ export default function TaskHistory( props ) {
   React.useEffect( () => {
     taskChangesRefetch( {
       variables: {
-        taskId: task.id
+        taskId: task.id,
+        fromInvoice,
       }
     } );
   }, [ task.id ] );
