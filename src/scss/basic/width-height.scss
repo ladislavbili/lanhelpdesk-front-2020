@@ -3,6 +3,12 @@
 }
 
 //HEIGHT
+@for $i from 0 through 400 {
+  .height-#{increment-by-5($i)} {
+    height: #{increment-by-5($i)}px;
+  }
+}
+
 .h-20-f {
   height: 20px !important;
 }

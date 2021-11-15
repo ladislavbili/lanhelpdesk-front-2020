@@ -76,6 +76,7 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: B
     }
     assignedTo {
       id
+      fullName
       email
       company {
         id
@@ -120,6 +121,7 @@ mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $
     }
     assignedTo {
       id
+      fullName
       email
       company {
         id
@@ -174,6 +176,7 @@ mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantit
     }
     assignedTo {
       id
+      fullName
       email
       company {
         id
@@ -217,6 +220,7 @@ mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boole
     }
     assignedTo {
       id
+      fullName
       email
       company {
         id

@@ -234,7 +234,7 @@ export default function TaskAddContainer( props ) {
                 }) )).filter((project) => project.right.addTask )
               }
               myProjects={loading ? [] : projectsData.myProjects}
-              users={ usersData ? toSelArr(usersData.basicUsers, 'email') : [] }
+              users={ usersData ? toSelArr(usersData.basicUsers, 'fullName') : [] }
               companies={ toSelArr(companiesData.basicCompanies) }
               taskTypes={ toSelArr(taskTypesData.taskTypes) }
               tripTypes={ toSelArr(tripTypesData.tripTypes) }

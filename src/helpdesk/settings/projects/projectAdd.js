@@ -24,6 +24,7 @@ import {
   toSelArr,
   toSelItem,
   getMyData,
+  filterUnique,
 } from 'helperFunctions';
 import {
   defaultGroups,
@@ -166,14 +167,15 @@ export default function ProjectAdd( props ) {
     }
   }, [ userGroups, companyGroups, usersLoading ] );
   const updateDefAssigned = () => {
-    const companyIds = companyGroups.filter( ( companyGroup ) => companyGroup.group.attributeRights.assigned.write )
-      .map( ( companyGroup ) => companyGroup.company.id );
-    const assignableUsers = [
-      ...userGroups.filter( ( userGroup ) => userGroup.group.attributeRights.assigned.write )
+    const assignableUsers = filterUnique( [
+      ...userGroups.filter( ( userGroup ) => userGroup.group.attributeRights.assigned.edit )
       .map( ( userGroup ) => userGroup.user ),
-      ...toSelArr( usersData.basicUsers, 'email' )
-      .filter( ( user ) => companyIds.includes( user.company.id ) )
-    ]
+      ...companyGroups.filter( ( companyGroup ) => companyGroup.group.attributeRights.assigned.edit )
+      .reduce( ( acc, companyGroup ) => {
+        return [ ...acc, ...( usersLoading ? [] : toSelArr( usersData.basicUsers, 'email' ) )
+          .filter( ( user ) => user.company.id === companyGroup.company.id ) ]
+      }, [] )
+    ], 'id' )
     setAttributes( {
       ...attributes,
       assigned: {
@@ -872,16 +874,26 @@ export default function ProjectAdd( props ) {
             userGroups.map( (userGroup) => userGroup.user ) :
             (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
           }
-          assignableUsers={[
-            ...userGroups.filter((userGroup) => userGroup.group.attributeRights.assigned.write ).map( (userGroup) => userGroup.user ),
-            ...companyGroups.reduce((acc, companyGroup) => {
+          assignableUsers={filterUnique([
+            ...userGroups.filter((userGroup) => userGroup.group.attributeRights.assigned.edit ).map( (userGroup) => userGroup.user ),
+            ...companyGroups.filter((companyGroup) => companyGroup.group.attributeRights.assigned.edit ).reduce((acc, companyGroup) => {
               return [...acc, ...(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email')).filter((user) => user.company.id === companyGroup.company.id ) ]
             },[])
-          ]}
+          ], 'id')}
           allTags={toSelArr(tags)}
           taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
           groups={groups}
-          setGroups={setGroups}
+          setGroups={(newGroups) => {
+            setGroups(newGroups);
+            setUserGroups(userGroups.map((userGroup) => ({
+              ...userGroup,
+              group: newGroups.find((newGroup) => newGroup.id === userGroup.group.id),
+            }) ));
+            setCompanyGroups(companyGroups.map((companyGroup) => ({
+              ...companyGroup,
+              group: newGroups.find((newGroup) => newGroup.id === companyGroup.group.id),
+            }) ));
+          } }
           attributes={attributes}
           setAttributes={setAttributes}
           />
@@ -923,7 +935,6 @@ export default function ProjectAdd( props ) {
           }}
           />
       </TabPane>
-
     </TabContent>
 
     <div className="row form-buttons-row">

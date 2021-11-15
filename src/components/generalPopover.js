@@ -27,13 +27,12 @@ export default function GeneralPopover( props ) {
 
   const closeAction = close ? close : () => setPopoverOpen( false );
   const isOpened = [ true, false ].includes( open ) ? open : popoverOpen;
-
   if ( useLegacy ) {
     return (
       <UncontrolledPopover trigger="legacy" placement={placement} className={`custom-popover ${className}`} isOpen={isOpened} target={target} toggle={ closeAction }>
         <PopoverBody>
           { header &&
-            <label style={{display: "block"}} className={ headerClassName ? headerClassName : ""  }>
+            <label style={{display: "block"}} className={ (headerClassName ? headerClassName : "")  }>
               {header}
             </label>
           }

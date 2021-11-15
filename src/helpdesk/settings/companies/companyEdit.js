@@ -77,6 +77,7 @@ export default function CompanyEdit( props ) {
       id: parseInt( match.params.id )
     },
     fetchPolicy: 'network-only',
+    notifyOnNetworkStatusChange: true,
   } );
 
   const {
@@ -104,7 +105,7 @@ export default function CompanyEdit( props ) {
   useSubscription( PRICELISTS_SUBSCRIPTION, {
     onSubscriptionData: () => {
       pricelistsRefetch()
-        .then( () => setData( false ) );
+        .then( () => setData() );
     }
   } );
 
@@ -214,6 +215,7 @@ export default function CompanyEdit( props ) {
     if ( companyLoading ) {
       return;
     }
+
     const company = companyData.company;
     setTitle( company.title );
     setOldTitle( company.title );
@@ -274,14 +276,12 @@ export default function CompanyEdit( props ) {
 
     let newRents = rents.map( r => {
       let newRent = {
+        id: r.id,
         title: r.title,
         quantity: isNaN( parseInt( r.quantity ) ) ? 0 : parseInt( r.quantity ),
         cost: isNaN( parseInt( r.unitCost ) ) ? 0 : parseInt( r.unitCost ),
         price: isNaN( parseInt( r.unitPrice ) ) ? 0 : parseInt( r.unitPrice )
       };
-      if ( r.id ) {
-        newRent.id = r.id;
-      }
       return newRent;
     } );
 
@@ -317,6 +317,15 @@ export default function CompanyEdit( props ) {
           taskWorkPausal: ( taskWorkPausal === "" ? 0 : parseFloat( taskWorkPausal ) ),
           taskTripPausal: ( taskTripPausal === "" ? 0 : parseFloat( taskTripPausal ) ),
           rents: newRents,
+        }
+      } )
+      .then( ( response ) => {
+        if ( newRents.some( ( rent ) => rent.id < 1 ) ) {
+          companyRefetch( {
+            variables: {
+              id: parseInt( match.params.id )
+            }
+          } );
         }
       } )
       .catch( ( err ) => {

@@ -241,14 +241,15 @@ export default function ProjectEdit( props ) {
   }
 
   const updateDefAssigned = () => {
-    const companyIds = companyGroups.filter( ( companyGroup ) => companyGroup.group.attributeRights.assigned.write )
-      .map( ( companyGroup ) => companyGroup.company.id );
-    const assignableUsers = [
-      ...userGroups.filter( ( userGroup ) => userGroup.group.attributeRights.assigned.write )
+    const assignableUsers = filterUnique( [
+      ...userGroups.filter( ( userGroup ) => userGroup.group.attributeRights.assigned.edit )
       .map( ( userGroup ) => userGroup.user ),
-      ...toSelArr( usersData.basicUsers, 'email' )
-      .filter( ( user ) => companyIds.includes( user.company.id ) )
-    ];
+      ...companyGroups.filter( ( companyGroup ) => companyGroup.group.attributeRights.assigned.edit )
+      .reduce( ( acc, companyGroup ) => {
+        return [ ...acc, ...( usersLoading ? [] : toSelArr( usersData.basicUsers, 'email' ) )
+          .filter( ( user ) => user.company.id === companyGroup.company.id ) ]
+      }, [] )
+    ], 'id' );
     setAttributes( {
       ...attributes,
       assigned: {
@@ -699,19 +700,6 @@ export default function ProjectEdit( props ) {
     mergeGroupRights( allMyGroups.length > 0 ? allMyGroups[ 0 ].rights : null, allMyGroups.length > 1 ? allMyGroups[ 1 ].rights : null );
   const allTags = getAllTags();
   const allStatuses = getAllStatuses();
-
-
-  const assignableGroupIds = groups.filter( ( group ) => group.attributeRights.assigned.edit )
-    .map( ( group ) => group.id );
-  const assignableUsers = filterUnique( [
-    ...userGroups.filter( ( userGroup ) => assignableGroupIds.includes( userGroup.group.id ) )
-      .map( ( userGroup ) => userGroup.user ),
-    ...companyGroups.filter( ( companyGroup ) => assignableGroupIds.includes( companyGroup.group.id ) )
-      .reduce( ( acc, companyGroup ) => {
-      return [ ...acc, ...( usersLoading ? [] : toSelArr( usersData.basicUsers, 'email' ) )
-          .filter( ( user ) => user.company.id === companyGroup.company.id ) ]
-    }, [] )
-  ], 'id' );
 
   const renderAttachments = () => {
     return (
@@ -1191,11 +1179,26 @@ export default function ProjectEdit( props ) {
                     userGroups.map( (userGroup) => userGroup.user ) :
                     (usersLoading ? [] : toSelArr(usersData.basicUsers, 'email'))
                   }
-                  assignableUsers={assignableUsers}
+                  assignableUsers={filterUnique([
+                    ...userGroups.filter((userGroup) => userGroup.group.attributeRights.assigned.edit ).map( (userGroup) => userGroup.user ),
+                    ...companyGroups.filter((companyGroup) => companyGroup.group.attributeRights.assigned.edit ).reduce((acc, companyGroup) => {
+                      return [...acc, ...(usersLoading ? [] : toSelArr(usersData.basicUsers, 'email')).filter((user) => user.company.id === companyGroup.company.id ) ]
+                    },[])
+                  ], 'id')}
                   allTags={toSelArr(allTags)}
                   taskTypes={(taskTypesLoading ? [] : toSelArr(taskTypesData.taskTypes))}
                   groups={groups}
-                  setGroups={setGroups}
+                  setGroups={(newGroups) => {
+                    setGroups(newGroups);
+                    setUserGroups(userGroups.map((userGroup) => ({
+                      ...userGroup,
+                      group: newGroups.find((newGroup) => newGroup.id === userGroup.group.id),
+                    }) ));
+                    setCompanyGroups(companyGroups.map((companyGroup) => ({
+                      ...companyGroup,
+                      group: newGroups.find((newGroup) => newGroup.id === companyGroup.group.id),
+                    }) ));
+                  } }
                   attributes={attributes}
                   setAttributes={setAttributes}
                   />

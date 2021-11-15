@@ -159,7 +159,7 @@ export default function UserListContainer( props ) {
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>Name / E-mail</th>
             <th>Company</th>
           </tr>
         </thead>
@@ -179,7 +179,8 @@ export default function UserListContainer( props ) {
                 onClick={ () => history.push(`.${match.params.id === undefined ? '/users' : '' }/${user.id}`) }>
                 <td
                   style={{maxWidth: "300px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }}  >
-                  {user.username}
+                  <div>{user.fullName}</div>
+                  <div>{user.email}</div>
                 </td>
                 <td className={(match.params.id === user.id ? " active":"") }
                   style={{maxWidth: "200px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }} >

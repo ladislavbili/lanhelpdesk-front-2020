@@ -31,6 +31,7 @@ export default function TagsPickerPopover( props ) {
         className="overflow-auto max-height-400"
         target={`edit-tags-${taskID}`}
         header="Select tags"
+        headerClassName="m-b-15"
         reset={() => {}}
         submit={() => {}}
         open={ tagsOpen }
@@ -44,7 +45,7 @@ export default function TagsPickerPopover( props ) {
             className={`${bodyClassName ? bodyClassName : ''}`}
             style={ bodyStyle ? bodyStyle : {} }
             >
-            { showFilter !== false &&
+            { showFilter &&
               <input
                 className="form-control m-b-15"
                 placeholder="Filter"

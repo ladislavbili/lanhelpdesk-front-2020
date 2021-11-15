@@ -203,7 +203,7 @@ export default function Comments( props ) {
           <div className="row m-b-30">
 
             <button
-              className="btn center-hor m-t-0 btn-distance"
+              className="btn center-hor btn-distance"
               disabled={(!isEmail && newComment==='')|| (isEmail&&(tos.length < 1 ||subject===''||emailBody===''))||saving}
               onClick={() => {
                 if(isEmail){
@@ -245,7 +245,7 @@ export default function Comments( props ) {
             </button>
             { userRights.rights.emails && userRights.rights.addComments &&
               <Checkbox
-                className = "m-r-15 center-hor "
+                className = "btn-distance center-hor"
                 centerHor
                 disabled={ !userRights.rights.emails || !userRights.rights.addComments }
                 label = "E-mail"
@@ -255,7 +255,7 @@ export default function Comments( props ) {
             }
             {userRights.rights.internal && !isEmail &&
               <Checkbox
-                className = "m-r-15 center-hor"
+                className = "btn-distance center-hor"
                 centerHor
                 label = "Internal"
                 value = { isInternal }
@@ -265,7 +265,7 @@ export default function Comments( props ) {
 
             <div className='center-hor'>
               <label
-                className="btn-link ver-align-middle clickable center-hor m-t-7"
+                className="btn-link ver-align-middle clickable h-fit-content center-hor m-l-0"
                 htmlFor="uploadCommentAttachments"
                 >
                 <i className="fa fa-plus" />

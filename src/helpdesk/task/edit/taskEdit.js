@@ -192,7 +192,7 @@ export default function TaskEdit( props ) {
     setChanges( {} );
     setTagsOpen( false );
     setVykazyChanges( defaultVykazyChanges );
-    setAssignedTo( toSelArr( task.assignedTo, 'email' )
+    setAssignedTo( toSelArr( task.assignedTo, 'fullName' )
       .filter( ( user ) => assignableUserIds.includes( user.id ) ) );
     setCloseDate( task.closeDate ? moment( parseInt( task.closeDate ) ) : null );
     setStartsAt( task.startsAt ? moment( parseInt( task.startsAt ) ) : null );
@@ -511,12 +511,12 @@ export default function TaskEdit( props ) {
   //vykazyTable
   const subtasks = task.subtasks.map( item => ( {
     ...item,
-    assignedTo: toSelItem( item.assignedTo, 'email' ),
+    assignedTo: toSelItem( item.assignedTo, 'fullName' ),
     type: item.type ? toSelItem( item.type ) : null,
   } ) );
   const workTrips = task.workTrips.map( item => ( {
     ...item,
-    assignedTo: toSelItem( item.assignedTo, 'email' ),
+    assignedTo: toSelItem( item.assignedTo, 'fullName' ),
     type: toSelItem( item.type )
   } ) );
   const materials = task.materials.map( ( item ) => ( {
@@ -528,12 +528,12 @@ export default function TaskEdit( props ) {
     shortSubtasks: task.shortSubtasks,
     subtasks: task.subtasks.map( item => ( {
       ...item,
-      assignedTo: toSelItem( item.assignedTo, 'email' ),
+      assignedTo: toSelItem( item.assignedTo, 'fullName' ),
       type: item.type ? toSelItem( item.type ) : null,
     } ) ),
     workTrips: task.workTrips.map( item => ( {
       ...item,
-      assignedTo: toSelItem( item.assignedTo, 'email' ),
+      assignedTo: toSelItem( item.assignedTo, 'fullName' ),
       type: toSelItem( item.type )
     } ) ),
     materials: task.materials,
@@ -667,7 +667,7 @@ export default function TaskEdit( props ) {
             createdAt={task.createdAt}
             taskWorks={task.subtasks.map( item => ( {
               ...item,
-              assignedTo: toSelItem( item.assignedTo, 'email' ),
+              assignedTo: toSelItem( item.assignedTo, 'fullName' ),
               type: toSelItem( item.type )
             } ) )}
             workTrips={workTrips}
@@ -805,9 +805,7 @@ export default function TaskEdit( props ) {
       const datepickerDisabled = ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.attributeRights.status.edit || invoiced;
       return (
         <div className="task-info ml-auto">
-          <span className="center-hor">
             Closed at:
-          </span>
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
@@ -816,7 +814,7 @@ export default function TaskEdit( props ) {
             ):
             (
               <DatePicker
-                className="form-control hidden-input bolder"
+                className="form-control hidden-input bolder p-0 text-right width-95"
                 selected={closeDate}
                 disabled={datepickerDisabled}
                 onChange={date => {
@@ -1249,7 +1247,7 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.attributeRights.deadline.view &&
+          { userRights.attributeRights.startsAt.view &&
             <div className="form-selects-entry-column" >
               <Label>Starts at</Label>
               <div className="form-selects-entry-column-rest" >

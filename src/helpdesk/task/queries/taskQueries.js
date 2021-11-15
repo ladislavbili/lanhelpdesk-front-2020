@@ -33,6 +33,7 @@ assignedTo {
   id
   name
   surname
+  fullName
   email
 }
 company {
@@ -136,6 +137,7 @@ subtasks {
   }
   assignedTo {
     id
+    fullName
     email
     company {
       id
@@ -164,6 +166,7 @@ workTrips {
   }
   assignedTo {
     id
+    fullName
     email
     company {
       id
