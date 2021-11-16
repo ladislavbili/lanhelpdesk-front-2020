@@ -44,6 +44,7 @@ import {
   GET_MILESTONE,
   GET_LOCAL_TASK_SEARCH,
   GET_GLOBAL_TASK_SEARCH,
+  GET_FILTER_OPEN,
 } from 'apollo/localSchema/queries';
 
 import {
@@ -57,6 +58,7 @@ export default function TasksLoader( props ) {
   } = props;
   const page = match.params.page ? parseInt( match.params.page ) : 1;
   const limit = 30;
+
   //local
   const {
     data: filterData,
@@ -77,6 +79,10 @@ export default function TasksLoader( props ) {
   const {
     data: globalSearchData,
   } = useQuery( GET_GLOBAL_TASK_SEARCH );
+
+  const {
+    data: filterOpenData,
+  } = useQuery( GET_FILTER_OPEN );
 
   const currentUser = getMyData();
 
@@ -200,6 +206,7 @@ export default function TasksLoader( props ) {
 
   return (
     <TasklistSwitch
+      isFilter={filterOpenData.filterOpen}
       history={history}
       match={match}
       currentUser={currentUser}

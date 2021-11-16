@@ -7,7 +7,8 @@ import {
   FormGroup,
   Popover,
   PopoverHeader,
-  PopoverBody
+  PopoverBody,
+  Label
 } from 'reactstrap';
 
 import DatePicker from 'components/DatePicker';
@@ -44,7 +45,7 @@ export default function FilterDatePickerPopover( props ) {
         text = showNowFrom ? 'From: Current date' : ( value ? `From: ${value}` : 'Select date from' );
       }
       return (
-        <div className="row form-control p-0" style={ minimal ? { backgroundColor:'inherit', color:'inherit' } : {}}>
+        <div className="row form-control p-0" style={ minimal ? {  color:'inherit' } : {}}>
           <button className={classnames({ "datepicker-input-button-minimal": minimal, "datepicker-input-button": !minimal })} onClick={onClick} style={{flex: 1}}>
             { text }
           </button>
@@ -58,10 +59,11 @@ export default function FilterDatePickerPopover( props ) {
             >
             { minimal ? 'Now' : 'Set now' }
           </Button>
-      </div>
+        </div>
       )
     }
   )
+
   const DateInputTo = forwardRef(
     ( {
       value,
@@ -74,7 +76,7 @@ export default function FilterDatePickerPopover( props ) {
         text = showNowTo ? 'To: Current date' : ( value ? `To: ${value}` : 'Select date to' );
       }
       return (
-        <div className="row form-control p-0" style={ minimal ? { backgroundColor:'inherit', color:'inherit' } : {}}>
+        <div className="row form-control p-0" style={ minimal ? {  color:'inherit' } : {}}>
           <button className={classnames({ "datepicker-input-button-minimal": minimal, "datepicker-input-button": !minimal })} onClick={onClick} style={{flex: 1}}>
             { text }
           </button>
@@ -88,127 +90,131 @@ export default function FilterDatePickerPopover( props ) {
             >
             { minimal ? 'Now' : 'Set now' }
           </Button>
-      </div>
+        </div>
       )
     }
   )
 
   return (
     <FormGroup className={classnames({'sidebar-filter-row': minimal})}>
-        <label style={{display: "block"}}>{label}</label>
-          <button id="Popover1" type="button" className="btn-link p-l-0 p-r-0 m-r-0" onClick={() => setPopoverOpen(true)}>
-            {`${dateFrom ? dateFrom.format( 'DD.MM.YYYY' ) : 'All'} - ${dateTo ? dateTo.format( 'DD.MM.YYYY' ) : 'All'}`}
-          </button>
-          <Popover placement="right" className="custom-popover" isOpen={popoverOpen} target="Popover1" toggle={() => setPopoverOpen(false)}>
-            <PopoverBody>
-              <label style={{display: "block"}}>{`Set ${label}`}</label>
-                <button
-                  type="button"
-                  className="btn-link"
-                  style={{display: "block"}}
-                  onClick={() => {
-                    setNewDateFrom(moment().startOf('week').add(1, 'days'));
-                    setNewDateTo(moment().endOf('week').add(1, 'days'));
-                  }}
-                  >
-                  This week
-                </button>
-                <button
-                  type="button"
-                  className="btn-link"
-                  style={{display: "block"}}
-                  onClick={() => {
-                    setNewDateFrom(moment().subtract(1, 'weeks').startOf('week').add(1, 'days'));
-                    setNewDateTo(moment().subtract(1, 'weeks').endOf('week').add(1, 'days'));
-                  }}
-                  >
-                  Last week
-                </button>
-                <button
-                  type="button"
-                  className="btn-link"
-                  style={{display: "block"}}
-                  onClick={() => {
-                    setNewDateFrom(moment().startOf('month'));
-                    setNewDateTo(moment().endOf('month'));
-                  }}
-                  >
-                  This month
-                </button>
-                <button
-                  type="button"
-                  className="btn-link"
-                  style={{display: "block"}}
-                  onClick={() => {
-                    setNewDateFrom(moment().subtract(1, 'months').startOf('month'));
-                    setNewDateTo(moment().subtract(1, 'months').endOf('month'));
-                  }}
-                  >
-                  Last month
-                </button>
+      <Label style={{display: "block"}}>
+        {label}
+      </Label>
+      <div className="bkg-white">
+        <button id="Popover1" type="button" className="btn-link p-l-0 p-r-0 m-r-0" onClick={() => setPopoverOpen(true)}>
+          {`${dateFrom ? dateFrom.format( 'DD.MM.YYYY' ) : 'All'} - ${dateTo ? dateTo.format( 'DD.MM.YYYY' ) : 'All'}`}
+        </button>
+        <Popover placement="right" className="custom-popover" isOpen={popoverOpen} target="Popover1" toggle={() => setPopoverOpen(false)}>
+          <PopoverBody>
+            <label style={{display: "block"}}>{`Set ${label}`}</label>
+            <button
+              type="button"
+              className="btn-link"
+              style={{display: "block"}}
+              onClick={() => {
+                setNewDateFrom(moment().startOf('week').add(1, 'days'));
+                setNewDateTo(moment().endOf('week').add(1, 'days'));
+              }}
+              >
+              This week
+            </button>
+            <button
+              type="button"
+              className="btn-link"
+              style={{display: "block"}}
+              onClick={() => {
+                setNewDateFrom(moment().subtract(1, 'weeks').startOf('week').add(1, 'days'));
+                setNewDateTo(moment().subtract(1, 'weeks').endOf('week').add(1, 'days'));
+              }}
+              >
+              Last week
+            </button>
+            <button
+              type="button"
+              className="btn-link"
+              style={{display: "block"}}
+              onClick={() => {
+                setNewDateFrom(moment().startOf('month'));
+                setNewDateTo(moment().endOf('month'));
+              }}
+              >
+              This month
+            </button>
+            <button
+              type="button"
+              className="btn-link"
+              style={{display: "block"}}
+              onClick={() => {
+                setNewDateFrom(moment().subtract(1, 'months').startOf('month'));
+                setNewDateTo(moment().subtract(1, 'months').endOf('month'));
+              }}
+              >
+              Last month
+            </button>
+            <div className="row">
+              <div className="width-50-p p-r-10">
                 <div className="row">
-                  <div className="width-50-p p-r-10">
-                    <div className="row">
-                      <label className="center-hor">From</label>
-                      <button type="button" className="btn-link ml-auto m-r-0" onClick={() => setNewDateFrom(moment())}>
-                        NOW
-                      </button>
-                    </div>
-                    <DatePicker
-                      className="form-control"
-                      hideTime={true}
-                      selected={newDateFrom}
-                      onChange={(e)=>{
-                        setNewDateFrom(e);
-                      }}
-                      placeholderText="No date"
-                      />
-                  </div>
+                  <label className="center-hor">From</label>
+                  <button type="button" className="btn-link ml-auto m-r-0" onClick={() => setNewDateFrom(moment())}>
+                    NOW
+                  </button>
+                </div>
+                <DatePicker
+                  className="form-control"
+                  hideTime={true}
+                  selected={newDateFrom}
+                  onChange={(e)=>{
+                    setNewDateFrom(e);
+                  }}
+                  placeholderText="No date"
+                  />
+              </div>
 
-                  <div className="width-50-p p-l-10">
-                    <div className="row">
-                      <label className="center-hor">To</label>
-                      <button type="button" className="btn-link ml-auto m-r-0" onClick={() => setNewDateTo(moment())}>
-                        NOW
-                      </button>
-                    </div>
-                    <DatePicker
-                      className="form-control"
-                      hideTime={true}
-                      selected={newDateTo}
-                      onChange={(e)=>{
-                        setNewDateTo(e);
-                      }}
-                      placeholderText="No date"
-                      />
-                  </div>
-                </div>
-                <div className="row m-t-15">
-                  <button
-                    type="button"
-                    className="btn-link-reversed"
-                    onClick={() => {
-                      setNewDateFrom(dateFrom);
-                      setNewDateTo(dateTo);
-                      setPopoverOpen(false);
-                    }}
-                    >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="btn ml-auto"
-                    onClick={() => {
-                      setDateFrom(newDateFrom);
-                      setDateTo(newDateTo);
-                      setPopoverOpen(false);
-                    }}
-                    >
-                    Save
+              <div className="width-50-p p-l-10">
+                <div className="row">
+                  <label className="center-hor">To</label>
+                  <button type="button" className="btn-link ml-auto m-r-0" onClick={() => setNewDateTo(moment())}>
+                    NOW
                   </button>
                 </div>
-            </PopoverBody>
-          </Popover>
-      </FormGroup>
+                <DatePicker
+                  className="form-control"
+                  hideTime={true}
+                  selected={newDateTo}
+                  onChange={(e)=>{
+                    setNewDateTo(e);
+                  }}
+                  placeholderText="No date"
+                  />
+              </div>
+            </div>
+            <div className="row m-t-15">
+              <button
+                type="button"
+                className="btn-link-reversed"
+                onClick={() => {
+                  setNewDateFrom(dateFrom);
+                  setNewDateTo(dateTo);
+                  setPopoverOpen(false);
+                }}
+                >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn ml-auto"
+                onClick={() => {
+                  setDateFrom(newDateFrom);
+                  setDateTo(newDateTo);
+                  setPopoverOpen(false);
+                }}
+                >
+                Save
+              </button>
+            </div>
+          </PopoverBody>
+        </Popover>
+      </div>
+    </FormGroup>
   );
 }

@@ -25,3 +25,9 @@ query globalTaskStringFilter {
   globalTaskStringFilter @client
 }
 `;
+
+export const GET_FILTER_OPEN = gql `
+query filterOpen {
+  filterOpen @client
+}
+`;

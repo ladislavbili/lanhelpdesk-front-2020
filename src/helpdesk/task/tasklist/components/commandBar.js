@@ -48,6 +48,7 @@ export default function CommandBar( props ) {
     showSort,
     showPreferences,
     currentUser,
+    isFilter,
   } = props;
   //prop constants
   const displayValues = (
@@ -127,7 +128,7 @@ export default function CommandBar( props ) {
         onClick: () => {
           setMilestone( allMilestones );
           setLocalFilter( getEmptyGeneralFilter() );
-          history.push( '/helpdesk/taskList/i/all' );
+          history.push( `/helpdesk/taskList/i/all` );
         }
       },
       {
@@ -137,7 +138,7 @@ export default function CommandBar( props ) {
         label: localMilestone.title,
         onClick: () => {
           setLocalFilter( getEmptyGeneralFilter() );
-          history.push( '/helpdesk/taskList/i/all' );
+          history.push( `/helpdesk/taskList/i/all` );
         }
       },
       {
@@ -170,16 +171,25 @@ export default function CommandBar( props ) {
     )
   );
 
-
   return (
     <div className="task-list-commandbar m-l-30 m-r-45">
       <div className="breadcrum-bar center-hor">
         <div className="flex-row breadcrumbs">
-          { filteredBreadcrums.map( (breadcrum, index) =>
+          { isFilter &&
+            <h2
+              className="clickable"
+              >
+              { localFilter.id === null ? 'Add filter' : `Filter: ${localFilter.title}` }
+            </h2>
+          }
+          { !isFilter && filteredBreadcrums.map( (breadcrum, index) =>
             <h2
               className="clickable"
               key={index}
-              onClick={breadcrum.onClick}>{`${index !== 0 && breadcrum.label ? '\\' : ''}${breadcrum.label}`}</h2>
+              onClick={breadcrum.onClick}
+              >
+              {`${index !== 0 && breadcrum.label ? '\\' : ''}${breadcrum.label}`}
+            </h2>
           )}
         </div>
       </div>

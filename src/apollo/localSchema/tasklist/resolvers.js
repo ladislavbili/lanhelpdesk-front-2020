@@ -5,6 +5,7 @@ import {
   globalSearchVar,
   localStringFilterVar,
   globalStringFilterVar,
+  filterOpenVar,
 } from './variables';
 
 export const localTaskSearch = () => {
@@ -21,4 +22,8 @@ export const localTaskStringFilter = () => {
 
 export const globalTaskStringFilter = () => {
   return globalStringFilterVar();
+}
+
+export const filterOpen = () => {
+  return filterOpenVar();
 }

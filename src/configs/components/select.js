@@ -83,7 +83,6 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
       if ( blueFont ) {
         newStyle = {
           ...newStyle,
-          backgroundColor: state.isFocused ? 'white' : 'inherit',
           fontFamily: "Segoe UI",
           fontStyle: "normal",
           fontWeight: 350,
@@ -150,7 +149,6 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
       if ( blueFont ) {
         newStyle = {
           ...newStyle,
-          backgroundColor: "#F2F1F1",
           color: "#0078D4",
         };
       }
@@ -260,7 +258,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
         backgroundColor: "white",
         borderRadius: 0
       }
-      if ( invisible || colored || blueFont || segoe ) {
+      if ( invisible || colored || segoe ) {
         newStyle = {
           ...newStyle,
           backgroundColor: "inherit",
@@ -391,8 +389,6 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
       if ( blueFont ) {
         newStyle = {
           ...newStyle,
-          backgroundColor: "#F2F1F1",
-          borderRadius: 0,
           color: "#0078D4",
         }
       }

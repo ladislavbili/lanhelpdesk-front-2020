@@ -79,6 +79,7 @@ import {
   GET_PROJECT,
   GET_MILESTONE,
   GET_LOCAL_CALENDAR_USER_ID,
+  GET_FILTER_OPEN,
 } from 'apollo/localSchema/queries';
 
 import {
@@ -86,6 +87,7 @@ import {
   setProject,
   setMilestone,
   setCalendarUserId,
+  setFilterOpen,
 } from 'apollo/localSchema/actions';
 import folderIcon from 'scss/icons/folder.svg';
 import filterIcon from 'scss/icons/filter.svg';
@@ -136,6 +138,10 @@ export default function TasksSidebar( props ) {
   } = useQuery( GET_LOCAL_CALENDAR_USER_ID );
 
   const {
+    data: filterOpenData,
+  } = useQuery( GET_FILTER_OPEN );
+
+  const {
     data: milestoneData,
     loading: milestoneLoading
   } = useQuery( GET_MILESTONE );
@@ -162,14 +168,11 @@ export default function TasksSidebar( props ) {
   const [ showFilters, setShowFilters ] = React.useState( true );
   const [ showCalendarUsers, setShowCalendarUsers ] = React.useState( true );
   const [ showMilestones, setShowMilestones ] = React.useState( true );
-  const [ showFilterAdd, setShowFilterAdd ] = React.useState( false );
   const [ openProjectAdd, setOpenProjectAdd ] = React.useState( false );
   const [ openMilestoneAdd, setOpenMilestoneAdd ] = React.useState( false );
   const [ openCompanyAdd, setOpenCompanyAdd ] = React.useState( false );
   const [ openUserAdd, setOpenUserAdd ] = React.useState( false );
   const [ activeTab, setActiveTab ] = React.useState( 0 );
-
-  const [ popoverOpen, setPopoverOpen ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
@@ -197,6 +200,7 @@ export default function TasksSidebar( props ) {
 
   const currentUser = getMyData();
   const localProject = projectData.localProject;
+  const filterOpen = filterOpenData.filterOpen;
 
   const getApplicableFilters = () => {
     if ( myFiltersLoading || projectLoading ) {
@@ -244,11 +248,6 @@ export default function TasksSidebar( props ) {
 
   if ( dataLoading ) {
     return ( <Loading /> )
-  }
-
-
-  const togglePopover = () => {
-    setPopoverOpen( !popoverOpen );
   }
 
   //Constants
@@ -655,7 +654,7 @@ export default function TasksSidebar( props ) {
               <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === parseInt(match.params.filterID) })}
                 onClick={() => {
                   if (filter.id === parseInt(match.params.filterID)) {
-                    setShowFilterAdd(true);
+                    setFilterOpen(true);
                   }
                 }}
                 >
@@ -724,8 +723,8 @@ export default function TasksSidebar( props ) {
       <button
         className='btn-link p-l-15'
         onClick={() => {
-          setFilter( getEmptyGeneralFilter() );
-          setShowFilterAdd(true);
+          history.push('/helpdesk/taskList/i/all');
+          setFilterOpen(true);
         }}
         >
         <i className="fa fa-plus"/>
@@ -759,7 +758,7 @@ export default function TasksSidebar( props ) {
         <Filter
           history={history}
           close={ () => {
-            setShowFilterAdd(false);
+            setFilterOpen(false);
           }}
           />
       </div>
@@ -768,8 +767,8 @@ export default function TasksSidebar( props ) {
   const renderFilterContainer = () => {
     return (
       <div className="popover"  style={{top: 'calc( 0.5em + ( 4.5em * 3 ) )'}}>
-        { showFilterAdd && ( myRights.customFilters || myRights.publicFilters ) && renderFilterAdd() }
-        { !showFilterAdd && renderFilters(true) }
+        { filterOpen && ( myRights.customFilters || myRights.publicFilters ) && renderFilterAdd() }
+        { !filterOpen && renderFilters(true) }
       </div>
     )
   }
@@ -837,7 +836,7 @@ export default function TasksSidebar( props ) {
               className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/users' ) }) }
               onClick={() => history.push(`/helpdesk/users`)}
               >
-              <i class="fas fa-users m-r-1 m-t-3" />
+              <i className="fas fa-users m-r-1 m-t-3" />
               Users
             </span>
           </NavItem>
@@ -848,7 +847,7 @@ export default function TasksSidebar( props ) {
               className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/companies' ) }) }
               onClick={() => history.push(`/helpdesk/companies`)}
               >
-              <i class="far fa-building m-r-5 m-t-3" />
+              <i className="far fa-building m-r-5 m-t-3" />
               Companies
             </span>
           </NavItem>
@@ -862,7 +861,7 @@ export default function TasksSidebar( props ) {
               className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/reports' ) }) }
               onClick={() => history.push(`/reports`)}
               >
-              <i class="far fa-file-alt m-r-5 m-t-3" />
+              <i className="far fa-file-alt m-r-5 m-t-3" />
               Výkazy
             </span>
           </NavItem>
@@ -889,7 +888,7 @@ export default function TasksSidebar( props ) {
         { renderTaskAddBtn() }
 
         <hr className = "m-l-15 m-r-15 m-t-15" />
-        { !showFilterAdd &&
+        { !filterOpen &&
           <Empty>
             { renderProjects() }
 
@@ -907,11 +906,11 @@ export default function TasksSidebar( props ) {
           </Empty>
         }
 
-        { showFilterAdd && ( myRights.customFilters || myRights.publicFilters ) && renderFilterAdd() }
+        { filterOpen && ( myRights.customFilters || myRights.publicFilters ) && renderFilterAdd() }
 
-        { ( showFilterAdd || canSeeSettings || myRights.vykazy ) && <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" /> }
+        { ( filterOpen || canSeeSettings || myRights.vykazy ) && <hr className = "m-l-15 m-r-15 m-t-11 m-b-11" /> }
 
-        { !showFilterAdd && ( canSeeSettings || myRights.vykazy ) &&
+        { !filterOpen && ( canSeeSettings || myRights.vykazy ) &&
           renderSettings(canSeeSettings)
         }
       </div>

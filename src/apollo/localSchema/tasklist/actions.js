@@ -3,6 +3,7 @@ import {
   globalSearchVar,
   localStringFilterVar,
   globalStringFilterVar,
+  filterOpenVar,
 } from './variables';
 import {
   getDayRange,
@@ -56,4 +57,8 @@ export function setGlobalTaskStringFilter() {
     overtime: localSearch.overtime,
     pausal: localSearch.pausal,
   } );
+}
+
+export function setFilterOpen( newValue ) {
+  filterOpenVar( newValue );
 }
