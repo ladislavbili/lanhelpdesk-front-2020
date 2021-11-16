@@ -634,7 +634,7 @@ export default function TaskAdd( props ) {
   }
 
   const layoutComponents = {
-    Project: () => (
+    Project: (
       <Select
         placeholder="Zadajte projekt"
         value={project}
@@ -650,6 +650,16 @@ export default function TaskAdd( props ) {
     ),
     Assigned: (
       <div>
+        { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit ) &&
+          <div>
+            { assignedTo.map((user) => (
+              <div className="disabled-info" key={user.id}>{user.label}</div>
+            ))}
+            { assignedTo.length === 0 &&
+              <div className="message error-message">Úloha nepriradená</div>
+            }
+          </div>
+        }
         { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.add &&
           <Select
             placeholder="Select reccomended"
@@ -666,6 +676,14 @@ export default function TaskAdd( props ) {
     ),
     Status: (
       <div>
+        { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit ) &&
+          <div
+            className={`disabled-info`}
+            style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }
+            >
+            {status ? status.label : "None"}
+          </div>
+        }
         { !projectAttributes.status.fixed && userRights.attributeRights.status.add &&
           <Select
             placeholder="Select required"
@@ -689,18 +707,28 @@ export default function TaskAdd( props ) {
       </div>
     ),
     Type: (
-      <Select
-        placeholder="Zadajte typ"
-        value={taskType}
-        styles={ pickSelectStyleWithRequired([ 'noArrow'], ['required'], userRights.attributeRights.taskType.required ) }
-        onChange={(taskType)=> {
-          setTaskType(taskType);
-        }}
-        options={taskTypes}
-        />
+      <div>
+        { (projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit ) &&
+          <div className="disabled-info">{taskType ? taskType.label : "None"}</div>
+        }
+        { !projectAttributes.taskType.fixed && userRights.attributeRights.taskType.edit &&
+          <Select
+            placeholder="Zadajte typ"
+            value={taskType}
+            styles={ pickSelectStyleWithRequired([ 'noArrow'], ['required'], userRights.attributeRights.taskType.required ) }
+            onChange={(taskType)=> {
+              setTaskType(taskType);
+            }}
+            options={taskTypes}
+            />
+        }
+      </div>
     ),
     Requester: (
       <div>
+        { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit ) &&
+          <div className="disabled-info">{requester ? requester.label : "None"}</div>
+        }
         { !projectAttributes.requester.fixed && userRights.attributeRights.requester.add &&
           <Select
             value={requester}
@@ -708,7 +736,7 @@ export default function TaskAdd( props ) {
             onChange={(requester)=>{
               setRequester(requester);
               if(userRights.attributeRights.company.add && !projectAttributes.company.fixed){
-                const newCompany = companies.find((company) => company.id === requester.id );
+                const newCompany = companies.find((company) => company.id === requester.company.id );
                 setCompany(newCompany);
               }
             }}
@@ -720,6 +748,9 @@ export default function TaskAdd( props ) {
     ),
     Company: (
       <div>
+        { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit ) &&
+          <div className="disabled-info">{company ? company.label : "None"}</div>
+        }
         { !projectAttributes.company.fixed && userRights.attributeRights.company.add &&
           <Select
             value={company}
@@ -736,6 +767,9 @@ export default function TaskAdd( props ) {
     ),
     StartsAt: (
       <div>
+        { (projectAttributes.startsAt.fixed || !userRights.attributeRights.startsAt.edit ) &&
+          <div className="disabled-info">{startsAt}</div>
+        }
         { !projectAttributes.startsAt.fixed && userRights.attributeRights.startsAt.add &&
           <DatePicker
             className={pickDatepickerStyles(startsAt, userRights.attributeRights.startsAt.required )}
@@ -752,6 +786,9 @@ export default function TaskAdd( props ) {
     ),
     Deadline: (
       <div>
+        { (projectAttributes.deadline.fixed || !userRights.attributeRights.deadline.edit ) &&
+          <div className="disabled-info">{deadline}</div>
+        }
         { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.add &&
           <DatePicker
             className={pickDatepickerStyles(deadline, userRights.attributeRights.deadline.required )}
@@ -766,6 +803,9 @@ export default function TaskAdd( props ) {
     ),
     Pausal: (
       <div>
+        { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed ) &&
+          <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
+        }
         { userRights.attributeRights.pausal.add && company && company.monthly && !projectAttributes.pausal.fixed &&
           <Select
             value={pausal}
@@ -779,6 +819,9 @@ export default function TaskAdd( props ) {
     ),
     Overtime: (
       <div>
+        { (projectAttributes.overtime.fixed || !userRights.attributeRights.overtime.edit ) &&
+          <div className="disabled-info">{overtime.label}</div>
+        }
         { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.add &&
           <Select
             placeholder="Select required"
@@ -801,7 +844,7 @@ export default function TaskAdd( props ) {
               <div className="row p-r-10">
                 <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
                 <div className="col-9">
-                  { layoutComponents.Project() }
+                  { layoutComponents.Project }
                 </div>
               </div>
             </div>
@@ -921,7 +964,7 @@ export default function TaskAdd( props ) {
       <div className="col-12 row task-edit-align-select-labels">
         <div className="col-2">
           <Label className="col-form-label">Projekt</Label>
-          { layoutComponents.Project() }
+          { layoutComponents.Project }
         </div>
         { userRights.attributeRights.status.add &&
           <div className="col-2" >
@@ -951,7 +994,7 @@ export default function TaskAdd( props ) {
         <div className="form-selects-entry-column" >
           <Label>Project <span className="warning-big">*</span></Label>
           <div className="form-selects-entry-column-rest" >
-            { layoutComponents.Project(true) }
+            { layoutComponents.Project }
           </div>
         </div>
         { userRights.attributeRights.status.add &&

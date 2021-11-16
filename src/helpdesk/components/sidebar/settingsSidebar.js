@@ -42,7 +42,7 @@ export default function SettingsSidebar( props ) {
 				{settings.filter((setting) => accessRights[setting.value]).map((setting)=>
 					<NavItem key={setting.link}>
 						<Link className={classnames("sidebar-menu-item" , {"active" : location.pathname.includes(setting.link)})}
-							to={{ pathname:'/helpdesk/settings/'+setting.link }}>{setting.title}</Link>
+							to={{ pathname:`/helpdesk/settings/${setting.link}/list` }}>{setting.title}</Link>
 					</NavItem>
 				)}
 			</Nav>

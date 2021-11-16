@@ -853,9 +853,10 @@ export default function TaskEdit( props ) {
     Assigned: (
       <div>
         { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit || invoiced) &&
-          <div> {assignedTo.map((user) =>
+          <div>
+            {assignedTo.map((user) => (
               <div className="disabled-info" key={user.id}>{user.label}</div>
-            )}
+            ))}
             { assignedTo.length === 0 &&
               <div className="message error-message">Úloha nepriradená</div>
             }
@@ -886,7 +887,12 @@ export default function TaskEdit( props ) {
     Status: (
       <div>
         { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit || invoiced) &&
-          <div className={`disabled-info`} style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }>{status ? status.label : "None"}</div>
+          <div
+            className={`disabled-info`}
+            style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }
+            >
+            {status ? status.label : "None"}
+          </div>
         }
         { !projectAttributes.status.fixed && userRights.attributeRights.status.edit && !invoiced &&
           <Select
@@ -951,24 +957,6 @@ export default function TaskEdit( props ) {
         }
       </div>
     ),
-    Pausal: (
-      <div>
-        { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed || invoiced ) &&
-          <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
-        }
-        { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed && !invoiced &&
-          <Select
-            value={ pausal }
-            styles={pickSelectStyle([ 'noArrow', 'required', ]) }
-            onChange={(pausal)=> {
-              autoUpdateTask({ pausal: pausal.value })
-              setPausal(pausal);
-            }}
-            options={booleanSelects}
-            />
-        }
-      </div>
-    ),
     StartsAt: (
       <div>
         { (projectAttributes.startsAt.fixed || !userRights.attributeRights.startsAt.edit || invoiced) &&
@@ -1005,6 +993,24 @@ export default function TaskEdit( props ) {
               autoUpdateTask({ deadline: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
             }}
             placeholderText="No deadline"
+            />
+        }
+      </div>
+    ),
+    Pausal: (
+      <div>
+        { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed || invoiced ) &&
+          <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
+        }
+        { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed && !invoiced &&
+          <Select
+            value={ pausal }
+            styles={pickSelectStyle([ 'noArrow', 'required', ]) }
+            onChange={(pausal)=> {
+              autoUpdateTask({ pausal: pausal.value })
+              setPausal(pausal);
+            }}
+            options={booleanSelects}
             />
         }
       </div>

@@ -220,9 +220,10 @@ export default function PublicFilterEdit( props ) {
       return;
     }
     let filter = publicFilterData.filter;
-    setRoles( filter.roles ? toSelArr( filter.roles ) : [] );
-    setTitle( filter.title )
+    setTitle( filter.title );
+    setOrder( filter.order );
 
+    setRoles( filter.roles ? toSelArr( filter.roles ) : [] );
     filter = filter.filter;
 
     setCompanies( [
