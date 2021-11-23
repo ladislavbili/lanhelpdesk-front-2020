@@ -102,7 +102,6 @@ export default function TasksLoader( props ) {
       !currentUser ||
       realLayout > 3 ||
       realLayout < 1 ||
-      !testing ||
       ( //DnD
         realLayout === 2 &&
         (

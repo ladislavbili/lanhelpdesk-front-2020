@@ -54,6 +54,7 @@ export default function DnDStatusColumn( props ) {
       page,
       limit: limit,
       statuses: [ status.id ],
+      invoiced: false,
     },
     notifyOnNetworkStatusChange: true,
   } );

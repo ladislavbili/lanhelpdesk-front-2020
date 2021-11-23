@@ -735,6 +735,7 @@ export default function TaskEdit( props ) {
             placeholder="Enter task name"
             />
         </span>
+        { invoiced && inModal && <div className="inline-warning-message center-hor">Úloha vykázaná</div> }
       </div>
     );
   }

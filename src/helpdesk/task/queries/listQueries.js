@@ -28,16 +28,6 @@ tasks {
   rights {
     ${groupRights}
   }
-  metadata {
-    subtasksApproved
-    subtasksPending
-    tripsApproved
-    tripsPending
-    materialsApproved
-    materialsPending
-    itemsApproved
-    itemsPending
-  }
   assignedTo {
     id
     fullName
@@ -62,15 +52,6 @@ tasks {
     order
     startsAt
     endsAt
-  }
-  subtasks{
-    id
-    done
-    title
-    quantity
-    assignedTo{
-      fullName
-    }
   }
   pendingDate
   project{
@@ -108,12 +89,6 @@ tasks {
   materialsPrice
   approvedMaterialsPrice
   pendingMaterialsPrice
-}
-totals{
-  approvedSubtasks
-  pendingSubtasks
-  approvedMaterials
-  pendingMaterials
 }
 count
 execTime
@@ -181,6 +156,7 @@ query tasks(
   $limit: Int
   $page: Int
   $statuses: [Int]
+  $invoiced: Boolean
 ){
   tasks (
     milestoneId: $milestoneId
@@ -193,6 +169,7 @@ query tasks(
     limit: $limit
     page: $page
     statuses: $statuses
+    invoiced: $invoiced
   ){
     ${listTasks}
   }
