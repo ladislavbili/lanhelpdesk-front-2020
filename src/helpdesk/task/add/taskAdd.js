@@ -490,6 +490,8 @@ export default function TaskAdd( props ) {
                   } )
                 }
                 setSaving( false );
+                closeModal();
+                return;
                 switch ( actionAfterAdd.action ) {
                   case 'open_new_task': {
                     closeModal();
@@ -523,6 +525,8 @@ export default function TaskAdd( props ) {
             } );
         } else {
           setSaving( false );
+          closeModal();
+          return;
           switch ( actionAfterAdd.action ) {
             case 'open_new_task': {
               closeModal();
@@ -610,12 +614,10 @@ export default function TaskAdd( props ) {
           </div>
           { status && userRights.attributeRights.status.add &&
             (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) &&
-            <div className="task-info-add ml-auto center-hor">
-              <span className="">
-                {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Close date: " : "PendingDate: "}
-              </span>
+            <div className="task-info ml-auto">
+                {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Closed at: " : "Pending date: "}
               <DatePicker
-                className="form-control hidden-input bolder"
+                className="form-control hidden-input bolder p-0 text-right width-95"
                 selected={(status.action==='CloseDate' || status.action==='CloseInvalid') ? closeDate : pendingDate }
                 onChange={date => {
                   if (status.action==='CloseDate' || status.action==='CloseInvalid'){

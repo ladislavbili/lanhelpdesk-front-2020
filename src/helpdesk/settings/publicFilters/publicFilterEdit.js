@@ -446,6 +446,26 @@ export default function PublicFilterEdit( props ) {
           />
       </FormGroup>
 
+      <FormGroup>
+        <label>Project</label>
+        <Select
+          id="filter-project"
+          options={[]}
+          value={{ label: 'Global (shown in every project)', id: 'Global (shown in every project)' }}
+          isDisabled={true}
+          styles={pickSelectStyle()}
+          />
+      </FormGroup>
+
+      <Checkbox
+        blocked={true}
+        label="Public"
+        />
+      <Checkbox
+        blocked={true}
+        label="Dashboard"
+        />
+
       <Label className="m-t-15">Filter attributes</Label>
       <hr className="m-t-5 m-b-10"/>
 

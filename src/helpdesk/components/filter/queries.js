@@ -73,6 +73,7 @@ query {
   myFilters {
     title
     id
+    order
     createdAt
     updatedAt
     id

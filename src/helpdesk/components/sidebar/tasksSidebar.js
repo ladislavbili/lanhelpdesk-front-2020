@@ -49,6 +49,7 @@ import {
   sortBy,
   filterUnique,
   getMyData,
+  splitArrayByFilter,
 } from 'helperFunctions';
 
 import {
@@ -206,11 +207,27 @@ export default function TasksSidebar( props ) {
     if ( myFiltersLoading || projectLoading ) {
       return [];
     }
+    let [ publicFilters, customFilters ] = splitArrayByFilter( myFiltersData.myFilters, ( filter ) => filter.pub );
+    publicFilters = sortBy( publicFilters, [ {
+      key: 'order',
+      asc: true
+    } ] );
+    customFilters = sortBy( customFilters, [ {
+      key: 'title',
+      asc: true
+    } ] );
+
     if ( localProject.id === null ) {
-      return myFiltersData.myFilters.filter( ( myFilter ) => myFilter.dashboard );
+      return [
+        ...publicFilters,
+        ...customFilters,
+      ]
     }
     if ( localProject.id ) {
-      return myFiltersData.myFilters.filter( ( myFilter ) => myFilter.global || ( myFilter.project && myFilter.project.id === localProject.id ) );
+      return [
+        ...publicFilters.filter( ( myFilter ) => myFilter.global || ( myFilter.project && myFilter.project.id === localProject.id ) ),
+        ...customFilters.filter( ( myFilter ) => myFilter.global || ( myFilter.project && myFilter.project.id === localProject.id ) ),
+      ]
     }
     return [];
   }
@@ -634,14 +651,6 @@ export default function TasksSidebar( props ) {
   const renderFiltersList = () => {
     return (
       <Nav vertical>
-        <NavItem key='all' className={classnames("row full-width sidebar-item", { "active": 'all' === match.params.filterID }) }>
-          <span
-            className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
-            onClick={() => history.push(`/helpdesk/taskList/i/all`)}
-            >
-            All tasks
-          </span>
-        </NavItem>
         { getApplicableFilters().map((filter) => (
           <NavItem key={filter.id} className={classnames("row full-width sidebar-item", { "active": filter.id === parseInt(match.params.filterID) }) }>
             <span
@@ -673,6 +682,14 @@ export default function TasksSidebar( props ) {
             </span>
           </NavItem>
         )) }
+        <NavItem key='all' className={classnames("row full-width sidebar-item", { "active": 'all' === match.params.filterID }) }>
+          <span
+            className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
+            onClick={() => history.push(`/helpdesk/taskList/i/all`)}
+            >
+            All tasks
+          </span>
+        </NavItem>
         <NavItem key='repeats' className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/helpdesk/repeats' ) }) }>
           <span
             className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/repeats' ) }) }

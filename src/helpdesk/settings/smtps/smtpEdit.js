@@ -245,7 +245,6 @@ export default function SMTPEdit( props ) {
     )
   );
 
-
   if ( smtpLoading ) {
     return <Loading />
   }
@@ -431,7 +430,7 @@ export default function SMTPEdit( props ) {
 
         <button
           className="btn"
-          disabled={cannotSave}
+          disabled={cannotSave()}
           onClick={updateSMTPFunc}
           >
           { saving ? 'Saving SMTP...' : 'Save SMTP' }

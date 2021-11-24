@@ -38,11 +38,6 @@ tasks {
     title
     dph
   }
-  createdBy {
-    id
-    name
-    surname
-  }
   startsAt
   deadline
   description

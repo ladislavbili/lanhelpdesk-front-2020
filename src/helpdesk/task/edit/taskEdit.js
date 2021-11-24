@@ -770,9 +770,7 @@ export default function TaskEdit( props ) {
       const datepickerDisabled = !userRights.attributeRights.status.edit || !pendingChangable || invoiced;
       return (
         <div className="task-info ml-auto">
-          <span className="center-hor">
             Pending date:
-          </span>
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
@@ -781,7 +779,7 @@ export default function TaskEdit( props ) {
             ):
             (
               <DatePicker
-                className="form-control hidden-input bolder"
+                className="form-control hidden-input bolder p-0 text-right width-95"
                 selected={pendingDate}
                 disabled={datepickerDisabled}
                 onChange={ (date) => {
@@ -1509,7 +1507,7 @@ export default function TaskEdit( props ) {
           currentUser={currentUser}
           company={company}
           showTotals={true}
-          showColumns={ [ 'done', 'title', 'scheduled', 'quantity', 'assigned', 'approved', 'actions' ] }
+          showColumns={ [ 'done', 'title', 'quantity', 'assigned', 'approved', 'actions' ] }
           showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
           autoApproved={project ? project.project.autoApproved : false}
           canAddSubtasksAndTrips={assignedTo.length !== 0}

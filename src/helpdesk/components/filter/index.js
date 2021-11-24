@@ -457,7 +457,7 @@ export default function FilterForm( props ) {
   if ( dataLoading ) {
     return <Loading />
   }
-  const users = toSelArr( usersData.basicUsers, 'email' );
+  const users = toSelArr( usersData.basicUsers, 'fullName' );
   const allCompanies = toSelArr( companiesData.basicCompanies );
   const allTaskTypes = toSelArr( taskTypesData.taskTypes );
 
@@ -610,7 +610,7 @@ export default function FilterForm( props ) {
           <label>Rieši</label>
           <div className="flex">
             <Select
-              options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(users, 'email'))}
+              options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(users, 'fullName'))}
               isMulti
               onChange={(newValues)=> {
                 setAssignedTos(newValues);
