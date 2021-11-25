@@ -119,7 +119,6 @@ export default function TaskAdd( props ) {
   const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
 
   const [ saving, setSaving ] = React.useState( false );
-  const [ actionAfterAdd, setActionAfterAdd ] = React.useState( actionsAfterAdd.find( ( action ) => action.action === 'open_tasklist' ) );
   const [ showLocalCreationError, setShowLocalCreationError ] = React.useState( false );
 
   const projectUsers = users.filter( ( user ) => project && project.users.some( ( userData ) => userData.user.id === user.id ) );
@@ -187,10 +186,6 @@ export default function TaskAdd( props ) {
   React.useEffect( () => {
     setDefaults( project );
   }, [ project.id ] );
-
-  React.useEffect( () => {
-    setActionAfterAdd( actionsAfterAdd.find( ( action ) => action.id === afterTaskCreate ) );
-  }, [ afterTaskCreate ] );
 
   React.useEffect( () => {
     if ( project ) {
@@ -492,29 +487,6 @@ export default function TaskAdd( props ) {
                 setSaving( false );
                 closeModal();
                 return;
-                switch ( actionAfterAdd.action ) {
-                  case 'open_new_task': {
-                    closeModal();
-                    history.push( `${link}/${response.data.addTask.id}` )
-                    break;
-                  }
-                  case 'open_tasklist': {
-                    const myProject = myProjects.find( ( myProject ) => myProject.project.id === project.id );
-                    setLocalProject( {
-                      ...myProject,
-                      id: myProject.project.id,
-                      value: myProject.project.id,
-                      title: myProject.project.title,
-                      label: myProject.project.title,
-                    } );
-                    closeModal();
-                    history.push( `${link}` );
-                    break;
-                  }
-                  default: {
-                    break;
-                  }
-                }
               } else {
                 setSaving( false );
               }
@@ -527,29 +499,6 @@ export default function TaskAdd( props ) {
           setSaving( false );
           closeModal();
           return;
-          switch ( actionAfterAdd.action ) {
-            case 'open_new_task': {
-              closeModal();
-              history.push( `${link}` );
-              break;
-            }
-            case 'open_tasklist': {
-              const myProject = myProjects.find( ( myProject ) => myProject.project.id === project.id );
-              setLocalProject( {
-                ...myProject,
-                id: myProject.project.id,
-                value: myProject.project.id,
-                title: myProject.project.title,
-                label: myProject.project.title,
-              } );
-              closeModal();
-              history.push( `${link}` );
-              break;
-            }
-            default: {
-              break;
-            }
-          }
         }
 
       } )
@@ -1368,9 +1317,6 @@ export default function TaskAdd( props ) {
                 setShowLocalCreationError(true);
               } else {
                 addTaskFunc();
-              }
-              if(actionAfterAdd.id !== afterTaskCreate){
-                setAfterTaskCreate({variables: {afterTaskCreate: actionAfterAdd.id}});
               }
             }}
             > Create task

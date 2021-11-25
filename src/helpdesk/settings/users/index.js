@@ -164,7 +164,7 @@ export default function UserListContainer( props ) {
           </tr>
         </thead>
         <tbody>
-          { users.filter( (item) => item.email.toLowerCase().includes( userFilter.toLowerCase() ) )
+          { users.filter( (item) => item.email.toLowerCase().includes( userFilter.toLowerCase() ) || item.fullName.toLowerCase().includes( userFilter.toLowerCase() ) )
             .sort( ( user1, user2 ) => user1.email > user2.email ? 1 : -1 )
             .map( (user) => (
               <tr

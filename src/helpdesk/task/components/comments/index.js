@@ -217,6 +217,11 @@ export default function Comments( props ) {
                     },
                     setSaving,
                     () => {
+                      setAttachments( [] );
+                      setEmailBody( '' );
+                      setNewComment( '' );
+                      setSubject( '' );
+                      setTos( [] );
                     }
                   )
                 }else{
@@ -230,15 +235,14 @@ export default function Comments( props ) {
                     },
                     setSaving,
                     () => {
+                      setAttachments( [] );
+                      setEmailBody( '' );
+                      setNewComment( '' );
+                      setSubject( '' );
+                      setTos( [] );
                     }
                   );
                 }
-                setSaving(true);
-                setAttachments( [] );
-                setEmailBody( '' );
-                setNewComment( '' );
-                setSubject( '' );
-                setTos( [] );
               }}
               >
               {`Add ${ isEmail ? 'e-mail' : 'comment'}`}
@@ -285,8 +289,10 @@ export default function Comments( props ) {
                 />
             </div>
             { attachments.map((attachment,index) =>
-              <div className="comment-attachment"
+              <div
+                className="comment-attachment"
                 style={{    height: "25px", marginTop: "7px", marginRight:"5px"}}
+                key={index}
                 >
                 <span style={{color: "#0078D4"}}>
                   {`${attachment.name} (${Math.round(parseInt(attachment.size)/1024)}kB)`}

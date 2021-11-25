@@ -611,7 +611,14 @@ export default function TaskEditContainer( props ) {
         }
       } )
       .then( ( response ) => {
-        onFinish();
+        if ( response.data.ok ) {
+          onFinish();
+        } else {
+          addLocalError( {
+            message: response.data.error,
+            name: 'Task e-mail error',
+          } );
+        }
         setSaving( false );
       } )
       .catch( ( err ) => {
@@ -637,14 +644,21 @@ export default function TaskEditContainer( props ) {
     formData.append( "message", emailBody );
     formData.append( "subject", subject );
     formData.append( "fromInvoice", fromInvoice );
-    tos.forEach( ( to ) => formData.append( `tos`, to.email ) );
+    tos.forEach( ( to ) => formData.append( `tos`, to.__isNew__ ? to.value : to.email ) );
     axios.post( `${REST_URL}/send-email`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       } )
       .then( ( response ) => {
-        onFinish();
+        if ( response.data.ok ) {
+          onFinish();
+        } else {
+          addLocalError( {
+            message: response.data.error,
+            name: 'Task e-mail error',
+          } );
+        }
         setSaving( false );
       } )
       .catch( ( err ) => {
