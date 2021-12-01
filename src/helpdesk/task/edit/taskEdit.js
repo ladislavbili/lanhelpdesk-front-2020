@@ -655,7 +655,7 @@ export default function TaskEdit( props ) {
         { project && canCopy &&
           <TaskAdd
             projectID={project.id}
-            task={task}
+            duplicateTask={getTaskData()}
             disabled={!canCopy}
             />
         }

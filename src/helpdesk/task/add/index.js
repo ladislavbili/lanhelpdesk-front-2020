@@ -256,7 +256,7 @@ export default function TaskAddContainer( props ) {
     )
   }
 
-  if ( props.task ) {
+  if ( props.duplicateTask ) {
     return (
       <Empty>
         {renderCopyButton()}
@@ -267,7 +267,7 @@ export default function TaskAddContainer( props ) {
   return (
     <div className="display-inline">
       {
-        !props.task &&
+        !props.duplicateTask &&
         renderAddTaskButton()
       }
 

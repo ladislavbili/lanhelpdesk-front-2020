@@ -78,7 +78,49 @@ export default function TaskAdd( props ) {
     addTask,
     setTaskLayout,
     setAfterTaskCreate,
+    duplicateTask,
   } = props;
+
+  const getDuplicateTaskAttribute = ( key, defValue ) => {
+    if ( duplicateTask ) {
+      if (
+        [
+          'assignedTo',
+          'closeDate',
+          'deadline',
+          'startsAt',
+          'description',
+          'important',
+          'overtime',
+          'pausal',
+          'pendingChangable',
+          'pendingDate',
+          'status',
+          'tags',
+          'taskType',
+          'company',
+          'milestone',
+          'requester',
+          'title',
+        ].includes( key )
+      ) {
+        return duplicateTask[ key ];
+      } else if ( key === 'project' ) {
+        return projects.find( ( project ) => duplicateTask.project.project.id === project.id );
+      } else if ( [
+        'shortSubtasks',
+        'subtasks',
+        'workTrips',
+        'materials',
+      ].includes( key ) ) {
+        return duplicateTask[ key ].map( ( item ) => ( {
+          ...item,
+          id: fakeID--
+        } ) );
+      }
+    }
+    return defValue;
+  }
 
   const afterTaskCreate = currentUser.afterTaskCreate;
   const currentUserIfInProject = ( project ) => {
@@ -90,33 +132,33 @@ export default function TaskAdd( props ) {
 
   const initialAssignableUsers = users.filter( ( user ) => initialProject && initialProject.users.some( ( userData ) => userData.assignable && userData.user.id === user.id ) );
   //state
-  const [ project, setProject ] = React.useState( initialProject );
+  const [ title, setTitle ] = React.useState( getDuplicateTaskAttribute( 'title', "" ) );
+  const [ project, setProject ] = React.useState( getDuplicateTaskAttribute( 'project', initialProject ) );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
 
   const [ attachments, setAttachments ] = React.useState( [] );
-  const [ assignedTo, setAssignedTo ] = React.useState( initialAssignableUsers.filter( ( user ) => user.id === currentUser.id ) );
-  const [ closeDate, setCloseDate ] = React.useState( null );
-  const [ company, setCompany ] = React.useState( null );
-  const [ deadline, setDeadline ] = React.useState( null );
-  const [ startsAt, setStartsAt ] = React.useState( null );
-  const [ description, setDescription ] = React.useState( "" );
+  const [ assignedTo, setAssignedTo ] = React.useState( getDuplicateTaskAttribute( 'assignedTo', initialAssignableUsers.filter( ( user ) => user.id === currentUser.id ) ) );
+  const [ closeDate, setCloseDate ] = React.useState( getDuplicateTaskAttribute( 'closeDate', null ) );
+  const [ company, setCompany ] = React.useState( getDuplicateTaskAttribute( 'company', null ) );
+  const [ deadline, setDeadline ] = React.useState( getDuplicateTaskAttribute( 'deadline', null ) );
+  const [ startsAt, setStartsAt ] = React.useState( getDuplicateTaskAttribute( 'startsAt', null ) );
+  const [ description, setDescription ] = React.useState( getDuplicateTaskAttribute( 'description', "" ) );
   const [ descriptionVisible, setDescriptionVisible ] = React.useState( false );
-  const [ milestone, setMilestone ] = React.useState( [ noMilestone ] );
-  const [ overtime, setOvertime ] = React.useState( booleanSelects[ 0 ] );
-  const [ pausal, setPausal ] = React.useState( booleanSelects[ 0 ] );
-  const [ pendingDate, setPendingDate ] = React.useState( null );
-  const [ pendingChangable, setPendingChangable ] = React.useState( false );
-  const [ important, setImportant ] = React.useState( false );
+  const [ milestone, setMilestone ] = React.useState( getDuplicateTaskAttribute( 'description', noMilestone ) );
+  const [ overtime, setOvertime ] = React.useState( getDuplicateTaskAttribute( 'overtime', booleanSelects[ 0 ] ) );
+  const [ pausal, setPausal ] = React.useState( getDuplicateTaskAttribute( 'pausal', booleanSelects[ 0 ] ) );
+  const [ pendingDate, setPendingDate ] = React.useState( getDuplicateTaskAttribute( 'pendingDate', null ) );
+  const [ pendingChangable, setPendingChangable ] = React.useState( getDuplicateTaskAttribute( 'pendingChangable', false ) );
+  const [ important, setImportant ] = React.useState( getDuplicateTaskAttribute( 'important', false ) );
   const [ repeat, setRepeat ] = React.useState( null );
-  const [ requester, setRequester ] = React.useState( currentUserIfInProject( project ) );
-  const [ status, setStatus ] = React.useState( null );
-  const [ subtasks, setSubtasks ] = React.useState( [] );
-  const [ tags, setTags ] = React.useState( [] );
-  const [ materials, setMaterials ] = React.useState( [] );
-  const [ taskType, setTaskType ] = React.useState( null );
-  const [ title, setTitle ] = React.useState( "" );
-  const [ workTrips, setWorkTrips ] = React.useState( [] );
-  const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
+  const [ requester, setRequester ] = React.useState( getDuplicateTaskAttribute( 'requester', currentUserIfInProject( project ) ) );
+  const [ status, setStatus ] = React.useState( getDuplicateTaskAttribute( 'status', null ) );
+  const [ tags, setTags ] = React.useState( getDuplicateTaskAttribute( 'tags', [] ) );
+  const [ taskType, setTaskType ] = React.useState( getDuplicateTaskAttribute( 'taskType', null ) );
+  const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( getDuplicateTaskAttribute( 'shortSubtasks', [] ) );
+  const [ subtasks, setSubtasks ] = React.useState( getDuplicateTaskAttribute( 'subtasks', [] ) );
+  const [ workTrips, setWorkTrips ] = React.useState( getDuplicateTaskAttribute( 'workTrips', [] ) );
+  const [ materials, setMaterials ] = React.useState( getDuplicateTaskAttribute( 'materials', [] ) );
 
   const [ saving, setSaving ] = React.useState( false );
   const [ showLocalCreationError, setShowLocalCreationError ] = React.useState( false );
@@ -363,7 +405,7 @@ export default function TaskAdd( props ) {
     setStatus( newStatus );
 
     let tagIds = projectAttributes.tags.value.map( t => t.id );
-    let newTags = projectAttributes.tags.projectAttributes ? project.tags.filter( ( item ) => tagIds.includes( item.id ) ) : [];
+    let newTags = projectAttributes.tags.value.length > 0 ? project.tags.filter( ( item ) => tagIds.includes( item.id ) ) : tags.filter( ( tag1 ) => project.tags.some( ( tag2 ) => tag2.id === tag1.id ) );
     setTags( newTags );
 
     let newDeadline = projectAttributes.deadline.value ? moment( parseInt( projectAttributes.deadline.value ) ) : deadline;
@@ -1073,7 +1115,7 @@ export default function TaskAdd( props ) {
         { userRights.attributeRights.tags.add &&
           tags.sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
           .map( ( tag ) => (
-            <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+            <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} key={tag.id} className="m-r-5 p-l-5 p-r-5">
               {tag.title}
             </span>
           ) )
