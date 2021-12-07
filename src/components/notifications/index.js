@@ -22,6 +22,8 @@ import NotificationInfo from './notificationInfo';
 import {
   timestampToString,
   getLocation,
+  translateAllSelectItems,
+  translateSelectItem,
 } from 'helperFunctions';
 
 import {
@@ -32,6 +34,10 @@ import {
   DELETE_SELECTED_USER_NOTIFICATIONS,
   USER_NOTIFICATIONS_SUBSCRIPTION,
 } from './queries';
+
+import {
+  useTranslation
+} from "react-i18next";
 
 const noTypeFilter = {
   value: null,
@@ -51,6 +57,10 @@ export default function NotificationList( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const notificationID = match.params.notificationID ? parseInt( match.params.notificationID ) : null;
   const URL = getLocation( history );
@@ -75,7 +85,7 @@ export default function NotificationList( props ) {
 
 
   const [ searchFilter, setSearchFilter ] = React.useState( '' );
-  const [ type, setType ] = React.useState( noTypeFilter );
+  const [ type, setType ] = React.useState( translateSelectItem( noTypeFilter, t ) );
 
   const setNotificationReadFunc = ( notification ) => {
     if ( !notification.read ) {
@@ -92,7 +102,7 @@ export default function NotificationList( props ) {
   }
 
   const markAllAsRead = () => {
-    if ( window.confirm( 'Ste si istý že chcete všetky správy označiť ako prečítané?' ) ) {
+    if ( window.confirm( t( 'confirmMessagesMarkAllRead' ) ) ) {
       setAllUserNotificationsRead( {
           variables: {
             read: true,
@@ -105,7 +115,7 @@ export default function NotificationList( props ) {
   }
 
   const deleteAll = () => {
-    if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
+    if ( window.confirm( t( 'confirmMessagesDeleteAll' ) ) ) {
       deleteAllUserNotifications()
         .catch( ( err ) => {
           addLocalError( err );
@@ -114,7 +124,7 @@ export default function NotificationList( props ) {
   }
 
   const deleteRead = () => {
-    if ( window.confirm( 'Ste si istý že chcete všetky prečítané správy vymazať?' ) ) {
+    if ( window.confirm( t( 'confirmMessagesDeleteAllRead' ) ) ) {
       const userNotifications = notificationsData.userNotifications.filter( notification => notification.read )
         .map( notification => notification.id );
       deleteSelectedUserNotifications( {
@@ -156,7 +166,7 @@ export default function NotificationList( props ) {
 
   const getTypes = () => {
     let typeFilter = [ noTypeFilter, readTypeFilter, unreadTypeFilter ];
-    return typeFilter;
+    return translateAllSelectItems( typeFilter, t );
   }
 
   const notifications = filterNotifications();
@@ -166,7 +176,7 @@ export default function NotificationList( props ) {
 
         <div className="scroll-visible fit-with-header lanwiki-list">
           <h1>
-            Notifications
+            {t('notifications')}
           </h1>
 
           <div className="row">
@@ -177,7 +187,7 @@ export default function NotificationList( props ) {
                   className="form-control search-text"
                   value={searchFilter}
                   onChange={(e) => setSearchFilter( e.target.value )}
-                  placeholder="Search"
+                  placeholder={t('search')}
                   />
                 <button className="search-btn" type="button">
                   <i className="fa fa-search" />
@@ -200,21 +210,21 @@ export default function NotificationList( props ) {
               className="btn-link btn-distance"
               onClick={markAllAsRead}
               disabled={notifications.every((notification)=>notification.read)}>
-              Označit všetky ako prečítané
+              {t('markAllRead')}
             </button>
             <button
               type="button"
               className="btn-link btn-distance"
               onClick={deleteAll}
               disabled={notifications.length === 0}>
-              Vymazať všetky
+              {t('deleteAll')}
             </button>
             <button
               type="button"
               className="btn-link"
               onClick={deleteRead}
               disabled={ !notifications.some( (notification) => notification.read) }>
-              Vymazať prečítané
+              {t('deleteRead')}
             </button>
           </div>
           <div>
@@ -232,17 +242,17 @@ export default function NotificationList( props ) {
                   >
                   <div className={(notificationID === notification.id ? "text-highlight":"")}>
                     <i className={classnames({ 'far fa-envelope-open': notification.read, 'fas fa-envelope': !notification.read })} />
-                    {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
+                    {notification.task ? `${notification.task.id}:${notification.task.title}` : t('noTask')}
                     <div className="row">
                       <div>
-                        <Label className="p-r-5">User:</Label>
-                        {notification.fromUser ? notification.fromUser.fullName : "no user"}
+                        <Label className="p-r-5">{t('user')}:</Label>
+                        {notification.fromUser ? notification.fromUser.fullName : t('noUser')}
                       </div>
                       <div className="ml-auto">
                         {timestampToString(parseInt(notification.createdAt))}
                       </div>
                     </div>
-                    <Label className="p-r-5">Subject:</Label>
+                    <Label className="p-r-5">{t('subject')}:</Label>
                     {notification.subject}
                   </div>
                 </li>
@@ -250,7 +260,7 @@ export default function NotificationList( props ) {
             }
             {
               notifications.length === 0 &&
-              <ListGroupItem>There are no notifications!</ListGroupItem>
+              <ListGroupItem>{t('noNotifications')}</ListGroupItem>
             }
           </div>
 
@@ -261,7 +271,7 @@ export default function NotificationList( props ) {
           <NotificationInfo notification={ notifications.find((notification) => notification.id === notificationID )} history={history} />
         }
         { notificationID === null &&
-          <div className="fit-with-header" style={{backgroundColor: "white"}}></div>
+          <div className="fit-with-header" style={{backgroundColor: "white"}}/>
         }
       </div>
     </div>

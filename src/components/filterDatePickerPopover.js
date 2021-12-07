@@ -14,6 +14,10 @@ import {
 import DatePicker from 'components/DatePicker';
 import classnames from 'classnames';
 import moment from 'moment';
+import {
+  useTranslation
+} from "react-i18next";
+
 
 export default function FilterDatePickerPopover( props ) {
   const {
@@ -28,6 +32,9 @@ export default function FilterDatePickerPopover( props ) {
     setDateTo,
     minimal
   } = props;
+  const {
+    t
+  } = useTranslation();
 
   const [ popoverOpen, setPopoverOpen ] = React.useState( false );
   const [ newDateFrom, setNewDateFrom ] = React.useState( dateFrom );
@@ -40,9 +47,9 @@ export default function FilterDatePickerPopover( props ) {
     }, ref ) => {
       let text = '';
       if ( minimal ) {
-        text = showNowFrom ? 'Current date' : ( value ? `${value}` : 'Select date from' )
+        text = showNowFrom ? t( 'currentDate' ) : ( value ? `${value}` : t( 'selectDateFrom' ) )
       } else {
-        text = showNowFrom ? 'From: Current date' : ( value ? `From: ${value}` : 'Select date from' );
+        text = showNowFrom ? `${t('from')}: ${t('currentDate')}` : ( value ? `${t('from')}: ${value}` : t( 'selectDateFrom' ) );
       }
       return (
         <div className="row form-control p-0" style={ minimal ? {  color:'inherit' } : {}}>
@@ -57,7 +64,7 @@ export default function FilterDatePickerPopover( props ) {
               setDateFrom(null);
             }}
             >
-            { minimal ? 'Now' : 'Set now' }
+            { minimal ? t('now') : t('setNow') }
           </Button>
         </div>
       )
@@ -71,9 +78,9 @@ export default function FilterDatePickerPopover( props ) {
     }, ref ) => {
       let text = '';
       if ( minimal ) {
-        text = showNowTo ? 'Current date' : ( value ? `${value}` : 'Select date to' )
+        text = showNowTo ? t( 'currentDate' ) : ( value ? `${value}` : t( 'selectDateTo' ) )
       } else {
-        text = showNowTo ? 'To: Current date' : ( value ? `To: ${value}` : 'Select date to' );
+        text = showNowTo ? `${t('from')}: ${t('currentDate')}` : ( value ? `${t('from')}: ${value}` : t( 'selectDateTo' ) );
       }
       return (
         <div className="row form-control p-0" style={ minimal ? {  color:'inherit' } : {}}>
@@ -88,7 +95,7 @@ export default function FilterDatePickerPopover( props ) {
               setDateTo(null);
             }}
             >
-            { minimal ? 'Now' : 'Set now' }
+            { minimal ? t('now') : t('setNow') }
           </Button>
         </div>
       )
@@ -102,7 +109,7 @@ export default function FilterDatePickerPopover( props ) {
       </Label>
       <div className="bkg-white">
         <button id="Popover1" type="button" className="btn-link p-l-0 p-r-0 m-r-0" onClick={() => setPopoverOpen(true)}>
-          {`${dateFrom ? dateFrom.format( 'DD.MM.YYYY' ) : 'All'} - ${dateTo ? dateTo.format( 'DD.MM.YYYY' ) : 'All'}`}
+          {`${dateFrom ? dateFrom.format( 'DD.MM.YYYY' ) : t('all')} - ${dateTo ? dateTo.format( 'DD.MM.YYYY' ) : t('all')}`}
         </button>
         <Popover placement="right" className="custom-popover" isOpen={popoverOpen} target="Popover1" toggle={() => setPopoverOpen(false)}>
           <PopoverBody>
@@ -116,7 +123,7 @@ export default function FilterDatePickerPopover( props ) {
                 setNewDateTo(moment().endOf('week').add(1, 'days'));
               }}
               >
-              This week
+              {t('thisWeek')}
             </button>
             <button
               type="button"
@@ -127,7 +134,7 @@ export default function FilterDatePickerPopover( props ) {
                 setNewDateTo(moment().subtract(1, 'weeks').endOf('week').add(1, 'days'));
               }}
               >
-              Last week
+              {t('lastWeek')}
             </button>
             <button
               type="button"
@@ -138,7 +145,7 @@ export default function FilterDatePickerPopover( props ) {
                 setNewDateTo(moment().endOf('month'));
               }}
               >
-              This month
+              {t('thisMonth')}
             </button>
             <button
               type="button"
@@ -149,14 +156,14 @@ export default function FilterDatePickerPopover( props ) {
                 setNewDateTo(moment().subtract(1, 'months').endOf('month'));
               }}
               >
-              Last month
+              {t('lastMonth')}
             </button>
             <div className="row">
               <div className="width-50-p p-r-10">
                 <div className="row">
-                  <label className="center-hor">From</label>
+                  <label className="center-hor">{t('from')}</label>
                   <button type="button" className="btn-link ml-auto m-r-0" onClick={() => setNewDateFrom(moment())}>
-                    NOW
+                    {t('now')}
                   </button>
                 </div>
                 <DatePicker
@@ -166,15 +173,15 @@ export default function FilterDatePickerPopover( props ) {
                   onChange={(e)=>{
                     setNewDateFrom(e);
                   }}
-                  placeholderText="No date"
+                  placeholderText={t('noDate')}
                   />
               </div>
 
               <div className="width-50-p p-l-10">
                 <div className="row">
-                  <label className="center-hor">To</label>
+                  <label className="center-hor">{t('to')}</label>
                   <button type="button" className="btn-link ml-auto m-r-0" onClick={() => setNewDateTo(moment())}>
-                    NOW
+                    {t('now')}
                   </button>
                 </div>
                 <DatePicker
@@ -184,7 +191,7 @@ export default function FilterDatePickerPopover( props ) {
                   onChange={(e)=>{
                     setNewDateTo(e);
                   }}
-                  placeholderText="No date"
+                  placeholderText={t('noDate')}
                   />
               </div>
             </div>
@@ -198,7 +205,7 @@ export default function FilterDatePickerPopover( props ) {
                   setPopoverOpen(false);
                 }}
                 >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 type="button"
@@ -209,7 +216,7 @@ export default function FilterDatePickerPopover( props ) {
                   setPopoverOpen(false);
                 }}
                 >
-                Save
+                {t('save')}
               </button>
             </div>
           </PopoverBody>

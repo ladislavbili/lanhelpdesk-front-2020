@@ -251,10 +251,14 @@ export default function TaskAdd( props ) {
       const updatedCompany = companies.find( ( company2 ) => company2.id === company.id )
       if ( updatedCompany ) {
         setCompany( updatedCompany );
-        setPausal( updatedCompany.monthly ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
+        if ( !project.projectAttributes.pausal.fixed ) {
+          setPausal( updatedCompany.monthly ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
+        }
       } else {
         setCompany( null );
-        setPausal( booleanSelects[ 0 ] );
+        if ( !project.projectAttributes.pausal.fixed ) {
+          setPausal( booleanSelects[ 0 ] );
+        }
       }
     }
   }, [ companies ] );
@@ -750,7 +754,9 @@ export default function TaskAdd( props ) {
             placeholder="Select required"
             onChange={(company)=> {
               setCompany(company);
-              setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
+              if(!project.projectAttributes.pausal.fixed){
+                setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
+              }
             }}
             options={companies}
             styles={ pickSelectStyle( ['noArrow', 'required' ] ) }
@@ -1361,7 +1367,8 @@ export default function TaskAdd( props ) {
                 addTaskFunc();
               }
             }}
-            > Create task
+            >
+            {saving ? 'Creating...' : 'Create task'}
           </button>
         </div>
       </div>

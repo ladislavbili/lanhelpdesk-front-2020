@@ -6,6 +6,9 @@ import {
   timestampToString,
   getLocation,
 } from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function NotificationInfo( props ) {
   const {
@@ -13,19 +16,23 @@ export default function NotificationInfo( props ) {
     notification
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   return (
     <div style={{backgroundColor: "white"}}>
       <div className="p-20 scroll-visible fit-with-header">
         <div>
-          <Label className="m-r-5">User:</Label>
-          {` ${notification.fromUser ? notification.fromUser.fullName : 'System message'}`}
+          <Label className="m-r-5">{t('user')}:</Label>
+          {` ${notification.fromUser ? notification.fromUser.fullName : t('systemMessage')}`}
         </div>
         <div>
-          <Label className="m-r-5">Subject:</Label>
+          <Label className="m-r-5">{t('subject')}:</Label>
           {notification.subject}
         </div>
         <div>
-          <Label className="m-r-5">Body:</Label>
+          <Label className="m-r-5">{t('body')}:</Label>
           <div
             className="m-l-10 m-b-15 font-13"
             dangerouslySetInnerHTML={{__html: notification.message.replace(/(?:\r\n|\r|\n)/g, '<br>') }}
@@ -39,11 +46,11 @@ export default function NotificationInfo( props ) {
             }
            } }
              >
-          <Label className="m-r-5">Task:</Label>
-          {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
+          <Label className="m-r-5">{t('task')}:</Label>
+          {notification.task ? `${notification.task.id}: ${notification.task.title}` : t('noTask')}
         </div>
         <button className="btn-link" onClick={() => {}}>
-          Cancel notifications
+          {t('cancelNotifications')} - WIP
         </button>
       </div>
     </div>

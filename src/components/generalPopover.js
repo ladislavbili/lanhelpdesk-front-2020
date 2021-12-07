@@ -5,6 +5,9 @@ import {
   PopoverBody,
   UncontrolledPopover,
 } from 'reactstrap';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function GeneralPopover( props ) {
   const {
@@ -23,6 +26,9 @@ export default function GeneralPopover( props ) {
     useLegacy,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
   const [ popoverOpen, setPopoverOpen ] = React.useState( false );
 
   const closeAction = close ? close : () => setPopoverOpen( false );
@@ -49,7 +55,7 @@ export default function GeneralPopover( props ) {
                   closeAction();
                 }}
                 >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 type="button"
@@ -59,7 +65,7 @@ export default function GeneralPopover( props ) {
                   closeAction();
                 }}
                 >
-                Save
+                {t('save')}
               </button>
             </div>
           }
@@ -72,7 +78,7 @@ export default function GeneralPopover( props ) {
                   closeAction();
                 }}
                 >
-                Close
+                {t('close')}
               </button>
             </div>
           }
@@ -102,7 +108,7 @@ export default function GeneralPopover( props ) {
                 closeAction();
               }}
               >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               type="button"
@@ -112,7 +118,7 @@ export default function GeneralPopover( props ) {
                 closeAction();
               }}
               >
-              Save
+              {t('save')}
             </button>
           </div>
         }
@@ -125,7 +131,7 @@ export default function GeneralPopover( props ) {
                 closeAction();
               }}
               >
-              Close
+              {t('close')}
             </button>
           </div>
         }

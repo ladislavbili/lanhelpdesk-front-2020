@@ -15,10 +15,11 @@ import {
 import {
   getMyData,
 } from 'helperFunctions';
+import i18n from "i18next";
 
 import Reroute from 'reroute';
 import HelpdeskNavigation from 'helpdesk/navigation';
-import ReportsNavigation from 'reports/navigation';
+import InvoicesNavigation from 'invoices/navigation';
 import LanwikiNavigation from 'lanwiki/navigation';
 import CMDBNavigation from 'cmdb/navigation';
 
@@ -38,7 +39,13 @@ export default function Navigation( props ) {
     }
   } );
 
+
   const currentUser = getMyData();
+  React.useEffect( () => {
+    if ( currentUser ) {
+      i18n.changeLanguage( currentUser.language );
+    }
+  }, [ currentUser, currentUser ? currentUser.language : null ] );
   if ( !userDataLoading && currentUser === null ) {
     location.reload( false );
   }
@@ -48,7 +55,7 @@ export default function Navigation( props ) {
       <Switch>
         <Route exact path='/' component={Reroute} />
         <Route path='/helpdesk' component={HelpdeskNavigation} />
-        <Route path='/reports' component={ReportsNavigation} />
+        <Route path='/invoices' component={InvoicesNavigation} />
         <Route path='/lanwiki' component={LanwikiNavigation} />
         <Route path='/cmdb' component={CMDBNavigation} />
       </Switch>

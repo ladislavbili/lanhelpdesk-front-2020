@@ -11,7 +11,7 @@
     "@ckeditor/ckeditor5-build-classic": "^16.0.0",
     "@ckeditor/ckeditor5-editor-classic": "^18.0.0",
     "@ckeditor/ckeditor5-react": "^2.1.0",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "bootstrap": "^4.5.3",
     "chroma-js": "^2.1.0",
     "ckeditor4-react": "^0.1.0",
@@ -21,6 +21,7 @@
     "exceljs": "^4.2.0",
     "file-saver": "^2.0.5",
     "graphql": "^15.4.0",
+    "i18next": "^21.5.4",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
@@ -32,6 +33,7 @@
     "react-dnd": "^14.0.2",
     "react-dnd-html5-backend": "^14.0.0",
     "react-dom": "^16.14.0",
+    "react-i18next": "^11.14.3",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-select": "^2.3.0",
@@ -39,7 +41,7 @@
     "react-timeago": "^4.4.0",
     "react-to-print": "^2.10.3",
     "reactstrap": "^7.1.0",
-    "subscriptions-transport-ws": "^0.9.18"
+    "subscriptions-transport-ws": "^0.11.0"
   },
   "devDependencies": {
     "node-sass": "^4.14.1",

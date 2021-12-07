@@ -16,6 +16,9 @@ import {
 import {
   clearLocalErrors,
 } from 'apollo/localSchema/actions';
+import {
+  useTranslation
+} from "react-i18next";
 import Empty from '../Empty';
 
 export default function LocalErrors( props ) {
@@ -24,6 +27,10 @@ export default function LocalErrors( props ) {
     history,
     location
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: localErrorsData,
@@ -42,7 +49,7 @@ export default function LocalErrors( props ) {
           <span className="m-l-2 header-icon-text clickable">{count > 99 ? '99+' : count }</span>
         </DropdownToggle>
         <DropdownMenu right>
-          <DropdownItem header={true}>Local Errors</DropdownItem>
+          <DropdownItem header={true}>{t('localErrors')}</DropdownItem>
           { localErrorsData.localErrors.slice(0,10).map( (localError, index) => {
             if(localError.apollo){
               const errors = localError.errors;
@@ -77,11 +84,11 @@ export default function LocalErrors( props ) {
           } )}
           <DropdownItem divider={true}/>
           <DropdownItem onClick={() => {
-              if(window.confirm('Are you sure?')){
+              if(window.confirm(t('generalConfirmation'))){
                 clearLocalErrors()
               }
             }}>
-            <span style={{ color: 'red' }}>Clear local errors</span>
+            <span style={{ color: 'red' }}>{t('clearLocalErrors')}</span>
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>

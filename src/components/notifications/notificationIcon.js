@@ -9,6 +9,9 @@ import classnames from 'classnames';
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
+import {
+  useTranslation
+} from "react-i18next";
 import Empty from '../Empty';
 import {
   GET_USER_NOTIFICATIONS_COUNT,
@@ -24,6 +27,10 @@ export default function NotificationIcon( props ) {
     history,
     location
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: userNotificationsCountData,
@@ -78,7 +85,7 @@ export default function NotificationIcon( props ) {
         className="overflow-auto max-height-600"
         headerClassName="header-font custom-popover-header"
         target="page-header-notifications"
-        header="Notifications"
+        header={t('notifications')}
         useLegacy
         reset={() => {}}
         submit={() => {}}
@@ -87,7 +94,7 @@ export default function NotificationIcon( props ) {
         hideButtons
         close={() => setNotificationsOpen(false)}
         >
-        {notifications.length === 0 && <div className="segoe-semi-text custom-popover-item">You have no notifications!</div>}
+        {notifications.length === 0 && <div className="segoe-semi-text custom-popover-item">{t('noNotifications')}</div>}
         { notifications.map( (notification) =>
           <div
             key={notification.id}
@@ -128,14 +135,14 @@ export default function NotificationIcon( props ) {
                 maxWidth: 250
               }}
               >
-              {notification.task ? `${notification.task.id}:${notification.task.title}` : `Task no longer exists.`}
+              {notification.task ? `${notification.task.id}:${notification.task.title}` : t('noTask')}
             </div>
           </div>
         )}
         <hr/>
         <div onClick={() => history.push('/helpdesk/notifications/')} className="segoe-semi-text clickable custom-popover-item">
-          <span style={{ fontWeight: 'bold' }} >Go to notifications</span>
-          { (count && count > 5) ? <span className='p-l-3'>{` ${count - 5} more unread...`}</span> : null }
+          <span style={{ fontWeight: 'bold' }} >{t('goToNotifications')}</span>
+          { (count && count > 5) ? <span className='p-l-3'>{` ${count - 5} ${t('moreUnread')}...`}</span> : null }
         </div>
       </GeneralPopover>
     </Empty>

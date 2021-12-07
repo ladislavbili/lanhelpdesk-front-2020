@@ -21,6 +21,9 @@ import {
 import {
   timestampToString
 } from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_ERROR_MESSAGES,
@@ -49,6 +52,10 @@ export default function ErrorList( props ) {
     history,
     match,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: errorMessagesData,
@@ -91,7 +98,7 @@ export default function ErrorList( props ) {
   }
 
   const markAllAsRead = () => {
-    if ( window.confirm( 'Ste si istý že chcete všetky správy označiť ako prečítané?' ) ) {
+    if ( window.confirm( t( 'confirmMessagesMarkAllRead' ) ) ) {
       setSelectedErrorID( null );
       setAllErrorMessagesRead( {
           variables: {
@@ -105,7 +112,7 @@ export default function ErrorList( props ) {
   }
 
   const deleteAll = () => {
-    if ( window.confirm( 'Ste si istý že chcete všetky správy vymazať?' ) ) {
+    if ( window.confirm( t( 'confirmMessagesDeleteAll' ) ) ) {
       setSelectedErrorID( null );
       deleteAllErrorMessages()
         .catch( ( err ) => {
@@ -115,7 +122,7 @@ export default function ErrorList( props ) {
   }
 
   const deleteRead = () => {
-    if ( window.confirm( 'Ste si istý že chcete všetky prečítané správy vymazať?' ) ) {
+    if ( window.confirm( t( 'confirmMessagesDeleteAllRead' ) ) ) {
       setSelectedErrorID( null );
       const readErrorMessages = errorMessages.filter( errorMessage => errorMessage.read )
         .map( errorMessage => errorMessage.id );
@@ -182,7 +189,7 @@ export default function ErrorList( props ) {
 
         <div className="scroll-visible fit-with-header lanwiki-list">
 
-          <h1>Error messages</h1>
+          <h1>{t('errorMessages')}</h1>
 
           <div className="row">
             <div className="search-row" style={{width: "60%"}}>
@@ -192,7 +199,7 @@ export default function ErrorList( props ) {
                   className="form-control search-text"
                   value={searchFilter}
                   onChange={(e) => setSearchFilter( e.target.value )}
-                  placeholder="Search"
+                  placeholder={t('search')}
                   />
                 <button className="search-btn" type="button">
                   <i className="fa fa-search" />
@@ -215,21 +222,21 @@ export default function ErrorList( props ) {
               className="btn-link btn-distance"
               onClick={markAllAsRead}
               disabled={errors.every((error)=>error.read)}>
-              Označit všetky ako prečítané
+              {t('markAllRead')}
             </button>
             <button
               type="button"
               className="btn-link btn-distance"
               onClick={deleteAll}
               disabled={errors.length === 0}>
-              Vymazať všetky
+              {t('deleteAll')}
             </button>
             <button
               type="button"
               className="btn-link"
               onClick={deleteRead}
               disabled={errors.filter((error)=>error.read).length === 0}>
-              Vymazať prečítané
+              {t('deleteRead')}
             </button>
           </div>
           <div>
@@ -247,7 +254,7 @@ export default function ErrorList( props ) {
                     {error.source}
                     <div className="row">
                       <div>
-                        {error.user ? error.user.email : "no user"}
+                        {error.user ? error.user.email : t('noUser')}
                       </div>
                       <div className="ml-auto">
                         {timestampToString(parseInt(error.createdAt))}
@@ -259,7 +266,7 @@ export default function ErrorList( props ) {
               )
             }
             { errorMessages.length === 0 &&
-              <ListGroupItem>There are no errors!</ListGroupItem>
+              <ListGroupItem>{t('noErrors')}</ListGroupItem>
             }
           </div>
 

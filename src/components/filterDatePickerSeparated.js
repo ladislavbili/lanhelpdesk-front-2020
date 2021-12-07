@@ -1,6 +1,4 @@
-import React, {
-  Component
-} from 'react';
+import React from 'react';
 import {
   FormGroup
 } from 'reactstrap';
@@ -10,37 +8,26 @@ import Checkbox from 'components/checkbox';
 import {
   rebase
 } from 'index';
+import {
+  useTranslation
+} from "react-i18next";
 
-export default class FilterDatePickerSeparated extends Component {
-  constructor( props ) {
-    super( props );
-    this.state = {
-      showCalendarFrom: false,
-      showCalendarTo: false,
-    }
-  }
+export default function FilterDatePickerSeparated( props ) {
+  const {
+    label,
+    showNowFrom,
+    dateFrom,
+    showNowTo,
+    dateTo
+  } = props;
+  const {
+    t
+  } = useTranslation();
+  const [ showCalendarFrom, setShowCalendarFrom ] = React.useState( false );
+  const [ showCalendarTo, setShowCalendarTo ] = React.useState( false );
 
-  render() {
-    const {
-      label,
-      showNowFrom,
-      dateFrom,
-      showNowTo,
-      dateTo
-    } = this.props;
-    const {
-      setShowNowFrom,
-      setDateFrom,
-      setShowNowTo,
-      setDateTo
-    } = this.props;
-    const {
-      showCalendarFrom,
-      showCalendarTo
-    } = this.state;
-
-    return (
-      <FormGroup>
+  return (
+    <FormGroup>
         <label>{label}</label>
         <div className="row">
           <div className="col-6">
@@ -52,16 +39,16 @@ export default class FilterDatePickerSeparated extends Component {
                     setShowNowFrom(true)
                   }}
                   >
-                  Set now
+                  {t('setNow')}
                 </button>
                 |
                 <button
                   className="btn-link center-hor"
                   onClick={()=>{
-                    this.setState({ showCalendarFrom: true })
+                    setShowCalendarFrom(true);
                   }}
                   >
-                  Set date
+                  {t('setDate')}
                 </button>
               </div>
             }
@@ -71,15 +58,15 @@ export default class FilterDatePickerSeparated extends Component {
                   className="form-control"
                   selected={dateFrom}
                   onChange={(e)=>{ setDateFrom(e) }}
-                  placeholderText="No date"
+                  placeholderText={t('noDate')}
                   />
-                <i className="fa fa-times center-hor m-l-10 m-r-10 clickable" onClick={ () => { setDateFrom(null); this.setState({showCalendarFrom: false}) } } />
+                <i className="fa fa-times center-hor m-l-10 m-r-10 clickable" onClick={ () => { setDateFrom(null); setShowCalendarFrom(false) } } />
               </FormGroup>
             }
             { showNowFrom &&
               <FormGroup className="display-flex">
                 <span>
-                Current date
+                {t( 'currentDate' )}
               </span>
                 <i className="fa fa-times center-hor ml-auto m-r-10 clickable" onClick={ () => setShowNowFrom(false) } />
               </FormGroup>
@@ -94,16 +81,16 @@ export default class FilterDatePickerSeparated extends Component {
                     setShowNowTo(true)
                   }}
                   >
-                  Set now
+                  {t('setNow')}
                 </button>
                 |
                 <button
                   className="btn-link center-hor"
                   onClick={()=>{
-                    this.setState({ showCalendarTo: true })
+                    setShowCalendarTo(true);
                   }}
                   >
-                  Set date
+                  {t('setDate')}
                 </button>
               </div>
             }
@@ -113,15 +100,15 @@ export default class FilterDatePickerSeparated extends Component {
                   className="form-control"
                   selected={dateTo}
                   onChange={(e)=>{ setDateTo(e) }}
-                  placeholderText="No date"
+                  placeholderText={t('noDate')}
                   />
-                <i className="fa fa-times center-hor m-l-10 m-r-10 clickable" onClick={ () => { setDateTo(null); this.setState({showCalendarTo: false}) } } />
+                <i className="fa fa-times center-hor m-l-10 m-r-10 clickable" onClick={ () => { setDateTo(null); setShowCalendarTo(false) } } />
               </FormGroup>
             }
             { showNowTo &&
               <FormGroup className="display-flex">
                 <span>
-                Current date
+                {t( 'currentDate' )}
               </span>
                 <i className="fa fa-times center-hor ml-auto clickable" onClick={ () => setShowNowTo(false) } />
               </FormGroup>
@@ -129,6 +116,5 @@ export default class FilterDatePickerSeparated extends Component {
           </div>
         </div>
       </FormGroup>
-    );
-  }
+  );
 }

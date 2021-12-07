@@ -11,13 +11,20 @@ import Select from 'react-select';
 import {
   pickSelectStyle
 } from "configs/components/select";
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function TaskTypeEdit( props ) {
+  const {
+    t
+  } = useTranslation();
+
   const [ replacement, setReplacement ] = React.useState( null );
   return (
     <Modal isOpen={props.isOpen}>
       <ModalHeader>
-        {`Please choose ${props.label} to replace the deleted one`}
+        {`${t('deleteReplacementInfo1')} ${t(props.label)} ${t('deleteReplacementInfo2')}`}
       </ModalHeader>
       <ModalBody>
         <FormGroup>
@@ -32,10 +39,10 @@ export default function TaskTypeEdit( props ) {
       </ModalBody>
       <ModalFooter>
         <Button className="btn-link mr-auto"onClick={props.close}>
-          Cancel
+          {t('cancel')}
         </Button>
         <Button className="btn ml-auto" disabled={!replacement} onClick={() => props.finishDelete(replacement)}>
-          Complete deletion
+          {t('completeDeletion')}
         </Button>
       </ModalFooter>
     </Modal>

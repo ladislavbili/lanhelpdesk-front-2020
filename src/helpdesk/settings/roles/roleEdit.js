@@ -78,7 +78,7 @@ export default function RoleEdit( props ) {
     {
       state: React.useState( false ),
       key: 'vykazy',
-      label: "Reports"
+      label: "Invoices"
     },
     {
       state: React.useState( false ),

@@ -875,8 +875,8 @@ export default function TasksSidebar( props ) {
         { myRights.vykazy &&
           <NavItem key='vykazy' className={classnames("row full-width sidebar-item") }>
             <span
-              className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/reports' ) }) }
-              onClick={() => history.push(`/reports`)}
+              className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/invoices' ) }) }
+              onClick={() => history.push(`/invoices/monthly/companies`)}
               >
               <i className="far fa-file-alt m-r-5 m-t-3" />
               Výkazy

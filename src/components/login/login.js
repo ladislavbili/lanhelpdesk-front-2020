@@ -19,12 +19,18 @@ import {
 import {
   socketLink
 } from 'apollo/links';
-
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function Login( props ) {
   const {
     loginUser
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ email, setEmail ] = React.useState( '' );
   const [ password, setPassword ] = React.useState( '' );
@@ -98,8 +104,8 @@ export default function Login( props ) {
         </h1>
 
         <FormGroup className="login-item">
-          <Label for="email">E-mail</Label>
-          <Input type="email" name="email" id="email" placeholder="Enter e-mail" value={email}
+          <Label for="email">{t('email')}</Label>
+          <Input type="email" name="email" id="email" placeholder={t('email')} value={email}
             onChange={(e) => setEmail(e.target.value) }
             onKeyPress={(e)=>{
               if( e.charCode===13 && signingIn && email.length > 0 && password.length > 0 ){
@@ -109,8 +115,8 @@ export default function Login( props ) {
             />
         </FormGroup>
         <FormGroup className="login-item">
-          <Label for="pass">Password</Label>
-          <Input type="password" name="pass" id="pass" placeholder="Enter password" value={password} onChange={(e)=>setPassword(e.target.value)}
+          <Label for="pass">{t('password')}</Label>
+          <Input type="password" name="pass" id="pass" placeholder={t('password')} value={password} onChange={(e)=>setPassword(e.target.value)}
             onKeyPress={(e)=>{
               if(e.charCode===13 && !signingIn && email.length>0 && password.length>0){
                 login();
@@ -123,7 +129,7 @@ export default function Login( props ) {
           disabled={ signingIn || email.length === 0 || password.length === 0 }
           onClick={ login }
           >
-          Login
+          {t('login')}
         </button>
         <ErrorMessage show={error !== null} message={error} className="m-l-10 m-r-10 m-b-5" />
       </div>

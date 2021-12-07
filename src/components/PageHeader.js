@@ -23,6 +23,9 @@ import {
   getLocation,
   getMyData,
 } from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 
 import UserProfile from 'helpdesk/settings/users/userProfile';
 
@@ -36,6 +39,9 @@ export default function PageHeader( props ) {
     match,
     history,
   } = props;
+  const {
+    t
+  } = useTranslation();
 
   const [ logoutUser ] = useMutation( LOGOUT_USER );
 
@@ -64,7 +70,7 @@ export default function PageHeader( props ) {
                 )
               }
               >
-              Úlohy
+              {t('tasks')}
             </Link>
             { accessRights.vykazy &&
               <Empty>
@@ -79,7 +85,7 @@ export default function PageHeader( props ) {
                     )
                   }
                   >
-                  Vykazy
+                  {t('invoices')}
                 </Link>
                 <Link
                   to={{ pathname: `/lanwiki` }}
@@ -92,7 +98,7 @@ export default function PageHeader( props ) {
                     )
                   }
                   >
-                  LanWiki
+                  {t('lanWiki')}
                 </Link>
                 <Link
                   to={{ pathname: `/cmdb` }}
@@ -105,7 +111,7 @@ export default function PageHeader( props ) {
                     )
                   }
                   >
-                  CMDB
+                  {t('cmdb')}
                 </Link>
               </Empty>
             }
@@ -113,7 +119,7 @@ export default function PageHeader( props ) {
         }
         <div className="ml-auto center-hor row m-r-30">
           <div className=" header-icon center-hor clickable" onClick={() => setModalUserProfileOpen(true)}>
-            { !currentUser ? `Loading...` : `${currentUser.name} ${currentUser.surname}`}
+            { !currentUser ? `${t('loading')}...` : `${currentUser.name} ${currentUser.surname}`}
             <i className="fas fa-user m-l-5"/>
           </div>
 
@@ -126,7 +132,7 @@ export default function PageHeader( props ) {
           <i
             className="header-icon clickable fa fa-sign-out-alt center-hor"
             onClick={() => {
-              if (window.confirm('Are you sure you want to log out?')) {
+              if (window.confirm(t('logoutConfirmation'))) {
                 logoutUser().then(() => {
                   history.push('/helpdesk/taskList/i/all');
                   location.reload(false);
@@ -139,7 +145,7 @@ export default function PageHeader( props ) {
 
       <Modal style={{width: "800px"}} isOpen={modalUserProfileOpen}>
         <ModalHeader>
-          User profile
+          {t('userProfile')}
         </ModalHeader>
         <ModalBody>
           <UserProfile

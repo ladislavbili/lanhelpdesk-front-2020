@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import Navigation from 'navigation';
 import Login from 'components/login';
+import initializeTranslations from 'configs/translations';
 import 'react-datepicker/dist/react-datepicker.css';
 import {
   setDefaultLocale,
@@ -21,6 +22,7 @@ import {
   GET_IS_LOGGED_IN,
 } from 'apollo/localSchema/queries';
 
+const i18n = initializeTranslations();
 registerLocale( 'sk', sk );
 setDefaultLocale( 'sk' );
 

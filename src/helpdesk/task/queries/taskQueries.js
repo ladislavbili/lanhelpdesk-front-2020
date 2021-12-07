@@ -12,6 +12,8 @@ ganttOrder
 updatedAt
 createdAt
 closeDate
+pausal
+overtime
 metadata{
   subtasksApproved
   subtasksPending
