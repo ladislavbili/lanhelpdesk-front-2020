@@ -4,6 +4,9 @@ import {
 } from 'reactstrap';
 import Loading from 'components/loading';
 import classnames from 'classnames';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function Pagination( props ) {
   const {
@@ -13,6 +16,10 @@ export default function Pagination( props ) {
     loading,
     setPage,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const dataFrom = limit * ( page - 1 ) + 1;
   let dataTo = dataFrom + limit - 1;
@@ -31,7 +38,7 @@ export default function Pagination( props ) {
   return (
     <div className={classnames("row m-b-10 ml-auto")}>
       <div className="message ml-auto m-t-1">
-        { `${ dataFrom }-${ dataTo } from total of ${count} comments` }
+        { `${ dataFrom }-${ dataTo } ${t('fromTotalOf')} ${count} ${t('comments2').toLowerCase()}` }
       </div>
       <Button
         disabled={  page === 1 }

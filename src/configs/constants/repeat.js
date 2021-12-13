@@ -1,5 +1,5 @@
 export const intervals = [ {
-    title: null,
+    title: 'none',
     value: null,
     label: 'Žiadny'
   },

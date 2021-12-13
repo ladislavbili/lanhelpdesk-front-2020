@@ -3,10 +3,6 @@ export default {
     en: 'Type',
     sk: 'Typ',
   },
-  createdAt: {
-    en: 'Created at',
-    sk: 'Vytvorené',
-  },
   search: {
     en: 'Search',
     sk: 'Hľadať',
@@ -27,9 +23,9 @@ export default {
     en: 'Tasks',
     sk: 'Úlohy',
   },
-  invoices: {
-    en: 'Invoices',
-    sk: 'Výkazy',
+  filter: {
+    en: 'Filter',
+    sk: 'Filter',
   },
   lanWiki: {
     en: 'LanWiki',
@@ -47,15 +43,15 @@ export default {
     en: 'Are you sure?',
     sk: 'Ste si istý?',
   },
-  'All types': {
+  allTypes: {
     en: 'All types',
     sk: 'Všetky typy',
   },
-  'Read': {
+  read: {
     en: 'Read',
     sk: 'Prečítané',
   },
-  'Unread': {
+  unread: {
     en: 'Unread',
     sk: 'Neprečítané',
   },
@@ -70,5 +66,37 @@ export default {
   logoutConfirmation: {
     en: 'Are you sure you want to log out?',
     sk: 'Naozaj sa chcete odhlásiť?',
-  }
+  },
+  sortBy: {
+    en: 'Sort by',
+    sk: 'Zoradit podľa',
+  },
+  yes: {
+    en: 'Yes',
+    sk: 'Áno',
+  },
+  no: {
+    en: 'No',
+    sk: 'Nie',
+  },
+  any: {
+    en: 'Any',
+    sk: 'Ktorýkoľvek',
+  },
+  saveBeforeLeaving: {
+    en: 'Save changes before leaving!',
+    sk: 'Uložte zmeny pred odchodom!',
+  },
+  fillAllRequiredInformation: {
+    en: 'Fill in all the required information!',
+    sk: 'Vyplňte všetky požadované polia!',
+  },
+  saved: {
+    en: 'Saved',
+    sk: 'Uložené',
+  },
+  view: {
+    en: 'View',
+    sk: 'Vidieť',
+  },
 }

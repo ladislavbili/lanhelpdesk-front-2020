@@ -221,7 +221,7 @@ export default function TaskAdd( props ) {
       ...getTaskData(),
       userRights,
       projectAttributes
-    } )
+    }, t )
   );
 
   //reactions
@@ -1242,7 +1242,7 @@ export default function TaskAdd( props ) {
           currentUser={currentUser}
           company={company}
           showTotals={true}
-          showColumns={ [ 'done', 'title', 'scheduled', 'quantity', 'assigned', 'approved', 'actions' ] }
+          showColumns={ [ 'done', 'title', 'quantity', 'assigned', 'approved', 'actions' ] }
           showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
           autoApproved={project ? project.autoApproved : false}
           canAddSubtasksAndTrips={assignedTo.length !== 0}

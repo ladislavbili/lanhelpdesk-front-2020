@@ -16,6 +16,12 @@ import Select from 'react-select';
 import SettingsInput from '../components/settingsInput';
 
 import {
+  useTranslation
+} from "react-i18next";
+import {
+  translateAllSelectItems,
+} from 'helperFunctions';
+import {
   pickSelectStyle
 } from "configs/components/select";
 import {
@@ -35,6 +41,10 @@ export default function StatusAdd( props ) {
   const {
     history
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const client = useApolloClient();
 
   const [ addStatusTemplate ] = useMutation( ADD_STATUS_TEMPLATE );
@@ -44,7 +54,7 @@ export default function StatusAdd( props ) {
   const [ color, setColor ] = React.useState( "#f759f2" );
   const [ order, setOrder ] = React.useState( 0 );
   const [ icon, setIcon ] = React.useState( "fas fa-arrow-left" );
-  const [ action, setAction ] = React.useState( actions[ 0 ] );
+  const [ action, setAction ] = React.useState( translateAllSelectItems( actions, t )[ 0 ] );
   const [ saving, setSaving ] = React.useState( false );
 
   //functions
@@ -77,12 +87,12 @@ export default function StatusAdd( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20">
-        Add status template
+        {`${t('add')} ${t('statusTemplate').toLowerCase()}`}
       </h2>
 
       <SettingsInput
         required
-        label="Status name"
+        label={t('statusTitle')}
         id="title"
         value={title}
         onChange={(e)=> {
@@ -91,7 +101,7 @@ export default function StatusAdd( props ) {
         />
 
       <SettingsInput
-        label="Icon"
+        label={t('icon')}
         placeholder="fas fa-arrow-left"
         id="icon"
         value={icon}
@@ -101,8 +111,8 @@ export default function StatusAdd( props ) {
         />
 
       <SettingsInput
-        label="Order"
-        placeholder="Lower means first"
+        label={t('order')}
+        placeholder={t('lowerMeansFirst')}
         type="number"
         id="order"
         value={order}
@@ -112,12 +122,12 @@ export default function StatusAdd( props ) {
         />
 
       <FormGroup>
-        <Label for="actionIfSelected">Action if selected</Label>
+        <Label for="actionIfSelected">{t('actionIfSelected')}</Label>
         <Select
           id="actionIfSelected"
           name="Action"
           styles={pickSelectStyle()}
-          options={actions}
+          options={translateAllSelectItems(actions, t)}
           value={action}
           onChange={e => setAction(e) }
           />
@@ -133,7 +143,7 @@ export default function StatusAdd( props ) {
 
         { cannotSave() &&
           <div className="message error-message ml-auto m-r-14">
-            Fill in all the required information!
+            {t('fillAllRequiredInformation')}
           </div>
         }
 
@@ -145,7 +155,7 @@ export default function StatusAdd( props ) {
           disabled={cannotSave()}
           onClick={addStatusFunc}
           >
-          { saving ? 'Adding...' : 'Add status' }
+          { saving ? `${t('adding')}...` : `${t('add')} ${t('status').toLowerCase()}` }
         </button>
 
       </div>

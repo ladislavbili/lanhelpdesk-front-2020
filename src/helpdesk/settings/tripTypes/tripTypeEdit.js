@@ -5,6 +5,9 @@ import {
   useApolloClient,
 } from "@apollo/client";
 import classnames from 'classnames';
+import {
+  useTranslation
+} from "react-i18next";
 
 import Loading from 'components/loading';
 import DeleteReplacement from 'components/deleteReplacement';
@@ -29,6 +32,10 @@ export default function TripTypeEdit( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const client = useApolloClient();
   const allTripTypes = toSelArr( client.readQuery( {
       query: GET_TRIP_TYPES
@@ -103,7 +110,7 @@ export default function TripTypeEdit( props ) {
   };
 
   const deleteTripTypeFunc = ( replacement ) => {
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteTripType( {
           variables: {
             id: parseInt( match.params.id ),
@@ -127,14 +134,14 @@ export default function TripTypeEdit( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20" >
-        Edit trip type
+        {`${t('edit')} ${t('tripType').toLowerCase()}`}
       </h2>
 
       <div className="p-20 scroll-visible fit-with-header-and-commandbar">
 
         <SettingsInput
           required
-          label="Trip type"
+          label={t('tripTypeTitle')}
           id="title"
           value={title}
           onChange={(e) => {
@@ -144,8 +151,8 @@ export default function TripTypeEdit( props ) {
           />
 
         <SettingsInput
-          label="Order"
-          placeholder="Lower means first"
+          label={t('order')}
+          placeholder={t('lowerMeansFirst')}
           id="order"
           value={order}
           onChange={(e) => {
@@ -160,18 +167,18 @@ export default function TripTypeEdit( props ) {
             disabled={saving || theOnlyOneLeft}
             onClick={() => setDeleteOpen(true)}
             >
-            Delete
+            {t('delete')}
           </button>
 
           <div className="ml-auto message m-r-10">
             { dataChanged &&
               <div className="message error-message">
-                Save changes before leaving!
+                {t('saveBeforeLeaving')}
               </div>
             }
             { !dataChanged &&
               <div className="message success-message">
-                Saved
+                {t('saved')}
               </div>
             }
           </div>
@@ -180,12 +187,12 @@ export default function TripTypeEdit( props ) {
             className="btn m-t-5"
             disabled={saving}
             onClick={updateTripTypeFunc}>
-            { saving ? 'Saving trip type...' : 'Save trip type' }
+            { saving ? `${t('saving')}...` : `${t('save')} ${t('tripType').toLowerCase()}` }
           </button>
         </div>
         <DeleteReplacement
           isOpen={deleteOpen}
-          label="trip type"
+          label={t('tripType')}
           options={filteredTripTypes}
           close={()=>setDeleteOpen(false)}
           finishDelete={deleteTripTypeFunc}

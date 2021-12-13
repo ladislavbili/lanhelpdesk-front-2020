@@ -14,6 +14,9 @@ import {
 import {
   SketchPicker
 } from "react-color";
+import {
+  useTranslation
+} from "react-i18next";
 import Select from 'react-select';
 import Loading from 'components/loading';
 import SettingsInput from '../components/settingsInput';
@@ -26,7 +29,8 @@ import {
   pickSelectStyle
 } from "configs/components/select";
 import {
-  toSelArr
+  toSelArr,
+  translateAllSelectItems,
 } from 'helperFunctions';
 import {
   addLocalError,
@@ -44,6 +48,10 @@ export default function StatusEdit( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const client = useApolloClient();
 
   const allStatuses = toSelArr( client.readQuery( {
@@ -72,7 +80,7 @@ export default function StatusEdit( props ) {
   const [ color, setColor ] = React.useState( "#f759f2" );
   const [ order, setOrder ] = React.useState( 0 );
   const [ icon, setIcon ] = React.useState( "fas fa-arrow-left" );
-  const [ action, setAction ] = React.useState( actions[ 0 ] );
+  const [ action, setAction ] = React.useState( translateAllSelectItems( actions, t )[ 0 ] );
 
   const [ saving, setSaving ] = React.useState( false );
   const [ deleteOpen, setDeleteOpen ] = React.useState( false );
@@ -102,7 +110,8 @@ export default function StatusEdit( props ) {
     setColor( statusTemplate.color );
     setOrder( statusTemplate.order );
     setIcon( statusTemplate.icon );
-    setAction( actions.find( a => a.value === statusTemplate.action ) );
+    setAction( translateAllSelectItems( actions, t )
+      .find( a => a.value === statusTemplate.action ) );
 
     setDataChanged( false );
   }
@@ -130,7 +139,7 @@ export default function StatusEdit( props ) {
   const deleteStatusFunc = () => {
     setDeleteOpen( false );
 
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteStatus( {
           variables: {
             id: parseInt( match.params.id ),
@@ -153,12 +162,12 @@ export default function StatusEdit( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20" >
-        Edit status
+        {`${t('edit')} ${t('statusTemplate').toLowerCase()}`}
       </h2>
 
       <SettingsInput
         required
-        label="Status name"
+        label={t('statusTitle')}
         id="title"
         value={title}
         onChange={(e)=> {
@@ -168,7 +177,7 @@ export default function StatusEdit( props ) {
         />
 
       <SettingsInput
-        label="Icon"
+        label={t('icon')}
         placeholder="fas fa-arrow-left"
         id="icon"
         value={icon}
@@ -179,8 +188,8 @@ export default function StatusEdit( props ) {
         />
 
       <SettingsInput
-        label="Order"
-        placeholder="Lower means first"
+        label={t('order')}
+        placeholder={t('lowerMeansFirst')}
         type="number"
         id="order"
         value={order}
@@ -191,12 +200,12 @@ export default function StatusEdit( props ) {
         />
 
       <FormGroup>
-        <Label for="actionIfSelected">Action if selected</Label>
+        <Label for="actionIfSelected">{t('actionIfSelected')}</Label>
         <Select
           id="actionIfSelected"
           name="Action"
           styles={pickSelectStyle()}
-          options={actions}
+          options={translateAllSelectItems(actions, t)}
           value={action}
           onChange={ e =>  {
             setAction(e) ;
@@ -221,18 +230,18 @@ export default function StatusEdit( props ) {
           disabled={saving || theOnlyOneLeft}
           onClick={ deleteStatusFunc }
           >
-          Delete
+          {t('delete')}
         </button>
 
         <div className="ml-auto message m-r-10">
           { dataChanged &&
             <div className="message error-message">
-              Save changes before leaving!
+              {t('saveBeforeLeaving')}
             </div>
           }
           { !dataChanged &&
             <div className="message success-message">
-              Saved
+              {t('saved')}
             </div>
           }
         </div>
@@ -241,7 +250,7 @@ export default function StatusEdit( props ) {
           className="btn m-t-5"
           disabled={saving}
           onClick={updateStatusFunc}>
-          { saving ? 'Saving status...' : 'Save status' }
+          { saving ? `${t('saving')}...` : `${t('save')} ${t('status').toLowerCase()}` }
         </button>
       </div>
     </div>

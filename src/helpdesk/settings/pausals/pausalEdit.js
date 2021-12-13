@@ -21,6 +21,9 @@ import {
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_PRICELISTS,
@@ -32,11 +35,6 @@ import {
   UPDATE_COMPANY
 } from '../companies/queries';
 
-const newPricelist = {
-  label: "Nový cenník",
-  value: "0"
-};
-
 let fakeID = -1;
 const getFakeID = () => {
   return fakeID--;
@@ -45,6 +43,15 @@ export default function PausalEdit( props ) {
   const {
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
+
+  const newPricelist = {
+    label: t( 'newPricelist' ),
+    value: "0"
+  };
 
   const {
     data: pausalCompanyData,
@@ -217,12 +224,12 @@ export default function PausalEdit( props ) {
   return (
     <div className="scroll-visible p-20 fit-with-header">
 
-      <h2>Edit service level agreement - {pausalCompanyData.pausalCompany.title}</h2>
+      <h2>{`${t('editSla')} - ${pausalCompanyData.pausalCompany.title}`}</h2>
 
-      <h3 className="m-t-10 m-b-10" >Paušál</h3>
+      <h3 className="m-t-10 m-b-10" >{t('pausal')}</h3>
         <SettingsInput
           id="taskWorkPausal"
-          label="Paušál práce"
+          label={`${t('pausal')} ${t('works').toLowerCase()}`}
           type="number"
           value={taskWorkPausal}
           onChange={(e) => {
@@ -233,7 +240,7 @@ export default function PausalEdit( props ) {
 
         <SettingsInput
           id="taskTripPausal"
-          label="Paušál výjazdy"
+          label={`${t('pausal')} ${t('trips').toLowerCase()}`}
           type="number"
           value={taskTripPausal}
           onChange={(e)=> {
@@ -299,12 +306,12 @@ export default function PausalEdit( props ) {
         <div className="ml-auto message m-r-10">
           { dataChanged &&
             <div className="message error-message">
-              Save changes before leaving!
+              {t('saveBeforeLeaving')}
             </div>
           }
           { !dataChanged &&
             <div className="message success-message">
-              Saved
+              {t('saved')}
             </div>
           }
         </div>
@@ -319,7 +326,7 @@ export default function PausalEdit( props ) {
             }
           }}
           >
-          { saving ? 'Saving...' : 'Save changes' }
+          { saving ? `${t('saving')}...` : t('saveChanges') }
         </button>
       </div>
     </div>

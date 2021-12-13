@@ -4,6 +4,10 @@ import {
   timestampToString,
 } from 'helperFunctions';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function AgentList( props ) {
   const {
     agents,
@@ -12,15 +16,18 @@ export default function AgentList( props ) {
     setAgent,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
 
   return (
     <div className="m-t-10 m-b-20">
       <table className="table bkg-white row-highlight">
         <thead>
           <tr>
-            <th>Agent</th>
-            <th>Works</th>
-            <th>Trips</th>
+            <th>{t('agent')}</th>
+            <th>{t('works')}</th>
+            <th>{t('trips')}</th>
           </tr>
         </thead>
         <tbody>
@@ -39,7 +46,7 @@ export default function AgentList( props ) {
             <tr
               key="no-items"
               >
-              <td colSpan="6">{`No agents in date range ${timestampToString(fromDate.valueOf())} - ${timestampToString(toDate.valueOf())}`}</td>
+              <td colSpan="6">{`${t('noAgents')} ${t('inDateRange').toLowerCase()} ${timestampToString(fromDate.valueOf())} - ${timestampToString(toDate.valueOf())}`}</td>
             </tr>
           }
         </tbody>

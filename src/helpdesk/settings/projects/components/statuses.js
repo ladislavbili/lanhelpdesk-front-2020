@@ -9,8 +9,12 @@ import {
 } from "react-color";
 import {
   sortBy,
-  inputError
+  inputError,
+  translateAllSelectItems,
 } from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 import {
   actions
 } from 'configs/constants/statuses';
@@ -29,10 +33,14 @@ export default function Statuses( props ) {
     updateStatus,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   const [ title, setTitle ] = React.useState( "" );
   const [ order, setOrder ] = React.useState( 0 );
   const [ icon, setIcon ] = React.useState( "fa fa-play" );
-  const [ action, setAction ] = React.useState( actions[ 0 ] );
+  const [ action, setAction ] = React.useState( translateAllSelectItems( actions, t )[ 0 ] );
   const [ color, setColor ] = React.useState( defaultTagColor );
   const [ editColorID, setEditColorID ] = React.useState( null );
 
@@ -43,12 +51,12 @@ export default function Statuses( props ) {
       <table className="table m-t-10 vykazyTable">
         <thead>
           <tr>
-            <th> Title </th>
-            <th width="100px"> Order </th>
-            <th width="150px"> Icon </th>
-            <th width="250px"> Reaction </th>
-            <th width="150px"> Color </th>
-            <th width="50px"> Actions </th>
+            <th>{t('title')}</th>
+            <th width="100px">{t('order')}</th>
+            <th width="150px">{t('icon')}</th>
+            <th width="250px">{t('reaction')}</th>
+            <th width="150px">{t('color')}</th>
+            <th width="50px">{t('actions')}</th>
           </tr>
         </thead>
 
@@ -82,8 +90,8 @@ export default function Statuses( props ) {
                   id="actionIfSelected"
                   name="Action"
                   styles={pickSelectStyle()}
-                  options={actions}
-                  value={actions.find((action) => action.value === status.action )}
+                  options={translateAllSelectItems(actions,t)}
+                  value={translateAllSelectItems(actions,t ).find((action) => action.value === status.action )}
                   isDisabled={status.id === firstNewStatusId}
                   onChange={e => updateStatus({ id: status.id, action: e.value }) }
                   />
@@ -94,15 +102,14 @@ export default function Statuses( props ) {
                   style={{backgroundColor: status.color }}
                   className={`btn full-width ${inputError(status.color, 'color')}`}
                   onClick={ () => setEditColorID(status.id) }
-                  >
-                </button>
+                  />
                 <Popover
                   placement="left"
                   target={`add-color-picker-${status.id}`}
                   toggle={() => setEditColorID(null) }
                   isOpen={editColorID !== null && editColorID === status.id }
                   >
-                  <PopoverHeader>Change color</PopoverHeader>
+                  <PopoverHeader>{t('changeColor')}</PopoverHeader>
                   <PopoverBody>
                     <SketchPicker
                       id="color"
@@ -116,7 +123,7 @@ export default function Statuses( props ) {
                           setEditColorID(null);
                         }}
                         >
-                        Close
+                        {t('close')}
                       </button>
                     </div>
                   </PopoverBody>
@@ -162,7 +169,7 @@ export default function Statuses( props ) {
                 id="actionIfSelected"
                 name="Action"
                 styles={pickSelectStyle()}
-                options={actions}
+                options={translateAllSelectItems(actions,t )}
                 value={action}
                 onChange={e => setAction( e ) }
                 />
@@ -181,7 +188,7 @@ export default function Statuses( props ) {
                 target="add-color-picker"
                 toggle={() => setEditColorID(null) }
                 >
-                <PopoverHeader>Change color</PopoverHeader>
+                <PopoverHeader>{t('changeColor')}</PopoverHeader>
                 <PopoverBody>
                   <SketchPicker
                     id="color"
@@ -195,7 +202,7 @@ export default function Statuses( props ) {
                         setEditColorID(null);
                       }}
                       >
-                      Close
+                      {t('close')}
                     </button>
                   </div>
                 </PopoverBody>
@@ -217,7 +224,7 @@ export default function Statuses( props ) {
                   setTitle("");
                   setOrder(0);
                   setIcon('fa fa-play');
-                  setAction(actions[0]);
+                  setAction(translateAllSelectItems(actions, t)[0]);
                   setColor(defaultTagColor);
                 }}
                 >

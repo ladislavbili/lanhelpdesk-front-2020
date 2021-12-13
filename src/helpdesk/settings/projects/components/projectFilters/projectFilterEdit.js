@@ -7,6 +7,9 @@ import {
 import {
   updateArrayItem,
 } from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 import Empty from 'components/Empty';
 import ProjectFilterForm from './projectFilterForm';
 
@@ -22,6 +25,10 @@ export default function ProjectFilterEdit( props ) {
     updateFilter,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   const [ open, setOpen ] = React.useState( false );
 
   return (
@@ -30,11 +37,11 @@ export default function ProjectFilterEdit( props ) {
         className="btn btn-link btn-distance"
         onClick={ () => setOpen(true) }
         >
-        EDIT
+        {t('edit')}
       </button>
       <Modal isOpen={open}>
         <ModalHeader>
-          Edit project filter
+          {`${t('edit')} ${t('projectFilter').toLowerCase()}`}
         </ModalHeader>
         <ModalBody>
           <ProjectFilterForm

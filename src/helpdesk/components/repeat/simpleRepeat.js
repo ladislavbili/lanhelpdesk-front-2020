@@ -16,9 +16,16 @@ import DatePicker from 'components/DatePicker';
 import {
   pickSelectStyle
 } from 'configs/components/select';
+
+import {
+  useTranslation
+} from "react-i18next";
+
 import {
   toMomentInput,
-  fromMomentToUnix
+  fromMomentToUnix,
+  translateSelectItem,
+  translateAllSelectItems,
 } from 'helperFunctions';
 import {
   intervals
@@ -32,6 +39,10 @@ export default function SimpleRepeat( props ) {
     vertical,
     disabled,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ open, setOpen ] = React.useState( false );
   const [ active, setActive ] = React.useState( true );
@@ -75,8 +86,8 @@ export default function SimpleRepeat( props ) {
           >
           {
             repeat ?
-            ("Opakovať každý "+ repeatEvery + ' ' + repeatInterval.title) :
-            "No repeat"
+            `${t('repeatEvery')} ${repeatEvery} ${t(repeatInterval.label).toLowerCase()}` :
+            t('noRepeat')
           }
         </button>
         { repeat && deleteRepeat &&
@@ -95,7 +106,7 @@ export default function SimpleRepeat( props ) {
     <div  className="display-inline">
       {vertical &&
         <div className="form-selects-entry-column">
-          <Label style={{display: "block"}}>Repeat</Label>
+          <Label style={{display: "block"}}>{t('repeat')}</Label>
           <div className="form-selects-entry-column-rest">
             {renderRepeatButton()}
           </div>
@@ -103,7 +114,7 @@ export default function SimpleRepeat( props ) {
       }
       {!vertical &&
         <div className="row p-r-10">
-          <Label className="col-3 col-form-label">Repeat</Label>
+          <Label className="col-3 col-form-label">{t('repeat')}</Label>
           <div className="col-9">
             {renderRepeatButton()}
           </div>
@@ -111,48 +122,48 @@ export default function SimpleRepeat( props ) {
       }
 
       <Popover placement="bottom" isOpen={open && !disabled} target={"repeatPopover"} toggle={toggleRepeat}>
-        <PopoverHeader>Opakovanie</PopoverHeader>
+        <PopoverHeader>{t('repetition')}</PopoverHeader>
         <PopoverBody>
           <div>
             <FormGroup className="task-add-date-picker-placeholder">
-              <Label>Start date *</Label>
+              <Label>{t('startDate')} *</Label>
               <DatePicker
                 className="form-control"
                 selected={startsAt}
                 onChange={setStartsAt}
-                placeholderText="No start date"
+                placeholderText={t('noStartDate')}
                 />
             </FormGroup>
 
             <FormGroup>
-              <Label>Repeat every *</Label>
+              <Label>{t('repeatEvery')} *</Label>
               <div className="row">
                 <div className="width-50-p p-r-20">
                   <Input type="number"
                     className={(parseInt(repeatEvery) < 0 ) ? "form-control-warning form-control-secondary" : "form-control-secondary"}
-                    placeholder="Enter number"
+                    placeholder={t('enterNumber')}
                     value={( repeatEvery )}
                     onChange={(e)=> setRepeatEvery(e.target.value)}
                     />
                 </div>
                 <div className="width-50-p">
                   <Select
-                    value={repeatInterval}
+                    value={translateSelectItem(repeatInterval, t)}
                     onChange={setRepeatInterval}
-                    options={intervals}
+                    options={translateAllSelectItems(intervals, t)}
                     styles={pickSelectStyle()}
                     />
                 </div>
                 {
                   parseInt(repeatEvery) <= 0 &&
-                  <Label className="warning">Must be bigger than 0.</Label>
+                  <Label className="warning">{t('warningMustBeMoreThan0')}.</Label>
                 }
               </div>
             </FormGroup>
             <Checkbox
               className = "m-r-5"
               disabled = {disabled}
-              label="Active"
+              label={t('active')}
               value = { active }
               onChange={() => setActive(!active )}
               />
@@ -161,7 +172,7 @@ export default function SimpleRepeat( props ) {
               <button
                 className="btn-link"
                 onClick={() => setOpen(false) }>
-                Close
+                {t('close')}
               </button>
               <button
                 className="btn ml-auto"
@@ -186,7 +197,7 @@ export default function SimpleRepeat( props ) {
                   setOpen(false);
                 }}
                 >
-                Save
+                {t('save')}
               </button>
             </div>
           </div>

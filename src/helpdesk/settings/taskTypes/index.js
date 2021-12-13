@@ -15,6 +15,9 @@ import {
   orderArr
 } from 'helperFunctions';
 import {
+  useTranslation
+} from "react-i18next";
+import {
   itemAttributesFullfillsString
 } from '../components/helpers';
 
@@ -29,6 +32,10 @@ export default function TaskTypeList( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: taskTypesData,
@@ -66,19 +73,19 @@ export default function TaskTypeList( props ) {
 
   return (
     <SettingListContainer
-      header="Work types"
+      header={t('taskTypes')}
       filter={taskTypeFilter}
       setFilter={setTaskTypeFilter}
       history={history}
       addURL="/helpdesk/settings/taskTypes/add"
-      addLabel="Work type"
+      addLabel={t('taskType')}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Order</th>
+            <th>{t('title')}</th>
+            <th>{t('order')}</th>
           </tr>
         </thead>
         <tbody>

@@ -12,6 +12,10 @@ import {
 import {
   toSelArr,
 } from 'helperFunctions';
+
+import {
+  useTranslation
+} from "react-i18next";
 import Select from 'react-select';
 import {
   FormGroup,
@@ -36,6 +40,10 @@ export default function AddUserToGroup( props ) {
     finish,
     disabled,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: projectGroupsData,
@@ -95,12 +103,12 @@ export default function AddUserToGroup( props ) {
   return (
     <Modal isOpen={user && !disabled } className="modal-without-borders" >
       <ModalHeader>
-        Add user to project group
+        {t('addUserToProjectGroup')}
       </ModalHeader>
       <ModalBody>
         <div className="p-20">
           <FormGroup>
-            <Label for="role">User group</Label>
+            <Label for="role">{t('userGroup')}</Label>
             <Select
               styles={ pickSelectStyle() }
               options={ projectGroups }
@@ -110,10 +118,10 @@ export default function AddUserToGroup( props ) {
           </FormGroup>
           <div className="form-buttons-row">
             <button className="btn" onClick={finish}>
-              Skip
+              {t('skip')}
             </button>
             <button className="btn ml-auto" disabled={ group === null } onClick={addUserToProjectGroupFunc}>
-              {saving?'Adding...':'Add user to project group'}
+              { saving ? `${t('adding')}...` : t('addUserToProjectGroup') }
             </button>
           </div>
         </div>

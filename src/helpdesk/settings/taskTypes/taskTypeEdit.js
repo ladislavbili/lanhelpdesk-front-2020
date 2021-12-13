@@ -11,6 +11,10 @@ import {
   Label,
   Input,
 } from 'reactstrap';
+import {
+  useTranslation
+} from "react-i18next";
+
 import Loading from 'components/loading';
 import DeleteReplacement from 'components/deleteReplacement';
 import SettingsInput from '../components/settingsInput';
@@ -34,6 +38,10 @@ export default function TaskTypeEdit( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const client = useApolloClient();
   const allTaskTypes = toSelArr( client.readQuery( {
       query: GET_TASK_TYPES
@@ -112,7 +120,7 @@ export default function TaskTypeEdit( props ) {
   const deleteTaskTypeFunc = ( replacement ) => {
     setDeleteOpen( false );
 
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteTaskType( {
           variables: {
             id: parseInt( match.params.id ),
@@ -136,12 +144,12 @@ export default function TaskTypeEdit( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20" >
-        Edit task type
+        {`${t('edit')} ${t('taskType').toLowerCase()}`}
       </h2>
 
       <SettingsInput
         required
-        label="Task type name"
+        label={t('taskTypeTitle')}
         id="title"
         value={title}
         onChange={(e)=> {
@@ -151,8 +159,8 @@ export default function TaskTypeEdit( props ) {
         />
 
       <SettingsInput
-        label="Order"
-        placeholder="Lower means first"
+        label={t('order')}
+        placeholder={t('lowerMeansFirst')}
         id="order"
         value={order}
         onChange={(e)=> {
@@ -170,18 +178,18 @@ export default function TaskTypeEdit( props ) {
             setDataChanged( true );
           }}
           >
-          Delete
+          {t('delete')}
         </button>
 
         <div className="ml-auto message m-r-10">
           { dataChanged &&
             <div className="message error-message">
-              Save changes before leaving!
+              {t('saveBeforeLeaving')}
             </div>
           }
           { !dataChanged &&
             <div className="message success-message">
-              Saved
+              {t('saved')}
             </div>
           }
         </div>
@@ -191,12 +199,12 @@ export default function TaskTypeEdit( props ) {
           disabled={saving}
           onClick={updateTaskTypeFunc}
           >
-          {saving ? 'Saving task type...' : 'Save task type'}
+          { saving ? `${t('saving')}...` : `${t('save')} ${t('taskType').toLowerCase()}` }
         </button>
       </div>
       <DeleteReplacement
         isOpen={deleteOpen}
-        label="task type"
+        label={t('taskType')}
         options={filteredTaskTypes}
         close={()=>setDeleteOpen(false)}
         finishDelete={deleteTaskTypeFunc}

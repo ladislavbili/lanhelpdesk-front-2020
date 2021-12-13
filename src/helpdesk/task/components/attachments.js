@@ -11,6 +11,9 @@ import {
   addLocalError,
 } from 'apollo/localSchema/actions';
 import classnames from 'classnames';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function TaskAttachments( props ) {
   //data & queries
@@ -22,6 +25,10 @@ export default function TaskAttachments( props ) {
     removeAttachment,
     type
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
 
   const getAttachment = ( attachment ) => {
@@ -71,7 +78,7 @@ export default function TaskAttachments( props ) {
         <div className="attachment-label">
           <label htmlFor={`uploadAttachment-${taskID}`} className="btn-link" >
             <i className="fa fa-plus" />
-            Attachment          
+            {t('attachment')}
           </label>
         </div>
       }
@@ -94,7 +101,7 @@ export default function TaskAttachments( props ) {
       { false && !disabled && top &&
         <label htmlFor={`uploadAttachment-${taskID}`} className="btn-link" >
           <i className="fa fa-plus" />
-          Attachment
+          {t('attachment')}
         </label>
       }
     </div>

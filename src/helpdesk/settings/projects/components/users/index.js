@@ -11,6 +11,9 @@ import Radio from 'components/radio';
 import {
   pickSelectStyle
 } from "configs/components/select";
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function ProjectUsers( props ) {
   //data
@@ -31,6 +34,10 @@ export default function ProjectUsers( props ) {
     setLockedRequester,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   const [ chosenUser, setChosenUser ] = React.useState( null );
   const [ userGroup, setUserGroup ] = React.useState( null );
   const [ chosenCompany, setChosenCompany ] = React.useState( null );
@@ -43,12 +50,12 @@ export default function ProjectUsers( props ) {
           {
             key: 'lockedRequesterOff',
             value: !lockedRequester,
-            label: 'A requester can be ALL helpdesk users',
+            label: t('requesterAllUsers'),
           },
           {
             key: 'lockedRequesterOn',
             value: lockedRequester,
-            label: 'A requester can be only one of PROJECT users.',
+            label: t('requesterFromProject'),
           },
         ] }
         name="lockedRequester"
@@ -61,9 +68,9 @@ export default function ProjectUsers( props ) {
       <table className="table bkg-white m-t-20">
         <thead>
           <tr>
-            <th width="50%">Helpdesk system user</th>
-            <th>Project Group</th>
-            <th width="50px">Akcie</th>
+            <th width="50%">{t('helpdeskSystemUser')}</th>
+            <th>{t('projectGroup')}</th>
+            <th width="50px">{t('actions')}</th>
           </tr>
         </thead>
 
@@ -106,9 +113,9 @@ export default function ProjectUsers( props ) {
       <table className="table bkg-white m-t-10">
         <thead>
           <tr>
-            <th width="50%">Company</th>
-            <th>Project Group</th>
-            <th width="50px">Akcie</th>
+            <th width="50%">{t('company')}</th>
+            <th>{t('projectGroup')}</th>
+            <th width="50px">{t('actions')}</th>
           </tr>
         </thead>
 
@@ -142,7 +149,7 @@ export default function ProjectUsers( props ) {
       <CompanyAdd submit={addCompanyRight} companies={companies.filter((company) => !companyGroups.map((permission) => permission.company.id).includes(company.id))} groups={groups} />
 
       <div className="m-t-20 m-b-20">
-        Helpdesk users with the administrator role have all project rights.
+      {t('helpdeskAdminHaveAllRights')}
       </div>
     </div>
   );

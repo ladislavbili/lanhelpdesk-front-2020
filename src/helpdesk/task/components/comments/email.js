@@ -8,6 +8,9 @@ import {
   DropdownToggle,
   DropdownMenu,
 } from 'reactstrap';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function EmailRender( props ) {
   const {
@@ -17,6 +20,10 @@ export default function EmailRender( props ) {
     openedComments,
     setOpenedComments,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   return (
     <div>
       <div className="media m-b-30 m-t-20">
@@ -29,8 +36,8 @@ export default function EmailRender( props ) {
         <div className="flex" >
           <div>
             <span className="media-meta pull-right color-muted">{timestampToString(comment.createdAt)}</span>
-            <h2 className="font-13 m-0"><Label>From: {comment.user !== null ? `${comment.user.fullName} (${comment.user.email})` : 'Unknown user'}</Label></h2>
-            { comment.tos.length !== 0 && <h2 className="font-13 m-0"><Label>To: {comment.tos.toString()}</Label></h2>}
+            <h2 className="font-13 m-0"><Label>{t('from2')}: {comment.user !== null ? `${comment.user.fullName} (${comment.user.email})` : t('unknownUser')}</Label></h2>
+            { comment.tos.length !== 0 && <h2 className="font-13 m-0"><Label>{t('to2')}: {comment.tos.toString()}</Label></h2>}
           </div>
           <Dropdown className="center-hor pull-right"
             isOpen={openedComments.includes(comment.id)}
@@ -54,7 +61,7 @@ export default function EmailRender( props ) {
               </label>
             </DropdownMenu>
           </Dropdown>
-          <p className="m-b-0">Subject: <span className="color-muted">{comment.subject}</span></p>
+          <p className="m-b-0">{t('subject')}: <span className="color-muted">{comment.subject}</span></p>
           <div
             className="ignore-css"
             dangerouslySetInnerHTML={{

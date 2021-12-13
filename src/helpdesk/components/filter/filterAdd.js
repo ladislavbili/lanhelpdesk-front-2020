@@ -23,6 +23,7 @@ import {
   toSelArr,
   toSelItem,
   getMyData,
+  translateSelectItem,
 } from 'helperFunctions';
 import Checkbox from 'components/checkbox';
 import {
@@ -51,6 +52,10 @@ import {
   GET_MY_PROJECTS,
 } from 'helpdesk/settings/projects/queries';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function FilterAdd( props ) {
   //data & queries
   const {
@@ -61,6 +66,10 @@ export default function FilterAdd( props ) {
     history
   } = props;
   //queries
+
+  const {
+    t
+  } = useTranslation();
 
   const [ addFilter, {
     client
@@ -216,15 +225,15 @@ export default function FilterAdd( props ) {
 
       <Modal style={{width: "800px"}} isOpen={opened}>
         <ModalHeader>
-          { projectId ? "Add filter to project ": "Add general filter"  }
+          { projectId ? t('addFilterToProject'): t('addGeneralFilter')  }
         </ModalHeader>
         <ModalBody>
           {/* Filter name */}
-          <Label>Filter name</Label>
+          <Label>{t('filterTitle')}</Label>
           <Input
             type="text"
             className="from-control m-t-5 m-b-5"
-            placeholder="Enter filter name"
+            placeholder={t('filterTitlePlaceholder')}
             autoFocus
             value={title}
             onChange={(e) => {
@@ -236,7 +245,7 @@ export default function FilterAdd( props ) {
           { canCreatePublicFilters &&
             <Checkbox
               className = "m-l-5 m-r-5"
-              label = "Public (everyone see this filter)"
+              label = {t('publicFilter')}
               value = { pub || !canCreateCustomFilters }
               blocked = { !canCreateCustomFilters }
               onChange={(e)=> setPub(!pub)}
@@ -246,9 +255,9 @@ export default function FilterAdd( props ) {
           {/* ROLES - what role in case of public */}
           { canCreatePublicFilters && ( pub || !canCreateCustomFilters ) &&
             <FormGroup>{/* Roles */}
-              <Label className="">Roles</Label>
+              <Label className="">{t('roles')}</Label>
               <Select
-                placeholder="Choose roles"
+                placeholder={t('rolesLabel')}
                 value={roles}
                 isMulti
                 onChange={(newRoles)=>{
@@ -262,7 +271,9 @@ export default function FilterAdd( props ) {
                     setRoles(newRoles);
                   }
                 }}
-                options={toSelArr([{id: 'all', title: roleData.basicRoles.length === roles.length ? 'Clear' : 'All' }].concat(roleData.basicRoles))}
+                options={toSelArr([
+                    {id: 'all', title: roleData.basicRoles.length === roles.length ? t('clear') : t('all') }
+                ].concat(roleData.basicRoles))}
                 styles={pickSelectStyle()}
                 />
             </FormGroup>
@@ -270,7 +281,7 @@ export default function FilterAdd( props ) {
           {/* In DASHBOARD - FILTER ONLY */}
             <Checkbox
               className = "m-l-5 m-r-5"
-              label = "Dashboard (shown in All Projects)"
+              label = {t('dashboard')}
               disabled = { !global && projectId === null }
               value = { dashboard }
               onChange={(e)=>setDashboard(!dashboard)}
@@ -279,7 +290,7 @@ export default function FilterAdd( props ) {
         </ModalBody>
         <ModalFooter>
           <button className="mr-auto btn-link" disabled={saving} onClick={() => setOpened(!opened)}>
-            Close
+            {t('close')}
           </button>
 
           <button
@@ -287,7 +298,7 @@ export default function FilterAdd( props ) {
             disabled={saving || title === "" || (!global && !dashboard && !projectId)}
             onClick={addFilterFunc}
             >
-            {id !== null ? (saving?'Saving...':'Save filter') : (saving ? 'Adding...' : 'Add filter' )}
+            {id !== null ? (saving?`${saving}...`:t('saveFilter')) : (saving ? `${t('adding')}...` : t('addFilter') )}
           </button>
         </ModalFooter>
       </Modal>

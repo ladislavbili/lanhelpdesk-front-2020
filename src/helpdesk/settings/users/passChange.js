@@ -12,24 +12,32 @@ import {
   InputGroupAddon
 } from 'reactstrap';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function PasswordChange( props ) {
   const {
     submitPass,
     isOpen,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const [ newPass, setNewPass ] = React.useState( "" );
   const [ showPass, setShowPass ] = React.useState( false );
   const [ newPassCheck, setNewPassCheck ] = React.useState( "" );
   return (
     <Modal isOpen={isOpen}>
       <ModalHeader>
-        Write a new password and repeat it.
+        {t('changePasswordMessage')}
       </ModalHeader>
       <ModalBody>
         <FormGroup>
-          <Label htmlFor="new-pass">New Password</Label>
+          <Label htmlFor="new-pass">{t('newPassword')}</Label>
           <InputGroup>
-            <Input type={showPass?'text':"password"} className="from-control" placeholder="Enter password" value={newPass} id="new-pass" onChange={ (e) => setNewPass(e.target.value) } />
+            <Input type={showPass?'text':"password"} className="from-control" placeholder={t('passwordPlaceholder')} value={newPass} id="new-pass" onChange={ (e) => setNewPass(e.target.value) } />
             <InputGroupAddon addonType="append" className="clickable" onClick={ () => setShowPass(!showPass) }>
               <InputGroupText>
                 <i className={"mt-auto mb-auto " + (!showPass ? 'fa fa-eye' : 'fa fa-eye-slash')} />
@@ -38,16 +46,16 @@ export default function PasswordChange( props ) {
           </InputGroup>
         </FormGroup>
         <FormGroup>
-          <Label htmlFor="pass-test">New Password Check</Label>
-          <Input type="password" id="pass-test" placeholder="Re-ender password" value={newPassCheck} onChange={ (e) => setNewPassCheck(e.target.value) } />
+          <Label htmlFor="pass-test">{t('newPasswordCheck')}</Label>
+          <Input type="password" id="pass-test" placeholder={t('newPasswordCheckPlaceholder')} value={newPassCheck} onChange={ (e) => setNewPassCheck(e.target.value) } />
         </FormGroup>
       </ModalBody>
       <ModalFooter>
         <button className="btn-link mr-auto"onClick={() => submitPass(null)}>
-          Cancel
+          {t('cancel')}
         </button>
         <button className="btn ml-auto" disabled={newPass.length < 6 || newPass !== newPassCheck } onClick={() => submitPass(newPass)}>
-          Change password
+          {t('changePassword')}
         </button>
       </ModalFooter>
     </Modal>

@@ -43,13 +43,19 @@ import {
   GET_PROJECTS,
 } from '../projects/queries';
 
-
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function IMAPAdd( props ) {
   const {
     match,
     history
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const client = useApolloClient();
 
   const {
@@ -161,26 +167,26 @@ export default function IMAPAdd( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20">
-        Add IMAP
+        {`${t('add')} ${t('imap')}`}
       </h2>
 
       <Checkbox
         className = "m-b-5 p-l-0"
         value = { def }
         onChange={ () => setDef(!def) }
-        label = "Default"
+        label = {t('default')}
         />
 
       <Checkbox
         className = "m-b-5 p-l-0"
         value = { active }
         onChange={ () => setActive(!active) }
-        label = "Active"
+        label = {t('active')}
         />
 
       <SettingsInput
         required
-        label="Title"
+        label={t('title')}
         id="title"
         value={title}
         onChange={(e)=> {
@@ -190,7 +196,7 @@ export default function IMAPAdd( props ) {
 
       <SettingsInput
         required
-        label="Host"
+        label={t('host')}
         id="host"
         value={host}
         onChange={(e)=> {
@@ -200,7 +206,7 @@ export default function IMAPAdd( props ) {
 
       <SettingsInput
         required
-        label="Port"
+        label={t('port')}
         id="port"
         type="number"
         value={port}
@@ -211,7 +217,7 @@ export default function IMAPAdd( props ) {
 
       <SettingsInput
         required
-        label="Username"
+        label={t('username')}
         id="username"
         value={username}
         onChange={(e)=> {
@@ -221,7 +227,7 @@ export default function IMAPAdd( props ) {
 
       <SettingsHiddenInput
         required
-        label="Password"
+        label={t('password')}
         id="password"
         value={password}
         onChange={(e)=> {
@@ -233,12 +239,12 @@ export default function IMAPAdd( props ) {
         className = "m-b-5 p-l-0"
         value = { tls }
         onChange={ () => setTls(!tls) }
-        label = "TLS"
+        label = {t('tls')}
         />
 
       <SettingsInput
         required
-        label="Destination"
+        label={t('destination')}
         id="destination"
         value={destination}
         onChange={(e)=> {
@@ -247,7 +253,7 @@ export default function IMAPAdd( props ) {
         />
 
       <FormGroup>
-        <Label for="ignoredRecievers">Ignored recievers</Label>
+        <Label for="ignoredRecievers">{t('ignoredRecievers')}</Label>
         <Creatable
           isMulti
           value={ignoredRecievers}
@@ -262,9 +268,9 @@ export default function IMAPAdd( props ) {
 
       <SettingsInput
         required
-        label="Destination"
+        label={t('destination')}
         id="ignoredRecieversDestination"
-        placeholder="Enter ignored e-mails destination"
+        placeholder={t('ignoredDestinationPlaceholder')}
         value={ignoredRecieversDestination}
         onChange={(e)=> {
           setIgnoredRecieversDestination(e.target.value);
@@ -275,11 +281,11 @@ export default function IMAPAdd( props ) {
         className = "m-b-5 p-l-0"
         value = { rejectUnauthorized }
         onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
-        label = "Reject unauthorized"
+        label = {t('rejectUnauthorized')}
         />
 
       <FormGroup>
-        <Label for="role">Users Role <span className="warning-big">*</span></Label>
+        <Label for="role">{t('usersRole')}<span className="warning-big">*</span></Label>
         <Select
           styles={pickSelectStyle()}
           options={toSelArr(roleData.roles)}
@@ -289,7 +295,7 @@ export default function IMAPAdd( props ) {
       </FormGroup>
 
       <FormGroup>
-        <Label for="project">Users Company <span className="warning-big">*</span></Label>
+        <Label for="project">{t('usersCompany')}<span className="warning-big">*</span></Label>
         <Select
           styles={pickSelectStyle()}
           options={toSelArr(companyData.basicCompanies)}
@@ -299,7 +305,7 @@ export default function IMAPAdd( props ) {
       </FormGroup>
 
       <FormGroup>
-        <Label for="project">Tasks Project <span className="warning-big">*</span></Label>
+        <Label for="project">{t('tasksProject')}<span className="warning-big">*</span></Label>
         <Select
           styles={pickSelectStyle()}
           options={toSelArr(projectData.projects)}
@@ -311,7 +317,7 @@ export default function IMAPAdd( props ) {
       <div className="form-buttons-row">
         { cannotSave() &&
           <div className="message error-message ml-auto m-r-14">
-            Fill in all the required information!
+            {t('fillAllRequiredInformation')}
           </div>
         }
         <button
@@ -321,7 +327,7 @@ export default function IMAPAdd( props ) {
           )}
           disabled={cannotSave()}
           onClick={addIMAPFunc}>
-          { saving ? 'Adding...' : 'Add Imap' }
+          { saving ? `${t('adding')}...` : `${t('add')} ${t('imap')}` }
         </button>
       </div>
     </div>

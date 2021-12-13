@@ -6,6 +6,9 @@ import {
 import classnames from "classnames";
 
 import SettingsInput from '../components/settingsInput';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   addLocalError,
@@ -20,6 +23,10 @@ export default function TaskTypeAdd( props ) {
   const {
     history
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const client = useApolloClient();
 
   const [ addTaskType ] = useMutation( ADD_TASK_TYPE );
@@ -55,12 +62,12 @@ export default function TaskTypeAdd( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20">
-        Add task type
+        {`${t('add')} ${t('taskType').toLowerCase()}`}
       </h2>
 
       <SettingsInput
         required
-        label="Task type name"
+        label={t('taskTypeTitle')}
         id="title"
         value={title}
         onChange={(e) => {
@@ -69,8 +76,8 @@ export default function TaskTypeAdd( props ) {
         />
 
       <SettingsInput
-        label="Order"
-        placeholder="Lower means first"
+        label={t('order')}
+        placeholder={t('lowerMeansFirst')}
         id="order"
         value={order}
         onChange={(e) => {
@@ -81,7 +88,7 @@ export default function TaskTypeAdd( props ) {
       <div className="form-buttons-row">
         { cannotSave() &&
           <div className="message error-message ml-auto m-r-14">
-            Fill in all the required information!
+            {t('fillAllRequiredInformation')}
           </div>
         }
         <button
@@ -92,7 +99,7 @@ export default function TaskTypeAdd( props ) {
           disabled={cannotSave()}
           onClick={addTaskTypeFunc}
           >
-          { saving ? 'Adding...' : 'Add task type' }
+          { saving ? `${t('adding')}...` : `${t('add')} ${t('taskType').toLowerCase()}` }
         </button>
       </div>
     </div>

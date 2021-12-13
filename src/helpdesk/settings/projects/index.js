@@ -15,6 +15,9 @@ import {
 import ProjectAdd from './projectAdd';
 import ProjectEdit from './projectEdit';
 import {
+  useTranslation
+} from "react-i18next";
+import {
   GET_PROJECTS,
   PROJECTS_SUBSCRIPTION,
 } from './queries';
@@ -24,6 +27,10 @@ export default function ProjectsList( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: projectsData,
@@ -50,11 +57,11 @@ export default function ProjectsList( props ) {
 
   const getProjectStat = ( project ) => {
     let color = 'red';
-    let text = 'No';
+    let text = t( 'no' );
     let iconName = 'far fa-times-circle';
     if ( project.right && project.right.projectWrite ) {
       color = 'green';
-      text = 'Yes';
+      text = t( 'yes' );
       iconName = 'far fa-check-circle';
     }
     return (
@@ -83,22 +90,22 @@ export default function ProjectsList( props ) {
 
   return (
     <SettingListContainer
-      header="Projects"
+      header={t('projects')}
       filter={projectFilter}
       setFilter={setProjectFilter}
       history={history}
       addURL="/helpdesk/settings/projects/add"
-      addLabel="Project"
+      addLabel={t('project')}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
             <th>
-              Title
+              {t('title')}
             </th>
             <th>
-              ACL
+              {t('access')}
             </th>
           </tr>
         </thead>

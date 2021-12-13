@@ -16,6 +16,9 @@ import Checkbox from 'components/checkbox';
 import Switch from "components/switch";
 import PasswordChange from './passChange';
 import SettingsInput from '../components/settingsInput';
+import {
+  useTranslation
+} from "react-i18next";
 
 import languages from "configs/constants/languages";
 import {
@@ -52,6 +55,10 @@ export default function UserEdit( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const id = parseInt( match.params.id );
   const client = useApolloClient();
@@ -179,7 +186,7 @@ export default function UserEdit( props ) {
   };
 
   const deleteUserFunc = () => {
-    if ( window.confirm( "Are you sure you want to delete the user?" ) ) {
+    if ( window.confirm( t( 'deleteUserMessage' ) ) ) {
       deleteUser( {
           variables: {
             id,
@@ -220,7 +227,7 @@ export default function UserEdit( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20" >
-        Edit user
+        {`${t('edit')} ${t('user2').toLowerCase()}`}
       </h2>
 
       <Switch
@@ -229,14 +236,14 @@ export default function UserEdit( props ) {
           setActive(!active);
           setDataChanged( true );
         }}
-        label="Active"
+        label={t('active')}
         disabled={id === currentUser.id}
         labelClassName="text-normal font-normal"
         simpleSwitch
         />
 
       <FormGroup>
-        <Label for="role">Role <span className="warning-big">*</span></Label>
+        <Label for="role">{t('role')}<span className="warning-big">*</span></Label>
         <Select
           styles={ pickSelectStyle() }
           isDisabled={ isDisabled }
@@ -251,7 +258,7 @@ export default function UserEdit( props ) {
 
       <SettingsInput
         required
-        label="Username"
+        label={t('username')}
         id="username"
         disabled={ isDisabled }
         value={username}
@@ -263,7 +270,7 @@ export default function UserEdit( props ) {
 
       <SettingsInput
         required
-        label="Name"
+        label={t('name')}
         id="name"
         disabled={ isDisabled }
         value={ name }
@@ -275,7 +282,7 @@ export default function UserEdit( props ) {
 
       <SettingsInput
         required
-        label="Surname"
+        label={t('surname')}
         id="surname"
         disabled={ isDisabled }
         value={ surname }
@@ -287,7 +294,7 @@ export default function UserEdit( props ) {
 
       <SettingsInput
         required
-        label="E-mail"
+        label={t('email')}
         id="email"
         type="email"
         disabled={ isDisabled }
@@ -299,7 +306,7 @@ export default function UserEdit( props ) {
         />
 
       <FormGroup>
-        <Label for="language">Language</Label>
+        <Label for="language">{t('language')}</Label>
         <Select
           styles={ pickSelectStyle() }
           options={ languages }
@@ -315,7 +322,7 @@ export default function UserEdit( props ) {
       <Checkbox
         className = "m-b-5 p-l-0"
         value = { receiveNotifications }
-        label = "Receive e-mail notifications"
+        label={t('receiveNotifications')}
         disabled={ isDisabled }
         onChange={()=> {
           setReceiveNotifications(!receiveNotifications);
@@ -324,7 +331,7 @@ export default function UserEdit( props ) {
         />
 
       <FormGroup>
-        <Label for="company">Company <span className="warning-big">*</span></Label>
+        <Label for="company">{t('company')}<span className="warning-big">*</span></Label>
         <Select
           styles={ pickSelectStyle() }
           isDisabled={ isDisabled }
@@ -338,7 +345,7 @@ export default function UserEdit( props ) {
       </FormGroup>
 
       <SettingsInput
-        label="Signature"
+        label={t('signature')}
         id="signature"
         type="textarea"
         disabled={ isDisabled }
@@ -358,7 +365,7 @@ export default function UserEdit( props ) {
               disabled={deletingUser}
               onClick={deleteUserFunc}
               >
-              Delete
+              {t('delete')}
             </button>
           }
 
@@ -369,18 +376,18 @@ export default function UserEdit( props ) {
               setPasswordChangeOpen(true);
             }}
             >
-            { password === null ? 'Change password' : 'Password change edit' }
+            { password === null ? t('changePassword') : t('changePasswordEdit') }
           </button>
 
           <div className="ml-auto message m-r-10">
             { dataChanged &&
               <div className="message error-message">
-                Save changes before leaving!
+                {t('saveBeforeLeaving')}
               </div>
             }
             { !dataChanged &&
               <div className="message success-message">
-                Saved
+                {t('saved')}
               </div>
             }
           </div>
@@ -390,7 +397,7 @@ export default function UserEdit( props ) {
             disabled={ saving || ( companiesData.basicCompanies ? companiesData.basicCompanies.length === 0 : false) || !isEmail(email) }
             onClick={ updateUserFunc }
             >
-            { saving ? 'Saving user...' : 'Save user' }
+            { saving ? `${t('saving')}...` : `${t('save')} ${t('user2').toLowerCase()}` }
           </button>
 
         </div>

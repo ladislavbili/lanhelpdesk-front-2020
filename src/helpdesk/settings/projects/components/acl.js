@@ -3,6 +3,9 @@ import {
 
 } from 'reactstrap';
 import classnames from 'classnames';
+import {
+  useTranslation
+} from "react-i18next";
 import Checkbox from 'components/checkbox';
 import {
   allACLs
@@ -14,6 +17,10 @@ export default function ProjectACL( props ) {
     groups,
     updateGroupRight,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const sortedGroups = groups.sort( ( group1, group2 ) => {
     if ( group1.order === group2.order ) {
@@ -91,7 +98,7 @@ export default function ProjectACL( props ) {
         <tbody>
           { allACLs.map((acl) => (
             <tr key={acl.id} className={classnames( { 'bkg-content h-30': acl.separator, 'font-bold': acl.header })}>
-              <td colSpan={acl.separator ? sortedGroups.length + 1 : '1' } >{ acl.separator ? '' : acl.title }</td>
+              <td colSpan={acl.separator ? sortedGroups.length + 1 : '1' } >{ acl.separator ? '' : t(acl.title) }</td>
               { sortedGroups.map( (group) => {
                 if(acl.separator){
                   return null;
@@ -99,7 +106,7 @@ export default function ProjectACL( props ) {
                 if(acl.header){
                   return (
                   <td key={group.id}>
-                    {group.title}
+                    {t(group.title)}
                   </td>
                   )
                 }

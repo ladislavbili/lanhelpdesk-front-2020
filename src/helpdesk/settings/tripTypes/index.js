@@ -12,6 +12,9 @@ import TripTypeAdd from './tripTypeAdd';
 import TripTypeEdit from './tripTypeEdit';
 
 import {
+  useTranslation
+} from "react-i18next";
+import {
   orderArr
 } from 'helperFunctions';
 import {
@@ -28,6 +31,10 @@ export default function TripTypeListContainer( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: tripTypesData,
@@ -68,19 +75,19 @@ export default function TripTypeListContainer( props ) {
 
   return (
     <SettingListContainer
-      header="Trip types"
+      header={t('tripTypes')}
       filter={tripTypeFilter}
       setFilter={setTripTypeFilter}
       history={history}
       addURL="/helpdesk/settings/tripTypes/add"
-      addLabel="Trip type"
+      addLabel={t('tripType')}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Order</th>
+            <th>{t('title')}</th>
+            <th>{t('order')}</th>
           </tr>
         </thead>
         <tbody>

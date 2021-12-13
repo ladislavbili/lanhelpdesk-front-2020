@@ -19,6 +19,9 @@ import {
   addLocalError,
 } from 'apollo/localSchema/actions';
 import {
+  useTranslation
+} from "react-i18next";
+import {
   getMyData,
 } from 'helperFunctions';
 
@@ -32,6 +35,10 @@ export default function RoleAdd( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const client = useApolloClient();
 
@@ -47,106 +54,106 @@ export default function RoleAdd( props ) {
     {
       state: React.useState( false ),
       key: 'login',
-      label: "Login to system"
+      label: t( 'loginToSystem' ),
     },
     {
       state: React.useState( false ),
       key: 'vykazy',
-      label: "Invoices"
+      label: t( 'invoices' ),
     },
     {
       state: React.useState( false ),
       key: 'publicFilters',
-      label: "Public Filters"
+      label: t( 'publicFilters' ),
     },
     {
       state: React.useState( false ),
       key: 'addProjects',
-      label: "Add projects"
+      label: t( 'addProjects' ),
     },
     {
       state: React.useState( false ),
       key: 'viewErrors',
-      label: "View errors"
+      label: t( 'viewErrors' ),
     }
   ];
   const settings = [
     {
       state: React.useState( false ),
       key: 'users',
-      label: "Users"
+      label: t( 'users' )
     },
     {
       state: React.useState( false ),
       key: 'companies',
-      label: "Companies"
+      label: t( 'companies' )
     },
     {
       state: React.useState( false ),
       key: 'pausals',
-      label: "Pausals"
+      label: t( 'pausals' )
     },
     {
       state: React.useState( false ),
       key: 'projects',
-      label: "Projects"
+      label: t( 'projects' )
     },
     {
       state: React.useState( false ),
       key: 'statuses',
-      label: "Statuses"
+      label: t( 'statuses' )
     },
     {
       state: React.useState( false ),
       key: 'prices',
-      label: "Prices"
+      label: t( 'pricelists' )
     },
     {
       state: React.useState( false ),
       key: 'roles',
-      label: "Roles"
+      label: t( 'roles' )
     },
     {
       state: React.useState( false ),
       key: 'taskTypes',
-      label: "Task types"
+      label: t( 'taskTypes' )
     },
     {
       state: React.useState( false ),
       key: 'tripTypes',
-      label: "Trip types"
+      label: t( 'tripTypes' )
     },
     {
       state: React.useState( false ),
       key: 'imaps',
-      label: "IMAPs"
+      label: t( 'imaps' )
     },
     {
       state: React.useState( false ),
       key: 'smtps',
-      label: "SMTPs"
+      label: t( 'smtps' )
     },
   ];
   const helpdesk = [
     {
       state: React.useState( false ),
       key: 'tasklistLayout',
-      label: "Set tasklist layout (all tasks)"
+      label: t( 'tasklistLayoutRight' ),
     },
     {
       state: React.useState( false ),
       key: 'tasklistCalendar',
-      label: "Tasklist calendar (all tasks)"
+      label: t( 'tasklistCalendarRight' ),
     },
     {
       state: React.useState( false ),
       key: 'tasklistPreferences',
-      label: "Tasklist column preferences"
+      label: t( 'tasklistPreferencesRight' ),
     },
     {
       state: React.useState( false ),
       key: 'customFilters',
-      label: "Create custom filters"
+      label: t( 'customFiltersRight' ),
     },
   ];
 
@@ -193,13 +200,13 @@ export default function RoleAdd( props ) {
   return (
     <div className="scroll-visible p-20 fit-with-header">
       <h2 className="m-b-20" >
-        Add role
+        {`${t('add')} ${t('role').toLowerCase()}`}
       </h2>
 
       <SettingsInput
         required
         id="title"
-        label="Role name"
+        label={t('roleTitle')}
         value={title}
         onChange={(e) => {
           setTitle(e.target.value);
@@ -208,7 +215,7 @@ export default function RoleAdd( props ) {
 
       <SettingsInput
         id="order"
-        label="Order"
+        label={t('order')}
         value={order}
         onChange={(e) => {
           setOrder(e.target.value);
@@ -217,10 +224,10 @@ export default function RoleAdd( props ) {
 
       <SettingsInput
         id="level"
-        label="Level"
+        label={t('level')}
         type="number"
         error={ currentUserLevel === null || level <= currentUserLevel }
-        errorMessage={`Targets role can't be lower or same as yours(${currentUserLevel})!`}
+        errorMessage={`${t('targerRoleCantBeLowerOrSameThanYours')}(${currentUserLevel})!`}
         value={level}
         onChange={(e) => {
           setLevel(e.target.value);
@@ -228,15 +235,15 @@ export default function RoleAdd( props ) {
         />
 
       <div>
-        <h2>General rights</h2>
+        <h2>{t('generalRights')}</h2>
         <table className="table">
           <thead>
             <tr>
               <th width={"90%"} key={1}>
-                Name
+                {t('title')}
               </th>
               <th className="text-center" key={2}>
-                Granted
+                {t('granted')}
               </th>
             </tr>
           </thead>
@@ -255,15 +262,15 @@ export default function RoleAdd( props ) {
       </div>
 
       <div>
-        <h2>Settings</h2>
+        <h2>{t('settings')}</h2>
         <table className="table">
           <thead>
             <tr>
               <th width={"90%"} key={1}>
-                Access
+                {t('access')}
               </th>
               <th className="text-center" key={2}>
-                View & Edit
+                {t('viewAndEdit')}
               </th>
             </tr>
           </thead>
@@ -282,15 +289,15 @@ export default function RoleAdd( props ) {
       </div>
 
       <div>
-        <h2>Helpdesk rights</h2>
+        <h2>{t('helpdeskRights')}</h2>
         <table className="table">
           <thead>
             <tr>
               <th width={"90%"} key={1}>
-                Name
+                {t('title')}
               </th>
               <th className="text-center" key={2}>
-                Granted
+                {t('granted')}
               </th>
             </tr>
           </thead>
@@ -314,13 +321,13 @@ export default function RoleAdd( props ) {
               props.close()
             }}
             >
-            Cancel
+            {t('cancel')}
           </button>
         }
 
         { cannotSave() &&
           <div className="message error-message ml-auto m-r-14">
-            Fill in all the required information!
+            {t('fillAllRequiredInformation')}
           </div>
         }
 
@@ -332,7 +339,7 @@ export default function RoleAdd( props ) {
           disabled={cannotSave()}
           onClick={addRoleFunc}
           >
-          { saving ? 'Adding...' : 'Add role' }
+          { saving ? `${t('adding')}...` : `${t('add')} ${t('role').toLowerCase()}` }
         </button>
       </div>
     </div>

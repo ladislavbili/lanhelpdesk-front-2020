@@ -25,7 +25,7 @@ export default function FilterDatePickerInCalendar( props ) {
     setShowNowTo,
     setDateTo,
     minimal
-  } = this.props;
+  } = props;
   const {
     t
   } = useTranslation();

@@ -15,6 +15,9 @@ import {
   columnsToShowOverPausalWorkTrips,
   columnsToShowMaterials
 } from './tableConfig';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function Invoice( props ) {
   const {
@@ -24,6 +27,10 @@ export default function Invoice( props ) {
     fromDate,
     toDate,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const totals = invoice.totals;
 
@@ -35,23 +42,23 @@ export default function Invoice( props ) {
 
   return (
     <div>
-      <h2>Fakturačný výkaz firmy</h2>
+      <h2>{t('invoiceOfCompany')}</h2>
       <div className="flex-row m-b-10">
         <div>
-          Firma {company.title}
+          {t('company')}: {company.title}
           <br/>
-          Obdobie od: {timestampToDate(fromDate)} do: {timestampToDate(toDate)}
+          {` ${t('period')} ${t('from').toLowerCase()}: ${timestampToDate(fromDate)} ${t('to').toLowerCase()}: ${timestampToDate(toDate)} `}
         </div>
         <div className="m-l-10">
-          Počet prác vrámci paušálu: {invoice.pausalTotals.workHours}
+          {t('countOfWorksInPausal')}: {invoice.pausalTotals.workHours}
           <br/>
-          Počet výjazdov vrámci paušálu: {invoice.pausalTotals.tripHours}
+          {t('countOfTripsInPausal')}: {invoice.pausalTotals.tripHours}
         </div>
       </div>
 
       <div className="m-b-30">
-        <h3 className="m-b-10">Práce a výjazdy v rámci paušálu</h3>
-        <h4>Práce</h4>
+        <h3 className="m-b-10">{t('worksTripsInPausal')}</h3>
+        <h4>{t('works')}</h4>
         <hr />
         <ReportsTable
           tasks={invoice.pausalTasks.filter((task) => task.subtasks.length > 0 )}
@@ -60,16 +67,16 @@ export default function Invoice( props ) {
           />
 
         <p className="m-0">
-          { `Spolu počet hodín: ${ invoice.pausalTotals.workHours }` }
+          { `${t('totalHours')}: ${ invoice.pausalTotals.workHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet hodín mimo pracovný čas: ${ invoice.pausalTotals.workOvertime } ( Čísla úloh: ${ invoice.pausalTotals.workOvertimeTasks.join(',') })` }
+          { `${t('overtimeTotalHours')}: ${ invoice.pausalTotals.workOvertime } ( ${t('taskIDs')}: ${ invoice.pausalTotals.workOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za práce mimo pracovných hodín: ${invoice.pausalTotals.workExtraPrice.toFixed(2)} eur` }
+          { `${t('overtimeWorkExtraPrice')}: ${invoice.pausalTotals.workExtraPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
 
-        <h4>Výjazdy</h4>
+        <h4>{t('trips')}</h4>
         <hr />
         <ReportsTable
           tasks={invoice.pausalTasks.filter((task) => task.workTrips.length > 0 )}
@@ -77,19 +84,19 @@ export default function Invoice( props ) {
           onClickTask={onClickTask}
           />
         <p className="m-0">
-          { `Spolu počet výjazdov: ${ invoice.pausalTotals.tripHours }` }
+          { `${t('tripTotal')}: ${ invoice.pausalTotals.tripHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet výjazdov mimo pracovný čas: ${ invoice.pausalTotals.tripOvertime } ( Čísla úloh: ${ invoice.pausalTotals.tripOvertimeTasks.join(',') })` }
+          { `${t('overtimeTripTotal')}: ${ invoice.pausalTotals.tripOvertime } ( ${t('taskIDs')}: ${ invoice.pausalTotals.tripOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za výjazdy mimo pracovných hodín: ${invoice.pausalTotals.tripExtraPrice.toFixed(2)} eur` }
+          { `${t('overtimeTripExtraPrice')}: ${invoice.pausalTotals.tripExtraPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
       </div>
 
       <div className="m-b-30">
-        <h3 className="m-b-10">Práce a výjazdy nad rámec paušálu</h3>
-        <h4>Práce</h4>
+        <h3 className="m-b-10">{t('worksTripsOverPausal')}</h3>
+        <h4>{t('works')}</h4>
         <hr />
         <ReportsTable
           tasks={invoice.overPausalTasks.filter((task) => task.subtasks.length > 0 )}
@@ -98,22 +105,22 @@ export default function Invoice( props ) {
           />
 
         <p className="m-0">
-          { `Spolu počet hodín: ${ invoice.overPausalTotals.workHours }` }
+          { `${t('totalHours')}: ${ invoice.overPausalTotals.workHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet hodín mimo pracovný čas: ${ invoice.overPausalTotals.workOvertime } ( Čísla úloh: ${ invoice.overPausalTotals.workOvertimeTasks.join(',') })` }
+          { `${t('overtimeTotalHours')}: ${ invoice.overPausalTotals.workOvertime } ( ${t('taskIDs')}: ${ invoice.overPausalTotals.workOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za práce mimo pracovných hodín: ${invoice.overPausalTotals.workExtraPrice.toFixed(2)} eur` }
+          { `${t('overtimeWorkExtraPrice')}: ${invoice.overPausalTotals.workExtraPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
         <p className="m-0">
-          { `Spolu cena bez DPH: ${invoice.overPausalTotals.workTotalPrice.toFixed(2)} eur` }
+          { `${t('totalPriceWithoutTax')}: ${invoice.overPausalTotals.workTotalPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${invoice.overPausalTotals.workTotalPriceWithDPH.toFixed(2)} eur` }
+          { `${t('totalPriceWithTax')}: ${invoice.overPausalTotals.workTotalPriceWithDPH.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
 
-        <h4>Výjazdy</h4>
+        <h4>{t('trips')}</h4>
         <hr />
         <ReportsTable
           tasks={invoice.overPausalTasks.filter((task) => task.workTrips.length > 0 )}
@@ -121,25 +128,25 @@ export default function Invoice( props ) {
           onClickTask={onClickTask}
           />
         <p className="m-0">
-          { `Spolu počet výjazdov: ${ invoice.overPausalTotals.tripHours }` }
+          { `${t('tripTotal')}: ${ invoice.overPausalTotals.tripHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet výjazdov mimo pracovný čas: ${ invoice.overPausalTotals.tripOvertime } ( Čísla úloh: ${ invoice.overPausalTotals.tripOvertimeTasks.join(',') })` }
+          { `${t('overtimeTripTotal')}: ${ invoice.overPausalTotals.tripOvertime } ( ${t('taskIDs')}: ${ invoice.overPausalTotals.tripOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za výjazdy mimo pracovných hodín: ${invoice.overPausalTotals.tripExtraPrice.toFixed(2)} eur` }
+          { `${t('overtimeTripExtraPrice')}: ${invoice.overPausalTotals.tripExtraPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
         <p className="m-0">
-          { `Spolu cena bez DPH: ${invoice.overPausalTotals.tripTotalPrice.toFixed(2)} eur` }
+          { `${t('totalPriceWithoutTax')}: ${invoice.overPausalTotals.tripTotalPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${invoice.overPausalTotals.tripTotalPriceWithDPH.toFixed(2)} eur` }
+          { `${t('totalPriceWithTax')}: ${invoice.overPausalTotals.tripTotalPriceWithDPH.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
       </div>
 
       <div className="m-b-30">
-        <h3 className="m-b-10">Projektové práce a výjazdy</h3>
-        <h4>Práce</h4>
+        <h3 className="m-b-10">{t('worksTripsInProject')}</h3>
+        <h4>{t('works')}</h4>
         <hr />
         <ReportsTable
           tasks={invoice.projectTasks.filter((task) => task.subtasks.length > 0 )}
@@ -147,22 +154,22 @@ export default function Invoice( props ) {
           onClickTask={onClickTask}
           />
         <p className="m-0">
-          { `Spolu počet hodín: ${ invoice.projectTotals.workHours }` }
+          { `${t('totalHours')}: ${ invoice.projectTotals.workHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet hodín mimo pracovný čas: ${ invoice.projectTotals.workOvertime } ( Čísla úloh: ${ invoice.projectTotals.workOvertimeTasks.join(',') })` }
+          { `${t('overtimeTotalHours')}: ${ invoice.projectTotals.workOvertime } ( ${t('taskIDs')}: ${ invoice.projectTotals.workOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za práce mimo pracovných hodín: ${invoice.projectTotals.workExtraPrice.toFixed(2)} eur` }
+          { `${t('overtimeWorkExtraPrice')}: ${invoice.projectTotals.workExtraPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
         <p className="m-0">
-          { `Spolu cena bez DPH: ${invoice.projectTotals.workTotalPrice.toFixed(2)} eur` }
+          { `${t('totalPriceWithoutTax')}: ${invoice.projectTotals.workTotalPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${invoice.projectTotals.workTotalPriceWithDPH.toFixed(2)} eur` }
+          { `${t('totalPriceWithTax')}: ${invoice.projectTotals.workTotalPriceWithDPH.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
 
-        <h4>Výjazdy</h4>
+        <h4>{t('trips')}</h4>
         <hr />
         <ReportsTable
           tasks={invoice.projectTasks.filter((task) => task.workTrips.length > 0 )}
@@ -171,24 +178,24 @@ export default function Invoice( props ) {
           />
 
         <p className="m-0">
-          { `Spolu počet výjazdov: ${ invoice.projectTotals.tripHours }` }
+          { `${t('tripTotal')}: ${ invoice.projectTotals.tripHours }` }
         </p>
         <p className="m-0">
-          { `Spolu počet výjazdov mimo pracovný čas: ${ invoice.projectTotals.tripOvertime } ( Čísla úloh: ${ invoice.projectTotals.tripOvertimeTasks.join(',') })` }
+          { `${t('overtimeTripTotal')}: ${ invoice.projectTotals.tripOvertime } ( ${t('taskIDs')}: ${ invoice.projectTotals.tripOvertimeTasks.join(',') })` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu prirážka za výjazdy mimo pracovných hodín: ${invoice.projectTotals.tripExtraPrice.toFixed(2)} eur` }
+          { `${t('overtimeTripExtraPrice')}: ${invoice.projectTotals.tripExtraPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
         <p className="m-0">
-          { `Spolu cena bez DPH: ${invoice.projectTotals.tripTotalPrice.toFixed(2)} eur` }
+          { `${t('totalPriceWithoutTax')}: ${invoice.projectTotals.tripTotalPrice.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${invoice.projectTotals.tripTotalPriceWithDPH.toFixed(2)} eur` }
+          { `${t('totalPriceWithTax')}: ${invoice.projectTotals.tripTotalPriceWithDPH.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
       </div>
 
       <div className="m-b-30">
-        <h3>Materiál</h3>
+        <h3>{t('material')}</h3>
         <hr />
 
         <ReportsTable
@@ -198,10 +205,10 @@ export default function Invoice( props ) {
           />
 
         <p className="m-0">
-          { `Spolu cena bez DPH: ${invoice.materialTotals.price.toFixed(2)} eur` }
+          { `${t('totalPriceWithoutTax')}: ${invoice.materialTotals.price.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
         <p className="m-0 m-b-10">
-          { `Spolu cena s DPH: ${invoice.materialTotals.priceWithDPH.toFixed(2)} eur` }
+          { `${t('totalPriceWithTax')}: ${invoice.materialTotals.priceWithDPH.toFixed(2)} ${t('euro').toLowerCase()}` }
         </p>
       </div>
 

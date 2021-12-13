@@ -55,6 +55,10 @@ import {
 } from './helpers';
 
 import {
+  useTranslation
+} from "react-i18next";
+
+import {
   REST_URL,
 } from 'configs/restAPI';
 
@@ -84,6 +88,10 @@ export default function ProjectAdd( props ) {
     match,
     closeModal,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ addProject ] = useMutation( ADD_PROJECT );
 
@@ -460,7 +468,7 @@ export default function ProjectAdd( props ) {
         companyGroups.some( ( companyGroup ) => companyGroup.group.id === group.id )
       )
     ) ) ||
-    filters.some( ( filter ) => filter.active && getGroupsProblematicAttributes( groups, filter )
+    filters.some( ( filter ) => filter.active && getGroupsProblematicAttributes( groups, filter, t )
       .length !== 0 ) ||
     attributes.taskType.value === null
   )
@@ -521,14 +529,14 @@ export default function ProjectAdd( props ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
-        RenderDescription = <div className="task-edit-popis">Projekt nemá popis</div>
+        RenderDescription = <div className="task-edit-popis">{t('projectNoDescription')}</div>
       }
     }
     return (
       <div>
       <div className="row" style={{alignItems: "baseline"}}>
         <Label>
-          Popis
+          {t('description')}
         </Label>
         <button
           className="btn-link btn-distance m-l-5"
@@ -538,11 +546,11 @@ export default function ProjectAdd( props ) {
           }}
           >
           <i className={`fa fa-${!editingDescription ? 'pen' : 'save' }`} />
-          { !editingDescription ? 'edit' : 'save' }
+          { !editingDescription ? t('edit') : t('save') }
         </button>
         <label htmlFor={`upload-project-attachment-add`} className="btn-link btn-distance m-l-0 clickable" >
           <i className="fa fa-plus" />
-          Attachment
+          {t('attachment')}
         </label>
       </div>
       <div className="form-section-rest">
@@ -564,7 +572,7 @@ export default function ProjectAdd( props ) {
     )}
     >
     <h2 className="m-b-17">
-      Add project
+      {`${t('add')} ${t('project').toLowerCase()}`}
     </h2>
 
     <Nav tabs className="no-border m-b-25">
@@ -573,7 +581,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'description'}, "clickable", "")}
           onClick={() => setOpenedTab('description') }
           >
-          Description
+          {t('description')}
         </NavLink>
       </NavItem>
       <NavItem>
@@ -586,7 +594,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'statuses' }, "clickable", "")}
           onClick={() => setOpenedTab('statuses') }
           >
-          Statuses
+          {t('statuses')}
         </NavLink>
       </NavItem>
       <NavItem>
@@ -599,7 +607,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'tags' }, "clickable", "")}
           onClick={() => setOpenedTab('tags') }
           >
-          Tags
+          {t('tags')}
         </NavLink>
       </NavItem>
       <NavItem>
@@ -612,7 +620,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'groups' }, "clickable", "")}
           onClick={() => setOpenedTab('groups') }
           >
-          Groups
+          {t('groups')}
         </NavLink>
       </NavItem>
       <NavItem>
@@ -625,7 +633,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'accRights' }, "clickable", "")}
           onClick={() => setOpenedTab('accRights') }
           >
-          Group rights
+          {t('groupRights')}
         </NavLink>
       </NavItem>
       <NavItem>
@@ -638,7 +646,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'users' }, "clickable", "")}
           onClick={() => setOpenedTab('users') }
           >
-          Users
+          {t('users')}
         </NavLink>
       </NavItem>
       <NavItem>
@@ -651,7 +659,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'attributes' }, "clickable", "")}
           onClick={() => setOpenedTab('attributes') }
           >
-          Attributes
+          {t('attributesRights')}
         </NavLink>
       </NavItem>
       <NavItem>
@@ -664,7 +672,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'custom' }, "clickable", "")}
           onClick={() => setOpenedTab('custom') }
           >
-          Custom attributes
+          {t('customAttributes')}
         </NavLink>
       </NavItem>
       <NavItem>
@@ -677,7 +685,7 @@ export default function ProjectAdd( props ) {
           className={classnames({ active: openedTab === 'projectFilters' }, "clickable", "")}
           onClick={() => setOpenedTab('projectFilters') }
           >
-          Project filters
+          {t('projectFilters')}
         </NavLink>
       </NavItem>
     </Nav>
@@ -686,12 +694,12 @@ export default function ProjectAdd( props ) {
 
       <TabPane tabId={'description'}>
         <FormGroup className="m-b-25">
-          <Label for="name">Project name <span className="warning-big">*</span></Label>
+          <Label for="name">{t('projectName')}<span className="warning-big">*</span></Label>
           <Input
             type="text"
             className="medium-input m-t-15"
             id="name"
-            placeholder="Enter project name"
+            placeholder={t('projectNamePlaceholder')}
             value={title}
             onChange={(e)=>setTitle(e.target.value)}
             />
@@ -704,7 +712,7 @@ export default function ProjectAdd( props ) {
           onChange={() => {
             setArchived(!archived)
           }}
-          label="Archived"
+          label={t('archived')}
           labelClassName="text-normal font-normal"
           simpleSwitch
           />
@@ -714,12 +722,12 @@ export default function ProjectAdd( props ) {
               {
                 key: 'autoApprovedOn',
                 value: autoApproved,
-                label: 'Invoice On',
+                label: t('invoiceOn'),
               },
               {
                 key: 'autoApprovedOff',
                 value: !autoApproved,
-                label: 'Invoice Off',
+                label: t('invoiceOff'),
               },
             ] }
             name="autoApproved"
@@ -733,7 +741,7 @@ export default function ProjectAdd( props ) {
           onChange={() => {
             setHideApproved(!hideApproved);
           }}
-          label="Don't show invoice"
+          label={t('hideInvoice')}
           labelClassName="text-normal font-normal"
           simpleSwitch
           />
@@ -939,7 +947,7 @@ export default function ProjectAdd( props ) {
 
     <div className="row form-buttons-row">
       {  closeModal &&
-        <button className="btn-link mr-auto" onClick={() => closeModal(null, null)}> Cancel </button>
+        <button className="btn-link mr-auto" onClick={() => closeModal(null, null)}>{t('cancel')}</button>
       }
 
       <button className={classnames(
@@ -956,7 +964,7 @@ export default function ProjectAdd( props ) {
           }
         }}
         >
-        { saving ? 'Adding...' : 'Add project' }
+        { saving ? `${t('adding')}...` : `${t('add')} ${t('project').toLowerCase()}` }
       </button>
     </div>
     { showProjectErrors &&

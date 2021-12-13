@@ -15,12 +15,19 @@ import {
   GET_DEF_COMPANY,
   COMPANIES_SUBSCRIPTION,
 } from 'helpdesk/settings/companies/queries';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function DefaultCompany( props ) {
   //data & queries
   const {
     location
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: companyData,
@@ -47,7 +54,7 @@ export default function DefaultCompany( props ) {
       <Link
         className={classnames("sidebar-menu-item" , {"active" : location.pathname.includes('settings/company')})}
         to={{ pathname:`/helpdesk/settings${ companyLoading ? '' : `/company/${company.id}`}` }}>
-        Helpdesk Company
+        Helpdesk {t('company')}
       </Link>
     </NavItem>
   );

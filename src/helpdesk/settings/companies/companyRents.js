@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function CompanyRents( props ) {
   //data
@@ -9,6 +12,10 @@ export default function CompanyRents( props ) {
     updateRent,
     removeRent
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -21,15 +28,15 @@ export default function CompanyRents( props ) {
     <div className="row m-t-20">
       <div className="col-md-12">
         <div>
-          <h4>Prenájom Hardware & Software </h4>
+          <h4>{t('rentsHeader')}</h4>
           <table className="table m-t--30">
             <thead>
               <tr>
-                <th>Názov</th>
-                <th>Mn.</th>
-                <th>Náklad/ks/mesiac</th>
-                <th>Cena/ks/mesiac</th>
-                <th>Cena/mesiac</th>
+                <th>{t('title')}</th>
+                <th>{t('quantityShort')}</th>
+                <th>{t('constPcMonth')}</th>
+                <th>{t('pricePcMonth')}</th>
+                <th>{t('pricePerMonth')}</th>
               </tr>
             </thead>
             <tbody>
@@ -116,7 +123,7 @@ export default function CompanyRents( props ) {
                     <button className="btn-link"
                       disabled={disabled}
                       onClick={()=>{
-                        if(window.confirm('Are you sure?')){
+                        if(window.confirm(t('generalConfirmation'))){
                           removeRent(rent);
                         }
                       }}>
@@ -260,7 +267,7 @@ export default function CompanyRents( props ) {
         <div className="row justify-content-end">
           <div className="col-md-6">
             <p className="text-right">
-              <b>Sub-total: </b>
+              <b>{t('subtotal')}: </b>
               {(data.map( (rent) => parseFloat(rent.totalPrice)).reduce((acc, cur) => {
                 if(!isNaN(cur)){
                   return acc+parseInt(cur);

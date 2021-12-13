@@ -26,10 +26,10 @@ import TagsPickerPopover from 'helpdesk/task/components/tags';
 import ShortSubtasks from 'helpdesk/task/components/shortSubtasks';
 import Materials from 'helpdesk/task/components/vykazy/materialsTable';
 import WorksTable from 'helpdesk/task/components/vykazy/worksTable';
-import {
-  getCreationError as getVykazyError
-} from 'helpdesk/task/components/vykazy/errors';
 
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   pickSelectStyle,
@@ -69,6 +69,10 @@ import {
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
+
+import {
+  getCreationError as getVykazyError
+} from 'helpdesk/task/components/vykazy/errors';
 
 import {
   toSelArr,
@@ -111,6 +115,10 @@ export default function RepeatForm( props ) {
     directSaving,
     newStartsAt,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const client = useApolloClient();
   let counter = 0;
@@ -331,7 +339,7 @@ export default function RepeatForm( props ) {
         active: originalRepeat.active,
       }
     } : {} );
-    setAssignedTo( toSelArr( data.assignedTo, 'email' ) );
+    setAssignedTo( toSelArr( data.assignedTo, 'fullName' ) );
     setCloseDate( moment( parseInt( data.closeDate ) ) );
     setDeadline( data.deadline ? moment( parseInt( data.deadline ) ) : null );
     setDescription( data.description );
@@ -372,12 +380,12 @@ export default function RepeatForm( props ) {
     setSimpleSubtasks( data.shortSubtasks );
     setSubtasks( data.subtasks.map( item => ( {
       ...item,
-      assignedTo: toSelItem( item.assignedTo, 'email' ),
+      assignedTo: toSelItem( item.assignedTo, 'fullName' ),
       type: toSelItem( item.type )
     } ) ) );
     setWorkTrips( data.workTrips.map( item => ( {
       ...item,
-      assignedTo: toSelItem( item.assignedTo, 'email' ),
+      assignedTo: toSelItem( item.assignedTo, 'fullName' ),
       type: toSelItem( item.type )
     } ) ) );
     setMaterials( data.materials );
@@ -433,7 +441,7 @@ export default function RepeatForm( props ) {
   }, [] );
 
   const deleteRepeatFunc = () => {
-    if ( window.confirm( 'Are you sure you want to delete this repeat?' ) ) {
+    if ( window.confirm( t( 'deleteRepeatMessage' ) ) ) {
       if ( editMode ) {
         deleteRepeat( {
             variables: {
@@ -804,7 +812,7 @@ export default function RepeatForm( props ) {
   const renderHeader = () => {
     return (
       <div className="task-edit-buttons row m-b-10 m-l-20 m-r-20 m-t-20">
-        <h2 className="center-hor">{`${ !editMode ? 'Add repeat' : 'Edit repeat' }`}</h2>
+        <h2 className="center-hor">{`${ !editMode ? t('addRepeat') : t('editRepeat') }`}</h2>
         <span className="ml-auto">
           { editMode && userRights.attributeRights.repeat.edit &&
             <button
@@ -853,7 +861,7 @@ export default function RepeatForm( props ) {
               setTitle(e.target.value);
               saveChange({ title: e.target.value })
             }}
-            placeholder="Enter task name"
+            placeholder={t('taskTitlePlaceholder')}
             />
         </span>
       </div>
@@ -870,7 +878,7 @@ export default function RepeatForm( props ) {
       return (
         <div className="task-info ml-auto">
           <span className="center-hor">
-            Pending date:
+            {t('pendingDate')}:
           </span>
           { datepickerDisabled ?
             (
@@ -889,7 +897,7 @@ export default function RepeatForm( props ) {
                     saveChange({pendingDate: date.valueOf().toString()});
                   }
                 }}
-                placeholderText="No pending date"
+                placeholderText={t('pendingDateLabel')}
                 />
             )
           }
@@ -906,7 +914,7 @@ export default function RepeatForm( props ) {
       return (
         <div className="task-info ml-auto">
           <span className="center-hor">
-            Closed at:
+            {t('closedAt')}:
           </span>
           { datepickerDisabled ?
             (
@@ -925,7 +933,7 @@ export default function RepeatForm( props ) {
                     saveChange({closeDate: date.valueOf().toString()});
                   }
                 }}
-                placeholderText="No pending date"
+                placeholderText={t('pendingDateLabel')}
                 />
             )
           }
@@ -938,7 +946,7 @@ export default function RepeatForm( props ) {
   const layoutComponents = {
     Project: (
       <Select
-        placeholder="Zadajte projekt"
+        placeholder={t('projectLabel')}
         value={project}
         onChange={changeProject}
         options={projects.filter((project) => currentUser.role.level === 0 || (project.right.addTask && project.right.repeatWrite ) )}
@@ -953,14 +961,14 @@ export default function RepeatForm( props ) {
               <div className="disabled-info">{user.label}</div>
             ) )}
             { assignedTo.length === 0 &&
-              <div className="message error-message">Úloha nepriradená</div>
+              <div className="message error-message">{t('taskNotAssigned')}</div>
             }
           </div>
         }
         { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit &&
           <Select
             value={assignedTo}
-            placeholder="Select reccomended"
+            placeholder={t('selectReccomended')}
             isMulti
             onChange={(users)=> {
               setAssignedTo(users);
@@ -975,11 +983,11 @@ export default function RepeatForm( props ) {
     Status: (
       <div>
         { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit) &&
-          <div className="disabled-info">{status ? status.label : "None"}</div>
+          <div className="disabled-info">{status ? status.label : t('none')}</div>
         }
         { !projectAttributes.status.fixed && userRights.attributeRights.status.edit &&
           <Select
-            placeholder="Status required"
+          placeholder={t('statusPlaceholder')}
             value={status}
             styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
             onChange={ changeStatus }
@@ -990,7 +998,7 @@ export default function RepeatForm( props ) {
     ),
     Type: (
       <Select
-        placeholder="Zadajte typ"
+      placeholder={t('taskTypePlaceholder')}
         value={taskType}
         isDisabled={ projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit }
         styles={ pickSelectStyle( [ 'noArrow', ] ) }
@@ -1004,11 +1012,11 @@ export default function RepeatForm( props ) {
     Requester: (
       <div>
         { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit) &&
-          <div className="disabled-info">{requester ? requester.label : "None"}</div>
+          <div className="disabled-info">{requester ? requester.label : t('none')}</div>
         }
         { !projectAttributes.requester.fixed && userRights.attributeRights.requester.edit &&
           <Select
-            placeholder="Zadajte žiadateľa"
+            placeholder={t('requesterPlaceholder')}
             value={requester}
             onChange={(requester)=>{
               setRequester(requester);
@@ -1029,11 +1037,11 @@ export default function RepeatForm( props ) {
     Company: (
       <div>
         { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit) &&
-          <div className="disabled-info">{company ? company.label : "None"}</div>
+          <div className="disabled-info">{company ? company.label : t('none')}</div>
         }
         { !projectAttributes.company.fixed && userRights.attributeRights.company.edit &&
           <Select
-            placeholder="Zadajte firmu"
+            placeholder={t('companyPlaceholder')}
             value={company}
             onChange={(company)=> {
               setCompany(company);
@@ -1052,7 +1060,7 @@ export default function RepeatForm( props ) {
     Pausal: (
       <div>
         { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed ) &&
-          <div className="disabled-info">{ pausal ? pausal.label : "None" }</div>
+          <div className="disabled-info">{ pausal ? pausal.label : t('none') }</div>
         }
         { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed &&
           <Select
@@ -1081,7 +1089,7 @@ export default function RepeatForm( props ) {
                 saveChange({ deadline: date.valueOf().toString() })
               }
             }}
-            placeholderText="No deadline"
+            placeholderText={t('deadlinePlaceholder')}
             />
         }
       </div>
@@ -1111,7 +1119,7 @@ export default function RepeatForm( props ) {
           <div className="col-12 row">
             <div className="col-4">
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
+                <Label className="col-3 col-form-label">{t('project')} <span className="warning-big">*</span></Label>
                 <div className="col-9">
                   { layoutComponents.Project }
                 </div>
@@ -1120,7 +1128,7 @@ export default function RepeatForm( props ) {
             { userRights.attributeRights.assigned.view &&
               <div className="col-8">
                 <div className="row p-r-10">
-                  <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
+                  <Label className="col-1-45 col-form-label">{t('assignedTo')} <span className="warning-big">*</span></Label>
                   <div className="col-10-45">
                     { layoutComponents.Assigned }
                   </div>
@@ -1133,7 +1141,7 @@ export default function RepeatForm( props ) {
             <div className="col-4">
               { userRights.attributeRights.status.view &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Status <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">{t('status')} <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Status }
                   </div>
@@ -1142,7 +1150,7 @@ export default function RepeatForm( props ) {
 
               { userRights.attributeRights.taskType.view &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Typ</Label>
+                  <Label className="col-3 col-form-label">{t('taskType')}</Label>
                   <div className="col-9">
                     { layoutComponents.Type }
                   </div>
@@ -1154,7 +1162,7 @@ export default function RepeatForm( props ) {
             <div className="col-4">
               { userRights.attributeRights.requester.view &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Zadal <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">{t('requester')} <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Requester }
                   </div>
@@ -1162,7 +1170,7 @@ export default function RepeatForm( props ) {
               }
               { userRights.attributeRights.company.view &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Firma <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">{t('company')} <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Company }
                   </div>
@@ -1170,7 +1178,7 @@ export default function RepeatForm( props ) {
               }
               { userRights.attributeRights.pausal.view &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Paušál <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">{t('pausal')} <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Pausal }
                   </div>
@@ -1181,7 +1189,7 @@ export default function RepeatForm( props ) {
             <div className="col-4">
               { userRights.attributeRights.deadline.view &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Deadline</Label>
+                  <Label className="col-3 col-form-label">{t('deadline')}</Label>
                   <div className="col-9">
                     { layoutComponents.Deadline }
                   </div>
@@ -1200,7 +1208,7 @@ export default function RepeatForm( props ) {
               }
               { userRights.attributeRights.overtime.view &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Mimo PH <span className="warning-big">*</span></Label>
+                  <Label className="col-3 col-form-label">{t('overtimeShort')} <span className="warning-big">*</span></Label>
                   <div className="col-9">
                     {layoutComponents.Overtime}
                   </div>
@@ -1218,24 +1226,24 @@ export default function RepeatForm( props ) {
     return (
       <div className="col-12 row task-edit-align-select-labels">
         <div className="col-2">
-          <Label className="col-form-label">Projekt</Label>
+          <Label className="col-form-label">{t('project')}</Label>
           { layoutComponents.Project }
         </div>
         { userRights.attributeRights.status.view &&
           <div className="col-2" >
-            <Label className="col-form-label">Status</Label>
+            <Label className="col-form-label">{t('status')}</Label>
             { layoutComponents.Status }
           </div>
         }
         { userRights.attributeRights.requester.view &&
           <div className="col-2">
-            <Label className="col-form-label">Zadal</Label>
+            <Label className="col-form-label">{t('requester')}</Label>
             { layoutComponents.Requester }
           </div>
         }
         { userRights.attributeRights.company.view &&
           <div className="col-2">
-            <Label className="col-form-label">Firma</Label>
+            <Label className="col-form-label">{t('company')}</Label>
             { layoutComponents.Company }
           </div>
         }
@@ -1247,14 +1255,14 @@ export default function RepeatForm( props ) {
     return (
       <div className="task-edit-right p-b-20 m-t-0">
         <div className="form-selects-entry-column" >
-          <Label>Project <span className="warning-big">*</span></Label>
+          <Label>{t('project')} <span className="warning-big">*</span></Label>
           <div className="form-selects-entry-column-rest" >
             { layoutComponents.Project }
           </div>
         </div>
         { userRights.attributeRights.status.view &&
           <div className="form-selects-entry-column" >
-            <Label>Status <span className="warning-big">*</span></Label>
+            <Label>{t('status')} <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Status }
             </div>
@@ -1262,7 +1270,7 @@ export default function RepeatForm( props ) {
         }
         { userRights.attributeRights.requester.view &&
           <div className="form-selects-entry-column" >
-            <Label>Requester <span className="warning-big">*</span></Label>
+            <Label>{t('requester')} <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Requester }
             </div>
@@ -1270,7 +1278,7 @@ export default function RepeatForm( props ) {
         }
         { userRights.attributeRights.company.view &&
           <div className="form-selects-entry-column" >
-            <Label>Company <span className="warning-big">*</span></Label>
+            <Label>{t('company')} <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Company }
             </div>
@@ -1278,7 +1286,7 @@ export default function RepeatForm( props ) {
         }
         { userRights.attributeRights.assigned.view &&
           <div className="form-selects-entry-column" >
-            <Label>Assigned <span className="warning-big">*</span></Label>
+            <Label>{t('assignedTo')} <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Assigned }
             </div>
@@ -1286,7 +1294,7 @@ export default function RepeatForm( props ) {
         }
         { userRights.attributeRights.deadline.view &&
           <div className="form-selects-entry-column" >
-            <Label>Deadline</Label>
+            <Label>{t('deadline')}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Deadline }
             </div>
@@ -1304,7 +1312,7 @@ export default function RepeatForm( props ) {
         }
         { userRights.attributeRights.taskType.view &&
           <div className="form-selects-entry-column" >
-            <Label>Task Type</Label>
+            <Label>{t('taskType')}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Type }
             </div>
@@ -1312,7 +1320,7 @@ export default function RepeatForm( props ) {
         }
         { userRights.attributeRights.pausal.view &&
           <div className="form-selects-entry-column" >
-            <Label>Pausal <span className="warning-big">*</span></Label>
+            <Label>{t('pausal')} <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Pausal }
             </div>
@@ -1320,7 +1328,7 @@ export default function RepeatForm( props ) {
         }
         { userRights.attributeRights.overtime.view &&
           <div className="form-selects-entry-column" >
-            <Label>Outside PH <span className="warning-big">*</span></Label>
+            <Label>{t('overtimeShort')} <span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Overtime }
             </div>
@@ -1366,7 +1374,7 @@ export default function RepeatForm( props ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
-        RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
+        RenderDescription = <div className="task-edit-popis">{t('noDescription')}</div>
       }
     } else {
       if ( showDescription ) {
@@ -1394,14 +1402,14 @@ export default function RepeatForm( props ) {
         if ( description.length !== 0 ) {
           RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
         } else {
-          RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
+          RenderDescription = <div className="task-edit-popis">{t('noDescription')}</div>
         }
       }
     }
     return (
       <div className="form-section">
         <div className="row" style={{alignItems: "baseline"}}>
-          <Label className="m-r-10">Popis úlohy</Label>
+          <Label className="m-r-10">{t('taskDescription')}</Label>
           { userRights.rights.taskDescriptionWrite &&
             <button
               className="btn-link btn-distance"
@@ -1414,13 +1422,13 @@ export default function RepeatForm( props ) {
               }}
               >
               <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
-              { !showDescription ? 'edit' : 'save' }
+              { !showDescription ? t('edit') : t('save') }
             </button>
           }
           { userRights.rights.taskAttachmentsWrite &&
             <label htmlFor={`uploadAttachment-${null}`} className="btn-link m-l-0" >
               <i className="fa fa-plus" />
-              Attachment
+              {t('attachment')}
             </label>
           }
           {renderMultiSelectTags()}
@@ -1481,9 +1489,9 @@ export default function RepeatForm( props ) {
           }
           setSimpleSubtasks(simpleSubtasks.filter((simpleSubtask2) => simpleSubtask.id !== simpleSubtask2.id ))
         } }
-        placeholder="Short subtask title"
-        newPlaceholder="New short subtask title"
-        label="Subtask"
+        placeholder={t('shortSubtaskTitle')}
+        newPlaceholder={t('newShortSubtaskTitle')}
+        label={t('shortSubtask')}
         />
     )
   }
@@ -1549,7 +1557,7 @@ export default function RepeatForm( props ) {
           currentUser={currentUser}
           company={company}
           showTotals={true}
-          showColumns={ [ 'done', 'title', 'scheduled', 'quantity', 'assigned', 'approved', 'actions' ] }
+          showColumns={ [ 'done', 'title', 'quantity', 'assigned', 'approved', 'actions' ] }
           showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
           autoApproved={project ? project.autoApproved : false}
           canAddSubtasksAndTrips={assignedTo.length !== 0}
@@ -1705,11 +1713,11 @@ export default function RepeatForm( props ) {
       <div className="form-section task-edit-buttons">
       <div className="row form-section-rest">
         {closeModal &&
-          <button className="btn-link-cancel m-l-20" onClick={() => closeModal(wasSaved, wasDisabled)}>Cancel</button>
+          <button className="btn-link-cancel m-l-20" onClick={() => closeModal(wasSaved, wasDisabled)}>{t('cancel')}</button>
         }
         { newStartsAt &&
           <span className="color-muted">
-            New Repeat time has been loaded, you can just save the changes or edit repeat!
+            {t('repeatAutoupdateMessage')}
           </span>
         }
         <div className="row pull-right">
@@ -1719,7 +1727,7 @@ export default function RepeatForm( props ) {
             disabled={ cantSave }
             onClick={ triggerSave }
             >
-            { editMode ? 'Update repeat' : 'Create repeat' }
+            { editMode ? t('updateRepeat') : t('createRepeat') }
           </button>
         </div>
       </div>
@@ -1728,7 +1736,7 @@ export default function RepeatForm( props ) {
   }
 
   const canCreateVykazyError = () => {
-    const error = getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company, userRights );
+    const error = getVykazyError( taskType, assignedTo.filter( ( user ) => user.id !== null ), company, userRights, t );
     if ( error === '' ) {
       return (
         <span className="center-hor ml-auto">

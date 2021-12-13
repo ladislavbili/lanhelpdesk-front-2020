@@ -13,84 +13,84 @@ import SMTPList from 'helpdesk/settings/smtps';
 
 export default [
   {
-    title: 'Users',
+    title: 'users',
     link: 'users',
     minimalRole: 1,
     component: UserList,
     value: 'users'
   },
   {
-    title: 'Companies',
+    title: 'companies',
     link: 'companies',
     minimalRole: 1,
     component: CompanyList,
     value: 'companies'
   },
   {
-    title: 'Public filters',
+    title: 'publicFilters',
     link: 'publicFilters',
     minimalRole: 1,
     component: PublicFiltersList,
     value: 'publicFilters'
   },
   {
-    title: 'Service level agreements',
+    title: 'sla',
     link: 'pausals',
     minimalRole: 3,
     component: SLAList,
     value: 'pausals'
   },
   {
-    title: 'Projects',
+    title: 'projects',
     link: 'projects',
     minimalRole: 2,
     component: ProjectList,
     value: 'projects'
   },
   {
-    title: 'Statuses',
+    title: 'statuses',
     link: 'statuses',
     minimalRole: 3,
     component: StatusList,
     value: 'statuses'
   },
   {
-    title: 'Price lists',
+    title: 'pricelists',
     link: 'pricelists',
     minimalRole: 2,
     component: PriceList,
     value: 'prices'
   },
   {
-    title: 'Roles',
+    title: 'roles',
     link: 'roles',
     minimalRole: 2,
     component: RoleList,
     value: 'roles'
   },
   {
-    title: 'Trip types',
+    title: 'tripTypes',
     link: 'tripTypes',
     minimalRole: 2,
     component: TripTypeList,
     value: 'tripTypes'
   },
   {
-    title: 'Task types',
+    title: 'taskTypes',
     link: 'taskTypes',
     minimalRole: 2,
     component: TaskTypeList,
     value: 'taskTypes'
   },
   {
-    title: 'Imaps',
+    title: 'imaps',
     link: 'imaps',
     minimalRole: 3,
     component: ImapList,
     value: 'imaps'
   },
   {
-    title: 'SMTPs',
+    title: 'smtps',
     link: 'smtps',
     minimalRole: 3,
     component: SMTPList,

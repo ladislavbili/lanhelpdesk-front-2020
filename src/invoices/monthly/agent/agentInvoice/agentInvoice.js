@@ -7,6 +7,10 @@ import {
   timestampToDate,
 } from 'helperFunctions';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function AgentInvoice( props ) {
   const {
     invoice,
@@ -25,6 +29,10 @@ export default function AgentInvoice( props ) {
     totals,
   } = invoice;
 
+  const {
+    t
+  } = useTranslation();
+
   const [ editedTask, setEditedTask ] = React.useState( null );
 
   const onClickTask = ( task ) => {
@@ -33,28 +41,28 @@ export default function AgentInvoice( props ) {
 
   return (
     <div>
-      <h2>Mesačný výkaz faktúrovaných prác agenta</h2>
+      <h2>{t('monthlyAgentInvoice')}</h2>
       <div className="flex-row m-b-30">
         <div>
-          {`Agent ${agent.fullName} (${agent.email})`}
+          {`${t('agent')} ${agent.fullName} (${agent.email})`}
           <br/>
-          Obdobie od: {timestampToDate(fromDate)} do: {timestampToDate(toDate)}
+          ${t('period')} {t('from').toLowerCase()}: {timestampToDate(fromDate)} {t('to').toLowerCase()}: {timestampToDate(toDate)}
         </div>
       </div>
-      <h3>Práce</h3>
+      <h3>{t('works')}</h3>
       <hr />
       <table className="table m-b-10 bkg-white row-highlight">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Názov úlohy</th>
-            <th>Zadal</th>
-            <th>Firma</th>
-            <th>Status</th>
-            <th>Close date</th>
-            <th>Popis práce</th>
-            <th style={{width:'150px'}}>Typ práce</th>
-            <th style={{width:'50px'}}>Hodiny</th>
+            <th>{t('taskTitle')}</th>
+            <th>{t('requester')}</th>
+            <th>{t('company')}</th>
+            <th>{t('status')}</th>
+            <th>{t('closeDate')}</th>
+            <th>{t('workDescription')}</th>
+            <th style={{width:'150px'}}>{t('workType')}</th>
+            <th style={{width:'50px'}}>{t('hoursCount')}</th>
           </tr>
         </thead>
         <tbody>
@@ -63,13 +71,13 @@ export default function AgentInvoice( props ) {
               <td>{task.taskId}</td>
               <td className="clickable" onClick={() => onClickTask(task)}>{task.title}</td>
               <td>{task.requester.fullName}</td>
-              <td>{task.company ? task.company.title : 'No company'}</td>
+              <td>{task.company ? task.company.title : t('noCompany')}</td>
               <td>
                 <span className="label label-info" style={{backgroundColor:task.status.color}}>
                   {task.status.title}
                 </span>
               </td>
-              <td>{isNaN(parseInt(task.closeDate)) ? 'Not closed yet' : timestampToDate(parseInt(task.closeDate))}</td>
+              <td>{isNaN(parseInt(task.closeDate)) ? t('notClosed') : timestampToDate(parseInt(task.closeDate))}</td>
               <td colSpan="3" style={{padding:0}}>
                 <table className="table-borderless full-width">
                   <tbody>
@@ -91,8 +99,8 @@ export default function AgentInvoice( props ) {
       <table className="table m-b-10 bkg-white row-highlight max-width-500">
         <thead>
           <tr>
-            <th>Typ práce</th>
-            <th className="width-100">Počet hodín</th>
+            <th>{t('workType')}</th>
+            <th className="width-100">{t('hoursCount')}</th>
           </tr>
         </thead>
         <tbody>
@@ -105,25 +113,25 @@ export default function AgentInvoice( props ) {
         </tbody>
       </table>
       <p className="m-0">
-        {`Spolu počet hodín: ${ totals.workHours }`}
+        {`${t('totalHours')}: ${ totals.workHours }`}
       </p>
       <p className="m-0 m-b-10">
-        { `Spolu počet hodín mimo pracovný čas: ${ totals.workOvertime } ( Čísla úloh: ${ totals.workOvertimeTasks.join(',') })` }
+        { `${t('overtimeTotalHours')}: ${ totals.workOvertime } ( ${t('taskIDs')}: ${ totals.workOvertimeTasks.join(',') })` }
       </p>
 
-      <h3>Výjazdy</h3>
+      <h3>{t('trips')}</h3>
       <hr />
       <table className="table m-b-10 bkg-white row-highlight">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Názov úlohy</th>
-            <th>Zadal</th>
-            <th>Firma</th>
-            <th>Status</th>
-            <th>Close date</th>
-            <th style={{width:'150px'}}>Výjazd</th>
-            <th style={{width:'50px'}}>Mn.</th>
+            <th>{t('taskTitle')}</th>
+            <th>{t('requester')}</th>
+            <th>{t('company')}</th>
+            <th>{t('status')}</th>
+            <th>{t('closeDate')}</th>
+            <th style={{width:'150px'}}>{t('trip')}</th>
+            <th style={{width:'50px'}}>{t('quantityShort')}</th>
           </tr>
         </thead>
         <tbody>
@@ -132,13 +140,13 @@ export default function AgentInvoice( props ) {
               <td>{task.taskId}</td>
               <td className="clickable" onClick={() => onClickTask(task)}>{task.title}</td>
               <td>{task.requester.fullName}</td>
-              <td>{task.company ? task.company.title : 'No company'}</td>
+              <td>{task.company ? task.company.title : t('company')}</td>
               <td>
                 <span className="label label-info" style={{backgroundColor:task.status.color}}>
                   {task.status.title}
                 </span>
               </td>
-              <td>{isNaN(parseInt(task.closeDate)) ? 'Not closed yet' : timestampToDate(parseInt(task.closeDate))}</td>
+              <td>{isNaN(parseInt(task.closeDate)) ? t('notClosed') : timestampToDate(parseInt(task.closeDate))}</td>
               <td colSpan="2" style={{padding:0}}>
                 <table className="table-borderless full-width">
                   <tbody>
@@ -158,8 +166,8 @@ export default function AgentInvoice( props ) {
       <table className="table m-b-10 bkg-white row-highlight max-width-500">
         <thead>
           <tr>
-            <th>Výjazd</th>
-            <th className="width-100">ks</th>
+            <th>{t('trip')}</th>
+            <th className="width-100">{t('pc')}</th>
           </tr>
         </thead>
         <tbody>
@@ -172,58 +180,58 @@ export default function AgentInvoice( props ) {
         </tbody>
       </table>
       <p className="m-0">
-        {`Spolu počet výjazdov: ${ totals.tripHours }`}
+        {`${t('tripTotal')}: ${ totals.tripHours }`}
       </p>
       <p className="m-0 m-b-10">
-        { `Spolu počet výjazdov mimo pracovný čas: ${ totals.tripOvertime } ( Čísla úloh: ${ totals.tripOvertimeTasks.join(',') })` }
+        { `${t('overtimeTripTotal')}: ${ totals.tripOvertime } ( ${t('taskIDs')}: ${ totals.tripOvertimeTasks.join(',') })` }
       </p>
 
-      <h3>Sumár podľa typu práce a výjazdov - v rámci paušálu, nad rámec paušálu, projektových</h3>
+      <h3>{t('uniqueAgentTotal')}</h3>
       <table className="table m-b-10 bkg-white row-highlight max-width-700">
         <tbody>
           { invoiced &&
             <tr>
-              <td>Počet prác vrámci paušálu</td>
+              <td>{t('countOfWorksInPausal')}</td>
               <td>{ totals.pausalWorkHours }</td>
             </tr>
           }
           { invoiced &&
           <tr>
-            <td>Počet prác nad rámec paušálu</td>
+            <td>{t('countOfWorksOverPausal')}</td>
             <td>{ totals.overPausalWorkHours }</td>
           </tr>
         }
         { !invoiced &&
           <tr>
-            <td>Počet prác vrámci a nad rámec paušálu</td>
+            <td>{t('countOfWorksInPausalAndOverPausal')}</td>
             <td>{ totals.pausalWorkHours }</td>
           </tr>
         }
           <tr>
-            <td>Projektové práce</td>
+            <td>{t('countOfWorksInProject')}</td>
             <td>{ totals.projectWorkHours }</td>
           </tr>
 
         { invoiced &&
           <tr>
-            <td>Výjazdy vrámci paušálu</td>
+            <td>{t('countOfTripsInPausal')}</td>
             <td>{ totals.pausalTripHours }</td>
           </tr>
         }
         { invoiced &&
           <tr>
-            <td>Výjazdy nad rámec paušálu</td>
+            <td>{t('countOfTripsOverPausal')}</td>
             <td>{ totals.overPausalTripHours }</td>
           </tr>
         }
         { !invoiced &&
           <tr>
-            <td>Výjazdy vrámci nad rámec paušálu</td>
+            <td>{t('countOfTripsInPausalAndOverPausal')}</td>
             <td>{ totals.pausalTripHours }</td>
           </tr>
         }
           <tr>
-            <td>Výjazdy pri projektových prácach</td>
+            <td>{t('countOfTripsInProject')}</td>
             <td>{ totals.projectTripHours }</td>
           </tr>
         </tbody>

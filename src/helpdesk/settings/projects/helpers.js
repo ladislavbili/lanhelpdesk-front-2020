@@ -346,7 +346,7 @@ export const mergeGroupAttributeRights = ( right1, right2 ) => {
   }
 }
 
-export const getGroupsProblematicAttributes = ( groups, filterData ) => {
+export const getGroupsProblematicAttributes = ( groups, filterData, t ) => {
   const filter = filterData.filter;
   const filterGroups = groups.filter( ( group ) => filterData.groups.includes( group.id ) );
 
@@ -361,7 +361,7 @@ export const getGroupsProblematicAttributes = ( groups, filterData ) => {
         filter.assignedTos.length !== 0
       )
     ) {
-      problematicAttributes.push( 'assigned users' );
+      problematicAttributes.push( t( 'assignedTos' ) );
     }
 
     if (
@@ -370,14 +370,14 @@ export const getGroupsProblematicAttributes = ( groups, filterData ) => {
         filter.requesters.length !== 0
       )
     ) {
-      problematicAttributes.push( 'requester' );
+      problematicAttributes.push( t( 'requester' ) );
     }
 
     if (
       !attributeRights.taskType.view && !attributeRights.taskType.edit &&
       filter.taskTypes.length !== 0
     ) {
-      problematicAttributes.push( 'task type' );
+      problematicAttributes.push( t( 'taskType' ) );
     }
 
     if (
@@ -386,21 +386,21 @@ export const getGroupsProblematicAttributes = ( groups, filterData ) => {
         filter.companies.length !== 0
       )
     ) {
-      problematicAttributes.push( 'company' );
+      problematicAttributes.push( t( 'company' ) );
     }
 
     if (
       !attributeRights.overtime.view && !attributeRights.overtime.edit &&
       filter.overtime !== null
     ) {
-      problematicAttributes.push( 'overtime' );
+      problematicAttributes.push( t( 'overtime' ) );
     }
 
     if (
       !attributeRights.pausal.view && !attributeRights.pausal.edit &&
       filter.pausal !== null
     ) {
-      problematicAttributes.push( 'pausal' );
+      problematicAttributes.push( t( 'pausal' ) );
     }
 
     if (
@@ -411,7 +411,7 @@ export const getGroupsProblematicAttributes = ( groups, filterData ) => {
         filter.deadlineTo !== null
       )
     ) {
-      problematicAttributes.push( 'deadline' );
+      problematicAttributes.push( t( 'deadline' ) );
     }
 
     if (
@@ -431,7 +431,7 @@ export const getGroupsProblematicAttributes = ( groups, filterData ) => {
         filter.pendingDateTo !== null
       )
     ) {
-      problematicAttributes.push( 'status (statuses, status date, close date, pending date)' );
+      problematicAttributes.push( t( 'projectSomeStatusProblem' ) );
     }
 
     if (
@@ -442,7 +442,7 @@ export const getGroupsProblematicAttributes = ( groups, filterData ) => {
         filter.scheduledTo !== null
       )
     ) {
-      problematicAttributes.push( 'task works (scheduled date)' );
+      problematicAttributes.push( t( 'projectSomeWorksProblem' ) );
     }
     if ( problematicAttributes.length !== 0 ) {
       groupsWithProblematicAttributes.push( {

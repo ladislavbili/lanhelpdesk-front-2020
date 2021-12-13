@@ -14,9 +14,7 @@ import moment from 'moment';
 
 import Attachments from 'helpdesk/components/attachments';
 
-import VykazyTable, {
-  getCreationError as getVykazyError
-} from 'helpdesk/components/vykazy/vykazyTable';
+import VykazyTable from 'helpdesk/components/vykazy/vykazyTable';
 
 import classnames from "classnames";
 

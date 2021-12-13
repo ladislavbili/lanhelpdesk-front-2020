@@ -7,7 +7,10 @@ import {
 import {
   months
 } from 'configs/constants/reports';
-
+import {
+  translateSelectItem,
+  translateAllSelectItems,
+} from 'helperFunctions';
 import {
   FormGroup,
   Label,
@@ -50,10 +53,10 @@ export default function MonthSelector( props ) {
     value: moment()
       .year()
   } );
-  const [ month, setMonth ] = React.useState(
+  const [ month, setMonth ] = React.useState( translateSelectItem(
     months[ moment()
-      .month() ]
-  );
+      .month() ], t
+  ) );
 
   return (
     <div>
@@ -64,7 +67,7 @@ export default function MonthSelector( props ) {
               <Select
                 value={month}
                 onChange={setMonth}
-                options={months}
+                options={translateAllSelectItems(months,t)}
                 styles={pickSelectStyle()}
                 />
             </div>
@@ -83,7 +86,7 @@ export default function MonthSelector( props ) {
                 month===null ||
                 blockedShow
               }
-              className="btn-primary max-width-50"
+              className="btn-primary max-width-150"
               onClick={() => {
                 let firstDay = moment({ year: year.value, month: month.value-1}).startOf('month');
                 let lastDay = moment({ year: year.value, month: month.value-1}).endOf('month');
@@ -92,18 +95,18 @@ export default function MonthSelector( props ) {
                 onTrigger(firstDay, lastDay);
               }}
               >
-              Show
+              {t('show')}
             </Button>
           </div>
         </FormGroup>
         { showFreeDateSelect &&
           <FormGroup>
-            <Label>Select date range you preffer</Label>
+            <Label>{t('selectPrefferedDateRange')}</Label>
             <div className="flex-row">
               <div className="flex flex-input p-r-20">
                 <DatePicker
                   hideTime
-                  placeholderText="From"
+                  placeholderText={t('from')}
                   className="form-control"
                   selected={fromDate}
                   onChange={date => onChangeFromDate(date) }
@@ -112,7 +115,7 @@ export default function MonthSelector( props ) {
               <div className="flex flex-input p-r-20">
                 <DatePicker
                   hideTime
-                  placeholderText="To"
+                  placeholderText={t('to')}
                   className="form-control"
                   selected={toDate}
                   onChange={date => onChangeToDate(date)}
@@ -120,7 +123,7 @@ export default function MonthSelector( props ) {
               </div>
               <Button
                 type="button"
-                className="btn-primary max-width-50"
+                className="btn-primary max-width-150"
                 disabled={
                   blockedShow ||
                   ( fromDate !== null &&
@@ -130,7 +133,7 @@ export default function MonthSelector( props ) {
                 }
                 onClick={() => onTrigger(fromDate, toDate)}
                 >
-                Show
+                {t('show')}
               </Button>
             </div>
           </FormGroup>

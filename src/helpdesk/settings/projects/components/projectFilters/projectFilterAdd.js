@@ -6,6 +6,9 @@ import {
 } from 'reactstrap';
 import Empty from 'components/Empty';
 import ProjectFilterForm from './projectFilterForm';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function ProjectFilterAdd( props ) {
   //props
@@ -18,6 +21,10 @@ export default function ProjectFilterAdd( props ) {
     addProjectFilter
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   const [ open, setOpen ] = React.useState( false );
 
   return (
@@ -27,11 +34,11 @@ export default function ProjectFilterAdd( props ) {
         onClick={ () => setOpen(true) }
         >
         <i className="fa fa-plus" />
-        Project filter
+        {t('projectFilter')}
       </button>
       <Modal isOpen={open}>
         <ModalHeader>
-          Add project filter
+          {`${t('add')} ${t('projectFilter').toLowerCase()}`}
         </ModalHeader>
         <ModalBody>
           <ProjectFilterForm

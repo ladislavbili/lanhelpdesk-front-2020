@@ -6,6 +6,9 @@ import {
   pickSelectStyle
 } from 'configs/components/select';
 import {
+  useTranslation
+} from "react-i18next";
+import {
   updateArrayItem,
 } from 'helperFunctions';
 
@@ -27,6 +30,10 @@ export default function ProjectSingleAttribute( props ) {
     onChangeDefValues,
     onChangeRight,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const value = noDef ? null : (
     defIsMulti ?
@@ -76,7 +83,7 @@ export default function ProjectSingleAttribute( props ) {
         { !noDef &&
           <tr>
             <td>
-              Default value
+              {t('defaultValue')}
             </td>
             {['Deadline', 'Starts at'].includes(label) &&
               <td colSpan="4">
@@ -91,7 +98,7 @@ export default function ProjectSingleAttribute( props ) {
                       onChangeAttribute({ ...attribute, value: date })
                     }
                   }}
-                  placeholderText="No default date"
+                  placeholderText={t('noDefaultDate')}
                   />
               </td>
             }
@@ -126,7 +133,7 @@ export default function ProjectSingleAttribute( props ) {
           <tr>
             <td colSpan="4">
               <label className="font-normal text-normal clickable noselect" htmlFor={`fixed-${label}`}>
-                Fixed
+                {t('fixed')}
               </label>
             </td>
             <td>
@@ -143,34 +150,34 @@ export default function ProjectSingleAttribute( props ) {
         <tr>
           <td>
             <div>
-              <label>Project user group ACL</label>
+              <label>{t('projectUserACL')}</label>
             </div>
           </td>
           <td>
             <div>
-              <label className="m-l-14">{ noRequired ? '' : 'Required' }</label>
+              <label className="m-l-14">{ noRequired ? '' : t('required') }</label>
             </div>
           </td>
           <td>
             <div>
-              <label className="m-l-30">Add</label>
+              <label className="m-l-30">{t('add')}</label>
             </div>
           </td>
           <td>
             <div>
-              <label className="m-l-25">View</label>
+              <label className="m-l-25">{t('view')}</label>
             </div>
           </td>
           <td>
             <div>
-              <label className="m-l-30">Edit</label>
+              <label className="m-l-30">{t('edit')}</label>
             </div>
           </td>
         </tr>
         { roles.map((role) => (
           <tr key={role.id}>
             <td>
-              {role.title}
+              {t(role.title)}
             </td>
             <td>
               { !noRequired &&

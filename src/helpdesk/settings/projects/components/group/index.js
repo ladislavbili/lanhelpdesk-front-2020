@@ -6,6 +6,9 @@ import {
   defaultGroups,
   createCleanRights
 } from 'configs/constants/projects';
+import {
+  useTranslation
+} from "react-i18next";
 
 let fakeID = -( defaultGroups.length + 1 );
 
@@ -17,6 +20,10 @@ export default function ProjectGroups( props ) {
     deleteGroup,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   const [ editedGroup, setEditedGroup ] = React.useState( null );
 
   return (
@@ -25,16 +32,16 @@ export default function ProjectGroups( props ) {
         <thead>
           <tr>
             <th>
-              Group name
+              {t('groupTitle')}
             </th>
             <th>
-              Description
+              {t('description')}
             </th>
             <th width="50">
-              Order
+              {t('order')}
             </th>
             <th width="100">
-              Action
+              {t('actions')}
             </th>
           </tr>
         </thead>
@@ -42,7 +49,7 @@ export default function ProjectGroups( props ) {
           { groups.map( (group) => (
             <tr key={group.id}>
               <td>
-                {group.title}
+                {t(group.title)}
               </td>
               <td>
                 {group.description.length > 0 ? group.description : 'No description' }
@@ -56,7 +63,7 @@ export default function ProjectGroups( props ) {
                     className="btn btn-link"
                     onClick={() => setEditedGroup(group)}
                     >
-                    EDIT
+                    {t('edit')}
                   </button>
                   <button
                     className="btn btn-link-red"
@@ -68,7 +75,7 @@ export default function ProjectGroups( props ) {
               }
               { group.def &&
                 <td>
-                  DEFAULT
+                  {t('default')}
                 </td>
               }
             </tr>

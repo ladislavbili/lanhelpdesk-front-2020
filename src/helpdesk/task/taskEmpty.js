@@ -1,6 +1,13 @@
 import React from 'react';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function TaskEmpty( props ) {
+
+  const {
+    t
+  } = useTranslation();
 
   return (
     <div className="flex">
@@ -10,7 +17,7 @@ export default function TaskEmpty( props ) {
 			</div>
 			<div className="card-box row fit-with-header-and-commandbar">
 				<div className=" center-ver center-hor">
-					Vyberte task zo zoznamu vlavo.
+				  {t('selectTaskFromTheLeft')}
 				</div>
 			</div>
 		</div>

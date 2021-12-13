@@ -5,12 +5,19 @@ import {
 import {
   Label,
 } from 'reactstrap';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function CommentRender( props ) {
   const {
     getAttachment,
     comment
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   return (
     <div>
@@ -22,8 +29,8 @@ export default function CommentRender( props ) {
           />
         <div className="flex">
           <span className="media-meta pull-right color-muted">{timestampToString(comment.createdAt)}</span>
-          <span className="font-15 m-0 font-bold">{comment.user !== null ? (comment.user.fullName) : 'Unknown sender'}</span>
-          { comment.internal && <span className="inline-success-message m-l-5" >Interná správa</span> }
+          <span className="font-15 m-0 font-bold">{comment.user !== null ? (comment.user.fullName) : t('unknownUser')}</span>
+          { comment.internal && <span className="inline-success-message m-l-5" >{t('internalMessage')}</span> }
         </div>
       </div>
       <div className="m-l-40 m-b-15 font-13" style={{marginTop: "-40px"}} dangerouslySetInnerHTML={{__html: comment.message.replace(/(?:\r\n|\r|\n)/g, '<br>').replace(/(?:<p>)/g, '<div>').replace(/(?:<\/p>)/g, '</div>') }}>

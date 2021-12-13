@@ -7,6 +7,9 @@ import {
   InputGroupAddon,
   InputGroup,
 } from 'reactstrap';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function SettingsHiddenInput( props ) {
   //data
@@ -23,6 +26,10 @@ export default function SettingsHiddenInput( props ) {
     children,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   const [ shown, setShown ] = React.useState( false );
 
   return (
@@ -32,7 +39,7 @@ export default function SettingsHiddenInput( props ) {
         <Input
           id={ id }
           type={ shown ? type : "password" }
-          placeholder={ placeholder ? placeholder : `Enter ${label.toLowerCase()}` }
+          placeholder={ placeholder ? placeholder : `${t('enter')} ${label.toLowerCase()}` }
           value={ value }
           onChange={ onChange }
           className={` ${ inputClassName ? inputClassName : '' }`}

@@ -10,6 +10,9 @@ import {
 import {
   defaultGroups,
 } from 'configs/constants/projects';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function ProjectGroupEdit( props ) {
   //props
@@ -19,6 +22,10 @@ export default function ProjectGroupEdit( props ) {
     group,
     updateGroup,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ title, setTitle ] = React.useState( '' );
   const [ description, setDescription ] = React.useState( '' );
@@ -35,20 +42,20 @@ export default function ProjectGroupEdit( props ) {
   return (
     <Modal isOpen={open}>
       <ModalHeader>
-        Edit group
+        {`${t('edit')} ${t('group2').toLowerCase()}`}
       </ModalHeader>
       <ModalBody>
         <FormGroup>
-          <Label for="group-title">Group name</Label>
-          <Input placeholder="Enter group name" value={title} onChange={(e) => setTitle(e.target.value)}/>
+          <Label for="group-title">{t('groupTitle')}</Label>
+          <Input placeholder={t('groupTitlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)}/>
         </FormGroup>
         <FormGroup>
-          <Label for="group-title">Group description</Label>
-          <Input placeholder="Enter group description" value={description} onChange={(e) => setDescription(e.target.value)}/>
+          <Label for="group-title">{t('groupDescription')}</Label>
+          <Input placeholder={t('groupDescriptionPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)}/>
         </FormGroup>
         <FormGroup>
-          <Label for="role">Order</Label>
-          <Input placeholder="Set order" type="number" value={order} onChange={(e) => setOrder(e.target.value)}/>
+          <Label for="role">{t('order')}</Label>
+          <Input placeholder={t('orderPlaceholder')} type="number" value={order} onChange={(e) => setOrder(e.target.value)}/>
         </FormGroup>
         <div className="form-buttons-row m-b-10">
           <button
@@ -60,7 +67,8 @@ export default function ProjectGroupEdit( props ) {
               closeModal();
             } }
             >
-            Cancel
+
+            {t('cancel')}
           </button>
           <div className="ml-auto">
             <button
@@ -71,7 +79,7 @@ export default function ProjectGroupEdit( props ) {
                 setOrder(group.order);
               } }
               >
-              Restore
+              {t('restore')}
             </button>
             <button
               className="btn"
@@ -81,7 +89,7 @@ export default function ProjectGroupEdit( props ) {
                 closeModal();
               } }
               >
-              Update
+              {t('update')}
             </button>
           </div>
         </div>

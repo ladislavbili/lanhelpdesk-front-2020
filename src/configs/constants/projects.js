@@ -7,12 +7,12 @@ let fakeID = -1;
 export const allACLs = [
   {
     id: 'header1',
-    title: 'Project ACL',
+    title: 'projectACL',
     header: true
   },
   {
     id: 'projectRead',
-    title: 'View project name & description',
+    title: 'viewProjectNameDescription',
     disabled: [
       {
         key: 'projectWrite',
@@ -22,7 +22,7 @@ export const allACLs = [
   },
   {
     id: 'projectWrite',
-    title: 'Project settings',
+    title: 'projectSettings',
     dependancy: [
       {
         key: 'projectRead',
@@ -36,12 +36,12 @@ export const allACLs = [
   },
   {
     id: 'header2',
-    title: 'Task list',
+    title: 'tasklist',
     header: true,
   },
   {
     id: 'myTasks',
-    title: 'View my tasks created/requested/assigned',
+    title: 'viewMyTasks',
     both: false,
     fake: true,
     value: true,
@@ -53,7 +53,7 @@ export const allACLs = [
   },
   {
     id: 'companyTasks',
-    title: 'View my company tasks',
+    title: 'viewMyCompanyTasks',
     both: false,
     disabled: [
       {
@@ -63,7 +63,7 @@ export const allACLs = [
   },
   {
     id: 'allTasks',
-    title: 'View all tasks in this project',
+    title: 'viewAllTasks',
     dependancy: [
       {
         key: 'companyTasks',
@@ -77,12 +77,12 @@ export const allACLs = [
   },
   {
     id: 'headerTaskList',
-    title: 'Task list view',
+    title: 'tasklistView',
     header: true,
   },
   {
     id: 'taskTable',
-    title: 'Task table',
+    title: 'taskTable',
     both: false,
     fake: true,
     value: true,
@@ -94,22 +94,22 @@ export const allACLs = [
   },
   {
     id: 'tasklistDnD',
-    title: 'Drag & Drop',
+    title: 'dnd',
     both: false,
   },
   {
     id: 'tasklistKalendar',
-    title: 'Calendar',
+    title: 'calendar',
     both: false,
   },
   {
     id: 'tasklistGantt',
-    title: 'Project management',
+    title: 'projectManagement',
     both: false,
   },
   {
     id: 'tasklistStatistics',
-    title: 'Statistics',
+    title: 'statistics',
     both: false,
   },
   {
@@ -118,12 +118,12 @@ export const allACLs = [
   },
   {
     id: 'headerAdd',
-    title: 'Add task',
+    title: 'addTask',
     header: true,
   },
   {
     id: 'addTask',
-    title: 'Add Task ( title, description, attachments )',
+    title: 'addTaskRight',
     both: false
   },
   {
@@ -132,62 +132,62 @@ export const allACLs = [
   },
   {
     id: 'headerTaskEdit',
-    title: 'Edit task',
+    title: 'editTask',
     header: true,
   },
   {
     id: 'deleteTask',
-    title: 'Delete Task',
+    title: 'deleteTask',
     both: false
   },
   {
     id: 'taskImportant',
-    title: 'Mark tasks as important',
+    title: 'importantRight',
     both: false
   },
   {
     id: 'taskTitleWrite',
-    title: 'Task title edit',
+    title: 'taskTitleEdit',
     both: false
   },
   {
     id: 'taskProjectWrite',
-    title: 'Change task project',
+    title: 'changeTaskProject',
     both: false
   },
   {
     id: 'taskDescription',
-    title: 'Task description',
+    title: 'taskDescription',
     both: true
   },
   {
     id: 'taskAttachments',
-    title: 'Task attachments',
+    title: 'taskAttachments',
     both: true
   },
   {
     id: 'taskSubtasks',
-    title: 'Task subtasks VIEW/EDIT',
+    title: 'taskSubtasksRight',
     both: true
   },
   {
     id: 'taskWorks',
-    title: 'Task works VIEW/EDIT',
+    title: 'taskWorksRight',
     both: true
   },
   {
     id: 'taskWorksAdvanced',
-    title: 'Task works advanced VIEW/EDIT',
+    title: 'taskWorksAdvancedRight',
     both: true
   },
   {
     id: 'taskMaterials',
-    title: 'Task materials VIEW/EDIT',
+    title: 'taskMaterialsRight',
     both: true
   },
   {
     id: 'taskPausalInfo',
-    title: 'Task pausal info VIEW/EDIT',
+    title: 'taskPausalInfoRight',
     both: false
   },
   {
@@ -196,12 +196,12 @@ export const allACLs = [
   },
   {
     id: 'headerComments',
-    title: 'Comments & history',
+    title: 'commentsHistory',
     header: true,
   },
   {
     id: 'viewComments',
-    title: 'View comments',
+    title: 'viewComments',
     both: false,
     disabled: [ {
       key: 'addComments'
@@ -213,7 +213,7 @@ export const allACLs = [
   },
   {
     id: 'addComments',
-    title: 'Add comments',
+    title: 'addComments',
     dependancy: [ {
       key: 'viewComments',
     } ],
@@ -221,7 +221,7 @@ export const allACLs = [
   },
   {
     id: 'internal',
-    title: 'Internal comments',
+    title: 'internalComments',
     dependancy: [ {
       key: 'viewComments',
     } ],
@@ -229,7 +229,7 @@ export const allACLs = [
   },
   {
     id: 'emails',
-    title: 'Send emails from comments',
+    title: 'sendEmailsFromComments',
     dependancy: [ {
       key: 'viewComments',
     } ],
@@ -237,7 +237,7 @@ export const allACLs = [
   },
   {
     id: 'history',
-    title: 'Task history',
+    title: 'taskHistory',
     both: false
   },
 
@@ -396,6 +396,7 @@ export const defItem = ( required ) => ( {
 export const emptyUserValue = {
   id: null,
   value: null,
+  labelId: 'emptyUserValue',
   label: 'Task Creator',
   title: 'Task Creator'
 }
@@ -403,6 +404,7 @@ export const emptyUserValue = {
 export const emptyCompanyValue = {
   id: null,
   value: null,
+  labelId: 'emptyCompanyValue',
   label: "Task Creator's company",
   title: "Task Creator's company"
 }
@@ -410,21 +412,24 @@ export const emptyCompanyValue = {
 export const emptyAssigned = {
   id: null,
   value: null,
+  labelId: 'emptyAssigned',
   label: 'Nepriradený/Zadávateľ má assigned edit právo',
   title: 'Nepriradený/Zadávateľ má assigned edit právo',
 };
 
 export const emptyStatus = {
-  title: 'New (first with new action)',
   id: null,
-  label: 'New (first with new action)',
   value: null,
+  labelId: 'emptyStatus',
+  title: 'New (first with new action)',
+  label: 'New (first with new action)',
   color: 'green'
 };
 
 export const emptyPausal = {
-  title: 'Set by tasks company',
   id: null,
-  label: 'Set by tasks company',
   value: null,
+  labelId: 'emptyPausal',
+  title: 'Set by tasks company',
+  label: 'Set by tasks company',
 };

@@ -13,6 +13,9 @@ import {
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
+import {
+  useTranslation
+} from "react-i18next";
 import Loading from 'components/loading';
 import Select from 'react-select';
 import {
@@ -42,6 +45,10 @@ export default function UserProfile( props ) {
     match,
     closeModal
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const currentUser = getMyData();
 
@@ -112,24 +119,24 @@ export default function UserProfile( props ) {
   return (
     <div className="p-t-10 p-b-20">
       <FormGroup>
-        <Label for="username">Username</Label>
-        <Input type="text" name="username" id="username" placeholder="Enter username" value={ username } onChange={ (e) => setUsername(e.target.value) } />
+        <Label for="username">{t('username')}</Label>
+        <Input type="text" name="username" id="username" placeholder={t('usernamePlaceholder')} value={ username } onChange={ (e) => setUsername(e.target.value) } />
       </FormGroup>
       <FormGroup>
-        <Label for="name">Name</Label>
-        <Input type="text" name="name" id="name" placeholder="Enter name" value={ name } onChange={ (e) => setName(e.target.value) } />
+        <Label for="name">{t('name')}</Label>
+        <Input type="text" name="name" id="name" placeholder={t('namePlaceholder')} value={ name } onChange={ (e) => setName(e.target.value) } />
       </FormGroup>
       <FormGroup>
-        <Label for="surname">Surname</Label>
-        <Input type="text" name="surname" id="surname" placeholder="Enter surname" value={ surname } onChange={ (e) => setSurname(e.target.value) } />
+        <Label for="surname">{t('surname')}</Label>
+        <Input type="text" name="surname" id="surname" placeholder={t('surnamePlaceholder')} value={ surname } onChange={ (e) => setSurname(e.target.value) } />
       </FormGroup>
       <FormGroup>
-        <Label for="email">E-mail</Label>
-        <Input type="email" name="email" id="email" placeholder="Enter email" value={ email } onChange={ (e) => setEmail(e.target.value) } />
+        <Label for="email">{t('email')}</Label>
+        <Input type="email" name="email" id="email" placeholder={t('emailPlaceholder')} value={ email } onChange={ (e) => setEmail(e.target.value) } />
       </FormGroup>
 
       <FormGroup>
-        <Label for="language">Language</Label>
+        <Label for="language">{t('language')}</Label>
         <Select
           styles={ pickSelectStyle() }
           options={ languages }
@@ -141,17 +148,17 @@ export default function UserProfile( props ) {
       <Checkbox
         className = "m-b-5 p-l-0"
         value = { receiveNotifications }
-        label = "Receive e-mail notifications"
+        label={t('receiveNotifications')}
         onChange={()=> setReceiveNotifications(!receiveNotifications)}
         />
 
       <FormGroup>
-        <Label for="signature">Signature</Label>
+        <Label for="signature">{t('signature')}</Label>
         <Input
           type="textarea"
           name="signature"
           id="signature"
-          placeholder="Enter signature"
+          placeholder={t('signaturePlaceholder')}
           value={ signature }
           onChange={ (e) => setSignature(e.target.value) }
           />
@@ -162,7 +169,7 @@ export default function UserProfile( props ) {
           className="btn-link"
           onClick={closeModal}
           >
-          Cancel
+          {t('cancel')}
         </button>
         <button
           className="btn-link ml-auto btn-distance"
@@ -171,14 +178,14 @@ export default function UserProfile( props ) {
             setPasswordChangeOpen(true);
           }}
           >
-          { password === null ? 'Change password' : 'Password change edit' }
+          { password === null ? t('changePassword') : t('changePasswordEdit') }
         </button>
         <button
           className="btn"
           disabled={ saving || !isEmail(email) }
           onClick={updateProfileFunc}
           >
-          { saving ? 'Saving user...' : 'Save user' }
+          { saving ? `${t('saving')}...` : `${t('save')} ${t('user2').toLowerCase()}` }
         </button>
       </div>
       <PasswordChange

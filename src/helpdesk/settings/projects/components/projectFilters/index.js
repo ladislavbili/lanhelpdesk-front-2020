@@ -20,6 +20,9 @@ import {
 import {
   GET_BASIC_COMPANIES,
 } from 'helpdesk/settings/companies/queries';
+import {
+  useTranslation
+} from "react-i18next";
 
 let fakeID = -1;
 
@@ -33,6 +36,10 @@ export default function ProjectFilters( props ) {
     deleteFilter,
     updateFilter,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: taskTypesData,
@@ -62,11 +69,11 @@ export default function ProjectFilters( props ) {
       <table className="table bkg-white m-t-5 m-b-30">
         <thead>
           <tr>
-            <th>Project filter name</th>
-            <th>Description</th>
-            <th>Groups</th>
-            <th>Order</th>
-            <th width="100">Action</th>
+            <th>{t('projectFilterName')}</th>
+            <th>{t('description')}</th>
+            <th>{t('groups')}</th>
+            <th>{t('order')}</th>
+            <th width="150">{t('actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -79,7 +86,7 @@ export default function ProjectFilters( props ) {
                 {projectFilter.description}
               </td>
               <td>
-                { getGroupsProblematicAttributes( groups, projectFilter ).length !== 0 && <i className="text-danger font-size-16 m-l-10 m-t-10 fa fa-exclamation-circle" /> }
+                { getGroupsProblematicAttributes( groups, projectFilter, t ).length !== 0 && <i className="text-danger font-size-16 m-l-10 m-t-10 fa fa-exclamation-circle" /> }
                 { groups.filter((group) => projectFilter.groups.some((groupId) => group.id === groupId )).map((group) => group.title ).join(', ') }
               </td>
               <td>

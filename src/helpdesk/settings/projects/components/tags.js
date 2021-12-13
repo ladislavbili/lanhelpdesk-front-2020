@@ -4,6 +4,10 @@ import {
   PopoverHeader,
   PopoverBody,
 } from 'reactstrap';
+
+import {
+  useTranslation
+} from "react-i18next";
 import {
   SketchPicker
 } from "react-color";
@@ -22,6 +26,10 @@ export default function Tags( props ) {
     updateTag,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   const [ title, setTitle ] = React.useState( "" );
   const [ order, setOrder ] = React.useState( 0 );
   const [ color, setColor ] = React.useState( defaultTagColor );
@@ -32,10 +40,10 @@ export default function Tags( props ) {
       <table className="table m-t-10 vykazyTable">
         <thead>
           <tr>
-            <th> Title </th>
-            <th width="100px"> Order </th>
-            <th width="150px"> Color </th>
-            <th width="50px"> Actions </th>
+            <th>{t('title')}</th>
+            <th width="100px">{t('order')}</th>
+            <th width="150px">{t('color')}</th>
+            <th width="50px">{t('actions')}</th>
           </tr>
         </thead>
 
@@ -71,7 +79,7 @@ export default function Tags( props ) {
                   toggle={() => setEditColorID(null) }
                   isOpen={editColorID !== null && editColorID === tag.id }
                   >
-                  <PopoverHeader>Change color</PopoverHeader>
+                  <PopoverHeader>{t('changeColor')}</PopoverHeader>
                   <PopoverBody>
                     <SketchPicker
                       id="color"
@@ -85,7 +93,7 @@ export default function Tags( props ) {
                           setEditColorID(null);
                         }}
                         >
-                        Close
+                        {t('close')}
                       </button>
                     </div>
                   </PopoverBody>
@@ -131,7 +139,7 @@ export default function Tags( props ) {
                 target="add-color-picker"
                 toggle={() => setEditColorID(null) }
                 >
-                <PopoverHeader>Change color</PopoverHeader>
+                <PopoverHeader>{t('changeColor')}</PopoverHeader>
                 <PopoverBody>
                   <SketchPicker
                     id="color"
@@ -145,7 +153,7 @@ export default function Tags( props ) {
                           setEditColorID(null);
                         }}
                         >
-                        Close
+                        {t('close')}
                       </button>
                     </div>
                 </PopoverBody>

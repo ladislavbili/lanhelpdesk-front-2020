@@ -42,6 +42,9 @@ import Comment from './comment';
 import Email from './email';
 
 import downloadjs from 'downloadjs';
+import {
+  useTranslation
+} from "react-i18next";
 
 const limit = 5;
 
@@ -57,6 +60,10 @@ export default function Comments( props ) {
     disabled,
     fromInvoice,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const [ page, setPage ] = React.useState( 1 );
 
   const {
@@ -165,7 +172,7 @@ export default function Comments( props ) {
         <div>
           { isEmail &&
             <FormGroup className="row m-b-10">
-              <Label className="m-r-10 center-hor" style={{width:50}}>To:</Label>
+              <Label className="m-r-10 center-hor" style={{width:50}}>{t('to2')}:</Label>
               <div className="flex">
                 <Creatable
                   isMulti
@@ -178,13 +185,13 @@ export default function Comments( props ) {
           }
           {isEmail &&
             <FormGroup className="row m-b-10">
-              <Label className="m-r-10 center-hor" style={{width:50}}>Subject:</Label>
-              <Input className="form-control-secondary flex" type="text" placeholder="Enter subject" value={subject} onChange={(e)=>setSubject(e.target.value)}/>
+              <Label className="m-r-10 center-hor" style={{width:50}}>{t('subject')}:</Label>
+              <Input className="form-control-secondary flex" type="text" placeholder={t('subjectPlaceholder')} value={subject} onChange={(e)=>setSubject(e.target.value)}/>
             </FormGroup>
           }
           {isEmail &&
             <FormGroup>
-              <Label className="">Message</Label>
+              <Label className="">{t('message')}</Label>
               <CKEditor
                 editor={ClassicEditor}
                 config={ck5config}
@@ -205,7 +212,7 @@ export default function Comments( props ) {
           }
           {isEmail && hasError &&
             <div style={{color:'red'}}>
-              E-mail failed to send! Check console for more information
+              {t('emailNotSendError')}
             </div>
           }
 
@@ -254,14 +261,14 @@ export default function Comments( props ) {
                 }
               }}
               >
-              {`Add ${ isEmail ? 'e-mail' : 'comment'}`}
+              {`${t('add')} ${ isEmail ? t('email').toLowerCase() : t('comment').toLowerCase()}`}
             </button>
             { userRights.rights.emails && userRights.rights.addComments &&
               <Checkbox
                 className = "btn-distance center-hor"
                 centerHor
                 disabled={ !userRights.rights.emails || !userRights.rights.addComments }
-                label = "E-mail"
+                label = {t('email')}
                 value = { isEmail }
                 onChange={() => setIsEmail(!isEmail) }
                 />
@@ -270,7 +277,7 @@ export default function Comments( props ) {
               <Checkbox
                 className = "btn-distance center-hor"
                 centerHor
-                label = "Internal"
+                label = {t('internal')}
                 value = { isInternal }
                 onChange={()=>setIsInternal(!isInternal)}
                 />
@@ -282,7 +289,7 @@ export default function Comments( props ) {
                 htmlFor="uploadCommentAttachments"
                 >
                 <i className="fa fa-plus" />
-                Attachement
+                {t('attachment')}
               </label>
               <input
                 type="file"
@@ -341,7 +348,7 @@ export default function Comments( props ) {
                 setTos( users.filter((user) => user.id === comment.user.id ) );
                 setSubject(comment.subject);
                 setIsEmail(true);
-                setEmailBody(('<body><br><blockquote><p>'+(comment.html?comment.html:unescape(comment.text).replace(/(?:\r\n|\r|\n)/g, '<br>'))+'</p></blockquote><body>'));
+                setEmailBody( '<body><br><blockquote><p>'+(comment.html ? comment.html : unescape(comment.text).replace(/(?:\r\n|\r|\n)/g, '<br>'))+'</p></blockquote><body>' );
               }}
               />
           }

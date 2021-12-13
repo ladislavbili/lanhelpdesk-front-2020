@@ -1,25 +1,31 @@
 export const actions = [ {
     label: 'None (nothing happens)',
-    value: 'None'
+    value: 'None',
+    labelId: 'actionNone'
   },
   {
     label: 'Open (none is open)',
-    value: 'IsOpen'
+    value: 'IsOpen',
+    labelId: 'actionIsOpen'
   },
   {
     label: 'New (none is new)',
-    value: 'IsNew'
+    value: 'IsNew',
+    labelId: 'actionIsNew'
   },
   {
     label: 'Close (set close date as current, can be invoiced)',
-    value: 'CloseDate'
+    value: 'CloseDate',
+    labelId: 'actionCloseDate'
   },
   {
     label: `Close Invalid (set close date as current, can't be invoiced)`,
-    value: 'CloseInvalid'
+    value: 'CloseInvalid',
+    labelId: 'actionCloseInvalid'
   },
   {
     label: 'Pending (set pending date to 24 hour)',
-    value: 'PendingDate'
+    value: 'PendingDate',
+    labelId: 'actionPendingDate'
   },
 ]

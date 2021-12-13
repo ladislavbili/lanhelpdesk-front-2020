@@ -15,6 +15,9 @@ import SettingListContainer from '../components/settingListContainer';
 import {
   toSelArr
 } from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_USERS,
@@ -34,6 +37,10 @@ export default function UserListContainer( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: usersData,
@@ -112,9 +119,9 @@ export default function UserListContainer( props ) {
   const UserRoleFilter = (
     <Multiselect
       className="ml-auto"
-      options={ [{ id:'All', label: 'All'}, ...roles] }
-      value={ allRolesSelected ? [{ id:'All', label: 'All'}, ...roles] : selectedRoles }
-      label={ "Filter users by roles" }
+      options={ [{ id:'All', label: t('all')}, ...roles] }
+      value={ allRolesSelected ? [{ id:'All', label: t('all')}, ...roles] : selectedRoles }
+      label={t('filterByRoles')}
       onChange={ ( role ) => {
         let selected = [ ...selectedRoles ];
         if (role.id === 'All' && !allRolesSelected ){
@@ -147,20 +154,20 @@ export default function UserListContainer( props ) {
 
   return (
     <SettingListContainer
-      header="Users"
+      header={t('users')}
       filter={userFilter}
       setFilter={setUserFilter}
       history={history}
       addURL={`.${match.params.id === undefined ? '/users' : '' }/add`}
-      addLabel="User"
+      addLabel={t('user')}
       RightFilterComponent={UserRoleFilter}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Name / E-mail</th>
-            <th>Company</th>
+            <th>{t('nameAndEmail')}</th>
+            <th>{t('company')}</th>
           </tr>
         </thead>
         <tbody>
@@ -184,7 +191,7 @@ export default function UserListContainer( props ) {
                 </td>
                 <td className={(match.params.id === user.id ? " active":"") }
                   style={{maxWidth: "200px", whiteSpace: "nowrap",  overflow: "hidden", textOverflow: "ellipsis"  }} >
-                  { (user.company ? user.company.title  : "NEZARADENÉ")}
+                  { (user.company ? user.company.title  : t('none'))}
                 </td>
               </tr>
             ))

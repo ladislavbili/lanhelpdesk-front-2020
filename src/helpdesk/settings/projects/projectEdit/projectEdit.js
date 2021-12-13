@@ -27,6 +27,9 @@ import booleanSelects from 'configs/constants/boolSelect';
 import {
   noSelect
 } from "../components/attributes";
+import {
+  useTranslation
+} from "react-i18next";
 import classnames from 'classnames';
 import DeleteReplacement from 'components/deleteReplacement';
 import Loading from 'components/loading';
@@ -97,6 +100,10 @@ export default function ProjectEdit( props ) {
     id,
     setting,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   //state
   const [ title, setTitle ] = React.useState( "" );
@@ -568,7 +575,7 @@ export default function ProjectEdit( props ) {
 
   const deleteProjectFunc = ( replacement ) => {
     setDeleteOpen( false );
-    if ( window.confirm( "Deleting a project deletes all tasks in the project. Do you still want to delete the project?" ) ) {
+    if ( window.confirm( t( 'deleteProjectMessage' ) ) ) {
       deleteProject( {
           variables: {
             id,
@@ -631,7 +638,7 @@ export default function ProjectEdit( props ) {
   }
 
   const removeAttachment = ( attachment ) => {
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteProjectAttachment( {
           variables: {
             id: attachment.id,
@@ -688,7 +695,7 @@ export default function ProjectEdit( props ) {
       )
     ) ) ||
     getAllFilters()
-    .some( ( filter ) => filter.active && getGroupsProblematicAttributes( groups, filter )
+    .some( ( filter ) => filter.active && getGroupsProblematicAttributes( groups, filter, t )
       .length !== 0 ) ||
     attributes.taskType.value === null
   )
@@ -721,7 +728,7 @@ export default function ProjectEdit( props ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
-        RenderDescription = <div className="task-edit-popis">Projekt nemá popis</div>
+        RenderDescription = <div className="task-edit-popis">{t('projectNoDescription')}</div>
       }
     } else {
       if ( editingDescription ) {
@@ -749,7 +756,7 @@ export default function ProjectEdit( props ) {
         if ( description.length !== 0 ) {
           RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
         } else {
-          RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
+          RenderDescription = <div className="task-edit-popis">{t('projectNoDescription')}</div>
         }
       }
     }
@@ -757,7 +764,7 @@ export default function ProjectEdit( props ) {
       <div className="m-b-15">
         <div className="row" style={{alignItems: "baseline"}}>
           <Label>
-            Popis
+            {t('description')}
           </Label>
           { myRights.projectWrite &&
             <button
@@ -768,13 +775,13 @@ export default function ProjectEdit( props ) {
               }}
               >
               <i className={`fa fa-${!editingDescription ? 'pen' : 'save' }`} />
-              { !editingDescription ? 'edit' : 'save' }
+              { !editingDescription ? t('edit') : t('save') }
             </button>
           }
           { myRights.projectWrite &&
             <label htmlFor={`upload-project-attachment-${id}`} className="btn-link btn-distance m-l-0 clickable" >
               <i className="fa fa-plus" />
-              Attachment
+              {t('attachment')}
             </label>
           }
         </div>
@@ -797,7 +804,7 @@ export default function ProjectEdit( props ) {
         >
 
         <h2 className="m-b-17" >
-          Edit project
+          {`${t('edit')} ${t('project').toLowerCase()}`}
         </h2>
 
         <Nav tabs className="no-border m-b-25">
@@ -806,7 +813,7 @@ export default function ProjectEdit( props ) {
               className={classnames({ active: openedTab === 'description'}, "clickable", "")}
               onClick={() => setOpenedTab('description') }
               >
-              Description
+              {t('description')}
             </NavLink>
           </NavItem>
           { myRights.projectWrite &&
@@ -821,7 +828,7 @@ export default function ProjectEdit( props ) {
                   className={classnames({ active: openedTab === 'statuses' }, "clickable", "")}
                   onClick={() => setOpenedTab('statuses') }
                   >
-                  Statuses
+                  {t('statuses')}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -834,7 +841,7 @@ export default function ProjectEdit( props ) {
                   className={classnames({ active: openedTab === 'tags' }, "clickable", "")}
                   onClick={() => setOpenedTab('tags') }
                   >
-                  Tags
+                  {t('tags')}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -847,7 +854,7 @@ export default function ProjectEdit( props ) {
                   className={classnames({ active: openedTab === 'groups' }, "clickable", "")}
                   onClick={() => setOpenedTab('groups') }
                   >
-                  Groups
+                  {t('groups')}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -860,7 +867,7 @@ export default function ProjectEdit( props ) {
                   className={classnames({ active: openedTab === 'accRights' }, "clickable", "")}
                   onClick={() => setOpenedTab('accRights') }
                   >
-                  Group rights
+                  {t('groupRights')}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -873,7 +880,7 @@ export default function ProjectEdit( props ) {
                   className={classnames({ active: openedTab === 'users' }, "clickable", "")}
                   onClick={() => setOpenedTab('users') }
                   >
-                  Users
+                  {t('users')}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -886,7 +893,7 @@ export default function ProjectEdit( props ) {
                   className={classnames({ active: openedTab === 'attributes' }, "clickable", "")}
                   onClick={() => setOpenedTab('attributes') }
                   >
-                  Attributes
+                  {t('attributesRights')}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -899,7 +906,7 @@ export default function ProjectEdit( props ) {
                   className={classnames({ active: openedTab === 'custom' }, "clickable", "")}
                   onClick={() => setOpenedTab('custom') }
                   >
-                  Custom attributes
+                  {t('customAttributes')}
                 </NavLink>
               </NavItem>
               <NavItem>
@@ -912,7 +919,7 @@ export default function ProjectEdit( props ) {
                   className={classnames({ active: openedTab === 'projectFilters' }, "clickable", "")}
                   onClick={() => setOpenedTab('projectFilters') }
                   >
-                  Project filters
+                  {t('projectFilters')}
                 </NavLink>
               </NavItem>
             </Empty>
@@ -925,13 +932,13 @@ export default function ProjectEdit( props ) {
             { myRights.projectRead &&
               <Empty>
                 <FormGroup className="m-b-25">
-                  <Label for="name">Project name <span className="warning-big">*</span></Label>
+                  <Label for="name">{t('projectName')}<span className="warning-big">*</span></Label>
                   <Input
                     disabled={!myRights.projectWrite}
                     type="text"
                     className="medium-input m-t-15"
                     id="name"
-                    placeholder="Enter project name"
+                    placeholder={t('projectNamePlaceholder')}
                     value={title}
                     onChange={(e)=>{
                       setTitle(e.target.value);
@@ -949,7 +956,7 @@ export default function ProjectEdit( props ) {
                     setArchived(!archived)
                     setDataChanged( true );
                   }}
-                  label="Archived"
+                  label={t('archived')}
                   labelClassName="text-normal font-normal"
                   simpleSwitch
                   />
@@ -958,12 +965,12 @@ export default function ProjectEdit( props ) {
                     {
                       key: 'autoApprovedOn',
                       value: autoApproved,
-                      label: 'Invoice On',
+                      label: t('invoiceOn'),
                     },
                     {
                       key: 'autoApprovedOff',
                       value: !autoApproved,
-                      label: 'Invoice Off',
+                      label: t('invoiceOff'),
                     },
                   ] }
                   name="autoApproved"
@@ -981,14 +988,14 @@ export default function ProjectEdit( props ) {
                     setDataChanged( true );
                   }}
                   disabled={!myRights.projectWrite}
-                  label="Don't show invoice"
+                  label={t('hideInvoice')}
                   labelClassName="text-normal font-normal"
                   simpleSwitch
                   />
 
                 { myRights.projectWrite &&
                   <button className="btn btn-full-red m-l-5" disabled={saving || theOnlyOneLeft} onClick={() => setDeleteOpen(true)}>
-                    DELETE PROJECT
+                    {t('deleteProject')}
                   </button>
                 }
               </Empty>
@@ -1269,7 +1276,7 @@ export default function ProjectEdit( props ) {
         <div className="form-buttons-row">
           { !numberOfTasksLoading && !numberOfTasksError &&
             <div className="ml-auto center-hor p-r-5">
-              { `This project includes ${numberOfTasksData.getNumberOfTasks} tasks.` }
+              { `${t('projectIncludes')} ${numberOfTasksData.getNumberOfTasks} ${t('tasks').toLowerCase()}.` }
             </div>
           }
 
@@ -1291,7 +1298,7 @@ export default function ProjectEdit( props ) {
                 }
               }}
               >
-              {(saving?'Saving...':'Save project')}
+              { saving ? `${t('saving')}...` : `${t('save')} ${t('project').toLowerCase()}` }
             </button>
           }
         </div>

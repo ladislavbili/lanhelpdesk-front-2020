@@ -17,6 +17,9 @@ import {
 import moment from 'moment';
 import Loading from 'components/loading';
 import Checkbox from 'components/checkbox';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function ReportsTable( props ) {
 
@@ -27,6 +30,10 @@ export default function ReportsTable( props ) {
     markedTasks,
     markTask,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const displayPausalSubtasks = (
     columnsToShow.includes( 'description' ) &&
@@ -72,23 +79,23 @@ export default function ReportsTable( props ) {
         <tr>
           { columnsToShow.includes('checkbox') && <th width="30"/> }
           { columnsToShow.includes('id') && <th>ID</th> }
-          { columnsToShow.includes('title') && <th>Názov úlohy</th> }
-          { columnsToShow.includes('requester') && <th>Zadal</th> }
-          { columnsToShow.includes('assignedTo') && <th>Rieši</th> }
-          { columnsToShow.includes('status') && <th>Status</th> }
-          { columnsToShow.includes('statusChange') && <th>Status date</th> }
-          { columnsToShow.includes('closeDate') && <th>Close date</th> }
+          { columnsToShow.includes('title') && <th>{t('taskTitle')}</th> }
+          { columnsToShow.includes('requester') && <th>{t('requester')}</th> }
+          { columnsToShow.includes('assignedTo') && <th>{t('assignedTo')}</th> }
+          { columnsToShow.includes('status') && <th>{t('status')}</th> }
+          { columnsToShow.includes('statusChange') && <th>{t('statusDate')}</th> }
+          { columnsToShow.includes('closeDate') && <th>{t('closeDate')}</th> }
           { columnsToShow.includes('description') && <th>Popis práce</th> }
-          { columnsToShow.includes('taskType') && <th style={{width:'150px'}}>Typ práce</th> }
-          { columnsToShow.includes('tripType') && <th style={{width:'150px'}}>Výjazd</th> }
-          { columnsToShow.includes('hours') && <th style={{width:'50px'}}>Hodiny</th> }
-          { columnsToShow.includes('material') && <th style={{width:'150px',paddingLeft:0}}>Material</th> }
-          { columnsToShow.includes('quantity') && <th style={{width:'50px'}}>Mn.</th> }
-          { columnsToShow.includes('unit') && <th style={{width:'100px'}}>Jednotka</th> }
-          { columnsToShow.includes('pricePerHour') && <th style={{width:'70px'}}>Cena/hodna</th> }
-          { columnsToShow.includes('pricePerQuantity') && <th style={{width:'100px'}}>Cena/Mn.</th> }
-          { columnsToShow.includes('pricePerUnit') && <th style={{width:'50px'}}>Cena/ks</th> }
-          { columnsToShow.includes('total') && <th style={{width:'70px'}}>Cena spolu</th> }
+          { columnsToShow.includes('taskType') && <th style={{width:'150px'}}>{t('workDescription')}</th> }
+          { columnsToShow.includes('tripType') && <th style={{width:'150px'}}>{t('trip')}</th> }
+          { columnsToShow.includes('hours') && <th style={{width:'50px'}}>{t('hours')}</th> }
+          { columnsToShow.includes('material') && <th style={{width:'150px',paddingLeft:0}}>{t('material')}</th> }
+          { columnsToShow.includes('quantity') && <th style={{width:'50px'}}>{t('quantityShort')}</th> }
+          { columnsToShow.includes('unit') && <th style={{width:'100px'}}>{t('unit')}</th> }
+          { columnsToShow.includes('pricePerHour') && <th style={{width:'70px'}}>{t('pricePerHour')}</th> }
+          { columnsToShow.includes('pricePerQuantity') && <th style={{width:'100px'}}>{t('pricePerQuantity')}</th> }
+          { columnsToShow.includes('pricePerUnit') && <th style={{width:'50px'}}>{t('pricePerUnit')}</th> }
+          { columnsToShow.includes('total') && <th style={{width:'70px'}}>{t('totalPrice')}</th> }
         </tr>
       </thead>
       <tbody>

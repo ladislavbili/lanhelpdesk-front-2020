@@ -19,6 +19,9 @@ import {
   orderArr,
   toSelArr
 } from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_BASIC_ROLES,
@@ -35,6 +38,10 @@ export default function PublicFilterList( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: publicFiltersData,
@@ -91,18 +98,18 @@ export default function PublicFilterList( props ) {
   const PublicFiltersSort = (
     <div className="d-flex flex-row align-items-center ml-auto">
       <div className="color-basic m-r-5 m-l-5">
-        Sort by
+        {t('sortBy')}
       </div>
       <select
         value={roleFilter}
         className="invisible-select font-bold text-highlight"
         onChange={ (e) => setRoleFilter(e.target.value) }
         >
-        <option value='all'>All filters</option>
+        <option value='all'>{t('allFilters')}</option>
         { orderArr(toSelArr(rolesData.basicRoles)).map((role) => (
           <option value={role.id} key={role.id}>{role.title}</option>
         ))}
-        <option value='none'>Without role</option>
+        <option value='none'>{t('withoutRole')}</option>
       </select>
     </div>
   );
@@ -124,20 +131,20 @@ export default function PublicFilterList( props ) {
 
   return (
     <SettingListContainer
-      header="Public Filters"
+      header={t('publicFilters')}
       filter={search}
       setFilter={setSearch}
       history={history}
       addURL="/helpdesk/settings/publicFilters/add"
-      addLabel="Public Filter"
+      addLabel={t('publicFilter2')}
       RightFilterComponent={PublicFiltersSort}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Order</th>
+            <th>{t('title')}</th>
+            <th>{t('order')}</th>
           </tr>
         </thead>
         <tbody>

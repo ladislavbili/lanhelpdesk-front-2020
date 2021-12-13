@@ -28,6 +28,9 @@ import {
 import {
   pickSelectStyle
 } from "configs/components/select";
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_IMAPS,
@@ -53,6 +56,11 @@ export default function IMAPEdit( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
+
   const client = useApolloClient();
   const allIMAPs = toSelArr( client.readQuery( {
       query: GET_IMAPS
@@ -229,7 +237,7 @@ export default function IMAPEdit( props ) {
   };
 
   const deleteIMAPFunc = () => {
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteImap( {
           variables: {
             id: parseInt( match.params.id ),
@@ -290,31 +298,31 @@ export default function IMAPEdit( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20" >
-        Edit IMAP
+        {`${t('edit')} ${t('imap')}`}
       </h2>
 
       <Checkbox
         className = "m-b-5 p-l-0"
-        value = { def }
+        value={ def }
         onChange={ () => {
           setDef(!def);
           setDataChanged( true );
         } }
-        label = "Default"
+        label={t('default')}
         />
       <Checkbox
-        className = "m-b-5 p-l-0"
-        value = { active }
+        className="m-b-5 p-l-0"
+        value={ active }
         onChange={ () => {
           setActive(!active);
           setDataChanged( true );
         } }
-        label = "Active"
+        label={t('active')}
         />
 
       <SettingsInput
         required
-        label="Title"
+        label={t('title')}
         id="title"
         value={title}
         onChange={(e)=> {
@@ -325,7 +333,7 @@ export default function IMAPEdit( props ) {
 
       <SettingsInput
         required
-        label="Host"
+        label={t('host')}
         id="host"
         value={host}
         onChange={(e)=> {
@@ -336,7 +344,7 @@ export default function IMAPEdit( props ) {
 
       <SettingsInput
         required
-        label="Port"
+        label={t('port')}
         id="port"
         type="number"
         value={port}
@@ -348,7 +356,7 @@ export default function IMAPEdit( props ) {
 
       <SettingsInput
         required
-        label="Username"
+        label={t('username')}
         id="username"
         value={username}
         onChange={(e)=> {
@@ -359,7 +367,7 @@ export default function IMAPEdit( props ) {
 
       <SettingsHiddenInput
         required
-        label="Password"
+        label={t('password')}
         id="password"
         value={password}
         onChange={(e)=> {
@@ -369,18 +377,18 @@ export default function IMAPEdit( props ) {
         />
 
       <Checkbox
-        className = "m-b-5 p-l-0"
-        value = { tls }
+        className="m-b-5 p-l-0"
+        value={ tls }
         onChange={ () => {
           setTls(!tls);
           setDataChanged( true );
         } }
-        label = "TLS"
+        label={t('tls')}
         />
 
       <SettingsInput
         required
-        label="Destination"
+        label={t('destination')}
         id="destination"
         value={destination}
         onChange={(e)=> {
@@ -390,7 +398,7 @@ export default function IMAPEdit( props ) {
         />
 
       <FormGroup>
-        <Label for="ignoredRecievers">Ignored recievers</Label>
+        <Label for="ignoredRecievers">{t('ignoredRecievers')}</Label>
         <Creatable
           isMulti
           value={ignoredRecievers}
@@ -406,9 +414,9 @@ export default function IMAPEdit( props ) {
 
       <SettingsInput
         required
-        label="Destination"
+        label={t('destination')}
         id="ignoredRecieversDestination"
-        placeholder="Enter ignored e-mails destination"
+        placeholder={t('ignoredDestinationPlaceholder')}
         value={ignoredRecieversDestination}
         onChange={(e)=> {
           setIgnoredRecieversDestination(e.target.value);
@@ -417,16 +425,16 @@ export default function IMAPEdit( props ) {
         />
 
       <Checkbox
-        className = "m-b-5 p-l-0"
-        value = { rejectUnauthorized }
+        className="m-b-5 p-l-0"
+        value={ rejectUnauthorized }
         onChange={ () => {
           setRejectUnauthorized(!rejectUnauthorized);
           setDataChanged( true );
         } }
-        label = "Reject unauthorized"
+        label={t('rejectUnauthorized')}
         />
       <FormGroup>
-        <Label for="role">Users Role <span className="warning-big">*</span></Label>
+        <Label for="role">{t('usersRole')}<span className="warning-big">*</span></Label>
         <Select
           styles={pickSelectStyle()}
           options={toSelArr(roleData.roles)}
@@ -438,7 +446,7 @@ export default function IMAPEdit( props ) {
           />
       </FormGroup>
       <FormGroup>
-        <Label for="project">Users Company <span className="warning-big">*</span></Label>
+        <Label for="project">{t('usersCompany')}<span className="warning-big">*</span></Label>
         <Select
           styles={pickSelectStyle()}
           options={toSelArr(companyData.basicCompanies)}
@@ -450,7 +458,7 @@ export default function IMAPEdit( props ) {
           />
       </FormGroup>
       <FormGroup>
-        <Label for="project">Tasks Project <span className="warning-big">*</span></Label>
+        <Label for="project">{t('tasksProject')}<span className="warning-big">*</span></Label>
         <Select
           styles={pickSelectStyle()}
           options={toSelArr(projectData.projects)}
@@ -468,18 +476,18 @@ export default function IMAPEdit( props ) {
           disabled={saving || theOnlyOneLeft}
           onClick={ deleteIMAPFunc }
           >
-          Delete
+          {t('delete')}
         </button>
 
         <div className="ml-auto message m-r-10">
           { dataChanged &&
             <div className="message error-message">
-              Save changes before leaving!
+              {t('saveBeforeLeaving')}
             </div>
           }
           { !dataChanged &&
             <div className="message success-message">
-              Saved
+              {t('saved')}
             </div>
           }
         </div>
@@ -489,14 +497,14 @@ export default function IMAPEdit( props ) {
           disabled={saving || tested}
           onClick={ startTest }
           >
-          Test IMAP
+          {t('testImap')}
         </button>
 
         <button
           className="btn"
           disabled={cannotSave()}
           onClick={updateIMAPFunc}>
-          { saving ? 'Saving IMAP...' : 'Save IMAP' }
+          { saving ? `${t('saving')} ${t('imap')}...` : `${t('save')} ${t('imap')}` }
         </button>
       </div>
     </div>

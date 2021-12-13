@@ -19,11 +19,19 @@ import {
   PRICELISTS_SUBSCRIPTION
 } from './queries';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function PricelistsList( props ) {
   const {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: pricelistsData,
@@ -64,20 +72,20 @@ export default function PricelistsList( props ) {
 
   return (
     <SettingListContainer
-      header="Price lists"
+      header={t('pricelists')}
       filter={pricelistFilter}
       setFilter={setPricelistFilter}
       history={history}
       addURL="/helpdesk/settings/pricelists/add"
-      addLabel="Price list"
+      addLabel={t('pricelist')}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Default</th>
-            <th>Order</th>
+            <th>{t('title')}</th>
+            <th>{t('default')}</th>
+            <th>{t('order')}</th>
           </tr>
         </thead>
         <tbody>

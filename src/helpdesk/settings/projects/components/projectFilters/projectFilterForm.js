@@ -12,6 +12,9 @@ import {
   pickSelectStyle
 } from 'configs/components/select';
 import {
+  useTranslation
+} from "react-i18next";
+import {
   emptyFilter,
   booleanSelectOptions,
   ofCurrentUser,
@@ -23,6 +26,8 @@ import {
   toSelArr,
   fromObjectToState,
   setDefaultFromObject,
+  translateSelectItem,
+  translateAllSelectItems,
 } from 'helperFunctions';
 import moment from 'moment';
 
@@ -40,6 +45,10 @@ export default function ProjectFilterForm( props ) {
     isOpened,
     closeModal,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ active, setActive ] = React.useState( true );
   const [ title, setTitle ] = React.useState( '' );
@@ -336,7 +345,7 @@ export default function ProjectFilterForm( props ) {
       title,
       description,
       groups: groups.map( ( group ) => group.id ),
-    } );
+    }, t );
 
     if ( troubledGroups.length === 0 ) {
       return null;
@@ -346,7 +355,7 @@ export default function ProjectFilterForm( props ) {
       <div>
         { troubledGroups.map((troubledGroup) => (
           <div className="error-message" key={troubledGroup.group.id}>
-            {`Group ${troubledGroup.group.title} can't use this filter! Attributes that they can't see are: ${troubledGroup.attributes.join(', ')}`}
+            {`${t('cantUseProjectFilter1')} ${troubledGroup.group.title} ${t('cantUseProjectFilter2')}: ${troubledGroup.attributes.join(', ')}`}
           </div>
         ) ) }
       </div>
@@ -360,14 +369,14 @@ export default function ProjectFilterForm( props ) {
         onChange={() => {
           setActive(!active);
         }}
-        label="Active"
+        label={t('active')}
         labelClassName="text-normal font-normal"
         simpleSwitch
         />
       <SettingsInput
         required
         id="title"
-        label="Filter name"
+        label={t('filterName')}
         value={title}
         onChange={(e) => {
           setTitle(e.target.value);
@@ -378,8 +387,7 @@ export default function ProjectFilterForm( props ) {
         required
         id="order"
         type="number"
-        label="Filter order"
-        placeholder="Enter filter order"
+        label={t('filterOrder')}
         value={order}
         onChange={(e) => {
           setOrder(e.target.value);
@@ -389,7 +397,7 @@ export default function ProjectFilterForm( props ) {
       <SettingsInput
         id="description"
         type="textarea"
-        label="Filter description"
+        label={t('filterDescription')}
         value={description}
         onChange={(e) => {
           setDescription(e.target.value);
@@ -397,9 +405,9 @@ export default function ProjectFilterForm( props ) {
         />
 
       <FormGroup>
-        <Label className="">Groups <span className="warning-big">*</span> </Label>
+        <Label className="">{t('groups')}<span className="warning-big">*</span> </Label>
         <Select
-          placeholder="Choose groups"
+          placeholder={t('chooseGroups')}
           value={groups}
           isMulti
           onChange={ (newGroups) => {
@@ -414,24 +422,24 @@ export default function ProjectFilterForm( props ) {
             }
           }}
           options={toSelArr([
-            { id: 'all', title: groups.length === allGroups.length ? 'Clear' : 'All' },
+            { id: 'all', title: groups.length === allGroups.length ? t('clear') : t('all') },
             ...allGroups
           ])}
           styles={pickSelectStyle(['required'])}
           />
       </FormGroup>
 
-      <Label className="m-t-15">Filter attributes</Label>
+      <Label className="m-t-15">{t('filterAttributes')}</Label>
 
       <hr className="m-t-5 m-b-10"/>
 
       {/* Requester */}
       <FormGroup>
-        <label>Zadal</label>
+        <label>{t('requester')}</label>
         <Select
           id="select-requester"
           isMulti
-          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(allUsers, 'email'))}
+          options={[translateSelectItem({label:'Current', labelId: 'currentUser' ,value:'cur',id:'cur'},t)].concat(toSelArr(allUsers, 'email'))}
           onChange={ (requesters) => {
             setRequesters(requesters) ;
           }}
@@ -442,10 +450,10 @@ export default function ProjectFilterForm( props ) {
 
       {/* Company */}
       <FormGroup>
-        <label>Firma</label>
+        <label>{t('company')}</label>
         <Select
           isMulti
-          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(allCompanies))}
+          options={[translateSelectItem({label:'Current', labelId: 'currentUser' ,value:'cur',id:'cur'},t)].concat(toSelArr(allCompanies))}
           onChange={ (companies) => {
             setCompanies(companies);
           }}
@@ -455,9 +463,9 @@ export default function ProjectFilterForm( props ) {
 
       {/* Assigned */}
       <FormGroup>
-        <label>Riesi</label>
+        <label>{t('assignedTo')}</label>
         <Select
-          options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(allUsers, 'email'))}
+          options={[translateSelectItem({label:'Current', labelId: 'currentUser' ,value:'cur',id:'cur'},t)].concat(toSelArr(allUsers, 'email'))}
           isMulti
           onChange={(newValue)=>{
             setAssignedTos(newValue);
@@ -469,7 +477,7 @@ export default function ProjectFilterForm( props ) {
 
       {/* Status */}
       <FormGroup>
-        <label>Status</label>
+        <label>{t('status')}</label>
         <Select
           options={toSelArr(allStatuses)}
           isMulti
@@ -483,7 +491,7 @@ export default function ProjectFilterForm( props ) {
 
       {/* Task type */}
       <FormGroup>
-        <label>Typ práce</label>
+        <label>{t('workType')}</label>
         <Select
           options={toSelArr(allTaskTypes)}
           isMulti
@@ -497,7 +505,7 @@ export default function ProjectFilterForm( props ) {
 
       {/* Status Date */}
       <FilterDatePickerInCalendar
-        label="Status date"
+        label={t('statusDate')}
         showNowFrom={statusDateFromNow}
         dateFrom={statusDateFrom}
         setShowNowFrom={(e) => {
@@ -518,7 +526,7 @@ export default function ProjectFilterForm( props ) {
 
       {/* Pending Date */}
       <FilterDatePickerInCalendar
-        label="Pending date"
+        label={t('pendingDate')}
         showNowFrom={pendingDateFromNow}
         dateFrom={pendingDateFrom}
         setShowNowFrom={(e) => {
@@ -539,7 +547,7 @@ export default function ProjectFilterForm( props ) {
 
       {/* Close Date */}
       <FilterDatePickerInCalendar
-        label="Close date"
+        label={t('closeDate')}
         showNowFrom={closeDateFromNow}
         dateFrom={closeDateFrom}
         showNowTo={closeDateToNow}
@@ -560,7 +568,7 @@ export default function ProjectFilterForm( props ) {
 
       {/* Deadline */}
       <FilterDatePickerInCalendar
-        label="Deadline"
+        label={t('deadline')}
         showNowFrom={deadlineFromNow}
         dateFrom={deadlineFrom}
         showNowTo={deadlineToNow}
@@ -581,7 +589,7 @@ export default function ProjectFilterForm( props ) {
 
       {/* Scheduled */}
       <FilterDatePickerInCalendar
-        label="Scheduled date"
+        label={t('scheduledDate')}
         showNowFrom={scheduledFromNow}
         dateFrom={scheduledFrom}
         showNowTo={scheduledToNow}
@@ -602,7 +610,7 @@ export default function ProjectFilterForm( props ) {
 
       {/* Created at */}
       <FilterDatePickerInCalendar
-        label="Created at"
+        label={t('createdAt')}
         showNowFrom={createdAtFromNow}
         dateFrom={createdAtFrom}
         showNowTo={createdAtToNow}
@@ -623,15 +631,15 @@ export default function ProjectFilterForm( props ) {
 
       {/* Important */}
       <div className="sidebar-filter-row">
-        <label htmlFor="filter-Important">Important</label>
+        <label htmlFor="filter-Important">{t('important')}</label>
         <div className="flex">
           <Select
             id="filter-Important"
-            options={booleanSelectOptions}
+            options={translateAllSelectItems(booleanSelectOptions, t)}
             onChange={(imp) => {
               setImportant(imp);
             }}
-            value={important}
+            value={translateSelectItem(important, t)}
             styles={pickSelectStyle()}
             />
         </div>
@@ -639,15 +647,15 @@ export default function ProjectFilterForm( props ) {
 
       {/* Invoiced */}
       <div className="sidebar-filter-row">
-        <label htmlFor="filter-Invoiced">Invoiced</label>
+        <label htmlFor="filter-Invoiced">{t('invoiced')}</label>
         <div className="flex">
           <Select
             id="filter-Invoiced"
-            options={booleanSelectOptions}
+            options={translateAllSelectItems(booleanSelectOptions, t)}
             onChange={(invoiced) => {
               setInvoiced(invoiced);
             }}
-            value={invoiced}
+            value={translateSelectItem(invoiced, t)}
             styles={pickSelectStyle()}
             />
         </div>
@@ -655,15 +663,15 @@ export default function ProjectFilterForm( props ) {
 
       {/* Pausal */}
       <div className="sidebar-filter-row">
-        <label htmlFor="filter-Paušál">Paušál</label>
+        <label htmlFor="filter-Paušál">{t('pausal')}</label>
         <div className="flex">
           <Select
             id="filter-Paušál"
-            options={booleanSelectOptions}
+            options={translateAllSelectItems(booleanSelectOptions, t)}
             onChange={(pausal) => {
               setPausal(pausal);
             }}
-            value={pausal}
+            value={translateSelectItem(pausal, t)}
             styles={pickSelectStyle()}
             />
         </div>
@@ -671,15 +679,15 @@ export default function ProjectFilterForm( props ) {
 
       {/* Overtime */}
       <div className="sidebar-filter-row">
-        <label htmlFor="filter-Overtime">Overtime</label>
+        <label htmlFor="filter-Overtime">{t('overtime')}</label>
         <div className="flex">
           <Select
             id="filter-Overtime"
-            options={booleanSelectOptions}
+            options={translateAllSelectItems(booleanSelectOptions, t)}
             onChange={(overtime) => {
               setOvertime(overtime);
             }}
-            value={overtime}
+            value={translateSelectItem(overtime, t)}
             styles={pickSelectStyle()}
             />
         </div>
@@ -694,7 +702,7 @@ export default function ProjectFilterForm( props ) {
           )}
           onClick={closeModal}
           >
-          Cancel
+          {t('cancel')}
         </button>
         <button
           className={classnames(
@@ -703,7 +711,7 @@ export default function ProjectFilterForm( props ) {
           disabled={cannotSave()}
           onClick={submitForm}
           >
-          {`${edit ? 'Save' : 'Add' } filter`}
+          {`${edit ? t('save') : t('add') } ${t('filter').toLowerCase()}`}
         </button>
       </div>
     </div>

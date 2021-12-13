@@ -3,6 +3,9 @@ import Checkbox from 'components/checkbox';
 import {
   Label
 } from 'reactstrap';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function CheckboxList( props ) {
   const {
@@ -16,13 +19,17 @@ export default function CheckboxList( props ) {
     label
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   const [ addItem, setAddItem ] = React.useState( false );
   const [ title, setTitle ] = React.useState( '' );
   const [ done, setDone ] = React.useState( false );
   const [ editedItem, setEditedItem ] = React.useState( null );
   return (
     <div className="form-section">
-          <Label>Subtasks</Label>
+          <Label>{t('shortSubtasks')}</Label>
           <div></div>
           <div className="form-section-rest">
       { items.map((item) =>

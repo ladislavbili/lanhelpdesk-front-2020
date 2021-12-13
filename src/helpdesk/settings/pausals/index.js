@@ -19,11 +19,19 @@ import {
   COMPANIES_SUBSCRIPTION,
 } from '../companies/queries';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function CompaniesList( props ) {
   const {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: basicCompaniesData,
@@ -57,7 +65,7 @@ export default function CompaniesList( props ) {
 
   return (
     <SettingListContainer
-      header="Service level agreements"
+      header={t('slas')}
       filter={companyFilter}
       setFilter={setCompanyFilter}
       history={history}
@@ -67,7 +75,7 @@ export default function CompaniesList( props ) {
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Title</th>
+            <th>{t('companyTitle')}</th>
           </tr>
         </thead>
         <tbody>

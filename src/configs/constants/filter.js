@@ -14,6 +14,7 @@ export const oneOfOptions = [ {
 
 export const ofCurrentUser = {
   label: 'Current',
+  labelId: 'currentUser',
   value: 'cur',
   id: 'cur'
 };
@@ -61,22 +62,26 @@ export const emptyFilter = {
   important: {
     id: null,
     label: 'Any',
-    value: null
+    value: null,
+    labelId: 'any',
   },
   invoiced: {
     id: null,
     label: 'Any',
-    value: null
+    value: null,
+    labelId: 'any',
   },
   pausal: {
     id: null,
     label: 'Any',
-    value: null
+    value: null,
+    labelId: 'any',
   },
   overtime: {
     id: null,
     label: 'Any',
-    value: null
+    value: null,
+    labelId: 'any',
   },
 
   public: false,
@@ -141,14 +146,17 @@ export const getEmptyFilter = () => ( {
 
 export const booleanSelectOptions = [ {
   label: 'Any',
+  label: 'any',
   value: null,
   id: null
 }, {
   label: 'Ano',
+  label: 'yes',
   value: true,
   id: 'ano'
 }, {
   label: 'Nie',
+  label: 'no',
   value: false,
   id: 'nie'
 } ]

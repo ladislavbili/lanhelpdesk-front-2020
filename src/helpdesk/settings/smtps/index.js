@@ -11,6 +11,9 @@ import SettingListContainer from '../components/settingListContainer';
 import {
   itemAttributesFullfillsString
 } from '../components/helpers';
+import {
+  useTranslation
+} from "react-i18next";
 
 import SMTPAdd from './smtpAdd';
 import SMTPEdit from './smtpEdit';
@@ -24,6 +27,10 @@ export default function SMTPsList( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: smtpsData,
@@ -88,12 +95,12 @@ export default function SMTPsList( props ) {
           className="btn btn-primary center-hor ml-auto"
           onClick={testSMTPs}
           >
-          Test SMTPs
+          {t('testSmtps')}
         </button>
       }
       { smtpTesting &&
         <div className="center-hor ml-auto">
-          Testing SMTPs...
+          {t('testingSmtps')}
         </div>
       }
       { smtpTesting &&
@@ -105,7 +112,7 @@ export default function SMTPsList( props ) {
             });
           }}
           >
-          Refetch
+          {t('Refetch')}
         </button>
       }
     </Empty>
@@ -113,23 +120,23 @@ export default function SMTPsList( props ) {
 
   return (
     <SettingListContainer
-      header="SMTPs"
+      header={t('smtps')}
       filter={SMTPFilter}
       setFilter={setSMTPFilter}
       history={history}
       addURL="/helpdesk/settings/smtps/add"
-      addLabel="SMTP"
+      addLabel={t('smtp')}
       RightFilterComponent={TestSmtpComponent}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Host</th>
-            <th>Port</th>
-            <th>Username</th>
-            <th>Def</th>
+            <th>{t('title')}</th>
+            <th>{t('host')}</th>
+            <th>{t('port')}</th>
+            <th>{t('username')}</th>
+            <th>{t('default')}</th>
             <th></th>
           </tr>
         </thead>
@@ -159,7 +166,7 @@ export default function SMTPsList( props ) {
                   {smtp.username}
                 </td>
                 <td>
-                  {smtp.def ? "Yes" : "No"}
+                  {smtp.def ? t('yes') : t('no')}
                 </td>
                 <td>
                   {getStatusIcon(smtp)}

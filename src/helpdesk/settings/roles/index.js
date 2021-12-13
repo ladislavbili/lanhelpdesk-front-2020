@@ -15,6 +15,9 @@ import {
   orderArr
 } from 'helperFunctions';
 import {
+  useTranslation
+} from "react-i18next";
+import {
   itemAttributesFullfillsString
 } from '../components/helpers';
 
@@ -28,6 +31,10 @@ export default function RolesList( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: rolesData,
@@ -67,20 +74,20 @@ export default function RolesList( props ) {
 
   return (
     <SettingListContainer
-      header="Roles"
+      header={t('roles')}
       filter={roleFilter}
       setFilter={setRoleFilter}
       history={history}
       addURL="/helpdesk/settings/roles/add"
-      addLabel="Role"
+      addLabel={t('role')}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Level</th>
-            <th>Order</th>
+            <th>{t('title')}</th>
+            <th>{t('level')}</th>
+            <th>{t('order')}</th>
           </tr>
         </thead>
         <tbody>

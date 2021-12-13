@@ -22,6 +22,9 @@ import {
   pickSelectStyle
 } from "configs/components/select";
 import {
+  useTranslation
+} from "react-i18next";
+import {
   isEmail,
   toSelArr,
   getMyData,
@@ -50,6 +53,10 @@ export default function UserAdd( props ) {
     addUserToList,
     closeModal
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const client = useApolloClient();
 
@@ -154,11 +161,11 @@ export default function UserAdd( props ) {
         >
 
         <h2 className="m-b-20" >
-          Add user
+          {`${t('add')} ${t('user2').toLowerCase()}`}
         </h2>
 
         <FormGroup>
-          <Label for="role">Role <span className="warning-big">*</span></Label>
+          <Label for="role">{t('role')}<span className="warning-big">*</span></Label>
           <Select
             styles={ pickSelectStyle() }
             options={ roles }
@@ -169,7 +176,7 @@ export default function UserAdd( props ) {
 
         <SettingsInput
           required
-          label="Username"
+          label={t('username')}
           id="username"
           value={username}
           onChange={(e) => {
@@ -179,7 +186,7 @@ export default function UserAdd( props ) {
 
         <SettingsInput
           required
-          label="Name"
+          label={t('name')}
           id="name"
           value={name}
           onChange={ (e) => {
@@ -195,7 +202,7 @@ export default function UserAdd( props ) {
 
         <SettingsInput
           required
-          label="Surname"
+          label={t('surname')}
           id="surname"
           value={surname}
           onChange={ (e) => {
@@ -211,7 +218,7 @@ export default function UserAdd( props ) {
 
         <SettingsInput
           required
-          label="E-mail"
+          label={t('email')}
           type="email"
           id="new-email"
           value={email}
@@ -222,7 +229,7 @@ export default function UserAdd( props ) {
 
         <SettingsHiddenInput
           required
-          label="Password"
+          label={t('password')}
           id="new-password"
           value={password}
           onChange={(e)=> {
@@ -231,7 +238,7 @@ export default function UserAdd( props ) {
           />
 
         <FormGroup>
-          <Label for="role">Language</Label>
+          <Label for="language">{t('language')}</Label>
           <Select
             styles={ pickSelectStyle() }
             options={ languages }
@@ -243,12 +250,12 @@ export default function UserAdd( props ) {
         <Checkbox
           className = "m-b-5 p-l-0"
           value = { receiveNotifications }
-          label = "Receive e-mail notifications"
+          label={t('receiveNotifications')}
           onChange={ () =>  setReceiveNotifications(!receiveNotifications) }
           />
 
         <FormGroup>
-          <Label for="company">Company <span className="warning-big">*</span></Label>
+          <Label for="company">{t('company')}<span className="warning-big">*</span></Label>
           <Select
             styles={ pickSelectStyle() }
             options={ companies }
@@ -266,7 +273,7 @@ export default function UserAdd( props ) {
         </FormGroup>
 
         <SettingsInput
-          label="Signature"
+          label={t('signature')}
           id="signature"
           type="textarea"
           value={signature}
@@ -283,13 +290,13 @@ export default function UserAdd( props ) {
               className="btn-link"
               onClick={ closeModal }
               >
-              Cancel
+              {t('cancel')}
             </button>
           }
 
           { cannotSave() &&
             <div className=" ml-auto message error-message m-r-10">
-              Fill in all the required information!
+              {t('fillAllRequiredInformation')}
             </div>
           }
 
@@ -301,7 +308,7 @@ export default function UserAdd( props ) {
             disabled={ cannotSave() }
             onClick={ addUserFunc }
             >
-            { saving ? 'Adding...' : 'Add user' }
+            { saving ? `${t('adding')}...` : `${t('add')} ${t('user2').toLowerCase()}` }
           </button>
 
         </div>

@@ -17,6 +17,7 @@ import {
 } from 'helperFunctions';
 import i18n from "i18next";
 
+import Loading from 'components/loading';
 import Reroute from 'reroute';
 import HelpdeskNavigation from 'helpdesk/navigation';
 import InvoicesNavigation from 'invoices/navigation';
@@ -48,6 +49,9 @@ export default function Navigation( props ) {
   }, [ currentUser, currentUser ? currentUser.language : null ] );
   if ( !userDataLoading && currentUser === null ) {
     location.reload( false );
+  }
+  if ( userDataLoading ) {
+    return <Loading/>;
   }
 
   return (

@@ -14,12 +14,20 @@ import {
 } from 'helperFunctions';
 import DefaultCompany from './defaultCompany';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function SettingsSidebar( props ) {
   //data & queries
   const {
     location,
     history,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const currentUser = getMyData();
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
@@ -29,20 +37,20 @@ export default function SettingsSidebar( props ) {
       <NavItem key="back-to-tasks" className="p-t-3 p-b-3">
         <button className="btn-link sidebar-align full-width text-left" onClick={() => { history.push('/helpdesk/taskList/i/all') } }>
           <i className="fa fa-chevron-left m-r-5" />
-          Back to tasks
+          {t('backToTasks')}
         </button>
       </NavItem>
       <div className="sidebar-align p-t-7 p-b-7">
         <i className="fa fa-cog font-19" />
         <Label className="noselect m-b-0">
-          Settings
+          {t('settings')}
         </Label>
       </div>
       { accessRights.companies && <DefaultCompany {...props} accessRights={accessRights} /> }
 				{settings.filter((setting) => accessRights[setting.value]).map((setting)=>
 					<NavItem key={setting.link}>
 						<Link className={classnames("sidebar-menu-item" , {"active" : location.pathname.includes(setting.link)})}
-							to={{ pathname:`/helpdesk/settings/${setting.link}/list` }}>{setting.title}</Link>
+							to={{ pathname:`/helpdesk/settings/${setting.link}/list` }}>{t(setting.title)}</Link>
 					</NavItem>
 				)}
 			</Nav>

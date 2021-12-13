@@ -24,7 +24,7 @@ export default function TaskTypeEdit( props ) {
   return (
     <Modal isOpen={props.isOpen}>
       <ModalHeader>
-        {`${t('deleteReplacementInfo1')} ${t(props.label)} ${t('deleteReplacementInfo2')}`}
+        {`${t('deleteReplacementInfo1')} ${props.label} ${t('deleteReplacementInfo2')}`}
       </ModalHeader>
       <ModalBody>
         <FormGroup>

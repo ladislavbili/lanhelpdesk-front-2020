@@ -17,6 +17,9 @@ import {
 import {
   itemAttributesFullfillsString
 } from '../components/helpers';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_STATUS_TEMPLATES,
@@ -28,6 +31,10 @@ export default function StatusesList( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: statusTemplatesData,
@@ -65,19 +72,19 @@ export default function StatusesList( props ) {
 
   return (
     <SettingListContainer
-      header="Status templates"
+      header={t('statusTemplates')}
       filter={statusFilter}
       setFilter={setStatusFilter}
       history={history}
       addURL="/helpdesk/settings/statuses/add"
-      addLabel="Status template"
+      addLabel={t('statusTemplate')}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Order</th>
+            <th>{t('title')}</th>
+            <th>{t('order')}</th>
           </tr>
         </thead>
         <tbody>

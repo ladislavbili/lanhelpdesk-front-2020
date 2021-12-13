@@ -10,6 +10,9 @@ import {
 } from "configs/components/select";
 import Switch from "react-switch";
 import PriceEdit from "../pricelists/pricelistEdit";
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function CompanyPriceList( props ) {
   //data
@@ -26,10 +29,14 @@ export default function CompanyPriceList( props ) {
     setPricelistName
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   return (
     <div>
       <div className="row">
-        <h3 className="m-b-20 m-r-10">Cenník</h3>
+        <h3 className="m-b-20 m-r-10">{t('pricelist')}</h3>
         <label>
           <Switch
             checked={ pricelist !== null && pricelist.def === true }
@@ -44,8 +51,8 @@ export default function CompanyPriceList( props ) {
             }}
             height={22}
             width={80}
-            checkedIcon={<span className="switchLabel">Default</span>}
-            uncheckedIcon={<span className="switchLabel-right">Vlastný</span>}
+            checkedIcon={<span className="switchLabel">{t('default')}</span>}
+            uncheckedIcon={<span className="switchLabel-right">{t('custom')}</span>}
             onColor={"#0078D4"}
             />
           <span className="m-l-10"></span>
@@ -53,7 +60,7 @@ export default function CompanyPriceList( props ) {
       </div>
       { pricelist !== null && !pricelist.def &&
         <FormGroup>
-            <Label for="pricelist">Pricelist</Label>
+            <Label for="pricelist">{t('pricelist')}</Label>
             <Select
               id="pricelist"
               name="pricelist"
@@ -77,14 +84,14 @@ export default function CompanyPriceList( props ) {
         ) &&
         <FormGroup className="row m-b-10">
           <div className="m-r-10 width-20-p">
-            <Label for="priceName">Price list name</Label>
+            <Label for="priceName">{t('pricelistTitle')}</Label>
           </div>
           <div className="flex">
             <Input
               name="priceName"
               id="priceName"
               type="text"
-              placeholder="Enter price list nema"
+              placeholder={t('pricelistTitlePlaceholder')}
               value={priceName}
               onChange={(e) => setPricelistName( e.target.value)}/>
           </div>
@@ -105,13 +112,13 @@ export default function CompanyPriceList( props ) {
           <button
             className="btn-link p-l-0"
             onClick={()=>{
-              if (window.confirm("You will be redirected to a page where you can edit this pricelist. All unsaved progress will be lost, are you sure you want to proceed?")){
+              if (window.confirm(t('pricelistRedirect'))){
                 cancel();
                 history.push(`/helpdesk/settings/pricelists/${pricelist.id}`)
               }
             }}
             >
-            Edit default pricelist
+            {t('editDefaultPricelist')}
           </button>
         </div>
       }

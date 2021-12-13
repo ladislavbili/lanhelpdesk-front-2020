@@ -6,6 +6,9 @@ import {
 import classnames from "classnames";
 
 import SettingsInput from '../components/settingsInput';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   addLocalError,
@@ -20,6 +23,10 @@ export default function TripTypeAdd( props ) {
   const {
     history
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const client = useApolloClient();
 
   const [ addTripType ] = useMutation( ADD_TRIP_TYPE );
@@ -54,12 +61,12 @@ export default function TripTypeAdd( props ) {
   return (
     <div className="scroll-visible p-20 fit-with-header">
       <h2 className="m-b-20" >
-        Add trip type
+        {`${t('add')} ${t('tripType').toLowerCase()}`}
       </h2>
 
       <SettingsInput
         required
-        label="Trip type"
+        label={t('tripTypeTitle')}
         id="title"
         value={title}
         onChange={(e) => {
@@ -68,8 +75,8 @@ export default function TripTypeAdd( props ) {
         />
 
       <SettingsInput
-        label="Order"
-        placeholder="Lower means first"
+        label={t('order')}
+        placeholder={t('lowerMeansFirst')}
         id="order"
         value={order}
         onChange={(e) => {
@@ -80,7 +87,7 @@ export default function TripTypeAdd( props ) {
       <div className="form-buttons-row">
         { cannotSave() &&
           <div className="message error-message ml-auto m-r-14">
-            Fill in all the required information!
+            {t('fillAllRequiredInformation')}
           </div>
         }
         <button
@@ -91,7 +98,7 @@ export default function TripTypeAdd( props ) {
           disabled={cannotSave()}
           onClick={addTripTypeFunc}
           >
-          { saving ? 'Adding...' : 'Add trip type' }
+          { saving ? `${t('adding')}...` : `${t('add')} ${t('tripType').toLowerCase()}` }
         </button>
       </div>
     </div>

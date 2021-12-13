@@ -19,6 +19,9 @@ import {
 } from 'helperFunctions';
 import Switch from "react-switch";
 import moment from 'moment';
+import {
+  useTranslation
+} from "react-i18next";
 
 const defaultCols = [
   {
@@ -36,42 +39,42 @@ const defaultCols = [
     columnClassnames: "",
   },
   {
-    header: 'Scheduled',
+    header: 'scheduled',
     key: 'scheduled',
     width: "15%",
     headerClassnames: "",
     columnClassnames: "p-l-8 center-hor min-width-160",
   },
   {
-    header: 'Mn.',
+    header: 'quantityShort',
     key: 'quantity',
     width: "50",
     headerClassnames: "text-right",
     columnClassnames: "p-l-5",
   },
   {
-    header: 'Typ',
+    header: 'type',
     key: 'type',
     width: "190",
     headerClassnames: "",
     columnClassnames: "p-l-8",
   },
   {
-    header: 'Rieši',
+    header: 'assignedTo',
     key: 'assigned',
     width: "12%",
     headerClassnames: "",
     columnClassnames: "p-l-8 min-width-150",
   },
   {
-    header: 'Faktúrovať',
+    header: 'invoiced',
     key: 'approved',
     width: "2%",
     headerClassnames: "",
     columnClassnames: "p-l-8",
   },
   {
-    header: 'Akcie',
+    header: 'actions',
     key: 'actions',
     width: "93",
     headerClassnames: "text-right",
@@ -79,21 +82,21 @@ const defaultCols = [
   },
   //advanced
   {
-    header: 'Cenník/ks',
+    header: 'pricePerUnit',
     key: 'price',
     width: "93",
     headerClassnames: "text-right",
     columnClassnames: "p-l-8 min-width-100",
   },
   {
-    header: 'Zľava',
+    header: 'discount',
     key: 'discount',
     width: "93",
     headerClassnames: "text-right",
     columnClassnames: "p-l-8",
   },
   {
-    header: 'Cena',
+    header: 'total',
     key: 'priceAfterDiscount',
     width: "93",
     headerClassnames: "text-right",
@@ -143,6 +146,9 @@ export default function WorksTable( props ) {
     removeTrip,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
 
   let defaultTab = '0';
 
@@ -262,7 +268,7 @@ export default function WorksTable( props ) {
           <input
             disabled={disabled || !canAddSubtasksAndTrips}
             className="form-control hidden-input segoe-blue-text"
-            placeholder="Add note"
+            placeholder={t('addNote')}
             value={
               subtask.id === focusedSubtask ?
               editedSubtaskTitle :
@@ -300,7 +306,7 @@ export default function WorksTable( props ) {
                 )
               }
             }}
-            placeholderText="No start"
+            placeholderText={t('noStartDate')}
             />
         );
       }
@@ -536,7 +542,7 @@ export default function WorksTable( props ) {
                 )
               }
             }}
-            placeholderText="No start"
+            placeholderText={t('noStartDate')}
             />
         );
       }
@@ -1194,7 +1200,7 @@ export default function WorksTable( props ) {
                 onClick={() => setToggleTab('1')}
                 className={classnames("clickable vykazyTableNav", {active: toggleTab === '1'})}
                 >
-                Práca
+                {t('work')}
               </span>
               { userRights.rights.taskWorksAdvancedRead &&
                 <Empty>
@@ -1205,7 +1211,7 @@ export default function WorksTable( props ) {
                     onClick={() => setToggleTab('2')}
                     className={classnames("clickable vykazyTableNav", {active: toggleTab === '2'})}
                     >
-                    Rozpočet
+                    {t('budget')}
                   </span>
                 </Empty>
               }
@@ -1214,7 +1220,7 @@ export default function WorksTable( props ) {
               if(index < 2 ){
                 return null;
               }
-              return <th width={colData.width} key={colData.key} className={colData.headerClassnames}>{colData.header}</th>
+              return <th width={colData.width} key={colData.key} className={colData.headerClassnames}>{t(colData.header)}</th>
             })}
           </tr>
         </thead>

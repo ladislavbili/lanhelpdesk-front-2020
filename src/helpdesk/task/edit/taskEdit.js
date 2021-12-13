@@ -307,7 +307,7 @@ export default function TaskEdit( props ) {
     if ( userRights.attributeRights.company.view ) {
       if ( projectAttributes.company.fixed ) {
         if ( projectAttributes.company.value ) {
-          potentialCompany = companies.find( ( company ) => company.id === def.company.value.id );
+          potentialCompany = companies.find( ( company ) => company.id === projectAttributes.company.value.id );
         } else if ( potentialRequester ) {
           potentialCompany = companies.find( ( company ) => company.id === potentialRequester.company.id );
         }

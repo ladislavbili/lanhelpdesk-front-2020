@@ -18,12 +18,19 @@ import {
   GET_COMPANIES,
   COMPANIES_SUBSCRIPTION,
 } from './queries';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function CompaniesList( props ) {
   const {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: companiesData,
@@ -52,15 +59,15 @@ export default function CompaniesList( props ) {
   const CompanySort = (
     <div className="d-flex flex-row align-items-center ml-auto">
       <div className="color-basic m-r-5 m-l-5">
-        Sort by
+        {t('sortBy')}
       </div>
       <select
         value={sortBy}
         className="invisible-select font-bold text-highlight"
         onChange={(e) => setSortBy(e.target.value)}>
-        <option value={0} key={0}>All</option>
-        <option value={1} key={1}>Contracted</option>
-        <option value={2} key={2}>Non-contracted</option>
+        <option value={0} key={0}>{t('all')}</option>
+        <option value={1} key={1}>{t('contracted')}</option>
+        <option value={2} key={2}>{t('nonContracted')}</option>
       </select>
     </div>
   );
@@ -81,20 +88,20 @@ export default function CompaniesList( props ) {
 
   return (
     <SettingListContainer
-      header="Companies"
+      header={t('companies')}
       filter={companyFilter}
       setFilter={setCompanyFilter}
       history={history}
       addURL={`.${match.params.id === undefined ? '/companies' : '' }/add`}
-      addLabel="Company"
+      addLabel={t('company')}
       RightFilterComponent={CompanySort}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr>
-            <th>Title</th>
-            <th>Monthly</th>
+            <th>{t('title')}</th>
+            <th>{t('contracted')}</th>
           </tr>
         </thead>
         <tbody>
@@ -121,7 +128,7 @@ export default function CompaniesList( props ) {
                 {company.title}
               </td>
               <td width="10%">
-                {company.monthly  ? "Zmluvný" : "Nezmluvný"}
+                {company.monthly  ? t('contracted') : t('nonContracted')}
               </td>
             </tr>
           ))}

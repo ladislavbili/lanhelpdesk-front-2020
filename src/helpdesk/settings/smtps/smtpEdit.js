@@ -31,6 +31,9 @@ import {
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_SMTPS,
@@ -45,6 +48,10 @@ export default function SMTPEdit( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const client = useApolloClient();
   const allSMTPs = toSelArr( client.readQuery( {
       query: GET_SMTPS
@@ -197,7 +204,7 @@ export default function SMTPEdit( props ) {
   const deleteSMTPFunc = () => {
     setChoosingNewSMTP( false );
 
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteSmtp( {
           variables: {
             id: parseInt( match.params.id ),
@@ -253,7 +260,7 @@ export default function SMTPEdit( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20" >
-        Edit SMTP
+        {`${t('edit')} ${t('smtp')}`}
       </h2>
 
       <Checkbox
@@ -263,12 +270,12 @@ export default function SMTPEdit( props ) {
           setDef(!def);
           setDataChanged( true );
         } }
-        label = "Default"
+        label={t('default')}
         />
 
       <SettingsInput
         required={!wellKnownBlock}
-        label="Title"
+        label={t('active')}
         id="title"
         value={title}
         onChange={(e)=> {
@@ -278,7 +285,7 @@ export default function SMTPEdit( props ) {
         />
 
       <FormGroup>
-        <Label>Well known providers - requires only user and password</Label>
+        <Label>{t('wellKnown')}</Label>
         <Select
           styles={pickSelectStyle()}
           options={wellKnownOptions}
@@ -292,7 +299,7 @@ export default function SMTPEdit( props ) {
 
       <SettingsInput
         required={!wellKnownBlock}
-        label="Host"
+        label={t('host')}
         id="host"
         value={host}
         onChange={(e)=> {
@@ -303,7 +310,7 @@ export default function SMTPEdit( props ) {
 
       <SettingsInput
         required={!wellKnownBlock}
-        label="Port"
+        label={t('port')}
         id="port"
         value={port}
         onChange={(e)=> {
@@ -313,18 +320,18 @@ export default function SMTPEdit( props ) {
         />
 
       <Checkbox
-        className = "m-b-5 p-l-0"
-        value = { secure }
+        className="m-b-5 p-l-0"
+        label={t('secure')}
+        value={ secure }
         onChange={ () => {
           setSecure(!secure);
           setDataChanged( true );
         } }
-        label = "Secure"
         />
 
       <SettingsInput
         required
-        label="Username"
+        label={t('username')}
         id="username"
         value={username}
         onChange={(e)=> {
@@ -335,7 +342,7 @@ export default function SMTPEdit( props ) {
 
       <SettingsHiddenInput
         required
-        label="Password"
+        label={t('password')}
         id="password"
         value={password}
         onChange={(e)=> {
@@ -346,21 +353,21 @@ export default function SMTPEdit( props ) {
 
       <Checkbox
         className = "m-b-5 p-l-0"
-        value = { rejectUnauthorized }
+        label={t('rejectUnauthorized')}
+        value={ rejectUnauthorized }
         onChange={ () => {
           setRejectUnauthorized(!rejectUnauthorized);
           setDataChanged( true );
         }}
-        label = "Reject unauthorized"
         />
 
       <Modal isOpen={choosingNewSMTP}>
         <ModalHeader>
-          Please choose an SMTP to replace this one
+          {t('selectReplacementSmtp')}
         </ModalHeader>
         <ModalBody>
           <FormGroup>
-            { def && <Label>A replacement SMTP</Label> }
+            { def && <Label>{t('smtpReplacement')}</Label> }
             <Select
               styles={pickSelectStyle()}
               options={filteredSMTPs}
@@ -374,7 +381,7 @@ export default function SMTPEdit( props ) {
 
           {def &&
             <FormGroup>
-              <Label>New default SMTP</Label>
+              <Label>{t('smtpNewDefault')}</Label>
               <Select
                 styles={pickSelectStyle()}
                 options={filteredSMTPs}
@@ -389,17 +396,17 @@ export default function SMTPEdit( props ) {
         </ModalBody>
         <ModalFooter>
           <button className="btn-link mr-auto"onClick={() => setChoosingNewSMTP(false)}>
-            Cancel
+            {t('cancel')}
           </button>
           <button className="btn ml-auto" disabled={!newSMTP || (def ? !newDefSMTP : false)} onClick={deleteSMTPFunc}>
-            Complete deletion
+            {t('completeDeletion')}
           </button>
         </ModalFooter>
       </Modal>
 
       <div className="form-buttons-row">
 
-        <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>Delete</button>
+        <button className="btn-red" disabled={saving || theOnlyOneLeft} onClick={ () => setChoosingNewSMTP(true) }>{t('delete')}</button>
 
         <ErrorMessage
           className="ml-auto m-r-10"
@@ -410,12 +417,12 @@ export default function SMTPEdit( props ) {
         <div className="message m-r-10">
           { dataChanged &&
             <div className="message error-message">
-              Save changes before leaving!
+              {t('saveBeforeLeaving')}
             </div>
           }
           { !dataChanged &&
             <div className="message success-message">
-              Saved
+              {t('saved')}
             </div>
           }
         </div>
@@ -425,7 +432,7 @@ export default function SMTPEdit( props ) {
           disabled={saving || tested}
           onClick={ startTest }
           >
-          Test SMTP
+          {t('testSmtp')}
         </button>
 
         <button
@@ -433,7 +440,7 @@ export default function SMTPEdit( props ) {
           disabled={cannotSave()}
           onClick={updateSMTPFunc}
           >
-          { saving ? 'Saving SMTP...' : 'Save SMTP' }
+          { saving ? `${t('saving')} ${t('smtp')}...` : `${t('save')} ${t('smtp')}` }
         </button>
       </div>
     </div>

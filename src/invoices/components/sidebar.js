@@ -8,12 +8,19 @@ import {
 import {
   NavLink as Link
 } from 'react-router-dom';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function Sidebar( props ) {
   //data
   const {
     history,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   return (
     <div className="sidebar">
@@ -27,21 +34,21 @@ export default function Sidebar( props ) {
                   to={{ pathname: `/helpdesk` }}
                   >
                   <i className="fa fa-chevron-left m-r-5" />
-                  Back to tasks
+                  {t('backToTasks')}
                 </Link>
               </NavItem>
               <NavItem>
                 <Link
                   className="sidebar-menu-item"
                   to={{ pathname: `/invoices/monthly/companies` }}>
-                  Firmy
+                  {t('companies')}
                 </Link>
               </NavItem>
               <NavItem>
                 <Link
                   className=" sidebar-menu-item"
                   to={{ pathname: `/invoices/monthly/agents` }}>
-                  Agenti
+                  {t('agents')}
                 </Link>
               </NavItem>
             </Nav>
@@ -51,7 +58,7 @@ export default function Sidebar( props ) {
                  <Link
                    className="sidebar-menu-item"
                    to={{ pathname: `/invoices/invoices` }}>
-                   Výkazy
+                   {t('invoices')}
                  </Link>
                </NavItem>
              </Nav>

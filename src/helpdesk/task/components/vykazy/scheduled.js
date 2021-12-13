@@ -7,6 +7,9 @@ import {
 } from 'reactstrap';
 import moment from 'moment';
 import DatePicker from 'components/DatePicker';
+import {
+  useTranslation
+} from "react-i18next";
 
 const getTimeDifference = ( fromDate, toDate ) => {
   if ( fromDate === null || toDate === null ) {
@@ -29,6 +32,10 @@ export default function Scheduled( props ) {
     //setQuantity,
     id,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ scheduledOpen, setScheduledOpen ] = React.useState( false );
   const [ newFrom, setNewFrom ] = React.useState( dateFrom ? dateFrom : null );
@@ -65,13 +72,13 @@ export default function Scheduled( props ) {
           } -
           ${ newTo.format( 'HH:mm DD.MM.YYYY' ) }
           ` :
-          `No scheduled date`
+          t('noScheduledDate')
         }
       </span>
       <Popover className="scheduled-in-table" placement="bottom" style={{maxWidth: '350px !important', width: '350px !important'}} isOpen={scheduledOpen && !disabled} target={'scheduled-' + id } toggle={() => {setScheduledOpen(!scheduledOpen)}}>
         <PopoverBody>
           <FormGroup>
-            <Label className="width-100-p">From</Label>
+            <Label className="width-100-p">{t('from')}</Label>
             <DatePicker
               className="form-control width-100-p"
               selected={newFrom}
@@ -100,11 +107,11 @@ export default function Scheduled( props ) {
                   }
                 }
               }}
-              placeholderText="No start"
+              placeholderText={t('noStartDate')}
               />
           </FormGroup>
           <FormGroup>
-            <Label className="width-100-p">To</Label>
+            <Label className="width-100-p">{t('to')}</Label>
             <DatePicker
               className="form-control width-100-p"
               selected={newTo}
@@ -135,7 +142,7 @@ export default function Scheduled( props ) {
                   }
                 }
               }}
-              placeholderText="No end"
+              placeholderText={t('noToDate')}
               />
           </FormGroup>
           <div className="p-t-5 row">
@@ -149,7 +156,7 @@ export default function Scheduled( props ) {
                 setScheduledOpen(false);
               }}
               >
-              Close
+              {t('close')}
             </button>
             <button
               className="btn-link-cancel btn-distance"
@@ -158,7 +165,7 @@ export default function Scheduled( props ) {
                 setNewTo(null);
               }}
               >
-              Clear
+              {t('clear')}
             </button>
             <button
               disabled={disabled}
@@ -171,7 +178,7 @@ export default function Scheduled( props ) {
                 setScheduledOpen(false);
               }}
               >
-              Save
+              {t('save')}
             </button>
           </div>
         </PopoverBody>

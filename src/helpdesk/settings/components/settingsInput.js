@@ -4,6 +4,9 @@ import {
   Label,
   Input,
 } from 'reactstrap';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function SettingsInput( props ) {
   //data
@@ -25,6 +28,10 @@ export default function SettingsInput( props ) {
     children,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   return (
     <FormGroup className={ className ? className : '' }>
       <Label className={`row ${ labelClassName ? labelClassName : '' }`} htmlFor={ id }>
@@ -38,7 +45,7 @@ export default function SettingsInput( props ) {
             autoComplete="off"
             id={ id }
             type={ type }
-            placeholder={ placeholder ? placeholder : `Enter ${label.toLowerCase()}` }
+            placeholder={ placeholder ? placeholder : `${t('enter')} ${label.toLowerCase()}` }
             value={ value }
             disabled={disabled}
             onChange={ onChange }

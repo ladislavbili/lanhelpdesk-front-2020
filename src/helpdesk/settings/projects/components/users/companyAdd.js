@@ -9,6 +9,9 @@ import {
 import {
   pickSelectStyle
 } from "configs/components/select";
+import {
+  useTranslation
+} from "react-i18next";
 import Select from "react-select";
 import Empty from 'components/Empty';
 
@@ -19,6 +22,10 @@ export default function ProjectGroupAddUser( props ) {
     companies,
     groups,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ open, setOpen ] = React.useState( false );
 
@@ -39,15 +46,15 @@ export default function ProjectGroupAddUser( props ) {
         onClick={() => setOpen(true)}
         >
         <i className="fa fa-plus" />
-        Helpdesk company
+        Helpdesk {t('company').toLowerCase()}
       </button>
       <Modal isOpen={open}>
         <ModalHeader>
-          Adding company to group
+          {t('addingCompanyToGroup')}
         </ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label for="group-title">Company</Label>
+            <Label for="group-title">{t('company')}</Label>
               <Select
                 value={chosenCompany}
                 styles={pickSelectStyle()}
@@ -56,7 +63,7 @@ export default function ProjectGroupAddUser( props ) {
                 />
           </FormGroup>
           <FormGroup>
-            <Label for="group-title">Group</Label>
+            <Label for="group-title">{t('group')}</Label>
               <Select
                 value={userGroup}
                 styles={pickSelectStyle()}
@@ -71,7 +78,7 @@ export default function ProjectGroupAddUser( props ) {
                 setOpen(false);
               } }
               >
-              Cancel
+              {t('cancel')}
             </button>
             <div className="ml-auto">
               <button
@@ -82,7 +89,7 @@ export default function ProjectGroupAddUser( props ) {
                   setOpen(false);
                 } }
                 >
-                Add
+                {t('add')}
               </button>
             </div>
           </div>

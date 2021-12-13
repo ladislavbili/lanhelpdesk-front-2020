@@ -19,10 +19,18 @@ import Switch from "components/switch";
 import MonthSelector from 'invoices/components/monthSelector';
 
 import {
+  useTranslation
+} from "react-i18next";
+
+import {
   setReportsFromDate,
   setReportsToDate,
   setReportsStatusActions,
 } from 'apollo/localSchema/actions';
+
+import {
+  translateAllSelectItems,
+} from 'helperFunctions';
 
 import {
   GET_REPORTS_FROM_DATE,
@@ -38,6 +46,10 @@ export default function AgentFilter( props ) {
     invoiced,
     setInvoiced,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: fromDateData,
@@ -64,12 +76,12 @@ export default function AgentFilter( props ) {
         onTrigger={onTrigger}
         />
       <div>
-        <Label>Task status action:</Label>
+        <Label>{t('statusAction')}:</Label>
         <Select
           isMulti
-          placeholder="Pick status actions"
-          value={statusActionsData.reportsStatusActions}
-          options={actions}
+          placeholder={t('statusActionLabel')}
+          value={translateAllSelectItems(statusActionsData.reportsStatusActions, t)}
+          options={translateAllSelectItems(actions, t)}
           onChange={(statusActions) => {
             setReportsStatusActions( statusActions );
           }}
@@ -81,7 +93,7 @@ export default function AgentFilter( props ) {
         onChange={() => {
           setInvoiced(!invoiced);
         }}
-        label="Invoiced"
+        label={t('invoiced')}
         simpleSwitch
         />
     </div>

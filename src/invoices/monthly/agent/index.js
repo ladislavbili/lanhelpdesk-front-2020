@@ -16,8 +16,15 @@ import {
   GET_REPORTS_TO_DATE,
   GET_REPORTS_STATUS_ACTIONS,
 } from 'apollo/localSchema/queries';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function AgentReportsLoader( props ) {
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: fromDateData,
@@ -35,7 +42,7 @@ export default function AgentReportsLoader( props ) {
 
   return (
     <div className="scrollable fit-with-header p-20">
-      <h2>Agenti</h2>
+      <h2>{t('agents')}</h2>
 
       <StatusAndDateFilter
         onTrigger={ (fromDate, toDate) => {

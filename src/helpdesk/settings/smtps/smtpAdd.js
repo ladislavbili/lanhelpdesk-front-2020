@@ -21,6 +21,9 @@ import {
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_SMTPS,
@@ -32,6 +35,10 @@ export default function SMTPAdd( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const client = useApolloClient();
 
   const [ addSmtp ] = useMutation( ADD_SMTP );
@@ -107,19 +114,19 @@ export default function SMTPAdd( props ) {
     <div className="scroll-visible p-20 fit-with-header">
 
       <h2 className="m-b-20">
-        Add SMTP
+        {`${t('add')} ${t('smtp')}`}
       </h2>
 
       <Checkbox
         className = "m-b-5 p-l-0"
         value = { def }
         onChange={ () => setDef(!def) }
-        label = "Default"
+        label={t('default')}
         />
 
       <SettingsInput
         required={!wellKnownBlock}
-        label="Title"
+        label={t('active')}
         id="title"
         value={title}
         onChange={(e)=> {
@@ -128,7 +135,7 @@ export default function SMTPAdd( props ) {
         />
 
       <FormGroup>
-        <Label>Well known providers - requires only user and password</Label>
+        <Label>{t('wellKnown')}</Label>
         <Select
           styles={pickSelectStyle()}
           options={wellKnownOptions}
@@ -139,7 +146,7 @@ export default function SMTPAdd( props ) {
 
       <SettingsInput
         required={!wellKnownBlock}
-        label="Host"
+        label={t('host')}
         id="host"
         value={host}
         onChange={(e)=> {
@@ -149,7 +156,7 @@ export default function SMTPAdd( props ) {
 
       <SettingsInput
         required={!wellKnownBlock}
-        label="Port"
+        label={t('port')}
         id="port"
         value={port}
         onChange={(e)=> {
@@ -159,14 +166,14 @@ export default function SMTPAdd( props ) {
 
       <Checkbox
         className = "m-b-5 p-l-0"
+        label={t('secure')}
         value = { secure }
         onChange={ () => setSecure(!secure) }
-        label = "Secure"
         />
 
       <SettingsInput
         required
-        label="Username"
+        label={t('username')}
         id="username"
         value={username}
         onChange={(e)=> {
@@ -176,7 +183,7 @@ export default function SMTPAdd( props ) {
 
       <SettingsHiddenInput
         required
-        label="Password"
+        label={t('password')}
         id="password"
         value={password}
         onChange={(e)=> {
@@ -186,15 +193,15 @@ export default function SMTPAdd( props ) {
 
       <Checkbox
         className="m-b-5 p-l-0"
+        label={t('rejectUnauthorized')}
         value={ rejectUnauthorized }
         onChange={ () => setRejectUnauthorized(!rejectUnauthorized) }
-        label="Reject unauthorized"
         />
 
       <div className="form-buttons-row">
         { cannotSave() &&
           <div className="message error-message ml-auto m-r-14">
-            Fill in all the required information!
+            {t('fillAllRequiredInformation')}
           </div>
         }
         <button
@@ -205,7 +212,7 @@ export default function SMTPAdd( props ) {
           disabled={cannotSave()}
           onClick={addSMTPFunc}
           >
-          { saving ? 'Adding...' : 'Add SMTP' }
+          { saving ? `${t('adding')} ${t('smtp')}...` : `${t('add')} ${t('smtp')}` }
         </button>
       </div>
     </div>

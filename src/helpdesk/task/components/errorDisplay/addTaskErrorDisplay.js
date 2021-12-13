@@ -1,40 +1,43 @@
 import React from 'react';
+import {
+  useTranslation
+} from "react-i18next";
 
 const attributesKeys = [
   {
     key: 'status',
-    label: 'Status'
+    label: 'status'
   },
   {
     key: 'requester',
-    label: 'Requester'
+    label: 'requester'
   },
   {
     key: 'company',
-    label: 'Company'
+    label: 'company'
   },
   {
     key: 'taskType',
-    label: 'Task Type'
+    label: 'taskType'
   },
   {
     key: 'deadline',
-    label: 'Deadline'
+    label: 'deadline'
   },
   {
     key: 'startsAt',
-    label: 'Starts at'
+    label: 'startsAt'
   },
   {
     key: 'pausal',
-    label: 'Pausal'
+    label: 'pausal'
   },
   {
     key: 'overtime',
-    label: 'After working hours'
-  }
+    label: 'overtime'
+  },
 ];
-export const hasAddTaskIssues = ( props ) => {
+export const hasAddTaskIssues = ( props, t ) => {
   const {
     userRights,
     projectAttributes,
@@ -84,7 +87,7 @@ export const hasAddTaskIssues = ( props ) => {
   if ( assignedTo.length === 0 && project.projectAttributes.assigned.required ) {
     requiredAttributesErrors.push( {
       key: 'assignedTo',
-      label: 'Assigned to'
+      label: t( 'assignedTo' )
     } )
   }
 
@@ -105,6 +108,10 @@ export default function EditTaskErrorDisplay( props ) {
     assignedTo,
     taskType,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   //errors
   const titleError = title.length === 0;
@@ -147,7 +154,7 @@ export default function EditTaskErrorDisplay( props ) {
   if ( assignedTo.length === 0 && project.projectAttributes.assigned.required ) {
     requiredAttributesErrors.push( {
       key: 'assignedTo',
-      label: 'Assigned to'
+      label: t( 'assignedTo' ),
     } )
   }
 
@@ -176,25 +183,25 @@ export default function EditTaskErrorDisplay( props ) {
     <div className="full-width m-b-20" >
       { generalErrors &&
         <div className="p-10 m-t-10 bkg-white">
-          <h4>General errors</h4>
+          <h4>{t('generalErrors')}</h4>
           { titleError &&
             <div className="error-message m-t-5">
-              Task title can't be empty!
+              {t('taskTitleCantBeEmpty')}
             </div>
           }
           { statusError &&
             <div className="error-message m-t-5">
-              Task status is missing!
+              {t('taskStatusMissing')}
             </div>
           }
           { projectError &&
             <div className="error-message m-t-5">
-              Task project is missing!
+              {t('taskProjectIsMissing')}
             </div>
           }
           { missingAssignedError &&
             <div className="error-message m-t-5">
-              Task must be assigned to someone!
+              {t('taskMustBeAssigned')}
             </div>
           }
         </div>
@@ -204,12 +211,12 @@ export default function EditTaskErrorDisplay( props ) {
           <h4>Attribute errors</h4>
           { assignedFixedError &&
             <div className="error-message m-t-5" key={attribute.key}>
-              Assigned is fixed but either assigned user is not you, empty or set value of project
+              {t('taskAssignedWrongFixed')}
             </div>
           }
           { requiredAttributesErrors.forEach((attribute) => (
             <div className="error-message m-t-5" key={attribute.key}>
-              ${`${attribute.label} is required but empty!`}
+              ${`${t(attribute.label)} ${t('isRequiredButEmpty')}!`}
             </div>
           ))}
         </div>
@@ -219,12 +226,12 @@ export default function EditTaskErrorDisplay( props ) {
           <h4>Warnings</h4>
           { taskTypeWarning &&
             <div className="warning-message m-t-5">
-              Without task type you can't create works and trips!
+              {t('withoutTaskTypeCantCreateWorksAndTrips')}
             </div>
           }
           { assignedWarning &&
             <div className="warning-message m-t-5">
-              Task type wasn't assigned to anyone, you can't create works and trips!
+              {t('taskWasntAssignedToAnyoneCantCreateWorksTrips')}
             </div>
           }
         </div>

@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function AddTaskErrorDisplay( props ) {
   const {
@@ -10,6 +13,10 @@ export default function AddTaskErrorDisplay( props ) {
     assignedTo,
     taskType,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   //errors
   const titleError = title.length === 0;
@@ -43,25 +50,25 @@ export default function AddTaskErrorDisplay( props ) {
     <div className="full-width" >
       { generalErrors &&
         <div className="p-10 m-t-10 bkg-white">
-          <h4>General errors</h4>
+          <h4>{t('generalErrors')}</h4>
           { titleError &&
             <div className="error-message m-t-5">
-              Task title can't be empty!
+              {t('taskTitleCantBeEmpty')}
             </div>
           }
           { statusError &&
             <div className="error-message m-t-5">
-              Task status is missing!
+              {t('taskStatusMissing')}
             </div>
           }
           { projectError &&
             <div className="error-message m-t-5">
-              Task project is missing!
+              {t('taskProjectIsMissing')}
             </div>
           }
           { missingAssignedError &&
             <div className="error-message m-t-5">
-              Task must be assigned to someone!
+              {t('taskMustBeAssigned')}
             </div>
           }
         </div>
@@ -71,12 +78,12 @@ export default function AddTaskErrorDisplay( props ) {
           <h4>Warnings</h4>
           { taskTypeWarning &&
             <div className="warning-message m-t-5">
-              Without task type you can't create works and trips!
+              {t('withoutTaskTypeCantCreateWorksAndTrips')}
             </div>
           }
           { assignedWarning &&
             <div className="warning-message m-t-5">
-              Task type wasn't assigned to anyone, you can't create works and trips!
+              {t('taskWasntAssignedToAnyoneCantCreateWorksTrips')}
             </div>
           }
         </div>

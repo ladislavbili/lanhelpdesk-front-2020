@@ -12,6 +12,8 @@ import {
   fromObjectToState,
   setDefaultFromObject,
   getMyData,
+  translateSelectItem,
+  translateAllSelectItems,
 } from 'helperFunctions';
 import AddFilter from './filterAdd';
 import Loading from 'components/loading';
@@ -54,17 +56,22 @@ import {
   GET_TASK_TYPES
 } from 'helpdesk/settings/taskTypes/queries';
 import moment from 'moment';
+import {
+  useTranslation
+} from "react-i18next";
 
 const globalProject = {
   id: 'global',
   value: 'global',
-  label: 'Global (shown in every project)'
+  label: 'Global (shown in every project)',
+  labelId: 'globalLabel',
 };
 
 const noProject = {
   id: null,
   value: null,
-  label: 'No project (only Dashboard)'
+  label: 'No project (only Dashboard)',
+  labelId: 'noProjectOnlyDashboard',
 };
 
 export default function FilterForm( props ) {
@@ -73,6 +80,10 @@ export default function FilterForm( props ) {
     close,
     history
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   //apollo
 
@@ -122,7 +133,7 @@ export default function FilterForm( props ) {
   const [ saving, setSaving ] = React.useState( null );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
   const [ statusesOpen, setStatusesOpen ] = React.useState( false );
-  const [ project, setProject ] = React.useState( noProject );
+  const [ project, setProject ] = React.useState( translateSelectItem( noProject, t ) );
 
   const {
     requesters,
@@ -283,7 +294,7 @@ export default function FilterForm( props ) {
     }
   }
   const deleteFilterFunc = () => {
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteFilter( {
           variables: {
             id,
@@ -381,19 +392,19 @@ export default function FilterForm( props ) {
     //filter data
     const filter = filterData.filter;
     setCompanies( [
-      ...( filter.companyCur ? [ ofCurrentUser ] : [] ),
+      ...( filter.companyCur ? [ translateSelectItem( ofCurrentUser ) ] : [] ),
       ...toSelArr( companiesData.basicCompanies )
       .filter( ( company ) => filter.companies.some( ( company2 ) => company.id === company2.id ) )
     ] );
 
     setRequesters( [
-      ...( filter.requesterCur ? [ ofCurrentUser ] : [] ),
+      ...( filter.requesterCur ? [ translateSelectItem( ofCurrentUser ) ] : [] ),
       ...toSelArr( usersData.basicUsers, "fullName" )
       .filter( ( user ) => filter.requesters.some( ( user2 ) => user.id === user2.id ) )
     ] );
 
     setAssignedTos( [
-      ...( filter.assignedToCur ? [ ofCurrentUser ] : [] ),
+      ...( filter.assignedToCur ? [ translateSelectItem( ofCurrentUser ) ] : [] ),
       ...toSelArr( usersData.basicUsers, "fullName" )
       .filter( ( user ) => filter.assignedTos.some( ( user2 ) => user.id === user2.id ) )
     ] );
@@ -414,11 +425,11 @@ export default function FilterForm( props ) {
         .filter( ( status1 ) => filter.statuses.some( ( status2 ) => status1.id === status2.id ) )
       );
     } else if ( filterData.global ) {
-      setProject( globalProject );
+      setProject( translateSelectItem( globalProject, t ) );
       setTags( [] );
       setStatuses( [] );
     } else {
-      setProject( noProject );
+      setProject( translateSelectItem( noProject, t ) );
       setTags( [] );
       setStatuses( [] );
     }
@@ -448,10 +459,14 @@ export default function FilterForm( props ) {
     setCreatedAtToNow( filter.createdAtToNow );
     setCreatedAtTo( filter.createdAtTo === null ? null : moment( parseInt( filter.createdAtTo ) ) );
     setOneOf( oneOfOptions.filter( ( oneOf ) => filter.oneOf.includes( oneOf.value ) ) );
-    setImportant( booleanSelectOptions.find( ( option ) => option.value === filter.important ) );
-    setInvoiced( booleanSelectOptions.find( ( option ) => option.value === filter.invoiced ) );
-    setPausal( booleanSelectOptions.find( ( option ) => option.value === filter.pausal ) );
-    setOvertime( booleanSelectOptions.find( ( option ) => option.value === filter.overtime ) );
+    setImportant( translateAllSelectItems( booleanSelectOptions, t )
+      .find( ( option ) => option.value === filter.important ) );
+    setInvoiced( translateAllSelectItems( booleanSelectOptions, t )
+      .find( ( option ) => option.value === filter.invoiced ) );
+    setPausal( translateAllSelectItems( booleanSelectOptions, t )
+      .find( ( option ) => option.value === filter.pausal ) );
+    setOvertime( translateAllSelectItems( booleanSelectOptions, t )
+      .find( ( option ) => option.value === filter.overtime ) );
   }
 
   if ( dataLoading ) {
@@ -485,7 +500,7 @@ export default function FilterForm( props ) {
       { filterData.localFilter.id &&
         <div>
           <div className="sidebar-filter-label">
-            Filter name
+            {t('filterTitle')}
           </div>
           <div>
             <h5 className="sidebar-filter-name">{ filterData.localFilter.title }</h5>
@@ -496,10 +511,10 @@ export default function FilterForm( props ) {
       <div className="sidebar-filter">
 
         <div className="sidebar-filter-row">
-          <label>Project</label>
+          <label>{t('project')}</label>
           <div className="flex">
             <Select
-              options={[ noProject, globalProject, ...myProjects]}
+              options={[ translateSelectItem(noProject, t), translateSelectItem(globalProject, t), ...myProjects]}
               onChange={(project)=> {
                 setTags([]);
                 setStatuses([]);
@@ -512,16 +527,16 @@ export default function FilterForm( props ) {
         </div>
         { project.id !== 'global' && project.id !== null && project.right.tagsRead &&
           <div className="sidebar-filter-row">
-            <label>Tags</label>
+            <label>{t('tags')}</label>
             <div className="row mb-auto">
               <button className="btn-link m-b-10 h-20-f btn-distance" id="filter-multiselect-tags" onClick={ () => setTagsOpen(true) } >
                 <i className="fa fa-plus" />
-                Tag
+                {t('tag')}
               </button>
               <MultiSelect
                 className="center-hor"
                 direction="right"
-                header="Select tags for this filter"
+                header={t('selectTagsForFilter')}
                 target="filter-multiselect-tags"
                 closeMultiSelect={() => { setTagsOpen(false) }}
                 open={tagsOpen}
@@ -545,16 +560,16 @@ export default function FilterForm( props ) {
 
         { project.id !== 'global' && project.id !== null && project.right.statusRead &&
           <div className="sidebar-filter-row">
-            <label>Status</label>
+            <label>{t('status')}</label>
             <div className="row mb-auto">
               <button className="btn-link m-b-10 h-20-f btn-distance" id="filter-multiselect-statuses" onClick={ () => setStatusesOpen(true) } >
                 <i className="fa fa-plus" />
-                Statuses
+                {t('statuses')}
               </button>
               <MultiSelect
                 className="center-hor"
                 direction="right"
-                header="Select statuses for this filter"
+                header={t('selectStatusesForFilter')}
                 target="filter-multiselect-statuses"
                 closeMultiSelect={() => { setStatusesOpen(false) }}
                 open={statusesOpen}
@@ -577,10 +592,10 @@ export default function FilterForm( props ) {
         }
 
         <div className="sidebar-filter-row">
-          <label>Zadal</label>
+          <label>{t('requester')}</label>
           <div className="flex">
             <Select
-              options={[{label:'Current',value:'cur',id:'cur'}].concat(users)}
+              options={[translateSelectItem(ofCurrentUser, t)].concat(users)}
               isMulti
               onChange={(newValues)=> {
                 setRequesters(newValues);
@@ -592,10 +607,10 @@ export default function FilterForm( props ) {
         </div>
 
         <div className="sidebar-filter-row">
-          <label>Firma</label>
+          <label>{t('company')}</label>
           <div className="flex">
             <Select
-              options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(allCompanies))}
+              options={[translateSelectItem(ofCurrentUser, t)].concat(toSelArr(allCompanies))}
               isMulti
               onChange={(companies) => {
                 setCompanies(companies);
@@ -607,10 +622,10 @@ export default function FilterForm( props ) {
         </div>
 
         <div className="sidebar-filter-row">
-          <label>Rieši</label>
+          <label>{t('assignedTo')}</label>
           <div className="flex">
             <Select
-              options={[{label:'Current',value:'cur',id:'cur'}].concat(toSelArr(users, 'fullName'))}
+              options={[translateSelectItem(ofCurrentUser, t)].concat(toSelArr(users, 'fullName'))}
               isMulti
               onChange={(newValues)=> {
                 setAssignedTos(newValues);
@@ -623,7 +638,7 @@ export default function FilterForm( props ) {
 
         {/*Task type*/}
         <div className="sidebar-filter-row">
-          <label>Typ práce</label>
+          <label>{t('workType')}</label>
           <div className="flex">
             <Select
               options={toSelArr(allTaskTypes)}
@@ -638,7 +653,7 @@ export default function FilterForm( props ) {
 
         {/* Status Date */}
         <FilterDatePickerPopover
-          label="Status date"
+          label={t('statusDate')}
           minimal
           showNowFrom={statusDateFromNow}
           dateFrom={statusDateFrom}
@@ -652,7 +667,7 @@ export default function FilterForm( props ) {
 
         {/* Pending Date */}
         <FilterDatePickerPopover
-          label="Pending date"
+          label={t('pendingDate')}
           minimal
           showNowFrom={pendingDateFromNow}
           dateFrom={pendingDateFrom}
@@ -666,7 +681,7 @@ export default function FilterForm( props ) {
 
         {/* Close Date */}
         <FilterDatePickerPopover
-          label="Close date"
+          label={t('closeDate')}
           minimal
           showNowFrom={closeDateFromNow}
           dateFrom={closeDateFrom}
@@ -680,7 +695,7 @@ export default function FilterForm( props ) {
 
         {/* Deadline */}
         <FilterDatePickerPopover
-          label="Deadline"
+          label={t('deadline')}
           minimal
           showNowFrom={deadlineFromNow}
           dateFrom={deadlineFrom}
@@ -694,7 +709,7 @@ export default function FilterForm( props ) {
 
         {/* Created at */}
         <FilterDatePickerPopover
-          label="Created at"
+          label={t('createdAt')}
           minimal
           showNowFrom={createdAtFromNow}
           dateFrom={createdAtFrom}
@@ -707,10 +722,10 @@ export default function FilterForm( props ) {
           />
 
         <div className="sidebar-filter-row">
-          <label>Important</label>
+          <label>{t('important')}</label>
           <div className="flex">
             <Select
-              options={booleanSelectOptions}
+              options={translateAllSelectItems(booleanSelectOptions, t)}
               onChange={(imp) => {
                 setImportant(imp);
               }}
@@ -720,10 +735,10 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label>Invoiced</label>
+          <label>{t('invoiced')}</label>
           <div className="flex">
             <Select
-              options={booleanSelectOptions}
+              options={translateAllSelectItems(booleanSelectOptions, t)}
               onChange={(invoiced) => {
                 setInvoiced(invoiced);
               }}
@@ -733,10 +748,10 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label>Paušál</label>
+          <label>{t('pausal')}</label>
           <div className="flex">
             <Select
-              options={booleanSelectOptions}
+              options={translateAllSelectItems(booleanSelectOptions, t)}
               onChange={(pausal) => {
                 setPausal(pausal);
               }}
@@ -746,10 +761,10 @@ export default function FilterForm( props ) {
           </div>
         </div>
         <div className="sidebar-filter-row">
-          <label>Overtime</label>
+          <label>{t('overtime')}</label>
           <div className="flex">
             <Select
-              options={booleanSelectOptions}
+              options={translateAllSelectItems(booleanSelectOptions, t)}
               onChange={(overtime) => {
                 setOvertime(overtime);
               }}

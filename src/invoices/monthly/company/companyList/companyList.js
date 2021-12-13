@@ -6,6 +6,10 @@ import {
   timestampToString,
 } from 'helperFunctions';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function CompanyList( props ) {
   const {
     companies,
@@ -14,16 +18,20 @@ export default function CompanyList( props ) {
     setCompany,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   return (
     <div className="m-t-10 m-b-20">
       <table className="table bkg-white row-highlight">
         <thead>
           <tr>
-            <th>Company name</th>
-            <th>Works</th>
-            <th>Trips</th>
-            <th>Materials</th>
-            <th>Rented items</th>
+            <th>{t('companyName')}</th>
+            <th>{t('works')}</th>
+            <th>{t('trips')}</th>
+            <th>{t('materials')}</th>
+            <th>{t('rentedItems')}</th>
           </tr>
         </thead>
         <tbody>
@@ -44,7 +52,7 @@ export default function CompanyList( props ) {
             <tr
               key="no-items"
               >
-              <td colSpan="6">{`No invoiceable companies in date range ${timestampToString(fromDate.valueOf())} - ${timestampToString(toDate.valueOf())}`}</td>
+              <td colSpan="6">{`${t('noInvoiceableCompanies')} ${t('inDateRange').toLowerCase()} ${timestampToString(fromDate.valueOf())} - ${timestampToString(toDate.valueOf())}`}</td>
             </tr>
           }
         </tbody>

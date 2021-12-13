@@ -12,12 +12,20 @@ import {
   useQuery
 } from "@apollo/client";
 import ProjectEdit from 'helpdesk/settings/projects/projectEdit';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function ProjectEditContainer( props ) {
   const {
     closeModal,
     projectDeleted
   } = props;
+
+  const {
+    t
+  } = useTranslation();
+
   //state
   const [ opened, setOpened ] = React.useState( false );
   const {
@@ -32,11 +40,11 @@ export default function ProjectEditContainer( props ) {
         onClick={() => setOpened(true)}
         >
         <i className="fa fa-cog"/>
-        Project
+        {t('project')}
       </button>
       <Modal isOpen={opened}>
         <ModalHeader>
-          Edit project
+          {`${t('edit')} ${t('project').toLowerCase()}`}
         </ModalHeader>
         <ModalBody>
           { !projectLoading &&

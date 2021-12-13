@@ -50,6 +50,8 @@ import {
   filterUnique,
   getMyData,
   splitArrayByFilter,
+  translateSelectItem,
+  translateAllSelectItems,
 } from 'helperFunctions';
 
 import {
@@ -62,6 +64,10 @@ import {
 } from 'configs/constants/sidebar';
 import settings from 'configs/constants/settings';
 import moment from 'moment';
+
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_MY_PROJECTS,
@@ -102,6 +108,10 @@ export default function TasksSidebar( props ) {
     toggleSidebar,
     sidebarOpen
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   //ziskaj len z networku data
   //prichystaj refresg ak sa nieco zmeni
@@ -326,11 +336,11 @@ export default function TasksSidebar( props ) {
     let selectProjects = toSelArr( projects.map( ( project ) => ( {
       ...project,
       id: project.project.id,
-      title: project.project.title
+      title: t( project.project.title )
     } ) ) );
     if ( myRights.addProjects && false ) {
       selectProjects.push( {
-        label: '+ Project',
+        label: `+ ${t('project')}`,
         value: -1
       } );
     }
@@ -345,7 +355,7 @@ export default function TasksSidebar( props ) {
               alt="Folder icon not found"
               />
             <Label>
-              Project
+              {t('project')}
             </Label>
           </div>
           { localProject.id !== null && localProject.right.projectRead &&
@@ -368,14 +378,14 @@ export default function TasksSidebar( props ) {
         <div className="sidebar-menu-item">
           <Select
             options={selectProjects}
-            value={localProject}
+            value={translateSelectItem(localProject, t)}
             styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar' ])}
             onChange={pro => {
               if( pro.value === -1 ){
                 history.push( `/helpdesk/project/add` )
                 return;
               }
-              setMilestone(allMilestones);
+              setMilestone(translateSelectItem(allMilestones, t));
               setProject(pro);
               if(tasklistPage){
                 history.push(URLprefix);
@@ -400,7 +410,7 @@ export default function TasksSidebar( props ) {
                 alt="Folder icon not found"
                 />
               <Label>
-                Project
+                {t('project')}
               </Label>
             </div>
           </div>
@@ -581,7 +591,7 @@ export default function TasksSidebar( props ) {
           <div>
             <i className="m-r-9 fa fa-user" />
             <Label className={classnames({ clickable: !alwaysShow })}>
-              Calendar users
+              {t('calendarUsers')}
             </Label>
           </div>
           { !alwaysShow &&
@@ -687,7 +697,7 @@ export default function TasksSidebar( props ) {
             className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
             onClick={() => history.push(`/helpdesk/taskList/i/all`)}
             >
-            All tasks
+            {t('allTasks')}
           </span>
         </NavItem>
         <NavItem key='repeats' className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/helpdesk/repeats' ) }) }>
@@ -695,7 +705,7 @@ export default function TasksSidebar( props ) {
             className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/repeats' ) }) }
             onClick={() => history.push(`/helpdesk/repeats`)}
             >
-            Repetitive Tasks
+            {t('repetitiveTasks')}
           </span>
         </NavItem>
       </Nav>
@@ -717,7 +727,7 @@ export default function TasksSidebar( props ) {
               alt="Filter icon not found"
               />
             <Label className={classnames({ clickable: !alwaysShow })}>
-              Filters
+              {t('filters')}
             </Label>
           </div>
           { !alwaysShow &&
@@ -745,7 +755,7 @@ export default function TasksSidebar( props ) {
         }}
         >
         <i className="fa fa-plus"/>
-        Filter
+        {t('filter')}
       </button>
     )
   }
@@ -768,7 +778,7 @@ export default function TasksSidebar( props ) {
               alt="Filter icon not found"
               />
             <Label>
-              { parseInt(match.params.filterID) ? "Edit filter" : "Add filter" }
+              { parseInt(match.params.filterID) ? `${t('edit')} ${t('filter').toLowerCase()}` : `${t('add')} ${t('filter').toLowerCase()}` }
             </Label>
           </div>
         </div>
@@ -812,7 +822,7 @@ export default function TasksSidebar( props ) {
           onClick={() => setOpenCompanyAdd(true)}
           >
           <i className="fa fa-plus" />
-          { addCompany.title }
+          { translateSelectItem(addCompany, t).title }
         </button>
       </NavItem>
     )
@@ -828,7 +838,7 @@ export default function TasksSidebar( props ) {
           onClick={() => setOpenUserAdd(true)}
           >
           <i className="fa fa-plus" />
-          { addUser.title }
+          { translateSelectItem(addUser, t).title }
         </button>
       </NavItem>
     )
@@ -842,7 +852,7 @@ export default function TasksSidebar( props ) {
             <div className="clickable noselect">
               <i className="fa fa-cog" />
               <Label className="clickable">
-                Settings
+                {t('settings')}
               </Label>
             </div>
           </div>
@@ -854,7 +864,7 @@ export default function TasksSidebar( props ) {
               onClick={() => history.push(`/helpdesk/users`)}
               >
               <i className="fas fa-users m-r-1 m-t-3" />
-              Users
+              {t('users')}
             </span>
           </NavItem>
         }
@@ -865,7 +875,7 @@ export default function TasksSidebar( props ) {
               onClick={() => history.push(`/helpdesk/companies`)}
               >
               <i className="far fa-building m-r-5 m-t-3" />
-              Companies
+              {t('companies')}
             </span>
           </NavItem>
         }
@@ -879,7 +889,7 @@ export default function TasksSidebar( props ) {
               onClick={() => history.push(`/invoices/monthly/companies`)}
               >
               <i className="far fa-file-alt m-r-5 m-t-3" />
-              Výkazy
+              {t('invoices')}
             </span>
           </NavItem>
         }

@@ -4,8 +4,13 @@ import {
   pickSelectStyle
 } from 'configs/components/select';
 import {
-  toSelItem
+  toSelItem,
+  translateSelectItem,
+  translateAllSelectItems,
 } from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 import Checkbox from 'components/checkbox';
 import ProjectSingleAttribute from './singleAttribute';
 import Switch from "components/switch";
@@ -20,6 +25,7 @@ import {
 
 export const noSelect = {
   label: 'None',
+  labelId: 'none',
   title: 'None',
   value: null,
   id: null
@@ -40,6 +46,10 @@ export default function ProjectAttributes( props ) {
     setAttributes,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   React.useEffect( () => {
     if ( attributes.assigned.value.some( ( user1 ) => !assignableUsers.some( ( user2 ) => user1.id === user2.id ) ) ) {
       setAttributes( {
@@ -55,12 +65,12 @@ export default function ProjectAttributes( props ) {
   return (
     <div>
       <ProjectSingleAttribute
-        label="Status"
+        label={t('status')}
         roles={ groups }
         right="status"
         defColored
         defSelectValues={statuses}
-        defEmptyValue={emptyStatus}
+        defEmptyValue={translateSelectItem(emptyStatus,t)}
         attribute={ attributes.status }
         onChangeAttribute={(value) => {
           if(!attributes.status.fixed && value.fixed && value.value === null ){
@@ -73,7 +83,7 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Tags"
+        label={t('tags')}
         roles={ groups }
         right="tags"
         defColored
@@ -87,12 +97,12 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Assigned"
+        label={t('assignedTo')}
         roles={ groups }
         right="assigned"
         defIsMulti
         defSelectValues={ assignableUsers }
-        defEmptyValue={ emptyAssigned }
+        defEmptyValue={ translateSelectItem(emptyAssigned, t) }
         attribute={ attributes.assigned }
         onChangeAttribute={(value) => {
           setAttributes( { ...attributes, assigned: value } )
@@ -103,11 +113,11 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Requester"
+        label={t('requester')}
         roles={ groups }
         right="requester"
         defSelectValues={ users }
-        defEmptyValue={ emptyUserValue }
+        defEmptyValue={ translateSelectItem(emptyUserValue,t ) }
         attribute={ attributes.requester }
         onChangeAttribute={(value) => {
           setAttributes( { ...attributes, requester: value } )
@@ -116,11 +126,11 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Company"
+        label={t('company')}
         roles={ groups }
         right="company"
         defSelectValues={ companies }
-        defEmptyValue={ emptyCompanyValue }
+        defEmptyValue={ translateSelectItem(emptyCompanyValue, t) }
         attribute={ attributes.company }
         onChangeAttribute={(value) => {
           setAttributes( { ...attributes, company: value } )
@@ -129,7 +139,7 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Task type"
+        label={t('taskType')}
         roles={ groups }
         right="taskType"
         canBeRequired
@@ -142,7 +152,7 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Repeat"
+        label={t('repeat')}
         roles={ groups }
         right="repeat"
         noDef
@@ -151,7 +161,7 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Starts at"
+        label={t('startsAt')}
         roles={ groups }
         right="startsAt"
         canBeRequired
@@ -163,7 +173,7 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Deadline"
+        label={t('deadline')}
         roles={ groups }
         right="deadline"
         canBeRequired
@@ -175,12 +185,12 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="Pausal"
+        label={t('pausal')}
         roles={ groups }
         right="pausal"
         canBeRequired
-        defEmptyValue={ emptyPausal }
-        defSelectValues={ booleanSelects }
+        defEmptyValue={ translateSelectItem(emptyPausal,t) }
+        defSelectValues={ translateAllSelectItems(booleanSelects, t) }
         attribute={ attributes.pausal }
         onChangeAttribute={(value) => {
           setAttributes( { ...attributes, pausal: value } )
@@ -189,12 +199,12 @@ export default function ProjectAttributes( props ) {
         />
 
       <ProjectSingleAttribute
-        label="After working hours"
+        label={t('overtime')}
         roles={ groups }
         right="overtime"
         canBeRequired
-        defEmptyValue={ noSelect }
-        defSelectValues={ booleanSelects }
+        defEmptyValue={ translateSelectItem(noSelect, t) }
+        defSelectValues={ translateAllSelectItems(booleanSelects, t) }
         attribute={ attributes.overtime }
         onChangeAttribute={(value) => {
           setAttributes( { ...attributes, overtime: value } )

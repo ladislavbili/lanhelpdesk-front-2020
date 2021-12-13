@@ -13,6 +13,9 @@ import {
   createCleanRights,
   getEmptyAttributeRights,
 } from 'configs/constants/projects';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function ProjectGroupAdd( props ) {
   //props
@@ -21,6 +24,10 @@ export default function ProjectGroupAdd( props ) {
     getFakeId,
     reccomendedOrder,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ open, setOpen ] = React.useState( false );
   const [ title, setTitle ] = React.useState( '' );
@@ -42,24 +49,24 @@ export default function ProjectGroupAdd( props ) {
         onClick={() => setOpen(true)}
         >
         <i className="fa fa-plus" />
-        Group
+        {t('group')}
       </button>
       <Modal isOpen={open}>
         <ModalHeader>
-          Edit group
+          {`${t('add')} ${t('group2').toLowerCase()}`}
         </ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label for="group-title">Group name</Label>
-            <Input placeholder="Enter group name" value={title} onChange={(e) => setTitle(e.target.value)}/>
+            <Label for="group-title">{t('groupTitle')}</Label>
+            <Input placeholder={t('groupTitlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)}/>
           </FormGroup>
           <FormGroup>
-            <Label for="group-title">Group description</Label>
-            <Input placeholder="Enter group description" value={description} onChange={(e) => setDescription(e.target.value)}/>
+            <Label for="group-title">{t('groupDescription')}</Label>
+            <Input placeholder={t('groupDescriptionPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)}/>
           </FormGroup>
           <FormGroup>
-            <Label for="role">Order</Label>
-            <Input placeholder="Set order" type="number" value={order} onChange={(e) => setOrder(e.target.value)}/>
+            <Label for="role">{t('order')}</Label>
+            <Input placeholder={t('orderPlaceholder')} type="number" value={order} onChange={(e) => setOrder(e.target.value)}/>
           </FormGroup>
           <div className="form-buttons-row m-b-10">
             <button
@@ -68,7 +75,7 @@ export default function ProjectGroupAdd( props ) {
                 setOpen(false);
               } }
               >
-              Cancel
+              {t('cancel')}
             </button>
             <div className="ml-auto">
               <button
@@ -79,7 +86,7 @@ export default function ProjectGroupAdd( props ) {
                   setOpen(false);
                 } }
                 >
-                Add
+                {t('add')}
               </button>
             </div>
           </div>

@@ -33,6 +33,9 @@ import {
   getMyData,
 } from 'helperFunctions';
 import {
+  useTranslation
+} from "react-i18next";
+import {
   addLocalError,
 } from 'apollo/localSchema/actions';
 
@@ -66,6 +69,11 @@ export default function CompanyEdit( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
+
   const client = useApolloClient();
 
   const {
@@ -339,7 +347,7 @@ export default function CompanyEdit( props ) {
   const deleteCompanyFunc = ( replacement ) => {
     setDeleteOpen( false );
 
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteCompany( {
           variables: {
             id: parseInt( match.params.id ),
@@ -447,7 +455,7 @@ export default function CompanyEdit( props ) {
         >
 
         <h2 className="m-b-20" >
-          {companyData.company.def ? "Edit Helpdesk Company" : "Edit company"}
+          {companyData.company.def ? `${t('edit')} Helpdesk ${t('company2')}` : `${t('edit')} ${t('company2').toLowerCase()}`}
         </h2>
 
         <Nav tabs className="no-border m-b-25">
@@ -456,7 +464,7 @@ export default function CompanyEdit( props ) {
               className={classnames({ active: openedTab === 'company'}, "clickable", "")}
               onClick={() => setOpenedTab('company') }
               >
-              Faktúračné údaje
+              {t('billingInformation')}
             </NavLink>
           </NavItem>
           { myRights.pausals &&
@@ -471,7 +479,7 @@ export default function CompanyEdit( props ) {
                   className={classnames({ active: openedTab === 'contract' }, "clickable", "")}
                   onClick={() => setOpenedTab('contract') }
                   >
-                  Zmluva
+                  {t('contract')}
                 </NavLink>
               </NavItem>
             </Empty>
@@ -482,7 +490,7 @@ export default function CompanyEdit( props ) {
             <SettingsInput
               required
               id="name"
-              label="Company name"
+              label={t('companyTitle')}
               value={title}
               onChange={(e)=> {
                 setTitle(e.target.value);
@@ -492,7 +500,7 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="dph"
-              label="DPH"
+              label={t('tax')}
               value={dph}
               onChange={(e)=>{
                 setDph(e.target.value);
@@ -503,7 +511,7 @@ export default function CompanyEdit( props ) {
             <SettingsInput
               required
               id="ico"
-              label="ICO"
+              label={t('ico')}
               value={ico}
               onChange={(e)=>{
                 setIco(e.target.value);
@@ -513,7 +521,7 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="dic"
-              label="DIC"
+              label={t('dic')}
               value={dic}
               onChange={(e)=>{
                 setDic(e.target.value);
@@ -523,7 +531,7 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="ic_dph"
-              label="IC DPH"
+              label={t('icDph')}
               value={ic_dph}
               onChange={(e)=>{
                 setIcDph(e.target.value);
@@ -533,7 +541,7 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="country"
-              label="Country"
+              label={t('country')}
               value={country}
               onChange={(e)=>{
                 setCountry(e.target.value);
@@ -543,7 +551,7 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="city"
-              label="City"
+              label={t('city')}
               value={city}
               onChange={(e)=>{
                 setCity(e.target.value);
@@ -554,7 +562,7 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="street"
-              label="Street"
+              label={t('street')}
               value={street}
               onChange={(e)=>{
                 setStreet(e.target.value);
@@ -564,7 +572,7 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="psc"
-              label="PSČ"
+              label={t('postCode')}
               value={zip}
               onChange={(e)=>{
                 setZip(e.target.value);
@@ -574,8 +582,8 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="mail"
-              label="E-mail"
-              placeholder="Enter e-mail (must be email or empty)"
+              label={t('email')}
+              placeholder={t('emailPlaceholderChecked')}
               value={email}
               onChange={(e)=>{
                 setEmail(e.target.value);
@@ -586,7 +594,7 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="phone"
-              label="Phone"
+              label={t('phone')}
               value={phone}
               onChange={(e)=>{
                 setPhone(e.target.value);
@@ -596,7 +604,7 @@ export default function CompanyEdit( props ) {
 
             <SettingsInput
               id="description"
-              label="Description"
+              label={t('description')}
               type="textarea"
               value={description}
               onChange={(e)=>{
@@ -608,7 +616,7 @@ export default function CompanyEdit( props ) {
           { myRights.pausals &&
             <TabPane tabId={'contract'}>
               <FormGroup>
-                <Label for="pricelist">Pricelist</Label>
+                <Label for="pricelist">{t('pricelist')}</Label>
                 <Select
                   id="pricelist"
                   name="pricelist"
@@ -632,14 +640,14 @@ export default function CompanyEdit( props ) {
                       setDataChanged( true );
                     }}
                     height={22}
-                    checkedIcon={<span className="switchLabel">YES</span>}
-                    uncheckedIcon={<span className="switchLabel">NO</span>}
+                    checkedIcon={<span className="switchLabel">{t('yes')}</span>}
+                    uncheckedIcon={<span className="switchLabel">{t('no')}</span>}
                     onColor={"#0078D4"}
                     />
                   <span className="m-l-10"></span>
                 </label>
                 <span className="m-r-5">
-                  Mesačný paušál
+                  {t('monthlyPausal')}
                 </span>
               </div>
               <SettingsInput
@@ -654,13 +662,13 @@ export default function CompanyEdit( props ) {
                 }}
                 >
                 <div className="m-l-10">
-                  <Label for="monthlyPausal">EUR bez DPH/mesiac</Label>
+                  <Label for="monthlyPausal">{t('euroWithoutTaxMonth')}</Label>
                 </div>
               </SettingsInput>
 
               <SettingsInput
                 id="taskWorkPausal"
-                label="Paušál práce"
+                label={`${t('pausal')} ${t('works').toLowerCase()}`}
                 type="number"
                 value={taskWorkPausal}
                 disabled={!monthly}
@@ -672,7 +680,7 @@ export default function CompanyEdit( props ) {
 
               <SettingsInput
                 id="taskTripPausal"
-                label="Paušál výjazdy"
+                label={`${t('pausal')} ${t('trips').toLowerCase()}`}
                 type="number"
                 value={taskTripPausal}
                 disabled={!monthly}
@@ -714,7 +722,7 @@ export default function CompanyEdit( props ) {
           <SettingsInput
             id="description"
             className="m-t-20"
-            label="Default DPH for all Companies"
+            label={t('defaultTax')}
             labelClassName="color-danger"
             type="number"
             value={defDph}
@@ -741,7 +749,7 @@ export default function CompanyEdit( props ) {
             disabled={saving}
             onClick={cancel}
             >
-            Cancel changes
+            {t('cancelChanges')}
           </button>
         }
         { !dataLoading && !companyData.company.def &&
@@ -750,19 +758,19 @@ export default function CompanyEdit( props ) {
             disabled={saving || deleting || theOnlyOneLeft}
             onClick={() => setDeleteOpen(true)}
             >
-            Delete
+            {t('delete')}
           </button>
         }
 
         <div className = "ml-auto message m-r-10">
           { dataChanged &&
             <div className="message error-message">
-              Save changes before leaving!
+              {t('saveBeforeLeaving')}
             </div>
           }
           { !dataChanged &&
             <div className="message success-message">
-              Saved
+              {t('saved')}
             </div>
           }
         </div>
@@ -777,14 +785,14 @@ export default function CompanyEdit( props ) {
             }
           }}
           >
-          { saving ? 'Saving...' : 'Save changes' }
+          { saving ? `${t('saving')}...` : t('saveChanges') }
         </button>
 
 
       </div>
       <DeleteReplacement
         isOpen = { deleteOpen }
-        label = "company"
+        label = {t('company')}
         options = { toSelArr(filteredCompanies) }
         close = { () => setDeleteOpen( false ) }
         finishDelete = { deleteCompanyFunc }

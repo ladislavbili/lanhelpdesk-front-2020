@@ -14,6 +14,9 @@ import ImapEdit from './imapEdit';
 import {
   itemAttributesFullfillsString
 } from '../components/helpers';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_IMAPS,
@@ -25,6 +28,10 @@ export default function IMAPsList( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: imapsData,
@@ -91,12 +98,12 @@ export default function IMAPsList( props ) {
           className="btn center-hor ml-auto"
           onClick={testIMAPs}
           >
-          Test IMAPs
+          {t('testImaps')}
         </button>
       }
       { imapTesting &&
         <div className="center-hor ml-auto">
-          Testing IMAPs...
+          {t('testingImaps')}...
         </div>
       }
       { imapTesting &&
@@ -108,7 +115,7 @@ export default function IMAPsList( props ) {
             });
           }}
           >
-          Refetch
+          {t('refetch')}
         </button>
       }
     </Empty>
@@ -116,22 +123,22 @@ export default function IMAPsList( props ) {
 
   return (
     <SettingListContainer
-      header="IMAPs"
+      header={t('imaps')}
       filter={imapFilter}
       setFilter={setImapFilter}
       history={history}
       addURL="/helpdesk/settings/imaps/add"
-      addLabel="IMAP"
+      addLabel={t('imap')}
       RightFilterComponent={TestImapComponent}
       RightSideComponent={RightSideComponent}
       >
       <table className="table table-hover">
         <thead>
           <tr className="clickable">
-            <th>Title</th>
-            <th>Host</th>
-            <th>Username</th>
-            <th>Order</th>
+            <th>{t('title')}</th>
+            <th>{t('host')}</th>
+            <th>{t('username')}</th>
+            <th>{t('order')}</th>
             <th></th>
           </tr>
         </thead>

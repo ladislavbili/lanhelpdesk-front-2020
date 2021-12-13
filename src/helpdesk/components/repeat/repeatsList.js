@@ -23,6 +23,10 @@ import {
   REPEATS_SUBSCRIPTION,
 } from './queries';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function RepeatList( props ) {
   // state
   const [ openRepeat, setOpenRepeat ] = React.useState( null );
@@ -37,6 +41,10 @@ export default function RepeatList( props ) {
     history,
     match
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: projectData,
@@ -76,7 +84,7 @@ export default function RepeatList( props ) {
       (
         repeat.repeatTemplate.status ?
         repeat.repeatTemplate.status.title :
-        "No status"
+        t( 'noStatus' )
       )
       .toLowerCase()
       .includes( statusFilter.toLowerCase() ) &&
@@ -84,8 +92,8 @@ export default function RepeatList( props ) {
       repeat.repeatTemplate.title.toLowerCase()
       .includes( repeatTemplateFilter.toLowerCase() ) &&
 
-      ( "Opakovať každý " + repeat.repeatEvery + ' ' + intervals.find( ( interval ) => interval.value === repeat.repeatInterval )
-        .title )
+      ( t( 'repeatEvery' ) + repeat.repeatEvery + ' ' + t( intervals.find( ( interval ) => interval.value === repeat.repeatInterval )
+        .title ) )
       .toLowerCase()
       .includes( repeatingFilter.toLowerCase() ) && (
         repeat.repeatTemplate.project.title.toLowerCase()
@@ -106,7 +114,7 @@ export default function RepeatList( props ) {
           {template.title}
         </td>
         <td>
-          {("Opakovať každý " + repeat.repeatEvery + ' ' + intervals.find((interval) => interval.value === repeat.repeatInterval ).title)}
+          {`${t('repeatEvery')} ${repeat.repeatEvery} ${t(intervals.find((interval) => interval.value === repeat.repeatInterval ).title)}`}
         </td>
         <td>
           <span
@@ -120,7 +128,7 @@ export default function RepeatList( props ) {
             {
               template.status
               ? template.status.title
-              : "No status"
+              : t('noStatus')
             }
           </span>
         </td>
@@ -143,7 +151,7 @@ export default function RepeatList( props ) {
               <div className="breadcrum-bar center-hor">
                 <div className="breadcrumbs">
                   <h2>
-                    Repetitive tasks
+                    {t('repetitiveTasks')}
                   </h2>
                 </div>
               </div>
@@ -154,10 +162,10 @@ export default function RepeatList( props ) {
               <table className = "table" >
                 <thead>
                   <tr>
-                    <th>Title</th>
-                    <th>Repeat timing</th>
-                    <th width="5%">Status</th>
-                    { !projectSelected && <th>Project</th> }
+                    <th>{t('title')}</th>
+                    <th>{t('repeatTiming')}</th>
+                    <th width="5%">{t('status')}</th>
+                    { !projectSelected && <th>{t('project')}</th> }
                   </tr>
                 </thead>
                 <tbody>

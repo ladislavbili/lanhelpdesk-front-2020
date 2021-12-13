@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function UserListContainer( props ) {
 
@@ -14,6 +17,10 @@ export default function UserListContainer( props ) {
     RightSideComponent,
     children
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   return (
     <div className="content">
@@ -35,7 +42,7 @@ export default function UserListContainer( props ) {
                   className="form-control search-text"
                   value={filter}
                   onChange={(e)=>setFilter(e.target.value)}
-                  placeholder="Search"
+                  placeholder={t('search')}
                   />
               </div>
             </div>

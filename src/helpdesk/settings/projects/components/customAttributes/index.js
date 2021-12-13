@@ -56,7 +56,7 @@ export default function CustomAttributes( props ) {
 
   return (
     <div>
-      <h3 className="m-t-20"> Custom Attributes</h3>
+      <h3 className="m-t-20"> Custom Attributes - WIP</h3>
       <table className="table m-t-10 vykazyTable">
         <thead>
           <tr>

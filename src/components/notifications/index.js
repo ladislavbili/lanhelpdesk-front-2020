@@ -41,15 +41,20 @@ import {
 
 const noTypeFilter = {
   value: null,
-  label: 'All types'
+  label: 'All types',
+  labelId: 'allTypes',
 };
+
 const readTypeFilter = {
   value: 'read',
-  label: 'Read'
+  label: 'Read',
+  labelId: 'read',
 };
+
 const unreadTypeFilter = {
   value: 'unread',
-  label: 'Unread'
+  label: 'Unread',
+  labelId: 'unread',
 };
 
 export default function NotificationList( props ) {

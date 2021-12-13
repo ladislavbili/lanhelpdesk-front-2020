@@ -21,6 +21,10 @@ import Loading from 'components/loading';
 import SettingsInput from '../components/settingsInput';
 
 import {
+  useTranslation
+} from "react-i18next";
+
+import {
   addLocalError,
 } from 'apollo/localSchema/actions';
 import {
@@ -42,6 +46,10 @@ export default function PricelistAdd( props ) {
   const {
     history
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: taskTypesData,
@@ -182,7 +190,7 @@ export default function PricelistAdd( props ) {
   return (
     <div className="scroll-visible p-20 fit-with-header">
       <h2 className="m-b-20" >
-        Add price list
+        {`${t('add')} ${t('pricelist').toLowerCase()}`}
       </h2>
 
       <label className="m-b-20">
@@ -190,16 +198,16 @@ export default function PricelistAdd( props ) {
           checked={def}
           onChange={ () => setDef(!def) }
           height={22}
-          checkedIcon={<span className="switchLabel">YES</span>}
-          uncheckedIcon={<span className="switchLabel">NO</span>}
+          checkedIcon={<span className="switchLabel">{t('yes')}</span>}
+          uncheckedIcon={<span className="switchLabel">{t('no')}</span>}
           onColor={"#0078D4"} />
-        <span className="m-l-10">Default</span>
+        <span className="m-l-10">{t('default')}</span>
       </label>
 
       <SettingsInput
         required
         id="title"
-        label="Pricelist name"
+        label={t('pricelistTitle')}
         value={title}
         onChange={(e) => {
           setTitle(e.target.value);
@@ -212,7 +220,7 @@ export default function PricelistAdd( props ) {
             className={classnames({ active: openedTab === 'taskTypes'}, "clickable", "")}
             onClick={() => setOpenedTab('taskTypes') }
             >
-            Task Types
+            {t('taskTypes')}
           </NavLink>
         </NavItem>
         <NavItem>
@@ -225,7 +233,7 @@ export default function PricelistAdd( props ) {
             className={classnames({ active: openedTab === 'tripTypes' }, "clickable", "")}
             onClick={() => setOpenedTab('tripTypes') }
             >
-            Trip Types
+            {t('tripTypes')}
           </NavLink>
         </NavItem>
         <NavItem>
@@ -238,7 +246,7 @@ export default function PricelistAdd( props ) {
             className={classnames({ active: openedTab === 'extra' }, "clickable", "")}
             onClick={() => setOpenedTab('extra') }
             >
-            Prirážky
+            {t('surcharges')}
           </NavLink>
         </NavItem>
       </Nav>
@@ -250,7 +258,7 @@ export default function PricelistAdd( props ) {
               key={index}
               id={`taskTypes-${item.title}-${item.id}`}
               label={item.title}
-              placeholder="Enter price"
+              placeholder={t('pricePlaceholder')}
               value={
                 taskTypePrices.find( (price) => price.id === item.id ) ?
                 taskTypePrices.find( (price) => price.id === item.id ).price :
@@ -275,7 +283,7 @@ export default function PricelistAdd( props ) {
               key={index}
               id={`tripTypes-${item.title}-${item.id}`}
               label={item.title}
-              placeholder="Enter price"
+              placeholder={t('pricePlaceholder')}
               value={tripTypePrices.find( (price) => price.id === item.id ) ? tripTypePrices.find( (price) => price.id === item.id ).price : undefined}
               onChange={(e) => {
                 let newPrices = tripTypePrices.map(p => {
@@ -293,7 +301,7 @@ export default function PricelistAdd( props ) {
         <TabPane tabId={'extra'}>
           <SettingsInput
             id="afterHours"
-            label="After hours percentage"
+            label={t('afterHoursPercentage')}
             value={afterHours}
             onChange={(e) => {
               setAfterHours(e.target.value.replace(",", "."));
@@ -302,8 +310,8 @@ export default function PricelistAdd( props ) {
 
           <SettingsInput
             id="materialMargin"
-            label="Materials margin percentage 50-"
-            placeholder="Enter materials margin percentage"
+            label={`${t('materialsMarginPercentage')} 50-`}
+            placeholder={t('materialsMarginPercentagePlaceholder')}
             value={materialMargin}
             onChange={(e) => {
               setMaterialMargin(e.target.value.replace(",", "."));
@@ -312,8 +320,8 @@ export default function PricelistAdd( props ) {
 
           <SettingsInput
             id="materialMarginExtra"
-            label="Materials margin percentage 50+"
-            placeholder="Enter materials margin percentage"
+            label={`${t('materialsMarginPercentage')} 50+`}
+            placeholder={t('materialsMarginPercentagePlaceholder')}
             value={materialMarginExtra}
             onChange={(e) => {
               setMaterialMarginExtra(e.target.value.replace(",", "."));
@@ -325,7 +333,7 @@ export default function PricelistAdd( props ) {
       <div className="form-buttons-row">
         { cannotSave() &&
           <div className="message error-message ml-auto m-r-14">
-            Fill in all the required information!
+            {t('fillAllRequiredInformation')}
           </div>
         }
         <button
@@ -336,7 +344,7 @@ export default function PricelistAdd( props ) {
           disabled={cannotSave()}
           onClick={addPricelistFunc}
           >
-          { saving ? 'Saving prices...' : 'Save prices' }
+          { saving ? `${t('adding')}...` : `${t('add')} ${t('pricelist').toLowerCase()}` }
         </button>
       </div>
     </div>

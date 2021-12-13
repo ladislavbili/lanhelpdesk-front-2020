@@ -11,6 +11,9 @@ import {
   timestampToString
 } from 'helperFunctions';
 import {
+  useTranslation
+} from "react-i18next";
+import {
   GET_TASK_CHANGES,
   TASK_HISTORY_SUBSCRIPTION,
 } from './queries';
@@ -21,6 +24,10 @@ export default function TaskHistory( props ) {
     task,
     fromInvoice,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: taskChangesData,
@@ -96,14 +103,14 @@ export default function TaskHistory( props ) {
       .map( ( taskChange ) => {
         let event = {
           user: taskChange.user ? taskChange.user : {
-            fullName: 'Unknown user',
+            fullName: t( 'unknownUser' ),
             id: -1
           },
           createdAt: parseInt( taskChange.createdAt ),
           id: taskChange.id
         }
         if ( taskChange.taskChangeMessages.length === 0 ) {
-          event.messages = [ 'Unspecified change was made.' ]
+          event.messages = [ t( 'unspecifiedChangeMessage' ) ]
         } else {
           event.messages = taskChange.taskChangeMessages.map( ( taskChangeMessage ) => taskChangeMessage.message )
         }
@@ -147,12 +154,12 @@ export default function TaskHistory( props ) {
 
   return (
     <div>
-      <h3>História</h3>
+      <h3>{t('history')}</h3>
       <ListGroup>
         { groupHistory().map( (eventGroup, index) => (
           <ListGroupItem key={index}>
             <p>
-              Changes made by: <span className="bolder">{eventGroup.user.fullName}</span>
+              {t('changesMadeBy')}: <span className="bolder">{eventGroup.user.fullName}</span>
           </p>
           {eventGroup.events.map( (event) =>
             renderMultipleMessages(event)
@@ -160,7 +167,7 @@ export default function TaskHistory( props ) {
         </ListGroupItem>
       ))}
     </ListGroup>
-    {	getHistory().length===0 && <div>História je prázdna.</div>	}
+    {	getHistory().length===0 && <div>{t('historyIsEmpty')}.</div>	}
   </div>
   )
 }

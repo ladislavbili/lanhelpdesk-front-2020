@@ -1,6 +1,9 @@
 import React from 'react';
 import GeneralPopover from 'components/generalPopover';
 import classnames from 'classnames';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function TagsPickerPopover( props ) {
   const {
@@ -15,6 +18,10 @@ export default function TagsPickerPopover( props ) {
     disabled,
     selected,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
   const coloredItems = ( items && items.length !== 0 ) ? items[ 0 ].hasOwnProperty( 'color' ) : false;
 
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
@@ -24,13 +31,13 @@ export default function TagsPickerPopover( props ) {
     <div className="row mb-auto">
       <button className="btn-link m-b-10 h-20-f btn-distance" id={`edit-tags-${taskID}`} onClick={ () => setTagsOpen(true) } >
         <i className="fa fa-plus" />
-        Tags
+        {t('tags')}
       </button>
       <GeneralPopover
         placement="bottom-start"
         className="overflow-auto max-height-400"
         target={`edit-tags-${taskID}`}
-        header="Select tags"
+        header={t('tagsPlaceholder')}
         headerClassName="m-b-15"
         reset={() => {}}
         submit={() => {}}
@@ -55,7 +62,7 @@ export default function TagsPickerPopover( props ) {
                 />
             }
             { !items &&
-              <span className="message error-message">{ ` Provided items are of value ${items}` }</span>
+              <span className="message error-message">{ `${t('providedItemsProblem')} ${items}` }</span>
             }
             { items && items.filter((item) => item.label.toLowerCase().includes(filter.toLowerCase()) ).map((item) => (
               <div

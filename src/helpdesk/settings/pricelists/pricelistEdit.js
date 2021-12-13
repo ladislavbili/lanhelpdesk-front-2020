@@ -35,6 +35,11 @@ import {
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
+
+import {
+  useTranslation
+} from "react-i18next";
+
 import {
   GET_PRICELISTS,
   GET_PRICELIST,
@@ -47,6 +52,11 @@ export default function PricelistEdit( props ) {
     history,
     listId
   } = props;
+
+  const {
+    t
+  } = useTranslation();
+
   const id = props.listId ? props.listId : parseInt( props.match.params.id );
   const client = useApolloClient();
   const allPricelists = toSelArr( client.readQuery( {
@@ -148,7 +158,7 @@ export default function PricelistEdit( props ) {
   const deletePricelistFunc = () => {
     setChoosingNewPricelist( false );
 
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deletePricelist( {
           variables: {
             id,
@@ -172,7 +182,7 @@ export default function PricelistEdit( props ) {
   return (
     <div className="scroll-visible p-20 fit-with-header">
       <h2 className="m-b-20" >
-        Edit price list
+        {`${t('edit')} ${t('pricelist').toLowerCase()}`}
       </h2>
 
       <label className="m-b-20">
@@ -183,16 +193,16 @@ export default function PricelistEdit( props ) {
             setDataChanged( true );
           } }
           height={22}
-          checkedIcon={<span className="switchLabel">YES</span>}
-          uncheckedIcon={<span className="switchLabel">NO</span>}
+          checkedIcon={<span className="switchLabel">{t('yes')}</span>}
+          uncheckedIcon={<span className="switchLabel">{t('no')}</span>}
           onColor={"#0078D4"} />
-        <span className="m-l-10">Default</span>
+        <span className="m-l-10">{t('default')}</span>
       </label>
 
       <SettingsInput
         required
         id="title"
-        label="Pricelist name"
+        label={t('pricelistTitle')}
         value={title}
         onChange={(e) => {
           setTitle(e.target.value);
@@ -206,7 +216,7 @@ export default function PricelistEdit( props ) {
             className={classnames({ active: openedTab === 'taskTypes'}, "clickable", "")}
             onClick={() => setOpenedTab('taskTypes') }
             >
-            Task Types
+            {t('taskTypes')}
           </NavLink>
         </NavItem>
         <NavItem>
@@ -219,7 +229,7 @@ export default function PricelistEdit( props ) {
             className={classnames({ active: openedTab === 'tripTypes' }, "clickable", "")}
             onClick={() => setOpenedTab('tripTypes') }
             >
-            Trip Types
+            {t('tripTypes')}
           </NavLink>
         </NavItem>
         <NavItem>
@@ -232,7 +242,7 @@ export default function PricelistEdit( props ) {
             className={classnames({ active: openedTab === 'extra' }, "clickable", "")}
             onClick={() => setOpenedTab('extra') }
             >
-            Prirážky
+            {t('surcharges')}
           </NavLink>
         </NavItem>
       </Nav>
@@ -244,8 +254,8 @@ export default function PricelistEdit( props ) {
               <SettingsInput
                 key={index}
                 id={ item.taskType ? `taskTypes-${item.taskType.title}-${item.taskType.id}` : `unknown-${index}`}
-                label={item.taskType ? item.taskType.title : "Unnamed"}
-                placeholder="Enter price"
+                label={item.taskType ? item.taskType.title : t('unnamed')}
+                placeholder={t('pricePlaceholder')}
                 value={item.price}
                 onChange={(e) => {
                   let newPrices = prices.map(price => {
@@ -268,8 +278,8 @@ export default function PricelistEdit( props ) {
               <SettingsInput
                 key={index}
                 id={ item.tripType ? `tripTypes-${item.tripType.title}-${item.tripType.id}` : `unknown-${index}`}
-                label={item.tripType ? item.tripType.title : "Unnamed"}
-                placeholder="Enter price"
+                label={item.tripType ? item.tripType.title : t('unnamed')}
+                placeholder={t('pricePlaceholder')}
                 value={item.price}
                 onChange={(e) => {
                   let newPrices = prices.map(p => {
@@ -289,7 +299,7 @@ export default function PricelistEdit( props ) {
         <TabPane tabId={'extra'}>
           <SettingsInput
             id="afterHours"
-            label="After hours percentage"
+            label={t('afterHoursPercentage')}
             value={afterHours}
             onChange={(e) => {
               setAfterHours(e.target.value.replace(",", "."));
@@ -299,8 +309,8 @@ export default function PricelistEdit( props ) {
 
           <SettingsInput
             id="materialMargin"
-            label="Materials margin percentage 50-"
-            placeholder="Enter materials margin percentage"
+            label={`${t('materialsMarginPercentage')} 50-`}
+            placeholder={t('materialsMarginPercentagePlaceholder')}
             value={materialMargin}
             onChange={(e) => {
               setMaterialMargin(e.target.value.replace(",", "."));
@@ -310,8 +320,8 @@ export default function PricelistEdit( props ) {
 
           <SettingsInput
             id="materialMarginExtra"
-            label="Materials margin percentage 50+"
-            placeholder="Enter materials margin percentage"
+            label={`${t('materialsMarginPercentage')} 50+`}
+            placeholder={t('materialsMarginPercentagePlaceholder')}
             value={materialMarginExtra}
             onChange={(e) => {
               setMaterialMarginExtra(e.target.value.replace(",", "."));
@@ -322,11 +332,12 @@ export default function PricelistEdit( props ) {
       </TabContent>
       <Modal isOpen={choosingNewPricelist}>
         <ModalHeader>
-          Please choose a pricelist to replace this one
+
+            {`${t('deleteReplacementInfo1')} ${t('pricelist').toLowerCase()} ${t('deleteReplacementInfo2')}`}
         </ModalHeader>
         <ModalBody>
           <FormGroup>
-            { def && <Label>A replacement pricelist</Label> }
+            { def && <Label>{t('replacementPricelist')}</Label> }
             <Select
               styles={pickSelectStyle()}
               options={filteredPricelists}
@@ -340,7 +351,7 @@ export default function PricelistEdit( props ) {
 
           {def &&
             <FormGroup>
-              <Label>New default pricelist</Label>
+              <Label>{t('newDefaultPricelist')}</Label>
               <Select
                 styles={pickSelectStyle()}
                 options={filteredPricelists}
@@ -355,13 +366,13 @@ export default function PricelistEdit( props ) {
         </ModalBody>
         <ModalFooter>
           <button className="btn-link-cancel mr-auto"onClick={() => setChoosingNewPricelist(false)}>
-            Cancel
+            {t('cancel')}
           </button>
           <button
             className="btn ml-auto"
             disabled={!newPricelist || (def ? !newDefPricelist : false)}
             onClick={deletePricelistFunc}>
-            Complete deletion
+              {t('completeDeletion')}
           </button>
         </ModalFooter>
       </Modal>
@@ -371,17 +382,17 @@ export default function PricelistEdit( props ) {
           className="btn-red" disabled={saving || theOnlyOneLeft}
           onClick={() => setChoosingNewPricelist(true)}
           >
-          Delete
+          {t('delete')}
         </button>
         <div className="ml-auto message m-r-10">
           { dataChanged &&
             <div className="message error-message">
-              Save changes before leaving!
+              {t('saveBeforeLeaving')}
             </div>
           }
           { !dataChanged &&
             <div className="message success-message">
-              Saved
+              {t('saved')}
             </div>
           }
         </div>
@@ -390,7 +401,7 @@ export default function PricelistEdit( props ) {
           disabled={saving}
           onClick={updatePricelistFunc}
           >
-          { saving ? 'Saving prices...' : 'Save prices' }
+          { saving ? `${t('saving')} ${t('pricelist').toLowerCase()}...` : `${t('save')} ${t('pricelist').toLowerCase()}` }
         </button>
       </div>
     </div>

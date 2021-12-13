@@ -9,52 +9,55 @@ import {
 import Empty from 'components/Empty';
 import Checkbox from 'components/checkbox';
 import Switch from "react-switch";
+import {
+  useTranslation
+} from "react-i18next";
 
 const defaultCols = [
   {
-    header: 'Done',
+    header: 'done',
     key: 'done',
     width: null,
     headerClassnames: "",
     columnClassnames: "",
   },
   {
-    header: 'Názov',
+    header: 'title',
     key: 'title',
     width: null,
     headerClassnames: "",
     columnClassnames: "",
   },
   {
-    header: 'Mn.',
+    header: 'quantityShort',
     key: 'quantity',
     width: "50",
     headerClassnames: "text-right",
     columnClassnames: "p-l-5",
   },
   {
-    header: 'Cena/ks',
+    header: 'pricePerUnit',
     key: 'price',
     width: "8%",
     headerClassnames: "text-right",
     columnClassnames: "p-l-8 min-width-100",
   },
   {
-    header: 'Spolu',
+    header: 'total',
     key: 'total',
     width: "8%",
     headerClassnames: "text-right",
     columnClassnames: "p-l-8 min-width-100",
   },
   {
-    header: 'Faktúrovať',
+    header: 'invoiced',
     key: 'approved',
     width: "2%",
     headerClassnames: "",
     columnClassnames: "p-l-8",
   },
   {
-    header: 'Akcie',
+    header: 'actions',
     key: 'actions',
     width: "80",
     headerClassnames: "text-right",
@@ -91,6 +94,10 @@ export default function MaterialsTable( props ) {
     updateMaterials,
     removeMaterial,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const shownColumns = getShownData( showColumns, autoApproved, newColumnDefinitions ? newColumnDefinitions : [] );
 
@@ -325,7 +332,7 @@ export default function MaterialsTable( props ) {
           type="text"
           className="form-control h-30 segoe-blue-text"
           id="inlineFormInput"
-          placeholder="Názov"
+          placeholder={t('enterTitle')}
           value={newMaterialTitle}
           onChange={(e)=>setNewMaterialTitle(e.target.value)}
           />
@@ -341,7 +348,7 @@ export default function MaterialsTable( props ) {
           onChange={(e)=>setNewMaterialQuantity(e.target.value.replace(',', '.') )}
           className="form-control h-30 text-right segoe-blue-text"
           id="inlineFormInput"
-          placeholder="Množstvo"
+          placeholder={t('quantity')}
           />
         )
       }
@@ -360,7 +367,7 @@ export default function MaterialsTable( props ) {
               setNewMaterialPrice(e.target.value);
             }}
             className="form-control h-30 segoe-blue-text"
-            placeholder="Cena"
+            placeholder={t('price')}
             />
         </span>
         )
@@ -385,7 +392,7 @@ export default function MaterialsTable( props ) {
               }
             }}
             className="form-control h-30 segoe-blue-text"
-            placeholder="Celková cena"
+            placeholder={t('totalPrice')}
             />
         </span>
         )
@@ -465,14 +472,14 @@ export default function MaterialsTable( props ) {
             <span
               className={classnames("clickable vykazyTableNav active")}
               >
-              Materiál
+              {t('material')}
             </span>
           </th>
           { shownColumns.map((colData, index) => {
             if(index < 2 ){
               return null;
             }
-            return <th width={colData.width} key={colData.key} className={colData.headerClassnames}>{colData.header}</th>
+            return <th width={colData.width} key={colData.key} className={colData.headerClassnames}>{t(colData.header)}</th>
           })}
         </tr>
       </thead>
@@ -513,7 +520,7 @@ export default function MaterialsTable( props ) {
                 }}
                 >
                 <i className="fa fa-plus" />
-                Materiál
+                {t('material')}
               </button>
             </td>
           </tr>
@@ -543,7 +550,7 @@ export default function MaterialsTable( props ) {
       <div className="row">
         <div className="ml-auto row m-r-10">
           <div className="text-right ml-auto m-r-5">
-            <b>Cena bez DPH: </b>
+            <b>{t('priceWithoutTax')}: </b>
             {
               (
                 materials.reduce((acc, cur)=> acc+(isNaN(parseFloat(getMaterialPrice(cur))) || isNaN(parseInt(cur.quantity)) ? 0 : parseFloat(getMaterialPrice(cur))*parseInt(cur.quantity)),0)
@@ -551,11 +558,11 @@ export default function MaterialsTable( props ) {
             }
           </div>
           <div className="text-right m-r-5">
-            <b>DPH: </b>
+            <b>{t('tax')}: </b>
             {((getDPH()-1)*100).toFixed(2) + ' %' }
           </div>
           <div className="text-right">
-            <b>Cena s DPH: </b>
+            <b>{t('priceWithTax')}: </b>
             {
               (
                 (

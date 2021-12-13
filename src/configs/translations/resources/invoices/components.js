@@ -1,30 +1,10 @@
 export default {
-  email: {
-    en: 'E-mail',
-    sk: 'E-mail',
+  selectPrefferedDateRange: {
+    en: 'Select preffered date range',
+    sk: 'Vyberte preferovaný rozsah dátumov',
   },
-  emailPlaceholder: {
-    en: 'Enter e-mail',
-    sk: 'Zadajte e-mail',
-  },
-  password: {
-    en: 'Password',
-    sk: 'Heslo',
-  },
-  passwordPlaceholder: {
-    en: 'Enter password',
-    sk: 'Zadajte heslo',
-  },
-  user: {
-    en: 'User',
-    sk: 'Používateľ',
-  },
-  subject: {
-    en: 'Subject',
-    sk: 'Predmet',
-  },
-  body: {
-    en: 'Body',
-    sk: 'Telo správy',
+  selectMonthAndYear: {
+    en: 'Select month and year',
+    sk: 'Vyberte mesiac a rok',
   },
 }
