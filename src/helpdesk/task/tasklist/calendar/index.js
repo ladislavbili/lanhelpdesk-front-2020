@@ -15,6 +15,10 @@ import renderRepeat from './renderRepeat';
 import moment from 'moment';
 
 import {
+  useTranslation
+} from "react-i18next";
+
+import {
   GET_TASKS,
   GET_SCHEDULED_WORKS,
   UPDATE_SCHEDULED_WORK,
@@ -71,6 +75,10 @@ export default function CalendarLoader( props ) {
     limit,
     processTasks,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const client = useApolloClient();
 
@@ -278,8 +286,8 @@ export default function CalendarLoader( props ) {
       end,
       type: 'repeatTime',
       time: parseInt( repeatTime.triggersAt ),
-      title: renderRepeatTime( repeatTime, parseInt( repeatTime.triggersAt ) ),
-      tooltip: repeatTime.task ? `Repeat task: ${repeatTime.task.title}` : `Repeat: every ${repeatTime.repeat.repeatEvery} ${repeatTime.repeat.repeatInterval}`,
+      title: renderRepeatTime( repeatTime, parseInt( repeatTime.triggersAt ), t ),
+      tooltip: repeatTime.task ? `${t('repeatTask')}: ${repeatTime.task.title}` : `${t('repeat')}: ${t('every').toLowerCase()} ${repeatTime.repeat.repeatEvery} ${repeatTime.repeat.repeatInterval}`,
     };
   }
 
@@ -398,8 +406,8 @@ export default function CalendarLoader( props ) {
         canEdit: repeat.canEdit,
         start: new Date( time ),
         end: new Date( time + 60 * 60 * 1000 ),
-        title: renderRepeat( repeat, time ),
-        tooltip: `Repeat: every ${repeat.repeatEvery} ${repeat.repeatInterval}`,
+        title: renderRepeat( repeat, time, t ),
+        tooltip: `${t('repeat')}: ${t('every').toLowerCase()} ${repeat.repeatEvery} ${repeat.repeatInterval}`,
       } ) )
     ]
   }, [] );

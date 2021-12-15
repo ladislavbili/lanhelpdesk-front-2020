@@ -63,4 +63,12 @@ export default {
     en: 'Skip',
     sk: 'Preskočiť',
   },
+  select: {
+    en: 'Select',
+    sk: 'Vybrať',
+  },
+  copy: {
+    en: 'Copy',
+    sk: 'Kopírovať',
+  },
 }

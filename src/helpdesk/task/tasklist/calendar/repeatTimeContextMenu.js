@@ -5,6 +5,10 @@ import {
   PopoverBody,
 } from 'reactstrap';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function RepeatTimeContextMenu( props ) {
   const {
     repeatTimeEvent,
@@ -16,6 +20,10 @@ export default function RepeatTimeContextMenu( props ) {
     repeatTimesRefetch,
     tasksRefetch,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   if ( !repeatTimeEvent ) {
     return null;
@@ -34,7 +42,7 @@ export default function RepeatTimeContextMenu( props ) {
 
   return (
     <Popover trigger="legacy" placement="auto" isOpen={ repeatTimeEvent !== null } target={`calendar-repeatTime-${repeatTime.id}-${time}`} toggle={closeContextMenu}>
-      <PopoverHeader>Repeat time options:</PopoverHeader>
+      <PopoverHeader>{t('repeatTimeOptions')}:</PopoverHeader>
       <PopoverBody style={{ fontSize: '1.2em' }}>
         <div>
           <button
@@ -44,7 +52,7 @@ export default function RepeatTimeContextMenu( props ) {
               closeContextMenu();
             }}
             >
-            Open repeat template
+            {t('openRepeat')}
           </button>
         </div>
         { repeatTime.task && repeatTime.triggered &&
@@ -55,7 +63,7 @@ export default function RepeatTimeContextMenu( props ) {
                 openCreatedTask(repeatTime.task.id);
               }}
               >
-              Open repeat task
+              {t('openRepeatTask')}
             </button>
           </div>
         }
@@ -79,22 +87,22 @@ export default function RepeatTimeContextMenu( props ) {
                 })
               }}
               >
-              Trigger repeat and create task
+              {t('triggerRepeatCreateTask')}
             </button>
           </div>
         }
         <hr/>
         <div className="h5 bolder">
-          Repeat details:
+          {t('repeatDetails')}:
         </div>
         <div>
-          {`Repeat id: ${repeat.id}`}
+          {`${t('repeatId')}: ${repeat.id}`}
         </div>
         <div>
-          {`Repeated every ${repeat.repeatEvery} ${repeat.repeatInterval}`}
+          {`${t('repeatedEvery')} ${repeat.repeatEvery} ${repeat.repeatInterval}`}
         </div>
         <div>
-          {`Task title ${ repeatTime.task ? `was originally named` : `will be`} named ${repeat.repeatTemplate.title}`}
+          {`${ repeatTime.task ? t('taskWasOriginallyNamed') : t('taskWillBeNamed')} ${repeat.repeatTemplate.title}`}
         </div>
       </PopoverBody>
     </Popover>

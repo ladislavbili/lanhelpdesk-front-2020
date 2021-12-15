@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 import Select from 'react-select';
 import {
   Label,
@@ -44,16 +43,17 @@ import {
   REST_URL
 } from 'configs/restAPI';
 import {
-  defaultVykazyChanges,
-  noTaskType,
-} from '../constants';
+  useTranslation
+} from "react-i18next";
 import {
   addLocalError,
   setProject as setLocalProject,
 } from 'apollo/localSchema/actions';
 
 import {
-  toSelArr
+  toSelArr,
+  translateAllSelectItems,
+  translateSelectItem,
 } from 'helperFunctions';
 import 'scss/direct/task-ckeditor.scss';
 
@@ -80,6 +80,10 @@ export default function TaskAdd( props ) {
     setAfterTaskCreate,
     duplicateTask,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const getDuplicateTaskAttribute = ( key, defValue ) => {
     if ( duplicateTask ) {
@@ -144,9 +148,9 @@ export default function TaskAdd( props ) {
   const [ startsAt, setStartsAt ] = React.useState( getDuplicateTaskAttribute( 'startsAt', null ) );
   const [ description, setDescription ] = React.useState( getDuplicateTaskAttribute( 'description', "" ) );
   const [ descriptionVisible, setDescriptionVisible ] = React.useState( false );
-  const [ milestone, setMilestone ] = React.useState( getDuplicateTaskAttribute( 'description', noMilestone ) );
-  const [ overtime, setOvertime ] = React.useState( getDuplicateTaskAttribute( 'overtime', booleanSelects[ 0 ] ) );
-  const [ pausal, setPausal ] = React.useState( getDuplicateTaskAttribute( 'pausal', booleanSelects[ 0 ] ) );
+  const [ milestone, setMilestone ] = React.useState( getDuplicateTaskAttribute( 'description', translateSelectItem( noMilestone, t ) ) );
+  const [ overtime, setOvertime ] = React.useState( getDuplicateTaskAttribute( 'overtime', translateAllSelectItems( booleanSelects, t )[ 0 ] ) );
+  const [ pausal, setPausal ] = React.useState( getDuplicateTaskAttribute( 'pausal', translateAllSelectItems( booleanSelects, t )[ 0 ] ) );
   const [ pendingDate, setPendingDate ] = React.useState( getDuplicateTaskAttribute( 'pendingDate', null ) );
   const [ pendingChangable, setPendingChangable ] = React.useState( getDuplicateTaskAttribute( 'pendingChangable', false ) );
   const [ important, setImportant ] = React.useState( getDuplicateTaskAttribute( 'important', false ) );
@@ -252,12 +256,12 @@ export default function TaskAdd( props ) {
       if ( updatedCompany ) {
         setCompany( updatedCompany );
         if ( !project.projectAttributes.pausal.fixed ) {
-          setPausal( updatedCompany.monthly ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
+          setPausal( updatedCompany.monthly ? translateAllSelectItems( booleanSelects, t )[ 1 ] : translateAllSelectItems( booleanSelects, t )[ 0 ] );
         }
       } else {
         setCompany( null );
         if ( !project.projectAttributes.pausal.fixed ) {
-          setPausal( booleanSelects[ 0 ] );
+          setPausal( translateAllSelectItems( booleanSelects, t )[ 0 ] );
         }
       }
     }
@@ -418,10 +422,12 @@ export default function TaskAdd( props ) {
     let newStartsAt = projectAttributes.startsAt.value ? moment( parseInt( projectAttributes.startsAt.value ) ) : startsAt;
     setStartsAt( newStartsAt );
 
-    let newOvertime = projectAttributes.overtime.value !== null ? booleanSelects.find( ( item ) => projectAttributes.overtime.value === item.value ) : overtime;
+    let newOvertime = projectAttributes.overtime.value !== null ? translateAllSelectItems( booleanSelects, t )
+      .find( ( item ) => projectAttributes.overtime.value === item.value ) : overtime;
     setOvertime( newOvertime );
 
-    let newPausal = projectAttributes.pausal.value !== null ? booleanSelects.find( ( item ) => projectAttributes.pausal.value === item.value ) : pausal;
+    let newPausal = projectAttributes.pausal.value !== null ? translateAllSelectItems( booleanSelects, t )
+      .find( ( item ) => projectAttributes.pausal.value === item.value ) : pausal;
     setPausal( newPausal );
   }
 
@@ -565,7 +571,7 @@ export default function TaskAdd( props ) {
   const renderHeader = () => {
     return (
       <div className="task-add-layout-2 row">
-        <h2 className="center-hor">Create new task</h2>
+        <h2 className="center-hor">{t('createNewTask')}</h2>
         {false &&
           <div className="ml-auto m-r-20">
             <button
@@ -575,7 +581,7 @@ export default function TaskAdd( props ) {
                 setTaskLayout( currentUser.taskLayout === 1 ? 2 : 1 )
               }}>
               <i className="fas fa-retweet "/>
-              Layout
+              {t('layout')}
             </button>
           </div>
         }
@@ -587,7 +593,7 @@ export default function TaskAdd( props ) {
     return (
       <div className="form-section row">
         <div className="flex">
-          <Label>Task name<span className="warning-big m-l-5">*</span> </Label>
+          <Label>{t('taskTitle')}<span className="warning-big m-l-5">*</span> </Label>
           <div className={classnames( "row m-l-10", {"placeholder-highlight": showLocalCreationError && title.length === 0 })}>
             { userRights.rights.taskImportant &&
               <button
@@ -605,12 +611,12 @@ export default function TaskAdd( props ) {
               value={title}
               className="form-control task-title-input"
               onChange={ (e) => setTitle(e.target.value) }
-              placeholder="Enter new task name" />
+              placeholder={t('newTaskTitlePlaceholder')} />
           </div>
           { status && userRights.attributeRights.status.add &&
             (['CloseDate','PendingDate','CloseInvalid']).includes(status.action) &&
             <div className="task-info ml-auto">
-                {(status.action==='CloseDate' || status.action==='CloseInvalid') ? "Closed at: " : "Pending date: "}
+                {(status.action==='CloseDate' || status.action==='CloseInvalid') ? `${t('closedAt')}: ` : `${t('pendingDate')}: `}
               <DatePicker
                 className="form-control hidden-input bolder p-0 text-right width-95"
                 selected={(status.action==='CloseDate' || status.action==='CloseInvalid') ? closeDate : pendingDate }
@@ -621,7 +627,7 @@ export default function TaskAdd( props ) {
                     setPendingDate(date);
                   }
                 }}
-                placeholderText="No close date"
+                placeholderText={(status.action==='CloseDate' || status.action==='CloseInvalid') ? t('noCloseDate') : t('noPendingDate')}
                 />
             </div>
           }
@@ -633,7 +639,7 @@ export default function TaskAdd( props ) {
   const layoutComponents = {
     Project: (
       <Select
-        placeholder="Zadajte projekt"
+        placeholder={t('selectProject')}
         value={project}
         onChange={(project)=>{
           setTags([]);
@@ -653,13 +659,13 @@ export default function TaskAdd( props ) {
               <div className="disabled-info" key={user.id}>{user.label}</div>
             ))}
             { assignedTo.length === 0 &&
-              <div className="message error-message">Úloha nepriradená</div>
+              <div className="message error-message">{t('taskUnassigned')}</div>
             }
           </div>
         }
         { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.add &&
           <Select
-            placeholder="Select reccomended"
+            placeholder={t('selectRecommended')}
             value={assignedTo}
             isMulti
             onChange={(users)=> {
@@ -678,19 +684,19 @@ export default function TaskAdd( props ) {
             className={`disabled-info`}
             style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }
             >
-            {status ? status.label : "None"}
+            {status ? status.label : t('none')}
           </div>
         }
         { !projectAttributes.status.fixed && userRights.attributeRights.status.add &&
           <Select
-            placeholder="Select required"
+            placeholder={t('statusPlaceholder')}
             value={status}
             styles={ pickSelectStyle([ 'noArrow', 'colored', 'required', ]) }
             onChange={(status)=>{
               if(status.action==='PendingDate'){
                 setStatus(status);
                 setPendingDate( moment().add(1,'d') );
-              }else if(status.action==='CloseDate'||status.action==='CloseInvalid'){
+              }else if(status.action==='CloseDate' || status.action==='CloseInvalid'){
                 setStatus(status);
                 setCloseDate( moment() );
               }
@@ -706,11 +712,11 @@ export default function TaskAdd( props ) {
     Type: (
       <div>
         { (projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit ) &&
-          <div className="disabled-info">{taskType ? taskType.label : "None"}</div>
+          <div className="disabled-info">{taskType ? taskType.label : t('none')}</div>
         }
         { !projectAttributes.taskType.fixed && userRights.attributeRights.taskType.edit &&
           <Select
-            placeholder="Zadajte typ"
+            placeholder={t('taskTypePlaceholder')}
             value={taskType}
             styles={ pickSelectStyleWithRequired([ 'noArrow'], ['required'], userRights.attributeRights.taskType.required ) }
             onChange={(taskType)=> {
@@ -724,12 +730,12 @@ export default function TaskAdd( props ) {
     Requester: (
       <div>
         { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit ) &&
-          <div className="disabled-info">{requester ? requester.label : "None"}</div>
+          <div className="disabled-info">{requester ? requester.label : t('none')}</div>
         }
         { !projectAttributes.requester.fixed && userRights.attributeRights.requester.add &&
           <Select
             value={requester}
-            placeholder="Select reccomended"
+            placeholder={t('requesterPlaceholder')}
             onChange={(requester)=>{
               setRequester(requester);
               if(userRights.attributeRights.company.add && !projectAttributes.company.fixed){
@@ -746,16 +752,16 @@ export default function TaskAdd( props ) {
     Company: (
       <div>
         { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit ) &&
-          <div className="disabled-info">{company ? company.label : "None"}</div>
+          <div className="disabled-info">{company ? company.label : t('none')}</div>
         }
         { !projectAttributes.company.fixed && userRights.attributeRights.company.add &&
           <Select
             value={company}
-            placeholder="Select required"
+            placeholder={t('companyPlaceholder')}
             onChange={(company)=> {
               setCompany(company);
               if(!project.projectAttributes.pausal.fixed){
-                setPausal(company.monthly ? booleanSelects[1] : booleanSelects[0]);
+                setPausal(company.monthly ? translateAllSelectItems(booleanSelects, t )[1] : translateAllSelectItems(booleanSelects, t )[0]);
               }
             }}
             options={companies}
@@ -778,7 +784,7 @@ export default function TaskAdd( props ) {
             onChange={date => {
               setStartsAt( isNaN(date.valueOf()) ? null : date );
             }}
-            placeholderText="No start date"
+            placeholderText={t('startsAtPlaceholder')}
             />
         }
       </div>
@@ -795,7 +801,7 @@ export default function TaskAdd( props ) {
             onChange={date => setDeadline( isNaN(date.valueOf()) ? null : date )}
             hideTime
             isClearable
-            placeholderText="No deadline"
+            placeholderText={t('deadlinePlaceholder')}
             />
         }
       </div>
@@ -803,15 +809,15 @@ export default function TaskAdd( props ) {
     Pausal: (
       <div>
         { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed ) &&
-          <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
+          <div className="disabled-info">{pausal ? pausal.label : t('none')}</div>
         }
         { userRights.attributeRights.pausal.add && company && company.monthly && !projectAttributes.pausal.fixed &&
           <Select
             value={pausal}
-            placeholder="Select required"
+            placeholder={t('selectRequired')}
             styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(pausal)=> setPausal(pausal)}
-            options={booleanSelects}
+            options={translateAllSelectItems(booleanSelects, t )}
             />
         }
       </div>
@@ -823,11 +829,11 @@ export default function TaskAdd( props ) {
         }
         { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.add &&
           <Select
-            placeholder="Select required"
+            placeholder={t('selectRequired')}
             value={overtime}
             styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(overtime) => setOvertime(overtime)}
-            options={booleanSelects}
+            options={translateAllSelectItems(booleanSelects, t )}
             />
         }
       </div>
@@ -841,7 +847,7 @@ export default function TaskAdd( props ) {
           <div className="col-12 row">
             <div className="col-4">
               <div className="row p-r-10">
-                <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
+                <Label className="col-3 col-form-label">{t('project')}<span className="warning-big">*</span></Label>
                 <div className="col-9">
                   { layoutComponents.Project }
                 </div>
@@ -850,7 +856,7 @@ export default function TaskAdd( props ) {
             { userRights.attributeRights.assigned.add &&
               <div className="col-8">
                 <div className="row p-r-10">
-                  <Label className="col-1-45 col-form-label">Assigned { userRights.attributeRights.assigned.required && <span className="warning-big">*</span> }</Label>
+                  <Label className="col-1-45 col-form-label">{t('assignedTo')}{ userRights.attributeRights.assigned.required && <span className="warning-big">*</span> }</Label>
                   <div className="col-10-45">
                     { layoutComponents.Assigned }
                   </div>
@@ -863,7 +869,7 @@ export default function TaskAdd( props ) {
             <div className="col-4">
               { userRights.attributeRights.status.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Status { userRights.attributeRights.status.required && <span className="warning-big">*</span> }</Label>
+                  <Label className="col-3 col-form-label">{t('status')}{ userRights.attributeRights.status.required && <span className="warning-big">*</span> }</Label>
                   <div className="col-9">
                     { layoutComponents.Status }
                   </div>
@@ -872,7 +878,7 @@ export default function TaskAdd( props ) {
 
               { userRights.attributeRights.taskType.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Task type { userRights.attributeRights.taskType.required && <span className="warning-big">*</span>}</Label>
+                  <Label className="col-3 col-form-label">{t('taskType')}{ userRights.attributeRights.taskType.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     { layoutComponents.Type }
                   </div>
@@ -883,7 +889,7 @@ export default function TaskAdd( props ) {
             <div className="col-4">
               { userRights.attributeRights.requester.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Requester { userRights.attributeRights.requester.required && <span className="warning-big">*</span>}</Label>
+                  <Label className="col-3 col-form-label">{t('requester')}{ userRights.attributeRights.requester.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     { layoutComponents.Requester }
                   </div>
@@ -891,7 +897,7 @@ export default function TaskAdd( props ) {
               }
               { userRights.attributeRights.company.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Company { userRights.attributeRights.company.required && <span className="warning-big">*</span>}</Label>
+                  <Label className="col-3 col-form-label">{t('company')}{ userRights.attributeRights.company.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     { layoutComponents.Company }
                   </div>
@@ -899,7 +905,7 @@ export default function TaskAdd( props ) {
               }
               { userRights.attributeRights.pausal.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Pausal { userRights.attributeRights.pausal.required && <span className="warning-big">*</span>}</Label>
+                  <Label className="col-3 col-form-label">{t('pausal')}{ userRights.attributeRights.pausal.required && <span className="warning-big">*</span>}</Label>
                   <div className="col-9">
                     { layoutComponents.Pausal }
                   </div>
@@ -910,7 +916,7 @@ export default function TaskAdd( props ) {
             <div className="col-4">
               { userRights.attributeRights.startsAt.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Starts at { userRights.attributeRights.startsAt.required && <span className="warning-big">*</span> }</Label>
+                  <Label className="col-3 col-form-label">{t('startsAt')}{ userRights.attributeRights.startsAt.required && <span className="warning-big">*</span> }</Label>
                   <div className="col-9">
                     { layoutComponents.StartsAt }
                   </div>
@@ -918,7 +924,7 @@ export default function TaskAdd( props ) {
               }
               { userRights.attributeRights.deadline.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">Deadline { userRights.attributeRights.deadline.required && <span className="warning-big">*</span> }</Label>
+                  <Label className="col-3 col-form-label">{t('deadline')}{ userRights.attributeRights.deadline.required && <span className="warning-big">*</span> }</Label>
                   <div className="col-9">
                     { layoutComponents.Deadline }
                   </div>
@@ -945,7 +951,7 @@ export default function TaskAdd( props ) {
               }
               { userRights.attributeRights.overtime.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">After working hours{ userRights.attributeRights.overtime.required && <span className="warning-big">*</span> }</Label>
+                  <Label className="col-3 col-form-label">{t('overtimeShort')}{ userRights.attributeRights.overtime.required && <span className="warning-big">*</span> }</Label>
                   <div className="col-9">
                     {layoutComponents.Overtime}
                   </div>
@@ -962,24 +968,24 @@ export default function TaskAdd( props ) {
     return (
       <div className="col-12 row task-edit-align-select-labels">
         <div className="col-2">
-          <Label className="col-form-label">Projekt</Label>
+          <Label className="col-form-label">{t('project')}</Label>
           { layoutComponents.Project }
         </div>
         { userRights.attributeRights.status.add &&
           <div className="col-2" >
-            <Label className="col-form-label">Status { userRights.attributeRights.status.required && <span className="warning-big">*</span> }</Label>
+            <Label className="col-form-label">{t('status')}{ userRights.attributeRights.status.required && <span className="warning-big">*</span> }</Label>
             { layoutComponents.Status }
           </div>
         }
         { userRights.attributeRights.requester.add &&
           <div className="col-2">
-            <Label className="col-form-label">Zadal { userRights.attributeRights.requester.required && <span className="warning-big">*</span> }</Label>
+            <Label className="col-form-label">{t('requester')}{ userRights.attributeRights.requester.required && <span className="warning-big">*</span> }</Label>
             { layoutComponents.Requester }
           </div>
         }
         { userRights.attributeRights.company.add &&
           <div className="col-2">
-            <Label className="col-form-label">Firma { userRights.attributeRights.company.required && <span className="warning-big">*</span> }</Label>
+            <Label className="col-form-label">{t('company')}{ userRights.attributeRights.company.required && <span className="warning-big">*</span> }</Label>
             { layoutComponents.Company }
           </div>
         }
@@ -991,14 +997,14 @@ export default function TaskAdd( props ) {
     return (
       <div className="task-edit-right p-b-20 p-t-20">
         <div className="form-selects-entry-column" >
-          <Label>Project <span className="warning-big">*</span></Label>
+          <Label>{t('project')}<span className="warning-big">*</span></Label>
           <div className="form-selects-entry-column-rest" >
             { layoutComponents.Project }
           </div>
         </div>
         { userRights.attributeRights.status.add &&
           <div className="form-selects-entry-column" >
-            <Label>Status { userRights.attributeRights.status.required && <span className="warning-big">*</span> }</Label>
+            <Label>{t('status')}{ userRights.attributeRights.status.required && <span className="warning-big">*</span> }</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Status }
             </div>
@@ -1006,7 +1012,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.requester.add &&
           <div className="form-selects-entry-column" >
-            <Label>Requester { userRights.attributeRights.requester.required && <span className="warning-big">*</span> }</Label>
+            <Label>{t('requester')}{ userRights.attributeRights.requester.required && <span className="warning-big">*</span> }</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Requester }
             </div>
@@ -1014,7 +1020,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.company.add &&
           <div className="form-selects-entry-column" >
-            <Label>Company { userRights.attributeRights.company.required && <span className="warning-big">*</span>}</Label>
+            <Label>{t('company')}{ userRights.attributeRights.company.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Company }
             </div>
@@ -1022,7 +1028,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.assigned.add &&
           <div className="form-selects-entry-column" >
-            <Label>Assigned { userRights.attributeRights.assigned.required && <span className="warning-big">*</span>}</Label>
+            <Label>{t('assignedTo')}{ userRights.attributeRights.assigned.required && <span className="warning-big">*</span>}</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Assigned }
             </div>
@@ -1030,7 +1036,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.startsAt.add &&
           <div className="form-selects-entry-column" >
-            <Label>Starts at { userRights.attributeRights.startsAt.required && <span className="warning-big">*</span> }</Label>
+            <Label>{t('startsAt')}{ userRights.attributeRights.startsAt.required && <span className="warning-big">*</span> }</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.StartsAt }
             </div>
@@ -1038,7 +1044,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.deadline.add &&
           <div className="form-selects-entry-column" >
-            <Label>Deadline { userRights.attributeRights.deadline.required && <span className="warning-big">*</span> }</Label>
+            <Label>{t('deadline')}{ userRights.attributeRights.deadline.required && <span className="warning-big">*</span> }</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Deadline }
             </div>
@@ -1065,7 +1071,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.taskType.add &&
           <div className="form-selects-entry-column" >
-            <Label>Task Type { userRights.attributeRights.taskType.required && <span className="warning-big">*</span> }</Label>
+            <Label>{t('taskType')}{ userRights.attributeRights.taskType.required && <span className="warning-big">*</span> }</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Type }
             </div>
@@ -1073,7 +1079,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.pausal.add &&
           <div className="form-selects-entry-column" >
-            <Label>Pausal { userRights.attributeRights.pausal.required && <span className="warning-big">*</span> }</Label>
+            <Label>{t('pausal')}{ userRights.attributeRights.pausal.required && <span className="warning-big">*</span> }</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Pausal }
             </div>
@@ -1081,7 +1087,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.overtime.add &&
           <div className="form-selects-entry-column" >
-            <Label>After working hours { userRights.attributeRights.overtime.required && <span className="warning-big">*</span> }</Label>
+            <Label>{t('overtimeShort')}{ userRights.attributeRights.overtime.required && <span className="warning-big">*</span> }</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Overtime }
             </div>
@@ -1098,14 +1104,14 @@ export default function TaskAdd( props ) {
           <div className="row center-hor">
             <button className="btn-link p-b-10 btn-distance" id="tags-multiselect-add" onClick={ () => setTagsOpen(true) } >
               <i className="fa fa-plus" />
-              Tags { userRights.attributeRights.tags.required && <span className="warning-big">*</span> }
+              {t('tags')}{ userRights.attributeRights.tags.required && <span className="warning-big">*</span> }
             </button>
             <MultiSelect
               className="center-hor"
               disabled={ projectAttributes.tags.fixed }
               direction="right"
               style={{}}
-              header="Select tags for this task"
+              header={t('tagsPlaceholder')}
               target="tags-multiselect-add"
               closeMultiSelect={() => { setTagsOpen(false) }}
               open={tagsOpen}
@@ -1134,10 +1140,10 @@ export default function TaskAdd( props ) {
     return (
       <div className="form-section">
         <div className="row" style={{alignItems: "baseline"}}>
-          <Label className="m-r-10">Popis úlohy</Label>
+          <Label className="m-r-10">{t('taskDescription')}</Label>
           <label htmlFor={`uploadAttachment-${null}`} className="btn-link h-20-f btn-distance clickable" >
             <i className="fa fa-plus" />
-            Attachment
+            {t('attachment')}
           </label>
           {renderMultiSelectTags()}
         </div>
@@ -1185,9 +1191,9 @@ export default function TaskAdd( props ) {
         deleteItem = { (simpleSubtask) => {
           setSimpleSubtasks(simpleSubtasks.filter((simpleSubtask2) => simpleSubtask.id !== simpleSubtask2.id ))
         } }
-        placeholder="Short subtask title"
-        newPlaceholder="New short subtask title"
-        label="Subtask"
+        placeholder={t('shortSubtaskTitle')}
+        newPlaceholder={t('newShortSubtaskTitle')}
+        label={t('shortSubtask')}
         />
     )
   }
@@ -1355,7 +1361,7 @@ export default function TaskAdd( props ) {
     return (
       <div className="row m-b-20 m-l-10 m-t-10">
         {closeModal &&
-          <button className="btn-link-cancel" onClick={() => closeModal()}>Cancel</button>
+          <button className="btn-link-cancel" onClick={() => closeModal()}>{t('cancel')}</button>
         }
         <div className="ml-auto">
           <button
@@ -1368,7 +1374,7 @@ export default function TaskAdd( props ) {
               }
             }}
             >
-            {saving ? 'Creating...' : 'Create task'}
+            {saving ? `${t('creating')}...` : `${t('createTask')}`}
           </button>
         </div>
       </div>

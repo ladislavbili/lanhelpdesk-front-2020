@@ -3,6 +3,10 @@ import classnames from 'classnames';
 import renderScheduled from './renderScheduled';
 
 import {
+  useTranslation
+} from "react-i18next";
+
+import {
   lightenDarkenColor,
 } from 'helperFunctions';
 
@@ -14,6 +18,11 @@ export default function RenderTaskStackItemRender( props ) {
     scheduledUserId,
     openTask,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
+
   const cantBeAdded = (
     !task.attributeRights.assigned.edit ||
     !task.rights.taskWorksRead ||
@@ -79,7 +88,7 @@ export default function RenderTaskStackItemRender( props ) {
       </span>
       { cantBeAdded &&
         <div className="m-l-3" style={{ color: secondaryTextColor }} >
-          User can't be assigned!
+          {t('userCantBeAssigned')}
         </div>
       }
     </div>

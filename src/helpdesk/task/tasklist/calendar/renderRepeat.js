@@ -1,7 +1,7 @@
 import React from 'react';
 import Empty from 'components/Empty';
 
-export default function CalendarRenderRepeatTime( repeat, start ) {
+export default function CalendarRenderRepeatTime( repeat, start, t ) {
   const repeatTime = repeat.repeatTime;
   const repeatTemplate = repeat.repeatTemplate;
   const task = repeatTime ? repeatTime.task : null;
@@ -21,7 +21,7 @@ export default function CalendarRenderRepeatTime( repeat, start ) {
             {`${ repeatTemplate.title }`}
           </p>
           <p className="m-l-3" style={{ color: 'white' }}>
-            {`Every ${ repeat.repeatEvery } ${ repeat.repeatInterval }`}
+            {`${t('every').toLowerCase()} ${ repeat.repeatEvery } ${ t(repeat.repeatInterval).toLowerCase() }`}
           </p>
         </Empty>
       }

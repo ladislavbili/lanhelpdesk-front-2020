@@ -5,6 +5,10 @@ import {
   PopoverBody,
 } from 'reactstrap';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function RepeatContextMenu( props ) {
   const {
     repeatEvent,
@@ -17,6 +21,10 @@ export default function RepeatContextMenu( props ) {
     openCreatedTask,
 
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   if ( !repeatEvent ) {
     return null;
@@ -32,7 +40,7 @@ export default function RepeatContextMenu( props ) {
 
   return (
     <Popover trigger="legacy" placement="auto" isOpen={ repeatEvent !== null } target={`calendar-repeat-${repeat.id}-${time}`} toggle={closeContextMenu}>
-      <PopoverHeader>Repeat options:</PopoverHeader>
+      <PopoverHeader>{t('repeatOptions')}:</PopoverHeader>
       <PopoverBody style={{ fontSize: '1.2em' }}>
         <button
           className="btn btn-link"
@@ -41,7 +49,7 @@ export default function RepeatContextMenu( props ) {
             closeContextMenu();
           }}
           >
-          Open repeat template
+          {t('openRepeat')}
         </button>
         { repeat.canCreateTask &&
           <button
@@ -62,21 +70,21 @@ export default function RepeatContextMenu( props ) {
               })
             }}
             >
-            Trigger repeat and create task
+            {t('triggerRepeatCreateTask')}
           </button>
         }
         <hr/>
         <div className="h5 bolder">
-          Repeat details:
+          {t('repeatDetails')}:
         </div>
         <div>
-          {`Repeat id: ${repeat.id}`}
+          {`${t('repeatId')}: ${repeat.id}`}
         </div>
         <div>
-          {`Repeated every ${repeat.repeatEvery} ${repeat.repeatInterval}`}
+          {`${t('repeatedEvery')} ${repeat.repeatEvery} ${repeat.repeatInterval}`}
         </div>
         <div>
-          {`Task title will be named ${repeat.repeatTemplate.title}`}
+          {`${t('taskWillBeNamed')} ${repeat.repeatTemplate.title}`}
         </div>
       </PopoverBody>
     </Popover>

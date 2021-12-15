@@ -36,6 +36,9 @@ import {
   taskCalendarDefaults,
 } from 'configs/components/bigCalendar';
 import {
+  useTranslation
+} from "react-i18next";
+import {
   lightenDarkenColor,
 } from 'helperFunctions';
 import {
@@ -94,6 +97,10 @@ export default function TaskCalendar( props ) {
     globalTaskSearch,
     setScheduledDone,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   //TODO: AK repeat nacita svoje repeatTimes, existuje dovod preco nacitavat zvlast repeattimes? nezabudnut na podmienku ak je v range zacaitok alebo novy zaciatok
   let path = `/helpdesk/taskList/i/${match.params.listID}`;
@@ -413,7 +420,7 @@ export default function TaskCalendar( props ) {
               )}
               >
               <DndProvider backend={HTML5Backend}>
-                <h1>Tasks stack</h1>
+                <h1>{t('taskStack')}</h1>
                 { tasks.map( task =>
                   <StackItem task={task} key={task.id} setDraggedTask={setDraggedTask} scheduledUserId={ scheduledUserId } openTask={ setEditedTask } />
                 )}

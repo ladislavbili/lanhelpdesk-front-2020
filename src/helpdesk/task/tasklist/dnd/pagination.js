@@ -3,6 +3,9 @@ import {
   Button
 } from 'reactstrap';
 import Loading from 'components/loading';
+import {
+  useTranslation
+} from "react-i18next";
 
 export default function DnDPagination( props ) {
   const {
@@ -12,6 +15,10 @@ export default function DnDPagination( props ) {
     count,
     loading,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const tasksFrom = limit * ( page - 1 ) + 1;
   let tasksTo = tasksFrom + limit - 1;
@@ -29,7 +36,7 @@ export default function DnDPagination( props ) {
         <i className="fa fa-chevron-left" />
       </Button>
       <div className="message center-hor center-ver m-t-1">
-        { loading ? `Loading...` : `${ tasksFrom }-${ tasksTo } from total of ${count} tasks` }
+        { loading ? `${t('loading')}...` : `${ tasksFrom }-${ tasksTo } ${t('fromTotalOf').toLowerCase()} ${count} ${t('tasks').toLowerCase()}` }
       </div>
       <Button
         disabled={ page * limit >= count }

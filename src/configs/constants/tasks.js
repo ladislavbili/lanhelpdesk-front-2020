@@ -120,47 +120,56 @@ export const orderByValues = [
   {
     value: 'id',
     label: 'ID',
-    type: 'int'
+    labelId: 'id',
+    type: 'int',
   },
   {
     value: 'important',
     label: 'Important',
-    type: 'boolean'
+    labelId: 'important',
+    type: 'boolean',
   },
   {
     value: 'title',
     label: 'Title',
-    type: 'text'
+    labelId: 'title',
+    type: 'text',
   },
   {
     value: 'status',
     label: 'Status',
-    type: 'object'
+    labelId: 'status',
+    type: 'object',
   },
   {
     value: 'requester',
     label: 'Requester',
-    type: 'user'
+    labelId: 'requester',
+    type: 'user',
   },
   {
     value: 'updatedAt',
     label: 'Change date',
-    type: 'date'
+    labelId: 'updatedAt',
+    type: 'date',
   },
   {
     value: 'createdAt',
     label: 'Created at',
-    type: 'date'
+    labelId: 'createdAt',
+    type: 'date',
   },
   {
     value: 'startsAt',
     label: 'Starts at',
-    type: 'date'
+    labelId: 'startsAt',
+    type: 'date',
   },
   {
     value: 'deadline',
     label: 'Deadline',
-    type: 'date'
+    labelId: 'deadline',
+    type: 'date',
   },
 ]
 
@@ -305,71 +314,85 @@ export const unimplementedAttributes = [
 export const allFilterAttributes = [
   {
     value: 'id',
+    labelId: 'id',
     label: 'ID',
     right: null,
   },
   {
     value: 'title',
+    labelId: 'title',
     label: 'Title',
     right: null,
   },
   {
     value: 'status',
+    labelId: 'status',
     label: 'Status',
     right: ( project ) => checkAttributeRight( project, 'status' ),
   },
   {
     value: 'project',
+    labelId: 'project',
     label: 'Project',
     right: null,
   },
   {
     value: 'requester',
+    labelId: 'requester',
     label: 'Requester',
     right: ( project ) => checkAttributeRight( project, 'requester' ),
   },
   {
     value: 'company',
+    labelId: 'company2',
     label: 'Company',
     right: ( project ) => checkAttributeRight( project, 'company' ),
   },
   {
     value: 'assignedTo',
+    labelId: 'assignedTo',
     label: 'Assigned',
     right: ( project ) => checkAttributeRight( project, 'assigned' ),
   },
   {
     value: 'tags',
+    labelId: 'tags',
     label: 'Tags',
     right: ( project ) => checkAttributeRight( project, 'tags' ),
   },
   {
     value: 'taskType',
+    labelId: 'taskType',
     label: 'Task Type',
     right: ( project ) => checkAttributeRight( project, 'taskType' ),
   },
   {
     value: 'createdAt',
+    labelId: 'createdAt',
     label: 'Created at',
     right: null,
   },
   {
     value: 'startsAt',
+    labelId: 'startsAt',
     label: 'Starts at',
     right: ( project ) => checkAttributeRight( project, 'startsAt' ),
   },
   {
     value: 'deadline',
+    labelId: 'deadline',
     label: 'Deadline',
     right: ( project ) => checkAttributeRight( project, 'deadline' ),
   },
   {
     value: 'pausal',
+    labelId: 'pausal',
     label: 'Pausal',
     right: ( project ) => checkAttributeRight( project, 'pausal' ),
   },
   {
     value: 'overtime',
+    labelId: 'overtime',
     label: 'Overtime',
     right: ( project ) => checkAttributeRight( project, 'overtime' ),
   },
@@ -394,18 +417,21 @@ export const createDisplayValues = ( preference, withoutProject ) => {
     },
     {
       value: 'important',
+      labelId: 'important',
       label: 'Important',
       type: 'important',
       show: preference[ 'important' ]
     },
     {
       value: 'invoiced',
+      labelId: 'invoiced',
       label: 'Invoiced',
       type: 'invoiced',
       show: preference[ 'invoiced' ]
     },
     {
       value: 'title',
+      labelId: 'title',
       label: 'Title',
       type: 'text',
       show: preference[ 'title' ],
@@ -413,6 +439,7 @@ export const createDisplayValues = ( preference, withoutProject ) => {
     },
     {
       value: 'status',
+      labelId: 'status',
       label: 'Status',
       type: 'object',
       show: preference[ 'status' ],
@@ -420,18 +447,21 @@ export const createDisplayValues = ( preference, withoutProject ) => {
     },
     {
       value: 'requester',
+      labelId: 'requester',
       label: 'Requester',
       type: 'user',
       show: preference[ 'requester' ]
     },
     {
       value: 'company',
+      labelId: 'company',
       label: 'Company',
       type: 'object',
       show: preference[ 'company' ]
     },
     {
       value: 'assignedTo',
+      labelId: 'assignedTo',
       label: 'Assigned',
       type: 'list',
       func: ( items ) => {
@@ -466,6 +496,7 @@ export const createDisplayValues = ( preference, withoutProject ) => {
     */
     {
       value: 'tags',
+      labelId: 'tags',
       label: 'Tags',
       type: 'list',
       func: ( items ) => (
@@ -481,12 +512,14 @@ export const createDisplayValues = ( preference, withoutProject ) => {
     },
     {
       value: 'taskType',
+      labelId: 'taskType',
       label: 'Task Type',
       type: 'object',
       show: preference[ 'taskType' ]
     },
     {
       value: 'createdAt',
+      labelId: 'createdAt',
       label: 'Created at',
       type: 'date',
       show: preference[ 'createdAtV' ],
@@ -494,30 +527,35 @@ export const createDisplayValues = ( preference, withoutProject ) => {
     },
     {
       value: 'startsAt',
+      labelId: 'startsAt',
       label: 'Starts at',
       type: 'date',
       show: preference[ 'startsAt' ]
     },
     {
       value: 'deadline',
+      labelId: 'deadline',
       label: 'Deadline',
       type: 'date',
       show: preference[ 'deadline' ]
     },
     {
       value: 'pausal',
+      labelId: 'pausal',
       label: 'Pausal',
       type: 'boolean',
       show: preference[ 'pausal' ]
     },
     {
       value: 'overtime',
+      labelId: 'overtime',
       label: 'Overtime',
       type: 'boolean',
       show: preference[ 'overtime' ]
     },
     {
       value: 'works',
+      labelId: 'works',
       label: 'Works',
       type: 'custom',
       func: ( task ) => {
@@ -530,6 +568,7 @@ export const createDisplayValues = ( preference, withoutProject ) => {
     },
     {
       value: 'trips',
+      labelId: 'trips',
       label: 'Trips',
       type: 'custom',
       func: ( task ) => {
@@ -542,6 +581,7 @@ export const createDisplayValues = ( preference, withoutProject ) => {
     },
     {
       value: 'materialsWithoutDPH',
+      labelId: 'materialsWithoutTax',
       label: 'Materials without DPH',
       type: 'custom',
       func: ( task ) => {
@@ -554,6 +594,7 @@ export const createDisplayValues = ( preference, withoutProject ) => {
     },
     {
       value: 'materialsWithDPH',
+      labelId: 'materialsWithTax',
       label: 'Materials with DPH',
       type: 'custom',
       func: ( task ) => {
@@ -570,6 +611,7 @@ export const createDisplayValues = ( preference, withoutProject ) => {
       6,
       0, {
         value: 'project',
+        labelId: 'project',
         label: 'Project',
         type: 'object',
         show: preference[ 'project' ]
@@ -583,6 +625,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
   return [
     {
       value: 'startsAt',
+      labelId: 'startsAt',
       label: 'Starts at',
       type: 'date',
       show: true,
@@ -591,6 +634,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'deadline',
+      labelId: 'deadline',
       label: 'End date',
       type: 'date',
       show: true,
@@ -599,18 +643,21 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'important',
+      labelId: 'important',
       label: 'Important',
       type: 'important',
       show: preference[ 'important' ]
     },
     {
       value: 'invoiced',
+      labelId: 'invoiced',
       label: 'Invoiced',
       type: 'invoiced',
       show: preference[ 'invoiced' ]
     },
     {
       value: 'title',
+      labelId: 'title',
       label: 'Title',
       type: 'text',
       show: true,
@@ -619,6 +666,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'id',
+      labelId: 'id',
       label: 'ID',
       type: 'int',
       show: preference[ 'taskId' ],
@@ -627,6 +675,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'status',
+      labelId: 'status',
       label: 'Status',
       type: 'object',
       show: preference[ 'status' ],
@@ -634,18 +683,21 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'requester',
+      labelId: 'requester',
       label: 'Requester',
       type: 'user',
       show: preference[ 'requester' ]
     },
     {
       value: 'company',
+      labelId: 'company',
       label: 'Company',
       type: 'object',
       show: preference[ 'company' ]
     },
     {
       value: 'assignedTo',
+      labelId: 'assignedTo',
       label: 'Assigned',
       type: 'list',
       func: ( items ) => {
@@ -663,6 +715,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     /*
     {
     value: 'scheduled',
+    labelId: 'scheduled',
     label: 'Scheduled',
     type: 'list',
     func: ( items ) => {
@@ -680,6 +733,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     */
     {
       value: 'tags',
+      labelId: 'tags',
       label: 'Tags',
       type: 'list',
       func: ( items ) => (
@@ -695,12 +749,14 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'taskType',
+      labelId: 'taskType',
       label: 'Task Type',
       type: 'object',
       show: preference[ 'taskType' ]
     },
     {
       value: 'createdAt',
+      labelId: 'createdAt',
       label: 'Created at',
       type: 'date',
       show: preference[ 'createdAtV' ],
@@ -708,18 +764,21 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'pausal',
+      labelId: 'pausal',
       label: 'Pausal',
       type: 'boolean',
       show: preference[ 'pausal' ]
     },
     {
       value: 'overtime',
+      labelId: 'overtime',
       label: 'Overtime',
       type: 'boolean',
       show: preference[ 'overtime' ]
     },
     {
       value: 'works',
+      labelId: 'works',
       label: 'Works',
       type: 'custom',
       func: ( task ) => {
@@ -732,6 +791,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'trips',
+      labelId: 'trips',
       label: 'Trips',
       type: 'custom',
       func: ( task ) => {
@@ -744,6 +804,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'materialsWithoutDPH',
+      labelId: 'materialsWithoutDPH',
       label: 'Materials without DPH',
       type: 'custom',
       func: ( task ) => {
@@ -756,6 +817,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'materialsWithDPH',
+      labelId: 'materialsWithDPH',
       label: 'Materials with DPH',
       type: 'custom',
       func: ( task ) => {
@@ -768,6 +830,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'subtasks',
+      labelId: 'works',
       label: 'Subtasks',
       type: 'custom',
       func: ( task ) => (
@@ -777,6 +840,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'subtaskAssigned',
+      labelId: 'worksAssignedTo',
       label: 'Subtask assigned to',
       type: 'custom',
       func: ( task ) => (
@@ -792,6 +856,7 @@ export const createGanttDisplayValues = ( preference, taskVariables ) => {
     },
     {
       value: 'subtasksHours',
+      labelId: 'hours',
       label: 'Hours',
       type: 'custom',
       func: ( task ) => (

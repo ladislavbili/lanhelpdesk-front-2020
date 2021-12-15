@@ -14,11 +14,12 @@ import {
   getEmptyGeneralFilter
 } from 'configs/constants/filter';
 import {
-  allMilestones
-} from 'configs/constants/sidebar';
+  useTranslation
+} from "react-i18next";
 import {
-  testing
-} from 'configs/restAPI';
+  translateSelectItem,
+  translateAllSelectItems,
+} from "helperFunctions";
 import {
   orderByValues,
   attributeLimitingRights,
@@ -50,6 +51,11 @@ export default function CommandBar( props ) {
     currentUser,
     isFilter,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
+
   //prop constants
   const displayValues = (
     allDisplayValues ?
@@ -104,15 +110,15 @@ export default function CommandBar( props ) {
       case 0:
         //return "fa-columns";
       case 1:
-        return "Zoznam";
+        return t( 'taskTable' );
       case 2:
-        return "DnD";
+        return t( 'dnd' );
       case 3:
-        return "Kalendár";
+        return t( 'calendar' );
       case 4:
-        return "Project management";
+        return t( 'projectManagement' );
       case 5:
-        return "Statistics";
+        return t( 'statistics' );
       default:
         return "";
     }
@@ -124,9 +130,8 @@ export default function CommandBar( props ) {
         type: 'project',
         show: true,
         data: localProject,
-        label: localProject.title,
+        label: t( localProject.title ),
         onClick: () => {
-          setMilestone( allMilestones );
           setLocalFilter( getEmptyGeneralFilter() );
           history.push( `/helpdesk/taskList/i/all` );
         }
@@ -135,7 +140,7 @@ export default function CommandBar( props ) {
         type: 'milestone',
         show: localProject.id !== null && localMilestone.id !== null,
         data: localMilestone,
-        label: localMilestone.title,
+        label: t( localMilestone.title ),
         onClick: () => {
           setLocalFilter( getEmptyGeneralFilter() );
           history.push( `/helpdesk/taskList/i/all` );
@@ -145,7 +150,7 @@ export default function CommandBar( props ) {
         type: 'filter',
         show: true,
         data: localFilter,
-        label: localFilter.title,
+        label: t( localFilter.title ),
         onClick: () => {}
       }
     ]
@@ -179,7 +184,7 @@ export default function CommandBar( props ) {
             <h2
               className="clickable"
               >
-              { localFilter.id === null ? 'Add filter' : `Filter: ${localFilter.title}` }
+              { localFilter.id === null ? t('addFilter') : `${t('filter')}: ${localFilter.title}` }
             </h2>
           }
           { !isFilter && filteredBreadcrums.map( (breadcrum, index) =>
@@ -206,14 +211,14 @@ export default function CommandBar( props ) {
                 { showSort &&
                   <Empty>
                     <div className="color-basic m-r-5 m-l-5">
-                      Sort by
+                      {t('sortBy')}
                     </div>
-                    <div className="min-width-90 m-r-5">
+                    <div className="min-width-120 m-r-5">
                     <Select
-                      placeholder="Sort"
-                      value={ orderByValues.find((order) => order.value === orderBy ) }
+                      placeholder={t('sortBy')}
+                      value={ translateAllSelectItems(orderByValues, t).find((order) => order.value === orderBy ) }
                       onChange={ (order) => setOrderBy(order.value) }
-                      options={ orderByValues }
+                      options={ translateAllSelectItems(orderByValues, t) }
                       styles={pickSelectStyle([ 'noArrow', 'invisible', 'bolder', 'basic', 'right', 'segoe' ])}
                       />
                   </div>
@@ -245,7 +250,7 @@ export default function CommandBar( props ) {
                       target="commandbar-column-preferences"
                       useLegacy
                       style={{}}
-                      header="Select task list columns"
+                      header={t('selectTasklistColumns')}
                       closeMultiSelect={() => setColumnPreferencesOpen(false)}
                       showFilter={false}
                       open={columnPreferencesOpen}
@@ -288,27 +293,27 @@ export default function CommandBar( props ) {
                     <label className={classnames({'active':tasklistLayout === 1 || tasklistLayout === 0}, "btn btn-link text-left")}>
                       <input type="radio" name="options" checked={tasklistLayout === 1 || ( tasklistLayout === 2 && localProject.id === null ) } onChange={() => {setTasklistLayout(1); setLayoutOpen(false); }}/>
                       <i className="fa fa-list m-r-5"/>
-                      Zoznam
+                      { t( 'taskTable' ) }
                     </label>
-                    { localProject.id !== null && localProject.right.tasklistDnD && testing &&
+                    { localProject.id !== null && localProject.right.tasklistDnD &&
                       <label className={classnames({'active':tasklistLayout === 2}, "btn btn-link text-left")}>
                         <input type="radio" name="options" onChange={() => {setTasklistLayout(2); setLayoutOpen(false); }} checked={tasklistLayout === 2}/>
                         <i className="fa fa-map m-r-5"/>
-                        DnD
+                        { t( 'dnd' ) }
                       </label>
                     }
-                    { canViewCalendar && testing &&
+                    { canViewCalendar &&
                       <label className={classnames({'active':tasklistLayout === 3}, "btn btn-link text-left")}>
                         <input type="radio" name="options" onChange={() => {setTasklistLayout(3); setLayoutOpen(false); }} checked={tasklistLayout === 3}/>
                         <i className="fa fa-calendar-alt m-r-5"/>
-                        Kalendár
+                        { t( 'calendar' ) }
                       </label>
                     }
                     { localProject.id && (myRights.tasklistLayout || localProject.right.tasklistGantt ) && false &&
                       <label className={classnames({'active':tasklistLayout === 4}, "btn btn-link text-left")}>
                         <input type="radio" name="options" onChange={() => {setTasklistLayout(4); setLayoutOpen(false); }} checked={tasklistLayout === 4}/>
                         <i className="fa fa-project-diagram m-r-5"/>
-                        Project management
+                        { t( 'projectManagement' ) }
                       </label>
                     }
                     { localProject.id && (myRights.tasklistLayout || localProject.right.tasklistStatistics ) && false &&
@@ -323,7 +328,7 @@ export default function CommandBar( props ) {
                           checked={tasklistLayout === 5}
                           />
                         <i className="fa fa-chart-bar m-r-5"/>
-                        Statistics
+                        { t( 'statistics' ) }
                       </label>
                     }
                   </div>

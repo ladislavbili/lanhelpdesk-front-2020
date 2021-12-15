@@ -13,6 +13,9 @@ import {
   dashboard,
   allMilestones,
 } from 'configs/constants/sidebar';
+import {
+  useTranslation
+} from "react-i18next";
 
 
 export default function ActiveSearch( props ) {
@@ -33,6 +36,10 @@ export default function ActiveSearch( props ) {
     globalTaskSearch,
     table,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   if (
     (
@@ -61,7 +68,7 @@ export default function ActiveSearch( props ) {
 
   let usedFilter = [];
   if ( includeGlobalSearch && globalTaskSearch.length > 0 ) {
-    usedFilter.push( `Task & ID: ${globalTaskSearch}` );
+    usedFilter.push( `${t('taskAndId')}: ${globalTaskSearch}` );
   }
 
   if ( globalStringFilter !== null ) {
@@ -82,7 +89,7 @@ export default function ActiveSearch( props ) {
       >
       <span className="center-hor m-l-5 font-14">
         <span className="bolder m-r-5">
-          Hľadané výrazy:
+          {t('searchedPhrases')}:
         </span>
         { usedFilter.join(', ') }
       </span>
@@ -93,7 +100,7 @@ export default function ActiveSearch( props ) {
         onClick={clearFilter}
         >
         <i className="fa fa-times" />
-        Clear search
+        {t('clearSearch')}
       </Button>
       <Button
         disabled={loading}
@@ -101,7 +108,7 @@ export default function ActiveSearch( props ) {
         onClick={forceRefetch}
         >
         <i className="fa fa-redo-alt" />
-        Repeat search
+      {t('repeatSearch')}
       </Button>
       <Button
         className="btn center-hor m-l-10"
@@ -112,7 +119,7 @@ export default function ActiveSearch( props ) {
           history.push(`/helpdesk/taskList/i/all`)
         }}
         >
-        Global search
+        {t('globalSearch')}
       </Button>
     </div>
   )

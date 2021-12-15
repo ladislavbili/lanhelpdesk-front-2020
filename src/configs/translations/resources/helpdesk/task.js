@@ -423,32 +423,284 @@ export default {
     en: 'Pick a task from the list to the left.',
     sk: 'Vyberte úloha zo zoznamu naľavo.',
   },
-  samp: {
-    en: 'sample',
-    sk: 'sample',
+  createNewTask: {
+    en: 'Create new task',
+    sk: 'Vytvoriť novú úlohu',
   },
-  samp: {
-    en: 'sample',
-    sk: 'sample',
+  selectProject: {
+    en: 'Select project',
+    sk: 'Vyberte projekt',
   },
-  samp: {
-    en: 'sample',
-    sk: 'sample',
+  layout: {
+    en: 'Layout',
+    sk: 'Rozloženie',
   },
-  samp: {
-    en: 'sample',
-    sk: 'sample',
+  taskTitle: {
+    en: 'Task name',
+    sk: 'Názov úlohy',
   },
-  samp: {
-    en: 'sample',
-    sk: 'sample',
+  newTaskTitlePlaceholder: {
+    en: 'Enter new task name',
+    sk: 'Zadajte názov novej úlohy',
   },
-  samp: {
-    en: 'sample',
-    sk: 'sample',
+  noCloseDate: {
+    en: 'No close date',
+    sk: 'Bez dátumu uzavretia',
   },
-  samp: {
-    en: 'sample',
-    sk: 'sample',
+  taskUnassigned: {
+    en: 'Task unassigned',
+    sk: 'Úloha nepriradená',
+  },
+  selectRecommended: {
+    en: 'Select recommended',
+    sk: 'Výber odporúčaný',
+  },
+  selectRequired: {
+    en: 'Select required',
+    sk: 'Výber povinný',
+  },
+  selectType: {
+    en: 'Select type',
+    sk: 'Vyberte typ',
+  },
+  noTaskType: {
+    en: 'No task type',
+    sk: 'Bez typu úlohy',
+  },
+  startsAt: {
+    en: 'Starts at',
+    sk: 'Začiatok',
+  },
+  creating: {
+    en: 'Creating',
+    sk: 'Vytvára sa',
+  },
+  createTask: {
+    en: 'Create task',
+    sk: 'Vytvoriť úlohu',
+  },
+  startsAtPlaceholder: {
+    en: 'No start date',
+    sk: 'Bez dátumu začiatku',
+  },
+  back: {
+    en: 'Back',
+    sk: 'Späť',
+  },
+  taskInvoiced: {
+    en: 'Task invoiced',
+    sk: 'Úloha vykázaná',
+  },
+  createdBy: {
+    en: 'Created by',
+    sk: 'Vytvoril',
+  },
+  atDate: {
+    en: 'at',
+    sk: 'o',
+  },
+  noPendingDate: {
+    en: 'No pending date',
+    sk: 'Bez dátumu odloženia',
+  },
+  statusChangedAt: {
+    en: 'Status changed at',
+    sk: 'Status zmenený',
+  },
+  addUserLabel: {
+    en: '+ Add user',
+    sk: '+ Pridať používateľa',
+  },
+  addCompanyLabel: {
+    en: '+ Add company',
+    sk: '+ Pridať firmu',
+  },
+  pausalSubtasks: {
+    en: 'Pausal subtasks',
+    sk: 'Paušál prác',
+  },
+  pausalTrips: {
+    en: 'Pausal trips',
+    sk: 'Paušál výjazdov',
+  },
+  comments: {
+    en: 'Comments',
+    sk: 'Komentáre',
+  },
+  addUser: {
+    en: 'Add user',
+    sk: 'Pridať používateľa',
+  },
+  priceWithoutTax: {
+    en: 'Price without tax',
+    sk: 'Cena bez DPH',
+  },
+  priceWithTax: {
+    en: 'Price with tax',
+    sk: 'Cena s DPH',
+  },
+  taskStack: {
+    en: 'Task stack',
+    sk: 'Úlohy',
+  },
+  moveOnlyThisEventHere: {
+    en: 'Move only this event here',
+    sk: 'Presunúť iba túto udalosť sem',
+  },
+  editRepeatTemplateOfThisEvent: {
+    en: 'Edit repeat template of this event',
+    sk: 'Upraviť opakovanú úlohu tejto udalosti',
+  },
+  repeatDetails: {
+    en: 'Repeat details',
+    sk: 'Podrobnosti opakovania',
+  },
+  repeatId: {
+    en: 'Repeat id',
+    sk: 'ID opakovania',
+  },
+  repeatedEvery: {
+    en: 'Repeated every',
+    sk: 'Opakované každý',
+  },
+  taskWillBeNamed: {
+    en: 'Task title will be named',
+    sk: 'Názov úlohy bude',
+  },
+  repeatOptions: {
+    en: 'Repeat options',
+    sk: 'Možnosti opakovanej úlohy',
+  },
+  repeatTimeOptions: {
+    en: 'Repeat time options',
+    sk: 'Možnosti udalosti opakovanej úlohy',
+  },
+  editRepeatTemplateToThisTime: {
+    en: 'Edit repeat template to this time',
+    sk: 'Upraviť opakovanú úlohu na tento čas',
+  },
+  repeatTask: {
+    en: 'Repeat task',
+    sk: 'Opakovaná úloha',
+  },
+  repeat: {
+    en: 'Repeat',
+    sk: 'Opakovanie',
+  },
+  every: {
+    en: 'Every',
+    sk: 'Každý',
+  },
+  userCantBeAssigned: {
+    en: "User can't be assigned!",
+    sk: 'Používateľ nemôže byť priradený!',
+  },
+  openRepeat: {
+    en: 'Open repeat',
+    sk: 'Otvoriť opakovanie',
+  },
+  triggerRepeatCreateTask: {
+    en: 'Trigger repeat and create task',
+    sk: 'Spustiť opakovanie a vytvoriť úlohu',
+  },
+  taskWasOriginallyNamed: {
+    en: 'Task was originally named',
+    sk: 'Úloha bola pôvodne pomenovaná',
+  },
+  openRepeatTask: {
+    en: 'Open repeat task',
+    sk: 'Otvoriť úlohu z opakovania',
+  },
+  invoicedTasks: {
+    en: 'Invoiced tasks',
+    sk: 'Vykázané úlohy',
+  },
+  noResultsForThisFilter: {
+    en: 'No results were found for this filter',
+    sk: 'Neboli nájdené žiadne výsledky pre tento filter',
+  },
+  taskAndId: {
+    en: 'Task & ID',
+    sk: 'Úloha a ID',
+  },
+  searchedPhrases: {
+    en: 'Searched phrases',
+    sk: 'Hľadané výrazy',
+  },
+  globalSearch: {
+    en: 'Global search',
+    sk: 'Globálne vyhľadávanie',
+  },
+  unknownStatus: {
+    en: 'Unknown status',
+    sk: 'Neznámy status',
+  },
+  unknown: {
+    en: 'Unknown',
+    sk: 'Neznámy',
+  },
+  selectTasklistColumns: {
+    en: 'Select tasklist columns',
+    sk: 'Vyberte stĺpce tabuľky úloh',
+  },
+  updatedAt: {
+    en: 'Last change',
+    sk: 'Posledná zmena',
+  },
+  id: {
+    en: 'ID',
+    sk: 'ID',
+  },
+  searchInIDAndTaskTitle: {
+    en: 'Search in ID and task title',
+    sk: 'Hľadať podľa ID a názvu úlohy',
+  },
+  invoiced: {
+    en: 'Invoiced',
+    sk: 'Vykázané',
+  },
+  worksAssignedTo: {
+    en: 'Work assigned to',
+    sk: 'Prácu rieši',
+  },
+  materialsWithoutTax: {
+    en: 'Materials without tax',
+    sk: 'Materiále bez DPH',
+  },
+  materialsWithTax: {
+    en: 'Materials with tax',
+    sk: 'Materiále s DPH',
+  },
+  of: {
+    en: 'of',
+    sk: 'z',
+  },
+  tasks2: {
+    en: 'Tasks',
+    sk: 'Úloh',
+  },
+  deleteSelectedTasksConfirmation: {
+    en: 'Are you sure you want to delete checked tasks?',
+    sk: 'Ste si istý že chcete vymazať vybrané úlohy?',
+  },
+  notAllTasksDeletedMessage: {
+    en: "were deleted. Some tasks couln't be deleted. This includes",
+    sk: 'boli vymazané. Niektoré úlohy sa nedali zmazať. Tieto úlohy sú',
+  },
+  pleaseFirstPickTasksToDelete: {
+    en: 'Please first pick tasks to delete!',
+    sk: 'Prosím najprv vyberte úlohy na zmazanie!',
+  },
+  pleaseFirstPickTasksToEdit: {
+    en: 'Please first pick tasks to edit!',
+    sk: 'Prosím najprv vyberte úlohy na úpravu!',
+  },
+  clearSearch: {
+    en: 'Clear search',
+    sk: 'Zrušiť vyhľadávanie',
+  },
+  repeatSearch: {
+    en: 'Repeat search',
+    sk: 'Opakovať vyhľadávanie',
   },
 }

@@ -58,7 +58,9 @@ import {
   timestampToString,
   orderArr,
   updateArrayItem,
-  toFloatOrZero
+  toFloatOrZero,
+  translateAllSelectItems,
+  translateSelectItem,
 } from 'helperFunctions';
 import {
   addLocalError,
@@ -72,6 +74,9 @@ import {
   getEmptyAttributeRights,
   backendCleanRights,
 } from 'configs/constants/projects';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   defaultVykazyChanges,
@@ -128,6 +133,10 @@ export default function TaskEdit( props ) {
     fromInvoice,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   const invoiced = task.invoiced;
 
   //state
@@ -138,11 +147,11 @@ export default function TaskEdit( props ) {
   const [ deadline, setDeadline ] = React.useState( null );
   const [ description, setDescription ] = React.useState( "" );
   const [ important, setImportant ] = React.useState( false );
-  const [ milestone, setMilestone ] = React.useState( [ noMilestone ] );
-  const [ overtime, setOvertime ] = React.useState( booleanSelects[ 0 ] );
+  const [ milestone, setMilestone ] = React.useState( [ translateSelectItem( noMilestone, t ) ] );
+  const [ overtime, setOvertime ] = React.useState( translateAllSelectItems( booleanSelects, t )[ 0 ] );
   const [ openUserAdd, setOpenUserAdd ] = React.useState( false );
   const [ openCompanyAdd, setOpenCompanyAdd ] = React.useState( false );
-  const [ pausal, setPausal ] = React.useState( booleanSelects[ 0 ] );
+  const [ pausal, setPausal ] = React.useState( translateAllSelectItems( booleanSelects, t )[ 0 ] );
   const [ pendingChangable, setPendingChangable ] = React.useState( false );
   const [ pendingDate, setPendingDate ] = React.useState( null );
   const [ potentialPendingStatus, setPotentialPendingStatus ] = React.useState( null );
@@ -163,6 +172,7 @@ export default function TaskEdit( props ) {
   const [ usedTripPausal, setUsedTripPausal ] = React.useState( 0 );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
   const [ newAddedUser, setNewAddedUser ] = React.useState( null );
+  const [ taskTitleEdited, setTaskTitleEdited ] = React.useState( false );
 
   const [ changes, setChanges ] = React.useState( {} );
   const [ vykazyChanges, setVykazyChanges ] = React.useState( defaultVykazyChanges );
@@ -203,8 +213,8 @@ export default function TaskEdit( props ) {
     const milestone = project && task.milestone ? toSelArr( project.project.milestones )
     .find( ( milestone ) => milestone.id === task.milestone.id ) : undefined;
     */
-    setOvertime( ( task.overtime ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
-    setPausal( ( task.pausal ? booleanSelects[ 1 ] : booleanSelects[ 0 ] ) );
+    setOvertime( ( task.overtime ? translateAllSelectItems( booleanSelects, t )[ 1 ] : translateAllSelectItems( booleanSelects, t )[ 0 ] ) );
+    setPausal( ( task.pausal ? translateAllSelectItems( booleanSelects, t )[ 1 ] : translateAllSelectItems( booleanSelects, t )[ 0 ] ) );
     setPendingChangable( task.pendingChangable );
     setPendingDate( task.pendingDate ? moment( parseInt( task.pendingDate ) ) : null );
     const status = ( task.status ? toSelItem( task.status ) : null )
@@ -315,7 +325,7 @@ export default function TaskEdit( props ) {
           setCompany( potentialCompany );
           changes.company = company.id;
           if ( !projectAttributes.pausal.fixed ) {
-            setPausal( parseInt( company.taskWorkPausal ) > 0 ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
+            setPausal( parseInt( company.taskWorkPausal ) > 0 ? translateAllSelectItems( booleanSelects, t )[ 1 ] : translateAllSelectItems( booleanSelects, t )[ 0 ] );
             changes.pausal = parseInt( company.taskWorkPausal ) > 0
           }
         }
@@ -354,7 +364,8 @@ export default function TaskEdit( props ) {
     //Pausal
     if ( userRights.attributeRights.pausal.view ) {
       if ( projectAttributes.pausal.fixed && pausal.value !== projectAttributes.pausal.value ) {
-        setPausal( booleanSelects.find( ( option ) => option.value === projectAttributes.pausal.value ) );
+        setPausal( translateAllSelectItems( booleanSelects, t )
+          .find( ( option ) => option.value === projectAttributes.pausal.value ) );
         changes.pausal = projectAttributes.pausal.value;
       }
     }
@@ -362,7 +373,8 @@ export default function TaskEdit( props ) {
     //Overtime
     if ( userRights.attributeRights.overtime.view ) {
       if ( projectAttributes.overtime.fixed && overtime.value !== projectAttributes.overtime.value ) {
-        setOvertime( booleanSelects.find( ( option ) => option.value === projectAttributes.overtime.value ) );
+        setOvertime( translateAllSelectItems( booleanSelects, t )
+          .find( ( option ) => option.value === projectAttributes.overtime.value ) );
         changes.overtime = projectAttributes.overtime.value;
       }
     }
@@ -626,7 +638,7 @@ export default function TaskEdit( props ) {
       setOpenCompanyAdd( true );
     } else {
       setCompany( company );
-      setPausal( parseInt( company.taskWorkPausal ) > 0 ? booleanSelects[ 1 ] : booleanSelects[ 0 ] );
+      setPausal( parseInt( company.taskWorkPausal ) > 0 ? translateAllSelectItems( booleanSelects, t )[ 1 ] : translateAllSelectItems( booleanSelects, t )[ 0 ] );
       autoUpdateTask( {
         company: company.id,
         pausal: parseInt( company.taskWorkPausal ) > 0
@@ -649,7 +661,7 @@ export default function TaskEdit( props ) {
             <i
               className="fas fa-arrow-left commandbar-command-icon"
               />
-            Back
+            {t('back')}
           </button>
         }
         { project && canCopy &&
@@ -682,11 +694,11 @@ export default function TaskEdit( props ) {
             onClick={deleteTaskFunc}
             >
             <i className="far fa-trash-alt" />
-            Delete
+            {t('delete')}
           </button>
         }
         { invoiced &&
-          <div className="inline-warning-message center-hor">Úloha vykázaná</div>
+          <div className="inline-warning-message center-hor">{t('taskInvoiced')}</div>
         }
         <span className="ml-auto">
           { inModal &&
@@ -721,21 +733,29 @@ export default function TaskEdit( props ) {
           </button>
         }
         <h2 className="center-hor">{id}: </h2>
-        <span className="center-hor flex m-r-15">
-          <input type="text"
-            disabled={ !userRights.rights.taskTitleWrite || invoiced }
-            value={title}
-            className="task-title-input text-extra-slim hidden-input form-control"
-            onChange={(e)=> {
-              setTitle(e.target.value);
-            }}
-            onBlur={(e) => {
-              autoUpdateTask({ title })
-            }}
-            placeholder="Enter task name"
-            />
-        </span>
-        { invoiced && inModal && <div className="inline-warning-message center-hor">Úloha vykázaná</div> }
+        { taskTitleEdited &&
+          <span className="center-hor flex m-r-15">
+            <input type="text"
+              disabled={ !userRights.rights.taskTitleWrite || invoiced }
+              value={title}
+              className="task-title-input text-extra-slim form-control m-t-4 m-b-3"
+              onChange={(e)=> {
+                setTitle(e.target.value);
+              }}
+              onBlur={(e) => {
+                autoUpdateTask({ title })
+              }}
+              placeholder={t('taskTitlePlaceholder')}
+              />
+          </span>
+        }
+        { !taskTitleEdited &&
+          <span className="task-title-input text-extra-slim m-l-7">
+            {title}
+          </span>
+        }
+        <i className={classnames({ "fa-pen": !taskTitleEdited, "fa-save": taskTitleEdited },"fa clickable center-hor")} onClick={() => setTaskTitleEdited(!taskTitleEdited) } />
+        { invoiced && inModal && <div className="inline-warning-message center-hor">{t('taskInvoiced')}</div> }
       </div>
     );
   }
@@ -745,16 +765,16 @@ export default function TaskEdit( props ) {
       <div className="ml-auto center-hor">
         <div className="task-info">
           <span className="">
-            {task.createdBy?"Created by ":""}
+            {task.createdBy ? `${t('createdBy')} ` : ""}
           </span>
           <span className="bolder">
-            {task.createdBy? (task.createdBy.name + " " +task.createdBy.surname) :''}
+            {task.createdBy ? `${task.createdBy.name} ${task.createdBy.surname}` :''}
           </span>
           <span className="">
-            {task.createdBy?' at ':'Created at '}
+            {task.createdBy ?` ${t('atDate')} `: t('createdAt')}
           </span>
           <span className="bolder">
-            {task.createdAt?(timestampToString(task.createdAt)):''}
+            {task.createdAt ? (timestampToString(task.createdAt)) : ''}
           </span>
         </div>
         { renderStatusDate() }
@@ -770,7 +790,7 @@ export default function TaskEdit( props ) {
       const datepickerDisabled = !userRights.attributeRights.status.edit || !pendingChangable || invoiced;
       return (
         <div className="task-info ml-auto">
-            Pending date:
+            {t('pendingDate')} :
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
@@ -788,7 +808,7 @@ export default function TaskEdit( props ) {
                     autoUpdateTask({pendingDate: date.valueOf().toString()});
                   }
                 }}
-                placeholderText="No pending date"
+                placeholderText={t('noPendingDate')}
                 />
             )
           }
@@ -804,7 +824,7 @@ export default function TaskEdit( props ) {
       const datepickerDisabled = ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.attributeRights.status.edit || invoiced;
       return (
         <div className="task-info ml-auto">
-            Closed at:
+            {t('closedAt')}:
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
@@ -822,7 +842,7 @@ export default function TaskEdit( props ) {
                     autoUpdateTask({closeDate: date.valueOf().toString()});
                   }
                 }}
-                placeholderText="No pending date"
+                placeholderText={t('noPendingDate')}
                 />
             )
           }
@@ -832,7 +852,7 @@ export default function TaskEdit( props ) {
     return (
       <div className="task-info ml-auto">
         <span className="center-hor bolder">
-          {task.statusChange ? ('Status changed at ' + timestampToString(task.statusChange) ) : ""}
+          {task.statusChange ? (`${t('statusChangedAt')} ` + timestampToString(task.statusChange) ) : ""}
         </span>
       </div>
     )
@@ -841,7 +861,7 @@ export default function TaskEdit( props ) {
   const layoutComponents = {
     Project: (
       <Select
-        placeholder="Zadajte projekt"
+        placeholder={t('selectProject')}
         isDisabled={ !userRights.rights.taskProjectWrite || invoiced }
         value={ project }
         onChange={ changeProject }
@@ -857,14 +877,14 @@ export default function TaskEdit( props ) {
               <div className="disabled-info" key={user.id}>{user.label}</div>
             ))}
             { assignedTo.length === 0 &&
-              <div className="message error-message">Úloha nepriradená</div>
+              <div className="message error-message">{t('taskUnassigned')}</div>
             }
           </div>
         }
         { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit && !invoiced &&
           <Select
             value={assignedTo}
-            placeholder="Select reccomended"
+              placeholder={t('selectRecommended')}
             isMulti
             onChange={(users)=> {
               if (users.some(u => u.id === -1)){
@@ -875,7 +895,10 @@ export default function TaskEdit( props ) {
               }
             }}
             options={
-              ( canAddUser ? [{id:-1, title:'+ Add user',body:'add', label:'+ Add user',value:null}] : [])
+              ( canAddUser ?
+                [translateSelectItem({id:-1, title:'+ Add user',body:'add', labelId: 'addUserLabel', label:'+ Add user', value:null}, t)] :
+                []
+              )
               .concat(assignedTos)
             }
             styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
@@ -890,12 +913,12 @@ export default function TaskEdit( props ) {
             className={`disabled-info`}
             style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }
             >
-            {status ? status.label : "None"}
+            {status ? status.label : t('none')}
           </div>
         }
         { !projectAttributes.status.fixed && userRights.attributeRights.status.edit && !invoiced &&
           <Select
-            placeholder="Status required"
+            placeholder={t('statusPlaceholder')}
             value={status}
             styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
             onChange={ changeStatus }
@@ -907,11 +930,11 @@ export default function TaskEdit( props ) {
     Type: (
       <div>
         { (projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit || invoiced) &&
-          <div className="disabled-info">{taskType ? taskType.label : "None"}</div>
+          <div className="disabled-info">{taskType ? taskType.label : t('none')}</div>
         }
         { !projectAttributes.taskType.fixed && userRights.attributeRights.taskType.edit && !invoiced &&
         <Select
-          placeholder="Zadajte typ"
+          placeholder={t('taskTypePlaceholder')}
           value={taskType}
           styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
           onChange={(type)=> {
@@ -926,15 +949,18 @@ export default function TaskEdit( props ) {
     Requester: (
       <div>
         { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit || invoiced) &&
-          <div className="disabled-info">{requester ? requester.label : "None"}</div>
+          <div className="disabled-info">{requester ? requester.label : t('none')}</div>
         }
         { !projectAttributes.requester.fixed && userRights.attributeRights.requester.edit && !invoiced &&
           <Select
-            placeholder="Zadajte žiadateľa"
+            placeholder={t('requesterPlaceholder')}
             value={requester}
             isDisabled={ projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit }
             onChange={changeRequester}
-            options={(canAddUser?[{id:-1,title:'+ Add user',body:'add', label:'+ Add user',value:null}]:[]).concat(requesters)}
+            options={( canAddUser ?
+              [translateSelectItem({id:-1, title:'+ Add user',body:'add', labelId: 'addUserLabel', label:'+ Add user', value:null}, t)] :
+              []
+            ).concat(requesters)}
             styles={ pickSelectStyle([ 'noArrow', 'required', ])}
             />
         }
@@ -943,14 +969,17 @@ export default function TaskEdit( props ) {
     Company: (
       <div>
         { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit || invoiced) &&
-          <div className="disabled-info">{company ? company.label : "None"}</div>
+          <div className="disabled-info">{company ? company.label : t('none')}</div>
         }
         { !projectAttributes.company.fixed && userRights.attributeRights.company.edit && !invoiced &&
           <Select
-            placeholder="Zadajte firmu"
+            placeholder={t('companyPlaceholder')}
             value={company}
             onChange={changeCompany}
-            options={(canAddCompany ? [{id:-1,title:'+ Add company',body:'add', label:'+ Add company', value:null}] : [] ).concat(companies)}
+            options={(canAddCompany ?
+              [translateSelectItem({id:-1,title:'+ Add company',body:'add', labelId: 'addCompanyLabel', label:'+ Add company', value:null}, t)] :
+              []
+            ).concat(companies)}
             styles={pickSelectStyle([ 'noArrow', 'required', ])}
             />
         }
@@ -971,7 +1000,7 @@ export default function TaskEdit( props ) {
               setStartsAt( isNaN(date.valueOf()) ? null : date );
               autoUpdateTask({ startsAt: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
             }}
-            placeholderText="No start date"
+            placeholderText={t('startsAtPlaceholder')}
             />
         }
       </div>
@@ -991,7 +1020,7 @@ export default function TaskEdit( props ) {
               setDeadline( isNaN(date.valueOf()) ? null : date );
               autoUpdateTask({ deadline: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
             }}
-            placeholderText="No deadline"
+            placeholderText={t('deadlinePlaceholder')}
             />
         }
       </div>
@@ -999,17 +1028,18 @@ export default function TaskEdit( props ) {
     Pausal: (
       <div>
         { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed || invoiced ) &&
-          <div className="disabled-info">{pausal ? pausal.label : "None"}</div>
+          <div className="disabled-info">{pausal ? pausal.label : t('none')}</div>
         }
         { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed && !invoiced &&
           <Select
             value={ pausal }
+            placeholder={t('selectRequired')}
             styles={pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(pausal)=> {
               autoUpdateTask({ pausal: pausal.value })
               setPausal(pausal);
             }}
-            options={booleanSelects}
+            options={translateAllSelectItems(booleanSelects, t)}
             />
         }
       </div>
@@ -1022,12 +1052,13 @@ export default function TaskEdit( props ) {
         { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.edit && !invoiced &&
           <Select
             value={overtime}
+            placeholder={t('selectRequired')}
             styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
             onChange={(overtime)=> {
               setOvertime(overtime);
               autoUpdateTask({ overtime: overtime.value })
             }}
-            options={booleanSelects}
+            options={translateAllSelectItems(booleanSelects, t)}
             />
         }
       </div>
@@ -1041,7 +1072,7 @@ export default function TaskEdit( props ) {
           <div className="col-12 row">
             <div className="col-3">
               <div className="p-r-10">
-                <Label className="col-3 col-form-label">Projekt <span className="warning-big">*</span></Label>
+                <Label className="col-3 col-form-label">{t('project')}<span className="warning-big">*</span></Label>
                 <div className="col-9">
                   { layoutComponents.Project }
                 </div>
@@ -1050,7 +1081,7 @@ export default function TaskEdit( props ) {
             { userRights.attributeRights.assigned.view &&
               <div className="col-9" style={{border: "none"}}>
                 <div className="p-r-10">
-                  <Label className="col-1-45 col-form-label">Assigned <span className="warning-big">*</span></Label>
+                  <Label className="col-1-45 col-form-label">{t('assignedTo')}<span className="warning-big">*</span></Label>
                   <div className="col-10-45" style={{maxWidth: "100%"}}>
                     { layoutComponents.Assigned }
                   </div>
@@ -1063,7 +1094,7 @@ export default function TaskEdit( props ) {
             <div className="col-3">
               { userRights.attributeRights.status.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label col-3 ">Status <span className="warning-big">*</span></Label>
+                  <Label className="col-form-label col-3 ">{t('status')}<span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Status }
                   </div>
@@ -1071,7 +1102,7 @@ export default function TaskEdit( props ) {
               }
               { userRights.attributeRights.taskType.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label  col-3">Typ <span className="warning-big">*</span></Label>
+                  <Label className="col-form-label  col-3">{t('taskType')}<span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Type }
                   </div>
@@ -1082,7 +1113,7 @@ export default function TaskEdit( props ) {
             <div className="col-3">
               { userRights.attributeRights.requester.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label col-3 ">Zadal <span className="warning-big">*</span></Label>
+                  <Label className="col-form-label col-3 ">{t('requester')}<span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Requester }
                   </div>
@@ -1090,7 +1121,7 @@ export default function TaskEdit( props ) {
               }
               { userRights.attributeRights.company.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label col-3 ">Firma <span className="warning-big">*</span></Label>
+                  <Label className="col-form-label col-3 ">{t('company')}<span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Company }
                   </div>
@@ -1101,7 +1132,7 @@ export default function TaskEdit( props ) {
             <div className="col-3">
               { userRights.attributeRights.pausal.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label col-3 ">Paušál <span className="warning-big">*</span></Label>
+                  <Label className="col-form-label col-3 ">{t('pausal')}<span className="warning-big">*</span></Label>
                   <div className="col-9">
                     { layoutComponents.Pausal }
                   </div>
@@ -1109,7 +1140,7 @@ export default function TaskEdit( props ) {
               }
               { userRights.attributeRights.startsAt.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label col-3">Starts at</Label>
+                  <Label className="col-form-label col-3">{t('startsAt')}</Label>
                   <div className="col-9">
                     { layoutComponents.StartsAt }
                   </div>
@@ -1117,7 +1148,7 @@ export default function TaskEdit( props ) {
               }
               { userRights.attributeRights.deadline.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label col-3">Deadline</Label>
+                  <Label className="col-form-label col-3">{t('deadline')}</Label>
                   <div className="col-9">
                     { layoutComponents.Deadline }
                   </div>
@@ -1137,7 +1168,7 @@ export default function TaskEdit( props ) {
               }
               { userRights.attributeRights.overtime.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label col-4">After working hours <span className="warning-big">*</span></Label>
+                  <Label className="col-form-label col-4">{t('overtimeShort')}<span className="warning-big">*</span></Label>
                   <div className="col-9">
                     {layoutComponents.Overtime}
                   </div>
@@ -1154,24 +1185,24 @@ export default function TaskEdit( props ) {
     return (
       <div className="col-12 row task-edit-align-select-labels">
         <div className="col-2">
-          <Label className="col-form-label">Projekt</Label>
+          <Label className="col-form-label">{t('project')}</Label>
           { layoutComponents.Project }
         </div>
         { userRights.attributeRights.status.view &&
           <div className="col-2" >
-            <Label className="col-form-label">Status</Label>
+            <Label className="col-form-label">{t('status')}</Label>
             { layoutComponents.Status }
           </div>
         }
         { userRights.attributeRights.requester.view &&
           <div className="col-2">
-            <Label className="col-form-label">Zadal</Label>
+            <Label className="col-form-label">{t('requester')}</Label>
             { layoutComponents.Requester }
           </div>
         }
         { userRights.attributeRights.company.view &&
           <div className="col-2">
-            <Label className="col-form-label">Firma</Label>
+            <Label className="col-form-label">{t('company')}</Label>
             { layoutComponents.Company }
           </div>
         }
@@ -1215,14 +1246,14 @@ export default function TaskEdit( props ) {
             </div>
           }
           <div className="form-selects-entry-column" >
-            <Label>Projekt <span className="warning-big">*</span></Label>
+            <Label>{t('project')}<span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.Project }
             </div>
           </div>
           { userRights.attributeRights.status.view &&
             <div className="form-selects-entry-column" >
-              <Label>Status <span className="warning-big">*</span></Label>
+              <Label>{t('status')}<span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Status }
               </div>
@@ -1230,7 +1261,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.requester.view &&
             <div className="form-selects-entry-column" >
-              <Label>Zadal <span className="warning-big">*</span></Label>
+              <Label>{t('requester')}<span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Requester }
               </div>
@@ -1238,7 +1269,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.company.view &&
             <div className="form-selects-entry-column" >
-              <Label>Firma <span className="warning-big">*</span></Label>
+              <Label>{t('company')}<span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Company }
               </div>
@@ -1246,7 +1277,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.assigned.view &&
             <div className="form-selects-entry-column" >
-              <Label>Assigned <span className="warning-big">*</span></Label>
+              <Label>{t('assignedTo')}<span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Assigned }
               </div>
@@ -1254,7 +1285,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.startsAt.view &&
             <div className="form-selects-entry-column" >
-              <Label>Starts at</Label>
+              <Label>{t('startsAt')}</Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.StartsAt }
               </div>
@@ -1262,7 +1293,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.deadline.view &&
             <div className="form-selects-entry-column" >
-              <Label>Deadline</Label>
+              <Label>{t('deadline')}</Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Deadline }
               </div>
@@ -1281,7 +1312,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.taskType.view &&
             <div className="form-selects-entry-column" >
-              <Label>Task Type <span className="warning-big">*</span></Label>
+              <Label>{t('taskType')}<span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Type }
               </div>
@@ -1289,7 +1320,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.pausal.view &&
             <div className="form-selects-entry-column" >
-              <Label>Paušál <span className="warning-big">*</span></Label>
+              <Label>{t('pausal')}<span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Pausal }
               </div>
@@ -1297,7 +1328,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.overtime.view &&
             <div className="form-selects-entry-column" >
-              <Label>After working hours <span className="warning-big">*</span></Label>
+              <Label>{t('overtimeShort')}<span className="warning-big">*</span></Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.Overtime }
               </div>
@@ -1346,7 +1377,7 @@ export default function TaskEdit( props ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
-        RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
+        RenderDescription = <div className="task-edit-popis">{t('noDescription')}</div>
       }
     } else {
       if ( showDescription && !invoiced ) {
@@ -1374,7 +1405,7 @@ export default function TaskEdit( props ) {
         if ( description.length !== 0 ) {
           RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
         } else {
-          RenderDescription = <div className="task-edit-popis">Úloha nemá popis</div>
+          RenderDescription = <div className="task-edit-popis">{t('noDescription')}</div>
         }
       }
     }
@@ -1382,7 +1413,7 @@ export default function TaskEdit( props ) {
       <div className="form-section">
         <div className="row" style={{alignItems: "baseline"}}>
           <Label className="m-r-10">
-            Popis úlohy
+            {t('taskDescription')}
           </Label>
           { userRights.rights.taskDescriptionWrite && !invoiced &&
             <button
@@ -1396,13 +1427,13 @@ export default function TaskEdit( props ) {
               }}
               >
               <i className={`fa fa-${!showDescription ? 'pen' : 'save' }`} />
-              { !showDescription ? 'edit' : 'save' }
+              { !showDescription ? t('edit') : t('save') }
             </button>
           }
           { userRights.rights.taskAttachmentsWrite && !invoiced &&
             <label htmlFor={`uploadAttachment-${id}`} className="btn-link btn-distance m-l-0 clickable" >
               <i className="fa fa-plus" />
-              Attachment
+              {t('attachment')}
             </label>
           }
           { renderMultiSelectTags() }
@@ -1423,13 +1454,13 @@ export default function TaskEdit( props ) {
       <div className="form-section">
         <div className="form-section-rest">
           <span className=" message success-message center-hor ml-auto">
-            { `Pausal ${company.title}  ` }
+            { `${t('pausal')} ${company.title}  ` }
             <span>
-              {`Pausal subtasks:`}
+              {`${t('pausalSubtasks')}:`}
               <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
                 {` ${usedSubtaskPausal}`}
               </span>
-              {` / ${taskWorkPausal} Pausal trips:`}
+              {` / ${taskWorkPausal} ${t('pausalTrips')}:`}
               <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
                 {` ${usedTripPausal}`}
               </span>
@@ -1460,9 +1491,9 @@ export default function TaskEdit( props ) {
         deleteItem = { (simpleSubtask) => {
           deleteShortSubtask(simpleSubtask.id)
         } }
-        placeholder="Short subtask title"
-        newPlaceholder="New short subtask title"
-        label="Subtask"
+        placeholder={t('shortSubtaskTitle')}
+        newPlaceholder={t('newShortSubtaskTitle')}
+        label={t('shortSubtask')}
         />
     )
   }
@@ -1645,7 +1676,7 @@ export default function TaskEdit( props ) {
                 className={classnames({ active: toggleTab === 1}, "clickable", "")}
                 onClick={() => setToggleTab(1) }
                 >
-                Komentáre
+                {t('comments')}
               </NavLink>
             </NavItem>
           }
@@ -1662,7 +1693,7 @@ export default function TaskEdit( props ) {
                 className={classnames({ active: toggleTab === 2 }, "clickable", "")}
                 onClick={() => setToggleTab(2) }
                 >
-                História
+                {t('history')}
               </NavLink>
             </NavItem>
           }
@@ -1699,7 +1730,7 @@ export default function TaskEdit( props ) {
       <Empty>
       <Modal isOpen={openUserAdd} className="modal-without-borders" >
         <ModalHeader>
-          Add user
+          {t('addUser')}
         </ModalHeader>
         <ModalBody>
           <UserAdd

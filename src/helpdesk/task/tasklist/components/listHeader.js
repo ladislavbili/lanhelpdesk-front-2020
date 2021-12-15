@@ -9,6 +9,9 @@ import {
   attributeLimitingRights,
   ganttAttributeLimitingRights,
 } from 'configs/constants/tasks';
+import {
+  useTranslation
+} from "react-i18next";
 
 //statuses, sort, column preferences
 export default function ListHeader( props ) {
@@ -28,6 +31,10 @@ export default function ListHeader( props ) {
     gantt,
     search,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const displayValues = (
     allDisplayValues ?
@@ -66,7 +73,7 @@ export default function ListHeader( props ) {
             >
 
             <div className="color-basic m-r-5 m-l-5">
-              Sort by
+              {t('sortBy')}
             </div>
 
             <select
@@ -102,7 +109,7 @@ export default function ListHeader( props ) {
                 bodyStyle={{ maxHeight: 300 }}
                 direction="left"
                 style={{}}
-                header="Select task list columns"
+                header={t('selectTasklistColumns')}
                 closeMultiSelect={openColumnPreferences}
                 showFilter={false}
                 open={columnPreferencesOpen}

@@ -14,6 +14,9 @@ import {
   timestampToString,
 }
 from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 import moment from 'moment';
 import DatePicker from 'components/DatePicker';
 import Checkbox from 'components/checkbox';
@@ -42,6 +45,10 @@ export default function TableList( props ) {
     setSingleLocalTaskStringFilter,
     setGlobalTaskStringFilter,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   let path = `/helpdesk/taskList/i/${match.params.listID ? match.params.listID : 'all' }`;
   if ( match.params.page ) {
@@ -114,7 +121,7 @@ export default function TableList( props ) {
               return;
             }
             if( !tasks.some( (task) => task.checked ) ){
-              window.alert('Please first pick tasks to delete!');
+              window.alert(t('pleaseFirstPickTasksToDelete'));
               return;
             }
             deleteTask()
@@ -129,7 +136,7 @@ export default function TableList( props ) {
                 return;
               }
               if( !tasks.some( (task) => task.checked ) ){
-                window.alert('Please first pick tasks to edit!');
+                window.alert(t('pleaseFirstPickTasksToEdit'));
                 return;
               }
               setEditOpen(true);
@@ -190,7 +197,7 @@ export default function TableList( props ) {
                   />
               </button>
               <button type="button" disabled={loading} className="btn" onClick={setGlobalTaskStringFilter}>
-                Filter
+                {t('filter')}
               </button>
             </div>
           }
@@ -218,7 +225,7 @@ export default function TableList( props ) {
                 <i className="fas fa-times commandbar-command-icon text-highlight" />
               </button>
               <button type="button" disabled={loading} className="btn" onClick={setGlobalTaskStringFilter}>
-                Filter
+              {t('filter')}
               </button>
             </div>
           }

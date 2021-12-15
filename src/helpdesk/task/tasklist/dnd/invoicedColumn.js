@@ -4,6 +4,9 @@ import {
   useSubscription,
 } from "@apollo/client";
 import classnames from 'classnames';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   Card,
@@ -33,6 +36,10 @@ export default function DnDInvoicedColumn( props ) {
     globalStringFilter,
     forcedRefetch,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ page, setPage ] = React.useState( 1 );
 
@@ -84,7 +91,7 @@ export default function DnDInvoicedColumn( props ) {
 
   return (
     <Card className="dnd-column">
-      <CardHeader className="dnd-header">Invoiced tasks</CardHeader>
+      <CardHeader className="dnd-header">{t('invoicedTasks')}</CardHeader>
       { tasksLoading &&
         <Loading flex />
       }

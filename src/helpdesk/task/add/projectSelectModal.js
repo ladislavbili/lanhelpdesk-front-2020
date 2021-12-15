@@ -11,6 +11,9 @@ import {
 import {
   pickSelectStyle
 } from 'configs/components/select';
+import {
+  useTranslation
+} from "react-i18next";
 
 import ErrorMessage from 'components/errorMessage';
 
@@ -23,6 +26,10 @@ export default function ProjectSelectModal( props ) {
     closeModal,
     loading,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ project, setProject ] = React.useState( null );
 
@@ -42,13 +49,13 @@ export default function ProjectSelectModal( props ) {
       <ModalBody>
         <div className="m-l-30 m-r-30">
           <div className="task-add-layout-2 p-l-0 row">
-            <h2 className="center-hor">Create new task</h2>
+            <h2 className="center-hor">{t('createNewTask')}</h2>
           </div>
           <div>
             <FormGroup className="m-b-0">
-              <Label>Project <span className="warning-big">*</span></Label>
+              <Label>{t('project')}<span className="warning-big">*</span></Label>
               <Select
-                placeholder="Zadajte projekt"
+                placeholder={t('selectProject')}
                 value={project}
                 onChange={(project)=>{
                   setProject(project);
@@ -59,12 +66,13 @@ export default function ProjectSelectModal( props ) {
             </FormGroup>
             <ErrorMessage className="m-t-5" message="Can't create tasks, no available project with rights." show={projects.length === 0} />
             <div className="task-add-layout-2 p-l-0 row ">
-              <Button className="btn-link-cancel align-self-center" onClick={closeModal}>Cancel</Button>
+              <Button className="btn-link-cancel align-self-center" onClick={closeModal}>{t('cancel')}</Button>
               <button
                 className="btn ml-auto align-self-center"
                 disabled={ project === null }
                 onClick={() => { onSubmit(project.id) }}
-                > Select
+                >
+                {t('select')}
               </button>
             </div>
           </div>

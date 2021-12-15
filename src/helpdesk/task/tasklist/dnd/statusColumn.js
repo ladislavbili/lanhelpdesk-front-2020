@@ -4,6 +4,9 @@ import {
   useSubscription,
 } from "@apollo/client";
 import classnames from 'classnames';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   Card,
@@ -41,6 +44,10 @@ export default function DnDStatusColumn( props ) {
     globalStringFilter,
     forcedRefetch,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const [ page, setPage ] = React.useState( 1 );
 
@@ -160,7 +167,7 @@ export default function DnDStatusColumn( props ) {
 
               { tasks.length === 0 &&
                 <div className="center-ver" style={{textAlign:'center'}}>
-                  Neboli nájdené žiadne výsledky pre tento filter
+                  {t('noResultsForThisFilter')}
                 </div>
               }
               {provided.placeholder}

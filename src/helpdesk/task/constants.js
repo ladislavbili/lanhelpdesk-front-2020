@@ -16,27 +16,9 @@ export const defaultVykazyChanges = {
   },
 }
 
-
-export const defaultCheckboxList = [
-  {
-    id: 1,
-    title: 'Test item 1',
-    done: false,
-  },
-  {
-    id: 2,
-    title: 'Test item 2',
-    done: true,
-  },
-  {
-    id: 3,
-    title: 'Test item 3',
-    done: false,
-  },
-]
 export const noTaskType = {
-  label: 'No type',
-  title: 'No type',
+  label: 'No task type',
+  labelId: 'noTaskType',
+  id: null,
   value: null,
-  id: null
 }

@@ -20,6 +20,9 @@ import {
 } from 'apollo/localSchema/actions';
 import ProjectSelectModal from './projectSelectModal';
 import classnames from 'classnames';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   GET_TASK_TYPES,
@@ -57,6 +60,10 @@ export default function TaskAddContainer( props ) {
     projectID: sidebarProjectID,
     noText
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   //data & queries
   const {
@@ -171,7 +178,7 @@ export default function TaskAddContainer( props ) {
         }}
         >
         <i className="far fa-copy"/>
-        {!noText && 'Copy'}
+        {!noText && t('copy')}
       </button>
     )
   }
@@ -185,7 +192,7 @@ export default function TaskAddContainer( props ) {
         }}
         >
         <i className="fa fa-plus"/>
-        Task
+        {t('task')}
       </button>
     )
   }

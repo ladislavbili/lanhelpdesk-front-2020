@@ -18,7 +18,11 @@ import {
   splitArrayByFilter,
   localFilterToValues,
   processStringFilter,
+  translateAllSelectItems,
 } from 'helperFunctions';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   addLocalError,
@@ -53,6 +57,10 @@ export default function TableListLoader( props ) {
     currentUser,
     filterVariables,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   //local queries
   const {
@@ -205,7 +213,7 @@ export default function TableListLoader( props ) {
   }
 
   const deleteTaskFunc = () => {
-    if ( window.confirm( "Are you sure you want to delete checked tasks?" ) ) {
+    if ( window.confirm( t( 'deleteSelectedTasksConfirmation' ) ) ) {
       let tasksForDelete = tasks.filter( ( task ) => markedTasks.includes( task.id ) );
       const [ canDeleteTasks, cantDeleteTasks ] = splitArrayByFilter( tasksForDelete, ( task ) => task.rights.deleteTask );
       Promise.all(
@@ -240,14 +248,14 @@ export default function TableListLoader( props ) {
         } );
 
       if ( cantDeleteTasks.length > 0 ) {
-        window.alert( `${canDeleteTasks.length} were deleted. Some tasks couln't be deleted. This includes: \n` + cantDeleteTasks.reduce( ( acc, task ) => acc + `${task.id} ${task.title} \n`, '' ) )
+        window.alert( `${canDeleteTasks.length} ${t('notAllTasksDeletedMessage')}: \n` + cantDeleteTasks.reduce( ( acc, task ) => acc + `${task.id} ${task.title} \n`, '' ) )
       }
     }
   }
 
   const tableProps = {
     ...props,
-    displayValues: createDisplayValues( createPreferences(), localProject.project.id !== null ),
+    displayValues: translateAllSelectItems( createDisplayValues( createPreferences(), localProject.project.id !== null ), t ),
     preference: createPreferences(),
     setPreference,
     tasks: processTasks( tasks )

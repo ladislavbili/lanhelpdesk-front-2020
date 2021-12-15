@@ -15,6 +15,13 @@ import {
   allMilestones,
 } from 'configs/constants/sidebar';
 import {
+  translateSelectItem,
+  translateAllSelectItems,
+} from "helperFunctions";
+import {
+  useTranslation
+} from "react-i18next";
+import {
   allFilterAttributes,
   defaultTasksAttributesFilter,
 } from 'configs/constants/tasks';
@@ -37,6 +44,10 @@ export default function Search( props ) {
     currentUser,
   } = props;
 
+  const {
+    t
+  } = useTranslation();
+
   //state
   const [ stringFilterOpen, setStringFilterOpen ] = React.useState( false );
   const [ searchFocused, setSearchFocused ] = React.useState( false );
@@ -49,7 +60,8 @@ export default function Search( props ) {
   }, [ stringFilterOpen ] );
 
   const userRights = localProject.id === null ? null : localProject.right;
-  const configurableStringFilters = allFilterAttributes.filter( ( filterAttribute ) => filterAttribute.right === null || userRights === null || userRights[ filterAttribute.right ] || currentUser.role.level === 0 );
+  const configurableStringFilters = translateAllSelectItems( allFilterAttributes, t )
+    .filter( ( filterAttribute ) => filterAttribute.right === null || userRights === null || userRights[ filterAttribute.right ] || currentUser.role.level === 0 );
 
   return (
     <div
@@ -71,7 +83,7 @@ export default function Search( props ) {
               setGlobalTaskSearch()
             }
           }}
-          placeholder="Search in id and task title"
+          placeholder={t('searchInIDAndTaskTitle')}
           />
         { configurableStringFilters.length > 0 &&
           <button className="btn btn-link search-btn p-l-5 p-r-5" onClick={() => setStringFilterOpen(!stringFilterOpen) }>
@@ -95,7 +107,7 @@ export default function Search( props ) {
           history.push(`/helpdesk/taskList/i/all`)
         }}
         >
-        Search
+        {t('search')}
       </Button>
       <Popover
         placement="bottom-start"
@@ -117,7 +129,7 @@ export default function Search( props ) {
                         selected={localStringFilter[filterAttribute.value]}
                         hideTime
                         isClearable
-                        placeholderText={`Select ${filterAttribute.label}`}
+                        placeholderText={`${t('select')} ${filterAttribute.label.toLowerCase()}`}
                         onChange={date => {
                           setSingleLocalTaskStringFilter(filterAttribute.value, isNaN(date.valueOf()) ? null : date);
                         }}
@@ -132,7 +144,7 @@ export default function Search( props ) {
                     <Input
                       id={filterAttribute.label}
                       type="text"
-                      placeholder={`Enter ${filterAttribute.label}`}
+                      placeholder={`${t('enter')} ${filterAttribute.label.toLowerCase()}`}
                       value={localStringFilter[filterAttribute.value]}
                       onChange={(e)=>{
                         setSingleLocalTaskStringFilter(filterAttribute.value, e.target.value)
@@ -153,14 +165,14 @@ export default function Search( props ) {
                   }
                 }}
                 >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 disabled={loading}
                 className="btn btn-link center-hor ml-auto"
                 onClick={() => setLocalTaskStringFilter( defaultTasksAttributesFilter ) }
                 >
-                Clear
+                {t('clear')}
               </Button>
               <Button
                 disabled={loading}
@@ -170,7 +182,7 @@ export default function Search( props ) {
                   setStringFilterOpen(!stringFilterOpen);
                 }}
                 >
-                Search
+                {t('search')}
               </Button>
             </div>
           </div>

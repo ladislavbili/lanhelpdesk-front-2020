@@ -17,6 +17,9 @@ import axios from 'axios';
 import {
   addLocalError,
 } from 'apollo/localSchema/actions';
+import {
+  useTranslation
+} from "react-i18next";
 
 import {
   toSelArr,
@@ -92,6 +95,10 @@ export default function TaskEditContainer( props ) {
     history,
     fromInvoice,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const inModal = props.inModal === true;
   const id = inModal ? taskID : parseInt( match.params.taskID );
@@ -542,7 +549,7 @@ export default function TaskEditContainer( props ) {
   }
 
   const deleteTaskFunc = () => {
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteTask( {
           variables: {
             id,
@@ -708,7 +715,7 @@ export default function TaskEditContainer( props ) {
   }
 
   const removeAttachment = ( attachment ) => {
-    if ( window.confirm( "Are you sure?" ) ) {
+    if ( window.confirm( t( 'generalConfirmation' ) ) ) {
       deleteTaskAttachment( {
           variables: {
             id: attachment.id,
