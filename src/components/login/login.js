@@ -108,7 +108,7 @@ export default function Login( props ) {
           <Input type="email" name="email" id="email" placeholder={t('email')} value={email}
             onChange={(e) => setEmail(e.target.value) }
             onKeyPress={(e)=>{
-              if( e.charCode===13 && signingIn && email.length > 0 && password.length > 0 ){
+              if( e.charCode === 13 && !signingIn && email.length > 0 && password.length > 0 ){
                 login();
               }
             }}
@@ -118,7 +118,7 @@ export default function Login( props ) {
           <Label for="pass">{t('password')}</Label>
           <Input type="password" name="pass" id="pass" placeholder={t('password')} value={password} onChange={(e)=>setPassword(e.target.value)}
             onKeyPress={(e)=>{
-              if(e.charCode===13 && !signingIn && email.length>0 && password.length>0){
+              if(e.charCode === 13 && !signingIn && email.length > 0 && password.length > 0){
                 login();
               }
             }}

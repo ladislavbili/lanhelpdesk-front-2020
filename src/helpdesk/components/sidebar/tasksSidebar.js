@@ -360,7 +360,7 @@ export default function TasksSidebar( props ) {
           </div>
           { localProject.id !== null && localProject.right.projectRead &&
             <Button
-              className='btn-link ml-auto center-hor'
+              className='btn-link ml-auto center-hor m-r-3'
               onClick={() => history.push( `/helpdesk/project/${localProject.id}/description` )}
               >
               <i className="fa fa-cog"/>
@@ -368,7 +368,7 @@ export default function TasksSidebar( props ) {
           }
           { localProject.id === null && myRights.addProjects &&
             <Button
-              className='btn-link ml-auto center-hor'
+              className='btn-link ml-auto center-hor m-r-2'
               onClick={() => history.push( `/helpdesk/project/add` ) }
               >
               <i className="fa fa-plus"/>
@@ -379,7 +379,7 @@ export default function TasksSidebar( props ) {
           <Select
             options={selectProjects}
             value={translateSelectItem(localProject, t)}
-            styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar' ])}
+            styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar', 'flex' ])}
             onChange={pro => {
               if( pro.value === -1 ){
                 history.push( `/helpdesk/project/add` )
@@ -661,6 +661,14 @@ export default function TasksSidebar( props ) {
   const renderFiltersList = () => {
     return (
       <Nav vertical>
+        <NavItem key='all' className={classnames("row full-width sidebar-item", { "active": 'all' === match.params.filterID }) }>
+          <span
+            className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
+            onClick={() => history.push(`/helpdesk/taskList/i/all`)}
+            >
+            {t('allTasks')}
+          </span>
+        </NavItem>
         { getApplicableFilters().map((filter) => (
           <NavItem key={filter.id} className={classnames("row full-width sidebar-item", { "active": filter.id === parseInt(match.params.filterID) }) }>
             <span
@@ -670,14 +678,14 @@ export default function TasksSidebar( props ) {
               {filter.title}
             </span>
             { ( (filter.pub && myRights.publicFilters) || (!filter.pub && myRights.customFilters) ) &&
-              <div className={classnames("sidebar-icon", "clickable", { "active": filter.id === parseInt(match.params.filterID) })}
+              <div className={classnames("sidebar-icon clickable", { "active": filter.id === parseInt(match.params.filterID) })}
                 onClick={() => {
                   if (filter.id === parseInt(match.params.filterID)) {
                     setFilterOpen(true);
                   }
                 }}
                 >
-                <i className="fa fa-cog"/>
+                <i className="fa fa-cog p-r-3"/>
               </div>
             }
           </NavItem>
@@ -692,14 +700,6 @@ export default function TasksSidebar( props ) {
             </span>
           </NavItem>
         )) }
-        <NavItem key='all' className={classnames("row full-width sidebar-item", { "active": 'all' === match.params.filterID }) }>
-          <span
-            className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.filterID }) }
-            onClick={() => history.push(`/helpdesk/taskList/i/all`)}
-            >
-            {t('allTasks')}
-          </span>
-        </NavItem>
         <NavItem key='repeats' className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/helpdesk/repeats' ) }) }>
           <span
             className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/helpdesk/repeats' ) }) }
@@ -731,7 +731,7 @@ export default function TasksSidebar( props ) {
             </Label>
           </div>
           { !alwaysShow &&
-            <div className="ml-auto">
+            <div className="ml-auto m-r-3">
               { showFilters && <i className="fas fa-chevron-up" /> }
               { !showFilters && <i className="fas fa-chevron-down" /> }
             </div>

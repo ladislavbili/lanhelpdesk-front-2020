@@ -257,6 +257,7 @@ export default function TableListLoader( props ) {
     ...props,
     displayValues: translateAllSelectItems( createDisplayValues( createPreferences(), localProject.project.id !== null ), t ),
     preference: createPreferences(),
+    loading: dataLoading,
     setPreference,
     tasks: processTasks( tasks )
       .map( ( task ) => ( {

@@ -539,4 +539,8 @@ export default {
     en: 'Enter signature',
     sk: 'Zadajte podpis',
   },
+  regeneratePassword: {
+    en: 'Regenerate password',
+    sk: 'Vygenerovať heslo',
+  },
 }

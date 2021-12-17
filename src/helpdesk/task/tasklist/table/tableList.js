@@ -157,6 +157,7 @@ export default function TableList( props ) {
       </th>
     )
   }
+
   const renderAttributeFilter = ( display, index ) => {
     const last = index === filteredDisplayValues.length - 1;
     if ( display.type === 'important' || display.type === 'invoiced' ) {
@@ -167,8 +168,7 @@ export default function TableList( props ) {
       return <th key={display.value} width={display.width ? display.width : '' } className={` ${display.className ? display.className : '' }` } >
         <Checkbox
           className = "m-l-7 m-t-6 p-l-0"
-          disabled={loading}
-          value = { tasks.every((task) => task.checked ) }
+          value = { tasks.every((task) => task.checked ) && !loading }
           label = ""
           onChange={ (e) => checkTask('all', e.target.checked) }
           highlighted={false}
@@ -182,7 +182,6 @@ export default function TableList( props ) {
               className="form-control"
               selected={localStringFilter[ display.value ]}
               hideTime
-              disabled={loading}
               isClearable
               onChange={date => {
                 setSingleLocalTaskStringFilter(display.value, isNaN(date.valueOf()) ? null : date);
@@ -209,17 +208,21 @@ export default function TableList( props ) {
         <div className={(last ? "row" : "")}>
           <div style={last ? {flex: "1"} : {}}>
             <input
-              disabled={loading}
               type="text"
               value={ value }
               className="form-control"
               style={{fontSize: "12px", marginRight: "10px"}}
+              onKeyPress={(e) => {
+                if( e.charCode === 13 && !loading){
+                  setGlobalTaskStringFilter();
+                }
+              }}
               onChange={(e) => {
                 setSingleLocalTaskStringFilter(display.value, e.target.value);
               }}
               />
           </div>
-          {last &&
+          { last &&
             <div className="ml-auto row">
               <button type="button" disabled={loading} className="btn-link m-l-8 m-r-5" onClick={() => setLocalTaskStringFilter( defaultTasksAttributesFilter ) }>
                 <i className="fas fa-times commandbar-command-icon text-highlight" />
@@ -329,7 +332,6 @@ export default function TableList( props ) {
             </tr>
             <ActiveSearch {...props} table />
             { tasks
-              .filter((task) => filterTaskByAttributes(task) )
               .map((task) =>
               renderTask(task)
             )}

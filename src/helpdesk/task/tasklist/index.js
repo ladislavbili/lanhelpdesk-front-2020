@@ -163,7 +163,7 @@ export default function TasksLoader( props ) {
         variables: {
           asc,
           sort,
-          layout: currentUser.tasklistLayout
+          layout: getCurrentLayout()
         }
       } )
       .catch( ( err ) => addLocalError( err ) );

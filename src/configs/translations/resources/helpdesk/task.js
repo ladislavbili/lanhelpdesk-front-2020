@@ -703,4 +703,12 @@ export default {
     en: 'Repeat search',
     sk: 'Opakovať vyhľadávanie',
   },
+  noDeadline: {
+    en: 'No deadline',
+    sk: 'Bez deadlinu',
+  },
+  noStartsAt: {
+    en: 'No start date',
+    sk: 'Bez dátumu začiatku',
+  },
 }

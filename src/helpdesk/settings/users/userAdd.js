@@ -229,6 +229,7 @@ export default function UserAdd( props ) {
 
         <SettingsHiddenInput
           required
+          regeneratePassword
           label={t('password')}
           id="new-password"
           value={password}

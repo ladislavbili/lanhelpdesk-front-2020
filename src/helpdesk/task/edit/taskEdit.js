@@ -32,6 +32,9 @@ import {
 import {
   noDef
 } from 'configs/constants/projects';
+import {
+  intervals
+} from 'configs/constants/repeat';
 
 import Repeat from 'helpdesk/components/repeat/repeatFormInput';
 
@@ -754,7 +757,9 @@ export default function TaskEdit( props ) {
             {title}
           </span>
         }
-        <i className={classnames({ "fa-pen": !taskTitleEdited, "fa-save": taskTitleEdited },"fa clickable center-hor")} onClick={() => setTaskTitleEdited(!taskTitleEdited) } />
+        { (userRights.rights.taskTitleWrite && !invoiced) &&
+          <i className={classnames({ "fa-pen": !taskTitleEdited, "fa-save": taskTitleEdited },"fa clickable center-hor color-link")} onClick={() => setTaskTitleEdited(!taskTitleEdited) } />
+        }
         { invoiced && inModal && <div className="inline-warning-message center-hor">{t('taskInvoiced')}</div> }
       </div>
     );
@@ -860,14 +865,20 @@ export default function TaskEdit( props ) {
 
   const layoutComponents = {
     Project: (
-      <Select
-        placeholder={t('selectProject')}
-        isDisabled={ !userRights.rights.taskProjectWrite || invoiced }
-        value={ project }
-        onChange={ changeProject }
-        options={ availableProjects }
-        styles={pickSelectStyle([ 'noArrow', 'required', ])}
-        />
+      <div>
+        { (!userRights.rights.taskProjectWrite || invoiced) &&
+          <div className="disabled-info">{project ? project.title : t('noProject')}</div>
+        }
+        { (userRights.rights.taskProjectWrite && !invoiced) &&
+          <Select
+            placeholder={t('selectProject')}
+            value={ project }
+            onChange={ changeProject }
+            options={ availableProjects }
+            styles={pickSelectStyle([ 'noArrow', 'required', ])}
+            />
+        }
+      </div>
     ),
     Assigned: (
       <div>
@@ -988,7 +999,7 @@ export default function TaskEdit( props ) {
     StartsAt: (
       <div>
         { (projectAttributes.startsAt.fixed || !userRights.attributeRights.startsAt.edit || invoiced) &&
-          <div className="disabled-info">{startsAt}</div>
+          <div className="disabled-info">{startsAt ? timestampToString(startsAt.valueOf()) : t('noStartsAt') }</div>
         }
         { !projectAttributes.startsAt.fixed && userRights.attributeRights.startsAt.edit && !invoiced &&
           <DatePicker
@@ -1008,7 +1019,7 @@ export default function TaskEdit( props ) {
     Deadline: (
       <div>
         { (projectAttributes.deadline.fixed || !userRights.attributeRights.deadline.edit || invoiced) &&
-          <div className="disabled-info">{deadline}</div>
+          <div className="disabled-info">{deadline ? timestampToString(deadline.valueOf()) : t('noDeadline') }</div>
         }
         { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit && !invoiced &&
           <DatePicker
@@ -1211,6 +1222,7 @@ export default function TaskEdit( props ) {
   }
 
   const renderSelectsLayout2Side = () => {
+    //used sidebar
     return (
       <div className={classnames("task-edit-right", {"width-250": columns})}>
         <div>
@@ -1300,15 +1312,32 @@ export default function TaskEdit( props ) {
             </div>
           }
           { userRights.attributeRights.repeat.view &&
-            <Repeat
-              vertical
-              disabled={!userRights.attributeRights.repeat.edit || invoiced}
-              duplicateTask={ !task.repeat ? getTaskData() : null}
-              taskID={id}
-              repeat={task.repeat}
-              repeatTime={task.repeatTime}
-              layout={layout}
-              />
+            <div>
+              { ( !userRights.attributeRights.repeat.edit || invoiced ) &&
+                <div className="form-selects-entry-column" >
+                  <Label>{t('repeat')}</Label>
+                  <div className="form-selects-entry-column-rest" >
+                    <div className="disabled-info">
+                      {
+                        task.repeat ?
+                        `${t('repeatEvery')} ${task.repeat.repeatEvery} ${t(intervals.find( ( interval ) => interval.value === task.repeat.repeatInterval ).label).toLowerCase()}` :
+                        t('noRepeat')
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+              { userRights.attributeRights.repeat.edit && !invoiced &&
+                <Repeat
+                  vertical
+                  duplicateTask={ !task.repeat ? getTaskData() : null}
+                  taskID={id}
+                  repeat={task.repeat}
+                  repeatTime={task.repeatTime}
+                  layout={layout}
+                  />
+              }
+            </div>
           }
           { userRights.attributeRights.taskType.view &&
             <div className="form-selects-entry-column" >
@@ -1832,8 +1861,6 @@ export default function TaskEdit( props ) {
             { currentUser.role.accessRights.companies && !invoiced && renderModalCompanyAdd() }
 
           </div>
-
-
         </div>
 
         { layout === 2 && renderSelectsLayout2Side() }

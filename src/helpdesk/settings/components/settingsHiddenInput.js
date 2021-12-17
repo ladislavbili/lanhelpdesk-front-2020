@@ -8,6 +8,9 @@ import {
   InputGroup,
 } from 'reactstrap';
 import {
+  randomPassword,
+} from 'helperFunctions';
+import {
   useTranslation
 } from "react-i18next";
 
@@ -24,6 +27,7 @@ export default function SettingsHiddenInput( props ) {
     inputProps,
     inputClassName,
     children,
+    regeneratePassword,
   } = props;
 
   const {
@@ -34,7 +38,10 @@ export default function SettingsHiddenInput( props ) {
 
   return (
     <FormGroup>
+      <div className="row">
       <Label htmlFor={ id }>{ label }{ required && <span className="warning-big">*</span> }</Label>
+      {regeneratePassword && <button className="btn-link ml-auto" onClick={()=> { onChange({target: {value: randomPassword()}}) }}>{t('regeneratePassword')}</button>}
+      </div>
       <InputGroup>
         <Input
           id={ id }

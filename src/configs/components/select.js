@@ -34,8 +34,21 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
   const right = wantedAttributes.includes( 'right' );
   const bolder = wantedAttributes.includes( 'bolder' );
   const basic = wantedAttributes.includes( 'basic' );
+  const flex = wantedAttributes.includes( 'flex' );
 
   return {
+    container: ( base, state ) => {
+      let newStyle = {
+        ...base,
+      }
+      if ( flex ) {
+        newStyle = {
+          ...newStyle,
+          flex: 1,
+        }
+      }
+      return newStyle;
+    },
     control: ( base, state ) => {
       let newStyle = {
         ...base,
@@ -223,12 +236,6 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
         ...base,
         padding: '0px 5px',
         borderRadius: 0,
-      }
-      if ( sidebar ) {
-        newStyle = {
-          ...newStyle,
-          width: 240,
-        }
       }
       if ( !colored ) {
         newStyle = {
