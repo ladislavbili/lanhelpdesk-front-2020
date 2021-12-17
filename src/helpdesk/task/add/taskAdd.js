@@ -16,6 +16,7 @@ import classnames from "classnames";
 import axios from 'axios';
 
 import Attachments from '../components/attachments';
+import TagsPickerPopover from '../components/tags';
 import ShortSubtasks from '../components/shortSubtasks';
 import WorksTable from '../components/vykazy/worksTable';
 import Materials from '../components/vykazy/materialsTable';
@@ -1101,27 +1102,17 @@ export default function TaskAdd( props ) {
     return (
       <Empty>
         { userRights.attributeRights.tags.add &&
-          <div className="row center-hor">
-            <button className="btn-link p-b-10 btn-distance" id="tags-multiselect-add" onClick={ () => setTagsOpen(true) } >
-              <i className="fa fa-plus" />
-              {t('tags')}{ userRights.attributeRights.tags.required && <span className="warning-big">*</span> }
-            </button>
-            <MultiSelect
-              className="center-hor"
-              disabled={ projectAttributes.tags.fixed }
-              direction="right"
-              style={{}}
-              header={t('tagsPlaceholder')}
-              target="tags-multiselect-add"
-              closeMultiSelect={() => { setTagsOpen(false) }}
-              open={tagsOpen}
-              items={toSelArr(project === null ? [] : project.tags)}
-              selected={tags}
-              onChange={(tags) => {
-                setTags(tags);
-              }}
-              />
-          </div>
+          <TagsPickerPopover
+            taskID={'add'}
+            required={userRights.attributeRights.tags.required}
+            disabled={ projectAttributes.tags.fixed }
+            items={toSelArr(project === null ? [] : project.tags)}
+            className="center-hor"
+            selected={tags}
+            onChange={(tags) => {
+              setTags(tags);
+            }}
+            />
         }
 
         { userRights.attributeRights.tags.add &&

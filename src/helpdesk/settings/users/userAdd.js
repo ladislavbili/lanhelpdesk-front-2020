@@ -31,6 +31,9 @@ import {
   randomPassword,
 } from 'helperFunctions';
 import {
+  newLine,
+} from 'configs/constants/general';
+import {
   addLocalError,
 } from 'apollo/localSchema/actions';
 
@@ -45,7 +48,6 @@ import {
 import {
   GET_BASIC_COMPANIES,
 } from '../companies/queries';
-
 
 export default function UserAdd( props ) {
   const {
@@ -194,7 +196,9 @@ export default function UserAdd( props ) {
               setName(e.target.value);
             } else {
               setName(e.target.value);
-              setSignature(`${e.target.value} ${surname}, ${(company? company.title :'')}`);
+              setSignature(
+                `${e.target.value} ${surname},${newLine}${(company? company.title :'')}.`
+              );
               setSignatureChanged(false);
             }
           }}
@@ -210,7 +214,9 @@ export default function UserAdd( props ) {
               setSurname(e.target.value);
             } else {
               setSurname(e.target.value);
-              setSignature(`${name} ${e.target.value}, ${(company? company.title :'')}`);
+              setSignature(
+                `${name} ${e.target.value},${newLine}${(company? company.title :'')}.`
+              );
               setSignatureChanged(false);
             }
           }}
@@ -266,7 +272,9 @@ export default function UserAdd( props ) {
                 setCompany(company);
               } else {
                 setCompany(company);
-                setSignature(`${name} ${surname}, ${company.title}`);
+                setSignature(
+                  `${name} ${surname},${newLine}${company.title}.`
+                );
                 setSignatureChanged(false);
               }
             }}

@@ -17,6 +17,7 @@ export default function TagsPickerPopover( props ) {
     onChange,
     disabled,
     selected,
+    required,
   } = props;
 
   const {
@@ -32,6 +33,7 @@ export default function TagsPickerPopover( props ) {
       <button className="btn-link m-b-10 h-20-f btn-distance" id={`edit-tags-${taskID}`} onClick={ () => setTagsOpen(true) } >
         <i className="fa fa-plus" />
         {t('tags')}
+        {required && <span className="warning-big">*</span>}
       </button>
       <GeneralPopover
         placement="bottom-start"

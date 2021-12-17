@@ -178,7 +178,7 @@ export default function Comments( props ) {
                   isMulti
                   value={tos}
                   onChange={(newData) => setTos(newData)}
-                  options={users}
+                  options={users.map((user) => ({...user, label: `${user.fullName} (${user.email})`}) )}
                   styles={pickSelectStyle()}/>
               </div>
             </FormGroup>

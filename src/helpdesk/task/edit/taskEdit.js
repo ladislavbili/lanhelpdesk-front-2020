@@ -1374,6 +1374,7 @@ export default function TaskEdit( props ) {
         { userRights.attributeRights.tags.edit && !invoiced &&
           <TagsPickerPopover
             taskID={id}
+            required={userRights.attributeRights.tags.required}
             disabled={ projectAttributes.tags.fixed || invoiced }
             items={toSelArr(project === null ? [] : project.project.tags)}
             className="center-hor"
