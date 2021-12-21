@@ -31,6 +31,10 @@ import {
 export default function DnDStatusColumn( props ) {
   const {
     status,
+    addStatusTasks,
+    addUpdateFunction,
+    fakeChanges,
+    setFakeChanges,
     taskVariables,
     history,
     change,
@@ -63,7 +67,6 @@ export default function DnDStatusColumn( props ) {
       statuses: [ status.id ],
       invoiced: false,
     },
-    notifyOnNetworkStatusChange: true,
   } );
 
   const [ editedTask, setEditedTask ] = React.useState( null );
@@ -86,8 +89,34 @@ export default function DnDStatusColumn( props ) {
   }, [ page ] );
 
   React.useEffect( () => {
+    if ( !tasksLoading ) {
+      addStatusTasks( tasksData.tasks.tasks );
+    }
+  }, [ tasksLoading ] );
+
+  React.useEffect( () => {
     if ( change !== null && ( change.originalStatus.id === status.id || change.newStatus.id === status.id ) ) {
-      tasksRefetch();
+      tasksRefetch()
+        .then( () => {
+          setFakeChanges(
+            fakeChanges.map( ( fakeChange ) => {
+              if ( fakeChange.originalStatus === status.id ) {
+                return {
+                  ...fakeChange,
+                  originUpdate: true,
+                }
+              }
+              if ( fakeChange.targetStatus === status.id ) {
+                return {
+                  ...fakeChange,
+                  targetUpdate: true,
+                }
+              }
+              return fakeChange;
+            } )
+            .filter( ( fakeChange ) => !fakeChange.originUpdate || !fakeChange.targetUpdate )
+          )
+        } )
     }
   }, [ change ] );
 
@@ -97,7 +126,14 @@ export default function DnDStatusColumn( props ) {
     }
   } );
 
-  const tasks = tasksLoading ? [] : tasksData.tasks.tasks;
+  const tasks = (
+    tasksLoading ? [] : [
+      ...tasksData.tasks.tasks.filter( ( task ) => !fakeChanges.some( ( fakeChange ) => fakeChange.originalStatus === status.id && fakeChange.task.id === task.id ) ),
+      ...fakeChanges
+        .filter( ( fakeChange ) => !tasksData.tasks.tasks.some( ( task ) => task.id === fakeChange.task.id ) && fakeChange.targetStatus === status.id )
+        .map( ( fakeChange ) => fakeChange.task ),
+    ]
+  );
   const count = tasksLoading ? 0 : tasksData.tasks.count;
 
   return (
@@ -121,7 +157,6 @@ export default function DnDStatusColumn( props ) {
                   <Draggable
                     key={task.id}
                     draggableId={task.id.toString()}
-                    extraData={'aaaa'}
                     index={index}
                     >
                     { (provided, snapshot) => (

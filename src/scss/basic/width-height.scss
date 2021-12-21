@@ -58,6 +58,10 @@
   height: calc(#{$height-without-header} - #{$task-list-commandbar-height});
 }
 
+.fit-with-header-and-commandbar-dnd {
+  min-height: calc(#{$height-without-header} - #{$commandbar-height} - 75px );
+}
+
 .fit-with-header-and-commandbar-calendar {
   height: calc(#{$height-without-header} - #{$commandbar-height} - 60px );
 }

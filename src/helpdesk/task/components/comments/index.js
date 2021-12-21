@@ -16,7 +16,8 @@ import {
 import Checkbox from 'components/checkbox';
 import Pagination from './pagination';
 import {
-  timestampToString
+  timestampToString,
+  getMyData,
 } from 'helperFunctions';
 import {
   Creatable
@@ -60,6 +61,7 @@ export default function Comments( props ) {
     disabled,
     fromInvoice,
   } = props;
+  const currentUser = getMyData();
 
   const {
     t
@@ -98,7 +100,7 @@ export default function Comments( props ) {
   } );
 
   const [ attachments, setAttachments ] = React.useState( [] );
-  const [ emailBody, setEmailBody ] = React.useState( "" );
+  const [ emailBody, setEmailBody ] = React.useState( `<br>${currentUser.signature.replace(/(?:\r\n|\r|\n)/g, '<br>')}` );
   const [ hasError ] = React.useState( false );
   const [ isEmail, setIsEmail ] = React.useState( !userRights.rights.addComments );
   const [ isInternal, setIsInternal ] = React.useState( false );
@@ -234,7 +236,7 @@ export default function Comments( props ) {
                     setSaving,
                     () => {
                       setAttachments( [] );
-                      setEmailBody( '' );
+                      setEmailBody( `<br>${currentUser.signature.replace(/(?:\r\n|\r|\n)/g, '<br>')}` );
                       setNewComment( '' );
                       setSubject( '' );
                       setTos( [] );
@@ -252,7 +254,7 @@ export default function Comments( props ) {
                     setSaving,
                     () => {
                       setAttachments( [] );
-                      setEmailBody( '' );
+                      setEmailBody( `<br>${currentUser.signature.replace(/(?:\r\n|\r|\n)/g, '<br>')}` );
                       setNewComment( '' );
                       setSubject( '' );
                       setTos( [] );
@@ -348,7 +350,7 @@ export default function Comments( props ) {
                 setTos( users.filter((user) => user.id === comment.user.id ) );
                 setSubject(comment.subject);
                 setIsEmail(true);
-                setEmailBody( '<body><br><blockquote><p>'+(comment.html ? comment.html : unescape(comment.text).replace(/(?:\r\n|\r|\n)/g, '<br>'))+'</p></blockquote><body>' );
+                setEmailBody( `<body><br>${currentUser.signature.replace(/(?:\r\n|\r|\n)/g, '<br>')}<br><blockquote><p>${(comment.html ? comment.html : unescape(comment.text).replace(/(?:\r\n|\r|\n)/g, '<br>'))}</p></blockquote></body>` );
               }}
               />
           }

@@ -50,16 +50,12 @@ export default function TaskListDnD( props ) {
     localFilter,
     globalStringFilter,
     globalTaskSearch,
-    tasks,
     taskVariables,
   } = props;
+
   const client = useApolloClient();
 
-  let statuses = (
-    localProject.project.statuses ?
-    localProject.project.statuses :
-    filterUnique( tasks.map( ( task ) => task.status ), 'id' )
-  )
+  let statuses = localProject.project.statuses;
 
   const filterStatuses = localFilter.filter.statuses;
   if ( filterStatuses.length > 0 ) {
@@ -79,6 +75,10 @@ export default function TaskListDnD( props ) {
 
   const [ updateTask ] = useMutation( UPDATE_TASK );
   const [ changedTask, setChangedTask ] = React.useState( null );
+  const [ fakeChanges, setFakeChanges ] = React.useState( [] );
+  const [ tasks, setTasks ] = React.useState( [] );
+
+  //create fake tasks, mark taskId and status of fake task
 
   const onDragEnd = ( props ) => {
     const {
@@ -97,8 +97,19 @@ export default function TaskListDnD( props ) {
 
     const originalStatus = statuses.find( ( status ) => status.id === parseInt( source.droppableId ) );
     const targetStatus = statuses.find( ( status ) => status.id === parseInt( destination.droppableId ) );
+    const task = tasks.find( ( task ) => task.id === parseInt( draggableId ) );
+    setFakeChanges( [
+      ...fakeChanges.filter( ( fakeChange ) => fakeChange.task.id !== task.id ),
+      {
+        task,
+        originalStatus: parseInt( source.droppableId ),
+        targetStatus: parseInt( destination.droppableId ),
+        targetUpdate: false,
+        originUpdate: false,
+    }
+  ] );
     let updateData = {
-      id: parseInt( draggableId ),
+      id: task.id,
       status: targetStatus.id,
     };
     if ( targetStatus.action === 'PendingDate' ) {
@@ -122,7 +133,7 @@ export default function TaskListDnD( props ) {
           originalStatus,
           newStatus,
           id: updateData.id,
-        } )
+        } );
       } )
       .catch( ( err ) => {
         addLocalError( err );
@@ -143,7 +154,20 @@ export default function TaskListDnD( props ) {
             { statuses
               .filter( (status) => status.action !== 'Invoiced' )
               .map( (status) =>
-              <StatusColumn {...props} disabled={!localProject.attributeRights.status.edit} change={changedTask} status={status} key={status.id} limit={limit} />
+              <StatusColumn
+                {...props}
+                disabled={!localProject.attributeRights.status.edit}
+                addStatusTasks={ (newTasks) => setTasks([
+                  ...tasks.filter((task) => newTasks.every((task2) => task.id !== task2.id ) ),
+                  ...newTasks,
+                ]) }
+                change={changedTask}
+                fakeChanges={fakeChanges}
+                setFakeChanges={setFakeChanges}
+                status={status}
+                key={status.id}
+                limit={1}
+                />
             ) }
           </DragDropContext>
           <InvoicedColumn {...props} limit={limit} />

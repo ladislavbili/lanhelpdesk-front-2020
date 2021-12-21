@@ -305,33 +305,6 @@ export default function TasksSidebar( props ) {
   //const milestones = [ allMilestones, ...( localProject.project.id !== null ? localProject.project.milestones : [] ) ]
   const tasklistPage = ![ '/helpdesk/repeats', '/helpdesk/companies', '/helpdesk/users' ].some( ( url ) => window.location.pathname.includes( url ) );
 
-  const DropdownIndicator = ( {
-    innerProps,
-    isDisabled
-  } ) => (
-    <div style={{ marginTop: "-15px" }}>
-      <img
-        className=""
-        style={{
-          position: 'absolute',
-          left: 15,
-          color: "#212121",
-          height: "17px"
-        }}
-        src={folderIcon}
-        alt="Folder icon not found"
-        />
-      <i
-        className="fa fa-chevron-down"
-        style={{
-          position: 'absolute',
-          right: 15,
-          color: "#212121"
-        }}
-        />
-    </div>
-  )
-
   const renderProjects = () => {
     let selectProjects = toSelArr( projects.map( ( project ) => ( {
       ...project,

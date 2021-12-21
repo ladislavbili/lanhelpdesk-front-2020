@@ -26,6 +26,9 @@ import {
 import {
   useTranslation
 } from "react-i18next";
+import {
+  testing,
+} from 'configs/restAPI';
 
 import UserProfile from 'helpdesk/settings/users/userProfile';
 
@@ -57,6 +60,23 @@ export default function PageHeader( props ) {
   return (
     <div className={classnames("page-header flex m-l-30")}>
       <div className="d-flex full-height">
+        { testing &&
+        <div className="center-hor">
+          <Link
+            to={{ pathname: `/lanwiki` }}
+            className={
+              "header-link" +
+              (
+                URL.includes("lanwiki") ?
+                " header-link-active" :
+                ""
+              )
+            }
+            >
+            {t('lanWiki')}
+          </Link>
+        </div>
+        }
         { false &&
           <div className="center-hor">
             <Link
@@ -86,19 +106,6 @@ export default function PageHeader( props ) {
                   }
                   >
                   {t('invoices')}
-                </Link>
-                <Link
-                  to={{ pathname: `/lanwiki` }}
-                  className={
-                    "header-link" +
-                    (
-                      URL.includes("lanwiki") ?
-                      " header-link-active" :
-                      ""
-                    )
-                  }
-                  >
-                  {t('lanWiki')}
                 </Link>
                 <Link
                   to={{ pathname: `/cmdb` }}

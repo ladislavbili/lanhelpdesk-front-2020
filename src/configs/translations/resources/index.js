@@ -5,12 +5,14 @@ import components from './components';
 import general from './general';
 import invoices from './invoices';
 import helpdesk from './helpdesk';
+import lanwiki from './lanwiki';
 
 const resources = {
   ...components,
   ...general,
   ...invoices,
   ...helpdesk,
+  ...lanwiki,
 }
 
 //compare keys if same throw error
@@ -21,6 +23,7 @@ if ( testingTranslations ) {
     ...Object.keys( general ),
     ...Object.keys( invoices ),
     ...Object.keys( helpdesk ),
+    ...Object.keys( lanwiki ),
   ]
   console.log( test.length );
 
