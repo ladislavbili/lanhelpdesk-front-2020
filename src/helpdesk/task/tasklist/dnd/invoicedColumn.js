@@ -96,28 +96,26 @@ export default function DnDInvoicedColumn( props ) {
         <Loading flex />
       }
       { !tasksLoading &&
-        <div>
+        <div
+          className="dnd-body card-body"
+          >
+          { tasks.map((task, index) => (
             <div
-              className="dnd-body card-body"
+              key={task.id}
               >
-              { tasks.map((task, index) => (
-                <div
-                  key={task.id}
-                  >
-                  <ul
-                    className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item", "noselect")}
-                    style={{borderLeft: "3px solid " + task.status.color}}
-                    onClick={(e)=>{
-                      //history.push(link+'/'+task.id);
-                      setEditedTask(task);
-                    }}
-                    key={task.id}
-                    >
-                    <ItemRender task={task} />
-                  </ul>
-                </div>
-              ))}
+              <ul
+                className={classnames("taskCol" ,"clickable", "list-unstyled", "dnd-item", "noselect")}
+                style={{borderLeft: "3px solid " + task.status.color}}
+                onClick={(e)=>{
+                  //history.push(link+'/'+task.id);
+                  setEditedTask(task);
+                }}
+                key={task.id}
+                >
+                <ItemRender task={task} />
+              </ul>
             </div>
+          ))}
         </div>
       }
       <Pagination

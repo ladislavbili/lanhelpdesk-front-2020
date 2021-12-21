@@ -63,7 +63,7 @@ export default function PageHeader( props ) {
         { testing &&
         <div className="center-hor">
           <Link
-            to={{ pathname: `/lanwiki` }}
+            to={{ pathname: `/lanwiki/i/all` }}
             className={
               "header-link" +
               (

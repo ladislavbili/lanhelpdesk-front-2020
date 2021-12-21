@@ -149,7 +149,7 @@ export default function TaskListDnD( props ) {
       <div className="scroll-visible overflow-x fit-with-header-and-commandbar task-container">
         <Search {...props} />
         <ActiveSearch {...props} includeGlobalSearch />
-        <div className="flex-row m-l-30" >
+        <div className="flex-row m-l-30 fit-with-header-and-commandbar-dnd" >
           <DragDropContext onDragEnd={onDragEnd}>
             { statuses
               .filter( (status) => status.action !== 'Invoiced' )
@@ -166,7 +166,7 @@ export default function TaskListDnD( props ) {
                 setFakeChanges={setFakeChanges}
                 status={status}
                 key={status.id}
-                limit={1}
+                limit={limit}
                 />
             ) }
           </DragDropContext>
