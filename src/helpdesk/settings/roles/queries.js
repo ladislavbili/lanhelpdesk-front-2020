@@ -8,6 +8,7 @@ export const accessRights = `
   publicFilters
   addProjects
   viewErrors
+  lanwiki
 
   users
   companies

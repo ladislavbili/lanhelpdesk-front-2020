@@ -447,8 +447,4 @@ export default {
     en: 'Set by tasks company',
     sk: 'Nastavený podľa firmy',
   },
-  startsAt: {
-    en: 'Starts at',
-    sk: 'Začne',
-  },
 }

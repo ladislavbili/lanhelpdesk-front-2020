@@ -60,23 +60,23 @@ export default function PageHeader( props ) {
   return (
     <div className={classnames("page-header flex m-l-30")}>
       <div className="d-flex full-height">
-        { testing &&
         <div className="center-hor">
-          <Link
-            to={{ pathname: `/lanwiki/i/all` }}
-            className={
-              "header-link" +
-              (
-                URL.includes("lanwiki") ?
-                " header-link-active" :
-                ""
-              )
-            }
-            >
-            {t('lanWiki')}
-          </Link>
+          { accessRights.lanwiki &&
+            <Link
+              to={{ pathname: `/lanwiki/i/all` }}
+              className={
+                "header-link" +
+                (
+                  URL.includes("lanwiki") ?
+                  " header-link-active" :
+                  ""
+                )
+              }
+              >
+              {t('lanWiki')}
+            </Link>
+          }
         </div>
-        }
         { false &&
           <div className="center-hor">
             <Link

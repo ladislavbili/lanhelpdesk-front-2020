@@ -101,7 +101,12 @@ export default function RoleEdit( props ) {
       state: React.useState( false ),
       key: 'viewErrors',
       label: t( 'viewErrors' ),
-    }
+    },
+    {
+      state: React.useState( false ),
+      key: 'lanwiki',
+      label: 'Lanwiki',
+    },
   ];
   const settings = [
     {

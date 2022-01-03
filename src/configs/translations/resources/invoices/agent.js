@@ -7,10 +7,6 @@ export default {
     en: 'Agent',
     sk: 'Agent',
   },
-  invoiced: {
-    en: 'Invoiced',
-    sk: 'Vykázané',
-  },
   noAgents: {
     en: 'No agents',
     sk: 'Žiadni agenti',

@@ -191,10 +191,6 @@ export default {
     en: 'Work type',
     sk: 'Typ práce',
   },
-  taskType: {
-    en: 'Task type',
-    sk: 'Typ úlohy',
-  },
   taskTypePlaceholder: {
     en: 'Select task type',
     sk: 'Vyberte typ úlohy',

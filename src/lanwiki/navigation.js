@@ -13,7 +13,7 @@ import TagAdd from './tags/add';
 import TagEdit from './tags/edit';
 
 export default function LanwikiNavigation( props ) {
-
+  //new Blob([str]).size;
   return (
     <div>
 			<div className="page-header">
@@ -26,12 +26,15 @@ export default function LanwikiNavigation( props ) {
 			<div className="row center center-ver">
         <Switch>
           <Route path="/lanwiki/i/:folderID" component={Sidebar} />
+          <Route path="/lanwiki" component={Sidebar} />
         </Switch>
 				<div className="main">
 					<Route exact path='/lanwiki' component={ListNotes} />
+          <Route exact path='/lanwiki/archive' component={ListNotes} />
           <Route exact path="/lanwiki/errorMessages" component={ErrorMessages} />
+
           <Route exact path='/lanwiki/i/:folderID' component={ListNotes} />
-          <Route exact path='/lanwiki/i/:folderID/:noteID' component={ListNotes} />
+          <Route exact path='/lanwiki/i/:folderID/note/:noteID' component={ListNotes} />
           <Route exact path='/lanwiki/tag/add' component={TagAdd} />
           <Route exact path='/lanwiki/tag/:tagID' component={TagEdit} />
 				</div>

@@ -60,7 +60,7 @@ export default function Navigation( props ) {
         <Route exact path='/' component={Reroute} />
         <Route path='/helpdesk' component={HelpdeskNavigation} />
         <Route path='/invoices' component={InvoicesNavigation} />
-        <Route path='/lanwiki' component={LanwikiNavigation} />
+        { userDataData.getMyData.role.accessRights.lanwiki && <Route path='/lanwiki' component={LanwikiNavigation} />}
         <Route path='/cmdb' component={CMDBNavigation} />
       </Switch>
     </BrowserRouter>

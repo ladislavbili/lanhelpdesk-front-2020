@@ -1,7 +1,7 @@
-export const testing = true;
-const production = false;
+export const testing = false;
+const production = true;
 const port = production ? 8080 : 8081;
-export const testingTranslations = false;
+export const testingTranslations = true;
 //https://nodejs02.lanhelpdesk.com
 //173.212.231.78
 const protectedREST = `https://nodejs02.lanhelpdesk.com:${port}`;

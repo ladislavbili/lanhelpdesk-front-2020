@@ -673,6 +673,8 @@ export default function TaskEdit( props ) {
             duplicateTask={getTaskData()}
             disabled={!canCopy}
             />
+          history={history}
+          match={match}
         }
         { false &&
           <TaskPrint
@@ -1245,6 +1247,8 @@ export default function TaskEdit( props ) {
                     duplicateTask={getTaskData()}
                     disabled={!canCopy}
                     noText
+                    history={history}
+                    match={match}
                     />
                 }
                 <button

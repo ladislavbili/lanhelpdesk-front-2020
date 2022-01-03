@@ -1,5 +1,9 @@
 import React from 'react';
 import {
+  useQuery,
+  useSubscription,
+} from "@apollo/client";
+import {
   Button,
   NavItem,
   Nav,
@@ -9,6 +13,7 @@ import {
 import {
   NavLink as Link
 } from 'react-router-dom';
+import Empty from 'components/Empty';
 
 import TagAdd from 'lanwiki/tags/add';
 import TagEdit from 'lanwiki/tags/edit';
@@ -24,6 +29,14 @@ import {
 import {
   tags,
 } from 'lanwiki/constants';
+import {
+  setLSidebarTagId,
+  setLSidebarFolderId,
+} from 'apollo/localSchema/actions';
+import {
+  L_SIDEBAR_TAG_ID,
+  L_SIDEBAR_FOLDER_ID,
+} from 'apollo/localSchema/queries';
 
 export default function Sidebar( props ) {
 
@@ -37,11 +50,26 @@ export default function Sidebar( props ) {
     t
   } = useTranslation();
 
+  const {
+    data: sidebarTagIdData,
+  } = useQuery( L_SIDEBAR_TAG_ID );
+  const {
+    data: sidebarFolderIdData,
+  } = useQuery( L_SIDEBAR_FOLDER_ID );
+
   const [ showTags, setShowTags ] = React.useState( true );
+  const [ showFolders, setShowFolders ] = React.useState( true );
   //OLD
   const [ tagEdit, setTagEdit ] = React.useState( null );
   const [ openAdd, setOpenAdd ] = React.useState( false );
   const [ openEdit, setOpenEdit ] = React.useState( false );
+
+  const tagId = sidebarTagIdData.lSidebarTagId;
+  const folderId = sidebarFolderIdData.lSidebarFolderId;
+
+  React.useEffect( () => {
+    setLSidebarFolderId( match.params.filterID === 'all' ? null : parseInt( match.params.filterID ) );
+  }, [ match.params.filterID ] );
 
   const toggleAdd = () => {
     setOpenAdd( !openAdd );
@@ -64,118 +92,109 @@ export default function Sidebar( props ) {
     <div className="sidebar">
       <div className="scrollable fit-with-header">
         <Nav vertical>
-
-          <NavItem className={classnames("row full-width sidebar-item sidebar-label", { "active": match.params.folderID === 'all' }) }>
-            <img
-              className="m-r-5 center-hor"
-              style={{
-                color: "#212121",
-                marginBottom: "3px"
-              }}
-              src={folderIcon}
-              alt="Filter icon not found"
-              />
-            <div
-              className={ classnames("clickable sidebar-menu-item link", { "active": match.params.folderID === 'all' }) }
-              onClick={() => history.push(`/lanwiki/i/all`)}
-              >
-              {t('allFolders')}
+          <div className="sidebar-label row clickable noselect" onClick={() => setShowFolders( !showFolders )}>
+            <div>
+              <img
+                className="m-r-5"
+                style={{
+                  color: "#212121",
+                  height: "17px",
+                  marginBottom: "3px"
+                }}
+                src={folderIcon}
+                alt="Filter icon not found"
+                />
+              <Label className="clickable">
+                {t('folders')}
+              </Label>
             </div>
-            <div
-              className={classnames("clickable center-hor", { "active": match.params.folderID === 'all' })}
-              >
-              <i className="fa fa-plus p-r-3"/>
+            <div className="ml-auto m-r-3">
+              { showFolders && <i className="fas fa-chevron-up" /> }
+              { !showFolders && <i className="fas fa-chevron-down" /> }
             </div>
-          </NavItem>
-          {console.log(match.params)}
+          </div>
+          { showFolders &&
+            <Empty>
+              <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/lanwiki/i/all' ) }) }>
+                <span
+                  className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/lanwiki/i/all' ) }) }
+                  onClick={() => { history.push('/lanwiki/i/all') }}
+                  >
+                  {t('allFolders')}
+                </span>
+              </NavItem>
+            </Empty>
+          }
         </Nav>
-        <hr className = "m-l-15 m-r-15 m-t-15" />
-
-        <div className="sidebar-label">
-          <img
-            className="m-r-5"
-            style={{
-              color: "#212121",
-              height: "17px",
-              marginBottom: "3px"
+        { showFolders &&
+          <button
+            className='btn-link p-l-15'
+            onClick={() => {
             }}
-            src={folderIcon}
-            alt="Filter icon not found"
-            />
-          All notes
-        </div>
+            >
+            <i className="fa fa-plus"/>
+            {t('folder')}
+          </button>
+        }
+        <hr className="m-l-15 m-r-15 m-t-15" />
 
         <Nav vertical>
-          <NavItem className={classnames("row full-width sidebar-item", { "active": 'all' === match.params.listID }) }>
+          <div className="sidebar-label row clickable noselect" onClick={() => setShowTags( !showTags )}>
+            <div>
+              <img
+                className="m-r-5"
+                style={{
+                  color: "#212121",
+                  height: "17px",
+                  marginBottom: "3px"
+                }}
+                src={tagIcon}
+                alt="Tag icon not found"
+                />
+              <Label className="clickable">
+                {t('tags')}
+              </Label>
+            </div>
+            <div className="ml-auto m-r-3">
+              { showTags && <i className="fas fa-chevron-up" /> }
+              { !showTags && <i className="fas fa-chevron-down" /> }
+            </div>
+          </div>
+          { showTags &&
+            <Empty>
+              <NavItem className={classnames("row full-width sidebar-item", { "active": tagId === null }) }>
+                <span
+                  className={ classnames("clickable sidebar-menu-item link", { "active": tagId === null }) }
+                  onClick={() => { setLSidebarTagId(null) }}
+                  >
+                  {t('allTags')}
+                </span>
+              </NavItem>
+            </Empty>
+          }
+        </Nav>
+        { showTags &&
+          <button
+            className='btn-link p-l-15'
+            onClick={() => {
+            }}
+            >
+            <i className="fa fa-plus"/>
+            {t('tag')}
+          </button>
+        }
+        <hr className="m-l-15 m-r-15 m-t-15 m-b-15" />
+        <Nav>
+          <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/lanwiki/archive' ) }) }>
             <span
-              className={ classnames("clickable sidebar-menu-item link", { "active": 'all' === match.params.listID }) }
-              onClick={() => {
-                history.push(`/lanwiki/i/all`)
-              }}>
-              ALL
+              className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/lanwiki/archive' ) }) }
+              onClick={() => { history.push('/lanwiki/archive') }}
+              >
+              {t('archived')}
             </span>
           </NavItem>
-
-          {
-            tags
-            .sort((item1,item2) => item1.title.toLowerCase() > item2.title.toLowerCase() ? 1 : -1)
-            .map((item)=>
-            <NavItem key={item.id} className={classnames("row full-width sidebar-item", { "active": item.id === parseInt(match.params.listID) }) }>
-              <span
-                className={ classnames("clickable sidebar-menu-item link", { "active": item.id === parseInt(match.params.listID) }) }
-                onClick={() => {
-                  history.push(`/lanwiki/i/${item.id}`)
-                }}>
-                {item.title}
-              </span>
-              {
-                 item.id === parseInt(match.params.listID)  &&
-                <div
-                  className={classnames("sidebar-icon", "clickable", {"active" : item.id === parseInt(match.params.listID)})}
-                  onClick={() => {
-                    setTagEdit(item);
-                    setOpenEdit(true);
-                  }}
-                  >
-                  <i className="fa fa-cog"/>
-                </div>
-              }
-            </NavItem>
-          )
-        }
-
-      </Nav>
-
-      <hr className='m-t-10 m-b-5 m-l-15 m-r-15'/>
-
-      <div className='p-l-15 p-r-15'>
-
-        <NavItem className="row full-width">
-          <Button
-            className='btn-link'
-            onClick={ () => history.push(`/lanwiki/tag-add`) }
-            >
-            <i className="fa fa-plus" />
-            Tag
-          </Button>
-        </NavItem>
-
-        {
-          match.params.listID &&
-          match.params.listID !== 'all' &&
-
-          <NavItem className="row full-width">
-            <Button
-              className='btn-link'
-              onClick={ () => history.push(`/lanwiki/tag-edit/${match.params.listID}`) }
-              >
-              <i className="fa fa-cog" />
-              Tag
-            </Button>
-          </NavItem>
-        }
+        </Nav>
       </div>
     </div>
-  </div>
   );
 }

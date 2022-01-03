@@ -8,3 +8,4 @@ export * from './reports/resolvers';
 
 export * from './tasklist/resolvers';
 export * from './calendar/resolvers';
+export * from './lanwiki/resolvers';
