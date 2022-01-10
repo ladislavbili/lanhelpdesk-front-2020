@@ -1,12 +1,22 @@
 import {
-  tagIdVar,
-  folderIdVar,
+  tagVar,
+  folderVar,
+  lLocalStringFilterVar,
+  lGlobalStringFilterVar,
 } from './variables';
 
-export const lSidebarTagId = () => {
-  return tagIdVar();
+export const lSidebarTag = () => {
+  return tagVar();
 }
 
-export const lSidebarFolderId = () => {
-  return folderIdVar();
+export const lSidebarFolder = () => {
+  return folderVar();
+}
+
+export const lLocalStringFilter = () => {
+  return lLocalStringFilterVar();
+}
+
+export const lGlobalStringFilter = () => {
+  return lGlobalStringFilterVar();
 }

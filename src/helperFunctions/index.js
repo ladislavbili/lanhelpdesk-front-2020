@@ -42,6 +42,11 @@ export {
 from './moment';
 
 export {
+  uint8ArrayToImg,
+}
+from './imageManipulations';
+
+export {
   applyTaskFilter,
   filterDateSatisfied,
   filterOneOf,

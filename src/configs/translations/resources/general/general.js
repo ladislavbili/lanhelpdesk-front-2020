@@ -61,7 +61,7 @@ export default {
   },
   loadingData: {
     en: 'Loading data',
-    sk: 'Načítavám sa údaje',
+    sk: 'Načítavajú sa údaje',
   },
   logoutConfirmation: {
     en: 'Are you sure you want to log out?',

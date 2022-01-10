@@ -176,7 +176,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
 
       if ( colored && data.color ) {
         const color = chroma( data.color );
-        let newStyle = {
+        newStyle = {
           ...newStyle,
           color: '#FFF',
           padding: '0px 5px',

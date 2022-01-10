@@ -61,7 +61,9 @@ export default function PageHeader( props ) {
     <div className={classnames("page-header flex m-l-30")}>
       <div className="d-flex full-height">
         <div className="center-hor">
-          { accessRights.lanwiki &&
+        </div>
+        { false &&
+          <div className="center-hor">
             <Link
               to={{ pathname: `/lanwiki/i/all` }}
               className={
@@ -75,10 +77,6 @@ export default function PageHeader( props ) {
               >
               {t('lanWiki')}
             </Link>
-          }
-        </div>
-        { false &&
-          <div className="center-hor">
             <Link
               to={{ pathname: `/helpdesk/taskList/i/all` }}
               className={

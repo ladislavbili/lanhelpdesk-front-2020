@@ -8,9 +8,8 @@ import Sidebar from 'lanwiki/components/sidebar';
 import ErrorMessages from 'components/errorMessages';
 import PageHeader from 'components/PageHeader';
 import SelectPage from 'components/SelectPage';
-import ListNotes from './notes';
-import TagAdd from './tags/add';
-import TagEdit from './tags/edit';
+import PagesList from './pages/list';
+import PageView from './pages/edit';
 
 export default function LanwikiNavigation( props ) {
   //new Blob([str]).size;
@@ -29,14 +28,10 @@ export default function LanwikiNavigation( props ) {
           <Route path="/lanwiki" component={Sidebar} />
         </Switch>
 				<div className="main">
-					<Route exact path='/lanwiki' component={ListNotes} />
-          <Route exact path='/lanwiki/archive' component={ListNotes} />
           <Route exact path="/lanwiki/errorMessages" component={ErrorMessages} />
-
-          <Route exact path='/lanwiki/i/:folderID' component={ListNotes} />
-          <Route exact path='/lanwiki/i/:folderID/note/:noteID' component={ListNotes} />
-          <Route exact path='/lanwiki/tag/add' component={TagAdd} />
-          <Route exact path='/lanwiki/tag/:tagID' component={TagEdit} />
+          <Route exact path='/lanwiki/i/:folderID' component={PagesList} />
+          <Route exact path='/lanwiki/i/:folderID/p/:page' component={PagesList} />
+          <Route exact path='/lanwiki/i/:folderID/p/:page/:pageID' component={PageView} />
 				</div>
 			</div>
 		</div>

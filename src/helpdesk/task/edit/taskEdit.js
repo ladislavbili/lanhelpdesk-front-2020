@@ -672,9 +672,9 @@ export default function TaskEdit( props ) {
             projectID={project.id}
             duplicateTask={getTaskData()}
             disabled={!canCopy}
+            history={history}
+            match={match}
             />
-          history={history}
-          match={match}
         }
         { false &&
           <TaskPrint

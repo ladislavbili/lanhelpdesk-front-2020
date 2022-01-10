@@ -91,7 +91,7 @@ export default function CompanyInvoice( props ) {
         <button
           className="btn btn-danger btn-distance"
           disabled={markedTasks.length === 0 || invoiceTriggered }
-          onClick={ () => invoiceTasks(company.id, markedTasks, setInvoiceTriggered) }
+          onClick={ () => invoiceTasks(company.id, markedTasks, setInvoiceTriggered, () => setMarkedTasks([]) ) }
           >
           {invoiceTriggered && <Spinner className="m-r-5" />}
           {`${invoiceTriggered ? t('invoicePending') : t('invoiceAction')} ${t('selected').toLowerCase()} ${t('tasks').toLowerCase()} (${markedTasks.length})`}

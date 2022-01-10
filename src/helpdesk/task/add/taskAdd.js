@@ -553,7 +553,6 @@ export default function TaskAdd( props ) {
           closeModal();
           return;
         }
-
       } )
       .catch( ( err ) => {
         addLocalError( err );

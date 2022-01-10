@@ -51,23 +51,30 @@ export default function CompanyInvoiceLoader( props ) {
     } );
   }, [ company ] );
 
-  const invoiceTasks = ( companyId, taskIds, setInvoiceTriggered ) => {
+  const invoiceTasks = ( companyId, taskIds, setInvoiceTriggered, emptySelected ) => {
     if ( window.confirm( 'Please confirm your choice to invoice these tasks.' ) ) {
       setInvoiceTriggered( true );
       invoiceTasksFunc( {
-        variables: {
-          ...filterData,
-          companyId,
-          taskIds
-        }
-      } );
-      invoiceRefetch( {
-        variables: {
-          ...filterData,
-          companyId: company.id,
-        },
-      } );
-      setInvoiceTriggered( false );
+          variables: {
+            ...filterData,
+            companyId,
+            taskIds
+          }
+        } )
+        .then( ( response ) => {
+          invoiceRefetch( {
+            variables: {
+              ...filterData,
+              companyId: company.id,
+            },
+          } );
+          setInvoiceTriggered( false );
+          emptySelected();
+        } )
+        .catch( ( e ) => {
+          console.log( e );
+          setInvoiceTriggered( false );
+        } );
     }
   }
 
