@@ -20,7 +20,6 @@ import IPList from './ipList';
 import Passwords from './passwords';
 import AttributesHandler from './attributesHandler';
 import InteractiveTasksDescription from '../components/interactiveDescription';
-import CKEditor from 'ckeditor4-react';
 import classnames from "classnames";
 
 export default function ItemAdd( props ) {
@@ -88,7 +87,7 @@ export default function ItemAdd( props ) {
             <div className="description">
               <label>Description</label>
               <div className="flex p-r-15">
-                <CKEditor
+                <input
                   data={null}
                   onChange={(e)=>{}}
                   config={ {

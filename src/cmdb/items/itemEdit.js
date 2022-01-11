@@ -7,7 +7,6 @@ import {
   NavItem,
   NavLink
 } from 'reactstrap';
-import CKEditor from 'ckeditor4-react';
 import classnames from "classnames";
 import AttributesHandler from './attributesHandler';
 import IPList from './ipList';
@@ -57,7 +56,7 @@ export default function ItemEdit( props ) {
           <div className="row">
           <div className="description">
             <div className="">
-              <CKEditor
+              <input
                 data={null}
                 onChange={(e)=>{/*this.setState({description:e.editor.getData()})*/}}
                 config={ {

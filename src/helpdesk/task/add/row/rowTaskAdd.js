@@ -18,9 +18,7 @@ import VykazyTable from 'helpdesk/components/vykazy/vykazyTable';
 
 import classnames from "classnames";
 
-import CKEditor5 from '@ckeditor/ckeditor5-react';
 import ck5config from 'configs/components/ck5config';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import axios from 'axios';
 import {
   pickSelectStyle

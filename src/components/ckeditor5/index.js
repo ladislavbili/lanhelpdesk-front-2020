@@ -1,6 +1,10 @@
 import React from 'react';
-import CKEditor from '@ckeditor/ckeditor5-react';
-//import Editor from './ckeditorBuild/build/ckeditor';
+/*
+import {
+  CKEditor
+} from '@ckeditor/ckeditor5-react';
+*/
+import Editor from 'ckeditor5-custom-build/build/ckeditor';
 
 import {
   uint8ArrayToImg
@@ -19,7 +23,6 @@ export default function CKCustomEditor( props ) {
 
   const inputFile = React.useRef( null );
   const editors = document.getElementsByClassName( "ck-file-dialog-button" );
-  console.log( CKEditor );
   return null;
   /*
   React.useEffect( () => {

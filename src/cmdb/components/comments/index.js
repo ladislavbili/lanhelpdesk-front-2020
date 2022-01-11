@@ -18,7 +18,6 @@ import {
 import {
   Creatable
 } from 'react-select';
-import CKEditor from 'ckeditor4-react';
 import {
   pickSelectStyle
 } from 'configs/components/select';
@@ -103,7 +102,7 @@ export default function Comments( props ) {
       {isEmail &&
         <FormGroup>
           <Label className="">Message</Label>
-          <CKEditor
+          <input
             data={emailBody}
             onChange={(evt)=>setEmailBody(evt.editor.getData()) }
             />

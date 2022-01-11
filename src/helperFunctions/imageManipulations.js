@@ -1,3 +1,7 @@
-export const uint8ArrayToImg = ( buffer ) => {
-  return new ImageData( buffer );
-}
+export const uint8ArrayToImg = ( arr ) => {
+  const blob = new Blob( [ arr ], {
+    type: "image/jpeg"
+  } );
+  const img = URL.createObjectURL( blob );
+  return img;
+};

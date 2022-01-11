@@ -4,7 +4,9 @@ import Select from 'react-select';
 import {
   Label,
 } from 'reactstrap';
-import CKEditor5 from '@ckeditor/ckeditor5-react';
+import {
+  CKEditor,
+} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import DatePicker from 'components/DatePicker';
 import MultiSelect from 'components/MultiSelectNew';
@@ -57,7 +59,6 @@ import {
   translateSelectItem,
 } from 'helperFunctions';
 import 'scss/direct/task-ckeditor.scss';
-
 let fakeID = -1;
 
 export default function TaskAdd( props ) {
@@ -1138,11 +1139,9 @@ export default function TaskAdd( props ) {
           {renderMultiSelectTags()}
         </div>
         <div className="form-section-rest">
-          <CKEditor5
+          <CKEditor
             editor={ ClassicEditor }
             data={description}
-            onInit={(editor)=>{
-            }}
             onChange={(e, editor)=>{
               setDescription(editor.getData());
             }}

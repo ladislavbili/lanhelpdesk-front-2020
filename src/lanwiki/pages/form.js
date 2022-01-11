@@ -7,7 +7,9 @@ import {
 } from 'reactstrap';
 
 import CKCustomEditor from 'components/ckeditor5';
-import CKEditor5 from '@ckeditor/ckeditor5-react';
+import {
+  CKEditor,
+} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import ck5config from 'configs/components/ck5config';
 import Empty from 'components/Empty';
@@ -152,12 +154,10 @@ export default function LanwikiPageForm( props ) {
       { !disabled &&
         <FormGroup>
           <Label htmlFor="content">{t('content')}</Label>
-          <CKEditor5
+          <CKEditor
             id="content"
             editor={ ClassicEditor }
             data={body}
-            onInit={(editor)=>{
-            }}
             onChange={(e, editor)=>{
               setBody(editor.getData());
             }}

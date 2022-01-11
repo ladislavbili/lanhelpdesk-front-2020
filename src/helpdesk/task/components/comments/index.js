@@ -22,7 +22,9 @@ import {
 import {
   Creatable
 } from 'react-select';
-import CKEditor from '@ckeditor/ckeditor5-react';
+import {
+  CKEditor,
+} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import ck5config from 'configs/components/ck5config';
 import {
