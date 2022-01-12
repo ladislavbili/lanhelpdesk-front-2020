@@ -13,11 +13,7 @@ import {
   ListGroup,
   ListGroupItem,
 } from 'reactstrap';
-import {
-  CKEditor,
-} from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import ck5config from 'configs/components/ck5config';
+import CKEditor from 'components/CKEditor';
 import DatePicker from 'components/DatePicker';
 import Empty from 'components/Empty';
 
@@ -1419,8 +1415,7 @@ export default function TaskEdit( props ) {
       if ( showDescription && !invoiced ) {
         RenderDescription = <div>
           <CKEditor
-            editor={ ClassicEditor }
-            data={description}
+            value={description}
             onReady={(editor) => {
               editor.editing.view.document.on( 'keydown', ( evt, data ) => {
                 if ( data.keyCode === 27 ) {
@@ -1431,10 +1426,10 @@ export default function TaskEdit( props ) {
                 }
               });
             }}
-            onChange={(e,editor)=>{
-              setDescription(editor.getData());
+            onChange={(description)=>{
+              setDescription(description);
             }}
-            config={ck5config}
+            type="basic"
             />
         </div>
       } else {

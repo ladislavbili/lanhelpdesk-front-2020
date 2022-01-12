@@ -13,9 +13,17 @@ import Loading from 'components/loading';
 import {
   useTranslation
 } from "react-i18next";
+import axios from 'axios';
 import {
-  toSelArr
+  toSelArr,
+  extractImages,
+  replacePlaceholdersWithLinks,
+  getDeletedImages,
 } from 'helperFunctions';
+
+import {
+  REST_URL,
+} from 'configs/restAPI';
 
 import {
   GET_TAGS,
@@ -102,6 +110,7 @@ export default function PageEditContainer( props ) {
   const myRights = page.myRights;
 
   return (
+    <div className="fit-with-header scroll-visible">
     <LanwikiPageForm
       id={page.id}
       edit={true}
@@ -109,13 +118,42 @@ export default function PageEditContainer( props ) {
       close={(() => history.back() )}
       savePage={(data, setSaving, afterUpdate) => {
         setSaving(true);
-        updatePage({variables: data}).then(() => {
-          setSaving(false);
-          afterUpdate();
-        }).catch((e) => {
-          console.log(e);
-          setSaving(false);
-        })
+        data.deletedImages = getDeletedImages(data.body, page.images);
+        const separatedData = extractImages(data.body);
+        if(separatedData.files.length > 0){
+          const formData = new FormData();
+          separatedData.files.forEach( ( file ) => formData.append( `file`, file ) );
+          formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
+          formData.append( "lanwikiId", data.id );
+          axios.post( `${REST_URL}/lw-upload-text-images`, formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            } ).then((response) => {
+              if(!response.data.ok){
+                console.log(response.data);
+                setSaving(false);
+                return;
+              }
+              const newBody = replacePlaceholdersWithLinks(separatedData.value, response.data.attachments);
+              data.body = newBody;
+              updatePage({variables: data}).then(() => {
+                setSaving(false);
+                afterUpdate();
+              }).catch((e) => {
+                console.log(e);
+                setSaving(false);
+              })
+            })
+        }else{
+          updatePage({variables: data}).then(() => {
+            setSaving(false);
+            afterUpdate();
+          }).catch((e) => {
+            console.log(e);
+            setSaving(false);
+          })
+        }
       }}
       deletePage={(setSaving) => {
         if(window.confirm(t('comfirmDeletingLanwikiPage'))){
@@ -133,6 +171,7 @@ export default function PageEditContainer( props ) {
       allFolders={toSelArr(folders)}
       page={page}
       />
+  </div>
   );
 
 }

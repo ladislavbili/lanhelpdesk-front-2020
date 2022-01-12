@@ -104,7 +104,7 @@ export default function Comments( props ) {
           <Label className="">Message</Label>
           <input
             data={emailBody}
-            onChange={(evt)=>setEmailBody(evt.editor.getData()) }
+            onChange={(emailBody)=>setEmailBody(emailBody) }
             />
         </FormGroup>
       }

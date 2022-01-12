@@ -17,8 +17,6 @@ import Attachments from 'helpdesk/components/attachments';
 import VykazyTable from 'helpdesk/components/vykazy/vykazyTable';
 
 import classnames from "classnames";
-
-import ck5config from 'configs/components/ck5config';
 import axios from 'axios';
 import {
   pickSelectStyle

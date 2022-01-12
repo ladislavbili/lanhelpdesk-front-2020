@@ -42,7 +42,7 @@ export {
 from './moment';
 
 export {
-  uint8ArrayToImg,
+  base64ToImg,
 }
 from './imageManipulations';
 
@@ -57,7 +57,10 @@ export {
 from './filter';
 
 export {
-  changeCKEData
+  changeCKEData,
+  extractImages,
+  replacePlaceholdersWithLinks,
+  getDeletedImages,
 }
 from './ckEditor';
 
@@ -115,6 +118,7 @@ from './navigationFunctions';
 export {
   randomString,
   randomPassword,
+  findAllIndexes,
 }
 from './stringManipulations';
 

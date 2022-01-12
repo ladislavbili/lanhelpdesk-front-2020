@@ -6,7 +6,10 @@ import {
 } from "@apollo/client";
 import {
   toSelArr,
+  extractImages,
+  replacePlaceholdersWithLinks,
 } from 'helperFunctions';
+import axios from 'axios';
 import Empty from 'components/Empty';
 import {
   Modal,
@@ -22,6 +25,10 @@ import {
 } from "react-i18next";
 
 import {
+  REST_URL,
+} from 'configs/restAPI';
+
+import {
   GET_TAGS,
   TAGS_SUBSCRIPTION,
 } from 'lanwiki/tags/queries';
@@ -33,6 +40,7 @@ import {
 
 import {
   ADD_PAGE,
+  UPDATE_PAGE,
 } from 'lanwiki/pages/queries';
 
 export default function PageAddContainer( props ) {
@@ -76,6 +84,7 @@ export default function PageAddContainer( props ) {
 
   //mutations
   const [ addPage ] = useMutation( ADD_PAGE );
+  const [ updatePage ] = useMutation( UPDATE_PAGE );
 
   //state
   const [ open, setOpen ] = React.useState( false );
@@ -105,9 +114,38 @@ export default function PageAddContainer( props ) {
               edit={false}
               addPage={(data, setSaving, afterAdd) => {
                 setSaving(true);
-                addPage({variables: data}).then(() => {
-                  setSaving(false);
-                  afterAdd();
+                const separatedData = extractImages(data.body);
+                data.body = separatedData.value;
+                addPage({variables: data}).then((response1) => {
+                  const id = response1.data.addLanwikiPage.id;
+                  if(separatedData.files.length > 0){
+                    const formData = new FormData();
+                    separatedData.files.forEach( ( file ) => formData.append( `file`, file ) );
+                    formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
+                    formData.append( "lanwikiId", id );
+                    axios.post( `${REST_URL}/lw-upload-text-images`, formData, {
+                        headers: {
+                          'Content-Type': 'multipart/form-data'
+                        }
+                      } ).then((response2) => {
+                        if(!response2.data.ok){
+                          console.log(response.data);
+                          setSaving(false);
+                          return;
+                        }
+                        const newBody = replacePlaceholdersWithLinks(separatedData.value, response2.data.attachments);
+                        updatePage({variables: { id, body: newBody, title: data.title }}).then(() => {
+                          setSaving(false);
+                          afterAdd();
+                        }).catch((e) => {
+                          console.log(e);
+                          setSaving(false);
+                        })
+                      })
+                    }else{
+                      setSaving(false);
+                      afterAdd();
+                    }
                 }).catch((e) => {
                   console.log(e);
                   setSaving(false);

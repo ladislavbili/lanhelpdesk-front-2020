@@ -4,10 +4,7 @@ import Select from 'react-select';
 import {
   Label,
 } from 'reactstrap';
-import {
-  CKEditor,
-} from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import CKEditor from 'components/CKEditor';
 import DatePicker from 'components/DatePicker';
 import MultiSelect from 'components/MultiSelectNew';
 import Empty from 'components/Empty';
@@ -26,7 +23,6 @@ import ErrorDisplay, {
   hasAddTaskIssues
 } from '../components/errorDisplay/addTaskErrorDisplay';
 
-import ck5config from 'configs/components/ck5config';
 import {
   pickSelectStyle,
   pickSelectStyleWithRequired,
@@ -1140,12 +1136,11 @@ export default function TaskAdd( props ) {
         </div>
         <div className="form-section-rest">
           <CKEditor
-            editor={ ClassicEditor }
-            data={description}
-            onChange={(e, editor)=>{
-              setDescription(editor.getData());
+            value={description}
+            onChange={(description)=>{
+              setDescription(description);
             }}
-            config={ck5config}
+            type="basic"
             />
 
           {

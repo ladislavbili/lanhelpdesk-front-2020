@@ -8,11 +8,7 @@ import Select from 'react-select';
 import {
   Label,
 } from 'reactstrap';
-import {
-  CKEditor,
-} from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import ck5config from 'configs/components/ck5config';
+import CKEditor from 'components/CKEditor';
 
 import axios from 'axios';
 import moment from 'moment';
@@ -1387,8 +1383,7 @@ export default function RepeatForm( props ) {
       if ( showDescription ) {
         RenderDescription = <div>
           <CKEditor
-            editor={ ClassicEditor }
-            data={description}
+            value={description}
             onReady={(editor) => {
               editor.editing.view.document.on( 'keydown', ( evt, data ) => {
                 if ( data.keyCode === 27 ) {
@@ -1398,10 +1393,10 @@ export default function RepeatForm( props ) {
                 }
               });
             }}
-            onChange={(e,editor)=>{
-              setDescription(editor.getData());
+            onChange={(description)=>{
+              setDescription(description);
             }}
-            config={ck5config}
+            type="basic"
             />
         </div>
       } else {

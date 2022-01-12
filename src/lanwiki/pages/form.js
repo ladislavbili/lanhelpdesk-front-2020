@@ -6,12 +6,7 @@ import {
   Input,
 } from 'reactstrap';
 
-import CKCustomEditor from 'components/ckeditor5';
-import {
-  CKEditor,
-} from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import ck5config from 'configs/components/ck5config';
+import CKEditor from 'components/CKEditor';
 import Empty from 'components/Empty';
 import AddPageErrors from './add/showErrors';
 import EditPageErrors from './edit/showErrors';
@@ -46,6 +41,7 @@ export default function LanwikiPageForm( props ) {
   const [ folder, setFolder ] = React.useState( page ? allFolders.find( ( folder ) => folder.id === page.folder.id ) : ( folderId === null ? allFolders[ 0 ] : allFolders.find( ( folder ) => folder.id === folderId ) ) );
   const [ tags, setTags ] = React.useState( page ? allTags.filter( ( tag ) => page.tags.some( ( tag2 ) => tag2.id === tag.id ) ) : ( tagId === null ? [] : allTags.filter( ( tag ) => tag.id === tagId ) ) );
   const [ body, setBody ] = React.useState( page ? page.body : '' );
+  const [ bodyImages, setBodyImages ] = React.useState( [] );
 
   const [ showErrors, setShowErrors ] = React.useState( false );
   const [ saving, setSaving ] = React.useState( false );
@@ -155,22 +151,16 @@ export default function LanwikiPageForm( props ) {
         <FormGroup>
           <Label htmlFor="content">{t('content')}</Label>
           <CKEditor
-            id="content"
-            editor={ ClassicEditor }
-            data={body}
-            onChange={(e, editor)=>{
-              setBody(editor.getData());
-            }}
-            config={ck5config}
-            />
-            <CKCustomEditor
-                text={body}
-                setText={(body) => {
-                  setBody(body);
-                }}
-                buttonId={"ckeditor-file-upload-button-note-form"}
-                editorIndex={0}
-                />
+              value={body}
+              type="imageUpload"
+              onChange={(body) => {
+                setBody(body);
+              }}
+              uploadImage={ (images) => {
+                setBodyImages([...bodyImages, ...images]);
+              }}
+              images={bodyImages}
+              />
         </FormGroup>
       }
 

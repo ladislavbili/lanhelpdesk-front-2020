@@ -1,7 +1,17 @@
-export const uint8ArrayToImg = ( arr ) => {
-  const blob = new Blob( [ arr ], {
-    type: "image/jpeg"
+export const base64ToImg = ( dataurl, filename ) => {
+  const arr = dataurl.split( ',' );
+  const mime = arr[ 0 ].match( /:(.*?);/ )[ 1 ];
+  const bstr = atob( arr[ 1 ] );
+  let n = bstr.length;
+  let u8arr = new Uint8Array( n );
+
+  while ( n-- ) {
+    u8arr[ n ] = bstr.charCodeAt( n );
+  }
+
+  return new File( [ u8arr ], `${filename}.${mime.substring( mime.indexOf('/') + 1, mime.length )}`, {
+    type: mime
   } );
-  const img = URL.createObjectURL( blob );
-  return img;
 };
+
+//Usage example:

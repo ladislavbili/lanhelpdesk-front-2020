@@ -66,6 +66,14 @@ query lanwikiPage(
       write
       manage
     }
+    images{
+      id
+      filename
+      path
+      mimetype
+      encoding
+      size
+    }
   }
 }
 `;
@@ -95,6 +103,7 @@ mutation updateLanwikiPage(
   $body: String!
   $folderId: Int
   $tags: [Int]
+  $deletedImages: [Int]
 ) {
   updateLanwikiPage(
     id: $id
@@ -102,6 +111,7 @@ mutation updateLanwikiPage(
     body: $body
     folderId: $folderId
     tags: $tags
+    deletedImages: $deletedImages
   ){
     id
   }

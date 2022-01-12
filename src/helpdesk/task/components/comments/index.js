@@ -22,11 +22,7 @@ import {
 import {
   Creatable
 } from 'react-select';
-import {
-  CKEditor,
-} from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import ck5config from 'configs/components/ck5config';
+import CKEditor from 'components/CKEditor';
 import {
   pickSelectStyle
 } from 'configs/components/select';
@@ -197,20 +193,18 @@ export default function Comments( props ) {
             <FormGroup>
               <Label className="">{t('message')}</Label>
               <CKEditor
-                editor={ClassicEditor}
-                config={ck5config}
-                data={emailBody}
-                onChange={(evt, editor)=>setEmailBody(editor.getData()) }
+                value={emailBody}
+                onChange={(emailBody) => setEmailBody(emailBody) }
+                type="basic"
                 />
             </FormGroup>
           }
           {!isEmail &&
             <FormGroup>
               <CKEditor
-                editor={ClassicEditor}
-                config={ck5config}
-                data={newComment}
-                onChange={(evt, editor)=>setNewComment(editor.getData()) }
+                value={newComment}
+                onChange={(newComment) => setNewComment(newComment) }
+                type="basic"
                 />
             </FormGroup>
           }
