@@ -71,7 +71,7 @@ export default function FolderEdit( props ) {
       <Checkbox
         value={archived}
         onChange={() => setArchived(!archived) }
-        label={t('active')}
+        label={t('archived')}
         />
 
       <FormGroup>

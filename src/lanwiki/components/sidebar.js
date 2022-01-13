@@ -101,6 +101,7 @@ export default function Sidebar( props ) {
 
   const [ showTags, setShowTags ] = React.useState( true );
   const [ showFolders, setShowFolders ] = React.useState( true );
+  const [ showArchived, setShowArchived ] = React.useState( false );
   //OLD
   const [ tagEdit, setTagEdit ] = React.useState( null );
   const [ openAdd, setOpenAdd ] = React.useState( false );
@@ -159,7 +160,7 @@ export default function Sidebar( props ) {
                   {t('allFolders')}
                 </span>
               </NavItem>
-              { folders.map((folder) => (
+              { folders.filter((folder) => !folder.archived ).map((folder) => (
                 <NavItem key={folder.id} className={classnames("row full-width sidebar-item", { "active": parseInt(match.params.folderID) === folder.id }) }>
                   <span
                     className={ classnames("clickable sidebar-menu-item link", { "active": parseInt(match.params.folderID) === folder.id }) }
@@ -231,16 +232,44 @@ export default function Sidebar( props ) {
         { showTags &&
           <TagAdd />
         }
-        <hr className="m-l-15 m-r-15 m-t-15 m-b-15" />
-        <Nav>
-          <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/lanwiki/archive' ) }) }>
-            <span
-              className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/lanwiki/archive' ) }) }
-              onClick={() => { history.push('/lanwiki/archive') }}
-              >
-              {t('archived')}
-            </span>
-          </NavItem>
+        <hr className="m-l-15 m-r-15 m-t-15" />
+        <Nav vertical>
+          <div className="sidebar-label row clickable noselect" onClick={() => setShowArchived( !showArchived )}>
+            <div>
+              <i
+                className="m-r-5 fa fa-archive"
+                style={{
+                  color: "#212121",
+                  height: "17px",
+                  marginBottom: "3px"
+                }}
+                />
+              <Label className="clickable">
+                {t('archived')}
+              </Label>
+            </div>
+            <div className="ml-auto m-r-3">
+              { showArchived && <i className="fas fa-chevron-up" /> }
+              { !showArchived && <i className="fas fa-chevron-down" /> }
+            </div>
+          </div>
+          { showArchived &&
+            <Empty>
+              { folders.filter((folder) => folder.archived ).map((folder) => (
+                <NavItem key={folder.id} className={classnames("row full-width sidebar-item", { "active": parseInt(match.params.folderID) === folder.id }) }>
+                  <span
+                    className={ classnames("clickable sidebar-menu-item link", { "active": parseInt(match.params.folderID) === folder.id }) }
+                    onClick={() => { history.push(`/lanwiki/i/${folder.id}`) }}
+                    >
+                    {folder.title}
+                  </span>
+                  { folder.myRights.manage && parseInt(match.params.folderID) === folder.id &&
+                    <FolderEdit id={folder.id} folders={folders} history={history} />
+                  }
+                </NavItem>
+              ))}
+            </Empty>
+          }
         </Nav>
       </div>
     </div>

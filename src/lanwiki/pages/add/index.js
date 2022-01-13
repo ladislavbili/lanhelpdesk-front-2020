@@ -73,7 +73,10 @@ export default function PageAddContainer( props ) {
     loading: foldersLoading,
     refetch: foldersRefetch,
   } = useQuery( GET_FOLDERS, {
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'network-only',
+    variables: {
+      archived: false,
+    }
   } );
 
   useSubscription( FOLDERS_SUBSCRIPTION, {

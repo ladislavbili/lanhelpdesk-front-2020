@@ -114,7 +114,7 @@ export default function PageEditContainer( props ) {
     <LanwikiPageForm
       id={page.id}
       edit={true}
-      disabled={!myRights.write}
+      disabled={!myRights.write || page.folder.archived}
       close={(() => history.back() )}
       savePage={(data, setSaving, afterUpdate) => {
         setSaving(true);

@@ -9,6 +9,7 @@ query lanwikiPages(
   $limit: Int
   $page: Int
   $stringFilter: LanwikiPageStringFilterInput
+  $archived: Boolean
 ){
   lanwikiPages (
     folderId: $folderId
@@ -16,6 +17,7 @@ query lanwikiPages(
     limit: $limit
     page: $page
     stringFilter: $stringFilter
+    archived: $archived
   ){
     count
     pages{
@@ -59,6 +61,7 @@ query lanwikiPage(
     folder{
       id
       title
+      archived
     }
     myRights{
       active
@@ -127,5 +130,11 @@ mutation deleteLanwikiPage(
   ){
     id
   }
+}
+`;
+
+export const PAGES_SUBSCRIPTION = gql `
+subscription lanwikiPagesSubscription {
+  lanwikiPagesSubscription
 }
 `;

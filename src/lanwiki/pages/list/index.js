@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   useQuery,
+  useSubscription,
 } from "@apollo/client";
 
 import {
@@ -23,6 +24,7 @@ import {
 
 import {
   GET_PAGES,
+  PAGES_SUBSCRIPTION,
 } from 'lanwiki/pages/queries';
 
 
@@ -79,6 +81,7 @@ export default function LanwikiPagesLoader( props ) {
     variables: {
       tagId,
       folderId,
+      archived: folderId === null ? false : folder.archived,
       page: match.params.page ? parseInt( match.params.page ) : 1,
       limit,
       stringFilter: globalStringFilter,
@@ -86,17 +89,19 @@ export default function LanwikiPagesLoader( props ) {
     fetchPolicy: 'network-only',
   } );
 
-  const pagesRefetchFunc = () => {
-    pagesRefetch( {
-      variables: {
-        tagId,
-        folderId,
-        page: match.params.page ? parseInt( match.params.page ) : 1,
-        limit,
-        stringFilter: globalStringFilter,
-      }
-    } )
-  };
+  useSubscription( PAGES_SUBSCRIPTION, {
+    onSubscriptionData: () => {
+      pagesRefetch( {
+        variables: {
+          tagId,
+          folderId,
+          page: match.params.page ? parseInt( match.params.page ) : 1,
+          limit,
+          stringFilter: globalStringFilter,
+        }
+      } )
+    }
+  } );
 
   React.useEffect( () => {
     pagesRefetch( {
@@ -120,7 +125,6 @@ export default function LanwikiPagesLoader( props ) {
       {...props}
       loading={pagesLoading}
       pages={pages}
-      pagesRefetch={pagesRefetchFunc}
       count={count}
       page={page}
       limit={limit}

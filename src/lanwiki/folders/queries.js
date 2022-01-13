@@ -12,6 +12,7 @@ query lanwikiFolders(
     id
     title
     order
+    archived
     myRights {
       write
       manage
