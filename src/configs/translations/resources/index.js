@@ -6,6 +6,7 @@ import general from './general';
 import invoices from './invoices';
 import helpdesk from './helpdesk';
 import lanwiki from './lanwiki';
+import cmdb from './cmdb';
 
 const resources = {
   ...components,
@@ -13,6 +14,7 @@ const resources = {
   ...invoices,
   ...helpdesk,
   ...lanwiki,
+  ...cmdb,
 }
 
 //compare keys if same throw error
@@ -24,6 +26,7 @@ if ( testingTranslations ) {
     ...Object.keys( invoices ),
     ...Object.keys( helpdesk ),
     ...Object.keys( lanwiki ),
+    ...Object.keys( cmdb ),
   ]
   console.log( test.length );
 

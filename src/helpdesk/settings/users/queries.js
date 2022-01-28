@@ -109,7 +109,8 @@ mutation updateUser(
   $name: String,
   $surname: String,
   $receiveNotifications: Boolean,
-  $signature: String, $roleId: Int,
+  $signature: String,
+  $roleId: Int,
   $companyId: Int,
   $language: LanguageEnum
   $password: String

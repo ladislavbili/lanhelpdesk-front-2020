@@ -8,3 +8,4 @@ export * from './reports/actions';
 export * from './tasklist/actions';
 export * from './calendar/actions';
 export * from './lanwiki/actions';
+export * from './cmdb/actions';

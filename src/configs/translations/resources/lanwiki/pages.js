@@ -4,12 +4,12 @@ export default {
     sk: 'Stránok',
   },
   noLanwikiPages: {
-    en: 'No lanwiki pages',
-    sk: 'Bez lanwiki stránok',
+    en: 'No LanWiki pages',
+    sk: 'Bez LanWiki stránok',
   },
   lanwikiPage: {
-    en: 'Lanwiki page',
-    sk: 'Lanwiki stránku',
+    en: 'LanWiki page',
+    sk: 'LanWiki stránku',
   },
   content: {
     en: 'Content',
@@ -24,11 +24,15 @@ export default {
     sk: 'Stránka nemá žiadny obsah',
   },
   comfirmDeletingLanwikiPage: {
-    en: 'Are you sure you want to delete this page?',
-    sk: 'Ste si istý, že chcete zmazať túto lanwiki stránku?',
+    en: 'Are you sure you want to delete this LanWiki page?',
+    sk: 'Ste si istý, že chcete zmazať túto LanWiki stránku?',
   },
   deleteAllLanwikiPages: {
-    en: 'None (Delete all lanwiki pages in the folder)',
-    sk: 'Žiadny (Vymaže všetky lanwiki stránky v priečinku)',
+    en: 'None (Delete all LanWiki pages in the folder)',
+    sk: 'Žiadny (Vymaže všetky LanWiki stránky v priečinku)',
+  },
+  page: {
+    en: 'Page',
+    sk: 'Stránka',
   },
 }

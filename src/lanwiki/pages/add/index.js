@@ -108,7 +108,7 @@ export default function PageAddContainer( props ) {
         }}
         >
         <i className="fa fa-plus"/>
-        {`${t('add')} ${t('lanwikiPage').toLowerCase()}`}
+        {`${t('page')}`}
       </button>
       <Modal isOpen={open} className="task-add-container" modalClassName="overflow-x-auto" >
         <ModalBody>
@@ -136,7 +136,7 @@ export default function PageAddContainer( props ) {
                           setSaving(false);
                           return;
                         }
-                        const newBody = replacePlaceholdersWithLinks(separatedData.value, response2.data.attachments);
+                        const newBody = replacePlaceholdersWithLinks(separatedData.value, response2.data.attachments, 'get-lw-file');
                         updatePage({variables: { id, body: newBody, title: data.title }}).then(() => {
                           setSaving(false);
                           afterAdd();

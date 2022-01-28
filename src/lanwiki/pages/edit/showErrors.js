@@ -3,7 +3,7 @@ import {
   useTranslation
 } from "react-i18next";
 
-export default function AddPageErrors( props ) {
+export default function EditPageErrors( props ) {
   const {
     title,
     folder,

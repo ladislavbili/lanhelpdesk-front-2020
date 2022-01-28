@@ -74,6 +74,10 @@
   height: calc(#{$height-without-header} - #{$commandbar-height} - 60px - 70px );
 }
 
+.fit-with-header-and-lanwiki-commandbar {
+  height: calc(#{$height-without-header} - 40px);
+}
+
 //WIDTH
 .full-width {
   width: 100%;

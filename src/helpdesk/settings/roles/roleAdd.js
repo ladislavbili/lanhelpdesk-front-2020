@@ -79,7 +79,12 @@ export default function RoleAdd( props ) {
     {
       state: React.useState( false ),
       key: 'lanwiki',
-      label: 'Lanwiki',
+      label: t( 'lanwiki' ),
+    },
+    {
+      state: React.useState( false ),
+      key: 'cmdb',
+      label: t( 'cmdb' ),
     },
   ];
   const settings = [

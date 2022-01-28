@@ -32,9 +32,6 @@ import {
 } from "react-i18next";
 
 import {
-  tags,
-} from 'lanwiki/constants';
-import {
   setLSidebarTag,
   setLSidebarFolder,
 } from 'apollo/localSchema/actions';
@@ -102,16 +99,12 @@ export default function Sidebar( props ) {
   const [ showTags, setShowTags ] = React.useState( true );
   const [ showFolders, setShowFolders ] = React.useState( true );
   const [ showArchived, setShowArchived ] = React.useState( false );
-  //OLD
-  const [ tagEdit, setTagEdit ] = React.useState( null );
-  const [ openAdd, setOpenAdd ] = React.useState( false );
-  const [ openEdit, setOpenEdit ] = React.useState( false );
 
   const tagId = sidebarTagData.lSidebarTag === null ? null : sidebarTagData.lSidebarTag.id;
   const folderId = sidebarFolderData.lSidebarFolder === null ? null : sidebarFolderData.lSidebarFolder.id;
 
   React.useEffect( () => {
-    if ( !foldersLoading ) {
+    if ( !foldersLoading && match.params.folderID !== undefined ) {
       setLSidebarFolder( match.params.folderID === 'all' ? null : foldersData.lanwikiFolders.find( ( folder ) => folder.id === parseInt( match.params.folderID ) ) );
     }
   }, [ match.params.folderID, foldersLoading ] );

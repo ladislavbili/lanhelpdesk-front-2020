@@ -65,6 +65,7 @@ export default function RoleEdit( props ) {
       id: parseInt( props.match.params.id )
     },
     fetchPolicy: 'network-only',
+    notifyOnNetworkStatusChange: true,
   } );
 
   const [ updateRole ] = useMutation( UPDATE_ROLE );
@@ -105,7 +106,12 @@ export default function RoleEdit( props ) {
     {
       state: React.useState( false ),
       key: 'lanwiki',
-      label: 'Lanwiki',
+      label: t( 'lanwiki' ),
+    },
+    {
+      state: React.useState( false ),
+      key: 'cmdb',
+      label: t( 'cmdb' ),
     },
   ];
   const settings = [
@@ -201,11 +207,10 @@ export default function RoleEdit( props ) {
 
   React.useEffect( () => {
     roleRefetch( {
-        variables: {
-          id: parseInt( match.params.id )
-        }
-      } )
-      .then( setData );
+      variables: {
+        id: parseInt( match.params.id )
+      }
+    } );
   }, [ match.params.id ] );
 
   // functions

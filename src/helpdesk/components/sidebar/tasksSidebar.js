@@ -26,7 +26,6 @@ import Select from "react-select";
 import Loading from 'components/loading';
 import Empty from 'components/Empty';
 import {
-  sidebarSelectStyle,
   pickSelectStyle,
 } from 'configs/components/select';
 

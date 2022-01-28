@@ -80,19 +80,28 @@ export default function PagesList( props ) {
                   />
               </th>
               <th>
-                <input
-                  type="text"
-                  value={ localStringFilter.tags }
-                  className="form-control"
-                  style={{fontSize: "12px", marginRight: "10px"}}
-                  onKeyPress={(e) => {
-                    if( e.charCode === 13 && !loading){
-                      setGlobalStringFilter();
-                    }
-                  }}
-                  onChange={(e) => {setLocalStringFilter('tags', e.target.value );
-                  }}
-                  />
+                <div className="row">
+                  <div className="flex">
+                    <input
+                      type="text"
+                      value={ localStringFilter.tags }
+                      className="form-control"
+                      style={{fontSize: "12px", marginRight: "10px"}}
+                      onKeyPress={(e) => {
+                        if( e.charCode === 13 && !loading){
+                          setGlobalStringFilter();
+                        }
+                      }}
+                      onChange={(e) => {setLocalStringFilter('tags', e.target.value );
+                      }}
+                      />
+                  </div>
+                  { folderId !== null &&
+                    <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+                      {t('filter')}
+                    </button>
+                  }
+                </div>
               </th>
               { folderId === null &&
                 <th>

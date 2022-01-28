@@ -94,6 +94,8 @@ export default function PageEditContainer( props ) {
   //mutations
   const [ updatePage ] = useMutation( UPDATE_PAGE );
   const [ deletePage ] = useMutation( DELETE_PAGE );
+  const [ showEdit, setShowEdit ] = React.useState( false );
+  const [ saving, setSaving ] = React.useState( false );
 
   const loading = (
     tagsLoading ||
@@ -110,22 +112,69 @@ export default function PageEditContainer( props ) {
   const myRights = page.myRights;
 
   return (
-    <div className="fit-with-header scroll-visible">
-    <LanwikiPageForm
-      id={page.id}
-      edit={true}
-      disabled={!myRights.write || page.folder.archived}
-      close={(() => history.back() )}
-      savePage={(data, setSaving, afterUpdate) => {
-        setSaving(true);
-        data.deletedImages = getDeletedImages(data.body, page.images);
-        const separatedData = extractImages(data.body);
-        if(separatedData.files.length > 0){
-          const formData = new FormData();
-          separatedData.files.forEach( ( file ) => formData.append( `file`, file ) );
-          formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
-          formData.append( "lanwikiId", data.id );
-          axios.post( `${REST_URL}/lw-upload-text-images`, formData, {
+    <div>
+      { !showEdit &&
+        <div className="task-add-layout row">
+          <button
+            type="button"
+            disabled={saving}
+            className="btn-link task-add-layout-button btn-distance"
+            onClick={() => {
+              history.back();
+            }}
+            >
+            <i className="fas fa-arrow-left commandbar-command-icon" />
+            {t('back')}
+          </button>
+          { myRights.write &&
+            <button
+              type="button"
+              disabled={saving}
+              className="btn-link task-add-layout-button btn-distance"
+              onClick={() => { setShowEdit(true) }}
+              >
+              <i className="fa fa-pen" />
+              {t('edit')}
+            </button>
+          }
+          { myRights.write &&
+            <button
+              type="button"
+              className="btn-link task-add-layout-button btn-distance"
+              onClick={() => {
+                if(window.confirm(t('comfirmDeletingLanwikiPage'))){
+                  setSaving(true);
+                  deletePage({variables: {id: page.id }}).then(() => {
+                    setSaving(false);
+                    history.back();
+                  }).catch((e) => {
+                    setSaving(false);
+                    console.log(e);
+                  })
+                }
+              }}
+              >
+              <i className="far fa-trash-alt" />
+              {t('delete')}
+            </button>
+          }
+        </div>
+      }
+      <LanwikiPageForm
+        id={page.id}
+        edit={true}
+        disabled={!myRights.write || page.folder.archived || !showEdit}
+        close={(() => setShowEdit(false) )}
+        savePage={(data, setSaving, afterUpdate) => {
+          setSaving(true);
+          data.deletedImages = getDeletedImages(data.body, page.images, 'get-lw-file');
+          const separatedData = extractImages(data.body);
+          if(separatedData.files.length > 0){
+            const formData = new FormData();
+            separatedData.files.forEach( ( file ) => formData.append( `file`, file ) );
+            formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
+            formData.append( "lanwikiId", data.id );
+            axios.post( `${REST_URL}/lw-upload-text-images`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data'
               }
@@ -135,7 +184,7 @@ export default function PageEditContainer( props ) {
                 setSaving(false);
                 return;
               }
-              const newBody = replacePlaceholdersWithLinks(separatedData.value, response.data.attachments);
+              const newBody = replacePlaceholdersWithLinks(separatedData.value, response.data.attachments, 'get-lw-file');
               data.body = newBody;
               updatePage({variables: data}).then(() => {
                 setSaving(false);
@@ -145,33 +194,33 @@ export default function PageEditContainer( props ) {
                 setSaving(false);
               })
             })
-        }else{
-          updatePage({variables: data}).then(() => {
-            setSaving(false);
-            afterUpdate();
-          }).catch((e) => {
-            console.log(e);
-            setSaving(false);
-          })
-        }
-      }}
-      deletePage={(setSaving) => {
-        if(window.confirm(t('comfirmDeletingLanwikiPage'))){
-          setSaving(true);
-          deletePage({variables: {id: page.id }}).then(() => {
-            setSaving(false);
-            history.back();
-          }).catch((e) => {
-            setSaving(false);
-            console.log(e);
-          })
-        }
-      }}
-      allTags={toSelArr(tags)}
-      allFolders={toSelArr(folders)}
-      page={page}
-      />
-  </div>
+          }else{
+            updatePage({variables: data}).then(() => {
+              setSaving(false);
+              afterUpdate();
+            }).catch((e) => {
+              console.log(e);
+              setSaving(false);
+            })
+          }
+        }}
+        deletePage={(setSaving) => {
+          if(window.confirm(t('comfirmDeletingLanwikiPage'))){
+            setSaving(true);
+            deletePage({variables: {id: page.id }}).then(() => {
+              setSaving(false);
+              history.back();
+            }).catch((e) => {
+              setSaving(false);
+              console.log(e);
+            })
+          }
+        }}
+        allTags={toSelArr(tags)}
+        allFolders={toSelArr(folders)}
+        page={page}
+        />
+    </div>
   );
 
 }

@@ -1,6 +1,6 @@
 export default {
   lanwiki: {
-    en: 'Lanwiki',
-    sk: 'Lanwiki',
+    en: 'LanWiki',
+    sk: 'LanWiki',
   },
 }

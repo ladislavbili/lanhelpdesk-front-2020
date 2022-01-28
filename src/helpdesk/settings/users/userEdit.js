@@ -404,7 +404,14 @@ export default function UserEdit( props ) {
       }
       <PasswordChange
         submitPass={(pass) => {
-          setPassword(pass);
+          if(pass !== null){            
+            updateUser({
+              variables: {
+                id,
+                password:pass,
+              }
+            });
+          }
           setPasswordChangeOpen(false);
         }}
         isOpen={passwordChangeOpen}

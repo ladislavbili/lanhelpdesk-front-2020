@@ -39,43 +39,17 @@ export const extractImages = ( value ) => {
 
 }
 
-export const replacePlaceholdersWithLinks = ( value, linkData ) => {
+export const replacePlaceholdersWithLinks = ( value, linkData, restAction ) => {
+  console.log( linkData );
   let newValue = value;
   linkData.forEach( ( imageFile ) => {
     const match = `src="${imageFile.filename}" alt="temp-picture">`;
     const srcIndex = newValue.indexOf( match );
-    newValue = `${newValue.substring(0, srcIndex )}src="${REST_URL}/get-lw-file?path=${imageFile.path}" alt="saved-picture">${newValue.substring(srcIndex + match.length , newValue.length )}`
+    newValue = `${newValue.substring(0, srcIndex )}src="${REST_URL}/${restAction}?path=${imageFile.path}" alt="saved-picture">${newValue.substring(srcIndex + match.length , newValue.length )}`
   } )
   return newValue;
 }
 
-export const getDeletedImages = ( value, allImages ) => {
-  return allImages.filter( ( image ) => !value.includes( `/get-lw-file?path=${image.path}" alt="saved-picture">` ) ).map( ( image ) => image.id );
+export const getDeletedImages = ( value, allImages, restAction ) => {
+  return allImages.filter( ( image ) => !value.includes( `/${restAction}?path=${image.path}" alt="saved-picture">` ) ).map( ( image ) => image.id );
 };
-
-/*
-const processImages = ( value ) => {
-let newValue = value;
-let allImages = [];
-let imageIndex = 0;
-while ( imageIndex !== null ) {
-imageIndex = newValue.indexOf( '<figure class="image"><img src="' );
-if ( imageIndex > -1 ) {
-const dataIndex = newValue.substring( imageIndex + 32, newValue.length )
-.indexOf( '"></figure>' );
-const imageData = newValue.substring( imageIndex + 32, imageIndex + 32 + dataIndex );
-const imageId = allImages.length //+ images.length;
-const imageFile = base64ToImg( imageData, `text-image-${imageId}` );
-allImages.push( imageFile );
-newValue = `
-${newValue.substring(0,imageIndex)}
-<p><span class="image-inline ck-widget ck-widget_selected" contentEditable="false"><img alt="loaded-picture-${imageId}" src="${imageFile.name}"></span></p>
-${newValue.substring( imageIndex + 32 + dataIndex + 11, newValue.length )}`;
-} else {
-imageIndex = null;
-}
-}
-//uploadImage( allImages );
-return newValue;
-};
-*/

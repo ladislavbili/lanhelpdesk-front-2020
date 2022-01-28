@@ -38,11 +38,7 @@ import {
 } from 'helperFunctions';
 
 export default function Navigation( props ) {
-  //data & queries
-
   const [ sidebarOpen, setSidebarOpen ] = React.useState( true );
-
-  const client = useApolloClient();
 
   const currentUser = getMyData();
   const accessRights = currentUser && currentUser.role ? currentUser.role.accessRights : {};
@@ -63,14 +59,14 @@ export default function Navigation( props ) {
         </Switch>
         <div className="main">
           <Route exact path="/helpdesk/errorMessages" component={accessRights.viewErrors ? ErrorMessages : AccessDenied} />
+          <Route exact path="/helpdesk/notifications" component={NotificationList} />
+          <Route exact path="/helpdesk/notifications/:notificationID" component={NotificationList} />
 
           <Route exact path="/helpdesk" component={TaskList} />
           <Route exact path="/helpdesk/taskList/i/:listID" component={TaskList} />
           <Route exact path="/helpdesk/taskList/i/:listID/p/:page" component={TaskList} />
           <Route exact path="/helpdesk/taskList/i/:listID/:taskID" component={TaskList} />
           <Route exact path="/helpdesk/taskList/i/:listID/p/:page/:taskID" component={TaskList} />
-          <Route exact path="/helpdesk/notifications" component={NotificationList} />
-          <Route exact path="/helpdesk/notifications/:notificationID" component={NotificationList} />
           { accessRights.addProjects ? <Route exact path="/helpdesk/project/add" component={ProjectAdd} /> : <Route exact path="/helpdesk/project/add" component={AccessDenied} /> }
           <Route exact path="/helpdesk/project/:projectID/:tabId" component={ProjectEdit} />
           <Route exact path="/helpdesk/repeats" component={RepeatsList} />

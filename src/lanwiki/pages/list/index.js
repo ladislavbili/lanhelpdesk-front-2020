@@ -132,6 +132,17 @@ export default function LanwikiPagesLoader( props ) {
       tagId={tagId}
       tag={tag}
       folder={folder}
+      pagesRefetch={() => {
+        pagesRefetch( {
+          variables: {
+            tagId,
+            folderId,
+            page: match.params.page ? parseInt( match.params.page ) : 1,
+            limit,
+            stringFilter: globalStringFilter,
+          }
+        } );
+      }}
       setGlobalStringFilter={setLGlobalStringFilter}
       setLocalStringFilter={setLLocalStringFilter}
       clearLocalStringFilter={clearLLocalStringFilter}

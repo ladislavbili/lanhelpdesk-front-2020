@@ -27,14 +27,6 @@ export default {
     en: 'Filter',
     sk: 'Filter',
   },
-  lanWiki: {
-    en: 'LanWiki',
-    sk: 'LanWiki',
-  },
-  cmdb: {
-    en: 'CMDB',
-    sk: 'CMDB',
-  },
   userProfile: {
     en: 'User profile',
     sk: 'Používateľský profil',

@@ -5,12 +5,14 @@ import components from './components';
 import project from './project';
 import settings from './settings';
 import task from './task';
+import general from './general';
 
 const invoices = {
   ...components,
   ...project,
   ...settings,
   ...task,
+  ...general,
 }
 
 if ( testingTranslations ) {
@@ -22,6 +24,7 @@ if ( testingTranslations ) {
   ...Object.keys( project ),
   ...Object.keys( settings ),
   ...Object.keys( task ),
+  ...Object.keys( general ),
 ]
 
   const testResult = test.filter( ( key, index ) => test.findIndex( ( key2 ) => key2 === key ) !== index );

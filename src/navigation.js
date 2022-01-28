@@ -61,7 +61,7 @@ export default function Navigation( props ) {
         <Route path='/helpdesk' component={HelpdeskNavigation} />
         <Route path='/invoices' component={InvoicesNavigation} />
         { userDataData.getMyData.role.accessRights.lanwiki && <Route path='/lanwiki' component={LanwikiNavigation} />}
-        <Route path='/cmdb' component={CMDBNavigation} />
+        { userDataData.getMyData.role.accessRights.cmdb && <Route path='/cmdb' component={CMDBNavigation} />}
       </Switch>
     </BrowserRouter>
   )

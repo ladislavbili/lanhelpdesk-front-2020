@@ -9,6 +9,7 @@ export const accessRights = `
   addProjects
   viewErrors
   lanwiki
+  cmdb
 
   users
   companies
