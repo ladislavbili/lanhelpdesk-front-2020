@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   useQuery,
-  useSubscription,
 } from "@apollo/client";
 
 import {

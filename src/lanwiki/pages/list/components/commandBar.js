@@ -1,20 +1,16 @@
 import React from 'react';
-import classnames from 'classnames';
 import {
   useTranslation
 } from "react-i18next";
 import {
-  setLSidebarFolder,
   setLSidebarTag,
 } from 'apollo/localSchema/actions';
 
 // breadcrums, layout switch
 export default function CommandBar( props ) {
   const {
-    loading,
     folder,
     tag,
-    history,
   } = props;
 
   const {
@@ -28,8 +24,6 @@ export default function CommandBar( props ) {
       show: true,
       label: t( folder.title ),
       onClick: () => {
-        //setLSidebarFolder( folder );
-        //history.push( `/lanwiki/i/${folder.id}` );
         setLSidebarTag( null );
       }
     },
@@ -38,9 +32,7 @@ export default function CommandBar( props ) {
       data: tag,
       show: tag.id !== null,
       label: t( tag.title ),
-      onClick: () => {
-        //setLSidebarTag( tag );
-      }
+      onClick: () => {}
     }
   ];
 

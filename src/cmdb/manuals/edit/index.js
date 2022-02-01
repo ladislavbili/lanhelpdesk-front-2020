@@ -3,10 +3,6 @@ import {
   useQuery,
   useMutation,
 } from "@apollo/client";
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
-import classnames from 'classnames';
 import ManualForm from 'cmdb/manuals/form';
 import Loading from 'components/loading';
 import {
@@ -14,7 +10,6 @@ import {
 } from "react-i18next";
 import axios from 'axios';
 import {
-  toSelArr,
   extractImages,
   replacePlaceholdersWithLinks,
   getDeletedImages,

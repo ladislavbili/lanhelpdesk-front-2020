@@ -4,10 +4,8 @@ import {
   useSubscription,
 } from "@apollo/client";
 import {
-  Button,
   NavItem,
   Nav,
-  Modal,
   Label,
 } from 'reactstrap';
 import {

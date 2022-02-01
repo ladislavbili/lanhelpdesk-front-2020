@@ -6,8 +6,6 @@ import {
   useSubscription,
 } from "@apollo/client";
 
-import moment from 'moment';
-
 import Loading from 'components/loading';
 import TaskEdit from './taskEdit';
 import AccessDenied from 'components/accessDenied';
@@ -593,87 +591,6 @@ export default function TaskEditContainer( props ) {
     basicCompaniesRefetch();
   }
 
-  const submitComment = ( comment, setSaving = () => {}, onFinish = () => {} ) => {
-    const {
-      id,
-      message,
-      attachments,
-      parentCommentId,
-      internal,
-    } = comment;
-
-    setSaving( true );
-    const formData = new FormData();
-    attachments.forEach( ( file ) => formData.append( `file`, file ) );
-    //FORM DATA
-    formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
-    formData.append( "taskId", id );
-    formData.append( "message", message );
-    formData.append( "parentCommentId", parentCommentId );
-    formData.append( "internal", internal );
-    formData.append( "fromInvoice", fromInvoice );
-    axios.post( `${REST_URL}/send-comment`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      } )
-      .then( ( response ) => {
-        if ( response.data.ok ) {
-          onFinish();
-        } else {
-          addLocalError( {
-            message: response.data.error,
-            name: 'Task e-mail error',
-          } );
-        }
-        setSaving( false );
-      } )
-      .catch( ( err ) => {
-        setSaving( false );
-        addLocalError( err );
-      } );
-  }
-
-  const submitEmail = ( email, setSaving = () => {}, onFinish = () => {} ) => {
-    const {
-      id,
-      attachments,
-      emailBody,
-      subject,
-      tos
-    } = email;
-    setSaving( true );
-    const formData = new FormData();
-    attachments.forEach( ( file ) => formData.append( `file`, file ) );
-    //FORM DATA
-    formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
-    formData.append( "taskId", id );
-    formData.append( "message", emailBody );
-    formData.append( "subject", subject );
-    formData.append( "fromInvoice", fromInvoice );
-    tos.forEach( ( to ) => formData.append( `tos`, to.__isNew__ ? to.value : to.email ) );
-    axios.post( `${REST_URL}/send-email`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      } )
-      .then( ( response ) => {
-        if ( response.data.ok ) {
-          onFinish();
-        } else {
-          addLocalError( {
-            message: response.data.error,
-            name: 'Task e-mail error',
-          } );
-        }
-        setSaving( false );
-      } )
-      .catch( ( err ) => {
-        setSaving( false );
-        addLocalError( err );
-      } );
-  }
-
   const addAttachments = ( attachments ) => {
     const formData = new FormData();
     attachments.forEach( ( file ) => formData.append( `file`, file ) );
@@ -801,8 +718,6 @@ export default function TaskEditContainer( props ) {
       originalProjectId={projectData.localProject.id}
       filterId={filterData.localFilter.id}
       addCompanyToList={addCompanyToList}
-      submitComment={submitComment}
-      submitEmail={submitEmail}
       addAttachments={addAttachments}
       removeAttachment={removeAttachment}
       deleteTaskFunc={deleteTaskFunc}

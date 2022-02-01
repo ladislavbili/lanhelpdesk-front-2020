@@ -1,6 +1,4 @@
 import React from 'react';
-import DatePicker from 'components/DatePicker';
-import Checkbox from 'components/checkbox';
 import Select from 'react-select';
 import Loading from 'components/loading';
 
@@ -13,19 +11,11 @@ import {
 } from 'configs/components/select';
 
 import {
-  getItemDisplayValue,
-  timestampToString,
   translateAllSelectItems,
-}
-from 'helperFunctions';
+} from 'helperFunctions';
 import {
   useTranslation
 } from "react-i18next";
-import moment from 'moment';
-
-import {
-  defaultTasksAttributesFilter
-} from 'configs/constants/tasks';
 
 const statuses = [
   {
@@ -218,14 +208,6 @@ export default function ItemsList( props ) {
                 </td>
               </tr>
             ))}
-
-            { !loading && items.length === 0 &&
-              <tr>
-                <td colSpan="3" className="bolder">
-                  {t('noCMDBItems')}
-                </td>
-              </tr>
-            }
 
             { loading &&
               <tr>

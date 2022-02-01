@@ -85,25 +85,16 @@ export default function LanwikiPageForm( props ) {
             <h2>
               {title}
             </h2>
-            <hr className="m-t-10 m-b-10" />
-            <div className="row">
-              { tags.map((tag) => (
-                <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
-                  {tag.title}
-                </span>
-              )) }
-            </div>
           </FormGroup>
         }
-        <FormGroup>
-          { !disabled &&
+        { !disabled &&
+          <FormGroup>
             <Empty>
               <Label htmlFor="name">{t('title')}</Label>
               <Input id="name" className="form-control" placeholder={t('titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)}/>
             </Empty>
-          }
-        </FormGroup>
-        { !disabled && <hr className="m-t-10 m-b-10"/> }
+          </FormGroup>
+        }
 
         <FormGroup>
           <Label htmlFor="name">{t('folder')}</Label>
@@ -125,9 +116,9 @@ export default function LanwikiPageForm( props ) {
           }
         </FormGroup>
 
-        {! disabled &&
-          <FormGroup>
-            <Label htmlFor="tags">{t('tags')}</Label>
+        <FormGroup>
+          <Label htmlFor="tags">{t('tags')}</Label>
+          {! disabled &&
             <Select
               id="tags"
               placeholder={t('selectTags')}
@@ -139,17 +130,21 @@ export default function LanwikiPageForm( props ) {
               }}
               styles={pickSelectStyle( [ 'noArrow', 'colored' ] )}
               />
-          </FormGroup>
-        }
+          }
+          {disabled &&
+            <div className="row">
+              { tags.map((tag) => (
+                <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+                  {tag.title}
+                </span>
+              )) }
+            </div>
+          }
+        </FormGroup>
 
-        { disabled &&
-          <FormGroup>
-            <div className="task-edit-popis p-t-10 min-height-300-f" dangerouslySetInnerHTML={{ __html: body }} />
-          </FormGroup>
-        }
-        { !disabled &&
-          <FormGroup>
-            <Label htmlFor="content">{t('content')}</Label>
+        <FormGroup>
+          <Label htmlFor="content">{t('content')}</Label>
+          { !disabled &&
             <CKEditor
               value={body}
               type="imageUpload"
@@ -161,8 +156,11 @@ export default function LanwikiPageForm( props ) {
               }}
               images={bodyImages}
               />
-          </FormGroup>
-        }
+          }
+          { disabled &&
+            <div className="task-edit-popis p-t-10 min-height-300-f" dangerouslySetInnerHTML={{ __html: body }} />
+          }
+        </FormGroup>
 
         { !edit && <AddPageErrors title={title} body={body} folder={folder} show={showErrors} />}
         { edit && <EditPageErrors title={title} body={body} folder={folder} show={showErrors} />}
@@ -187,21 +185,21 @@ export default function LanwikiPageForm( props ) {
       { !disabled && edit &&
         <div className="task-add-layout row stick-to-bottom">
           <div className="center-ver">
-          <button
-            className="btn-link task-add-layout-button btn-distance"
-            onClick={close}
-            >
-            <i className="fas fa-arrow-left commandbar-command-icon" />
-            {t('close')}
-          </button>
-          <button
-            className="btn-link task-add-layout-button btn-distance"
-            disabled={cannotSave() && showErrors}
-            onClick={saveOrAddPage}
-            >
-            {saving ? `${t('saving')}...` : `${t('save')} ${t('lanwikiPage').toLowerCase()}`}
-          </button>
-        </div>
+            <button
+              className="btn-link task-add-layout-button btn-distance"
+              onClick={close}
+              >
+              <i className="fas fa-arrow-left commandbar-command-icon" />
+              {t('close')}
+            </button>
+            <button
+              className="btn-link task-add-layout-button btn-distance"
+              disabled={cannotSave() && showErrors}
+              onClick={saveOrAddPage}
+              >
+              {saving ? `${t('saving')}...` : `${t('save')} ${t('lanwikiPage').toLowerCase()}`}
+            </button>
+          </div>
         </div>
       }
     </Empty>

@@ -24,29 +24,29 @@ export default function AddressesTable( props ) {
       <table className="table">
         <thead>
           <tr className="bolder">
-            <th>
+            <th className="text-center">
               {t('nic')}
             </th>
-            <th>
+            <th className="text-center">
               {t('ip')}
             </th>
-            <th>
+            <th className="text-center">
               {t('mask')}
             </th>
-            <th>
+            <th className="text-center">
               {t('gateway')}
             </th>
-            <th>
+            <th className="text-center">
               {t('dns')}
             </th>
-            <th>
+            <th className="text-center">
               {t('vlan')}
             </th>
-            <th>
+            <th className="text-center">
               {t('note')}
             </th>
             { !disabled &&
-              <th width="55">
+              <th className="text-center" width="55">
                 {t('actions')}
               </th>
             }
@@ -56,29 +56,29 @@ export default function AddressesTable( props ) {
         <tbody>
           { addresses.map((address) => (
             <tr key={address.id}>
-              <td>
+              <td className="text-center">
                 {address.nic}
               </td>
-              <td>
+              <td className="text-center">
                 {address.ip}
               </td>
-              <td>
+              <td className="text-center">
                 {address.mask}
               </td>
-              <td>
+              <td className="text-center">
                 {address.gateway}
               </td>
-              <td>
+              <td className="text-center">
                 {address.dns}
               </td>
-              <td>
+              <td className="text-center">
                 {address.vlan}
               </td>
-              <td className="max-width-200">
+              <td className="max-width-200 text-center">
                 {address.note}
               </td>
               { !disabled &&
-                <td>
+                <td className="text-center">
                   <button className="btn-link" onClick={() => setEdited(address) } ><i className="fa fa-pen"/></button>
                   <button className="btn-link" onClick={() => onDelete(address.id) }><i className="fa fa-times m-l-5"/></button>
                 </td>
@@ -88,7 +88,7 @@ export default function AddressesTable( props ) {
         }
         { !disabled &&
           <tr>
-            <td>
+            <td colSpan="10">
               <button className="btn-link" onClick={() => setAddOpen(true) }><i className="fa fa-plus"/>{t('address2')}</button>
             </td>
           </tr>

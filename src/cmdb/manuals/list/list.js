@@ -1,6 +1,4 @@
 import React from 'react';
-import DatePicker from 'components/DatePicker';
-import Checkbox from 'components/checkbox';
 import Loading from 'components/loading';
 
 import CommandBar from './components/commandBar';
@@ -8,18 +6,11 @@ import Pagination from './components/pagination';
 import ActiveSearch from './components/activeSearch';
 
 import {
-  getItemDisplayValue,
   timestampToString,
-}
-from 'helperFunctions';
+} from 'helperFunctions';
 import {
   useTranslation
 } from "react-i18next";
-import moment from 'moment';
-
-import {
-  defaultTasksAttributesFilter
-} from 'configs/constants/tasks';
 
 export default function ManualsList( props ) {
   const {
@@ -54,35 +45,37 @@ export default function ManualsList( props ) {
                 {t('updatedAt')}
               </th>
                 <th width="350">
-                  {t('createdA')}
+                  {t('createdAt')}
                 </th>
             </tr>
           </thead>
 
           <tbody>
             <tr>
-              <th colSpan="3">
-                  <div className="row">
-                    <div className="flex">
-                      <input
-                        type="text"
-                        value={ localStringFilter.title }
-                        className="form-control"
-                        style={{fontSize: "12px", marginRight: "10px"}}
-                        onKeyPress={(e) => {
-                          if( e.charCode === 13 && !loading){
-                            setGlobalStringFilter();
-                          }
-                        }}
-                        onChange={(e) => {setLocalStringFilter('title', e.target.value );
-                        }}
-                        />
-                    </div>
-                    <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
-                      {t('filter')}
-                    </button>
-                  </div>
+              <th>
+                <input
+                  type="text"
+                  value={ localStringFilter.title }
+                  className="form-control"
+                  style={{fontSize: "12px", marginRight: "10px"}}
+                  onKeyPress={(e) => {
+                    if( e.charCode === 13 && !loading){
+                      setGlobalStringFilter();
+                    }
+                  }}
+                  onChange={(e) => {setLocalStringFilter('title', e.target.value );
+                  }}
+                  />
               </th>
+              <th/>
+                <th>
+                    <div className="row">
+                      <div className="flex" />
+                      <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+                        {t('filter')}
+                      </button>
+                    </div>
+                </th>
             </tr>
 
             <ActiveSearch {...props} />
@@ -122,14 +115,6 @@ export default function ManualsList( props ) {
                   </td>
               </tr>
             ))}
-
-            { !loading && manuals.length === 0 &&
-              <tr>
-                <td colSpan="3" className="bolder">
-                  {t('noManuals')}
-                </td>
-              </tr>
-            }
 
             { loading &&
               <tr>

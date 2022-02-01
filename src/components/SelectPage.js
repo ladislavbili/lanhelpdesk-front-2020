@@ -56,37 +56,39 @@ export default function PageHeader( props ) {
 
   return (
     <div className="width-270 page-header row">
-      <GeneralPopover
-        placement="bottom-start"
-        className="overflow-auto max-height-200 min-width-0"
-        target="page-select-popover"
-        useLegacy
-        reset={() => {}}
-        submit={() => {}}
-        open={ open }
-        close={() => setOpen(false)}
-        hideButtons
-        >
-        <div className="btn-group-vertical" data-toggle="buttons">
-          <label className={classnames({'active':subpage === 1 || subpage === 0}, "btn btn-link text-left")}>
-            <input type="radio" name="options" checked={ subpage === 1 } onChange={() => {history.push('/helpdesk/taskList/i/all'); setOpen(false); }}/>
-            { t( 'lanhelpdesk' ) }
-          </label>
-          { accessRights.lanwiki &&
-            <label className={classnames({'active':subpage === 2}, "btn btn-link text-left")}>
-              <input type="radio" name="options" checked={subpage === 2} onChange={() => {history.push('/lanwiki/i/all'); setOpen(false); }}/>
-              { t( 'lanwiki' ) }
+      { (accessRights.lanwiki || accessRights.cmdb) &&
+        <GeneralPopover
+          placement="bottom-start"
+          className="overflow-auto max-height-200 min-width-0"
+          target="page-select-popover"
+          useLegacy
+          reset={() => {}}
+          submit={() => {}}
+          open={ open }
+          close={() => setOpen(false)}
+          hideButtons
+          >
+          <div className="btn-group-vertical" data-toggle="buttons">
+            <label className={classnames({'active':subpage === 1 || subpage === 0}, "btn btn-link text-left")}>
+              <input type="radio" name="options" checked={ subpage === 1 } onChange={() => {history.push('/helpdesk/taskList/i/all'); setOpen(false); }}/>
+              { t( 'lanhelpdesk' ) }
             </label>
-          }
-          { accessRights.cmdb &&
-            <label className={classnames({'active':subpage === 3}, "btn btn-link text-left")}>
-              <input type="radio" name="options" checked={subpage === 3} onChange={() => {history.push('/cmdb/i/all'); setOpen(false); }}/>
-              { t( 'cmdb' ) }
-            </label>
-          }
+            { accessRights.lanwiki &&
+              <label className={classnames({'active':subpage === 2}, "btn btn-link text-left")}>
+                <input type="radio" name="options" checked={subpage === 2} onChange={() => {history.push('/lanwiki/i/all'); setOpen(false); }}/>
+                { t( 'lanwiki' ) }
+              </label>
+            }
+            { accessRights.cmdb &&
+              <label className={classnames({'active':subpage === 3}, "btn btn-link text-left")}>
+                <input type="radio" name="options" checked={subpage === 3} onChange={() => {history.push('/cmdb/i/all'); setOpen(false); }}/>
+                { t( 'cmdb' ) }
+              </label>
+            }
 
-        </div>
-      </GeneralPopover>
+          </div>
+        </GeneralPopover>
+      }
       <div className="lansystems-title">
         { (accessRights.lanwiki || accessRights.cmdb) &&
           <button className="btn btn-link color-white center-hor" id="page-select-popover" onClick={ () => setOpen(true) } >

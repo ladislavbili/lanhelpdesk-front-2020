@@ -10,6 +10,7 @@ import {
 } from 'apollo/globalQueries';
 import {
   useQuery,
+  useMutation,
   useSubscription,
 } from "@apollo/client";
 import {
@@ -23,6 +24,10 @@ import HelpdeskNavigation from 'helpdesk/navigation';
 import InvoicesNavigation from 'invoices/navigation';
 import LanwikiNavigation from 'lanwiki/navigation';
 import CMDBNavigation from 'cmdb/navigation';
+
+import {
+  LOGOUT_USER
+} from 'components/queries';
 
 export default function Navigation( props ) {
 
@@ -40,6 +45,7 @@ export default function Navigation( props ) {
     }
   } );
 
+  const [ logoutUser ] = useMutation( LOGOUT_USER );
 
   const currentUser = getMyData();
   React.useEffect( () => {
@@ -48,7 +54,11 @@ export default function Navigation( props ) {
     }
   }, [ currentUser, currentUser ? currentUser.language : null ] );
   if ( !userDataLoading && currentUser === null ) {
-    location.reload( false );
+    logoutUser()
+      .then( () => {
+        location.reload( false );
+      } );
+    return null;
   }
   if ( userDataLoading ) {
     return <Loading/>;

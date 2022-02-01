@@ -10,8 +10,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  ListGroup,
-  ListGroupItem,
 } from 'reactstrap';
 import CKEditor from 'components/CKEditor';
 import DatePicker from 'components/DatePicker';
@@ -27,9 +25,6 @@ import booleanSelects from 'configs/constants/boolSelect';
 import {
   noMilestone
 } from 'configs/constants/sidebar';
-import {
-  noDef
-} from 'configs/constants/projects';
 import {
   intervals
 } from 'configs/constants/repeat';
@@ -57,9 +52,7 @@ import {
   toSelArr,
   toSelItem,
   timestampToString,
-  orderArr,
   updateArrayItem,
-  toFloatOrZero,
   translateAllSelectItems,
   translateSelectItem,
 } from 'helperFunctions';
@@ -104,14 +97,11 @@ export default function TaskEdit( props ) {
     taskTypes,
     tripTypes,
     projects,
-    emails,
     saving,
     setSaving,
     filterValues,
     originalProjectId,
     filterId,
-    submitComment,
-    submitEmail,
     deleteTaskFunc,
     addCompanyToList,
     addAttachments,
@@ -130,7 +120,6 @@ export default function TaskEdit( props ) {
     deleteShortSubtask,
     updateTask,
     client,
-    setTaskLayout,
     fromInvoice,
   } = props;
 
@@ -1735,8 +1724,6 @@ export default function TaskEdit( props ) {
               <Comments
                 disabled={invoiced}
                 id={id}
-                submitComment={ submitComment }
-                submitEmail={ submitEmail }
                 userRights={ userRights }
                 users={users}
                 fromInvoice={fromInvoice}

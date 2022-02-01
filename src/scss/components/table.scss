@@ -19,6 +19,10 @@ td {
   color: $contrasting-font-color;
 }
 
+.table>thead>tr>th {
+  padding-left: 0px !important;
+}
+
 .tr-no-lines > th {
   border-bottom: 0px solid $table-lines !important;
 }

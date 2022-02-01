@@ -31,6 +31,10 @@ export default {
     en: 'No monitoring label',
     sk: 'Bez označenia monitoringu',
   },
+  noNote: {
+    en: 'No note',
+    sk: 'Bez poznámky',
+  },
   active2: {
     en: 'Active',
     sk: 'Aktívne',
@@ -46,6 +50,34 @@ export default {
   placementPlaceholder: {
     en: 'Enter placement',
     sk: 'Zadajte lokáciu',
+  },
+  noPlacement: {
+    en: 'No placement',
+    sk: 'Bez lokácie',
+  },
+  hardwareModel: {
+    en: 'Hardware/Model',
+    sk: 'Hardware/Model',
+  },
+  noHardwareModel: {
+    en: 'No hardware/model',
+    sk: 'Bez hardware/modelu',
+  },
+  hardwareModelPlaceholder: {
+    en: 'Enter hardware/model',
+    sk: 'Zadajte hardware/model',
+  },
+  serialNumber: {
+    en: 'Serial number',
+    sk: 'Sériové číslo',
+  },
+  noSerialNumber: {
+    en: 'No serial number',
+    sk: 'Bez sériového čísla',
+  },
+  serialNumberPlaceholder: {
+    en: 'Enter Serial number',
+    sk: 'Zadajte Sériové číslo',
   },
   installDate: {
     en: 'Install date',

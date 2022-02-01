@@ -1,7 +1,7 @@
 export default {
   cmdb: {
-    en: 'CMDB',
-    sk: 'CMDB',
+    en: 'LanCMDB',
+    sk: 'LanCMDB',
   },
   allCompanies: {
     en: 'All companies',

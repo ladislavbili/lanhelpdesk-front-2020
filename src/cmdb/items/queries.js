@@ -67,6 +67,8 @@ query cmdbItem(
     location
     installDate
     expireDate
+    hardware
+    serialNumber
     description
     backup
     monitoring
@@ -135,6 +137,8 @@ mutation addCmdbItem(
   $location: String!
   $installDate: String
   $expireDate: String
+  $hardware: String!
+  $serialNumber: String!
   $description: String!
   $backup: String!
   $monitoring: String!
@@ -148,6 +152,8 @@ mutation addCmdbItem(
     location: $location
     installDate: $installDate
     expireDate: $expireDate
+    hardware: $hardware
+    serialNumber: $serialNumber
     description: $description
     backup: $backup
     monitoring: $monitoring
@@ -168,6 +174,8 @@ mutation updateCmdbItem(
   $location: String!
   $installDate: String
   $expireDate: String
+  $hardware: String!
+  $serialNumber: String!
   $description: String!
   $backup: String!
   $monitoring: String!
@@ -182,6 +190,8 @@ mutation updateCmdbItem(
     location: $location
     installDate: $installDate
     expireDate: $expireDate
+    hardware: $hardware
+    serialNumber: $serialNumber
     description: $description
     backup: $backup
     monitoring: $monitoring

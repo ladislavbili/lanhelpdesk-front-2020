@@ -4,10 +4,6 @@ import {
   useMutation,
   useSubscription,
 } from "@apollo/client";
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
-import classnames from 'classnames';
 import LanwikiPageForm from 'lanwiki/pages/form';
 import Loading from 'components/loading';
 import {

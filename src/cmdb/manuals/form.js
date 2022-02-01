@@ -1,5 +1,4 @@
 import React from 'react';
-import Select from 'react-select';
 import {
   FormGroup,
   Label,
@@ -10,10 +9,8 @@ import CKEditor from 'components/CKEditor';
 import Empty from 'components/Empty';
 import AddManualErrors from './add/showErrors';
 import EditManualErrors from './edit/showErrors';
-import {
-  pickSelectStyle,
-} from 'configs/components/select';
 import classnames from 'classnames';
+
 import {
   timestampToString,
 } from 'helperFunctions';
@@ -119,7 +116,6 @@ export default function ManualForm( props ) {
             <Input id="name" className="form-control" placeholder={t('titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)}/>
           }
         </FormGroup>
-        <hr className="m-t-10 m-b-10"/>
 
         { disabled &&
           <FormGroup>

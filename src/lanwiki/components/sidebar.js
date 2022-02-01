@@ -7,12 +7,8 @@ import {
   Button,
   NavItem,
   Nav,
-  Modal,
   Label,
 } from 'reactstrap';
-import {
-  NavLink as Link
-} from 'react-router-dom';
 import Empty from 'components/Empty';
 import Loading from 'components/loading';
 

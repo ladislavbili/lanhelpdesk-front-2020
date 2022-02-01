@@ -1,19 +1,18 @@
 import React from 'react';
+import {
+  useQuery,
+} from "@apollo/client";
 import Zoom from 'react-medium-image-zoom';
 import CKEditor from 'components/CKEditor';
 import {
-  Button,
   FormGroup,
   Label,
   Input,
 } from 'reactstrap';
+import axios from 'axios';
 import {
   useTranslation
 } from "react-i18next";
-import {
-  useQuery,
-} from "@apollo/client";
-import axios from 'axios';
 import {
   REST_URL,
 } from 'configs/restAPI';
@@ -85,8 +84,6 @@ export default function SchemeForm( props ) {
         console.log( error );
       } );
   }
-
-  console.log( company );
 
   if ( !showEdit ) {
     return (

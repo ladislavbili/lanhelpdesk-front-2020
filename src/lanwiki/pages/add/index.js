@@ -15,10 +15,6 @@ import {
   Modal,
   ModalBody,
 } from 'reactstrap';
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
-import classnames from 'classnames';
 import LanwikiPageForm from 'lanwiki/pages/form';
 import {
   useTranslation

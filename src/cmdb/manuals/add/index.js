@@ -1,24 +1,12 @@
 import React from 'react';
 import {
-  useQuery,
   useMutation,
-  useSubscription,
 } from "@apollo/client";
 import {
-  toSelArr,
   extractImages,
   replacePlaceholdersWithLinks,
 } from 'helperFunctions';
 import axios from 'axios';
-import Empty from 'components/Empty';
-import {
-  Modal,
-  ModalBody,
-} from 'reactstrap';
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
-import classnames from 'classnames';
 import ManualForm from 'cmdb/manuals/form';
 import {
   useTranslation

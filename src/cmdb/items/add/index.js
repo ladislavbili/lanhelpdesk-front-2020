@@ -15,10 +15,6 @@ import {
   Modal,
   ModalBody,
 } from 'reactstrap';
-import {
-  addLocalError,
-} from 'apollo/localSchema/actions';
-import classnames from 'classnames';
 import ItemForm from 'cmdb/items/form';
 import {
   useTranslation
@@ -99,6 +95,7 @@ export default function ItemAddContainer( props ) {
     <Empty>
       <button
         className="btn sidebar-btn"
+        disabled={companies.length === 0 || categories.length === 0}
         onClick={() => {
           setOpen(true);
         }}

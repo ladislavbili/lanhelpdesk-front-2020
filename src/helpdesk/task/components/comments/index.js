@@ -54,8 +54,6 @@ export default function Comments( props ) {
     isMulti,
     users,
     userRights,
-    submitComment,
-    submitEmail,
     disabled,
     fromInvoice,
   } = props;
@@ -161,6 +159,81 @@ export default function Comments( props ) {
       } )
   }
 
+  const submitComment = () => {
+    setSaving( true );
+    const formData = new FormData();
+    attachments.forEach( ( file ) => formData.append( `file`, file ) );
+    //FORM DATA
+    formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
+    formData.append( "taskId", id );
+    formData.append( "message", newComment );
+    formData.append( "parentCommentId", null );
+    formData.append( "internal", isInternal );
+    formData.append( "fromInvoice", fromInvoice );
+    axios.post( `${REST_URL}/send-comment`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      } )
+      .then( ( response ) => {
+        if ( response.data.ok ) {
+          setAttachments( [] );
+          setEmailBody( `<br>${currentUser.signature.replace(/(?:\r\n|\r|\n)/g, '<br>')}` );
+          setNewComment( '' );
+          setSubject( '' );
+          setTos( [] );
+        } else {
+          addLocalError( {
+            message: response.data.error,
+            name: 'Task e-mail error',
+          } );
+        }
+        setSaving( false );
+      } )
+      .catch( ( err ) => {
+        setSaving( false );
+        addLocalError( err );
+      } );
+  }
+
+  const submitEmail = () => {
+    setSaving( true );
+    const formData = new FormData();
+    attachments.forEach( ( file ) => formData.append( `file`, file ) );
+    //FORM DATA
+    formData.append( "token", `Bearer ${sessionStorage.getItem('acctok')}` );
+    formData.append( "taskId", id );
+    formData.append( "message", emailBody );
+    formData.append( "subject", subject );
+    formData.append( "fromInvoice", fromInvoice );
+    tos.forEach( ( to ) => formData.append( `tos`, to.__isNew__ ? to.value : to.email ) );
+    axios.post( `${REST_URL}/send-email`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      } )
+      .then( ( response ) => {
+        if ( response.data.ok ) {
+          setAttachments( [] );
+          setEmailBody( `<br>${currentUser.signature.replace(/(?:\r\n|\r|\n)/g, '<br>')}` );
+          setNewComment( '' );
+          setSubject( '' );
+          setTos( [] );
+        } else {
+          addLocalError( {
+            message: response.data.error,
+            name: 'Task e-mail error',
+          } );
+        }
+        setSaving( false );
+      } )
+      .catch( ( err ) => {
+        setSaving( false );
+        addLocalError( err );
+      } );
+  }
+
+
   if ( commentsLoading ) {
     return <Loading />
   }
@@ -221,41 +294,9 @@ export default function Comments( props ) {
               disabled={(!isEmail && newComment==='')|| (isEmail&&(tos.length < 1 ||subject===''||emailBody===''))||saving}
               onClick={() => {
                 if(isEmail){
-                  submitEmail(
-                    {
-                      id,
-                      attachments,
-                      emailBody,
-                      subject,
-                      tos,
-                    },
-                    setSaving,
-                    () => {
-                      setAttachments( [] );
-                      setEmailBody( `<br>${currentUser.signature.replace(/(?:\r\n|\r|\n)/g, '<br>')}` );
-                      setNewComment( '' );
-                      setSubject( '' );
-                      setTos( [] );
-                    }
-                  )
+                  submitEmail()
                 }else{
-                  submitComment(
-                    {
-                      id,
-                      message: newComment,
-                      attachments,
-                      parentCommentId: null,
-                      internal: isInternal,
-                    },
-                    setSaving,
-                    () => {
-                      setAttachments( [] );
-                      setEmailBody( `<br>${currentUser.signature.replace(/(?:\r\n|\r|\n)/g, '<br>')}` );
-                      setNewComment( '' );
-                      setSubject( '' );
-                      setTos( [] );
-                    }
-                  );
+                  submitComment();
                 }
               }}
               >

@@ -1,6 +1,4 @@
 import React from 'react';
-import DatePicker from 'components/DatePicker';
-import Checkbox from 'components/checkbox';
 import Loading from 'components/loading';
 
 import CommandBar from './components/commandBar';
@@ -8,18 +6,8 @@ import Pagination from './components/pagination';
 import ActiveSearch from './components/activeSearch';
 
 import {
-  getItemDisplayValue,
-  timestampToString,
-}
-from 'helperFunctions';
-import {
   useTranslation
 } from "react-i18next";
-import moment from 'moment';
-
-import {
-  defaultTasksAttributesFilter
-} from 'configs/constants/tasks';
 
 export default function PagesList( props ) {
   const {
@@ -150,14 +138,6 @@ export default function PagesList( props ) {
                 }
               </tr>
             ))}
-
-            { !loading && pages.length === 0 &&
-              <tr>
-                <td colSpan="3" className="bolder">
-                  {t('noLanwikiPages')}
-                </td>
-              </tr>
-            }
 
             { loading &&
               <tr>

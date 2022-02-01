@@ -236,6 +236,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
         ...base,
         padding: '0px 5px',
         borderRadius: 0,
+        paddingLeft: 0, //all selects no left padding
       }
       if ( !colored ) {
         newStyle = {

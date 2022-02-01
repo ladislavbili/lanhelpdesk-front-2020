@@ -1,21 +1,15 @@
 import React from 'react';
-import classnames from 'classnames';
 import Select from 'react-select';
-
 import {
   pickSelectStyle,
 } from 'configs/components/select';
 import {
   useTranslation
 } from "react-i18next";
-import {
-  setCmdbSidebarCompany,
-} from 'apollo/localSchema/actions';
 
 // breadcrums, layout switch
 export default function CommandBar( props ) {
   const {
-    loading,
     company,
     category,
     sort,
@@ -87,8 +81,8 @@ export default function CommandBar( props ) {
             </h2>
           ))}
         </div>
-        <div className="ml-auto row">
-          <div className="color-basic m-r-5 m-l-5">
+        <div className="ml-auto center-hor row">
+          <div className="color-basic m-r-5 m-l-5 center-hor">
             {t('sortBy')}
           </div>
           <div className="min-width-120 m-r-5">

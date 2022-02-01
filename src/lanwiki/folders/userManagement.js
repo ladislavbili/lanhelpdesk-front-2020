@@ -1,5 +1,4 @@
 import React from 'react';
-import classnames from 'classnames';
 import Checkbox from 'components/checkbox';
 import {
   Label,

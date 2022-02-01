@@ -1,6 +1,5 @@
 import React from 'react';
 import Empty from 'components/Empty';
-import Checkbox from 'components/checkbox';
 import {
   Modal,
   ModalBody,
