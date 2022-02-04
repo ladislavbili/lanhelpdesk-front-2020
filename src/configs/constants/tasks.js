@@ -84,6 +84,7 @@ export const defaultTasklistColumnPreference = {
   trips: false,
   materialsWithoutDPH: false,
   materialsWithDPH: false,
+  repeat: false,
 }
 
 export const defaultTasklistGanttColumnPreference = {
@@ -244,6 +245,10 @@ export const attributeLimitingRights = [
     right: ( project ) => checkRight( project, 'taskMaterialsRead' ),
     preference: 'materialsWithDPH'
   },
+  {
+    right: ( project ) => checkAttributeRight( project, 'repeat' ),
+    preference: 'repeat'
+  },
 ]
 export const ganttAttributeLimitingRights = [
   {
@@ -398,7 +403,7 @@ export const allFilterAttributes = [
   },
 ]
 
-export const createDisplayValues = ( preference, withoutProject ) => {
+export const createDisplayValues = ( preference, withoutProject, t ) => {
   let displayValues = [
     {
       value: 'checked',
@@ -604,6 +609,16 @@ export const createDisplayValues = ( preference, withoutProject ) => {
         return '---';
       },
       show: preference[ 'materialsWithDPH' ],
+    },
+    {
+      value: 'repeat',
+      labelId: 'repeat',
+      label: 'Repeat',
+      type: 'custom',
+      func: ( task ) => {
+        return task.repeat ? `${t('repeatEvery')} ${task.repeat.repeatEvery} ${t(task.repeat.repeatInterval).toLowerCase()}` : t( 'noRepeat' );
+      },
+      show: preference[ 'repeat' ],
     },
   ]
   if ( !withoutProject ) {

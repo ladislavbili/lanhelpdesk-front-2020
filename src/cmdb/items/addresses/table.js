@@ -24,7 +24,7 @@ export default function AddressesTable( props ) {
       <table className="table">
         <thead>
           <tr className="bolder">
-            <th className="text-center">
+            <th>
               {t('nic')}
             </th>
             <th className="text-center">
@@ -56,7 +56,7 @@ export default function AddressesTable( props ) {
         <tbody>
           { addresses.map((address) => (
             <tr key={address.id}>
-              <td className="text-center">
+              <td>
                 {address.nic}
               </td>
               <td className="text-center">

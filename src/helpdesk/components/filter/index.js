@@ -653,6 +653,7 @@ export default function FilterForm( props ) {
 
         {/* Status Date */}
         <FilterDatePickerPopover
+          id="statusDate"
           label={t('statusDate')}
           minimal
           showNowFrom={statusDateFromNow}
@@ -667,6 +668,7 @@ export default function FilterForm( props ) {
 
         {/* Pending Date */}
         <FilterDatePickerPopover
+          id="pendingDate"
           label={t('pendingDate')}
           minimal
           showNowFrom={pendingDateFromNow}
@@ -681,6 +683,7 @@ export default function FilterForm( props ) {
 
         {/* Close Date */}
         <FilterDatePickerPopover
+          id="closeDate"
           label={t('closeDate')}
           minimal
           showNowFrom={closeDateFromNow}
@@ -695,6 +698,7 @@ export default function FilterForm( props ) {
 
         {/* Deadline */}
         <FilterDatePickerPopover
+          id="deadline"
           label={t('deadline')}
           minimal
           showNowFrom={deadlineFromNow}
@@ -709,6 +713,7 @@ export default function FilterForm( props ) {
 
         {/* Created at */}
         <FilterDatePickerPopover
+          id="createdAt"
           label={t('createdAt')}
           minimal
           showNowFrom={createdAtFromNow}

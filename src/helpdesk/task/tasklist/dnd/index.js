@@ -25,6 +25,10 @@ import {
   createDisplayValues,
 } from 'configs/constants/tasks';
 
+import {
+  useTranslation
+} from "react-i18next";
+
 export default function DnDListLoader( props ) {
   const {
     localProject,
@@ -34,6 +38,10 @@ export default function DnDListLoader( props ) {
     ascending,
     globalTaskSearch,
   } = props;
+
+  const {
+    t
+  } = useTranslation();
 
   const {
     data: localStringFilter,
@@ -69,7 +77,7 @@ export default function DnDListLoader( props ) {
     globalStringFilter: globalStringFilter.globalTaskStringFilter,
     setGlobalTaskStringFilter,
     setSingleLocalTaskStringFilter,
-    displayValues: createDisplayValues( defaultTasklistColumnPreference ),
+    displayValues: createDisplayValues( defaultTasklistColumnPreference, false, t ),
   }
 
   return (

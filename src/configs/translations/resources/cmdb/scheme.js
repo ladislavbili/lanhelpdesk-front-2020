@@ -8,8 +8,8 @@ export default {
     sk: 'Schému',
   },
   noSchemeUploaded: {
-    en: 'No scheme uploaded!',
-    sk: 'Bez nahranej schémy!',
+    en: 'No scheme uploaded',
+    sk: 'Bez nahranej schémy',
   },
   currentScheme: {
     en: 'Current scheme',

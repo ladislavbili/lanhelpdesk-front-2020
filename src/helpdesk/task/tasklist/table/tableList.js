@@ -163,7 +163,25 @@ export default function TableList( props ) {
     if ( display.type === 'important' || display.type === 'invoiced' ) {
       return null;
     } else if ( [ 'works', 'trips', 'materialsWithoutDPH', 'materialsWithDPH' ].includes( display.value ) ) {
-      return ( <th key={display.value} width={display.width ? display.width : '' } className={` ${display.className ? display.className : '' }` } /> );
+      return (
+        <th key={display.value} width={display.width ? display.width : '' } className={` ${display.className ? display.className : '' }` }>
+          <div className="row">
+            <div className="flex" />
+              {last &&
+                <div className="ml-auto row">
+                  <button type="button" disabled={loading} className="btn-link m-l-8 m-r-5" onClick={() => setLocalTaskStringFilter( defaultTasksAttributesFilter ) }>
+                    <i
+                      className="fas fa-times commandbar-command-icon text-highlight"
+                      />
+                  </button>
+                  <button type="button" disabled={loading} className="btn" onClick={setGlobalTaskStringFilter}>
+                    {t('filter')}
+                  </button>
+                </div>
+              }
+          </div>
+        </th>
+      );
     } else if ( display.type === 'checkbox' ) {
       return <th key={display.value} width={display.width ? display.width : '' } className={` ${display.className ? display.className : '' }` } >
         <Checkbox

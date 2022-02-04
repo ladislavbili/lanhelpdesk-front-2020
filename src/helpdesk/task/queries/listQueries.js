@@ -68,6 +68,13 @@ tasks {
     color
     action
   }
+  repeat {
+    id
+    repeatEvery
+    repeatInterval
+    startsAt
+    active
+  }
   tags {
     id
     color
@@ -115,6 +122,7 @@ works
 trips
 materialsWithoutDPH
 materialsWithDPH
+repeat
 `;
 
 const tasklistGanttPreferenceBody = `
@@ -218,6 +226,7 @@ mutation addOrUpdateTasklistColumnPreference(
   $trips: Boolean
   $materialsWithoutDPH: Boolean
   $materialsWithDPH: Boolean
+  $repeat: Boolean
 ) {
   addOrUpdateTasklistColumnPreference(
     projectId: $projectId
@@ -241,6 +250,7 @@ mutation addOrUpdateTasklistColumnPreference(
     trips: $trips
     materialsWithoutDPH: $materialsWithoutDPH
     materialsWithDPH: $materialsWithDPH
+    repeat: $repeat
   ){
     ${tasklistPreferenceBody}
   }

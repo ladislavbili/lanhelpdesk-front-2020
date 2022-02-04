@@ -3,10 +3,8 @@ import Select from 'react-select';
 import Checkbox from 'components/checkbox';
 import classnames from 'classnames';
 import Empty from 'components/Empty';
+import GeneralPopover from 'components/generalPopover';
 import {
-  Popover,
-  PopoverHeader,
-  PopoverBody,
   FormGroup,
   Label,
   Input
@@ -33,6 +31,7 @@ import {
 
 export default function SimpleRepeat( props ) {
   const {
+    taskID,
     repeat,
     submitRepeat,
     deleteRepeat,
@@ -69,7 +68,7 @@ export default function SimpleRepeat( props ) {
     if ( disabled ) {
       return;
     }
-    setOpen( true );
+    setOpen( !open );
   }
 
   const renderRepeatButton = () => {
@@ -106,7 +105,7 @@ export default function SimpleRepeat( props ) {
     <div  className="display-inline">
       {vertical &&
         <div className="form-selects-entry-column">
-          <Label style={{display: "block"}}>{t('repeat')}</Label>
+          <Label id={`task-repeat-${taskID}`} style={{display: "block"}}>{t('repeat')}</Label>
           <div className="form-selects-entry-column-rest">
             {renderRepeatButton()}
           </div>
@@ -114,95 +113,82 @@ export default function SimpleRepeat( props ) {
       }
       {!vertical &&
         <div className="row p-r-10">
-          <Label className="col-3 col-form-label">{t('repeat')}</Label>
+          <Label id={`task-repeat-${taskID}`} className="col-3 col-form-label">{t('repeat')}</Label>
           <div className="col-9">
             {renderRepeatButton()}
           </div>
         </div>
       }
 
-      <Popover placement="bottom" isOpen={open && !disabled} target={"repeatPopover"} toggle={toggleRepeat}>
-        <PopoverHeader>{t('repetition')}</PopoverHeader>
-        <PopoverBody>
-          <div>
-            <FormGroup className="task-add-date-picker-placeholder">
-              <Label>{t('startDate')} *</Label>
-              <DatePicker
-                className="form-control"
-                selected={startsAt}
-                onChange={setStartsAt}
-                placeholderText={t('noStartDate')}
-                />
-            </FormGroup>
+      <GeneralPopover
+        placement="bottom-start"
+        className="overflow-auto min-width-270"
+        target={`task-repeat-${taskID}`}
+        reset={() => {}}
+        submit={() => {
+          if(
+            repeatInterval.value===null ||
+            parseInt(repeatEvery) <= 0 ||
+            isNaN(parseInt(repeatEvery)) ||
+            startsAt === null
+          ){
+            if(repeat !== null){
+              deleteRepeat();
+            }
+          }else{
+            submitRepeat({
+              startsAt,
+              repeatEvery,
+              repeatInterval,
+              active
+            });
+          }
+          setOpen(false);
+        }}
+        open={ open && !disabled }
+        close={ toggleRepeat }
+        >
+        <div>
+          <FormGroup className="task-add-date-picker-placeholder">
+            <Label>{t('startDate')} *</Label>
+              <div className="flex-input">
+            <DatePicker
+              className="form-control"
+              selected={startsAt}
+              onChange={setStartsAt}
+              placeholderText={t('noStartDate')}
+              />
+          </div>
+          </FormGroup>
 
-            <FormGroup>
-              <Label>{t('repeatEvery')} *</Label>
-              <div className="row">
-                <div className="width-50-p p-r-20">
-                  <Input type="number"
-                    className={(parseInt(repeatEvery) < 0 ) ? "form-control-warning form-control-secondary" : "form-control-secondary"}
-                    placeholder={t('enterNumber')}
-                    value={( repeatEvery )}
-                    onChange={(e)=> setRepeatEvery(e.target.value)}
-                    />
-                </div>
-                <div className="width-50-p">
+          <FormGroup>
+            <Label>{t('repeatEvery')} *</Label>
+                <Input type="number"
+                  className={classnames({ "form-control-warning": parseInt(repeatEvery) < 0 }, "form-control-secondary hidden-input m-b-10" ) }
+                  placeholder={t('enterNumber')}
+                  value={( repeatEvery )}
+                  onChange={(e)=> setRepeatEvery(e.target.value)}
+                  />
                   <Select
                     value={translateSelectItem(repeatInterval, t)}
                     onChange={setRepeatInterval}
                     options={translateAllSelectItems(intervals, t)}
                     styles={pickSelectStyle()}
                     />
-                </div>
-                {
-                  parseInt(repeatEvery) <= 0 &&
-                  <Label className="warning">{t('warningMustBeMoreThan0')}.</Label>
-                }
-              </div>
-            </FormGroup>
-            <Checkbox
-              className = "m-r-5"
-              disabled = {disabled}
-              label={t('active')}
-              value = { active }
-              onChange={() => setActive(!active )}
-              />
-
-            <div className="row">
-              <button
-                className="btn-link"
-                onClick={() => setOpen(false) }>
-                {t('close')}
-              </button>
-              <button
-                className="btn ml-auto"
-                onClick={()=>{
-                  if(
-                    repeatInterval.value===null ||
-                    parseInt(repeatEvery) <= 0 ||
-                    isNaN(parseInt(repeatEvery)) ||
-                    startsAt === null
-                  ){
-                    if(repeat !== null){
-                      deleteRepeat();
-                    }
-                  }else{
-                    submitRepeat({
-                      startsAt,
-                      repeatEvery,
-                      repeatInterval,
-                      active
-                    });
-                  }
-                  setOpen(false);
-                }}
-                >
-                {t('save')}
-              </button>
-            </div>
-          </div>
-        </PopoverBody>
-      </Popover>
+          </FormGroup>
+          {
+            parseInt(repeatEvery) <= 0 &&
+            <Label className="warning">{t('warningMustBeMoreThan0')}.</Label>
+          }
+          <Checkbox
+            className = "m-r-5"
+            disabled = {disabled}
+            label={t('active')}
+            value = { active }
+            onChange={() => setActive(!active )}
+            />
+        </div>
+      </GeneralPopover>
     </div>
   );
 }

@@ -133,46 +133,46 @@ export default function ItemForm( props ) {
         className={classnames({"fit-with-header-and-lanwiki-commandbar scroll-visible": edit },"row")}
         style={{backgroundColor: "#eaeaea"}}
         >
-        <div className="task-edit-left">
-          {!disabled &&
-            <h2>{ edit ? `${t('edit')} ${t('cmdbItem2').toLowerCase()}` : `${t('add')} ${t('cmdbItem2').toLowerCase()}` }</h2>
-          }
+        <div className="task-edit-left p-b-20">
           <FormGroup>
             { disabled &&
-              <div className="row">
-                <h2>
-                  {title}
-                </h2>
-                <div className="ml-auto">
-                  <div>
-                    <span className="">
-                      {item.createdBy ? `${t('createdBy')} ` : ""}
-                    </span>
-                    <span className="bolder">
-                      {item.createdBy ? `${item.createdBy.fullName}` :''}
-                    </span>
-                    <span className="">
-                      {item.createdBy ?` ${t('atDate')} `: t('createdAt')}
-                    </span>
-                    <span className="bolder">
-                      {item.createdAt ? (timestampToString(item.createdAt)) : ''}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="">
-                      {item.updatedBy ? `${t('changedBy')} ` : ""}
-                    </span>
-                    <span className="bolder">
-                      {item.updatedBy ? `${item.updatedBy.fullName}` :''}
-                    </span>
-                    <span className="">
-                      {item.updatedBy ?` ${t('atDate')} `: t('changedAt')}
-                    </span>
-                    <span className="bolder">
-                      {item.createdAt ? (timestampToString(item.updatedAt)) : ''}
-                    </span>
+              <div>
+                <div className="row">
+                  <h2>
+                    {title}
+                  </h2>
+                  <div className="ml-auto">
+                    <div className="text-right">
+                      <span>
+                        {item.createdBy ? `${t('createdBy')} ` : ""}
+                      </span>
+                      <span className="bolder">
+                        {item.createdBy ? `${item.createdBy.fullName}` :''}
+                      </span>
+                      <span>
+                        {item.createdBy ?` ${t('atDate')} `: t('createdAt')}
+                      </span>
+                      <span className="bolder">
+                        {item.createdAt ? (timestampToString(item.createdAt)) : ''}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span>
+                        {item.updatedBy ? `${t('changedBy')} ` : ""}
+                      </span>
+                      <span className="bolder">
+                        {item.updatedBy ? `${item.updatedBy.fullName}` :''}
+                      </span>
+                      <span>
+                        {item.updatedBy ?` ${t('atDate')} `: t('changedAt')}
+                      </span>
+                      <span className="bolder">
+                        {item.createdAt ? (timestampToString(item.updatedAt)) : ''}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <hr />
               </div>
             }
             { !disabled &&
@@ -254,7 +254,10 @@ export default function ItemForm( props ) {
 
           { !edit &&
             <div className="row m-t-20">
-              <button className="btn-link-cancel" onClick={close}>{edit ? t('back') : t('cancel')}</button>
+              <button className="btn-red" onClick={close}>
+                <i className="fas fa-ban commandbar-command-icon" />
+                {t('cancel')}
+              </button>
               { !disabled &&
                 <div className="ml-auto">
                   <button
@@ -401,22 +404,27 @@ export default function ItemForm( props ) {
 
       </div>
       { !disabled && edit &&
-        <div className="task-add-layout row stick-to-bottom">
-          <div className="center-ver">
-            <button
-              className="btn-link task-add-layout-button btn-distance"
-              onClick={close}
-              >
-              <i className="fas fa-arrow-left commandbar-command-icon" />
-              {t('close')}
-            </button>
-            <button
-              className="btn-link task-add-layout-button btn-distance"
-              disabled={cannotSave() && showErrors}
-              onClick={saveOrAddItem}
-              >
-              {saving ? `${t('saving')}...` : `${t('save')} ${t('cmdbItem2').toLowerCase()}`}
-            </button>
+        <div className="button-bar row stick-to-bottom">
+          <div className="center-ver row">
+            <div>
+              <button
+                className="btn-red btn-distance center-hor"
+                onClick={close}
+                >
+                <i className="fas fa-ban commandbar-command-icon" />
+                {t('cancel')}
+              </button>
+            </div>
+            <div>
+              <button
+                className="btn btn-distance center-hor"
+                disabled={cannotSave() && showErrors}
+                onClick={saveOrAddItem}
+                >
+                <i className="fas fa-save commandbar-command-icon" />
+                {saving ? `${t('saving')}...` : `${t('save')}`}
+              </button>
+            </div>
           </div>
         </div>
       }

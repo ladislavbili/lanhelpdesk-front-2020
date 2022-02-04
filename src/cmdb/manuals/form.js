@@ -69,62 +69,65 @@ export default function ManualForm( props ) {
         >
 
         <div className="row">
-          <h2 className="m-b-20" >
-            {`${ edit ? t('edit') : t('add')} ${t('manual').toLowerCase()}`}
-          </h2>
-          { disabled &&
-          <div className="ml-auto">
-            <div>
-              <span className="">
-                {manual.createdBy ? `${t('createdBy')} ` : ""}
-              </span>
-              <span className="bolder">
-                {manual.createdBy ? `${manual.createdBy.fullName}` :''}
-              </span>
-              <span className="">
-                {manual.createdBy ?` ${t('atDate')} `: t('createdAt')}
-              </span>
-              <span className="bolder">
-                {manual.createdAt ? (timestampToString(manual.createdAt)) : ''}
-              </span>
-            </div>
-            <div>
-              <span className="">
-                {manual.updatedBy ? `${t('changedBy')} ` : ""}
-              </span>
-              <span className="bolder">
-                {manual.updatedBy ? `${manual.updatedBy.fullName}` :''}
-              </span>
-              <span className="">
-                {manual.updatedBy ?` ${t('atDate')} `: t('changedAt')}
-              </span>
-              <span className="bolder">
-                {manual.createdAt ? (timestampToString(manual.updatedAt)) : ''}
-              </span>
-            </div>
-          </div>
-          }
         </div>
         <FormGroup>
-          <Label htmlFor="name">{t('title')}</Label>
+          { !disabled && <Label htmlFor="name">{t('title')}</Label> }
           { disabled &&
-            <h2>
-              {title}
-            </h2>
+            <div>
+              <div className="row">
+                <div>
+                  <Label htmlFor="name">{t('title')}</Label>
+                  <h2>
+                    {title}
+                  </h2>
+                </div>
+                <div className="ml-auto">
+                  <div className="text-right">
+                    <span>
+                      {manual.createdBy ? `${t('createdBy')} ` : ""}
+                    </span>
+                    <span className="bolder">
+                      {manual.createdBy ? `${manual.createdBy.fullName}` :''}
+                    </span>
+                    <span>
+                      {manual.createdBy ?` ${t('atDate')} `: t('createdAt')}
+                    </span>
+                    <span className="bolder">
+                      {manual.createdAt ? (timestampToString(manual.createdAt)) : ''}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span>
+                      {manual.updatedBy ? `${t('changedBy')} ` : ""}
+                    </span>
+                    <span className="bolder">
+                      {manual.updatedBy ? `${manual.updatedBy.fullName}` :''}
+                    </span>
+                    <span>
+                      {manual.updatedBy ?` ${t('atDate')} `: t('changedAt')}
+                    </span>
+                    <span className="bolder">
+                      {manual.createdAt ? (timestampToString(manual.updatedAt)) : ''}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <hr />
+            </div>
           }
           { !disabled &&
             <Input id="name" className="form-control" placeholder={t('titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)}/>
           }
         </FormGroup>
 
-        { disabled &&
-          <FormGroup>
-            <div className="task-edit-popis p-t-10 min-height-300-f" dangerouslySetInnerHTML={{ __html: body }} />
-          </FormGroup>
-        }
-        { !disabled &&
-          <FormGroup>
-            <Label htmlFor="content">{t('content')}</Label>
+        <FormGroup>
+          <Label htmlFor="content">{t('content')}</Label>
+          { disabled &&
+            <FormGroup>
+              <div className="task-edit-popis p-t-10 min-height-300-f" dangerouslySetInnerHTML={{ __html: body }} />
+            </FormGroup>
+          }
+          { !disabled &&
             <CKEditor
               value={body}
               type="imageUpload"
@@ -132,15 +135,18 @@ export default function ManualForm( props ) {
                 setBody(body);
               }}
               />
-          </FormGroup>
-        }
+          }
+        </FormGroup>
 
         { !edit && <AddManualErrors title={title} body={body} show={showErrors} />}
         { edit && <EditManualErrors title={title} body={body} show={showErrors} />}
 
         { !edit &&
           <div className="row m-t-20">
-          <button className="btn-link-cancel" onClick={close}>{edit ? t('back') : t('cancel')}</button>
+            <button className="btn-red" onClick={close}>
+              <i className="fas fa-ban commandbar-command-icon" />
+              {t('cancel')}
+              </button>
             { !disabled &&
               <div className="ml-auto">
                 <button
@@ -148,7 +154,7 @@ export default function ManualForm( props ) {
                   disabled={cannotSave() && showErrors}
                   onClick={saveOrAddManual}
                   >
-                  {saving ? `${t('adding')}...` : `${t('add')} ${t('manual').toLowerCase()}`}
+                  {saving ? `${t('adding')}...` : `${t('add')}`}
                 </button>
               </div>
             }
@@ -156,22 +162,27 @@ export default function ManualForm( props ) {
         }
       </div>
       { !disabled && edit &&
-        <div className="task-add-layout row stick-to-bottom">
-          <div className="center-ver">
-            <button
-              className="btn-link task-add-layout-button btn-distance"
-              onClick={close}
-              >
-              <i className="fas fa-arrow-left commandbar-command-icon" />
-              {t('close')}
-            </button>
-            <button
-              className="btn-link task-add-layout-button btn-distance"
-              disabled={cannotSave() && showErrors}
-              onClick={saveOrAddManual}
-              >
-              {saving ? `${t('saving')}...` : `${t('save')} ${t('manual').toLowerCase()}`}
-            </button>
+        <div className="button-bar row stick-to-bottom">
+          <div className="center-ver row">
+            <div>
+              <button
+                className="btn-red btn-distance center-hor"
+                onClick={close}
+                >
+                <i className="fas fa-ban commandbar-command-icon" />
+                {t('cancel')}
+              </button>
+            </div>
+            <div>
+              <button
+                className="btn btn-distance center-hor"
+                disabled={cannotSave() && showErrors}
+                onClick={saveOrAddManual}
+                >
+                <i className="fas fa-save commandbar-command-icon" />
+                {saving ? `${t('saving')}...` : `${t('save')}`}
+              </button>
+            </div>
           </div>
         </div>
       }

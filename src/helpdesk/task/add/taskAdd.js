@@ -17,8 +17,7 @@ import axios from 'axios';
 import Attachments from '../components/attachments';
 import TagsPickerPopover from '../components/tags';
 import ShortSubtasks from '../components/shortSubtasks';
-import WorksTable from '../components/vykazy/worksTable';
-import Materials from '../components/vykazy/materialsTable';
+import Vykazy from '../components/vykazy';
 import ErrorDisplay, {
   hasAddTaskIssues
 } from '../components/errorDisplay/addTaskErrorDisplay';
@@ -781,7 +780,7 @@ export default function TaskAdd( props ) {
             onChange={date => {
               setStartsAt( isNaN(date.valueOf()) ? null : date );
             }}
-            placeholderText={t('startsAtPlaceholder')}
+            placeholderText={t('plannedAtPlaceholder')}
             />
         }
       </div>
@@ -913,7 +912,7 @@ export default function TaskAdd( props ) {
             <div className="col-4">
               { userRights.attributeRights.startsAt.add &&
                 <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">{t('startsAt')}{ userRights.attributeRights.startsAt.required && <span className="warning-big">*</span> }</Label>
+                  <Label className="col-3 col-form-label">{t('plannedAt')}{ userRights.attributeRights.startsAt.required && <span className="warning-big">*</span> }</Label>
                   <div className="col-9">
                     { layoutComponents.StartsAt }
                   </div>
@@ -1033,7 +1032,7 @@ export default function TaskAdd( props ) {
         }
         { userRights.attributeRights.startsAt.add &&
           <div className="form-selects-entry-column" >
-            <Label>{t('startsAt')}{ userRights.attributeRights.startsAt.required && <span className="warning-big">*</span> }</Label>
+            <Label>{t('plannedAt')}{ userRights.attributeRights.startsAt.required && <span className="warning-big">*</span> }</Label>
             <div className="form-selects-entry-column-rest" >
               { layoutComponents.StartsAt }
             </div>
@@ -1221,124 +1220,24 @@ export default function TaskAdd( props ) {
     }
 
     return (
-      <Empty>
-        { (
-          userRights.rights.taskWorksWrite ||
-          userRights.rights.taskWorksAdvancedWrite
-        ) &&
-        <WorksTable
-          userID={currentUser.id}
-          userRights={userRights}
-          currentUser={currentUser}
-          company={company}
-          showTotals={true}
-          showColumns={ [ 'done', 'title', 'quantity', 'assigned', 'approved', 'actions' ] }
-          showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
-          autoApproved={project ? project.autoApproved : false}
-          canAddSubtasksAndTrips={assignedTo.length !== 0}
-          canEditInvoiced={false}
-          taskAssigned={assignedTo}
-
-          taskTypes={taskTypes}
-          defaultType={taskType}
-          subtasks={subtasks}
-          addSubtask={(newSubtask)=>{
-            setSubtasks([...subtasks,{id:getNewID(), ...newSubtask}]);
-          }}
-          updateSubtask={(id,newData)=>{
-            let newSubtasks=[...subtasks];
-            let index = newSubtasks.findIndex((subtask)=>subtask.id===id);
-            if(newData.approved && newSubtasks[index].approved !== newData.approved ){
-              newSubtasks[index]={...newSubtasks[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-            }else{
-              newSubtasks[index]={...newSubtasks[index],...newData };
-            }
-            setSubtasks(newSubtasks);
-          }}
-          updateSubtasks={(multipleSubtasks)=>{
-            let newSubtasks=[...subtasks];
-            multipleSubtasks.forEach(({id, newData})=>{
-              newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
-            });
-            setSubtasks(newSubtasks);
-          }}
-          removeSubtask={(id)=>{
-            let newSubtasks=[...subtasks];
-            newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
-            setSubtasks(newSubtasks);
-          }}
-
-          workTrips={ workTrips }
-          tripTypes={tripTypes}
-          workTrips={workTrips}
-          tripTypes={tripTypes}
-          addTrip={(newTrip)=>{
-            setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
-          }}
-          updateTrip={(id,newData)=>{
-            let newTrips=[...workTrips];
-            let index = newTrips.findIndex((trip)=>trip.id===id);
-            if(newData.approved && newTrips[index].approved !== newData.approved ){
-              newTrips[index]={...newTrips[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-            }else{
-              newTrips[index]={...newTrips[index],...newData };
-            }
-            setWorkTrips(newTrips);
-          }}
-          updateTrips={(multipleTrips)=>{
-            let newTrips=[...workTrips];
-            multipleTrips.forEach(({id, newData})=>{
-              newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-            });
-            setWorkTrips(newTrips);
-          }}
-          removeTrip={(id)=>{
-            let newTrips=[...workTrips];
-            newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
-            setWorkTrips(newTrips);
-          }}
-          />
-
-      }
-
-      { userRights.rights.taskMaterialsWrite &&
-        <Materials
-          showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
-          showTotals={true}
-          autoApproved={project ? project.autoApproved : false}
-          userRights={userRights}
-          currentUser={currentUser}
-          company={company}
-          materials={ materials }
-          addMaterial={(newMaterial)=>{
-            setMaterials([...materials,{id:getNewID(),...newMaterial}]);
-          }}
-          updateMaterial={(id,newData)=>{
-            let newMaterials=[...materials];
-            let index = newMaterials.findIndex((material)=>material.id===id);
-            if(newData.approved && newMaterials[index].approved !== newData.approved ){
-              newMaterials[index]={...newMaterials[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-            }else{
-              newMaterials[index]={...newMaterials[index],...newData };
-            }
-            setMaterials(newMaterials);
-          }}
-          updateMaterials={(multipleMaterials)=>{
-            let newMaterials=[...materials];
-            multipleMaterials.forEach(({id, newData})=>{
-              newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-            });
-            setMaterials(newMaterials);
-          }}
-          removeMaterial={(id)=>{
-            let newMaterials=[...materials];
-            newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-            setMaterials(newMaterials);
-          }}
-          />
-      }
-    </Empty>
-    )
+      <Vykazy
+        autoApproved={project ? project.autoApproved : false}
+        userRights={userRights}
+        currentUser={currentUser}
+        assignedTo={assignedTo}
+        company={company}
+        works={subtasks}
+        setWorks={setSubtasks}
+        taskTypes={taskTypes}
+        taskType={taskType}
+        trips={workTrips}
+        setTrips={setWorkTrips}
+        tripTypes={tripTypes}
+        materials={materials}
+        setMaterials={setMaterials}
+        setSaving={setSaving}
+        />
+    );
   }
 
   const renderButtons = () => {

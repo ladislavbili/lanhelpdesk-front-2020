@@ -726,7 +726,7 @@ export default function ProjectEdit( props ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
-        RenderDescription = <div className="task-edit-popis">{t('projectNoDescription')}</div>
+        RenderDescription = <div className="task-edit-popis">{t('projectnoTaskDescription')}</div>
       }
     } else {
       if ( editingDescription ) {
@@ -753,7 +753,7 @@ export default function ProjectEdit( props ) {
         if ( description.length !== 0 ) {
           RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
         } else {
-          RenderDescription = <div className="task-edit-popis">{t('projectNoDescription')}</div>
+          RenderDescription = <div className="task-edit-popis">{t('projectnoTaskDescription')}</div>
         }
       }
     }

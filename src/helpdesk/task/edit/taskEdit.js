@@ -34,8 +34,7 @@ import Repeat from 'helpdesk/components/repeat/repeatFormInput';
 import Attachments from '../components/attachments';
 import TagsPickerPopover from '../components/tags';
 import ShortSubtasks from '../components/shortSubtasks';
-import Materials from '../components/vykazy/materialsTable';
-import WorksTable from '../components/vykazy/worksTable';
+import Vykazy from '../components/vykazy';
 import Comments from '../components/comments';
 import TaskHistory from '../components/taskHistory';
 import ErrorDisplay from '../components/errorDisplay/editTaskErrorDisplay';
@@ -106,18 +105,10 @@ export default function TaskEdit( props ) {
     addCompanyToList,
     addAttachments,
     removeAttachment,
-    addSubtaskFunc,
-    updateSubtaskFunc,
-    deleteSubtaskFunc,
-    addWorkTripFunc,
-    updateWorkTripFunc,
-    deleteWorkTripFunc,
-    addMaterialFunc,
-    updateMaterialFunc,
-    deleteMaterialFunc,
     addShortSubtask,
     updateShortSubtask,
     deleteShortSubtask,
+    updateCasheStorage,
     updateTask,
     client,
     fromInvoice,
@@ -784,7 +775,7 @@ export default function TaskEdit( props ) {
       const datepickerDisabled = !userRights.attributeRights.status.edit || !pendingChangable || invoiced;
       return (
         <div className="task-info ml-auto">
-            {t('pendingDate')} :
+          {t('pendingDate')} :
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
@@ -818,7 +809,7 @@ export default function TaskEdit( props ) {
       const datepickerDisabled = ( status.action !== 'CloseDate' && status.action !== 'CloseInvalid' ) || !userRights.attributeRights.status.edit || invoiced;
       return (
         <div className="task-info ml-auto">
-            {t('closedAt')}:
+          {t('closedAt')}:
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
@@ -884,7 +875,7 @@ export default function TaskEdit( props ) {
         { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit && !invoiced &&
           <Select
             value={assignedTo}
-              placeholder={t('selectRecommended')}
+            placeholder={t('selectRecommended')}
             isMulti
             onChange={(users)=> {
               if (users.some(u => u.id === -1)){
@@ -933,16 +924,16 @@ export default function TaskEdit( props ) {
           <div className="disabled-info">{taskType ? taskType.label : t('none')}</div>
         }
         { !projectAttributes.taskType.fixed && userRights.attributeRights.taskType.edit && !invoiced &&
-        <Select
-          placeholder={t('taskTypePlaceholder')}
-          value={taskType}
-          styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
-          onChange={(type)=> {
-            setTaskType(type);
-            autoUpdateTask({ taskType: type.id })
-          }}
-          options={[noTaskType, ...taskTypes]}
-          />
+          <Select
+            placeholder={t('taskTypePlaceholder')}
+            value={taskType}
+            styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
+            onChange={(type)=> {
+              setTaskType(type);
+              autoUpdateTask({ taskType: type.id })
+            }}
+            options={[noTaskType, ...taskTypes]}
+            />
         }
       </div>
     ),
@@ -988,7 +979,7 @@ export default function TaskEdit( props ) {
     StartsAt: (
       <div>
         { (projectAttributes.startsAt.fixed || !userRights.attributeRights.startsAt.edit || invoiced) &&
-          <div className="disabled-info">{startsAt ? timestampToString(startsAt.valueOf()) : t('noStartsAt') }</div>
+          <div className="disabled-info">{startsAt ? timestampToString(startsAt.valueOf()) : t('noPlannedAt') }</div>
         }
         { !projectAttributes.startsAt.fixed && userRights.attributeRights.startsAt.edit && !invoiced &&
           <DatePicker
@@ -1000,7 +991,7 @@ export default function TaskEdit( props ) {
               setStartsAt( isNaN(date.valueOf()) ? null : date );
               autoUpdateTask({ startsAt: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
             }}
-            placeholderText={t('startsAtPlaceholder')}
+            placeholderText={t('plannedAtPlaceholder')}
             />
         }
       </div>
@@ -1140,7 +1131,7 @@ export default function TaskEdit( props ) {
               }
               { userRights.attributeRights.startsAt.view &&
                 <div className="p-r-10">
-                  <Label className="col-form-label col-3">{t('startsAt')}</Label>
+                  <Label className="col-form-label col-3">{t('plannedAt')}</Label>
                   <div className="col-9">
                     { layoutComponents.StartsAt }
                   </div>
@@ -1288,7 +1279,7 @@ export default function TaskEdit( props ) {
           }
           { userRights.attributeRights.startsAt.view &&
             <div className="form-selects-entry-column" >
-              <Label>{t('startsAt')}</Label>
+              <Label>{t('plannedAt')}</Label>
               <div className="form-selects-entry-column-rest" >
                 { layoutComponents.StartsAt }
               </div>
@@ -1398,7 +1389,7 @@ export default function TaskEdit( props ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
-        RenderDescription = <div className="task-edit-popis">{t('noDescription')}</div>
+        RenderDescription = <div className="task-edit-popis">{t('noTaskDescription')}</div>
       }
     } else {
       if ( showDescription && !invoiced ) {
@@ -1425,7 +1416,7 @@ export default function TaskEdit( props ) {
         if ( description.length !== 0 ) {
           RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
         } else {
-          RenderDescription = <div className="task-edit-popis">{t('noDescription')}</div>
+          RenderDescription = <div className="task-edit-popis">{t('noTaskDescription')}</div>
         }
       }
     }
@@ -1546,140 +1537,28 @@ export default function TaskEdit( props ) {
     }
 
     return (
-      <Empty>
-        { (
-          userRights.rights.taskWorksRead ||
-          userRights.rights.taskWorksAdvancedRead
-        ) &&
-        <WorksTable
-          invoiced={invoiced}
-          userID={currentUser.id}
-          userRights={userRights}
-          currentUser={currentUser}
-          company={company}
-          showTotals={true}
-          showColumns={ [ 'done', 'title', 'quantity', 'assigned', 'approved', 'actions' ] }
-          showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
-          autoApproved={project ? project.project.autoApproved : false}
-          canAddSubtasksAndTrips={assignedTo.length !== 0}
-          canEditInvoiced={false}
-          taskAssigned={assignedTo.filter((user) => user.id !== null )}
-
-          taskTypes={taskTypes}
-          defaultType={taskType}
-          subtasks={ subtasks }
-          addSubtask={(newSubtask, price) => {
-            addSubtaskFunc(newSubtask);
-            setVykazyChanged(true);
-          }}
-          updateSubtask={(id,newData)=>{
-            let originalSubtask = subtasks.find((item)=>item.id===id);
-            originalSubtask = {
-              ...originalSubtask,
-              scheduled: originalSubtask.scheduled ?
-              {
-                from: originalSubtask.scheduled.from,
-                to: originalSubtask.scheduled.to,
-              } :
-              null
-            }
-            updateSubtaskFunc({...originalSubtask,...newData});
-            setVykazyChanged(true);
-          }}
-          updateSubtasks={(multipleSubtasks)=>{
-            multipleSubtasks.forEach(({id, newData})=>{
-              let originalSubtask = subtasks.find((item)=>item.id===id);
-              originalSubtask = {
-                ...originalSubtask,
-                scheduled: originalSubtask.scheduled ?
-                {
-                  from: originalSubtask.scheduled.from,
-                  to: originalSubtask.scheduled.to,
-                } :
-                null
-              }
-              updateSubtaskFunc({...originalSubtask,...newData});
-              setVykazyChanged(true);
-            });
-          }}
-          removeSubtask={(id)=>{
-            deleteSubtaskFunc(id);
-            setVykazyChanged(true);
-          }}
-
-          workTrips={ workTrips }
-          tripTypes={tripTypes}
-          addTrip={(newTrip, price)=>{
-            addWorkTripFunc(newTrip);
-            setVykazyChanged(true);
-          }}
-          updateTrip={(id,newData)=>{
-            let originalTrip = workTrips.find((item)=>item.id===id);
-            originalTrip = {
-              ...originalTrip,
-              scheduled: originalTrip.scheduled ?
-              {
-                from: originalTrip.scheduled.from,
-                to: originalTrip.scheduled.to,
-              } :
-              null
-            }
-            updateWorkTripFunc({...originalTrip,...newData});
-            setVykazyChanged(true);
-          }}
-          updateTrips={(multipleTrips)=>{
-            multipleTrips.forEach(({id, newData})=>{
-              let originalTrip = workTrips.find((item)=>item.id===id);
-              originalTrip = {
-                ...originalTrip,
-                scheduled: originalTrip.scheduled ?
-                {
-                  from: originalTrip.scheduled.from,
-                  to: originalTrip.scheduled.to,
-                } :
-                null
-              }
-              updateWorkTripFunc({...originalTrip,...newData});
-              setVykazyChanged(true);
-            });
-          }}
-          removeTrip={(id)=>{
-            deleteWorkTripFunc(id);
-            setVykazyChanged(true);
-          }}
-          />
-      }
-
-      { userRights.rights.taskPausalInfo && renderCompanyPausalInfo()}
-
-      { userRights.rights.taskMaterialsRead &&
-        <Materials
-          invoiced={invoiced}
-          showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
-          showTotals={true}
-          autoApproved={project ? project.project.autoApproved : false}
-          userRights={userRights}
-          currentUser={currentUser}
-          company={company}
-          materials={ materials }
-          addMaterial={(newMaterial)=>{
-            addMaterialFunc(newMaterial);
-          }}
-          updateMaterial={(id,newData)=>{
-            updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-          }}
-          updateMaterials={(multipleMaterials)=>{
-            multipleMaterials.forEach(({id, newData})=>{
-              updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-            });
-          }}
-          removeMaterial={(id)=>{
-            deleteMaterialFunc(id);
-          }}
-          />
-      }
-    </Empty>
-    )
+      <Vykazy
+        edit
+        task={id}
+        invoiced={invoiced}
+        fromInvoice
+        autoApproved={project ? project.project.autoApproved : false}
+        userRights={userRights}
+        currentUser={currentUser}
+        assignedTo={assignedTo}
+        company={company}
+        setChanged={() => setVykazyChanged(true) }
+        updateCasheStorage={updateCasheStorage}
+        renderCompanyPausalInfo={renderCompanyPausalInfo}
+        works={subtasks}
+        taskTypes={taskTypes}
+        taskType={taskType}
+        trips={workTrips}
+        tripTypes={tripTypes}
+        setMaterials
+        materials={materials}
+        />
+    );
   }
 
   const renderComments = () => {

@@ -92,7 +92,7 @@ export default function PageHeader( props ) {
       <div className="lansystems-title">
         { (accessRights.lanwiki || accessRights.cmdb) &&
           <button className="btn btn-link color-white center-hor" id="page-select-popover" onClick={ () => setOpen(true) } >
-            <i className="m-r-15 fa fa-bars font-size-16-f"/>
+            <i className="m-r-15 fa fa-th font-size-16-f"/>
           </button>
         }
         <h1 className="center-hor clickable noselect" onClick={() => history.push(selectSubpageLink()) }>{selectSubpageTitle()}</h1>

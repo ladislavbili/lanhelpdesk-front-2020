@@ -158,7 +158,7 @@ export default function Sidebar( props ) {
             <Select
               options={[translateSelectItem(allCompanies, t), ...toSelArr(companies)]}
               value={translateSelectItem(company, t)}
-              styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar', 'flex' ])}
+              styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar', 'flex', 'inputSize' ])}
               onChange={company => {
                 setCmdbSidebarCompany(company);
                 history.push(`/cmdb/i/${category ? category.id : 'all'  }`)

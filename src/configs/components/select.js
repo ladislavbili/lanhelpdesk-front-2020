@@ -1,15 +1,21 @@
 import chroma from 'chroma-js';
 
 const value = {
-  font: '14px Segoe UI',
+  fontFamily: "Segoe UI",
+  fontStyle: "normal",
+  fontSize: '14px',
   color: '#333',
 }
 const noValue = {
-  font: '14px Segoe UI',
+  fontFamily: "Segoe UI",
+  fontStyle: "normal",
+  fontSize: '14px',
   color: '#777',
 }
 const noValueMandatory = {
-  font: '14px Segoe UI',
+  fontFamily: "Segoe UI",
+  fontStyle: "normal",
+  fontSize: '14px',
 }
 
 export const pickSelectStyleWithRequired = ( defaultStyles, requiredStyles, required ) => {
@@ -35,6 +41,9 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
   const bolder = wantedAttributes.includes( 'bolder' );
   const basic = wantedAttributes.includes( 'basic' );
   const flex = wantedAttributes.includes( 'flex' );
+  const size12 = wantedAttributes.includes( 'size12' );
+  const size14 = wantedAttributes.includes( 'size14' );
+  const inputSize = wantedAttributes.includes( 'inputSize' );
 
   return {
     container: ( base, state ) => {
@@ -103,6 +112,27 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           lineHeight: "20px",
           letterSpacing: "0.5px",
           color: "#0078D4",
+        }
+      }
+
+      if ( size12 ) {
+        newStyle = {
+          ...newStyle,
+          fontSize: "12px",
+        }
+      }
+
+      if ( size14 ) {
+        newStyle = {
+          ...newStyle,
+          fontSize: "14px",
+        }
+      }
+
+      if ( inputSize ) {
+        newStyle = {
+          ...newStyle,
+          minHeight: 30,
         }
       }
 
@@ -250,6 +280,20 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           padding: '0px 6px',
         }
       }
+      if ( size12 ) {
+        newStyle = {
+          ...newStyle,
+          fontSize: "12px",
+        }
+      }
+
+      if ( size14 ) {
+        newStyle = {
+          ...newStyle,
+          fontSize: "14px",
+        }
+      }
+
       if ( highlight ) {
         newStyle = {
           ...newStyle,
@@ -304,6 +348,21 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
           fontSize: "14px",
         }
       }
+
+      if ( size12 ) {
+        newStyle = {
+          ...newStyle,
+          fontSize: "12px",
+        }
+      }
+
+      if ( size14 ) {
+        newStyle = {
+          ...newStyle,
+          fontSize: "14px",
+        }
+      }
+
       if ( segoe ) {
         newStyle = {
           ...newStyle,

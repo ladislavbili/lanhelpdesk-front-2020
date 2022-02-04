@@ -8,6 +8,9 @@ import {
 import {
   useMutation,
 } from "@apollo/client";
+import Empty from 'components/Empty';
+import WorksTable from './worksTable';
+import Materials from './materialsTable';
 
 import {
   ADD_SUBTASK,
@@ -21,23 +24,33 @@ import {
   DELETE_MATERIAL,
 } from './queries';
 
+let fakeID = -1;
+
 export default function TaskEditTablesLoader( props ) {
   const {
+    edit,
     task,
-    userRights,
     invoiced,
-    currentUser,
-    company,
+    fromInvoice,
     autoApproved,
+    userRights,
+    currentUser,
     assignedTo,
+    company,
+    updateCasheStorage,
+    renderCompanyPausalInfo,
+    works,
+    setWorks,
     taskTypes,
     taskType,
-    subtasks,
-    edit,
-    updateCasheStorage,
-    setSaving,
-    fromInvoice,
+    trips,
+    setTrips,
+    tripTypes,
+    setMaterials,
+    materials,
   } = props;
+  const setChanged = props.setChanged ? props.setChanged : () => {};
+  const setSaving = props.setSaving ? props.setSaving : () => {};
 
   const [ addSubtask ] = useMutation( ADD_SUBTASK );
   const [ updateSubtask ] = useMutation( UPDATE_SUBTASK );
@@ -45,308 +58,339 @@ export default function TaskEditTablesLoader( props ) {
   const [ addWorkTrip ] = useMutation( ADD_WORKTRIP );
   const [ updateWorkTrip ] = useMutation( UPDATE_WORKTRIP );
   const [ deleteWorkTrip ] = useMutation( DELETE_WORKTRIP );
-  const [ addMaterial ] = useMutation( ADD_MATERIAL );
-  const [ updateMaterial ] = useMutation( UPDATE_MATERIAL );
-  const [ deleteMaterial ] = useMutation( DELETE_MATERIAL );
+  const [ addTaskMaterial ] = useMutation( ADD_MATERIAL );
+  const [ updateTaskMaterial ] = useMutation( UPDATE_MATERIAL );
+  const [ deleteTaskMaterial ] = useMutation( DELETE_MATERIAL );
 
-  const addSubtaskFunc = ( sub ) => {
-    setSaving( true );
+  const addWork = ( work ) => {
+    if ( edit ) {
+      setSaving( true );
 
-    addSubtask( {
-        variables: {
-          title: sub.title,
-          order: sub.order,
-          done: sub.done,
-          approved: sub.approved,
-          discount: sub.discount,
-          quantity: sub.quantity,
-          //type: sub.type.id,
-          task,
-          assignedTo: sub.assignedTo.id,
-          scheduled: sub.scheduled,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.addSubtask, 'subtasks', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
+      addSubtask( {
+          variables: {
+            title: work.title,
+            order: work.order,
+            done: work.done,
+            approved: work.approved,
+            discount: work.discount,
+            quantity: work.quantity,
+            //type: work.type.id,
+            task,
+            assignedTo: work.assignedTo.id,
+            scheduled: work.scheduled,
+            fromInvoice,
+          }
+        } )
+        .then( ( response ) => {
+          updateCasheStorage( response.data.addSubtask, 'subtasks', 'ADD' );
+          setSaving( false );
+        } )
+        .catch( ( err ) => {
+          addLocalError( err );
+          setSaving( false );
+        } );
+    } else {
+      work.id = fakeID--;
+      setWorks( [ ...works, work ] )
+    }
   }
 
-  const updateSubtaskFunc = ( sub ) => {
-    setSaving( true );
+  const updateWork = ( work ) => {
+    if ( edit ) {
+      setSaving( true );
 
-    updateSubtask( {
-        variables: {
-          id: sub.id,
-          title: sub.title,
-          order: sub.order,
-          done: sub.done,
-          approved: sub.approved,
-          discount: sub.discount,
-          quantity: sub.quantity,
-          //type: sub.type.id,
-          assignedTo: sub.assignedTo.id,
-          scheduled: sub.scheduled,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.updateSubtask, 'subtasks', 'UPDATE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
+      updateSubtask( {
+          variables: {
+            id: work.id,
+            title: work.title,
+            order: work.order,
+            done: work.done,
+            approved: work.approved,
+            discount: work.discount,
+            quantity: work.quantity,
+            //type: work.type.id,
+            assignedTo: work.assignedTo.id,
+            scheduled: work.scheduled,
+            fromInvoice,
+          }
+        } )
+        .then( ( response ) => {
+          updateCasheStorage( response.data.updateSubtask, 'subtasks', 'UPDATE' );
+          setSaving( false );
+        } )
+        .catch( ( err ) => {
+          addLocalError( err );
+          setSaving( false );
+        } );
+    } else {
+      setWorks( updateArrayItem( works, work ) );
+    }
   }
 
-  const deleteSubtaskFunc = ( id ) => {
-    deleteSubtask( {
-        variables: {
-          id,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'subtasks', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
+  const deleteWork = ( id ) => {
+    if ( edit ) {
+      deleteSubtask( {
+          variables: {
+            id,
+            fromInvoice,
+          }
+        } )
+        .then( ( response ) => {
+          updateCasheStorage( {
+            id
+          }, 'subtasks', 'DELETE' );
+        } )
+        .catch( ( err ) => {
+          addLocalError( err );
+        } );
+    } else {
+      setWorks( works.filter( ( work ) => work.id !== id ) );
+    }
   }
 
-  const addWorkTripFunc = ( wt ) => {
-    setSaving( true );
+  const addTrip = ( trip ) => {
+    if ( edit ) {
+      setSaving( true );
 
-    addWorkTrip( {
-        variables: {
-          order: wt.order,
-          done: wt.done,
-          approved: wt.approved,
-          discount: parseFloat( wt.discount ),
-          quantity: parseFloat( wt.quantity ),
-          type: wt.type.id,
-          task,
-          assignedTo: wt.assignedTo.id,
-          scheduled: wt.scheduled,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.addWorkTrip, 'workTrips', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
+      addWorkTrip( {
+          variables: {
+            order: trip.order,
+            done: trip.done,
+            approved: trip.approved,
+            discount: parseFloat( trip.discount ),
+            quantity: parseFloat( trip.quantity ),
+            type: trip.type.id,
+            task,
+            assignedTo: trip.assignedTo.id,
+            scheduled: trip.scheduled,
+            fromInvoice,
+          }
+        } )
+        .then( ( response ) => {
+          updateCasheStorage( response.data.addWorkTrip, 'workTrips', 'ADD' );
+          setSaving( false );
+        } )
+        .catch( ( err ) => {
+          addLocalError( err );
+          setSaving( false );
+        } );
+    } else {
+      trip.id = fakeID--;
+      setTrips( [ ...trips, trip ] )
+    }
   }
 
-  const updateWorkTripFunc = ( item ) => {
-    setSaving( true );
+  const updateTrip = ( item ) => {
+    if ( edit ) {
+      setSaving( true );
 
-    updateWorkTrip( {
-        variables: {
-          id: item.id,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          discount: item.discount,
-          quantity: item.quantity,
-          type: item.type.id,
-          assignedTo: item.assignedTo.id,
-          scheduled: item.scheduled,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.updateWorkTrip, 'workTrips', 'UPDATE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
+      updateWorkTrip( {
+          variables: {
+            id: item.id,
+            order: item.order,
+            done: item.done,
+            approved: item.approved,
+            discount: item.discount,
+            quantity: item.quantity,
+            type: item.type.id,
+            assignedTo: item.assignedTo.id,
+            scheduled: item.scheduled,
+            fromInvoice,
+          }
+        } )
+        .then( ( response ) => {
+          updateCasheStorage( response.data.updateWorkTrip, 'workTrips', 'UPDATE' );
+          setSaving( false );
+        } )
+        .catch( ( err ) => {
+          addLocalError( err );
+          setSaving( false );
+        } );
+    } else {
+      setTrips( updateArrayItem( trips, item ) );
+    }
   }
 
-  const deleteWorkTripFunc = ( id ) => {
-    deleteWorkTrip( {
-        variables: {
-          id,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'workTrips', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
+  const deleteTrip = ( id ) => {
+    if ( edit ) {
+      deleteWorkTrip( {
+          variables: {
+            id,
+            fromInvoice,
+          }
+        } )
+        .then( ( response ) => {
+          updateCasheStorage( {
+            id
+          }, 'workTrips', 'DELETE' );
+        } )
+        .catch( ( err ) => {
+          addLocalError( err );
+        } );
+    } else {
+      setTrips( trips.filter( ( trip ) => trip.id !== id ) );
+    }
   }
 
-  const addMaterialFunc = ( item ) => {
-    setSaving( true );
-    addMaterial( {
-        variables: {
-          title: item.title,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          quantity: parseFloat( item.quantity ),
-          margin: parseFloat( item.margin ),
-          price: parseFloat( item.price ),
-          task,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.addMaterial, 'materials', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
+  const addMaterial = ( item ) => {
+    if ( edit ) {
+      setSaving( true );
+      addTaskMaterial( {
+          variables: {
+            title: item.title,
+            order: item.order,
+            done: item.done,
+            approved: item.approved,
+            quantity: parseFloat( item.quantity ),
+            margin: parseFloat( item.margin ),
+            price: parseFloat( item.price ),
+            task,
+            fromInvoice,
+          }
+        } )
+        .then( ( response ) => {
+          updateCasheStorage( response.data.addMaterial, 'materials', 'ADD' );
+          setSaving( false );
+        } )
+        .catch( ( err ) => {
+          addLocalError( err );
+          setSaving( false );
+        } );
 
-    setSaving( false );
+    } else {
+      item.id = fakeID--;
+      setMaterials( [ ...materials, item ] )
+    }
   }
 
-  const updateMaterialFunc = ( item ) => {
-    setSaving( true );
+  const updateMaterial = ( item ) => {
+    if ( edit ) {
+      setSaving( true );
 
-    updateMaterial( {
-        variables: {
-          id: item.id,
-          title: item.title,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          quantity: parseFloat( item.quantity ),
-          margin: parseFloat( item.margin ),
-          price: parseFloat( item.price ),
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.updateMaterial, 'materials', 'UPDATE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
+      updateTaskMaterial( {
+          variables: {
+            id: item.id,
+            title: item.title,
+            order: item.order,
+            done: item.done,
+            approved: item.approved,
+            quantity: parseFloat( item.quantity ),
+            margin: parseFloat( item.margin ),
+            price: parseFloat( item.price ),
+            fromInvoice,
+          }
+        } )
+        .then( ( response ) => {
+          updateCasheStorage( response.data.updateMaterial, 'materials', 'UPDATE' );
+          setSaving( false );
+        } )
+        .catch( ( err ) => {
+          addLocalError( err );
+          setSaving( false );
+        } );
+    } else {
+      setMaterials( updateArrayItem( materials, item ) );
+    }
   }
 
-  const deleteMaterialFunc = ( id ) => {
-    deleteMaterial( {
-        variables: {
-          id,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'materials', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
+  const deleteMaterial = ( id ) => {
+    if ( edit ) {
+      deleteTaskMaterial( {
+          variables: {
+            id,
+            fromInvoice,
+          }
+        } )
+        .then( ( response ) => {
+          updateCasheStorage( {
+            id
+          }, 'materials', 'DELETE' );
+        } )
+        .catch( ( err ) => {
+          addLocalError( err );
+        } );
+    } else {
+      setMaterials( materials.filter( ( material ) => material.id !== id ) );
+    }
   }
 
 
   return (
     <Empty>
-      { (
-        userRights.rights.taskWorksRead ||
-        userRights.rights.taskWorksAdvancedRead
-      ) &&
-      <WorksTable
-        invoiced={invoiced}
-        userID={currentUser.id}
-        userRights={userRights}
-        currentUser={currentUser}
-        company={company}
-        showTotals={true}
-        showColumns={ [ 'done', 'title', 'quantity', 'assigned', 'approved', 'actions' ] }
-        showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
-        autoApproved={project ? project.project.autoApproved : false}
-        canAddSubtasksAndTrips={assignedTo.length > 0}
-        canEditInvoiced={false}
-        taskAssigned={assignedTo.filter((user) => user.id !== null )}
+      {
+        (
+          userRights.rights.taskWorksRead ||
+          userRights.rights.taskWorksAdvancedRead
+        ) &&
+        (
+          edit ||
+          userRights.rights.taskWorksWrite ||
+          userRights.rights.taskWorksAdvancedWrite
+        ) &&
+        <WorksTable
+          invoiced={invoiced}
+          userID={currentUser.id}
+          userRights={userRights}
+          currentUser={currentUser}
+          company={company}
+          showTotals={true}
+          showColumns={ [ 'done', 'title', 'quantity', 'assigned', 'approved', 'actions' ] }
+          showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
+          autoApproved={autoApproved}
+          canAddSubtasksAndTrips={assignedTo.length > 0}
+          canEditInvoiced={false}
+          taskAssigned={assignedTo.filter((user) => user.id !== null )}
 
-        taskTypes={taskTypes}
-        defaultType={taskType}
-        subtasks={ subtasks }
-        addSubtask={(newSubtask, price) => {
-          addSubtaskFunc(newSubtask);
-          setVykazyChanged(true);
-        }}
-        updateSubtask={(id,newData)=>{
-          let originalSubtask = subtasks.find((item)=>item.id===id);
-          originalSubtask = {
-            ...originalSubtask,
-            scheduled: originalSubtask.scheduled ?
-            {
-              from: originalSubtask.scheduled.from,
-              to: originalSubtask.scheduled.to,
-            } :
-            null
-          }
-          updateSubtaskFunc({...originalSubtask,...newData});
-          setVykazyChanged(true);
-        }}
-        updateSubtasks={(multipleSubtasks)=>{
-          multipleSubtasks.forEach(({id, newData})=>{
-            let originalSubtask = subtasks.find((item)=>item.id===id);
-            originalSubtask = {
-              ...originalSubtask,
-              scheduled: originalSubtask.scheduled ?
+          taskTypes={taskTypes}
+          defaultType={taskType}
+          subtasks={ works }
+          addSubtask={(newSubtask, price) => {
+            addWork(newSubtask);
+            setChanged();
+          }}
+          updateSubtask={(id,newData)=>{
+            let originalWork = works.find((item)=>item.id === id);
+            originalWork = {
+              ...originalWork,
+              scheduled: originalWork.scheduled ?
               {
-                from: originalSubtask.scheduled.from,
-                to: originalSubtask.scheduled.to,
+                from: originalWork.scheduled.from,
+                to: originalWork.scheduled.to,
               } :
               null
             }
-            updateSubtaskFunc({...originalSubtask,...newData});
-            setVykazyChanged(true);
-          });
-        }}
-        removeSubtask={(id)=>{
-          deleteSubtaskFunc(id);
-          setVykazyChanged(true);
-        }}
+            updateWork({...originalWork,...newData});
+            setChanged();
+          }}
+          updateSubtasks={(multipleSubtasks)=>{
+            multipleSubtasks.forEach(({id, newData})=>{
+              let originalWork = works.find((item)=>item.id === id);
+              originalWork = {
+                ...originalWork,
+                scheduled: originalWork.scheduled ?
+                {
+                  from: originalWork.scheduled.from,
+                  to: originalWork.scheduled.to,
+                } :
+                null
+              }
+              updateWork({...originalWork,...newData});
+              setChanged();
+            });
+          }}
+          removeSubtask={(id)=>{
+            deleteWork(id);
+            setChanged();
+          }}
 
-        workTrips={ workTrips }
-        tripTypes={tripTypes}
-        addTrip={(newTrip, price)=>{
-          addWorkTripFunc(newTrip);
-          setVykazyChanged(true);
-        }}
-        updateTrip={(id,newData)=>{
-          let originalTrip = workTrips.find((item)=>item.id===id);
-          originalTrip = {
-            ...originalTrip,
-            scheduled: originalTrip.scheduled ?
-            {
-              from: originalTrip.scheduled.from,
-              to: originalTrip.scheduled.to,
-            } :
-            null
-          }
-          updateWorkTripFunc({...originalTrip,...newData});
-          setVykazyChanged(true);
-        }}
-        updateTrips={(multipleTrips)=>{
-          multipleTrips.forEach(({id, newData})=>{
-            let originalTrip = workTrips.find((item)=>item.id===id);
+          workTrips={ trips }
+          tripTypes={tripTypes}
+          addTrip={(newTrip, price)=>{
+            addTrip(newTrip);
+            setChanged();
+          }}
+          updateTrip={(id,newData)=>{
+            let originalTrip = trips.find((item)=>item.id===id);
             originalTrip = {
               ...originalTrip,
               scheduled: originalTrip.scheduled ?
@@ -356,45 +400,60 @@ export default function TaskEditTablesLoader( props ) {
               } :
               null
             }
-            updateWorkTripFunc({...originalTrip,...newData});
-            setVykazyChanged(true);
-          });
-        }}
-        removeTrip={(id)=>{
-          deleteWorkTripFunc(id);
-          setVykazyChanged(true);
-        }}
-        />
-    }
+            updateTrip({...originalTrip,...newData});
+            setChanged();
+          }}
+          updateTrips={(multipleTrips)=>{
+            multipleTrips.forEach(({id, newData})=>{
+              let originalTrip = trips.find((item)=>item.id===id);
+              originalTrip = {
+                ...originalTrip,
+                scheduled: originalTrip.scheduled ?
+                {
+                  from: originalTrip.scheduled.from,
+                  to: originalTrip.scheduled.to,
+                } :
+                null
+              }
+              updateTrip({...originalTrip,...newData});
+              setChanged();
+            });
+          }}
+          removeTrip={(id)=>{
+            deleteTrip(id);
+            setChanged();
+          }}
+          />
+      }
 
-    { userRights.rights.taskPausalInfo && renderCompanyPausalInfo()}
+      { userRights.rights.taskPausalInfo && renderCompanyPausalInfo && renderCompanyPausalInfo()}
 
-    { userRights.rights.taskMaterialsRead &&
-      <Materials
-        invoiced={invoiced}
-        showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
-        showTotals={true}
-        autoApproved={project ? project.project.autoApproved : false}
-        userRights={userRights}
-        currentUser={currentUser}
-        company={company}
-        materials={ materials }
-        addMaterial={(newMaterial)=>{
-          addMaterialFunc(newMaterial);
-        }}
-        updateMaterial={(id,newData)=>{
-          updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-        }}
-        updateMaterials={(multipleMaterials)=>{
-          multipleMaterials.forEach(({id, newData})=>{
-            updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-          });
-        }}
-        removeMaterial={(id)=>{
-          deleteMaterialFunc(id);
-        }}
-        />
-    }
-  </Empty>
+      { userRights.rights.taskMaterialsRead && ( edit || userRights.rights.taskMaterialsWrite ) &&
+        <Materials
+          invoiced={invoiced}
+          showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
+          showTotals={true}
+          autoApproved={autoApproved}
+          userRights={userRights}
+          currentUser={currentUser}
+          company={company}
+          materials={ materials }
+          addMaterial={(newMaterial)=>{
+            addMaterial(newMaterial);
+          }}
+          updateMaterial={(id,newData)=>{
+            updateMaterial({...materials.find((material)=>material.id===id),...newData});
+          }}
+          updateMaterials={(multipleMaterials)=>{
+            multipleMaterials.forEach(({id, newData})=>{
+              updateMaterial({...materials.find((material)=>material.id===id),...newData});
+            });
+          }}
+          removeMaterial={(id)=>{
+            deleteMaterial(id);
+          }}
+          />
+      }
+    </Empty>
   );
 }

@@ -105,6 +105,7 @@ export default function Comments( props ) {
   const [ subject, setSubject ] = React.useState( "" );
   const [ tos, setTos ] = React.useState( [] );
   const [ openedComments, setOpenedComments ] = React.useState( [] );
+  const [ addCommentOpen, setAddCommentOpen ] = React.useState( false );
 
   React.useEffect( () => {
     setOpenedComments( [] )
@@ -182,6 +183,15 @@ export default function Comments( props ) {
           setNewComment( '' );
           setSubject( '' );
           setTos( [] );
+          setAddCommentOpen( false );
+          commentsRefetch( {
+            variables: {
+              task: id,
+              page,
+              limit,
+              fromInvoice,
+            }
+          } );
         } else {
           addLocalError( {
             message: response.data.error,
@@ -219,6 +229,15 @@ export default function Comments( props ) {
           setNewComment( '' );
           setSubject( '' );
           setTos( [] );
+          setAddCommentOpen( false );
+          commentsRefetch( {
+            variables: {
+              task: id,
+              page,
+              limit,
+              fromInvoice,
+            }
+          } );
         } else {
           addLocalError( {
             message: response.data.error,
@@ -241,7 +260,13 @@ export default function Comments( props ) {
 
   return (
     <div>
-      { (userRights.rights.addComments || userRights.rights.emails) && !disabled &&
+      { !addCommentOpen &&
+        <button className="btn-link" onClick={() => setAddCommentOpen(true) }>
+        <i className="fa fa-plus" />
+          {t('comment')}
+        </button>
+      }
+      { (userRights.rights.addComments || userRights.rights.emails) && !disabled && addCommentOpen &&
         <div>
           { isEmail &&
             <FormGroup className="row m-b-10">
@@ -300,7 +325,7 @@ export default function Comments( props ) {
                 }
               }}
               >
-              {`${t('add')} ${ isEmail ? t('email').toLowerCase() : t('comment').toLowerCase()}`}
+              {t('add')}
             </button>
             { userRights.rights.emails && userRights.rights.addComments &&
               <Checkbox
@@ -372,6 +397,14 @@ export default function Comments( props ) {
                 </button>
               </div>
             )}
+
+            <button
+              className="btn-red ml-auto center-hor m-r-0"
+              onClick={() => { setAddCommentOpen(false) }}
+              >
+              <i className="fas fa-ban commandbar-command-icon" />
+              {t('cancel')}
+            </button>
           </div>
         </div>
       }

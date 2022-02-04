@@ -44,9 +44,9 @@ export default function ManualsList( props ) {
               <th width="250">
                 {t('updatedAt')}
               </th>
-                <th width="350">
-                  {t('createdAt')}
-                </th>
+              <th width="350">
+                {t('createdAt')}
+              </th>
             </tr>
           </thead>
 
@@ -68,14 +68,14 @@ export default function ManualsList( props ) {
                   />
               </th>
               <th/>
-                <th>
-                    <div className="row">
-                      <div className="flex" />
-                      <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
-                        {t('filter')}
-                      </button>
-                    </div>
-                </th>
+              <th>
+                <div className="row">
+                  <div className="flex" />
+                  <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+                    {t('filter')}
+                  </button>
+                </div>
+              </th>
             </tr>
 
             <ActiveSearch {...props} />
@@ -99,23 +99,29 @@ export default function ManualsList( props ) {
                     {manual.createdAt ? (timestampToString(manual.createdAt)) : ''}
                   </span>
                 </td>
-                  <td>
-                    <span className="">
-                      {manual.updatedBy ? `${t('changedBy')} ` : ""}
-                    </span>
-                    <span className="bolder">
-                      {manual.updatedBy ? `${manual.updatedBy.fullName}` :''}
-                    </span>
-                    <span className="">
-                      {manual.updatedBy ?` ${t('atDate')} `: t('changedAt')}
-                    </span>
-                    <span className="bolder">
-                      {manual.createdAt ? (timestampToString(manual.updatedAt)) : ''}
-                    </span>
-                  </td>
+                <td>
+                  <span className="">
+                    {manual.updatedBy ? `${t('changedBy')} ` : ""}
+                  </span>
+                  <span className="bolder">
+                    {manual.updatedBy ? `${manual.updatedBy.fullName}` :''}
+                  </span>
+                  <span className="">
+                    {manual.updatedBy ?` ${t('atDate')} `: t('changedAt')}
+                  </span>
+                  <span className="bolder">
+                    {manual.createdAt ? (timestampToString(manual.updatedAt)) : ''}
+                  </span>
+                </td>
               </tr>
             ))}
-
+            { manuals.length === 0 &&
+              <tr>
+                <td colSpan="10">
+                  {t('noData')}
+                </td>
+              </tr>
+            }
             { loading &&
               <tr>
                 <td colSpan="100">

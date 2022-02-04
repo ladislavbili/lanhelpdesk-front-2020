@@ -1948,7 +1948,7 @@ export default function TaskEdit( props ) {
           />
         } else {
           RenderDescription = < div className = "task-edit-popis" > {
-            t( 'noDescription' )
+            t( 'noTaskDescription' )
           } < /div>
         }
       } else {
@@ -1993,7 +1993,7 @@ export default function TaskEdit( props ) {
             />
           } else {
             RenderDescription = < div className = "task-edit-popis" > {
-              t( 'noDescription' )
+              t( 'noTaskDescription' )
             } < /div>
           }
         }

@@ -91,4 +91,12 @@ export default {
     en: 'View',
     sk: 'Vidieť',
   },
+  noDescription: {
+    en: 'No description',
+    sk: 'Bez popisu',
+  },
+  noData: {
+    en: 'No data',
+    sk: 'Bez dát',
+  },
 }

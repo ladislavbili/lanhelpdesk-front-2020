@@ -72,6 +72,9 @@ export default function ItemsList( props ) {
               <th>
                 {t('title')}
               </th>
+                <th>
+                  {t('active2')}
+                </th>
               { companyId === null &&
                 <th width="350">
                   {t('company')}
@@ -91,8 +94,6 @@ export default function ItemsList( props ) {
           <tbody>
             <tr>
               <th>
-                <div className="row">
-                  <div className="flex">
                 <input
                   type="text"
                   value={ localStringFilter.title }
@@ -107,8 +108,8 @@ export default function ItemsList( props ) {
                     setLocalStringFilter('title', e.target.value );
                   }}
                   />
-              </div>
-              <div className="min-width-200 m-l-5">
+                </th>
+              <th>
               <Select
                 placeholder={t('selectStatus')}
                 value={translateAllSelectItems(statuses, t).find((status) => status.id === localStringFilter.active )}
@@ -116,10 +117,8 @@ export default function ItemsList( props ) {
                 onChange={(status)=>{
                   setLocalStringFilter('active', status.value );
                 }}
-                styles={pickSelectStyle( [ 'noArrow' ] )}
+                styles={pickSelectStyle( [ 'noArrow', 'size12', 'inputSize' ] )}
                 />
-            </div>
-          </div>
               </th>
               { companyId === null &&
                 <th>
@@ -184,10 +183,10 @@ export default function ItemsList( props ) {
             { items.map((item) => (
               <tr key={item.id} className="clickable noselect" onClick={() => history.push(`${path}/${item.id}`)}>
                 <td>
-                  { !item.active &&
-                    <i className="far fa-file-alt"/>
-                  }
                   {item.title}
+                </td>
+                <td>
+                  { !item.active ? t('inactive2') : t('active2') }
                 </td>
                 { companyId === null &&
                   <td>
@@ -208,7 +207,13 @@ export default function ItemsList( props ) {
                 </td>
               </tr>
             ))}
-
+            { items.length === 0 &&
+              <tr>
+                <td colSpan="10">
+                  {t('noData')}
+                </td>
+              </tr>
+            }
             { loading &&
               <tr>
                 <td colSpan="100">

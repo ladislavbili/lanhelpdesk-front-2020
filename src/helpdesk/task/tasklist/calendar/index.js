@@ -466,7 +466,7 @@ export default function CalendarLoader( props ) {
     globalStringFilter: globalStringFilter.globalTaskStringFilter,
     setGlobalTaskStringFilter,
     setSingleLocalTaskStringFilter,
-    displayValues: createDisplayValues( defaultTasklistColumnPreference ),
+    displayValues: createDisplayValues( defaultTasklistColumnPreference, false, t ),
   }
 
   return (

@@ -85,6 +85,7 @@ export default function LanwikiPageForm( props ) {
             <h2>
               {title}
             </h2>
+          <hr/>
           </FormGroup>
         }
         { !disabled &&
@@ -167,7 +168,10 @@ export default function LanwikiPageForm( props ) {
 
         { !edit &&
           <div className="row m-t-20">
-            <button className="btn-link-cancel" onClick={close}>{edit ? t('back') : t('cancel')}</button>
+            <button className="btn-red" onClick={close}>
+              <i className="fas fa-ban commandbar-command-icon" />
+              {t('cancel')}
+            </button>
             { !disabled &&
               <div className="ml-auto">
                 <button
@@ -175,7 +179,7 @@ export default function LanwikiPageForm( props ) {
                   disabled={cannotSave() && showErrors}
                   onClick={saveOrAddPage}
                   >
-                  {saving ? `${t('adding')}...` : `${t('add')} ${t('lanwikiPage').toLowerCase()}`}
+                  {saving ? `${t('adding')}...` : `${t('add')}`}
                 </button>
               </div>
             }
@@ -183,22 +187,27 @@ export default function LanwikiPageForm( props ) {
         }
       </div>
       { !disabled && edit &&
-        <div className="task-add-layout row stick-to-bottom">
-          <div className="center-ver">
-            <button
-              className="btn-link task-add-layout-button btn-distance"
-              onClick={close}
-              >
-              <i className="fas fa-arrow-left commandbar-command-icon" />
-              {t('close')}
-            </button>
-            <button
-              className="btn-link task-add-layout-button btn-distance"
-              disabled={cannotSave() && showErrors}
-              onClick={saveOrAddPage}
-              >
-              {saving ? `${t('saving')}...` : `${t('save')} ${t('lanwikiPage').toLowerCase()}`}
-            </button>
+        <div className="button-bar row stick-to-bottom">
+          <div className="center-ver row">
+            <div>
+              <button
+                className="btn-red btn-distance center-hor"
+                onClick={close}
+                >
+                <i className="fas fa-ban commandbar-command-icon" />
+                {t('cancel')}
+              </button>
+            </div>
+            <div>
+              <button
+                className="btn btn-distance center-hor"
+                disabled={cannotSave() && showErrors}
+                onClick={saveOrAddPage}
+                >
+                <i className="fas fa-save commandbar-command-icon" />
+                {saving ? `${t('saving')}...` : `${t('save')}`}
+              </button>
+            </div>
           </div>
         </div>
       }

@@ -138,7 +138,13 @@ export default function PagesList( props ) {
                 }
               </tr>
             ))}
-
+            { pages.length === 0 &&
+              <tr>
+                <td colSpan="10">
+                  {t('noData')}
+                </td>
+              </tr>
+            }
             { loading &&
               <tr>
                 <td colSpan="100">

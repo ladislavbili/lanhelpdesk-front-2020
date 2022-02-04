@@ -62,15 +62,6 @@ import {
   ADD_SHORT_SUBTASK,
   UPDATE_SHORT_SUBTASK,
   DELETE_SHORT_SUBTASK,
-  ADD_SUBTASK,
-  UPDATE_SUBTASK,
-  DELETE_SUBTASK,
-  ADD_WORKTRIP,
-  UPDATE_WORKTRIP,
-  DELETE_WORKTRIP,
-  ADD_MATERIAL,
-  UPDATE_MATERIAL,
-  DELETE_MATERIAL,
   DELETE_TASK_ATTACHMENT,
 } from '../queries';
 
@@ -167,15 +158,6 @@ export default function TaskEditContainer( props ) {
   const [ updateShortSubtask ] = useMutation( UPDATE_SHORT_SUBTASK );
   const [ deleteShortSubtask ] = useMutation( DELETE_SHORT_SUBTASK );
   const [ deleteTask ] = useMutation( DELETE_TASK );
-  const [ addSubtask ] = useMutation( ADD_SUBTASK );
-  const [ updateSubtask ] = useMutation( UPDATE_SUBTASK );
-  const [ deleteSubtask ] = useMutation( DELETE_SUBTASK );
-  const [ addWorkTrip ] = useMutation( ADD_WORKTRIP );
-  const [ updateWorkTrip ] = useMutation( UPDATE_WORKTRIP );
-  const [ deleteWorkTrip ] = useMutation( DELETE_WORKTRIP );
-  const [ addMaterial ] = useMutation( ADD_MATERIAL );
-  const [ updateMaterial ] = useMutation( UPDATE_MATERIAL );
-  const [ deleteMaterial ] = useMutation( DELETE_MATERIAL );
   const [ deleteTaskAttachment ] = useMutation( DELETE_TASK_ATTACHMENT );
 
   useSubscription( TASK_TYPES_SUBSCRIPTION, {
@@ -328,218 +310,6 @@ export default function TaskEditContainer( props ) {
         updateCasheStorage( {
           id
         }, 'shortSubtasks', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-  }
-
-  const addSubtaskFunc = ( sub ) => {
-    setSaving( true );
-
-    addSubtask( {
-        variables: {
-          title: sub.title,
-          order: sub.order,
-          done: sub.done,
-          approved: sub.approved,
-          discount: sub.discount,
-          quantity: sub.quantity,
-          //type: sub.type.id,
-          task: parseInt( id ),
-          assignedTo: sub.assignedTo.id,
-          scheduled: sub.scheduled,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.addSubtask, 'subtasks', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const updateSubtaskFunc = ( sub ) => {
-    setSaving( true );
-
-    updateSubtask( {
-        variables: {
-          id: sub.id,
-          title: sub.title,
-          order: sub.order,
-          done: sub.done,
-          approved: sub.approved,
-          discount: sub.discount,
-          quantity: sub.quantity,
-          //type: sub.type.id,
-          assignedTo: sub.assignedTo.id,
-          scheduled: sub.scheduled,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.updateSubtask, 'subtasks', 'UPDATE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const deleteSubtaskFunc = ( id ) => {
-    deleteSubtask( {
-        variables: {
-          id,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'subtasks', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-  }
-
-  const addWorkTripFunc = ( wt ) => {
-    setSaving( true );
-
-    addWorkTrip( {
-        variables: {
-          order: wt.order,
-          done: wt.done,
-          approved: wt.approved,
-          discount: parseFloat( wt.discount ),
-          quantity: parseFloat( wt.quantity ),
-          type: wt.type.id,
-          task: parseInt( id ),
-          assignedTo: wt.assignedTo.id,
-          scheduled: wt.scheduled,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.addWorkTrip, 'workTrips', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const updateWorkTripFunc = ( item ) => {
-    setSaving( true );
-
-    updateWorkTrip( {
-        variables: {
-          id: item.id,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          discount: item.discount,
-          quantity: item.quantity,
-          type: item.type.id,
-          assignedTo: item.assignedTo.id,
-          scheduled: item.scheduled,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.updateWorkTrip, 'workTrips', 'UPDATE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const deleteWorkTripFunc = ( id ) => {
-    deleteWorkTrip( {
-        variables: {
-          id,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'workTrips', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-  }
-
-  const addMaterialFunc = ( item ) => {
-    setSaving( true );
-    addMaterial( {
-        variables: {
-          title: item.title,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          quantity: parseFloat( item.quantity ),
-          margin: parseFloat( item.margin ),
-          price: parseFloat( item.price ),
-          task: parseInt( id ),
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.addMaterial, 'materials', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const updateMaterialFunc = ( item ) => {
-    setSaving( true );
-
-    updateMaterial( {
-        variables: {
-          id: item.id,
-          title: item.title,
-          order: item.order,
-          done: item.done,
-          approved: item.approved,
-          quantity: parseFloat( item.quantity ),
-          margin: parseFloat( item.margin ),
-          price: parseFloat( item.price ),
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.updateMaterial, 'materials', 'UPDATE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const deleteMaterialFunc = ( id ) => {
-    deleteMaterial( {
-        variables: {
-          id,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'materials', 'DELETE' );
       } )
       .catch( ( err ) => {
         addLocalError( err );
@@ -721,18 +491,10 @@ export default function TaskEditContainer( props ) {
       addAttachments={addAttachments}
       removeAttachment={removeAttachment}
       deleteTaskFunc={deleteTaskFunc}
-      addSubtaskFunc={addSubtaskFunc}
-      updateSubtaskFunc={updateSubtaskFunc}
-      deleteSubtaskFunc={deleteSubtaskFunc}
-      addWorkTripFunc={addWorkTripFunc}
-      updateWorkTripFunc={updateWorkTripFunc}
-      deleteWorkTripFunc={deleteWorkTripFunc}
-      addMaterialFunc={addMaterialFunc}
-      updateMaterialFunc={updateMaterialFunc}
-      deleteMaterialFunc={deleteMaterialFunc}
       addShortSubtask={addShortSubtaskFunc}
       updateShortSubtask={updateShortSubtaskFunc}
       deleteShortSubtask={deleteShortSubtaskFunc}
+      updateCasheStorage={updateCasheStorage}
       updateTask={updateTask}
       setTaskLayout={setTaskLayoutFunc}
       client={client}

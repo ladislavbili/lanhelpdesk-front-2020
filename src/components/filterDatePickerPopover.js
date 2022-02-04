@@ -21,6 +21,7 @@ import {
 
 export default function FilterDatePickerPopover( props ) {
   const {
+    id,
     label,
     showNowFrom,
     dateFrom,
@@ -104,14 +105,14 @@ export default function FilterDatePickerPopover( props ) {
 
   return (
     <FormGroup className={classnames({'sidebar-filter-row': minimal})}>
-      <Label style={{display: "block"}}>
+      <Label id={`date-popover-${id}`} style={{display: "block"}}>
         {label}
       </Label>
       <div className="bkg-white">
-        <button id="Popover1" type="button" className="btn-link p-l-0 p-r-0 m-r-0" onClick={() => setPopoverOpen(true)}>
+        <button type="button" className="btn-link p-l-0 p-r-0 m-r-0" onClick={() => setPopoverOpen(true)}>
           {`${dateFrom ? dateFrom.format( 'DD.MM.YYYY' ) : t('all')} - ${dateTo ? dateTo.format( 'DD.MM.YYYY' ) : t('all')}`}
         </button>
-        <Popover placement="right" className="custom-popover" isOpen={popoverOpen} target="Popover1" toggle={() => setPopoverOpen(false)}>
+        <Popover placement="bottom-end" className="custom-popover" isOpen={popoverOpen} target={`date-popover-${id}`} toggle={() => setPopoverOpen(false)}>
           <PopoverBody>
             <label style={{display: "block"}}>{`Set ${label}`}</label>
             <button

@@ -39,6 +39,18 @@ export default {
     en: 'No start date',
     sk: 'Bez dátumu začiatku',
   },
+  plannedAt: {
+    en: 'Planned at',
+    sk: 'Dátum plánovania',
+  },
+  plannedAtPlaceholder: {
+    en: 'Enter planned date',
+    sk: 'Zadajte dátum plánovania',
+  },
+  noPlannedAt: {
+    en: 'No planned date',
+    sk: 'Bez dátumu plánovania',
+  },
   number: {
     en: 'Number',
     sk: 'Číslo',
@@ -215,7 +227,7 @@ export default {
     en: 'Task description',
     sk: 'Popis úlohy',
   },
-  noDescription: {
+  noTaskDescription: {
     en: "Task doesn't description",
     sk: 'Úloha nemá popis',
   },
@@ -290,6 +302,10 @@ export default {
   internal: {
     en: 'Internal',
     sk: 'Interná',
+  },
+  comment: {
+    en: 'Comment',
+    sk: 'Komentár',
   },
   comments2: {
     en: 'Comments',

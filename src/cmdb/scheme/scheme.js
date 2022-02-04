@@ -114,10 +114,11 @@ export default function SchemeForm( props ) {
           <h2>
             {
               company.id === null ? '' :
-              (scheme ? company.title: `${company.title} (${t('companyWithoutScheme').toLowerCase()})`)
+              (scheme ? company.title: `${company.title}`)
             }
           </h2>
-          <FormGroup>
+          <hr/>
+          <FormGroup className="m-t-20">
             <Label>{t('scheme')}</Label>
             <div>
               { schemeImage &&
@@ -130,7 +131,7 @@ export default function SchemeForm( props ) {
                 </Zoom>
               }
               { !schemeImage &&
-                <div>{t('noSchemeUploaded')}</div>
+                <div>{`${t('noSchemeUploaded')}.`}</div>
               }
             </div>
           </FormGroup>
@@ -141,7 +142,7 @@ export default function SchemeForm( props ) {
                 <div dangerouslySetInnerHTML={{ __html: scheme.description }} />
               }
               { !scheme &&
-                <div>{`${t('noDescription')}!`}</div>
+                <div>{`${t('noDescription')}.`}</div>
               }
             </div>
           </FormGroup>
@@ -152,10 +153,9 @@ export default function SchemeForm( props ) {
   return (
     <div>
       <div className="p-20 fit-with-header-and-lanwiki-commandbar scroll-visible">
-        <h2>{`${t('edit')} ${t('scheme2').toLowerCase()}`}</h2>
         <FormGroup>
           <Label htmlFor="scheme">{t('scheme')}</Label>
-          <Input type="file" className="form-control" id="description" placeholder={t('scheme')} accepts="image/jpeg,image/png,image/gif,image/bmp,image/webp,image/tiff" onChange={(e) => {
+          <Input type="file" className="form-control" id="description" placeholder={t('scheme')} accept="image/jpeg,image/png,image/gif,image/bmp,image/webp,image/tiff" onChange={(e) => {
               const files = [...e.target.files];
               if(files.length > 0){
                 setNewScheme(files[0]);
@@ -178,32 +178,37 @@ export default function SchemeForm( props ) {
           }
           <FormGroup>
             <Label htmlFor="description">{t('description')}</Label>
-              <CKEditor
-                value={description}
-                type="advanced"
-                onChange={(description) => {
-                  setDescription(description);
-                }}
-                />
+            <CKEditor
+              value={description}
+              type="advanced"
+              onChange={(description) => {
+                setDescription(description);
+              }}
+              />
           </FormGroup>
         </div>
 
-        <div className="task-add-layout row stick-to-bottom">
-          <div className="center-ver">
-            <button
-              className="btn-link task-add-layout-button btn-distance"
-              onClick={() => setShowEdit(false) }
-              >
-              <i className="fas fa-arrow-left commandbar-command-icon" />
-              {t('close')}
-            </button>
-            <button
-              className="btn-link task-add-layout-button btn-distance"
-              disabled={saving}
-              onClick={addOrUpdateCmdbSchemeFunc}
-              >
-              {saving ? `${t('saving')}...` : `${t('save')} ${t('scheme2').toLowerCase()}`}
-            </button>
+        <div className="button-bar row stick-to-bottom">
+          <div className="center-ver row">
+            <div>
+              <button
+                className="btn-red btn-distance center-hor"
+                onClick={() => setShowEdit(false) }
+                >
+                <i className="fas fa-ban commandbar-command-icon" />
+                {t('cancel')}
+              </button>
+            </div>
+            <div>
+              <button
+                className="btn btn-distance center-hor"
+                disabled={saving}
+                onClick={addOrUpdateCmdbSchemeFunc}
+                >
+                <i className="fas fa-save commandbar-command-icon" />
+                {saving ? `${t('saving')}...` : `${t('save')}`}
+              </button>
+            </div>
           </div>
         </div>
 

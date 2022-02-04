@@ -7,8 +7,11 @@ import {
 import Select from 'react-select';
 import {
   Label,
+  FormGroup,
+  Input,
 } from 'reactstrap';
 import CKEditor from 'components/CKEditor';
+import Checkbox from 'components/checkbox';
 
 import axios from 'axios';
 import moment from 'moment';
@@ -76,6 +79,7 @@ import {
   toSelArr,
   toSelItem,
   deleteAttributes,
+  translateSelectItem,
   translateAllSelectItems,
 } from 'helperFunctions';
 
@@ -171,7 +175,11 @@ export default function RepeatForm( props ) {
   const [ taskType, setTaskType ] = React.useState( null );
   const [ title, setTitle ] = React.useState( "" );
   const [ workTrips, setWorkTrips ] = React.useState( [] );
-  const [ repeat, setRepeat ] = React.useState( null );
+
+  const [ active, setActive ] = React.useState( true );
+  const [ startsAt, setStartsAt ] = React.useState( originalRepeat ? originalRepeat.startsAt : null );
+  const [ repeatEvery, setRepeatEvery ] = React.useState( originalRepeat ? originalRepeat.repeatEvery : "1" );
+  const [ repeatInterval, setRepeatInterval ] = React.useState( originalRepeat ? originalRepeat.repeatInterval : intervals[ 0 ] );
 
   const [ simpleSubtasks, setSimpleSubtasks ] = React.useState( [] );
 
@@ -333,24 +341,21 @@ export default function RepeatForm( props ) {
   const setOriginalRepeat = () => {
     const data = originalRepeat.repeatTemplate;
     setChanges( newStartsAt ? {
-      repeat: {
-        repeatEvery: originalRepeat.repeatEvery,
-        repeatInterval: originalRepeat.repeatInterval,
-        startsAt: newStartsAt.toString(),
-        active: originalRepeat.active,
-      }
+      repeatEvery: originalRepeat.repeatEvery,
+      repeatInterval: originalRepeat.repeatInterval,
+      startsAt: newStartsAt.toString(),
+      active: originalRepeat.active,
     } : {} );
     setAssignedTo( toSelArr( data.assignedTo, 'fullName' ) );
     setCloseDate( moment( parseInt( data.closeDate ) ) );
     setDeadline( data.deadline ? moment( parseInt( data.deadline ) ) : null );
     setDescription( data.description );
     setImportant( data.important );
-    setRepeat( {
-      repeatEvery: originalRepeat.repeatEvery,
-      repeatInterval: intervals.find( ( interval ) => interval.value === originalRepeat.repeatInterval ),
-      startsAt: newStartsAt ? moment( newStartsAt ) : moment( parseInt( originalRepeat.startsAt ) ),
-      active: originalRepeat.active,
-    } )
+
+    setActive( originalRepeat.active );
+    setStartsAt( newStartsAt ? moment( newStartsAt ) : moment( parseInt( originalRepeat.startsAt ) ) );
+    setRepeatEvery( originalRepeat.repeatEvery );
+    setRepeatInterval( intervals.find( ( interval ) => interval.value === originalRepeat.repeatInterval ) );
     const project = projects.find( ( project ) => project.id === data.project.id );
     /*
     const milestone = project && data.milestone ? toSelArr( project.milestones )
@@ -473,11 +478,24 @@ export default function RepeatForm( props ) {
   const triggerSave = () => {
     setSaving( true );
     if ( editMode ) {
-      const newRepeatData = changes.repeat;
-      const repeatTemplate = deleteAttributes( changes, [ 'repeat' ] );
+      const newRepeatData = (
+        (
+          changes.startsAt === undefined &&
+          changes.repeatEvery === undefined &&
+          changes.repeatInterval === undefined &&
+          changes.active === undefined
+        ) ? {} : {
+          startsAt: startsAt.valueOf()
+            .toString(),
+          repeatEvery: parseInt( repeatEvery ),
+          repeatInterval: repeatInterval.value,
+          active,
+        }
+      );
+      const repeatTemplate = deleteAttributes( changes, [ 'startsAt', 'repeatEvery', 'repeatInterval', 'active' ] );
       const variables = {
         id: originalRepeat.id,
-        ...( newRepeatData ? newRepeatData : {} ),
+        ...newRepeatData,
         ...(
           repeatTemplate ? {
             repeatTemplate
@@ -503,12 +521,12 @@ export default function RepeatForm( props ) {
     } else {
       addRepeat( {
           variables: {
-            active: repeat.active,
+            active,
             taskId: taskID ? taskID : undefined,
-            repeatInterval: repeat.repeatInterval.value,
-            startsAt: repeat.startsAt.valueOf()
+            repeatInterval: repeatInterval.value,
+            startsAt: startsAt.valueOf()
               .toString(),
-            repeatEvery: parseInt( repeat.repeatEvery ),
+            repeatEvery: parseInt( repeatEvery ),
             repeatTemplate: {
               title,
               closeDate: closeDate ? closeDate.valueOf()
@@ -577,7 +595,7 @@ export default function RepeatForm( props ) {
                 if ( response2.data.ok ) {
                   updateTask( response, 'add' );
                   setSaving( false );
-                  closeModal( true, repeat.active );
+                  closeModal( true, active );
                 } else {
                   setSaving( false );
                 }
@@ -589,7 +607,7 @@ export default function RepeatForm( props ) {
           } else {
             updateTask( response, 'add' );
             setSaving( false );
-            closeModal( true, repeat.active );
+            closeModal( true, active );
           }
         } )
         .catch( ( err ) => {
@@ -749,52 +767,6 @@ export default function RepeatForm( props ) {
       } )
     }
   }
-  /*
-  const changeMilestone = ( milestone ) => {
-  if ( status.action === 'PendingDate' ) {
-  if ( milestone.startsAt !== null ) {
-  setMilestone( milestone );
-  setPendingDate( moment( milestone.startsAt ) );
-  setPendingChangable( false );
-  saveChange( {
-  milestone: milestone.id,
-  pendingDate: moment( milestone.startsAt )
-  .valueOf()
-  .toString(),
-  pendingChangable: false
-  } )
-  } else {
-  setMilestone( milestone );
-  setPendingChangable( true );
-  saveChange( {
-  milestone: milestone.id,
-  pendingChangable: true
-  } )
-  }
-  } else {
-  setMilestone( milestone );
-  saveChange( {
-  milestone: milestone.id
-  } )
-  }
-  }
-  */
-
-  const changeRepeat = ( repeat ) => {
-    if ( !userRights.attributeRights.repeat.edit ) {
-      return;
-    }
-    setRepeat( repeat );
-    saveChange( {
-      repeat: {
-        active: repeat.active,
-        repeatInterval: repeat.repeatInterval.value,
-        startsAt: repeat.startsAt.valueOf()
-          .toString(),
-        repeatEvery: repeat.repeatEvery
-      }
-    } )
-  }
 
   const cantSave = (
     saving ||
@@ -803,7 +775,10 @@ export default function RepeatForm( props ) {
     status === null ||
     project === null ||
     ( assignedTo.length === 0 && userRights.attributeRights.assigned.view && !projectAttributes.assigned.fixed ) ||
-    repeat === null ||
+    repeatInterval.value === null ||
+    parseInt( repeatEvery ) <= 0 ||
+    isNaN( parseInt( repeatEvery ) ) ||
+    startsAt === null ||
     ( !company && userRights.attributeRights.company.view ) ||
     ( editMode && Object.keys( changes )
       .length === 0 && !newStartsAt )
@@ -813,7 +788,7 @@ export default function RepeatForm( props ) {
   const renderHeader = () => {
     return (
       <div className="task-edit-buttons row m-b-10 m-l-20 m-r-20 m-t-20">
-        <h2 className="center-hor">{`${ !editMode ? t('addRepeat') : t('editRepeat') }`}</h2>
+        <h2 className="center-hor">{t('repeat')}</h2>
         <span className="ml-auto">
           { editMode && userRights.attributeRights.repeat.edit &&
             <button
@@ -988,7 +963,7 @@ export default function RepeatForm( props ) {
         }
         { !projectAttributes.status.fixed && userRights.attributeRights.status.edit &&
           <Select
-          placeholder={t('statusPlaceholder')}
+            placeholder={t('statusPlaceholder')}
             value={status}
             styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
             onChange={ changeStatus }
@@ -999,7 +974,7 @@ export default function RepeatForm( props ) {
     ),
     Type: (
       <Select
-      placeholder={t('taskTypePlaceholder')}
+        placeholder={t('taskTypePlaceholder')}
         value={taskType}
         isDisabled={ projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit }
         styles={ pickSelectStyle( [ 'noArrow', ] ) }
@@ -1112,6 +1087,67 @@ export default function RepeatForm( props ) {
         }
       </div>
     ),
+    Repeat: (
+      <div className="secondary-border p-10" style={{ marginLeft: -10, marginRight: -10 }}>
+        <FormGroup className="task-add-date-picker-placeholder">
+          <Label>{t('startDate')} *</Label>
+          <div className="flex-input">
+            <DatePicker
+              className="form-control"
+              selected={startsAt}
+              onChange={(value) => {
+                setStartsAt(value);
+                saveChange( {
+                    startsAt: value.valueOf()
+                      .toString(),
+                } );
+              }}
+              placeholderText={t('noStartDate')}
+              />
+          </div>
+        </FormGroup>
+
+        <FormGroup>
+          <Label>{t('repeatEvery')} *</Label>
+          { parseInt(repeatEvery) <= 0 &&
+            <Label className="warning">{t('warningMustBeMoreThan0')}.</Label>
+          }
+          <Input type="number"
+            className={classnames({ "form-control-warning": parseInt(repeatEvery) < 0 }, "form-control-secondary no-border m-b-10" ) }
+            placeholder={t('enterNumber')}
+            value={( repeatEvery )}
+            onChange={(e)=> {
+              setRepeatEvery(e.target.value);
+              saveChange( {
+                  repeatEvery: e.target.value,
+              } );
+            }}
+            />
+          <Select
+            value={translateSelectItem(repeatInterval, t)}
+            onChange={(value) =>{
+              setRepeatInterval( value );
+              saveChange( {
+                  repeatInterval: value.value,
+              } );
+            }}
+            options={translateAllSelectItems(intervals, t)}
+            styles={pickSelectStyle()}
+            />
+        </FormGroup>
+        <Checkbox
+          className = "m-r-5"
+          label={t('active')}
+          value = { active }
+          onChange={() =>{
+            setActive(!active );
+            saveChange( {
+                active: !active,
+            } );
+          }}
+          />
+      </div>
+    )
   }
 
   const renderSelectsLayout1 = () => {
@@ -1199,16 +1235,6 @@ export default function RepeatForm( props ) {
                 </div>
               }
 
-              { userRights.attributeRights.repeat.view &&
-                <SimpleRepeat
-                  taskID={null}
-                  repeat={repeat}
-                  submitRepeat={changeRepeat}
-                  columns={true}
-                  vertical={false}
-                  addTask={true}
-                  />
-              }
               { userRights.attributeRights.overtime.view &&
                 <div className="row p-r-10">
                   <Label className="col-3 col-form-label">{t('overtimeShort')} <span className="warning-big">*</span></Label>
@@ -1304,14 +1330,12 @@ export default function RepeatForm( props ) {
           </div>
         }
         { userRights.attributeRights.repeat.view &&
-          <SimpleRepeat
-            taskID={null}
-            repeat={repeat}
-            submitRepeat={changeRepeat}
-            columns={true}
-            addTask={true}
-            vertical={true}
-            />
+          <div className="form-selects-entry-column" >
+            <Label>{t('repeat')}</Label>
+            <div className="form-selects-entry-column-rest" >
+              { layoutComponents.Repeat }
+            </div>
+          </div>
         }
         { userRights.attributeRights.taskType.view &&
           <div className="form-selects-entry-column" >
@@ -1377,7 +1401,7 @@ export default function RepeatForm( props ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
-        RenderDescription = <div className="task-edit-popis">{t('noDescription')}</div>
+        RenderDescription = <div className="task-edit-popis">{t('noTaskDescription')}</div>
       }
     } else {
       if ( showDescription ) {
@@ -1403,7 +1427,7 @@ export default function RepeatForm( props ) {
         if ( description.length !== 0 ) {
           RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
         } else {
-          RenderDescription = <div className="task-edit-popis">{t('noDescription')}</div>
+          RenderDescription = <div className="task-edit-popis">{t('noTaskDescription')}</div>
         }
       }
     }
@@ -1728,7 +1752,7 @@ export default function RepeatForm( props ) {
             disabled={ cantSave }
             onClick={ triggerSave }
             >
-            { editMode ? t('updateRepeat') : t('createRepeat') }
+              { t('save') }
           </button>
         </div>
       </div>

@@ -1,3 +1,17 @@
+.list-commandbar{
+  display: flex;
+  padding: 0px 1px 0px 1px;
+  margin-top: 17.5px;
+  white-space: pre-wrap;
+  background-color: $content-background-color; //#f4f8fb;
+  border-bottom: $main-border;
+}
+
+.commandbar-addon {
+  margin-top: 8.75px;
+  margin-bottom: 8.75px;
+}
+
 .cmdb {
   .border {
     border: 1px solid #dddddd;

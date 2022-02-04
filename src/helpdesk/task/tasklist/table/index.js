@@ -255,7 +255,7 @@ export default function TableListLoader( props ) {
 
   const tableProps = {
     ...props,
-    displayValues: translateAllSelectItems( createDisplayValues( createPreferences(), localProject.project.id !== null ), t ),
+    displayValues: translateAllSelectItems( createDisplayValues( createPreferences(), localProject.project.id !== null, t ), t ),
     preference: createPreferences(),
     loading: dataLoading,
     setPreference,

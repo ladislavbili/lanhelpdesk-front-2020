@@ -1,7 +1,4 @@
 import React from 'react';
-import {
-  Button
-} from 'reactstrap';
 import Loading from 'components/loading';
 import classnames from 'classnames';
 import {
@@ -44,20 +41,20 @@ export default function Pagination( props ) {
       <div className="message ml-auto m-t-1">
         { `${ pageFrom }-${ pageTo } ${!shortForm ? t('fromTotalOf').toLowerCase() : t('of')} ${count} ${!shortForm ? t('page2').toLowerCase()  : ''}` }
       </div>
-      <Button
+      <button
         disabled={  page === 1 }
         onClick={ () => { history.push(`${path}${page - 1}`) } }
         className="btn-link center-hor m-l-5 p-l-5 p-r-5"
         >
         <i className="fa fa-chevron-left" />
-      </Button>
-      <Button
+      </button>
+      <button
         disabled={ page * limit >= count }
         onClick={ () => { history.push(`${path}${page + 1}`) } }
         className="btn-link center-hor m-l-5 p-l-5 p-r-5"
         >
         <i className="fa fa-chevron-right" />
-      </Button>
+      </button>
     </div>
   );
 }

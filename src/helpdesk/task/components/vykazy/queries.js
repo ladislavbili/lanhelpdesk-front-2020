@@ -2,6 +2,82 @@ import {
   gql
 } from '@apollo/client';
 
+const subtaskData = `
+  id
+  title
+  order
+  done
+  approved
+  price
+  approvedBy{
+    id
+    fullName
+  }
+  quantity
+  discount
+  type {
+    id
+    title
+  }
+  assignedTo {
+    id
+    fullName
+    email
+    company {
+      id
+    }
+  }
+  scheduled {
+    from
+    to
+  }
+`;
+
+const tripData = `
+  id
+  order
+  done
+  approved
+  price
+  approvedBy{
+    id
+    fullName
+  }
+  quantity
+  discount
+  type {
+    id
+    title
+  }
+  assignedTo {
+    id
+    fullName
+    email
+    company {
+      id
+    }
+  }
+  scheduled {
+    from
+    to
+  }
+`;
+
+const materialData = `
+  id
+  title
+  order
+  done
+  approved
+  approvedBy{
+    id
+    fullName
+  }
+  quantity
+  margin
+  price
+`;
+
 export const ADD_SUBTASK = gql `
 mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: Boolean, $quantity: Float!, $discount: Float!, $task: Int!, $assignedTo: Int!, $scheduled: ScheduledWorkInput, $fromInvoice: Boolean ) {
   addSubtask(
@@ -16,33 +92,7 @@ mutation addSubtask($title: String!, $order: Int!, $done: Boolean!, $approved: B
     scheduled: $scheduled,
     fromInvoice: $fromInvoice
   ){
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    discount
-    type {
-      id
-      title
-    }
-    assignedTo {
-      id
-      fullName
-      email
-      company {
-        id
-      }
-    }
-    scheduled {
-      from
-      to
-    }
+    ${subtaskData}
   }
 }
 `;
@@ -61,33 +111,7 @@ mutation updateSubtask($id: Int!, $title: String, $order: Int, $done: Boolean, $
     scheduled: $scheduled,
     fromInvoice: $fromInvoice
   ){
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    discount
-    type {
-      id
-      title
-    }
-    assignedTo {
-      id
-      fullName
-      email
-      company {
-        id
-      }
-    }
-    scheduled {
-      from
-      to
-    }
+    ${subtaskData}
   }
 }
 `;
@@ -117,32 +141,7 @@ mutation addWorkTrip($order: Int!, $done: Boolean!, $approved: Boolean, $quantit
     scheduled: $scheduled,
     fromInvoice: $fromInvoice
   ){
-    id
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    discount
-    type {
-      id
-      title
-    }
-    assignedTo {
-      id
-      fullName
-      email
-      company {
-        id
-      }
-    }
-    scheduled {
-      from
-      to
-    }
+    ${tripData}
   }
 }
 `;
@@ -161,32 +160,7 @@ mutation updateWorkTrip($id: Int!, $order: Int, $done: Boolean, $approved: Boole
     scheduled: $scheduled,
     fromInvoice: $fromInvoice
   ){
-    id
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    discount
-    type {
-      id
-      title
-    }
-    assignedTo {
-      id
-      fullName
-      email
-      company {
-        id
-      }
-    }
-    scheduled {
-      from
-      to
-    }
+    ${tripData}
   }
 }
 `;
@@ -215,18 +189,7 @@ mutation addMaterial($title: String!, $order: Int!, $done: Boolean!, $approved: 
     task: $task,
     fromInvoice: $fromInvoice
   ){
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    margin
-    price
+    ${materialData}
   }
 }
 `;
@@ -244,18 +207,7 @@ mutation updateMaterial($id: Int!, $title: String, $order: Int, $done: Boolean, 
     price: $price,
     fromInvoice: $fromInvoice
   ){
-    id
-    title
-    order
-    done
-    approved
-    approvedBy{
-      id
-      fullName
-    }
-    quantity
-    margin
-    price
+    ${materialData}
   }
 }
 `;
