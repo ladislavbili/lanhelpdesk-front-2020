@@ -415,3 +415,9 @@ mutation updateScheduledWork(
   }
 }
 `;
+
+export const TASK_DND_CHANGE_SUBSCRIPTION = gql `
+  subscription taskDndChangeSubscription( $statusId: Int ) {
+    taskDndChangeSubscription( statusId: $statusId )
+  }
+`;

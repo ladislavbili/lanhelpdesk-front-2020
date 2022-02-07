@@ -250,7 +250,6 @@ export default function FilterForm( props ) {
   }
   const resetFilter = () => {
     if ( id === null ) {
-      setTitle( '' );
       setDefaultFromObject( {
         setRequesters,
         setCompanies,
@@ -392,19 +391,19 @@ export default function FilterForm( props ) {
     //filter data
     const filter = filterData.filter;
     setCompanies( [
-      ...( filter.companyCur ? [ translateSelectItem( ofCurrentUser ) ] : [] ),
+      ...( filter.companyCur ? [ translateSelectItem( ofCurrentUser, t ) ] : [] ),
       ...toSelArr( companiesData.basicCompanies )
       .filter( ( company ) => filter.companies.some( ( company2 ) => company.id === company2.id ) )
     ] );
 
     setRequesters( [
-      ...( filter.requesterCur ? [ translateSelectItem( ofCurrentUser ) ] : [] ),
+      ...( filter.requesterCur ? [ translateSelectItem( ofCurrentUser, t ) ] : [] ),
       ...toSelArr( usersData.basicUsers, "fullName" )
       .filter( ( user ) => filter.requesters.some( ( user2 ) => user.id === user2.id ) )
     ] );
 
     setAssignedTos( [
-      ...( filter.assignedToCur ? [ translateSelectItem( ofCurrentUser ) ] : [] ),
+      ...( filter.assignedToCur ? [ translateSelectItem( ofCurrentUser, t ) ] : [] ),
       ...toSelArr( usersData.basicUsers, "fullName" )
       .filter( ( user ) => filter.assignedTos.some( ( user2 ) => user.id === user2.id ) )
     ] );

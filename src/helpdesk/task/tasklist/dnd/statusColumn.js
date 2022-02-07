@@ -25,7 +25,7 @@ import ModalTaskEdit from 'helpdesk/task/edit/modalEdit';
 
 import {
   GET_TASKS,
-  ADD_TASK_SUBSCRIPTION,
+  TASK_DND_CHANGE_SUBSCRIPTION,
 } from '../../queries';
 
 export default function DnDStatusColumn( props ) {
@@ -120,7 +120,10 @@ export default function DnDStatusColumn( props ) {
     }
   }, [ change ] );
 
-  useSubscription( ADD_TASK_SUBSCRIPTION, {
+  useSubscription( TASK_DND_CHANGE_SUBSCRIPTION, {
+    variables: {
+      statusId: status.id,
+    },
     onSubscriptionData: () => {
       tasksRefetch();
     }
