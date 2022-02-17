@@ -24,12 +24,26 @@ import {
   DELETE_MATERIAL,
 } from './queries';
 
+import {
+  ADD_SUBTASK as REPEAT_ADD_SUBTASK,
+  UPDATE_SUBTASK as REPEAT_UPDATE_SUBTASK,
+  DELETE_SUBTASK as REPEAT_DELETE_SUBTASK,
+  ADD_WORKTRIP as REPEAT_ADD_WORKTRIP,
+  UPDATE_WORKTRIP as REPEAT_UPDATE_WORKTRIP,
+  DELETE_WORKTRIP as REPEAT_DELETE_WORKTRIP,
+  ADD_MATERIAL as REPEAT_ADD_MATERIAL,
+  UPDATE_MATERIAL as REPEAT_UPDATE_MATERIAL,
+  DELETE_MATERIAL as REPEAT_DELETE_MATERIAL,
+} from 'helpdesk/components/repeat/queries';
+
 let fakeID = -1;
 
 export default function TaskEditTablesLoader( props ) {
   const {
     edit,
     task,
+    repeat,
+    repeatID,
     invoiced,
     fromInvoice,
     autoApproved,
@@ -52,15 +66,15 @@ export default function TaskEditTablesLoader( props ) {
   const setChanged = props.setChanged ? props.setChanged : () => {};
   const setSaving = props.setSaving ? props.setSaving : () => {};
 
-  const [ addSubtask ] = useMutation( ADD_SUBTASK );
-  const [ updateSubtask ] = useMutation( UPDATE_SUBTASK );
-  const [ deleteSubtask ] = useMutation( DELETE_SUBTASK );
-  const [ addWorkTrip ] = useMutation( ADD_WORKTRIP );
-  const [ updateWorkTrip ] = useMutation( UPDATE_WORKTRIP );
-  const [ deleteWorkTrip ] = useMutation( DELETE_WORKTRIP );
-  const [ addTaskMaterial ] = useMutation( ADD_MATERIAL );
-  const [ updateTaskMaterial ] = useMutation( UPDATE_MATERIAL );
-  const [ deleteTaskMaterial ] = useMutation( DELETE_MATERIAL );
+  const [ addSubtask ] = useMutation( repeat ? ADD_SUBTASK : ADD_SUBTASK );
+  const [ updateSubtask ] = useMutation( repeat ? UPDATE_SUBTASK : UPDATE_SUBTASK );
+  const [ deleteSubtask ] = useMutation( repeat ? DELETE_SUBTASK : DELETE_SUBTASK );
+  const [ addWorkTrip ] = useMutation( repeat ? ADD_WORKTRIP : ADD_WORKTRIP );
+  const [ updateWorkTrip ] = useMutation( repeat ? UPDATE_WORKTRIP : UPDATE_WORKTRIP );
+  const [ deleteWorkTrip ] = useMutation( repeat ? DELETE_WORKTRIP : DELETE_WORKTRIP );
+  const [ addTaskMaterial ] = useMutation( repeat ? ADD_MATERIAL : ADD_MATERIAL );
+  const [ updateTaskMaterial ] = useMutation( repeat ? UPDATE_MATERIAL : UPDATE_MATERIAL );
+  const [ deleteTaskMaterial ] = useMutation( repeat ? DELETE_MATERIAL : DELETE_MATERIAL );
 
   const addWork = ( work ) => {
     if ( edit ) {
@@ -76,13 +90,22 @@ export default function TaskEditTablesLoader( props ) {
             quantity: work.quantity,
             //type: work.type.id,
             task,
+            repeatTemplate: repeatID,
             assignedTo: work.assignedTo.id,
             scheduled: work.scheduled,
             fromInvoice,
           }
         } )
         .then( ( response ) => {
-          updateCasheStorage( response.data.addSubtask, 'subtasks', 'ADD' );
+          if ( repeat ) {
+            updateCasheStorage( response.data.addRepeatTemplateSubtask, 'subtasks', 'ADD' );
+            setWorks( [ ...works, {
+              ...work,
+              id: response.data.addRepeatTemplateSubtask.id
+            } ] );
+          } else {
+            updateCasheStorage( response.data.addSubtask, 'subtasks', 'ADD' );
+          }
           setSaving( false );
         } )
         .catch( ( err ) => {
@@ -115,7 +138,11 @@ export default function TaskEditTablesLoader( props ) {
           }
         } )
         .then( ( response ) => {
-          updateCasheStorage( response.data.updateSubtask, 'subtasks', 'UPDATE' );
+          if ( repeat ) {
+            updateCasheStorage( response.data.updateRepeatTemplateSubtask, 'subtasks', 'UPDATE' );
+          } else {
+            updateCasheStorage( response.data.updateSubtask, 'subtasks', 'UPDATE' );
+          }
           setSaving( false );
         } )
         .catch( ( err ) => {
@@ -161,13 +188,22 @@ export default function TaskEditTablesLoader( props ) {
             quantity: parseFloat( trip.quantity ),
             type: trip.type.id,
             task,
+            repeatTemplate: repeatID,
             assignedTo: trip.assignedTo.id,
             scheduled: trip.scheduled,
             fromInvoice,
           }
         } )
         .then( ( response ) => {
-          updateCasheStorage( response.data.addWorkTrip, 'workTrips', 'ADD' );
+          if ( repeat ) {
+            updateCasheStorage( response.data.addRepeatTemplateWorkTrip, 'workTrips', 'ADD' );
+            setTrips( [ ...trips, {
+              ...trip,
+              id: response.data.addRepeatTemplateWorkTrip.id
+            } ] )
+          } else {
+            updateCasheStorage( response.data.addWorkTrip, 'workTrips', 'ADD' );
+          }
           setSaving( false );
         } )
         .catch( ( err ) => {
@@ -199,7 +235,11 @@ export default function TaskEditTablesLoader( props ) {
           }
         } )
         .then( ( response ) => {
-          updateCasheStorage( response.data.updateWorkTrip, 'workTrips', 'UPDATE' );
+          if ( repeat ) {
+            updateCasheStorage( response.data.updateRepeatTemplateWorkTrip, 'workTrips', 'UPDATE' );
+          } else {
+            updateCasheStorage( response.data.updateWorkTrip, 'workTrips', 'UPDATE' );
+          }
           setSaving( false );
         } )
         .catch( ( err ) => {
@@ -245,11 +285,20 @@ export default function TaskEditTablesLoader( props ) {
             margin: parseFloat( item.margin ),
             price: parseFloat( item.price ),
             task,
+            repeatTemplate: repeatID,
             fromInvoice,
           }
         } )
         .then( ( response ) => {
-          updateCasheStorage( response.data.addMaterial, 'materials', 'ADD' );
+          if ( repeat ) {
+            setMaterials( [ ...materials, {
+              ...item,
+              id: response.data.addRepeatTemplateMaterial.id
+            } ] );
+            updateCasheStorage( response.data.addRepeatTemplateMaterial, 'materials', 'ADD' );
+          } else {
+            updateCasheStorage( response.data.addMaterial, 'materials', 'ADD' );
+          }
           setSaving( false );
         } )
         .catch( ( err ) => {
@@ -281,7 +330,11 @@ export default function TaskEditTablesLoader( props ) {
           }
         } )
         .then( ( response ) => {
-          updateCasheStorage( response.data.updateMaterial, 'materials', 'UPDATE' );
+          if ( repeat ) {
+            updateCasheStorage( response.data.updateRepeatTemplateMaterial, 'materials', 'UPDATE' );
+          } else {
+            updateCasheStorage( response.data.updateMaterial, 'materials', 'UPDATE' );
+          }
           setSaving( false );
         } )
         .catch( ( err ) => {

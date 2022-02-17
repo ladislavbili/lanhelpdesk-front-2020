@@ -173,12 +173,10 @@ mutation updateProfile(
 `;
 
 export const DELETE_USER = gql `
-mutation deleteUser($id: Int!, $taskPairs: [TaskPairInput]!, $subtaskPairs: [SubtaskPairInput]!, $workTripPairs: [WorkTripPairInput]!) {
+mutation deleteUser($id: Int!, $newId: Int!) {
   deleteUser(
     id: $id,
-    taskPairs: $taskPairs,
-    subtaskPairs: $subtaskPairs,
-    workTripPairs: $workTripPairs,
+    newId: $newId,
   ){
     id
   }

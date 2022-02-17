@@ -57,11 +57,7 @@ import {
   DELETE_TASK,
   TASK_DELETE_SUBSCRIPTION,
   UPDATE_TASK,
-  SET_TASK_LAYOUT,
 
-  ADD_SHORT_SUBTASK,
-  UPDATE_SHORT_SUBTASK,
-  DELETE_SHORT_SUBTASK,
   DELETE_TASK_ATTACHMENT,
 } from '../queries';
 
@@ -152,11 +148,7 @@ export default function TaskEditContainer( props ) {
   } = useQuery( GET_PROJECT );
 
   const [ updateTask ] = useMutation( UPDATE_TASK );
-  const [ setTaskLayout ] = useMutation( SET_TASK_LAYOUT );
 
-  const [ addShortSubtask ] = useMutation( ADD_SHORT_SUBTASK );
-  const [ updateShortSubtask ] = useMutation( UPDATE_SHORT_SUBTASK );
-  const [ deleteShortSubtask ] = useMutation( DELETE_SHORT_SUBTASK );
   const [ deleteTask ] = useMutation( DELETE_TASK );
   const [ deleteTaskAttachment ] = useMutation( DELETE_TASK_ATTACHMENT );
 
@@ -257,63 +249,6 @@ export default function TaskEditContainer( props ) {
         task: newTask
       }
     } );
-  }
-
-  const addShortSubtaskFunc = ( sub ) => {
-    setSaving( true );
-
-    addShortSubtask( {
-        variables: {
-          ...sub,
-          fromInvoice
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.addShortSubtask, 'shortSubtasks', 'ADD' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const updateShortSubtaskFunc = ( sub ) => {
-    setSaving( true );
-
-    updateShortSubtask( {
-        variables: {
-          id: sub.id,
-          title: sub.title,
-          done: sub.done,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( response.data.updateShortSubtask, 'shortSubtasks', 'UPDATE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
-
-    setSaving( false );
-  }
-
-  const deleteShortSubtaskFunc = ( id ) => {
-    deleteShortSubtask( {
-        variables: {
-          id,
-          fromInvoice,
-        }
-      } )
-      .then( ( response ) => {
-        updateCasheStorage( {
-          id
-        }, 'shortSubtasks', 'DELETE' );
-      } )
-      .catch( ( err ) => {
-        addLocalError( err );
-      } );
   }
 
   const deleteTaskFunc = () => {
@@ -436,15 +371,6 @@ export default function TaskEditContainer( props ) {
 
   }
 
-  const setTaskLayoutFunc = ( value ) => {
-    setTaskLayout( {
-        variables: {
-          taskLayout: value,
-        }
-      } )
-      .catch( ( err ) => addLocalError( err ) );
-  }
-
   const currentUser = getMyData();
   const dataLoading = (
     !currentUser ||
@@ -491,12 +417,8 @@ export default function TaskEditContainer( props ) {
       addAttachments={addAttachments}
       removeAttachment={removeAttachment}
       deleteTaskFunc={deleteTaskFunc}
-      addShortSubtask={addShortSubtaskFunc}
-      updateShortSubtask={updateShortSubtaskFunc}
-      deleteShortSubtask={deleteShortSubtaskFunc}
       updateCasheStorage={updateCasheStorage}
       updateTask={updateTask}
-      setTaskLayout={setTaskLayoutFunc}
       client={client}
       saving={saving}
       setSaving={setSaving}

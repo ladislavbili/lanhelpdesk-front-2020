@@ -28,7 +28,7 @@ if ( testingTranslations ) {
     ...Object.keys( lanwiki ),
     ...Object.keys( cmdb ),
   ]
-  console.log( test.length );
+  //console.log( test.length );
 
   const testResult = test.filter( ( key, index ) => test.findIndex( ( key2 ) => key2 === key ) !== index );
   if ( testResult.length > 0 ) {

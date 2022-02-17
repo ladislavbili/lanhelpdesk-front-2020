@@ -25,6 +25,7 @@ import SimpleRepeat from 'helpdesk/components/repeat/simpleRepeat';
 import Attachments from 'helpdesk/task/components/attachments';
 import TagsPickerPopover from 'helpdesk/task/components/tags';
 import ShortSubtasks from 'helpdesk/task/components/shortSubtasks';
+import Vykazy from 'helpdesk/task/components/vykazy';
 import Materials from 'helpdesk/task/components/vykazy/materialsTable';
 import WorksTable from 'helpdesk/task/components/vykazy/worksTable';
 
@@ -101,18 +102,7 @@ export default function RepeatForm( props ) {
     closeModal,
     taskID,
     duplicateTask,
-    addShortSubtaskFunc,
-    updateShortSubtaskFunc,
-    deleteShortSubtaskFunc,
-    addSubtaskFunc,
-    updateSubtaskFunc,
-    deleteSubtaskFunc,
-    addWorkTripFunc,
-    updateWorkTripFunc,
-    deleteWorkTripFunc,
-    addMaterialFunc,
-    updateMaterialFunc,
-    deleteMaterialFunc,
+    updateCasheStorage,
     addAttachments,
     removeAttachment,
     directSaving,
@@ -139,7 +129,6 @@ export default function RepeatForm( props ) {
   const [ deleteRepeat ] = useMutation( DELETE_REPEAT );
 
   //state
-  const [ layout, setLayout ] = React.useState( 2 );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
 
   const [ project, setProject ] = React.useState( null );
@@ -444,7 +433,7 @@ export default function RepeatForm( props ) {
     } else if ( duplicateTask ) {
       setTaskData();
     }
-  }, [] );
+  }, [ originalRepeat ] );
 
   const deleteRepeatFunc = () => {
     if ( window.confirm( t( 'deleteRepeatMessage' ) ) ) {
@@ -689,10 +678,7 @@ export default function RepeatForm( props ) {
             ...task,
             repeat: {
               ...task.repeat,
-              active: repeat.active,
-              repeatEvery: repeat.repeatEvery,
-              repeatInterval: repeat.repeatInterval,
-              startsAt: repeat.startsAt,
+              ...repeat,
             }
           }
         }
@@ -745,7 +731,7 @@ export default function RepeatForm( props ) {
       setPendingDate( moment()
         .add( 1, 'd' ) );
       saveChange( {
-        status,
+        status: status.id,
         pendingDate: moment()
           .add( 1, 'd' )
           .valueOf()
@@ -755,7 +741,7 @@ export default function RepeatForm( props ) {
       setStatus( status );
       setCloseDate( moment() );
       saveChange( {
-        status,
+        status: status.id,
         closeDate: moment()
           .valueOf()
           .toString()
@@ -763,7 +749,7 @@ export default function RepeatForm( props ) {
     } else {
       setStatus( status );
       saveChange( {
-        status,
+        status: status.id,
       } )
     }
   }
@@ -785,7 +771,352 @@ export default function RepeatForm( props ) {
   )
 
   //RENDERS
-  const renderHeader = () => {
+
+  const renderSide = () => {
+    return (
+      <div className="task-edit-right p-b-20 m-t-0">
+        <div className="form-selects-entry-column" >
+          <Label>{t('project')} <span className="warning-big">*</span></Label>
+          <div className="form-selects-entry-column-rest" >
+            <Select
+              placeholder={t('selectProject')}
+              value={project}
+              onChange={changeProject}
+              options={projects.filter((project) => currentUser.role.level === 0 || (project.right.addTask && project.right.repeatWrite ) )}
+              styles={pickSelectStyle([ 'noArrow', 'required', ])}
+              />
+          </div>
+        </div>
+        { userRights.attributeRights.status.view &&
+          <div className="form-selects-entry-column" >
+            <Label>{t('status')}<span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit) &&
+                <div className="disabled-info">{status ? status.label : t('none')}</div>
+              }
+              { !projectAttributes.status.fixed && userRights.attributeRights.status.edit &&
+                <Select
+                  placeholder={t('statusPlaceholder')}
+                  value={status}
+                  styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
+                  onChange={ changeStatus }
+                  options={(project ? toSelArr(project.statuses) : []).filter( (status) => status.action !== 'Invoiced' )}
+                  />
+              }
+            </div>
+          </div>
+        }
+        { userRights.attributeRights.requester.view &&
+          <div className="form-selects-entry-column" >
+            <Label>{t('requester')}<span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit) &&
+                <div className="disabled-info">{requester ? requester.label : t('none')}</div>
+              }
+              { !projectAttributes.requester.fixed && userRights.attributeRights.requester.edit &&
+                <Select
+                  placeholder={t('requesterPlaceholder')}
+                  value={requester}
+                  onChange={(requester)=>{
+                    setRequester(requester);
+                    if(!editMode){
+                      const newCompany = companies.find((company) => company.id === requester.id );
+                      setCompany(newCompany);
+                    }
+                    saveChange({
+                      requester: requester.id
+                    })
+                  }}
+                  options={requesters}
+                  styles={ pickSelectStyle([ 'noArrow', 'required', ])}
+                  />
+              }
+            </div>
+          </div>
+        }
+        { userRights.attributeRights.company.view &&
+          <div className="form-selects-entry-column" >
+            <Label>{t('company')}<span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit) &&
+                <div className="disabled-info">{company ? company.label : t('none')}</div>
+              }
+              { !projectAttributes.company.fixed && userRights.attributeRights.company.edit &&
+                <Select
+                  placeholder={t('companyPlaceholder')}
+                  value={company}
+                  onChange={(company)=> {
+                    setCompany(company);
+                    setPausal(company.monthly ? translateAllSelectItems(booleanSelects, t)[1] : translateAllSelectItems(booleanSelects, t)[0]);
+                    saveChange({
+                      requester: company.id,
+                      pausal: company.monthly
+                    })
+                  }}
+                  options={companies}
+                  styles={pickSelectStyle([ 'noArrow', 'required', ])}
+                  />
+              }
+            </div>
+          </div>
+        }
+        { userRights.attributeRights.assigned.view &&
+          <div className="form-selects-entry-column" >
+            <Label>{t('assignedTo')}<span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit) &&
+                <div>
+                  { assignedTo.map((user) => (
+                    <div className="disabled-info">{user.label}</div>
+                  ) )}
+                  { assignedTo.length === 0 &&
+                    <div className="message error-message">{t('taskNotAssigned')}</div>
+                  }
+                </div>
+              }
+              { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit &&
+                <Select
+                  value={assignedTo}
+                  placeholder={t('selectReccomended')}
+                  isMulti
+                  onChange={(users)=> {
+                    setAssignedTo(users);
+                    saveChange({ assignedTo: users.map((user) => user.id) })
+                  }}
+                  options={assignableUsers}
+                  styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
+                  />
+              }
+            </div>
+          </div>
+        }
+        <div className="form-selects-entry-column" >
+          <Label>{t('plannedAt')}</Label>
+          <div className="form-selects-entry-column-rest" >
+            <div className="disabled-info">{t('taskCreationDate')}</div>
+          </div>
+        </div>
+        { userRights.attributeRights.deadline.view &&
+          <div className="form-selects-entry-column" >
+            <Label>{t('deadlineSinceCreation')}</Label>
+            <div className="form-selects-entry-column-rest" >
+              { (projectAttributes.deadline.fixed || !userRights.attributeRights.deadline.edit) &&
+                <div className="disabled-info">{deadline}</div>
+              }
+              { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit &&
+                <input
+                  className="form-control"
+                  type="number"
+                  placeholder={t("deadlineSinceCreationPlaceholder")}
+                  onChange={() => {} }
+                  />
+              }
+            </div>
+          </div>
+        }
+        { userRights.attributeRights.repeat.view &&
+          <div className="form-selects-entry-column" >
+            <Label>{t('repeat')}</Label>
+            <div className="form-selects-entry-column-rest" >
+              <div className="secondary-border p-10" style={{ marginLeft: -10, marginRight: -10 }}>
+                <FormGroup className="task-add-date-picker-placeholder">
+                  <Label>{t('startDate')} *</Label>
+                  <div className="flex-input">
+                    <DatePicker
+                      className="form-control"
+                      selected={startsAt}
+                      onChange={(value) => {
+                        setStartsAt(value);
+                        saveChange( {
+                          startsAt: value.valueOf()
+                          .toString(),
+                        } );
+                      }}
+                      placeholderText={t('noStartDate')}
+                      />
+                  </div>
+                </FormGroup>
+
+                <FormGroup>
+                  <Label>{t('repeatEvery')} *</Label>
+                  { parseInt(repeatEvery) <= 0 &&
+                    <Label className="warning">{t('warningMustBeMoreThan0')}.</Label>
+                  }
+                  <Input type="number"
+                    className={classnames({ "form-control-warning": parseInt(repeatEvery) < 0 }, "form-control-secondary no-border m-b-10" ) }
+                    placeholder={t('enterNumber')}
+                    value={( repeatEvery )}
+                    onChange={(e)=> {
+                      setRepeatEvery(e.target.value);
+                      saveChange( {
+                        repeatEvery: e.target.value,
+                      } );
+                    }}
+                    />
+                  <Select
+                    value={translateSelectItem(repeatInterval, t)}
+                    onChange={(value) =>{
+                      setRepeatInterval( value );
+                      saveChange( {
+                        repeatInterval: value.value,
+                      } );
+                    }}
+                    options={translateAllSelectItems(intervals, t)}
+                    styles={pickSelectStyle()}
+                    />
+                </FormGroup>
+                <Checkbox
+                  className = "m-r-5"
+                  label={t('active')}
+                  value = { active }
+                  onChange={() =>{
+                    setActive(!active );
+                    saveChange( {
+                      active: !active,
+                    } );
+                  }}
+                  />
+              </div>
+            </div>
+          </div>
+    } {
+      userRights.attributeRights.taskType.view &&
+        <div className="form-selects-entry-column" >
+            <Label>{t('taskType')}</Label>
+            <div className="form-selects-entry-column-rest" >
+              <Select
+                placeholder={t('taskTypePlaceholder')}
+                value={taskType}
+                isDisabled={ projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit }
+                styles={ pickSelectStyle( [ 'noArrow', 'required' ] )}
+                onChange={ (taskType) => {
+                  setTaskType(taskType);
+                  saveChange({ taskType: taskType.id })
+                }}
+                options={taskTypes}
+                />
+            </div>
+          </div>
+    } {
+      userRights.attributeRights.pausal.view &&
+        <div className="form-selects-entry-column" >
+            <Label>{t('pausal')}<span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed ) &&
+                <div className="disabled-info">{ pausal ? pausal.label : t('none') }</div>
+              }
+              { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed &&
+                <Select
+                  value={ pausal }
+                  placeholder={t('selectRequired')}
+                  styles={pickSelectStyle([ 'noArrow', 'required', ]) }
+                  onChange={(pausal)=> { setPausal(pausal); saveChange({ pausal: pausal.value }) }}
+                  options={translateAllSelectItems(booleanSelects, t)}
+                  />
+              }
+            </div>
+          </div>
+    } {
+      userRights.attributeRights.overtime.view &&
+        <div className="form-selects-entry-column" >
+            <Label>{t('overtimeShort')}<span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { (projectAttributes.overtime.fixed || !userRights.attributeRights.overtime.edit) &&
+                <div className="disabled-info">{overtime.label}</div>
+              }
+              { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.edit &&
+                <Select
+                  value={overtime}
+                  placeholder={t('selectRequired')}
+                  styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
+                  onChange={(overtime) => { setOvertime(overtime); saveChange({ overtime: pausal.value }); }}
+                  options={translateAllSelectItems(booleanSelects, t)}
+                  />
+              }
+            </div>
+          </div>
+    }
+    </div>
+    )
+  }
+
+  const renderMain = () => {
+    return (
+      <div
+        className="task-edit-left m-t-0">
+
+        { renderMainTop() }
+
+        { renderDescriptionAttachmentsTags() }
+
+        { userRights.rights.taskSubtasksRead && (
+          <ShortSubtasks
+            edit={editMode}
+            repeat
+            repeatID={editMode ? originalRepeat.repeatTemplate.id : null}
+            disabled={!userRights.rights.taskSubtasksWrite}
+            setSaving={() => {}}
+            shortSubtasks={simpleSubtasks}
+            setShortSubtasks={setSimpleSubtasks}
+            updateCasheStorage={updateCasheStorage}
+            />
+        ) }
+        {(
+          userRights.rights.taskWorksRead ||
+          userRights.rights.taskWorksAdvancedRead ||
+          userRights.rights.taskMaterialsRead
+        ) && (
+          <Vykazy
+            edit={editMode}
+            repeat
+            repeatID={editMode ? originalRepeat.repeatTemplate.id : null}
+            autoApproved={project ? project.autoApproved : false}
+            userRights={userRights}
+            currentUser={currentUser}
+            assignedTo={assignedTo}
+            company={company}
+            updateCasheStorage={updateCasheStorage}
+            renderCompanyPausalInfo={null}
+            works={subtasks}
+            setWorks={setSubtasks}
+            taskTypes={ taskTypes }
+            taskType={ taskType }
+            trips={ workTrips }
+            setTrips={setWorkTrips}
+            tripTypes={tripTypes}
+            materials={materials}
+            setMaterials={setMaterials}
+            setSaving={setSubtasks}
+            />
+        )}
+        <div className="form-section task-edit-buttons">
+          <div className="row form-section-rest">
+            {closeModal &&
+              <button className="btn-link-cancel m-l-20" onClick={() => closeModal(wasSaved, wasDisabled)}>{t('cancel')}</button>
+            }
+            { newStartsAt &&
+              <span className="color-muted">
+                {t('repeatAutoupdateMessage')}
+              </span>
+            }
+            <div className="row pull-right">
+              {canCreateVykazyError()}
+              <button
+                className="btn"
+                disabled={ cantSave }
+                onClick={ triggerSave }
+                >
+                { t('save') }
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    );
+  }
+
+  const renderCommandbar = () => {
     return (
       <div className="task-edit-buttons row m-b-10 m-l-20 m-r-20 m-t-20">
         <h2 className="center-hor">{t('repeat')}</h2>
@@ -812,34 +1143,38 @@ export default function RepeatForm( props ) {
     )
   }
 
-  const renderTitle = () => {
+  const renderMainTop = () => {
     return (
-      <div className="d-flex">
-        { userRights.rights.taskImportant &&
-          <button
-            type="button"
-            style={{color: '#ffc107'}}
-            className="btn-link center-hor m-r-10"
-            onClick={()=>{
-              setImportant(!important);
-              saveChange({ important: !important });
-            }}
-            >
-            <i className={`fa${ important ? 's' : 'r' } fa-star`} style={{ fontSize: 25 }} />
-          </button>
-        }
-        { editMode && <h2 className="center-hor">{originalRepeat.id}: </h2> }
-        <span className="center-hor flex m-r-15">
-          <input type="text"
-            value={title}
-            className="task-title-input text-extra-slim hidden-input form-control"
-            onChange={(e)=> {
-              setTitle(e.target.value);
-              saveChange({ title: e.target.value })
-            }}
-            placeholder={t('taskTitlePlaceholder')}
-            />
-        </span>
+      <div>
+        <div className="d-flex">
+          { userRights.rights.taskImportant &&
+            <button
+              type="button"
+              style={{color: '#ffc107'}}
+              className="btn-link center-hor m-r-10"
+              onClick={()=>{
+                setImportant(!important);
+                saveChange({ important: !important });
+              }}
+              >
+              <i className={`fa${ important ? 's' : 'r' } fa-star`} style={{ fontSize: 25 }} />
+            </button>
+          }
+          { editMode && <h2 className="center-hor">{originalRepeat.id}: </h2> }
+          <span className="center-hor flex m-r-15">
+            <input type="text"
+              value={title}
+              className="task-title-input text-extra-slim hidden-input form-control"
+              onChange={(e)=> {
+                setTitle(e.target.value);
+                saveChange({ title: e.target.value })
+              }}
+              placeholder={t('taskTitlePlaceholder')}
+              />
+          </span>
+        </div>
+        <hr className="m-t-5 m-b-18"/>
+        { renderStatusDate() }
       </div>
     );
   }
@@ -919,480 +1254,7 @@ export default function RepeatForm( props ) {
     return null;
   }
 
-  const layoutComponents = {
-    Project: (
-      <Select
-        placeholder={t('selectProject')}
-        value={project}
-        onChange={changeProject}
-        options={projects.filter((project) => currentUser.role.level === 0 || (project.right.addTask && project.right.repeatWrite ) )}
-        styles={pickSelectStyle([ 'noArrow', 'required', ])}
-        />
-    ),
-    Assigned: (
-      <div>
-        { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit) &&
-          <div>
-            { assignedTo.map((user) => (
-              <div className="disabled-info">{user.label}</div>
-            ) )}
-            { assignedTo.length === 0 &&
-              <div className="message error-message">{t('taskNotAssigned')}</div>
-            }
-          </div>
-        }
-        { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit &&
-          <Select
-            value={assignedTo}
-            placeholder={t('selectReccomended')}
-            isMulti
-            onChange={(users)=> {
-              setAssignedTo(users);
-              saveChange({ assignedTo: users.map((user) => user.id) })
-            }}
-            options={assignableUsers}
-            styles={pickSelectStyle( [ 'noArrow', ] )}
-            />
-        }
-      </div>
-    ),
-    Status: (
-      <div>
-        { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit) &&
-          <div className="disabled-info">{status ? status.label : t('none')}</div>
-        }
-        { !projectAttributes.status.fixed && userRights.attributeRights.status.edit &&
-          <Select
-            placeholder={t('statusPlaceholder')}
-            value={status}
-            styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
-            onChange={ changeStatus }
-            options={(project ? toSelArr(project.statuses) : []).filter( (status) => status.action !== 'Invoiced' )}
-            />
-        }
-      </div>
-    ),
-    Type: (
-      <Select
-        placeholder={t('taskTypePlaceholder')}
-        value={taskType}
-        isDisabled={ projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit }
-        styles={ pickSelectStyle( [ 'noArrow', ] ) }
-        onChange={ (taskType) => {
-          setTaskType(taskType);
-          saveChange({ taskType: taskType.id })
-        }}
-        options={taskTypes}
-        />
-    ),
-    Requester: (
-      <div>
-        { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit) &&
-          <div className="disabled-info">{requester ? requester.label : t('none')}</div>
-        }
-        { !projectAttributes.requester.fixed && userRights.attributeRights.requester.edit &&
-          <Select
-            placeholder={t('requesterPlaceholder')}
-            value={requester}
-            onChange={(requester)=>{
-              setRequester(requester);
-              if(!editMode){
-                const newCompany = companies.find((company) => company.id === requester.id );
-                setCompany(newCompany);
-              }
-              saveChange({
-                requester: requester.id
-              })
-            }}
-            options={requesters}
-            styles={ pickSelectStyle([ 'noArrow', 'required', ])}
-            />
-        }
-      </div>
-    ),
-    Company: (
-      <div>
-        { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit) &&
-          <div className="disabled-info">{company ? company.label : t('none')}</div>
-        }
-        { !projectAttributes.company.fixed && userRights.attributeRights.company.edit &&
-          <Select
-            placeholder={t('companyPlaceholder')}
-            value={company}
-            onChange={(company)=> {
-              setCompany(company);
-              setPausal(company.monthly ? translateAllSelectItems(booleanSelects, t)[1] : translateAllSelectItems(booleanSelects, t)[0]);
-              saveChange({
-                requester: company.id,
-                pausal: company.monthly
-              })
-            }}
-            options={companies}
-            styles={pickSelectStyle([ 'noArrow', 'required', ])}
-            />
-        }
-      </div>
-    ),
-    Pausal: (
-      <div>
-        { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed ) &&
-          <div className="disabled-info">{ pausal ? pausal.label : t('none') }</div>
-        }
-        { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed &&
-          <Select
-            value={ pausal }
-            placeholder={t('selectRequired')}
-            styles={pickSelectStyle([ 'noArrow', 'required', ]) }
-            onChange={(pausal)=> { setPausal(pausal); saveChange({ pausal: pausal.value }) }}
-            options={translateAllSelectItems(booleanSelects, t)}
-            />
-        }
-      </div>
-    ),
-    Deadline: (
-      <div>
-        { (projectAttributes.deadline.fixed || !userRights.attributeRights.deadline.edit) &&
-          <div className="disabled-info">{deadline}</div>
-        }
-        { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit &&
-          <DatePicker
-            className={classnames("form-control")}
-            selected={deadline}
-            hideTime
-            isClearable
-            onChange={date => {
-              setDeadline(date);
-              if( date.valueOf() !== null ){
-                saveChange({ deadline: date.valueOf().toString() })
-              }
-            }}
-            placeholderText={t('deadlinePlaceholder')}
-            />
-        }
-      </div>
-    ),
-    Overtime: (
-      <div>
-        { (projectAttributes.overtime.fixed || !userRights.attributeRights.overtime.edit) &&
-          <div className="disabled-info">{overtime.label}</div>
-        }
-        { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.edit &&
-          <Select
-            value={overtime}
-            placeholder={t('selectRequired')}
-            styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
-            onChange={(overtime) => { setOvertime(overtime); saveChange({ overtime: pausal.value }); }}
-            options={translateAllSelectItems(booleanSelects, t)}
-            />
-        }
-      </div>
-    ),
-    Repeat: (
-      <div className="secondary-border p-10" style={{ marginLeft: -10, marginRight: -10 }}>
-        <FormGroup className="task-add-date-picker-placeholder">
-          <Label>{t('startDate')} *</Label>
-          <div className="flex-input">
-            <DatePicker
-              className="form-control"
-              selected={startsAt}
-              onChange={(value) => {
-                setStartsAt(value);
-                saveChange( {
-                    startsAt: value.valueOf()
-                      .toString(),
-                } );
-              }}
-              placeholderText={t('noStartDate')}
-              />
-          </div>
-        </FormGroup>
-
-        <FormGroup>
-          <Label>{t('repeatEvery')} *</Label>
-          { parseInt(repeatEvery) <= 0 &&
-            <Label className="warning">{t('warningMustBeMoreThan0')}.</Label>
-          }
-          <Input type="number"
-            className={classnames({ "form-control-warning": parseInt(repeatEvery) < 0 }, "form-control-secondary no-border m-b-10" ) }
-            placeholder={t('enterNumber')}
-            value={( repeatEvery )}
-            onChange={(e)=> {
-              setRepeatEvery(e.target.value);
-              saveChange( {
-                  repeatEvery: e.target.value,
-              } );
-            }}
-            />
-          <Select
-            value={translateSelectItem(repeatInterval, t)}
-            onChange={(value) =>{
-              setRepeatInterval( value );
-              saveChange( {
-                  repeatInterval: value.value,
-              } );
-            }}
-            options={translateAllSelectItems(intervals, t)}
-            styles={pickSelectStyle()}
-            />
-        </FormGroup>
-        <Checkbox
-          className = "m-r-5"
-          label={t('active')}
-          value = { active }
-          onChange={() =>{
-            setActive(!active );
-            saveChange( {
-                active: !active,
-            } );
-          }}
-          />
-      </div>
-    )
-  }
-
-  const renderSelectsLayout1 = () => {
-    return (
-      <div className = "form-section form-selects-entries" >
-        <div className="form-section-rest">
-
-          <div className="col-12 row">
-            <div className="col-4">
-              <div className="row p-r-10">
-                <Label className="col-3 col-form-label">{t('project')}<span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Project }
-                </div>
-              </div>
-            </div>
-            { userRights.attributeRights.assigned.view &&
-              <div className="col-8">
-                <div className="row p-r-10">
-                  <Label className="col-1-45 col-form-label">{t('assignedTo')}<span className="warning-big">*</span></Label>
-                  <div className="col-10-45">
-                    { layoutComponents.Assigned }
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-
-          <div className="row">
-            <div className="col-4">
-              { userRights.attributeRights.status.view &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">{t('status')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Status }
-                  </div>
-                </div>
-              }
-
-              { userRights.attributeRights.taskType.view &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">{t('taskType')}</Label>
-                  <div className="col-9">
-                    { layoutComponents.Type }
-                  </div>
-                </div>
-              }
-
-            </div>
-
-            <div className="col-4">
-              { userRights.attributeRights.requester.view &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">{t('requester')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Requester }
-                  </div>
-                </div>
-              }
-              { userRights.attributeRights.company.view &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">{t('company')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Company }
-                  </div>
-                </div>
-              }
-              { userRights.attributeRights.pausal.view &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">{t('pausal')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Pausal }
-                  </div>
-                </div>
-              }
-            </div>
-
-            <div className="col-4">
-              { userRights.attributeRights.deadline.view &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">{t('deadline')}</Label>
-                  <div className="col-9">
-                    { layoutComponents.Deadline }
-                  </div>
-                </div>
-              }
-
-              { userRights.attributeRights.overtime.view &&
-                <div className="row p-r-10">
-                  <Label className="col-3 col-form-label">{t('overtimeShort')} <span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    {layoutComponents.Overtime}
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
-        </div>
-      </div>
-    )
-  }
-
-  const renderSelectsLayout2Form = () => {
-    return (
-      <div className="col-12 row task-edit-align-select-labels">
-        <div className="col-2">
-          <Label className="col-form-label">{t('project')}</Label>
-          { layoutComponents.Project }
-        </div>
-        { userRights.attributeRights.status.view &&
-          <div className="col-2" >
-            <Label className="col-form-label">{t('status')}</Label>
-            { layoutComponents.Status }
-          </div>
-        }
-        { userRights.attributeRights.requester.view &&
-          <div className="col-2">
-            <Label className="col-form-label">{t('requester')}</Label>
-            { layoutComponents.Requester }
-          </div>
-        }
-        { userRights.attributeRights.company.view &&
-          <div className="col-2">
-            <Label className="col-form-label">{t('company')}</Label>
-            { layoutComponents.Company }
-          </div>
-        }
-      </div>
-    )
-  }
-
-  const renderSelectsLayout2Side = () => {
-    return (
-      <div className="task-edit-right p-b-20 m-t-0">
-        <div className="form-selects-entry-column" >
-          <Label>{t('project')} <span className="warning-big">*</span></Label>
-          <div className="form-selects-entry-column-rest" >
-            { layoutComponents.Project }
-          </div>
-        </div>
-        { userRights.attributeRights.status.view &&
-          <div className="form-selects-entry-column" >
-            <Label>{t('status')}<span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Status }
-            </div>
-          </div>
-        }
-        { userRights.attributeRights.requester.view &&
-          <div className="form-selects-entry-column" >
-            <Label>{t('requester')}<span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Requester }
-            </div>
-          </div>
-        }
-        { userRights.attributeRights.company.view &&
-          <div className="form-selects-entry-column" >
-            <Label>{t('company')}<span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Company }
-            </div>
-          </div>
-        }
-        { userRights.attributeRights.assigned.view &&
-          <div className="form-selects-entry-column" >
-            <Label>{t('assignedTo')}<span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Assigned }
-            </div>
-          </div>
-        }
-        { userRights.attributeRights.deadline.view &&
-          <div className="form-selects-entry-column" >
-            <Label>{t('deadline')}</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Deadline }
-            </div>
-          </div>
-        }
-        { userRights.attributeRights.repeat.view &&
-          <div className="form-selects-entry-column" >
-            <Label>{t('repeat')}</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Repeat }
-            </div>
-          </div>
-        }
-        { userRights.attributeRights.taskType.view &&
-          <div className="form-selects-entry-column" >
-            <Label>{t('taskType')}</Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Type }
-            </div>
-          </div>
-        }
-        { userRights.attributeRights.pausal.view &&
-          <div className="form-selects-entry-column" >
-            <Label>{t('pausal')}<span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Pausal }
-            </div>
-          </div>
-        }
-        { userRights.attributeRights.overtime.view &&
-          <div className="form-selects-entry-column" >
-            <Label>{t('overtimeShort')}<span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Overtime }
-            </div>
-          </div>
-        }
-      </div>
-    )
-  }
-
-  const renderMultiSelectTags = () => {
-    return (
-      <Empty>
-        <span className="m-l-10"/>
-        { userRights.attributeRights.tags.edit &&
-          <TagsPickerPopover
-            taskID={`repeat-${ editMode ? originalRepeat.id : 'add' }`}
-            disabled={ projectAttributes.tags.fixed }
-            items={toSelArr(project === null ? [] : project.tags)}
-            className="center-hor"
-            selected={tags}
-            onChange={ (tags) => { setTags(tags); saveChange({ tags: tags.map((tag) => tag.id ) }) }}
-            />
-        }
-
-        { userRights.attributeRights.tags.view &&
-          tags.sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
-          .map( ( tag ) => (
-            <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} key={tag.id} className="m-r-5 p-l-5 p-r-5">
-              {tag.title}
-            </span>
-          ) )
-        }
-      </Empty>
-    )
-  }
-
-  const renderDescription = () => {
+  const renderDescriptionAttachmentsTags = () => {
     if ( !userRights.rights.taskDescriptionRead && !userRights.rights.taskAttachmentsRead ) {
       return null;
     }
@@ -1456,307 +1318,64 @@ export default function RepeatForm( props ) {
               {t('attachment')}
             </label>
           }
-          {renderMultiSelectTags()}
+          <span className="m-l-10"/>
+          { userRights.attributeRights.tags.edit &&
+            <TagsPickerPopover
+              taskID={`repeat-${ editMode ? originalRepeat.id : 'add' }`}
+              disabled={ projectAttributes.tags.fixed }
+              items={toSelArr(project === null ? [] : project.tags)}
+              className="center-hor"
+              selected={tags}
+              onChange={ (tags) => { setTags(tags); saveChange({ tags: tags.map((tag) => tag.id ) }) }}
+              />
+          }
+
+          { userRights.attributeRights.tags.view &&
+            tags.sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+            .map( ( tag ) => (
+              <span style={{ background: tag.color, color: 'white', borderRadius: 3 }} key={tag.id} className="m-r-5 p-l-5 p-r-5">
+                {tag.title}
+              </span>
+            ) )
+          }
         </div>
         <div  className="form-section-rest">
           {RenderDescription}
-          {
-            renderAttachments(false)
-          }
-        </div>
-      </div>
-    )
-  }
-
-  const renderSimpleSubtasks = () => {
-    if ( !userRights.rights.taskSubtasksRead ) {
-      return null;
-    }
-    return (
-      <ShortSubtasks
-        disabled={!userRights.rights.taskSubtasksWrite}
-        items={simpleSubtasks}
-        onChange={(simpleSubtask) => {
-          if(editMode){
-            updateShortSubtaskFunc(simpleSubtask);
-          }
-          let newSimpleSubtasks = [...simpleSubtasks];
-          newSimpleSubtasks[newSimpleSubtasks.findIndex((simpleSubtask2) => simpleSubtask2.id === simpleSubtask.id )] = simpleSubtask;
-          setSimpleSubtasks(newSimpleSubtasks);
-        }}
-        submitItem = { (newSimpleSubtask) => {
-          if(editMode){
-            addShortSubtaskFunc(
-              {...newSimpleSubtask, repeatTemplate: originalRepeat.repeatTemplate.id},
-              (id) => {
-                setSimpleSubtasks([
-                  ...simpleSubtasks,
-                  {
-                    ...newSimpleSubtask,
-                    id,
+          { userRights.rights.taskAttachmentsRead && (
+            <Attachments
+              disabled={!userRights.rights.taskAttachmentsWrite }
+              taskID={null}
+              top={false}
+              type="repeatTemplate"
+              attachments={attachments}
+              addAttachments={(newAttachments)=>{
+                if(editMode){
+                  addAttachments(newAttachments);
+                }
+                let time = moment().valueOf();
+                newAttachments = newAttachments.map((attachment)=>{
+                  return {
+                    title:attachment.name,
+                    size:attachment.size,
+                    filename: attachment.name,
+                    time,
+                    data: attachment
                   }
-                ])
-              }
-            );
-          }else{
-            setSimpleSubtasks([
-              ...simpleSubtasks,
-              {
-                ...newSimpleSubtask,
-                id: fakeID--,
-              }
-            ])
-          }
-        }}
-        deleteItem = { (simpleSubtask) => {
-          if(editMode){
-            deleteShortSubtaskFunc(simpleSubtask.id)
-          }
-          setSimpleSubtasks(simpleSubtasks.filter((simpleSubtask2) => simpleSubtask.id !== simpleSubtask2.id ))
-        } }
-        placeholder={t('shortSubtaskTitle')}
-        newPlaceholder={t('newShortSubtaskTitle')}
-        label={t('shortSubtask')}
-        />
-    )
-  }
-
-  const renderAttachments = ( top ) => {
-    if ( !userRights.rights.taskAttachmentsRead ) {
-      return null;
-    }
-
-    return (
-      <Attachments
-        disabled={!userRights.rights.taskAttachmentsWrite }
-        taskID={null}
-        top={top}
-        type="repeatTemplate"
-        attachments={attachments}
-        addAttachments={(newAttachments)=>{
-          if(editMode){
-            addAttachments(newAttachments);
-          }
-          let time = moment().valueOf();
-          newAttachments = newAttachments.map((attachment)=>{
-            return {
-              title:attachment.name,
-              size:attachment.size,
-              filename: attachment.name,
-              time,
-              data: attachment
-            }
-          });
-          setAttachments([...attachments, ...newAttachments]);
-        }}
-        removeAttachment={(attachment)=>{
-          if(editMode){
-            removeAttachment(attachment);
-          }
-          let newAttachments = [...attachments];
-          newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
-          setAttachments([...newAttachments]);
-        }}
-        />
-    )
-  }
-
-  const renderVykazyTable = ( subtasks, workTrips, materials ) => {
-    if (
-      !userRights.rights.taskWorksRead &&
-      !userRights.rights.taskWorksAdvancedRead &&
-      !userRights.rights.taskMaterialsRead
-    ) {
-      return null
-    }
-
-    return (
-      <Empty>
-        { (
-          userRights.rights.taskWorksRead ||
-          userRights.rights.taskWorksAdvancedRead
-        ) &&
-        <WorksTable
-          userID={currentUser.id}
-          userRights={userRights}
-          currentUser={currentUser}
-          company={company}
-          showTotals={true}
-          showColumns={ [ 'done', 'title', 'quantity', 'assigned', 'approved', 'actions' ] }
-          showAdvancedColumns={ [ 'done', 'title', 'quantity', 'price', 'discount', 'priceAfterDiscount' , 'actions' ] }
-          autoApproved={project ? project.autoApproved : false}
-          canAddSubtasksAndTrips={assignedTo.length !== 0}
-          canEditInvoiced={false}
-          taskAssigned={assignedTo}
-
-          taskTypes={ taskTypes }
-          defaultType={ taskType }
-          subtasks={ subtasks }
-          addSubtask={(newSubtask)=>{
-            if(editMode){
-              addSubtaskFunc( newSubtask, (id) => setSubtasks([...subtasks,{id, ...newSubtask}]) );
-            }else{
-              setSubtasks([...subtasks,{id:getNewID(), ...newSubtask}]);
-            }
-          }}
-          updateSubtask={(id,newData)=>{
-            if(editMode){
-              updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
-            }
-            let newSubtasks=[...subtasks];
-            let index = newSubtasks.findIndex((subtask)=>subtask.id===id);
-            if(newData.approved && newSubtasks[index].approved !== newData.approved ){
-              newSubtasks[index]={...newSubtasks[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-            }else{
-              newSubtasks[index]={...newSubtasks[index],...newData };
-            }
-            setSubtasks(newSubtasks);
-          }}
-          updateSubtasks={(multipleSubtasks)=>{
-            if(editMode){
-              multipleSubtasks.forEach(({id, newData})=>{
-                updateSubtaskFunc({...subtasks.find((item)=>item.id===id),...newData});
-              });
-            }
-            let newSubtasks=[...subtasks];
-            multipleSubtasks.forEach(({id, newData})=>{
-              newSubtasks[newSubtasks.findIndex((taskWork)=>taskWork.id===id)]={...newSubtasks.find((taskWork)=>taskWork.id===id),...newData};
-            });
-            setSubtasks(newSubtasks);
-          }}
-          removeSubtask={(id)=>{
-            if(editMode){
-              deleteSubtaskFunc(id);
-            }
-            let newSubtasks=[...subtasks];
-            newSubtasks.splice(newSubtasks.findIndex((taskWork)=>taskWork.id===id),1);
-            setSubtasks(newSubtasks);
-          }}
-
-          workTrips={ workTrips }
-          tripTypes={tripTypes}
-          addTrip={(newTrip)=>{
-            if(editMode){
-              addWorkTripFunc(newTrip, (id) => setWorkTrips([...workTrips,{id,...newTrip}]));
-            }else{
-              setWorkTrips([...workTrips,{id: getNewID(),...newTrip}]);
-            }
-          }}
-          updateTrip={(id,newData)=>{
-            if(editMode){
-              updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
-            }
-            let newTrips=[...workTrips];
-            let index = newTrips.findIndex((trip)=>trip.id===id);
-            if(newData.approved && newTrips[index].approved !== newData.approved ){
-              newTrips[index]={...newTrips[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-            }else{
-              newTrips[index]={...newTrips[index],...newData };
-            }
-            setWorkTrips(newTrips);
-          }}
-          updateTrips={(multipleTrips)=>{
-            if(editMode){
-              multipleTrips.forEach(({id, newData})=>{
-                updateWorkTripFunc({...workTrips.find((trip)=>trip.id===id),...newData});
-              });
-            }
-            let newTrips=[...workTrips];
-            multipleTrips.forEach(({id, newData})=>{
-              newTrips[newTrips.findIndex((trip)=>trip.id===id)]={...newTrips.find((trip)=>trip.id===id),...newData};
-            });
-            setWorkTrips(newTrips);
-          }}
-          removeTrip={(id)=>{
-            if(editMode){
-              deleteWorkTripFunc(id);
-            }
-            let newTrips=[...workTrips];
-            newTrips.splice(newTrips.findIndex((trip)=>trip.id===id),1);
-            setWorkTrips(newTrips);
-          }}
-          />
-      }
-
-      { userRights.rights.taskMaterialsRead &&
-        <Materials
-          showColumns={ [ 'done', 'title', 'quantity', 'price', 'total', 'approved', 'actions' ] }
-          showTotals={true}
-          autoApproved={project ? project.autoApproved : false}
-          userRights={userRights}
-          currentUser={currentUser}
-          company={company}
-          materials={ materials }
-          addMaterial={(newMaterial)=>{
-            if(editMode){
-              addMaterialFunc(newMaterial, (id) => setMaterials([...materials,{ id, ...newMaterial }]) );
-            }else{
-              setMaterials([...materials,{id:getNewID(),...newMaterial}]);
-            }
-          }}
-          updateMaterial={(id,newData)=>{
-            if(editMode){
-              updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-            }
-            let newMaterials=[...materials];
-            let index = newMaterials.findIndex((material)=>material.id===id);
-            if(newData.approved && newMaterials[index].approved !== newData.approved ){
-              newMaterials[index]={...newMaterials[index],...newData, approvedBy: users.find( ( user ) => user.id === currentUser.id ) };
-            }else{
-              newMaterials[index]={...newMaterials[index],...newData };
-            }
-            setMaterials(newMaterials);
-          }}
-          updateMaterials={(multipleMaterials)=>{
-            if(editMode){
-              multipleMaterials.forEach(({id, newData})=>{
-                updateMaterialFunc({...materials.find((material)=>material.id===id),...newData});
-              });
-            }
-            let newMaterials=[...materials];
-            multipleMaterials.forEach(({id, newData})=>{
-              newMaterials[newMaterials.findIndex((material)=>material.id===id)]={...newMaterials.find((material)=>material.id===id),...newData};
-            });
-            setMaterials(newMaterials);
-          }}
-          removeMaterial={(id)=>{
-            if(editMode){
-              deleteMaterialFunc(id);
-            }
-            let newMaterials=[...materials];
-            newMaterials.splice(newMaterials.findIndex((taskMaterial)=>taskMaterial.id===id),1);
-            setMaterials(newMaterials);
-          }}
-          />
-      }
-    </Empty>
-    )
-  }
-
-  const renderButtons = () => {
-    return (
-      <div className="form-section task-edit-buttons">
-      <div className="row form-section-rest">
-        {closeModal &&
-          <button className="btn-link-cancel m-l-20" onClick={() => closeModal(wasSaved, wasDisabled)}>{t('cancel')}</button>
-        }
-        { newStartsAt &&
-          <span className="color-muted">
-            {t('repeatAutoupdateMessage')}
-          </span>
-        }
-        <div className="row pull-right">
-          {canCreateVykazyError()}
-          <button
-            className="btn"
-            disabled={ cantSave }
-            onClick={ triggerSave }
-            >
-              { t('save') }
-          </button>
+                });
+                setAttachments([...attachments, ...newAttachments]);
+              }}
+              removeAttachment={(attachment)=>{
+                if(editMode){
+                  removeAttachment(attachment);
+                }
+                let newAttachments = [...attachments];
+                newAttachments.splice(newAttachments.findIndex((item)=>item.title===attachment.title && item.size===attachment.size && item.time===attachment.time),1);
+                setAttachments([...newAttachments]);
+              }}
+              />
+          )}
         </div>
       </div>
-    </div>
     )
   }
 
@@ -1765,59 +1384,28 @@ export default function RepeatForm( props ) {
     if ( error === '' ) {
       return (
         <span className="center-hor ml-auto">
-      </span>
+        </span>
       );
     }
     return (
       <span className="message error-message center-hor ml-auto">
-      {error}
-    </span>
+        {error}
+      </span>
     );
   }
 
   return (
     <div>
-    {renderHeader()}
-    <div
-      className={classnames(
-        "scrollable",
-        "min-height-400",
-        { "row": layout === 2}
-      )}
-      >
-
+      { renderCommandbar() }
       <div
-        className={classnames(
-          {
-            "task-edit-left": layout === 2,
-            "task-edit-left-columns": layout !== 2
-          },
-          'm-t-0'
-        )}>
+        className="scrollable min-height-400 row">
 
-        { renderTitle() }
+        { renderMain() }
 
-        { layout === 2 && <hr className="m-t-5 m-b-18"/> }
-        { renderStatusDate() }
-
-        { layout === 1 && renderSelectsLayout1()  }
-
-        { renderDescription() }
-
-
-        { renderSimpleSubtasks() }
-
-        { renderVykazyTable(subtasks, workTrips, materials) }
-
-        <div className="task-add-layout-2"></div>
-        { renderButtons() }
+        { renderSide() }
 
       </div>
 
-      { layout === 2 && renderSelectsLayout2Side() }
-
     </div>
-
-  </div>
   );
 }

@@ -46,6 +46,7 @@ export const hasAddTaskIssues = ( props, t ) => {
     project,
     assignedTo,
     taskType,
+    currentUser,
   } = props;
   const titleError = title.length === 0;
   const statusError = status === null && userRights.attributeRights.status.add;
@@ -98,7 +99,7 @@ export const hasAddTaskIssues = ( props, t ) => {
   return ( generalErrors || attributesErrors );
 }
 
-export default function EditTaskErrorDisplay( props ) {
+export default function AddTaskErrorDisplay( props ) {
   const {
     userRights,
     projectAttributes,
@@ -107,6 +108,7 @@ export default function EditTaskErrorDisplay( props ) {
     project,
     assignedTo,
     taskType,
+    currentUser,
   } = props;
 
   const {

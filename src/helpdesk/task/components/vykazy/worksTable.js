@@ -1161,13 +1161,10 @@ export default function WorksTable( props ) {
   }
 
   const getPrice = ( type ) => {
-    if ( !type ) {
-      return NaN;
-    }
     let price = ( company && company.pricelist && company.pricelist.prices ? company.pricelist.prices.find( price => {
       if ( type.__typename === "TaskType" && price.type === "TaskType" ) {
-        return price.taskType.id === type.id;
-      } else if ( type.__typename === "TripType" && price.type === "TripType" ) {
+        return price.taskType.id === defaultType.id;
+      } else if ( type && type.__typename === "TripType" && price.type === "TripType" ) {
         return price.tripType.id === type.id;
       }
       return false;
@@ -1344,7 +1341,7 @@ export default function WorksTable( props ) {
               <b>Cena bez DPH: </b>
               {
                 (
-                  [...subtasks, ...workTrips ].reduce((acc, cur) => acc + getTotalPrice(cur), 0 )
+                  [...subtasks.map((subtask)=>({...subtask, type: { __typename: "TaskType"} })), ...workTrips ].reduce((acc, cur) => acc + getTotalPrice(cur), 0 )
                 ).toFixed(2)
               }
             </div>
@@ -1357,7 +1354,7 @@ export default function WorksTable( props ) {
               {
                 (
                   (
-                    [...subtasks, ...workTrips ].reduce((acc, cur) => acc + getTotalPrice(cur), 0 )
+                    [...subtasks.map((subtask)=>({...subtask, type: { __typename: "TaskType"} })), ...workTrips ].reduce((acc, cur) => acc + getTotalPrice(cur), 0 )
                   )*getDPH()
                 ).toFixed(2)
               }

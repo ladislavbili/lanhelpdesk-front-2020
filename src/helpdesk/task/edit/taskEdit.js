@@ -105,9 +105,6 @@ export default function TaskEdit( props ) {
     addCompanyToList,
     addAttachments,
     removeAttachment,
-    addShortSubtask,
-    updateShortSubtask,
-    deleteShortSubtask,
     updateCasheStorage,
     updateTask,
     client,
@@ -219,7 +216,7 @@ export default function TaskEdit( props ) {
     setGanttOrder( task.ganttOrder );
     setUsedSubtaskPausal( task.company ? task.company.usedSubtaskPausal : 0 );
     setUsedTripPausal( task.company ? task.company.usedTripPausal : 0 );
-  }, [ id ] );
+  }, [ id, task ] );
 
   React.useEffect( () => {
     updateToProjectRules( project );
@@ -374,8 +371,6 @@ export default function TaskEdit( props ) {
 
   const requesters = ( project && project.project.lockedRequester ? toSelArr( project.usersWithRights.map( ( userWithRights ) => userWithRights.user ), 'fullName' ) : users );
   //const milestones = [ noMilestone ].concat( ( project ? toSelArr( project.project.milestones ) : [] ) );
-
-  const layout = 2; //currentUser.taskLayout
 
   //functions
   const getCantSave = ( change = {} ) => {
@@ -628,6 +623,441 @@ export default function TaskEdit( props ) {
   }
 
   //render
+  const renderSide = () => {
+    //used sidebar
+    return (
+      <div className={classnames("task-edit-right", {"width-250": columns})}>
+        <div>
+          { inModal &&
+            <div className="task-edit-buttons row m-b-10">
+              <span className="ml-auto center-hor">
+
+                { userRights.rights.deleteTask && !invoiced &&
+                  <button
+                    type="button"
+                    className="btn-link-red btn-distance p-0"
+                    onClick={deleteTaskFunc}
+                    >
+                    <i className="far fa-trash-alt" />
+                  </button>
+                }
+                { project && canCopy &&
+                  <TaskAdd
+                    project={project.id}
+                    duplicateTask={getTaskData()}
+                    disabled={!canCopy}
+                    noText
+                    history={history}
+                    match={match}
+                    />
+                }
+                <button
+                  type="button"
+                  className="btn-link p-r-10"
+                  onClick={() => closeModal(vykazyChanged)}
+                  >
+                  <i className="fa fa-times" style={{ fontSize: 25 }} />
+                </button>
+              </span>
+            </div>
+          }
+          <div className="form-selects-entry-column" >
+            <Label>{t('project')}<span className="warning-big">*</span></Label>
+            <div className="form-selects-entry-column-rest" >
+              { (!userRights.rights.taskProjectWrite || invoiced) &&
+                <div className="disabled-info">{project ? project.title : t('noProject')}</div>
+              }
+              { (userRights.rights.taskProjectWrite && !invoiced) &&
+                <Select
+                  placeholder={t('selectProject')}
+                  value={ project }
+                  onChange={ changeProject }
+                  options={ availableProjects }
+                  styles={pickSelectStyle([ 'noArrow', 'required', ])}
+                  />
+              }
+            </div>
+          </div>
+          { userRights.attributeRights.status.view &&
+            <div className="form-selects-entry-column" >
+              <Label>{t('status')}<span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit || invoiced) &&
+                  <div
+                    className={`disabled-info`}
+                    style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }
+                    >
+                    {status ? status.label : t('none')}
+                  </div>
+                }
+                { !projectAttributes.status.fixed && userRights.attributeRights.status.edit && !invoiced &&
+                  <Select
+                    placeholder={t('statusPlaceholder')}
+                    value={status}
+                    styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
+                    onChange={ changeStatus }
+                    options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action !== 'Invoiced')}
+                    />
+                }
+              </div>
+            </div>
+          }
+          { userRights.attributeRights.requester.view &&
+            <div className="form-selects-entry-column" >
+              <Label>{t('requester')}<span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit || invoiced) &&
+                  <div className="disabled-info">{requester ? requester.label : t('none')}</div>
+                }
+                { !projectAttributes.requester.fixed && userRights.attributeRights.requester.edit && !invoiced &&
+                  <Select
+                    placeholder={t('requesterPlaceholder')}
+                    value={requester}
+                    isDisabled={ projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit }
+                    onChange={changeRequester}
+                    options={( canAddUser ?
+                      [translateSelectItem({id:-1, title:'+ Add user',body:'add', labelId: 'addUserLabel', label:'+ Add user', value:null}, t)] :
+                      []
+                    ).concat(requesters)}
+                    styles={ pickSelectStyle([ 'noArrow', 'required', ])}
+                    />
+                }
+              </div>
+            </div>
+          }
+          { userRights.attributeRights.company.view &&
+            <div className="form-selects-entry-column" >
+              <Label>{t('company')}<span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit || invoiced) &&
+                  <div className="disabled-info">{company ? company.label : t('none')}</div>
+                }
+                { !projectAttributes.company.fixed && userRights.attributeRights.company.edit && !invoiced &&
+                  <Select
+                    placeholder={t('companyPlaceholder')}
+                    value={company}
+                    onChange={changeCompany}
+                    options={(canAddCompany ?
+                      [translateSelectItem({id:-1,title:'+ Add company',body:'add', labelId: 'addCompanyLabel', label:'+ Add company', value:null}, t)] :
+                      []
+                    ).concat(companies)}
+                    styles={pickSelectStyle([ 'noArrow', 'required', ])}
+                    />
+                }
+              </div>
+            </div>
+          }
+          { userRights.attributeRights.assigned.view &&
+            <div className="form-selects-entry-column" >
+              <Label>{t('assignedTo')}<span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit || invoiced) &&
+                  <div>
+                    {assignedTo.map((user) => (
+                      <div className="disabled-info" key={user.id}>{user.label}</div>
+                    ))}
+                    { assignedTo.length === 0 &&
+                      <div className="message error-message">{t('taskUnassigned')}</div>
+                    }
+                  </div>
+                }
+                { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit && !invoiced &&
+                  <Select
+                    value={assignedTo}
+                    placeholder={t('selectRecommended')}
+                    isMulti
+                    onChange={(users)=> {
+                      if (users.some(u => u.id === -1)){
+                        setOpenUserAdd(true);
+                      } else {
+                        setAssignedTo(users);
+                        autoUpdateTask({ assignedTo: users.map((user) => user.id) })
+                      }
+                    }}
+                    options={
+                      ( canAddUser ?
+                        [translateSelectItem({id:-1, title:'+ Add user',body:'add', labelId: 'addUserLabel', label:'+ Add user', value:null}, t)] :
+                        []
+                      )
+                      .concat(assignedTos)
+                    }
+                    styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
+                    />
+                }
+              </div>
+            </div>
+          }
+          { userRights.attributeRights.startsAt.view &&
+            <div className="form-selects-entry-column" >
+              <Label>{t('plannedAt')}</Label>
+              <div className="form-selects-entry-column-rest" >
+                { (projectAttributes.startsAt.fixed || !userRights.attributeRights.startsAt.edit || invoiced) &&
+                  <div className="disabled-info">{startsAt ? timestampToString(startsAt.valueOf()) : t('noPlannedAt') }</div>
+                }
+                { !projectAttributes.startsAt.fixed && userRights.attributeRights.startsAt.edit && !invoiced &&
+                  <DatePicker
+                    className={classnames("form-control")}
+                    selected={startsAt}
+                    hideTime
+                    isClearable
+                    onChange={date => {
+                      setStartsAt( isNaN(date.valueOf()) ? null : date );
+                      autoUpdateTask({ startsAt: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
+                    }}
+                    placeholderText={t('plannedAtPlaceholder')}
+                    />
+                }
+              </div>
+            </div>
+          }
+          { userRights.attributeRights.deadline.view &&
+            <div className="form-selects-entry-column" >
+              <Label>{t('deadline')}</Label>
+              <div className="form-selects-entry-column-rest" >
+                { (projectAttributes.deadline.fixed || !userRights.attributeRights.deadline.edit || invoiced) &&
+                  <div className="disabled-info">{deadline ? timestampToString(deadline.valueOf()) : t('noDeadline') }</div>
+                }
+                { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit && !invoiced &&
+                  <DatePicker
+                    className={classnames("form-control")}
+                    selected={deadline}
+                    hideTime
+                    isClearable
+                    onChange={date => {
+                      setDeadline( isNaN(date.valueOf()) ? null : date );
+                      autoUpdateTask({ deadline: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
+                    }}
+                    placeholderText={t('deadlinePlaceholder')}
+                    />
+                }
+              </div>
+            </div>
+          }
+          { userRights.attributeRights.repeat.view &&
+            <div>
+              { ( !userRights.attributeRights.repeat.edit || invoiced ) &&
+                <div className="form-selects-entry-column" >
+                  <Label>{t('repeat')}</Label>
+                  <div className="form-selects-entry-column-rest" >
+                    <div className="disabled-info">
+                      {
+                        task.repeat ?
+                        `${t('repeatEvery')} ${task.repeat.repeatEvery} ${t(intervals.find( ( interval ) => interval.value === task.repeat.repeatInterval ).label).toLowerCase()}` :
+                        t('noRepeat')
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+              { userRights.attributeRights.repeat.edit && !invoiced &&
+                <Repeat
+                  vertical
+                  duplicateTask={ !task.repeat ? getTaskData() : null}
+                  taskID={id}
+                  repeat={task.repeat}
+                  repeatTime={task.repeatTime}
+                  layout={2}
+                  />
+              }
+            </div>
+          }
+          { userRights.attributeRights.taskType.view &&
+            <div className="form-selects-entry-column" >
+              <Label>{t('taskType')}<span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { (projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit || invoiced) &&
+                  <div className="disabled-info">{taskType ? taskType.label : t('none')}</div>
+                }
+                { !projectAttributes.taskType.fixed && userRights.attributeRights.taskType.edit && !invoiced &&
+                  <Select
+                    placeholder={t('taskTypePlaceholder')}
+                    value={taskType}
+                    styles={ pickSelectStyle( [ 'noArrow', 'required' ] )}
+                    onChange={(type)=> {
+                      setTaskType(type);
+                      autoUpdateTask({ taskType: type.id })
+                    }}
+                    options={[noTaskType, ...taskTypes]}
+                    />
+                }
+              </div>
+            </div>
+          }
+          { userRights.attributeRights.pausal.view &&
+            <div className="form-selects-entry-column" >
+              <Label>{t('pausal')}<span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed || invoiced ) &&
+                  <div className="disabled-info">{pausal ? pausal.label : t('none')}</div>
+                }
+                { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed && !invoiced &&
+                  <Select
+                    value={ pausal }
+                    placeholder={t('selectRequired')}
+                    styles={pickSelectStyle([ 'noArrow', 'required', ]) }
+                    onChange={(pausal)=> {
+                      autoUpdateTask({ pausal: pausal.value })
+                      setPausal(pausal);
+                    }}
+                    options={translateAllSelectItems(booleanSelects, t)}
+                    />
+                }
+              </div>
+            </div>
+          }
+          { userRights.attributeRights.overtime.view &&
+            <div className="form-selects-entry-column" >
+              <Label>{t('overtimeShort')}<span className="warning-big">*</span></Label>
+              <div className="form-selects-entry-column-rest" >
+                { (projectAttributes.overtime.fixed || !userRights.attributeRights.overtime.edit || invoiced) &&
+                  <div className="disabled-info">{overtime.label}</div>
+                }
+                { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.edit && !invoiced &&
+                  <Select
+                    value={overtime}
+                    placeholder={t('selectRequired')}
+                    styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
+                    onChange={(overtime)=> {
+                      setOvertime(overtime);
+                      autoUpdateTask({ overtime: overtime.value })
+                    }}
+                    options={translateAllSelectItems(booleanSelects, t)}
+                    />
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    );
+  }
+
+  const renderMain = () => {
+
+    const PausalInfo = () => (
+      <div className="form-section">
+        <div className="form-section-rest">
+          <span className=" message success-message center-hor ml-auto">
+            { `${t('pausal')} ${company ? company.title : ''}  ` }
+            <span>
+              {`${t('pausalSubtasks')}:`}
+              <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
+                {` ${usedSubtaskPausal}`}
+              </span>
+              {` / ${taskWorkPausal} ${t('pausalTrips')}:`}
+              <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
+                {` ${usedTripPausal}`}
+              </span>
+              {` / ${taskTripPausal}`}
+            </span>
+          </span>
+        </div>
+      </div>
+    );
+
+    return (
+      <div
+        className={classnames(
+          {
+            "task-edit-left": !columns,
+            "task-edit-left-columns": columns,
+          },
+        )}
+        >
+        { renderMainTop() }
+
+        { renderDescriptionAttachmentsTags() }
+
+        { userRights.rights.taskSubtasksRead &&
+          <ShortSubtasks
+            edit
+            taskID={id}
+            setSaving={setSaving}
+            updateCasheStorage={updateCasheStorage}
+            disabled={!userRights.rights.taskSubtasksWrite || invoiced}
+            fromInvoice={fromInvoice}
+            shortSubtasks={task.shortSubtasks}
+            />
+        }
+
+        {
+          (
+            userRights.rights.taskWorksRead ||
+            userRights.rights.taskWorksAdvancedRead ||
+            userRights.rights.taskMaterialsRead ||
+            userRights.rights.taskPausalInfo
+          ) &&
+          <Vykazy
+            edit
+            task={id}
+            invoiced={invoiced}
+            fromInvoice
+            autoApproved={project ? project.project.autoApproved : false}
+            userRights={userRights}
+            currentUser={currentUser}
+            assignedTo={assignedTo}
+            company={company}
+            setChanged={() => setVykazyChanged(true) }
+            updateCasheStorage={updateCasheStorage}
+            renderCompanyPausalInfo={ (company && company.monthlyPausal && userRights.rights.taskPausalInfo) ? PausalInfo : null }
+            works={subtasks}
+            taskTypes={taskTypes}
+            taskType={taskType}
+            trips={workTrips}
+            tripTypes={tripTypes}
+            setMaterials
+            materials={materials}
+            />
+        }
+
+        { renderComments() }
+
+        <ErrorDisplay
+          {...getTaskData()}
+          userRights={userRights}
+          projectAttributes={projectAttributes}
+          />
+
+        { currentUser.role.accessRights.users && !invoiced &&
+          <Empty>
+            <Modal isOpen={openUserAdd} className="modal-without-borders" >
+              <ModalHeader>
+                {t('addUser')}
+              </ModalHeader>
+              <ModalBody>
+                <UserAdd
+                  closeModal={() => setOpenUserAdd(false)}
+                  addUserToList={(user) => {
+                    setNewAddedUser(user);
+                  }}
+                  />
+              </ModalBody>
+            </Modal>
+            { project && project.id && userRights.rights.projectWrite &&
+              <AddUserToGroup
+                user={newAddedUser}
+                disabled={ !userRights.rights.projectWrite }
+                projectID={project.id}
+                finish={() => setNewAddedUser(null)}
+                />
+            }
+          </Empty>
+        }
+
+        { currentUser.role.accessRights.companies && !invoiced &&
+          <Modal isOpen={openCompanyAdd} className="modal-without-borders">
+            <ModalBody>
+              <CompanyAdd
+                closeModal={() => setOpenCompanyAdd(false)}
+                addCompanyToList={addCompanyToList}
+                />
+            </ModalBody>
+          </Modal>
+        }
+      </div>
+    );
+  };
+
   const renderCommandbar = () => {
     return (
       <div className="task-add-layout row">
@@ -698,73 +1128,72 @@ export default function TaskEdit( props ) {
     )
   }
 
-  const renderTitle = () => {
+  const renderMainTop = () => {
     return (
-      <div className="d-flex">
-        { userRights.rights.taskImportant &&
-          <button
-            type="button"
-            style={{color: '#ffc107'}}
-            className="btn-link center-hor m-r-10"
-            disabled={invoiced}
-            onClick={()=>{
-              setImportant(!important);
-              autoUpdateTask({ important: !important });
-            }}
-            >
-            <i className={`fa${ important ? 's' : 'r' } fa-star`} style={{ fontSize: 25 }} />
-          </button>
-        }
-        <h2 className="center-hor">{id}: </h2>
-        { taskTitleEdited &&
-          <span className="center-hor flex m-r-15">
-            <input type="text"
-              disabled={ !userRights.rights.taskTitleWrite || invoiced }
-              value={title}
-              className="task-title-input text-extra-slim form-control m-t-4 m-b-3"
-              onChange={(e)=> {
-                setTitle(e.target.value);
+      <div>
+        <div className="d-flex">
+          { userRights.rights.taskImportant &&
+            <button
+              type="button"
+              style={{color: '#ffc107'}}
+              className="btn-link center-hor m-r-10"
+              disabled={invoiced}
+              onClick={()=>{
+                setImportant(!important);
+                autoUpdateTask({ important: !important });
               }}
-              onBlur={(e) => {
-                autoUpdateTask({ title })
-              }}
-              placeholder={t('taskTitlePlaceholder')}
-              />
-          </span>
-        }
-        { !taskTitleEdited &&
-          <span className="task-title-input text-extra-slim m-l-7">
-            {title}
-          </span>
-        }
-        { (userRights.rights.taskTitleWrite && !invoiced) &&
-          <i className={classnames({ "fa-pen": !taskTitleEdited, "fa-save": taskTitleEdited },"fa clickable center-hor color-link")} onClick={() => setTaskTitleEdited(!taskTitleEdited) } />
-        }
-        { invoiced && inModal && <div className="inline-warning-message center-hor">{t('taskInvoiced')}</div> }
+              >
+              <i className={`fa${ important ? 's' : 'r' } fa-star`} style={{ fontSize: 25 }} />
+            </button>
+          }
+          <h2 className="center-hor">{id}: </h2>
+          { taskTitleEdited &&
+            <span className="center-hor flex m-r-15">
+              <input type="text"
+                disabled={ !userRights.rights.taskTitleWrite || invoiced }
+                value={title}
+                className="task-title-input text-extra-slim form-control m-t-4 m-b-3"
+                onChange={(e)=> {
+                  setTitle(e.target.value);
+                }}
+                onBlur={(e) => {
+                  autoUpdateTask({ title })
+                }}
+                placeholder={t('taskTitlePlaceholder')}
+                />
+            </span>
+          }
+          { !taskTitleEdited &&
+            <span className="task-title-input text-extra-slim m-l-7">
+              {title}
+            </span>
+          }
+          { (userRights.rights.taskTitleWrite && !invoiced) &&
+            <i className={classnames({ "fa-pen": !taskTitleEdited, "fa-save": taskTitleEdited },"fa clickable center-hor color-link")} onClick={() => setTaskTitleEdited(!taskTitleEdited) } />
+          }
+          { invoiced && inModal && <div className="inline-warning-message center-hor">{t('taskInvoiced')}</div> }
+        </div>
+        <hr className="m-t-5 m-b-2"/>
+
+        <div className="ml-auto center-hor">
+          <div className="task-info">
+            <span>
+              {task.createdBy ? `${t('createdBy')} ` : ""}
+            </span>
+            <span className="bolder">
+              {task.createdBy ? `${task.createdBy.name} ${task.createdBy.surname}` :''}
+            </span>
+            <span>
+              {task.createdBy ?` ${t('atDate')} `: t('createdAt')}
+            </span>
+            <span className="bolder">
+              {task.createdAt ? (timestampToString(task.createdAt)) : ''}
+            </span>
+          </div>
+          { renderStatusDate() }
+        </div>
       </div>
     );
-  }
-
-  const renderTaskInfoAndDates = () => {
-    return (
-      <div className="ml-auto center-hor">
-        <div className="task-info">
-          <span className="">
-            {task.createdBy ? `${t('createdBy')} ` : ""}
-          </span>
-          <span className="bolder">
-            {task.createdBy ? `${task.createdBy.name} ${task.createdBy.surname}` :''}
-          </span>
-          <span className="">
-            {task.createdBy ?` ${t('atDate')} `: t('createdAt')}
-          </span>
-          <span className="bolder">
-            {task.createdAt ? (timestampToString(task.createdAt)) : ''}
-          </span>
-        </div>
-        { renderStatusDate() }
-      </div>
-    )
   }
 
   const renderStatusDate = () => {
@@ -843,544 +1272,7 @@ export default function TaskEdit( props ) {
     )
   }
 
-  const layoutComponents = {
-    Project: (
-      <div>
-        { (!userRights.rights.taskProjectWrite || invoiced) &&
-          <div className="disabled-info">{project ? project.title : t('noProject')}</div>
-        }
-        { (userRights.rights.taskProjectWrite && !invoiced) &&
-          <Select
-            placeholder={t('selectProject')}
-            value={ project }
-            onChange={ changeProject }
-            options={ availableProjects }
-            styles={pickSelectStyle([ 'noArrow', 'required', ])}
-            />
-        }
-      </div>
-    ),
-    Assigned: (
-      <div>
-        { (projectAttributes.assigned.fixed || !userRights.attributeRights.assigned.edit || invoiced) &&
-          <div>
-            {assignedTo.map((user) => (
-              <div className="disabled-info" key={user.id}>{user.label}</div>
-            ))}
-            { assignedTo.length === 0 &&
-              <div className="message error-message">{t('taskUnassigned')}</div>
-            }
-          </div>
-        }
-        { !projectAttributes.assigned.fixed && userRights.attributeRights.assigned.edit && !invoiced &&
-          <Select
-            value={assignedTo}
-            placeholder={t('selectRecommended')}
-            isMulti
-            onChange={(users)=> {
-              if (users.some(u => u.id === -1)){
-                setOpenUserAdd(true);
-              } else {
-                setAssignedTo(users);
-                autoUpdateTask({ assignedTo: users.map((user) => user.id) })
-              }
-            }}
-            options={
-              ( canAddUser ?
-                [translateSelectItem({id:-1, title:'+ Add user',body:'add', labelId: 'addUserLabel', label:'+ Add user', value:null}, t)] :
-                []
-              )
-              .concat(assignedTos)
-            }
-            styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
-            />
-        }
-      </div>
-    ),
-    Status: (
-      <div>
-        { (projectAttributes.status.fixed || !userRights.attributeRights.status.edit || invoiced) &&
-          <div
-            className={`disabled-info`}
-            style={status ? { backgroundColor: status.color, color: 'white', fontWeight: 'bolder' } : {} }
-            >
-            {status ? status.label : t('none')}
-          </div>
-        }
-        { !projectAttributes.status.fixed && userRights.attributeRights.status.edit && !invoiced &&
-          <Select
-            placeholder={t('statusPlaceholder')}
-            value={status}
-            styles={pickSelectStyle( [ 'noArrow', 'colored', 'required', ] )}
-            onChange={ changeStatus }
-            options={(project ? toSelArr(project.project.statuses) : []).filter((status)=>status.action !== 'Invoiced')}
-            />
-        }
-      </div>
-    ),
-    Type: (
-      <div>
-        { (projectAttributes.taskType.fixed || !userRights.attributeRights.taskType.edit || invoiced) &&
-          <div className="disabled-info">{taskType ? taskType.label : t('none')}</div>
-        }
-        { !projectAttributes.taskType.fixed && userRights.attributeRights.taskType.edit && !invoiced &&
-          <Select
-            placeholder={t('taskTypePlaceholder')}
-            value={taskType}
-            styles={pickSelectStyle( [ 'noArrow', 'required' ] )}
-            onChange={(type)=> {
-              setTaskType(type);
-              autoUpdateTask({ taskType: type.id })
-            }}
-            options={[noTaskType, ...taskTypes]}
-            />
-        }
-      </div>
-    ),
-    Requester: (
-      <div>
-        { (projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit || invoiced) &&
-          <div className="disabled-info">{requester ? requester.label : t('none')}</div>
-        }
-        { !projectAttributes.requester.fixed && userRights.attributeRights.requester.edit && !invoiced &&
-          <Select
-            placeholder={t('requesterPlaceholder')}
-            value={requester}
-            isDisabled={ projectAttributes.requester.fixed || !userRights.attributeRights.requester.edit }
-            onChange={changeRequester}
-            options={( canAddUser ?
-              [translateSelectItem({id:-1, title:'+ Add user',body:'add', labelId: 'addUserLabel', label:'+ Add user', value:null}, t)] :
-              []
-            ).concat(requesters)}
-            styles={ pickSelectStyle([ 'noArrow', 'required', ])}
-            />
-        }
-      </div>
-    ),
-    Company: (
-      <div>
-        { (projectAttributes.company.fixed || !userRights.attributeRights.company.edit || invoiced) &&
-          <div className="disabled-info">{company ? company.label : t('none')}</div>
-        }
-        { !projectAttributes.company.fixed && userRights.attributeRights.company.edit && !invoiced &&
-          <Select
-            placeholder={t('companyPlaceholder')}
-            value={company}
-            onChange={changeCompany}
-            options={(canAddCompany ?
-              [translateSelectItem({id:-1,title:'+ Add company',body:'add', labelId: 'addCompanyLabel', label:'+ Add company', value:null}, t)] :
-              []
-            ).concat(companies)}
-            styles={pickSelectStyle([ 'noArrow', 'required', ])}
-            />
-        }
-      </div>
-    ),
-    StartsAt: (
-      <div>
-        { (projectAttributes.startsAt.fixed || !userRights.attributeRights.startsAt.edit || invoiced) &&
-          <div className="disabled-info">{startsAt ? timestampToString(startsAt.valueOf()) : t('noPlannedAt') }</div>
-        }
-        { !projectAttributes.startsAt.fixed && userRights.attributeRights.startsAt.edit && !invoiced &&
-          <DatePicker
-            className={classnames("form-control")}
-            selected={startsAt}
-            hideTime
-            isClearable
-            onChange={date => {
-              setStartsAt( isNaN(date.valueOf()) ? null : date );
-              autoUpdateTask({ startsAt: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
-            }}
-            placeholderText={t('plannedAtPlaceholder')}
-            />
-        }
-      </div>
-    ),
-    Deadline: (
-      <div>
-        { (projectAttributes.deadline.fixed || !userRights.attributeRights.deadline.edit || invoiced) &&
-          <div className="disabled-info">{deadline ? timestampToString(deadline.valueOf()) : t('noDeadline') }</div>
-        }
-        { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit && !invoiced &&
-          <DatePicker
-            className={classnames("form-control")}
-            selected={deadline}
-            hideTime
-            isClearable
-            onChange={date => {
-              setDeadline( isNaN(date.valueOf()) ? null : date );
-              autoUpdateTask({ deadline: isNaN(date.valueOf()) ? null : date.valueOf().toString() });
-            }}
-            placeholderText={t('deadlinePlaceholder')}
-            />
-        }
-      </div>
-    ),
-    Pausal: (
-      <div>
-        { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed || invoiced ) &&
-          <div className="disabled-info">{pausal ? pausal.label : t('none')}</div>
-        }
-        { userRights.attributeRights.pausal.edit && company && company.monthly && !projectAttributes.pausal.fixed && !invoiced &&
-          <Select
-            value={ pausal }
-            placeholder={t('selectRequired')}
-            styles={pickSelectStyle([ 'noArrow', 'required', ]) }
-            onChange={(pausal)=> {
-              autoUpdateTask({ pausal: pausal.value })
-              setPausal(pausal);
-            }}
-            options={translateAllSelectItems(booleanSelects, t)}
-            />
-        }
-      </div>
-    ),
-    Overtime: (
-      <div>
-        { (projectAttributes.overtime.fixed || !userRights.attributeRights.overtime.edit || invoiced) &&
-          <div className="disabled-info">{overtime.label}</div>
-        }
-        { !projectAttributes.overtime.fixed && userRights.attributeRights.overtime.edit && !invoiced &&
-          <Select
-            value={overtime}
-            placeholder={t('selectRequired')}
-            styles={ pickSelectStyle([ 'noArrow', 'required', ]) }
-            onChange={(overtime)=> {
-              setOvertime(overtime);
-              autoUpdateTask({ overtime: overtime.value })
-            }}
-            options={translateAllSelectItems(booleanSelects, t)}
-            />
-        }
-      </div>
-    ),
-  }
-
-  const renderSelectsLayout1 = () => {
-    return (
-      <div className = "form-section form-selects-entries" >
-        <div className="form-section-rest">
-          <div className="col-12 row">
-            <div className="col-3">
-              <div className="p-r-10">
-                <Label className="col-3 col-form-label">{t('project')}<span className="warning-big">*</span></Label>
-                <div className="col-9">
-                  { layoutComponents.Project }
-                </div>
-              </div>
-            </div>
-            { userRights.attributeRights.assigned.view &&
-              <div className="col-9" style={{border: "none"}}>
-                <div className="p-r-10">
-                  <Label className="col-1-45 col-form-label">{t('assignedTo')}<span className="warning-big">*</span></Label>
-                  <div className="col-10-45" style={{maxWidth: "100%"}}>
-                    { layoutComponents.Assigned }
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-
-          <div className="row">
-            <div className="col-3">
-              { userRights.attributeRights.status.view &&
-                <div className="p-r-10">
-                  <Label className="col-form-label col-3 ">{t('status')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Status }
-                  </div>
-                </div>
-              }
-              { userRights.attributeRights.taskType.view &&
-                <div className="p-r-10">
-                  <Label className="col-form-label  col-3">{t('taskType')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Type }
-                  </div>
-                </div>
-              }
-            </div>
-
-            <div className="col-3">
-              { userRights.attributeRights.requester.view &&
-                <div className="p-r-10">
-                  <Label className="col-form-label col-3 ">{t('requester')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Requester }
-                  </div>
-                </div>
-              }
-              { userRights.attributeRights.company.view &&
-                <div className="p-r-10">
-                  <Label className="col-form-label col-3 ">{t('company')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Company }
-                  </div>
-                </div>
-              }
-            </div>
-
-            <div className="col-3">
-              { userRights.attributeRights.pausal.view &&
-                <div className="p-r-10">
-                  <Label className="col-form-label col-3 ">{t('pausal')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    { layoutComponents.Pausal }
-                  </div>
-                </div>
-              }
-              { userRights.attributeRights.startsAt.view &&
-                <div className="p-r-10">
-                  <Label className="col-form-label col-3">{t('plannedAt')}</Label>
-                  <div className="col-9">
-                    { layoutComponents.StartsAt }
-                  </div>
-                </div>
-              }
-              { userRights.attributeRights.deadline.view &&
-                <div className="p-r-10">
-                  <Label className="col-form-label col-3">{t('deadline')}</Label>
-                  <div className="col-9">
-                    { layoutComponents.Deadline }
-                  </div>
-                </div>
-              }
-            </div>
-            <div className="col-3">
-              { userRights.attributeRights.repeat.view &&
-                <Repeat
-                  disabled={!userRights.attributeRights.repeat.edit || invoiced}
-                  taskID={id}
-                  duplicateTask={ !task.repeat ? getTaskData() : null}
-                  repeat={task.repeat}
-                  layout={layout}
-                  repeatTime={task.repeatTime}
-                  />
-              }
-              { userRights.attributeRights.overtime.view &&
-                <div className="p-r-10">
-                  <Label className="col-form-label col-4">{t('overtimeShort')}<span className="warning-big">*</span></Label>
-                  <div className="col-9">
-                    {layoutComponents.Overtime}
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const renderSelectsLayout2Form = () => {
-    return (
-      <div className="col-12 row task-edit-align-select-labels">
-        <div className="col-2">
-          <Label className="col-form-label">{t('project')}</Label>
-          { layoutComponents.Project }
-        </div>
-        { userRights.attributeRights.status.view &&
-          <div className="col-2" >
-            <Label className="col-form-label">{t('status')}</Label>
-            { layoutComponents.Status }
-          </div>
-        }
-        { userRights.attributeRights.requester.view &&
-          <div className="col-2">
-            <Label className="col-form-label">{t('requester')}</Label>
-            { layoutComponents.Requester }
-          </div>
-        }
-        { userRights.attributeRights.company.view &&
-          <div className="col-2">
-            <Label className="col-form-label">{t('company')}</Label>
-            { layoutComponents.Company }
-          </div>
-        }
-      </div>
-    )
-  }
-
-  const renderSelectsLayout2Side = () => {
-    //used sidebar
-    return (
-      <div className={classnames("task-edit-right", {"width-250": columns})}>
-        <div>
-          { inModal &&
-            <div className="task-edit-buttons row m-b-10">
-              <span className="ml-auto center-hor">
-
-                { userRights.rights.deleteTask && !invoiced &&
-                  <button
-                    type="button"
-                    className="btn-link-red btn-distance p-0"
-                    onClick={deleteTaskFunc}
-                    >
-                    <i className="far fa-trash-alt" />
-                  </button>
-                }
-                { project && canCopy &&
-                  <TaskAdd
-                    project={project.id}
-                    duplicateTask={getTaskData()}
-                    disabled={!canCopy}
-                    noText
-                    history={history}
-                    match={match}
-                    />
-                }
-                <button
-                  type="button"
-                  className="btn-link p-r-10"
-                  onClick={() => closeModal(vykazyChanged)}
-                  >
-                  <i className="fa fa-times" style={{ fontSize: 25 }} />
-                </button>
-              </span>
-            </div>
-          }
-          <div className="form-selects-entry-column" >
-            <Label>{t('project')}<span className="warning-big">*</span></Label>
-            <div className="form-selects-entry-column-rest" >
-              { layoutComponents.Project }
-            </div>
-          </div>
-          { userRights.attributeRights.status.view &&
-            <div className="form-selects-entry-column" >
-              <Label>{t('status')}<span className="warning-big">*</span></Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Status }
-              </div>
-            </div>
-          }
-          { userRights.attributeRights.requester.view &&
-            <div className="form-selects-entry-column" >
-              <Label>{t('requester')}<span className="warning-big">*</span></Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Requester }
-              </div>
-            </div>
-          }
-          { userRights.attributeRights.company.view &&
-            <div className="form-selects-entry-column" >
-              <Label>{t('company')}<span className="warning-big">*</span></Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Company }
-              </div>
-            </div>
-          }
-          { userRights.attributeRights.assigned.view &&
-            <div className="form-selects-entry-column" >
-              <Label>{t('assignedTo')}<span className="warning-big">*</span></Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Assigned }
-              </div>
-            </div>
-          }
-          { userRights.attributeRights.startsAt.view &&
-            <div className="form-selects-entry-column" >
-              <Label>{t('plannedAt')}</Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.StartsAt }
-              </div>
-            </div>
-          }
-          { userRights.attributeRights.deadline.view &&
-            <div className="form-selects-entry-column" >
-              <Label>{t('deadline')}</Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Deadline }
-              </div>
-            </div>
-          }
-          { userRights.attributeRights.repeat.view &&
-            <div>
-              { ( !userRights.attributeRights.repeat.edit || invoiced ) &&
-                <div className="form-selects-entry-column" >
-                  <Label>{t('repeat')}</Label>
-                  <div className="form-selects-entry-column-rest" >
-                    <div className="disabled-info">
-                      {
-                        task.repeat ?
-                        `${t('repeatEvery')} ${task.repeat.repeatEvery} ${t(intervals.find( ( interval ) => interval.value === task.repeat.repeatInterval ).label).toLowerCase()}` :
-                        t('noRepeat')
-                      }
-                    </div>
-                  </div>
-                </div>
-              }
-              { userRights.attributeRights.repeat.edit && !invoiced &&
-                <Repeat
-                  vertical
-                  duplicateTask={ !task.repeat ? getTaskData() : null}
-                  taskID={id}
-                  repeat={task.repeat}
-                  repeatTime={task.repeatTime}
-                  layout={layout}
-                  />
-              }
-            </div>
-          }
-          { userRights.attributeRights.taskType.view &&
-            <div className="form-selects-entry-column" >
-              <Label>{t('taskType')}<span className="warning-big">*</span></Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Type }
-              </div>
-            </div>
-          }
-          { userRights.attributeRights.pausal.view &&
-            <div className="form-selects-entry-column" >
-              <Label>{t('pausal')}<span className="warning-big">*</span></Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Pausal }
-              </div>
-            </div>
-          }
-          { userRights.attributeRights.overtime.view &&
-            <div className="form-selects-entry-column" >
-              <Label>{t('overtimeShort')}<span className="warning-big">*</span></Label>
-              <div className="form-selects-entry-column-rest" >
-                { layoutComponents.Overtime }
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-    );
-  }
-
-  const renderMultiSelectTags = () => {
-    return (
-      <Empty>
-        { userRights.attributeRights.tags.edit && !invoiced &&
-          <TagsPickerPopover
-            taskID={id}
-            required={userRights.attributeRights.tags.required}
-            disabled={ projectAttributes.tags.fixed || invoiced }
-            items={toSelArr(project === null ? [] : project.project.tags)}
-            className="center-hor"
-            selected={tags}
-            onChange={(tags) => {
-              setTags(tags);
-              autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
-            }}
-            />
-        }
-
-        { userRights.attributeRights.tags.view &&
-          tags.sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
-          .map( ( tag ) => (
-            <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
-              {tag.title}
-            </span>
-          ) )
-        }
-      </Empty>
-    )
-  }
-
-  const renderDescription = () => {
+  const renderDescriptionAttachmentsTags = () => {
     if ( !userRights.rights.taskDescriptionRead && !userRights.rights.taskAttachmentsRead ) {
       return null;
     }
@@ -1447,118 +1339,46 @@ export default function TaskEdit( props ) {
               {t('attachment')}
             </label>
           }
-          { renderMultiSelectTags() }
+          { userRights.attributeRights.tags.edit && !invoiced &&
+            <TagsPickerPopover
+              taskID={id}
+              required={userRights.attributeRights.tags.required}
+              disabled={ projectAttributes.tags.fixed || invoiced }
+              items={toSelArr(project === null ? [] : project.project.tags)}
+              className="center-hor"
+              selected={tags}
+              onChange={(tags) => {
+                setTags(tags);
+                autoUpdateTask({ tags: tags.map((tag) => tag.id ) })
+              }}
+              />
+          }
+
+          { userRights.attributeRights.tags.view &&
+            tags.sort( ( tag1, tag2 ) => tag1.order > tag2.order ? 1 : -1 )
+            .map( ( tag ) => (
+              <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+                {tag.title}
+              </span>
+            ) )
+          }
         </div>
         <div className="form-section-rest">
           {RenderDescription}
-          {renderAttachments(false)}
+          { userRights.rights.taskAttachmentsRead &&
+            <Attachments
+              disabled={!userRights.rights.taskAttachmentsWrite || invoiced }
+              taskID={id}
+              type="task"
+              top={false}
+              attachments={task.taskAttachments}
+              addAttachments={addAttachments}
+              removeAttachment={removeAttachment}
+              />
+          }
         </div>
       </div>
     )
-  }
-
-  const renderCompanyPausalInfo = () => {
-    if ( !company || !company.monthlyPausal || !userRights.rights.taskPausalInfo ) {
-      return null;
-    }
-    return (
-      <div className="form-section">
-        <div className="form-section-rest">
-          <span className=" message success-message center-hor ml-auto">
-            { `${t('pausal')} ${company.title}  ` }
-            <span>
-              {`${t('pausalSubtasks')}:`}
-              <span className={classnames( {"warning-general": (usedSubtaskPausal > taskWorkPausal)} )}>
-                {` ${usedSubtaskPausal}`}
-              </span>
-              {` / ${taskWorkPausal} ${t('pausalTrips')}:`}
-              <span className={classnames( {"warning-general": (usedTripPausal > taskTripPausal)} )} >
-                {` ${usedTripPausal}`}
-              </span>
-              {` / ${taskTripPausal}`}
-            </span>
-          </span>
-        </div>
-      </div>
-    )
-  }
-
-  const renderSimpleSubtasks = () => {
-    //hidden
-    if ( !userRights.rights.taskSubtasksRead ) {
-      return null;
-    }
-
-    return (
-      <ShortSubtasks
-        disabled={!userRights.rights.taskSubtasksWrite || invoiced}
-        items={task.shortSubtasks}
-        onChange={(simpleSubtask) => {
-          updateShortSubtask(simpleSubtask);
-        }}
-        submitItem = { (newSimpleSubtask) => {
-          addShortSubtask({...newSimpleSubtask, task: id});
-        }}
-        deleteItem = { (simpleSubtask) => {
-          deleteShortSubtask(simpleSubtask.id)
-        } }
-        placeholder={t('shortSubtaskTitle')}
-        newPlaceholder={t('newShortSubtaskTitle')}
-        label={t('shortSubtask')}
-        />
-    )
-  }
-
-  const renderAttachments = ( top ) => {
-    if ( !userRights.rights.taskAttachmentsRead ) {
-      return null;
-    }
-    return (
-      <Attachments
-        disabled={!userRights.rights.taskAttachmentsWrite || invoiced }
-        taskID={id}
-        type="task"
-        top={top}
-        attachments={task.taskAttachments}
-        addAttachments={addAttachments}
-        removeAttachment={removeAttachment}
-        />
-    )
-  }
-
-  const renderVykazyTable = () => {
-    if (
-      !userRights.rights.taskWorksRead &&
-      !userRights.rights.taskWorksAdvancedRead &&
-      !userRights.rights.taskMaterialsRead &&
-      !userRights.rights.taskPausalInfo
-    ) {
-      return null
-    }
-
-    return (
-      <Vykazy
-        edit
-        task={id}
-        invoiced={invoiced}
-        fromInvoice
-        autoApproved={project ? project.project.autoApproved : false}
-        userRights={userRights}
-        currentUser={currentUser}
-        assignedTo={assignedTo}
-        company={company}
-        setChanged={() => setVykazyChanged(true) }
-        updateCasheStorage={updateCasheStorage}
-        renderCompanyPausalInfo={renderCompanyPausalInfo}
-        works={subtasks}
-        taskTypes={taskTypes}
-        taskType={taskType}
-        trips={workTrips}
-        tripTypes={tripTypes}
-        setMaterials
-        materials={materials}
-        />
-    );
   }
 
   const renderComments = () => {
@@ -1567,173 +1387,88 @@ export default function TaskEdit( props ) {
     }
     return (
       <div className="form-section">
-      <div className="form-section-rest">
-        <Nav tabs className="no-border m-b-10">
-          { userRights.rights.viewComments &&
-            <NavItem>
-              <NavLink
-                className={classnames({ active: toggleTab === 1}, "clickable", "")}
-                onClick={() => setToggleTab(1) }
-                >
-                {t('comments')}
-              </NavLink>
-            </NavItem>
-          }
-          { userRights.rights.history && userRights.rights.viewComments &&
-            <NavItem>
-              <NavLink>
-                |
-              </NavLink>
-            </NavItem>
-          }
-          { userRights.rights.history &&
-            <NavItem>
-              <NavLink
-                className={classnames({ active: toggleTab === 2 }, "clickable", "")}
-                onClick={() => setToggleTab(2) }
-                >
-                {t('history')}
-              </NavLink>
-            </NavItem>
-          }
-        </Nav>
-        <TabContent activeTab={toggleTab}>
-          <TabPane tabId={1}>
+        <div className="form-section-rest">
+          <Nav tabs className="no-border m-b-10">
             { userRights.rights.viewComments &&
-              <Comments
-                disabled={invoiced}
-                id={id}
-                userRights={ userRights }
-                users={users}
-                fromInvoice={fromInvoice}
-                />
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: toggleTab === 1}, "clickable", "")}
+                  onClick={() => setToggleTab(1) }
+                  >
+                  {t('comments')}
+                </NavLink>
+              </NavItem>
             }
-          </TabPane>
-          {	userRights.rights.history &&
-            <TabPane tabId={2}>
-              { userRights.rights.history &&
-                <TaskHistory task={task} fromInvoice={fromInvoice} />
+            { userRights.rights.history && userRights.rights.viewComments &&
+              <NavItem>
+                <NavLink>
+                  |
+                </NavLink>
+              </NavItem>
+            }
+            { userRights.rights.history &&
+              <NavItem>
+                <NavLink
+                  className={classnames({ active: toggleTab === 2 }, "clickable", "")}
+                  onClick={() => setToggleTab(2) }
+                  >
+                  {t('history')}
+                </NavLink>
+              </NavItem>
+            }
+          </Nav>
+          <TabContent activeTab={toggleTab}>
+            <TabPane tabId={1}>
+              { userRights.rights.viewComments &&
+                <Comments
+                  disabled={invoiced}
+                  id={id}
+                  userRights={ userRights }
+                  users={users}
+                  fromInvoice={fromInvoice}
+                  />
               }
             </TabPane>
-          }
-        </TabContent>
+            {	userRights.rights.history &&
+              <TabPane tabId={2}>
+                { userRights.rights.history &&
+                  <TaskHistory task={task} fromInvoice={fromInvoice} />
+                }
+              </TabPane>
+            }
+          </TabContent>
+        </div>
       </div>
-    </div>
-    )
-  }
-
-  const renderModalUserAdd = () => {
-    return (
-      <Empty>
-      <Modal isOpen={openUserAdd} className="modal-without-borders" >
-        <ModalHeader>
-          {t('addUser')}
-        </ModalHeader>
-        <ModalBody>
-          <UserAdd
-            closeModal={() => setOpenUserAdd(false)}
-            addUserToList={(user) => {
-              setNewAddedUser(user);
-            }}
-            />
-        </ModalBody>
-      </Modal>
-      { project && project.id && userRights.rights.projectWrite &&
-        <AddUserToGroup
-          user={newAddedUser}
-          disabled={ !userRights.rights.projectWrite }
-          projectID={project.id}
-          finish={() => setNewAddedUser(null)}
-          />
-      }
-    </Empty>
-    )
-  }
-
-  const renderModalCompanyAdd = () => {
-    return (
-      <Modal isOpen={openCompanyAdd} className="modal-without-borders">
-      <ModalBody>
-        <CompanyAdd
-          closeModal={() => setOpenCompanyAdd(false)}
-          addCompanyToList={addCompanyToList}
-          />
-      </ModalBody>
-    </Modal>
     )
   }
 
   return (
     <div
-    className={classnames(
-      {
-        'task-edit-width': !inModal
-      },
-      "flex",
-      "max-height-400",
-      {
-        "basic-border-top": layout === 1
-      }
-    )}
-    >
-
-    <div
       className={classnames(
-        {"fit-with-header": !columns && !inModal},
-        {"fit-with-header-and-commandbar": columns && !inModal},
-        {"scroll-visible": !inModal},
-        {"overflow-x-auto": inModal},
+        {
+          'task-edit-width': !inModal
+        },
+        "flex max-height-400",
       )}
       >
-      { !inModal && renderCommandbar() }
+
       <div
         className={classnames(
-          {
-            "row":  layout === 2,
-          },
+          {"fit-with-header": !columns && !inModal},
+          {"fit-with-header-and-commandbar": columns && !inModal},
+          {"scroll-visible": !inModal},
+          {"overflow-x-auto": inModal},
         )}
-        style={{minHeight: "calc(100% - 70px)"}}
         >
+        { !inModal && renderCommandbar() }
         <div
-          className={classnames(
-            {
-              "task-edit-left":  layout === 2 && !columns,
-              "task-edit-left-columns": (layout === 2 && columns) || layout === 1 || layout === 3,
-            },
-          )}
+          className="row"
+          style={{minHeight: "calc(100% - 70px)"}}
           >
-
-          <div className="" >
-            { renderTitle() }
-            { layout === 2 && <hr className="m-t-5 m-b-2"/> }
-            {renderTaskInfoAndDates()}
-
-            { layout === 1 && renderSelectsLayout1() }
-
-            { renderDescription() }
-
-            { renderSimpleSubtasks() }
-
-            { renderVykazyTable() }
-
-            { renderComments() }
-
-            <ErrorDisplay
-              {...getTaskData()}
-              userRights={userRights}
-              projectAttributes={projectAttributes}
-              />
-
-            { currentUser.role.accessRights.users && !invoiced && renderModalUserAdd() }
-
-            { currentUser.role.accessRights.companies && !invoiced && renderModalCompanyAdd() }
-
-          </div>
+          { renderMain() }
+          { renderSide() }
         </div>
-
-        { layout === 2 && renderSelectsLayout2Side() }
       </div>
     </div>
-  </div>
   );
 }

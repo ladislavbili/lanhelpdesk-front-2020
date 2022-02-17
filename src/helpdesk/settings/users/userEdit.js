@@ -16,6 +16,7 @@ import Checkbox from 'components/checkbox';
 import Switch from "components/switch";
 import PasswordChange from './passChange';
 import SettingsInput from '../components/settingsInput';
+import DeleteReplacement from 'components/deleteReplacement';
 import {
   useTranslation
 } from "react-i18next";
@@ -76,6 +77,14 @@ export default function UserEdit( props ) {
   } );
 
   const {
+    data: usersData,
+    loading: usersLoading,
+    refetch: usersRefetch
+  } = useQuery( GET_USERS, {
+    fetchPolicy: 'network-only'
+  } );
+
+  const {
     data: rolesData,
     loading: rolesLoading
   } = useQuery( GET_ROLES, {
@@ -110,6 +119,7 @@ export default function UserEdit( props ) {
   const [ saving, setSaving ] = React.useState( false );
   const [ deletingUser ] = React.useState( false );
   const [ dataChanged, setDataChanged ] = React.useState( false );
+  const [ deleteOpen, setDeleteOpen ] = React.useState( false );
 
   // sync
   React.useEffect( () => {
@@ -185,14 +195,14 @@ export default function UserEdit( props ) {
       } );
   };
 
-  const deleteUserFunc = () => {
+  const deleteUserFunc = ( replacement ) => {
+    setDeleteOpen( false );
+
     if ( window.confirm( t( 'deleteUserMessage' ) ) ) {
       deleteUser( {
           variables: {
             id,
-            taskPairs: [],
-            subtaskPairs: [],
-            workTripPairs: [],
+            newId: parseInt( replacement.id ),
           }
         } )
         .catch( ( err ) => {
@@ -210,7 +220,7 @@ export default function UserEdit( props ) {
     } );
   }
 
-  const dataLoading = ( userLoading || rolesLoading || companiesLoading || !currentUser );
+  const dataLoading = ( userLoading || usersLoading || rolesLoading || companiesLoading || !currentUser );
 
   if ( dataLoading ) {
     return <Loading />
@@ -363,7 +373,7 @@ export default function UserEdit( props ) {
             <button
               className="btn-red btn-distance"
               disabled={deletingUser}
-              onClick={deleteUserFunc}
+              onClick={() => setDeleteOpen(true)}
               >
               {t('delete')}
             </button>
@@ -404,7 +414,7 @@ export default function UserEdit( props ) {
       }
       <PasswordChange
         submitPass={(pass) => {
-          if(pass !== null){            
+          if(pass !== null){
             updateUser({
               variables: {
                 id,
@@ -415,6 +425,13 @@ export default function UserEdit( props ) {
           setPasswordChangeOpen(false);
         }}
         isOpen={passwordChangeOpen}
+        />
+      <DeleteReplacement
+        isOpen = { deleteOpen }
+        label = {t('user')}
+        options = { toSelArr(usersData.users.filter( user => user.id !== parseInt( match.params.id ) ), 'fullName') }
+        close = { () => setDeleteOpen( false ) }
+        finishDelete = { deleteUserFunc }
         />
     </div>
   )

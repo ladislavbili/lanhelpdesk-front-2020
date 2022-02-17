@@ -41,15 +41,19 @@ export default {
   },
   plannedAt: {
     en: 'Planned at',
-    sk: 'Dátum plánovania',
+    sk: 'Plánovanie',
   },
   plannedAtPlaceholder: {
     en: 'Enter planned date',
-    sk: 'Zadajte dátum plánovania',
+    sk: 'Zadajte plánovanie',
   },
   noPlannedAt: {
     en: 'No planned date',
-    sk: 'Bez dátumu plánovania',
+    sk: 'Bez plánovania',
+  },
+  taskCreationDate: {
+    en: 'Task creation date',
+    sk: 'Dátum vytvorenia úlohy',
   },
   number: {
     en: 'Number',
@@ -722,5 +726,13 @@ export default {
   noStartsAt: {
     en: 'No start date',
     sk: 'Bez dátumu začiatku',
+  },
+  deadlineSinceCreation: {
+    en: 'Deadline (since creation in days)',
+    sk: 'Deadline (od vytvorenia v dňoch)',
+  },
+  deadlineSinceCreationPlaceholder: {
+    en: 'Number of days since creation',
+    sk: 'Počet dní od vytvorenia',
   },
 }
