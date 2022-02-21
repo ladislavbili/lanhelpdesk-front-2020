@@ -152,7 +152,7 @@ export default function MaterialsTable( props ) {
       .toFixed( 2 )
   }
 
-  let sortedMaterials = materials.sort( ( material1, material2 ) => material1.order - material2.order );
+  let sortedMaterials = [ ...materials ].sort( ( material1, material2 ) => material1.order > material2.order ? -1 : 1 );
   let disabled = !userRights.rights.taskMaterialsWrite || invoiced;
 
   const getColRender = ( key, material, index ) => {

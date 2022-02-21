@@ -63,7 +63,7 @@ repeatTemplate{
     name
     surname
   }
-  deadline
+  daysToDeadline
   description
   milestone{
     id
@@ -221,7 +221,7 @@ query (
         name
         surname
       }
-      deadline
+      daysToDeadline
       description
       milestone{
         id

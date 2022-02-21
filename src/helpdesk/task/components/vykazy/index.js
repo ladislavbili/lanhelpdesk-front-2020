@@ -66,15 +66,15 @@ export default function TaskEditTablesLoader( props ) {
   const setChanged = props.setChanged ? props.setChanged : () => {};
   const setSaving = props.setSaving ? props.setSaving : () => {};
 
-  const [ addSubtask ] = useMutation( repeat ? ADD_SUBTASK : ADD_SUBTASK );
-  const [ updateSubtask ] = useMutation( repeat ? UPDATE_SUBTASK : UPDATE_SUBTASK );
-  const [ deleteSubtask ] = useMutation( repeat ? DELETE_SUBTASK : DELETE_SUBTASK );
-  const [ addWorkTrip ] = useMutation( repeat ? ADD_WORKTRIP : ADD_WORKTRIP );
-  const [ updateWorkTrip ] = useMutation( repeat ? UPDATE_WORKTRIP : UPDATE_WORKTRIP );
-  const [ deleteWorkTrip ] = useMutation( repeat ? DELETE_WORKTRIP : DELETE_WORKTRIP );
-  const [ addTaskMaterial ] = useMutation( repeat ? ADD_MATERIAL : ADD_MATERIAL );
-  const [ updateTaskMaterial ] = useMutation( repeat ? UPDATE_MATERIAL : UPDATE_MATERIAL );
-  const [ deleteTaskMaterial ] = useMutation( repeat ? DELETE_MATERIAL : DELETE_MATERIAL );
+  const [ addSubtask ] = useMutation( repeat ? REPEAT_ADD_SUBTASK : ADD_SUBTASK );
+  const [ updateSubtask ] = useMutation( repeat ? REPEAT_UPDATE_SUBTASK : UPDATE_SUBTASK );
+  const [ deleteSubtask ] = useMutation( repeat ? REPEAT_DELETE_SUBTASK : DELETE_SUBTASK );
+  const [ addWorkTrip ] = useMutation( repeat ? REPEAT_ADD_WORKTRIP : ADD_WORKTRIP );
+  const [ updateWorkTrip ] = useMutation( repeat ? REPEAT_UPDATE_WORKTRIP : UPDATE_WORKTRIP );
+  const [ deleteWorkTrip ] = useMutation( repeat ? REPEAT_DELETE_WORKTRIP : DELETE_WORKTRIP );
+  const [ addTaskMaterial ] = useMutation( repeat ? REPEAT_ADD_MATERIAL : ADD_MATERIAL );
+  const [ updateTaskMaterial ] = useMutation( repeat ? REPEAT_UPDATE_MATERIAL : UPDATE_MATERIAL );
+  const [ deleteTaskMaterial ] = useMutation( repeat ? REPEAT_DELETE_MATERIAL : DELETE_MATERIAL );
 
   const addWork = ( work ) => {
     if ( edit ) {

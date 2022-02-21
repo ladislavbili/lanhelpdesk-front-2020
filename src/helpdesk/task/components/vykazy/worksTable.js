@@ -233,8 +233,8 @@ export default function WorksTable( props ) {
     setFocusedTrip( trip.id );
   }
 
-  let sortedSubtasks = subtasks.sort( ( work1, work2 ) => work1.order - work2.order );
-  let sortedTrips = workTrips.sort( ( trip1, trip2 ) => trip1.order - trip2.order );
+  let sortedSubtasks = [ ...subtasks ].sort( ( work1, work2 ) => work1.order - work2.order );
+  let sortedTrips = [ ...workTrips ].sort( ( trip1, trip2 ) => trip1.order - trip2.order );
   let disabled = !(
     ( userRights.rights.taskSubtasksWrite && toggleTab === '0' ) ||
     ( userRights.rights.taskWorksWrite && toggleTab === '1' ) ||

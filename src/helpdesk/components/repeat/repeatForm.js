@@ -140,7 +140,7 @@ export default function RepeatForm( props ) {
   const [ assignedTo, setAssignedTo ] = React.useState( assignableUsers.filter( ( user ) => user.id === currentUser.id ) );
   const [ closeDate, setCloseDate ] = React.useState( null );
   const [ company, setCompany ] = React.useState( null );
-  const [ deadline, setDeadline ] = React.useState( null );
+  const [ daysToDeadline, setDaysToDeadline ] = React.useState( 0 );
   const [ showDescription, setShowDescription ] = React.useState( false );
   const [ description, setDescription ] = React.useState( "" );
   const [ descriptionVisible, setDescriptionVisible ] = React.useState( false );
@@ -294,15 +294,6 @@ export default function RepeatForm( props ) {
       }
     }
 
-    //Deadline
-    if ( userRights.attributeRights.deadline.view ) {
-      if ( projectAttributes.deadline.fixed && deadline.valueOf()
-        .toString() !== projectAttributes.deadline.value ) {
-        setDeadline( projectAttributes.deadline.value ? moment( parseInt( projectAttributes.deadline.value ) ) : null );
-        changes.deadline = projectAttributes.deadline.value;
-      }
-    }
-
     //Pausal
     if ( userRights.attributeRights.pausal.view ) {
       if ( projectAttributes.pausal.fixed && pausal.value !== projectAttributes.pausal.value ) {
@@ -337,7 +328,7 @@ export default function RepeatForm( props ) {
     } : {} );
     setAssignedTo( toSelArr( data.assignedTo, 'fullName' ) );
     setCloseDate( moment( parseInt( data.closeDate ) ) );
-    setDeadline( data.deadline ? moment( parseInt( data.deadline ) ) : null );
+    setDaysToDeadline( data.daysToDeadline ? data.daysToDeadline : null );
     setDescription( data.description );
     setImportant( data.important );
 
@@ -376,7 +367,7 @@ export default function RepeatForm( props ) {
     setSubtasks( data.subtasks.map( item => ( {
       ...item,
       assignedTo: toSelItem( item.assignedTo, 'fullName' ),
-      type: toSelItem( item.type )
+      type: null
     } ) ) );
     setWorkTrips( data.workTrips.map( item => ( {
       ...item,
@@ -389,7 +380,6 @@ export default function RepeatForm( props ) {
   const setTaskData = () => {
     setAssignedTo( duplicateTask.assignedTo );
     setCloseDate( duplicateTask.closeDate );
-    setDeadline( duplicateTask.deadline );
     setDescription( duplicateTask.description );
     setImportant( duplicateTask.important );
     setOvertime( duplicateTask.overtime );
@@ -522,8 +512,7 @@ export default function RepeatForm( props ) {
                 .toString() : null,
               assignedTo: assignedTo.map( user => user.id ),
               company: company ? company.id : null,
-              deadline: deadline ? deadline.valueOf()
-                .toString() : null,
+              daysToDeadline,
               description,
               milestone: /*milestone ? milestone.id :*/ null,
               overtime: overtime.value,
@@ -904,12 +893,27 @@ export default function RepeatForm( props ) {
                 <div className="disabled-info">{deadline}</div>
               }
               { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit &&
-                <input
-                  className="form-control"
-                  type="number"
-                  placeholder={t("deadlineSinceCreationPlaceholder")}
-                  onChange={() => {} }
-                  />
+                <div className="row">
+                  <div className="flex">
+                  <input
+                    className="form-control"
+                    type="number"
+                    placeholder={daysToDeadline === null ? t('noDeadline') : t("deadlineSinceCreationPlaceholder")}
+                    value={daysToDeadline === null ? '' : daysToDeadline }
+                    onChange={(e) => {
+                      setDaysToDeadline( e.target.value );
+                      saveChange({ daysToDeadline: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value) });
+                    } }
+                    />
+                  </div>
+                  { daysToDeadline !== null &&
+                    <div className="ml-auto row">
+                      <button type="button" className="btn-link m-l-5 m-r-0" onClick={() => { setDaysToDeadline(null); saveChange({ daysToDeadline: null }) } }>
+                        <i className="fas fa-times text-highlight" />
+                      </button>
+                    </div>
+                  }
+                </div>
               }
             </div>
           </div>
@@ -1086,7 +1090,7 @@ export default function RepeatForm( props ) {
             tripTypes={tripTypes}
             materials={materials}
             setMaterials={setMaterials}
-            setSaving={setSubtasks}
+            setSaving={setSaving}
             />
         )}
         <div className="form-section task-edit-buttons">

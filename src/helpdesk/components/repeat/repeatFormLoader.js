@@ -47,18 +47,6 @@ import {
 
 import {
   GET_REPEAT,
-  ADD_SHORT_SUBTASK,
-  UPDATE_SHORT_SUBTASK,
-  DELETE_SHORT_SUBTASK,
-  ADD_SUBTASK,
-  UPDATE_SUBTASK,
-  DELETE_SUBTASK,
-  ADD_WORKTRIP,
-  UPDATE_WORKTRIP,
-  DELETE_WORKTRIP,
-  ADD_MATERIAL,
-  UPDATE_MATERIAL,
-  DELETE_MATERIAL,
   DELETE_REPEAT_TEMPLATE_ATTACHMENT,
 } from './queries';
 
@@ -117,15 +105,6 @@ export default function RepeatFormLoader( props ) {
     fetchPolicy: 'network-only'
   } );
 
-  const [ addSubtask ] = useMutation( ADD_SUBTASK );
-  const [ updateSubtask ] = useMutation( UPDATE_SUBTASK );
-  const [ deleteSubtask ] = useMutation( DELETE_SUBTASK );
-  const [ addWorkTrip ] = useMutation( ADD_WORKTRIP );
-  const [ updateWorkTrip ] = useMutation( UPDATE_WORKTRIP );
-  const [ deleteWorkTrip ] = useMutation( DELETE_WORKTRIP );
-  const [ addMaterial ] = useMutation( ADD_MATERIAL );
-  const [ updateMaterial ] = useMutation( UPDATE_MATERIAL );
-  const [ deleteMaterial ] = useMutation( DELETE_MATERIAL );
   const [ deleteRepeatTemplateAttachment ] = useMutation( DELETE_REPEAT_TEMPLATE_ATTACHMENT );
 
   const [ saving, setSaving ] = React.useState( false );
@@ -141,6 +120,7 @@ export default function RepeatFormLoader( props ) {
     let newRepeatTemplate = {
       ...oldRepeat.repeatTemplate,
     };
+
     newRepeatTemplate[ key ] = [ ...newRepeatTemplate[ key ] ]
     switch ( type ) {
       case 'ADD': {
@@ -159,6 +139,7 @@ export default function RepeatFormLoader( props ) {
         return;
       }
     }
+
     client.writeQuery( {
       query: GET_REPEAT,
       variables: {

@@ -461,6 +461,7 @@ export default function CalendarLoader( props ) {
     setScheduledDone,
 
     forceRefetch: () => setForcedRefetch( !forcedRefetch ),
+    tasksRefetch,
     localStringFilter: localStringFilter.localTaskStringFilter,
     setLocalTaskStringFilter,
     globalStringFilter: globalStringFilter.globalTaskStringFilter,
