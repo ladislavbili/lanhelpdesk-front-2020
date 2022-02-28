@@ -303,8 +303,8 @@ export default function TaskEdit( props ) {
           setCompany( potentialCompany );
           changes.company = company.id;
           if ( !projectAttributes.pausal.fixed ) {
-            setPausal( parseInt( company.taskWorkPausal ) > 0 ? translateAllSelectItems( booleanSelects, t )[ 1 ] : translateAllSelectItems( booleanSelects, t )[ 0 ] );
-            changes.pausal = parseInt( company.taskWorkPausal ) > 0
+            setPausal( parseInt( company.monthly ) > 0 ? translateAllSelectItems( booleanSelects, t )[ 1 ] : translateAllSelectItems( booleanSelects, t )[ 0 ] );
+            changes.pausal = parseInt( company.monthly ) > 0
           }
         }
       }
@@ -342,9 +342,16 @@ export default function TaskEdit( props ) {
     //Pausal
     if ( userRights.attributeRights.pausal.view ) {
       if ( projectAttributes.pausal.fixed && pausal.value !== projectAttributes.pausal.value ) {
-        setPausal( translateAllSelectItems( booleanSelects, t )
-          .find( ( option ) => option.value === projectAttributes.pausal.value ) );
-        changes.pausal = projectAttributes.pausal.value;
+        if ( projectAttributes.pausal.value === null ) {
+          const companyMonthly = potentialCompany ? potentialCompany.monthly : company.monthly;
+          setPausal( translateAllSelectItems( booleanSelects, t )
+            .find( ( option ) => option.value === companyMonthly ) );
+          changes.pausal = companyMonthly;
+        } else {
+          setPausal( translateAllSelectItems( booleanSelects, t )
+            .find( ( option ) => option.value === projectAttributes.pausal.value ) );
+          changes.pausal = projectAttributes.pausal.value;
+        }
       }
     }
 
@@ -549,19 +556,18 @@ export default function TaskEdit( props ) {
 
   //Value Change
   const changeProject = ( project ) => {
-    let newAssignedTo = assignedTo.filter( ( user ) => project.usersWithRights.some( ( projectUser ) => projectUser.assignable && projectUser.user.id === user.id ) );
-    setProject( project );
-    setAssignedTo( newAssignedTo );
-    //setMilestone( noMilestone );
-    setTags( [] );
-    setStatus( null );
-    autoUpdateTask( {
+    let variables = {
+      id,
+      fromInvoice,
       project: project.id,
-      tags: [],
-      status: null,
-      assignedTo: newAssignedTo.map( ( user ) => user.id ),
-      milestone: null
-    } );
+    };
+    setSaving( true );
+    updateTask( {
+        variables
+      } )
+      .finally( () => {
+        setSaving( false );
+      } );
   }
 
   const changeStatus = ( status ) => {
@@ -833,32 +839,16 @@ export default function TaskEdit( props ) {
               </div>
             </div>
           }
-          { userRights.attributeRights.repeat.view &&
+          { userRights.attributeRights.repeat.view && ( userRights.attributeRights.repeat.edit || task.repeat ) &&
             <div>
-              { ( !userRights.attributeRights.repeat.edit || invoiced ) &&
-                <div className="form-selects-entry-column" >
-                  <Label>{t('repeat')}</Label>
-                  <div className="form-selects-entry-column-rest" >
-                    <div className="disabled-info">
-                      {
-                        task.repeat ?
-                        `${t('repeatEvery')} ${task.repeat.repeatEvery} ${t(intervals.find( ( interval ) => interval.value === task.repeat.repeatInterval ).label).toLowerCase()}` :
-                        t('noRepeat')
-                      }
-                    </div>
-                  </div>
-                </div>
-              }
-              { userRights.attributeRights.repeat.edit && !invoiced &&
-                <Repeat
-                  vertical
-                  duplicateTask={ !task.repeat ? getTaskData() : null}
-                  taskID={id}
-                  repeat={task.repeat}
-                  repeatTime={task.repeatTime}
-                  layout={2}
-                  />
-              }
+              <Repeat
+                vertical
+                duplicateTask={ !task.repeat ? getTaskData() : null}
+                taskID={id}
+                repeat={task.repeat}
+                repeatTime={task.repeatTime}
+                layout={2}
+                />
             </div>
           }
           { userRights.attributeRights.taskType.view &&

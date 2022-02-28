@@ -19,6 +19,7 @@ export default function ProjectSingleAttribute( props ) {
     roles,
     right,
     noDef,
+    dataType,
     noRequired,
     attribute,
     onChangeAttribute,
@@ -85,7 +86,7 @@ export default function ProjectSingleAttribute( props ) {
             <td>
               {t('defaultValue')}
             </td>
-            {['Deadline', 'Starts at'].includes(label) &&
+            {dataType === 'date' &&
               <td colSpan="4">
                 <DatePicker
                   className="form-control hidden-input bolder"
@@ -102,7 +103,7 @@ export default function ProjectSingleAttribute( props ) {
                   />
               </td>
             }
-            {!['Deadline', 'Starts at'].includes(label) &&
+            { !dataType &&
               <td colSpan="4">
                 <Select
                   value={ value }

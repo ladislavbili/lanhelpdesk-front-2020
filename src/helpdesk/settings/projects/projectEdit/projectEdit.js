@@ -15,11 +15,13 @@ import {
   toSelArr,
   toSelItem,
   filterUnique,
+  translateAllSelectItems,
 } from 'helperFunctions';
 import {
   allACLs,
   noDef,
   getEmptyAttributes,
+  emptyPausal,
 } from 'configs/constants/projects';
 import booleanSelects from 'configs/constants/boolSelect';
 import {
@@ -181,6 +183,7 @@ export default function ProjectEdit( props ) {
     const companies = toSelArr( companiesData.basicCompanies );
     const taskTypes = toSelArr( taskTypesData.taskTypes );
     const statuses = toSelArr( project.statuses );
+
     setAttributes( {
       assigned: {
         fixed: attributes.assigned.fixed,
@@ -196,11 +199,11 @@ export default function ProjectEdit( props ) {
       },
       overtime: {
         fixed: attributes.overtime.fixed,
-        value: attributes.overtime.value === null ? null : [ ...booleanSelects, noSelect ].find( ( selectVal ) => selectVal.value === attributes.overtime.value ),
+        value: attributes.overtime.value === null ? null : [ ...translateAllSelectItems( booleanSelects, t ), noSelect ].find( ( selectVal ) => selectVal.value === attributes.overtime.value ),
       },
       pausal: {
         fixed: attributes.pausal.fixed,
-        value: attributes.pausal.value === null ? null : [ ...booleanSelects, noSelect ].find( ( selectVal ) => selectVal.value === attributes.pausal.value ),
+        value: [ ...translateAllSelectItems( booleanSelects, t ), emptyPausal ].find( ( selectVal ) => selectVal.value === attributes.pausal.value ),
       },
       requester: {
         fixed: attributes.requester.fixed,

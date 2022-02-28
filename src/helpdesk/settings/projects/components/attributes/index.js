@@ -165,6 +165,7 @@ export default function ProjectAttributes( props ) {
         roles={ groups }
         right="startsAt"
         canBeRequired
+        dataType="date"
         attribute={ attributes.startsAt }
         onChangeAttribute={(value) => {
           setAttributes( { ...attributes, startsAt: value } )
@@ -177,6 +178,7 @@ export default function ProjectAttributes( props ) {
         roles={ groups }
         right="deadline"
         canBeRequired
+        dataType="date"
         attribute={ attributes.deadline }
         onChangeAttribute={(value) => {
           setAttributes( { ...attributes, deadline: value } )
@@ -188,9 +190,7 @@ export default function ProjectAttributes( props ) {
         label={t('pausal')}
         roles={ groups }
         right="pausal"
-        canBeRequired
-        defEmptyValue={ translateSelectItem(emptyPausal,t) }
-        defSelectValues={ translateAllSelectItems(booleanSelects, t) }
+        defSelectValues={ translateAllSelectItems([...booleanSelects, emptyPausal], t) }
         attribute={ attributes.pausal }
         onChangeAttribute={(value) => {
           setAttributes( { ...attributes, pausal: value } )

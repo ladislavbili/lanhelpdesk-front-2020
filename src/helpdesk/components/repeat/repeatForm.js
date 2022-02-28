@@ -114,11 +114,6 @@ export default function RepeatForm( props ) {
   } = useTranslation();
 
   const client = useApolloClient();
-  let counter = 0;
-
-  const getNewID = () => {
-    return counter++;
-  }
 
   const currentUserIfInProject = ( project ) => {
     return project && project.users.some( ( userData ) => userData.user.id === currentUser.id ) ? users.find( ( user ) => user.id === currentUser.id ) : null;
@@ -760,7 +755,6 @@ export default function RepeatForm( props ) {
   )
 
   //RENDERS
-
   const renderSide = () => {
     return (
       <div className="task-edit-right p-b-20 m-t-0">
@@ -771,7 +765,7 @@ export default function RepeatForm( props ) {
               placeholder={t('selectProject')}
               value={project}
               onChange={changeProject}
-              options={projects.filter((project) => currentUser.role.level === 0 || (project.right.addTask && project.right.repeatWrite ) )}
+              options={projects.filter((project) =>  project.right.addTask && project.attributeRights.repeat.edit && project.attributeRights.repeat.add )}
               styles={pickSelectStyle([ 'noArrow', 'required', ])}
               />
           </div>
