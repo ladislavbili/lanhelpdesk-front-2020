@@ -981,7 +981,7 @@ export default function TaskEdit( props ) {
             edit
             task={id}
             invoiced={invoiced}
-            fromInvoice
+            fromInvoice={fromInvoice}
             autoApproved={project ? project.project.autoApproved : false}
             userRights={userRights}
             currentUser={currentUser}
