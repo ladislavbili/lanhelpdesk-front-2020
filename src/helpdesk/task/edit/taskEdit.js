@@ -995,7 +995,6 @@ export default function TaskEdit( props ) {
             taskType={taskType}
             trips={workTrips}
             tripTypes={tripTypes}
-            setMaterials
             materials={materials}
             />
         }

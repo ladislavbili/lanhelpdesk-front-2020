@@ -526,7 +526,7 @@ export default function ProjectAdd( props ) {
       if ( description.length !== 0 ) {
         RenderDescription = <div className="task-edit-popis" dangerouslySetInnerHTML={{__html:description }} />
       } else {
-        RenderDescription = <div className="task-edit-popis">{t('projectnoTaskDescription')}</div>
+        RenderDescription = <div className="task-edit-popis">{t('projectNoTaskDescription')}</div>
       }
     }
     return (
@@ -557,6 +557,17 @@ export default function ProjectAdd( props ) {
     </div>
     )
   }
+
+  if ( taskTypesData.taskTypes.length === 0 ) {
+    return (
+      <div className="fit-with-header">
+        <div className="error-message center-hor">
+          {t('newProjectRequiresTaskType')}
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div

@@ -447,4 +447,12 @@ export default {
     en: 'Set by tasks company',
     sk: 'Nastavený podľa firmy',
   },
+  projectNoTaskDescription: {
+    en: 'Project without description',
+    sk: 'Projekt bez popisu',
+  },
+  newProjectRequiresTaskType: {
+    en: 'To create project you need at least one task type!',
+    sk: 'Na vytvorenie projekt potrebujete aspoň jeden typ úlohy!',
+  },
 }
