@@ -82,6 +82,7 @@ import {
   deleteAttributes,
   translateSelectItem,
   translateAllSelectItems,
+  timestampToString,
 } from 'helperFunctions';
 
 let fakeID = -1;
@@ -759,8 +760,8 @@ export default function RepeatForm( props ) {
     return (
       <div className="task-edit-right p-b-20 m-t-0">
         <div className="form-selects-entry-column" >
-          <Label>{t('project')} <span className="warning-big">*</span></Label>
-          <div className="form-selects-entry-column-rest" >
+          <Label>{t('project')}<span className="warning-big">*</span></Label>
+          <div className="form-selects-entry-column-rest">
             <Select
               placeholder={t('selectProject')}
               value={project}
@@ -889,16 +890,16 @@ export default function RepeatForm( props ) {
               { !projectAttributes.deadline.fixed && userRights.attributeRights.deadline.edit &&
                 <div className="row">
                   <div className="flex">
-                  <input
-                    className="form-control"
-                    type="number"
-                    placeholder={daysToDeadline === null ? t('noDeadline') : t("deadlineSinceCreationPlaceholder")}
-                    value={daysToDeadline === null ? '' : daysToDeadline }
-                    onChange={(e) => {
-                      setDaysToDeadline( e.target.value );
-                      saveChange({ daysToDeadline: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value) });
-                    } }
-                    />
+                    <input
+                      className="form-control"
+                      type="number"
+                      placeholder={daysToDeadline === null ? t('noDeadline') : t("deadlineSinceCreationPlaceholder")}
+                      value={daysToDeadline === null ? '' : daysToDeadline }
+                      onChange={(e) => {
+                        setDaysToDeadline( e.target.value );
+                        saveChange({ daysToDeadline: isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value) });
+                      } }
+                      />
                   </div>
                   { daysToDeadline !== null &&
                     <div className="ml-auto row">
@@ -912,74 +913,9 @@ export default function RepeatForm( props ) {
             </div>
           </div>
         }
-        { userRights.attributeRights.repeat.view &&
+        {
+          userRights.attributeRights.taskType.view &&
           <div className="form-selects-entry-column" >
-            <Label>{t('repeat')}</Label>
-            <div className="form-selects-entry-column-rest" >
-              <div className="secondary-border p-10" style={{ marginLeft: -10, marginRight: -10 }}>
-                <FormGroup className="task-add-date-picker-placeholder">
-                  <Label>{t('startDate')} *</Label>
-                  <div className="flex-input">
-                    <DatePicker
-                      className="form-control"
-                      selected={startsAt}
-                      onChange={(value) => {
-                        setStartsAt(value);
-                        saveChange( {
-                          startsAt: value.valueOf()
-                          .toString(),
-                        } );
-                      }}
-                      placeholderText={t('noStartDate')}
-                      />
-                  </div>
-                </FormGroup>
-
-                <FormGroup>
-                  <Label>{t('repeatEvery')} *</Label>
-                  { parseInt(repeatEvery) <= 0 &&
-                    <Label className="warning">{t('warningMustBeMoreThan0')}.</Label>
-                  }
-                  <Input type="number"
-                    className={classnames({ "form-control-warning": parseInt(repeatEvery) < 0 }, "form-control-secondary no-border m-b-10" ) }
-                    placeholder={t('enterNumber')}
-                    value={( repeatEvery )}
-                    onChange={(e)=> {
-                      setRepeatEvery(e.target.value);
-                      saveChange( {
-                        repeatEvery: e.target.value,
-                      } );
-                    }}
-                    />
-                  <Select
-                    value={translateSelectItem(repeatInterval, t)}
-                    onChange={(value) =>{
-                      setRepeatInterval( value );
-                      saveChange( {
-                        repeatInterval: value.value,
-                      } );
-                    }}
-                    options={translateAllSelectItems(intervals, t)}
-                    styles={pickSelectStyle()}
-                    />
-                </FormGroup>
-                <Checkbox
-                  className = "m-r-5"
-                  label={t('active')}
-                  value = { active }
-                  onChange={() =>{
-                    setActive(!active );
-                    saveChange( {
-                      active: !active,
-                    } );
-                  }}
-                  />
-              </div>
-            </div>
-          </div>
-    } {
-      userRights.attributeRights.taskType.view &&
-        <div className="form-selects-entry-column" >
             <Label>{t('taskType')}</Label>
             <div className="form-selects-entry-column-rest" >
               <Select
@@ -995,9 +931,9 @@ export default function RepeatForm( props ) {
                 />
             </div>
           </div>
-    } {
-      userRights.attributeRights.pausal.view &&
-        <div className="form-selects-entry-column" >
+        } {
+          userRights.attributeRights.pausal.view &&
+          <div className="form-selects-entry-column" >
             <Label>{t('pausal')}<span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { ( !userRights.attributeRights.pausal.edit || !company || !company.monthly || projectAttributes.pausal.fixed ) &&
@@ -1014,9 +950,9 @@ export default function RepeatForm( props ) {
               }
             </div>
           </div>
-    } {
-      userRights.attributeRights.overtime.view &&
-        <div className="form-selects-entry-column" >
+        } {
+          userRights.attributeRights.overtime.view &&
+          <div className="form-selects-entry-column" >
             <Label>{t('overtimeShort')}<span className="warning-big">*</span></Label>
             <div className="form-selects-entry-column-rest" >
               { (projectAttributes.overtime.fixed || !userRights.attributeRights.overtime.edit) &&
@@ -1033,8 +969,8 @@ export default function RepeatForm( props ) {
               }
             </div>
           </div>
-    }
-    </div>
+        }
+      </div>
     )
   }
 
@@ -1116,27 +1052,93 @@ export default function RepeatForm( props ) {
 
   const renderCommandbar = () => {
     return (
-      <div className="task-edit-buttons row m-b-10 m-l-20 m-r-20 m-t-20">
-        <h2 className="center-hor">{t('repeat')}</h2>
-        <span className="ml-auto">
-          { editMode && userRights.attributeRights.repeat.edit &&
+      <div className="m-b-0 m-l-20 m-r-20 m-t-20">
+        <div className="task-edit-buttons row">
+          <h2 className="center-hor m-b-10">{t('repeat')}</h2>
+          <span className="ml-auto">
+            { editMode && userRights.attributeRights.repeat.edit &&
+              <button
+                type="button"
+                className="btn-link-red btn-distance p-0"
+                onClick={deleteRepeatFunc}
+                >
+                <i className="far fa-trash-alt" />
+              </button>
+            }
             <button
               type="button"
-              className="btn-link-red btn-distance p-0"
-              onClick={deleteRepeatFunc}
+              className="btn-link p-r-10"
+              onClick={() => closeModal(wasSaved, wasDisabled)}
               >
-              <i className="far fa-trash-alt" />
+              <i className="fa fa-times" style={{ fontSize: 25 }} />
             </button>
-          }
-          <button
-            type="button"
-            className="btn-link p-r-10"
-            onClick={() => closeModal(wasSaved, wasDisabled)}
-            >
-            <i className="fa fa-times" style={{ fontSize: 25 }} />
-          </button>
-        </span>
+          </span>
+        </div>
+        <hr className="m-t-5 m-b-5"/>
+        { userRights.attributeRights.repeat.view &&
+          <div className="row">
+            <Label className="center-hor m-r-5">{t('startDate')} *</Label>
+            <div className="flex-input m-r-15">
+              <DatePicker
+                className="form-control"
+                selected={moment.unix(startsAt/1000)}
+                onChange={(value) => {
+                  setStartsAt(value);
+                  saveChange( {
+                    startsAt: value.valueOf()
+                    .toString(),
+                  } );
+                }}
+                placeholderText={t('noStartDate')}
+                />
+            </div>
 
+            <Label className="center-hor m-r-5">{t('repeatEvery')} *</Label>
+            { parseInt(repeatEvery) <= 0 &&
+              <Label className="warning">{t('warningMustBeMoreThan0')}.</Label>
+            }
+            <div className="repeat-every-interval">
+              <Input
+                type="number"
+                className={classnames({ "form-control-warning": parseInt(repeatEvery) < 0 }, "form-control-secondary no-border" ) }
+                placeholder={t('enterNumber')}
+                value={( repeatEvery )}
+                onChange={(e)=> {
+                  setRepeatEvery(e.target.value);
+                  saveChange( {
+                    repeatEvery: e.target.value,
+                  } );
+                }}
+                />
+            </div>
+            <div className="min-width-100 m-r-5 m-l-10">
+              <Select
+                value={translateSelectItem(repeatInterval, t)}
+                onChange={(value) =>{
+                  setRepeatInterval( value );
+                  saveChange( {
+                    repeatInterval: value.value,
+                  } );
+                }}
+                options={translateAllSelectItems(intervals, t)}
+                styles={pickSelectStyle()}
+                />
+            </div>
+            <Checkbox
+              className="m-l-15"
+              label={t('active')}
+              value = { active }
+              centerHor
+              onChange={() =>{
+                setActive(!active );
+                saveChange( {
+                  active: !active,
+                } );
+              }}
+              />
+          </div>
+        }
+        <hr className="m-t-5 m-b-5"/>
       </div>
     )
   }
@@ -1192,7 +1194,7 @@ export default function RepeatForm( props ) {
           { datepickerDisabled ?
             (
               <span className="bolder center-hor m-l-3">
-                { closeDate ? (timestampToString(pendingDate.valueOf())) : '' }
+                { pendingDate ? (timestampToString(pendingDate.valueOf())) : '' }
               </span>
             ):
             (

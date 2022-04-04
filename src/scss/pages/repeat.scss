@@ -1,0 +1,109 @@
+.repeat .task-edit-left {
+  background-color: white;
+  padding:$odsadenie-form
+    calc(#{$odsadenie-form} - #{$difference-form})
+    0px
+    $odsadenie-form;
+}
+
+.repeat hr{
+  margin-top: 20px !important;
+}
+
+.repeat .task-edit-popis{
+  background-color: transparent !important;
+  padding: 15px 0px;
+}
+
+.repeat .form-control, .repeat .disabled-info{
+  background-color: transparent !important;
+  padding-left: 0px !important;
+}
+
+.repeat div[class*='multiValue']{
+  width: 90%;
+  background-color: transparent;
+}
+
+.repeat div[class*='multiValue']>div:first-child{
+  font-size: 14px;
+  width: 100%;
+  padding-left: 0px;
+  background-color: transparent;
+}
+
+.repeat div[class*='multiValue']>div:last-child{
+  background-color: transparent;
+}
+
+.repeat .form-control:focus{
+  background-color: white !important;
+  padding-left: 7px;
+}
+
+.repeat .form-selects-entry-column-rest{
+  border-bottom: 1px solid transparent;
+}
+
+.repeat .form-selects-entry-column-rest:hover{
+  border-bottom: 1px solid $basic-button-color;
+}
+
+.repeat-row{
+  display: flex;
+  align-items: center;
+
+  margin: 20px 0px;
+  padding: 20px 15px;
+
+  background-color: #F9F9F9;
+  border-top: 1px solid $content-background-color;
+  border-bottom: 1px solid $content-background-color;
+
+  .form-group{
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    margin-bottom: 0px;
+  }
+
+  label{
+    margin: 0px !important;
+    align-self: center;
+  }
+
+  .checkbox-container{
+    margin-left: auto;
+  }
+
+  .checkbox-container>label:last-child{
+    margin-left: 10px !important;
+  }
+
+  .form-control{
+    background-color: transparent;
+    width: auto;
+    margin-left: 10px;
+  }
+
+  .border{
+    border: 1px solid $content-background-color;
+  }
+
+  .repeat-every-interval{
+    display: flex;
+    align-items: center;
+  }
+
+  .repeat-every-interval>input{
+    background-color: white !important;
+    height: 32px;
+    margin-right: 10px;
+    width: 25%;
+  }
+
+  .repeat-every-interval>div{
+    width: 75%;
+  }
+
+}

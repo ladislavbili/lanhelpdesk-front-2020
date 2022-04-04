@@ -35,6 +35,7 @@ export default function RepeatList( props ) {
   const [ repeatTemplateFilter, setRepeatTemplateFilter ] = React.useState( '' );
   const [ repeatingFilter, setRepeatingFilter ] = React.useState( '' );
   const [ projectFilter, setProjectFilter ] = React.useState( '' );
+  const [ companyFilter, setCompanyFilter ] = React.useState( '' );
 
   //data
   const {
@@ -92,6 +93,14 @@ export default function RepeatList( props ) {
       repeat.repeatTemplate.title.toLowerCase()
       .includes( repeatTemplateFilter.toLowerCase() ) &&
 
+      (
+        repeat.repeatTemplate.company ?
+        repeat.repeatTemplate.company.title :
+        t( 'noCompany' )
+      )
+      .toLowerCase()
+      .includes( companyFilter.toLowerCase() ) &&
+
       ( t( 'repeatEvery' ) + repeat.repeatEvery + ' ' + t( intervals.find( ( interval ) => interval.value === repeat.repeatInterval )
         .title ) )
       .toLowerCase()
@@ -133,10 +142,13 @@ export default function RepeatList( props ) {
           </span>
         </td>
         { !projectSelected &&
-        <td>
-          {template.project.title}
-        </td>
+          <td>
+            {template.project.title}
+          </td>
         }
+        <td>
+          {template.company.title}
+        </td>
       </tr>
     );
   }
@@ -166,6 +178,7 @@ export default function RepeatList( props ) {
                     <th>{t('repeatTiming')}</th>
                     <th width="5%">{t('status')}</th>
                     { !projectSelected && <th>{t('project')}</th> }
+                    <th>{t('company')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -204,18 +217,29 @@ export default function RepeatList( props ) {
                         />
                     </th>
                     { !projectSelected &&
+                      <th>
+                        <input
+                          type="text"
+                          value={ projectFilter }
+                          className="form-control"
+                          style={{fontSize: "12px", marginRight: "10px"}}
+                          onChange={(e) => {
+                            setProjectFilter(e.target.value);
+                          }}
+                          />
+                      </th>
+                    }
                     <th>
                       <input
                         type="text"
-                        value={ projectFilter }
+                        value={ companyFilter }
                         className="form-control"
                         style={{fontSize: "12px", marginRight: "10px"}}
                         onChange={(e) => {
-                          setProjectFilter(e.target.value);
+                          setCompanyFilter(e.target.value);
                         }}
                         />
                     </th>
-                    }
                   </tr>
                   { repeatsData.repeats.filter( filterForRepeats ).map( ( repeat ) =>
                     renderRepeat(repeat)

@@ -61,7 +61,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
     control: ( base, state ) => {
       let newStyle = {
         ...base,
-        minHeight: 30,
+        minHeight: 32,
         borderRadius: 0,
         borderWidth: 0,
       };
@@ -132,7 +132,7 @@ export const pickSelectStyle = ( wantedAttributes = [] ) => {
       if ( inputSize ) {
         newStyle = {
           ...newStyle,
-          minHeight: 30,
+          minHeight: 32,
         }
       }
 
@@ -540,7 +540,7 @@ export const sidebarSelectStyle = {
   placeholder: ( provided, state ) => {
     return {
       ...provided,
-      marginLeft: 30
+      marginLeft: 30,
     };
   },
 };
@@ -588,7 +588,7 @@ export const sidebarSelectStyleNoIcon = {
 export const CRMMertelSelectStyle = {
   control: base => ( {
     ...base,
-    minHeight: 30,
+    minHeight: 32,
     backgroundColor: 'white',
     borderRadius: 4.13,
     fontWeight: 600,

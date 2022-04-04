@@ -19,6 +19,10 @@ export default {
     en: 'Day',
     sk: 'Deň',
   },
+  hour: {
+    en: 'Hour',
+    sk: 'Hodina',
+  },
   week: {
     en: 'Week',
     sk: 'Týždeň',

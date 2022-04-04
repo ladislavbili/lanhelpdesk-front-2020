@@ -4,6 +4,11 @@ export const intervals = [ {
     label: 'Žiadny'
   },
   {
+    title: 'hour',
+    value: 'hour',
+    label: 'hour'
+  },
+  {
     title: 'day',
     value: 'day',
     label: 'day'
