@@ -16,6 +16,7 @@ import ManualEdit from './manuals/edit';
 import SchemeLoader from './scheme';
 import ItemsList from './items/list';
 import ItemView from './items/edit';
+import RepeatsList from 'helpdesk/components/repeat/repeatsList';
 
 import {
   getMyData,
@@ -53,6 +54,7 @@ export default function CMDBNavigation( props ) {
           <Route exact path='/cmdb/i/:categoryID' component={ItemsList} />
           <Route exact path='/cmdb/i/:categoryID/p/:page' component={ItemsList} />
           <Route exact path='/cmdb/i/:categoryID/p/:page/:itemID' component={ItemView} />
+          <Route exact path="/cmdb/repeats/i/:categoryID" component={RepeatsList} />
         </div>
       </div>
     </div>

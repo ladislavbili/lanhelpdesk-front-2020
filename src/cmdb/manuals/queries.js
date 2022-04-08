@@ -4,7 +4,7 @@ import {
 
 export const CMDB_MANUALS = gql `
 query cmdbManuals(
-  $companyId: Int!
+  $companyId: Int
   $order: EnumCMDBManualSort!
   $limit: Int
   $page: Int
@@ -73,7 +73,7 @@ export const ADD_MANUAL = gql `
 mutation addCmdbManual(
   $title: String!
   $body: String!
-  $companyId: Int!
+  $companyId: Int
 ) {
   addCmdbManual(
     title: $title
@@ -117,7 +117,7 @@ mutation deleteCmdbManual(
 
 export const MANUALS_SUBSCRIPTION = gql `
 subscription cmdbManualsSubscription(
-  $companyId: Int!
+  $companyId: Int
 ) {
   cmdbManualsSubscription(
     companyId: $companyId

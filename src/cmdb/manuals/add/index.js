@@ -26,7 +26,7 @@ export default function ManualAddContainer( props ) {
     match,
     history,
   } = props;
-  const companyId = parseInt( match.params.companyID );
+  const companyId = match.params.companyID === 'all' ? null : parseInt( match.params.companyID );
 
   const {
     t
@@ -64,7 +64,7 @@ export default function ManualAddContainer( props ) {
               const newBody = replacePlaceholdersWithLinks(separatedData.value, response2.data.attachments, 'get-cmdb-file');
               updateManual({variables: { id, body: newBody, title: data.title }}).then(() => {
                 setSaving(false);
-                history.push(`/cmdb/manuals/${companyId}/p/1/${id}`);
+                history.push(`/cmdb/manuals/${companyId === null ? 'all' : companyId}/p/1/${id}`);
               }).catch((e) => {
                 console.log(e);
                 setSaving(false);
@@ -72,7 +72,7 @@ export default function ManualAddContainer( props ) {
             })
           }else{
             setSaving(false);
-            history.push(`/cmdb/manuals/${companyId}/p/1/${id}`);
+            history.push(`/cmdb/manuals/${companyId === null ? 'all' : companyId}/p/1/${id}`);
           }
         }).catch((e) => {
           console.log(e);

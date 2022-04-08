@@ -18,6 +18,7 @@ export default function ManualsList( props ) {
     match,
     loading,
     manuals,
+    company,
     setLocalStringFilter,
     localStringFilter,
     setGlobalStringFilter,
@@ -35,6 +36,31 @@ export default function ManualsList( props ) {
         {...props}
         />
       <div className="full-width scroll-visible fit-with-header-and-commandbar-list task-container">
+        <div className="row m-l-30">
+        <input
+          type="text"
+          value={ localStringFilter.title }
+          placeholder={t('title')}
+          className="form-control width-250"
+          style={{fontSize: "12px", marginRight: "10px"}}
+          onKeyPress={(e) => {
+            if( e.charCode === 13 && !loading){
+              setGlobalStringFilter();
+            }
+          }}
+          onChange={(e) => {setLocalStringFilter('title', e.target.value );
+          }}
+          />
+          <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+            {t('search')}
+          </button>
+          <button
+            className="btn-link center-hor commandbar-addon m-l-15"
+            onClick={()=> history.push(`/cmdb/manuals/${company.id === null ? 'all' : company.id}/add`)}>
+            <i className="fa fa-plus p-l-5 p-r-5"/>
+            {t('manual')}
+          </button>
+        </div>
         <table className="table">
           <thead>
             <tr>
@@ -51,38 +77,11 @@ export default function ManualsList( props ) {
           </thead>
 
           <tbody>
-            <tr>
-              <th>
-                <input
-                  type="text"
-                  value={ localStringFilter.title }
-                  className="form-control"
-                  style={{fontSize: "12px", marginRight: "10px"}}
-                  onKeyPress={(e) => {
-                    if( e.charCode === 13 && !loading){
-                      setGlobalStringFilter();
-                    }
-                  }}
-                  onChange={(e) => {setLocalStringFilter('title', e.target.value );
-                  }}
-                  />
-              </th>
-              <th/>
-              <th>
-                <div className="row">
-                  <div className="flex" />
-                  <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
-                    {t('filter')}
-                  </button>
-                </div>
-              </th>
-            </tr>
-
             <ActiveSearch {...props} />
 
             { manuals.map((manual) => (
               <tr key={manual.id} className="clickable noselect" onClick={() => history.push(`${path}/${manual.id}`)}>
-                <td>
+                <td className="font-14-f">
                   {manual.title}
                 </td>
                 <td>

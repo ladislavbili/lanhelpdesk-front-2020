@@ -185,11 +185,13 @@ query repeat($id: Int){
 export const GET_REPEATS = gql `
 query (
   $projectId: Int
-    $milestoneId: Int
+  $milestoneId: Int
+  $companyId: Int
 ) {
   repeats(
     projectId: $projectId
-      milestoneId: $milestoneId
+    milestoneId: $milestoneId
+    companyId: $companyId
   ) {
     id
     repeatEvery

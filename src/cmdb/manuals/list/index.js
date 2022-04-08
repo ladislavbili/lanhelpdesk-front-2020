@@ -56,7 +56,7 @@ export default function CMDBManualsLoader( props ) {
   } );
 
   const company = sidebarCompanyData.cmdbSidebarCompany;
-  const companyId = parseInt( match.params.companyID );
+  const companyId = match.params.companyID === 'all' ? null : parseInt( match.params.companyID );
   const localStringFilter = localStringFilterData.cmdbManualLocalStringFilter;
   const globalStringFilter = globalStringFilterData.cmdbManualGlobalStringFilter;
 

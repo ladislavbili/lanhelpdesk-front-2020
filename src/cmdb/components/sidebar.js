@@ -125,7 +125,7 @@ export default function Sidebar( props ) {
 
   React.useEffect( () => {
     if ( !companiesLoading && match.params.companyID !== undefined ) {
-      setCmdbSidebarCompany( match.params.companyID === 'all' ? null : toSelItem( companiesData.basicCompanies.find( ( company ) => company.id === parseInt( match.params.companyID ) ) ) );
+      setCmdbSidebarCompany( match.params.companyID === 'all' ? allCompanies : toSelItem( companiesData.basicCompanies.find( ( company ) => company.id === parseInt( match.params.companyID ) ) ) );
     }
   }, [ match.params.companyID, companiesLoading ] );
 
@@ -161,13 +161,15 @@ export default function Sidebar( props ) {
               styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar', 'flex', 'inputSize' ])}
               onChange={company => {
                 setCmdbSidebarCompany(company);
-                history.push(`/cmdb/i/${category ? category.id : 'all'  }`)
+                if(!location.pathname.includes('/cmdb/repeats/')){
+                  history.push(`/cmdb/i/${category ? category.id : 'all' }`);
+                }
               }}
               />
           </div>
         </div>
+        <Nav vertical className="m-t-10">
         { company.id !== null &&
-          <Nav vertical className="m-t-10">
             <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/cmdb/scheme' ) }) }>
               <span
                 className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/cmdb/scheme' ) }) }
@@ -176,16 +178,16 @@ export default function Sidebar( props ) {
                 {t('scheme')}
               </span>
             </NavItem>
-            <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/cmdb/manuals' ) }) }>
-              <span
-                className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/cmdb/manuals' ) }) }
-                onClick={() => { history.push(`/cmdb/manuals/${company.id}`) }}
-                >
-                {t('manuals')}
-              </span>
-            </NavItem>
-          </Nav>
-        }
+          }
+          <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/cmdb/manuals' ) }) }>
+            <span
+              className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/cmdb/manuals' ) }) }
+              onClick={() => { history.push(`/cmdb/manuals/${company.id ? company.id : 'all' }`) }}
+              >
+              {t('manuals')}
+            </span>
+          </NavItem>
+        </Nav>
         <hr className = "m-l-15 m-r-15 m-t-15" />
 
         <Nav vertical>
@@ -239,6 +241,18 @@ export default function Sidebar( props ) {
         { showCategories &&
           <CategoryAdd />
         }
+        <hr className = "m-l-15 m-r-15 m-t-15" />
+        <Nav vertical>
+          <NavItem className={classnames("row full-width sidebar-item", { "active": location.pathname.includes(`cmdb/repeats/i/${category ? category.id : 'all' }`) }) }>
+            <span
+              className={ classnames("clickable sidebar-menu-item link", { "active": location.pathname.includes(`cmdb/repeats/i/${category ? category.id : 'all' }`) }) }
+              onClick={() => { history.push(`/cmdb/repeats/i/${category ? category.id : 'all' }`) }}
+              >
+              {t('repetitiveTasks')}
+            </span>
+          </NavItem>
+
+        </Nav>
       </div>
     </div>
   );

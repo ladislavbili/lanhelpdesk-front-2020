@@ -86,7 +86,7 @@ export default function PagesList( props ) {
                   </div>
                   { folderId !== null &&
                     <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
-                      {t('filter')}
+                      {t('search')}
                     </button>
                   }
                 </div>
@@ -110,7 +110,7 @@ export default function PagesList( props ) {
                         />
                     </div>
                     <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
-                      {t('filter')}
+                      {t('search')}
                     </button>
                   </div>
                 </th>
@@ -121,7 +121,7 @@ export default function PagesList( props ) {
 
             { pages.map((page) => (
               <tr key={page.id} className="clickable noselect" onClick={() => history.push(`${path}/${page.id}`)}>
-                <td>
+                <td className="font-14-f">
                   {page.title}
                 </td>
                 <td>

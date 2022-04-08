@@ -172,7 +172,7 @@ export default function ItemsList( props ) {
                       />
                   </div>
                   <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
-                    {t('filter')}
+                    {t('search')}
                   </button>
                 </div>
               </th>
@@ -182,7 +182,7 @@ export default function ItemsList( props ) {
 
             { items.map((item) => (
               <tr key={item.id} className="clickable noselect" onClick={() => history.push(`${path}/${item.id}`)}>
-                <td>
+                <td className="font-14-f">
                   {item.title}
                 </td>
                 <td>

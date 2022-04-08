@@ -4,7 +4,9 @@ import {
   useQuery,
 } from "@apollo/client";
 import axios from 'axios';
-
+import {
+  addLocalError,
+} from 'apollo/localSchema/actions';
 import Scheme from './scheme';
 import Loading from 'components/loading';
 

@@ -2,6 +2,9 @@
   .font-#{$i} {
     font-size: #{$i}px;
   }
+  .font-#{$i}-f {
+    font-size: #{$i}px !important;
+  }
 }
 
 //text align

@@ -77,6 +77,16 @@ query lanwikiPage(
       encoding
       size
     }
+    createdAt
+    createdBy{
+      id
+      fullName
+    }
+    updatedAt
+    updatedBy{
+      id
+      fullName
+    }
   }
 }
 `;

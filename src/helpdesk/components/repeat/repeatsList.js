@@ -16,6 +16,7 @@ import Repeat from './repeatFormModal';
 import {
   GET_PROJECT,
   GET_MILESTONE,
+  CMDB_SIDEBAR_COMPANY,
 } from 'apollo/localSchema/queries';
 
 import {
@@ -40,7 +41,8 @@ export default function RepeatList( props ) {
   //data
   const {
     history,
-    match
+    match,
+    location,
   } = props;
 
   const {
@@ -51,6 +53,10 @@ export default function RepeatList( props ) {
     data: projectData,
     loading: projectLoading
   } = useQuery( GET_PROJECT );
+
+  const {
+    data: companyData,
+  } = useQuery( CMDB_SIDEBAR_COMPANY );
 
   const {
     data: milestoneData,
@@ -65,6 +71,7 @@ export default function RepeatList( props ) {
     variables: {
       projectId: projectData.localProject.id,
       milestoneId: milestoneData.localMilestone.id,
+      companyId: !location.pathname.includes( 'cmdb' ) ? null : companyData.cmdbSidebarCompany.id,
     },
     fetchPolicy: 'network-only',
   } );

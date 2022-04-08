@@ -13,6 +13,9 @@ import EditPageErrors from './edit/showErrors';
 import {
   pickSelectStyle,
 } from 'configs/components/select';
+import {
+  timestampToString,
+} from 'helperFunctions';
 import classnames from 'classnames';
 import {
   useTranslation
@@ -78,93 +81,127 @@ export default function LanwikiPageForm( props ) {
 
   return (
     <Empty>
-      <div className={classnames({"fit-with-header-and-lanwiki-commandbar scroll-visible": edit, "p-b-20":  disabled || !edit },"p-t-20 p-l-20 p-r-20 p-b-0")} style={{backgroundColor: "#eaeaea"}}
-        >
-        { disabled &&
-          <FormGroup>
-            <h2>
-              {title}
-            </h2>
-          <hr/>
-          </FormGroup>
-        }
-        { !disabled &&
-          <FormGroup>
-            <Empty>
-              <Label htmlFor="name">{t('title')}</Label>
-              <Input id="name" className="form-control" placeholder={t('titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)}/>
-            </Empty>
-          </FormGroup>
-        }
+      <div className={classnames({"fit-with-header-and-lanwiki-commandbar scroll-visible": edit },"row")} style={{backgroundColor: "#eaeaea"}}>
 
-        <FormGroup>
-          <Label htmlFor="name">{t('folder')}</Label>
+        <div className="task-edit-left">
           { disabled &&
             <div>
-              {folder.title}
+              <div className="row">
+                <h2>
+                  {title}
+                </h2>
+                <div className="ml-auto">
+                  <div className="text-right">
+                    <span>
+                      {page.createdBy ? `${t('createdBy')} ` : ""}
+                    </span>
+                    <span className="bolder">
+                      {page.createdBy ? `${page.createdBy.fullName}` :''}
+                    </span>
+                    <span>
+                      {` ${page.createdBy ? t('atDate') : t('createdAt')} `}
+                    </span>
+                    <span className="bolder">
+                      {page.createdAt ? (timestampToString(page.createdAt)) : ''}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span>
+                      {page.updatedBy ? `${t('changedBy')} ` : ""}
+                    </span>
+                    <span className="bolder">
+                      {page.updatedBy ? `${page.updatedBy.fullName}` :''}
+                    </span>
+                    <span>
+                      {page.updatedBy ?` ${t('atDate')} `: t('changedAt')}
+                    </span>
+                    <span className="bolder">
+                      {page.createdAt ? (timestampToString(page.updatedAt)) : ''}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <hr/>
             </div>
           }
-          {! disabled &&
-            <Select
-              placeholder={t('selectFolder')}
-              value={folder}
-              options={allFolders.filter((folder) => folder.myRights.write )}
-              onChange={(folder)=>{
-                setFolder(folder);
-              }}
-              styles={pickSelectStyle( [ 'noArrow', 'required', ] )}
-              />
-          }
-        </FormGroup>
-
-        <FormGroup>
-          <Label htmlFor="tags">{t('tags')}</Label>
-          {! disabled &&
-            <Select
-              id="tags"
-              placeholder={t('selectTags')}
-              isMulti
-              value={tags}
-              options={allTags}
-              onChange={(tags)=>{
-                setTags(tags);
-              }}
-              styles={pickSelectStyle( [ 'noArrow', 'colored' ] )}
-              />
-          }
-          {disabled &&
-            <div className="row">
-              { tags.map((tag) => (
-                <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
-                  {tag.title}
-                </span>
-              )) }
-            </div>
-          }
-        </FormGroup>
-
-        <FormGroup>
-          <Label htmlFor="content">{t('content')}</Label>
           { !disabled &&
-            <CKEditor
-              value={body}
-              type="imageUpload"
-              onChange={(body) => {
-                setBody(body);
-              }}
-              uploadImage={ (images) => {
-                setBodyImages([...bodyImages, ...images]);
-              }}
-              images={bodyImages}
-              />
+            <FormGroup>
+              <Empty>
+                <Label htmlFor="name">{t('title')}</Label>
+                <Input id="name" className="form-control" placeholder={t('titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)}/>
+              </Empty>
+            </FormGroup>
           }
-          { disabled &&
-            <div className="task-edit-popis p-t-10 min-height-300-f" dangerouslySetInnerHTML={{ __html: body }} />
-          }
-        </FormGroup>
+          <FormGroup>
+            { !disabled &&
+              <CKEditor
+                value={body}
+                type="imageUpload"
+                onChange={(body) => {
+                  setBody(body);
+                }}
+                uploadImage={ (images) => {
+                  setBodyImages([...bodyImages, ...images]);
+                }}
+                images={bodyImages}
+                />
+            }
+            { disabled &&
+              <div className="task-edit-popis p-t-10 min-height-300-f" dangerouslySetInnerHTML={{ __html: body }} />
+            }
+          </FormGroup>
+          { !edit && <AddPageErrors title={title} body={body} folder={folder} show={showErrors} />}
+          { edit && <EditPageErrors title={title} body={body} folder={folder} show={showErrors} />}
+        </div>
 
-        { !edit && <AddPageErrors title={title} body={body} folder={folder} show={showErrors} />}
-        { edit && <EditPageErrors title={title} body={body} folder={folder} show={showErrors} />}
+        <div className="task-edit-right">
+          <FormGroup>
+            <Label htmlFor="name">{t('folder')}</Label>
+            { disabled &&
+              <div>
+                {folder.title}
+              </div>
+            }
+            {! disabled &&
+              <Select
+                placeholder={t('selectFolder')}
+                value={folder}
+                options={allFolders.filter((folder) => folder.myRights.write )}
+                onChange={(folder)=>{
+                  setFolder(folder);
+                }}
+                styles={pickSelectStyle( [ 'noArrow', 'required', ] )}
+                />
+            }
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="tags">{t('tags')}</Label>
+            {! disabled &&
+              <Select
+                id="tags"
+                placeholder={t('selectTags')}
+                isMulti
+                value={tags}
+                options={allTags}
+                onChange={(tags)=>{
+                  setTags(tags);
+                }}
+                styles={pickSelectStyle( [ 'noArrow', 'colored' ] )}
+                />
+            }
+            {disabled &&
+              <div className="row">
+                { tags.map((tag) => (
+                  <span key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 p-l-5 p-r-5">
+                    {tag.title}
+                  </span>
+                )) }
+              </div>
+            }
+          </FormGroup>
+        </div>
+
 
         { !edit &&
           <div className="row m-t-20">

@@ -175,7 +175,7 @@ export default function TableList( props ) {
                       />
                   </button>
                   <button type="button" disabled={loading} className="btn" onClick={setGlobalTaskStringFilter}>
-                    {t('filter')}
+                    {t('search')}
                   </button>
                 </div>
               }
@@ -214,7 +214,7 @@ export default function TableList( props ) {
                   />
               </button>
               <button type="button" disabled={loading} className="btn" onClick={setGlobalTaskStringFilter}>
-                {t('filter')}
+                {t('search')}
               </button>
             </div>
           }
@@ -246,7 +246,7 @@ export default function TableList( props ) {
                 <i className="fas fa-times commandbar-command-icon text-highlight" />
               </button>
               <button type="button" disabled={loading} className="btn" onClick={setGlobalTaskStringFilter}>
-              {t('filter')}
+              {t('search')}
               </button>
             </div>
           }
