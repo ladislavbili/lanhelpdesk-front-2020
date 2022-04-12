@@ -34,6 +34,13 @@ import {
   ofCurrentUser,
   booleanSelectOptions
 } from 'configs/constants/filter';
+import {
+  dashboard,
+} from 'configs/constants/sidebar';
+
+import {
+  setProject as setLocalProject,
+} from 'apollo/localSchema/actions';
 
 import {
   GET_MY_FILTERS,
@@ -59,20 +66,6 @@ import moment from 'moment';
 import {
   useTranslation
 } from "react-i18next";
-
-const globalProject = {
-  id: 'global',
-  value: 'global',
-  label: 'Global (shown in every project)',
-  labelId: 'globalLabel',
-};
-
-const noProject = {
-  id: null,
-  value: null,
-  label: 'No project (only Dashboard)',
-  labelId: 'noProjectOnlyDashboard',
-};
 
 export default function FilterForm( props ) {
   //data & queries
@@ -133,7 +126,7 @@ export default function FilterForm( props ) {
   const [ saving, setSaving ] = React.useState( null );
   const [ tagsOpen, setTagsOpen ] = React.useState( false );
   const [ statusesOpen, setStatusesOpen ] = React.useState( false );
-  const [ project, setProject ] = React.useState( translateSelectItem( noProject, t ) );
+  const [ project, setProject ] = React.useState( dashboard );
 
   const {
     requesters,
@@ -428,7 +421,7 @@ export default function FilterForm( props ) {
       setTags( [] );
       setStatuses( [] );
     } else {
-      setProject( translateSelectItem( noProject, t ) );
+      setProject( dashboard );
       setTags( [] );
       setStatuses( [] );
     }
@@ -489,7 +482,7 @@ export default function FilterForm( props ) {
           {...props}
           />
 
-        <button type="button" className="btn-link" onClick={resetFilter}><i className="fa fa-sync icon-M p-r-0 m-r-0"/></button>
+        <button type="button" className="btn-link" onClick={resetFilter}><i className="fa fa-ban icon-M p-r-0 m-r-0"/></button>
         { canModify &&
           <button type="button" className="btn-link" onClick={deleteFilterFunc}><i className="far fa-trash-alt icon-M p-r-0 m-r-0"/></button>
         }
@@ -513,13 +506,14 @@ export default function FilterForm( props ) {
           <label>{t('project')}</label>
           <div className="flex">
             <Select
-              options={[ translateSelectItem(noProject, t), translateSelectItem(globalProject, t), ...myProjects]}
+              options={[ translateSelectItem(dashboard, t), ...myProjects]}
               onChange={(project)=> {
                 setTags([]);
                 setStatuses([]);
                 setProject(project);
+                setLocalProject(project);
               }}
-              value={project}
+              value={translateSelectItem(project, t)}
               styles={pickSelectStyle(['blueFont', ])}
               />
           </div>

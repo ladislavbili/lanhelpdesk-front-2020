@@ -13,6 +13,9 @@ import SelectPage from 'components/SelectPage';
 import ManualsList from './manuals/list';
 import ManualAdd from './manuals/add';
 import ManualEdit from './manuals/edit';
+import PasswordsList from './passwords/list';
+import PasswordAdd from './passwords/add';
+import PasswordEdit from './passwords/edit';
 import SchemeLoader from './scheme';
 import ItemsList from './items/list';
 import ItemView from './items/edit';
@@ -51,6 +54,10 @@ export default function CMDBNavigation( props ) {
           <Route exact path='/cmdb/manuals/:companyID/p/:page' component={ManualsList} />
           <Route exact path='/cmdb/manuals/:companyID/add' component={ManualAdd} />
           <Route exact path='/cmdb/manuals/:companyID/p/:page/:manualID' component={ManualEdit} />
+          <Route exact path='/cmdb/passwords/:companyID' component={PasswordsList} />
+          <Route exact path='/cmdb/passwords/:companyID/p/:page' component={PasswordsList} />
+          <Route exact path='/cmdb/passwords/:companyID/add' component={PasswordAdd} />
+          <Route exact path='/cmdb/passwords/:companyID/p/:page/:passwordID' component={PasswordEdit} />
           <Route exact path='/cmdb/i/:categoryID' component={ItemsList} />
           <Route exact path='/cmdb/i/:categoryID/p/:page' component={ItemsList} />
           <Route exact path='/cmdb/i/:categoryID/p/:page/:itemID' component={ItemView} />

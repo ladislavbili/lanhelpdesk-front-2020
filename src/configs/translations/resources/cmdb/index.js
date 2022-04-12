@@ -6,6 +6,7 @@ import general from './general';
 import items from './items';
 import scheme from './scheme';
 import manuals from './manuals';
+import passwords from './passwords';
 
 const invoices = {
   ...categories,
@@ -13,6 +14,7 @@ const invoices = {
   ...items,
   ...scheme,
   ...manuals,
+  ...passwords,
 }
 
 if ( testingTranslations ) {
@@ -24,6 +26,7 @@ if ( testingTranslations ) {
   ...Object.keys( items ),
   ...Object.keys( scheme ),
   ...Object.keys( manuals ),
+  ...Object.keys( passwords ),
 ]
 
   const testResult = test.filter( ( key, index ) => test.findIndex( ( key2 ) => key2 === key ) !== index );

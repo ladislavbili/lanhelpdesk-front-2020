@@ -5,6 +5,8 @@ import {
   cmdbGlobalStringFilterVar,
   cmdbManualLocalStringFilterVar,
   cmdbManualGlobalStringFilterVar,
+  cmdbPasswordLocalStringFilterVar,
+  cmdbPasswordGlobalStringFilterVar,
 } from './variables';
 
 export function setCmdbSidebarCompany( newValue ) {
@@ -49,6 +51,23 @@ export function setCmdbManualLocalStringFilter( key, value ) {
 
 export function clearCmdbManualLocalStringFilter() {
   cmdbManualLocalStringFilterVar( {
+    title: '',
+  } );
+}
+
+export function setCmdbPasswordGlobalStringFilter() {
+  cmdbPasswordGlobalStringFilterVar( cmdbPasswordLocalStringFilterVar() );
+}
+
+export function setCmdbPasswordLocalStringFilter( key, value ) {
+  cmdbPasswordLocalStringFilterVar( {
+    ...cmdbPasswordLocalStringFilterVar(),
+    [ key ]: value,
+  } );
+}
+
+export function clearCmdbPasswordLocalStringFilter() {
+  cmdbPasswordLocalStringFilterVar( {
     title: '',
   } );
 }

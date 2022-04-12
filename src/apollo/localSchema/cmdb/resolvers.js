@@ -5,6 +5,8 @@ import {
   cmdbGlobalStringFilterVar,
   cmdbManualLocalStringFilterVar,
   cmdbManualGlobalStringFilterVar,
+  cmdbPasswordLocalStringFilterVar,
+  cmdbPasswordGlobalStringFilterVar,
 } from './variables';
 
 export const cmdbSidebarCompany = () => {
@@ -22,10 +24,19 @@ export const cmdbLocalStringFilter = () => {
 export const cmdbGlobalStringFilter = () => {
   return cmdbGlobalStringFilterVar();
 }
+
 export const cmdbManualLocalStringFilter = () => {
   return cmdbManualLocalStringFilterVar();
 }
 
 export const cmdbManualGlobalStringFilter = () => {
   return cmdbManualGlobalStringFilterVar();
+}
+
+export const cmdbPasswordLocalStringFilter = () => {
+  return cmdbPasswordLocalStringFilterVar();
+}
+
+export const cmdbPasswordGlobalStringFilter = () => {
+  return cmdbPasswordGlobalStringFilterVar();
 }

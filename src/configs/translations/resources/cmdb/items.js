@@ -101,7 +101,7 @@ export default {
   },
   expireDatePlaceholder: {
     en: 'Select expire date',
-    sk: 'Vyberte dátum inštalácie',
+    sk: 'Vyberte dátum vypršania',
   },
   nic: {
     en: 'NIC',

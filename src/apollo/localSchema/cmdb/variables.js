@@ -31,3 +31,10 @@ export const cmdbManualLocalStringFilterVar = makeVar( {
 export const cmdbManualGlobalStringFilterVar = makeVar( {
   title: '',
 } );
+
+export const cmdbPasswordLocalStringFilterVar = makeVar( {
+  title: '',
+} );
+export const cmdbPasswordGlobalStringFilterVar = makeVar( {
+  title: '',
+} );

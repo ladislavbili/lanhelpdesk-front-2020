@@ -352,13 +352,14 @@ export default function TasksSidebar( props ) {
             options={selectProjects}
             value={translateSelectItem(localProject, t)}
             styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar', 'flex' ])}
-            onChange={pro => {
-              if( pro.value === -1 ){
+            onChange={project => {
+              console.log(project);
+              if( project.value === -1 ){
                 history.push( `/helpdesk/project/add` )
                 return;
               }
               setMilestone(translateSelectItem(allMilestones, t));
-              setProject(pro);
+              setProject(project);
               if(tasklistPage){
                 history.push(URLprefix);
               }

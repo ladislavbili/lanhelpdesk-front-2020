@@ -37,3 +37,15 @@ query cmdbManualGlobalStringFilter {
   cmdbManualGlobalStringFilter @client
 }
 `;
+
+export const CMDB_PASSWORD_LOCAL_STRING_FILTER = gql `
+query cmdbPasswordLocalStringFilter {
+  cmdbPasswordLocalStringFilter @client
+}
+`;
+
+export const CMDB_PASSWORD_GLOBAL_STRING_FILTER = gql `
+query cmdbPasswordGlobalStringFilter {
+  cmdbPasswordGlobalStringFilter @client
+}
+`;

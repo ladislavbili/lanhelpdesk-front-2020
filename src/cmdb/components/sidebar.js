@@ -161,8 +161,12 @@ export default function Sidebar( props ) {
               styles={pickSelectStyle([ 'invisible', 'blueFont', 'sidebar', 'flex', 'inputSize' ])}
               onChange={company => {
                 setCmdbSidebarCompany(company);
-                if(!location.pathname.includes('/cmdb/repeats/')){
-                  history.push(`/cmdb/i/${category ? category.id : 'all' }`);
+                if(location.pathname.includes('/cmdb/manuals/')){
+                  history.push(`/cmdb/manuals/${company.id === null ? 'all' : company.id}`);
+                }else if(location.pathname.includes('/cmdb/passwords/')){
+                  history.push(`/cmdb/passwords/${company.id === null ? 'all' : company.id}`);
+                }else if(!location.pathname.includes('/cmdb/repeats/')){
+                  history.push(`/cmdb/i/all`);
                 }
               }}
               />
@@ -185,6 +189,14 @@ export default function Sidebar( props ) {
               onClick={() => { history.push(`/cmdb/manuals/${company.id ? company.id : 'all' }`) }}
               >
               {t('manuals')}
+            </span>
+          </NavItem>
+          <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/cmdb/passwords' ) }) }>
+            <span
+              className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/cmdb/passwords' ) }) }
+              onClick={() => { history.push(`/cmdb/passwords/${company.id ? company.id : 'all' }`) }}
+              >
+              {t('passwords')}
             </span>
           </NavItem>
         </Nav>
@@ -217,7 +229,7 @@ export default function Sidebar( props ) {
               <NavItem className={classnames("row full-width sidebar-item", { "active": category === null }) }>
                 <span
                   className={ classnames("clickable sidebar-menu-item link", { "active": category === null }) }
-                  onClick={() => { history.push(`/cmdb/i/all`) }}
+                  onClick={() => { history.push(`/cmdb/i/all`); setCmdbSidebarCompany(translateSelectItem(allCompanies, t));  }}
                   >
                   {t('allCategories')}
                 </span>
@@ -226,7 +238,7 @@ export default function Sidebar( props ) {
                 <NavItem key={sidebarCategory.id} className={classnames("row full-width sidebar-item", { "active": category !== null && category.id === sidebarCategory.id }) }>
                   <span
                     className={ classnames("clickable sidebar-menu-item link", { "active": category !== null && category.id === sidebarCategory.id }) }
-                    onClick={() => { history.push(`/cmdb/i/${sidebarCategory.id}`) }}
+                    onClick={() => { history.push(`/cmdb/i/${sidebarCategory.id}`); setCmdbSidebarCompany(translateSelectItem(allCompanies, t)); }}
                     >
                     {sidebarCategory.title}
                   </span>

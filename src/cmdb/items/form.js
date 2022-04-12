@@ -10,6 +10,7 @@ import CKEditor from 'components/CKEditor';
 import DatePicker from 'components/DatePicker';
 import Empty from 'components/Empty';
 import Addresses from './addresses';
+import Passwords from './passwords';
 import AddItemErrors from './add/showErrors';
 import EditItemErrors from './edit/showErrors';
 import {
@@ -188,6 +189,11 @@ export default function ItemForm( props ) {
             addresses={addresses}
             setAddresses={setAddresses}
             disabled={disabled}
+            />
+          <Passwords
+            itemId={edit ? item.id : null}
+            disabled={disabled}
+            edit={edit}
             />
           <FormGroup>
             <Label htmlFor="description">{t('description')}</Label>

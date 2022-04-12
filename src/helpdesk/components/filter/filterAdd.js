@@ -241,52 +241,6 @@ export default function FilterAdd( props ) {
             }}
             />
 
-          {/* PUBLIC - every user can see */}
-          { canCreatePublicFilters &&
-            <Checkbox
-              className = "m-l-5 m-r-5"
-              label = {t('publicFilter')}
-              value = { pub || !canCreateCustomFilters }
-              blocked = { !canCreateCustomFilters }
-              onChange={(e)=> setPub(!pub)}
-              />
-          }
-
-          {/* ROLES - what role in case of public */}
-          { canCreatePublicFilters && ( pub || !canCreateCustomFilters ) &&
-            <FormGroup>{/* Roles */}
-              <Label className="">{t('roles')}</Label>
-              <Select
-                placeholder={t('rolesLabel')}
-                value={roles}
-                isMulti
-                onChange={(newRoles)=>{
-                  if(newRoles.some((role) => role.id === 'all' )){
-                    if( roleData.basicRoles.length === roles.length ){
-                      setRoles([]);
-                    }else{
-                      setRoles(toSelArr(roleData.basicRoles))
-                    }
-                  }else{
-                    setRoles(newRoles);
-                  }
-                }}
-                options={toSelArr([
-                    {id: 'all', title: roleData.basicRoles.length === roles.length ? t('clear') : t('all') }
-                ].concat(roleData.basicRoles))}
-                styles={pickSelectStyle()}
-                />
-            </FormGroup>
-          }
-          {/* In DASHBOARD - FILTER ONLY */}
-            <Checkbox
-              className = "m-l-5 m-r-5"
-              label = {t('dashboard')}
-              disabled = { !global && projectId === null }
-              value = { dashboard }
-              onChange={(e)=>setDashboard(!dashboard)}
-              />
-
         </ModalBody>
         <ModalFooter>
           <button className="mr-auto btn-link" disabled={saving} onClick={() => setOpened(!opened)}>
