@@ -2,6 +2,9 @@ import React from 'react';
 import {
   useTranslation
 } from "react-i18next";
+import {
+  timestampToString,
+} from 'helperFunctions';
 import Form from './form';
 
 export default function PasswordsTable( props ) {

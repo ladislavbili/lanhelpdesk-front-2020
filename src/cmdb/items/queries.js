@@ -124,6 +124,15 @@ query cmdbItem(
       vlan
       note
     }
+    passwords{
+      id
+      title
+      login
+      password
+      url
+      expireDate
+      note
+    }
   }
 }
 `;
@@ -143,6 +152,7 @@ mutation addCmdbItem(
   $backup: String!
   $monitoring: String!
   $addresses: [CMDBAddressInput]!
+  $passwords: [CMDBItemPasswordInput]!
 ) {
   addCmdbItem(
     companyId: $companyId
@@ -158,6 +168,7 @@ mutation addCmdbItem(
     backup: $backup
     monitoring: $monitoring
     addresses: $addresses
+    passwords: $passwords
   ){
     id
   }
@@ -278,6 +289,72 @@ mutation deleteCmdbAddress(
   $id: Int!
 ) {
   deleteCmdbAddress(
+    id: $id
+  ){
+    id
+  }
+}
+`;
+
+export const ADD_ITEM_PASSWORD = gql `
+mutation addCmdbItemPassword(
+  $itemId: Int
+  $title: String!
+  $login: String!
+  $password: String!
+  $url: String
+  $expireDate: String
+  $note: String
+) {
+  addCmdbItemPassword(
+    itemId: $itemId
+    title: $title
+    login: $login
+    password: $password
+    url: $url
+    expireDate: $expireDate
+    note: $note
+  ){
+    id
+    title
+    login
+    password
+    url
+    expireDate
+    note
+  }
+}
+`;
+
+export const UPDATE_ITEM_PASSWORD = gql `
+mutation updateCmdbItemPassword(
+  $itemId: Int
+  $title: String!
+  $login: String!
+  $password: String!
+  $url: String
+  $expireDate: String
+  $note: String
+) {
+  updateCmdbItemPassword(
+    itemId: $itemId
+    title: $title
+    login: $login
+    password: $password
+    url: $url
+    expireDate: $expireDate
+    note: $note
+  ){
+    id
+  }
+}
+`;
+
+export const DELETE_ITEM_PASSWORD = gql `
+mutation deleteCmdbItemPassword(
+  $id: Int!
+) {
+  deleteCmdbItemPassword(
     id: $id
   ){
     id

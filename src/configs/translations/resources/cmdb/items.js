@@ -179,4 +179,17 @@ export default {
     en: 'Are you sure you want to delete this item?',
     sk: 'Ste si istý, že chcete zmazať túto položku?',
   },
+
+  cmdbItemPasswordMissingTitle: {
+    en: 'Password missing title',
+    sk: 'Heslu chýba názov',
+  },
+  cmdbItemPasswordWithoutTitle: {
+    en: 'Password without title',
+    sk: 'Heslo bez názvu',
+  },
+  andUsername: {
+    en: 'and username',
+    sk: 'a prihlásením',
+  },
 }

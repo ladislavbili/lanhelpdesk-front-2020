@@ -76,6 +76,7 @@ export default function ItemForm( props ) {
   const [ backup, setBackup ] = React.useState( item ? item.backup : '' );
   const [ monitoring, setMonitoring ] = React.useState( item ? item.monitoring : '' );
   const [ addresses, setAddresses ] = React.useState( item ? item.addresses : [] );
+  const [ passwords, setPasswords ] = React.useState( item ? item.passwords : [] );
 
   const [ showErrors, setShowErrors ] = React.useState( false );
   const [ saving, setSaving ] = React.useState( false );
@@ -88,7 +89,8 @@ export default function ItemForm( props ) {
       !company.id ||
       !category ||
       !category.id ||
-      addresses.some( ( address ) => address.nic.length === 0 )
+      ( !edit && addresses.some( ( address ) => address.nic.length === 0 ) ) ||
+      ( !edit && passwords.some( ( password ) => password.title.length === 0 ) )
     );
   }
 
@@ -122,6 +124,10 @@ export default function ItemForm( props ) {
         data.addresses = addresses.map( ( address ) => {
           delete address.id;
           return address;
+        } );
+        data.passwords = passwords.map( ( password ) => {
+          delete password.id;
+          return password;
         } );
         addItem( data, setSaving, close );
       }
@@ -192,8 +198,10 @@ export default function ItemForm( props ) {
             />
           <Passwords
             itemId={edit ? item.id : null}
-            disabled={disabled}
             edit={edit}
+            passwords={passwords}
+            setPasswords={setPasswords}
+            disabled={disabled}
             />
           <FormGroup>
             <Label htmlFor="description">{t('description')}</Label>
@@ -255,7 +263,7 @@ export default function ItemForm( props ) {
 
 
 
-          { !edit && <AddItemErrors title={title} category={category} company={company} addresses={addresses} show={showErrors} />}
+          { !edit && <AddItemErrors title={title} category={category} company={company} addresses={addresses} passwords={passwords} show={showErrors} />}
           { edit && <EditItemErrors title={title} category={category} company={company} show={showErrors} />}
 
           { !edit &&

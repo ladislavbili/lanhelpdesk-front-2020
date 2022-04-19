@@ -10,6 +10,7 @@ export default function AddPageErrors( props ) {
     company,
     show,
     addresses,
+    passwords,
   } = props;
   const {
     t
@@ -20,8 +21,10 @@ export default function AddPageErrors( props ) {
   const noCompany = !company || !company.id;
   const problematicAddresses = addresses.filter( ( address ) => address.nic.length === 0 );
   const addressWithoutNic = problematicAddresses.length > 0;
+  const problematicPasswords = passwords.filter( ( password ) => password.title.length === 0 );
+  const passwordsWithoutTitle = problematicPasswords.length > 0;
 
-  if ( ( !noTitle && !noCategory && !noCompany && !addressWithoutNic ) || !show ) {
+  if ( ( !noTitle && !noCategory && !noCompany && !addressWithoutNic && !passwordsWithoutTitle ) || !show ) {
     return null;
   }
 
@@ -48,6 +51,16 @@ export default function AddPageErrors( props ) {
           { problematicAddresses.map((address) => (
             <div>
               `${t('addressesWithNic')} ${address.nic} ${t('andIp')} ${address.ip}.`
+            </div>
+          ))}
+        </div>
+      }
+      { passwordsWithoutTitle &&
+        <div className="error-message m-t-5">
+          {`${t('cmdbItemPasswordMissingTitle')}:`}
+          { problematicPasswords.map((password) => (
+            <div>
+              `${t('cmdbItemPasswordWithoutTitle')} ${password.id} ${t('andUsername')} ${password.username}.`
             </div>
           ))}
         </div>
