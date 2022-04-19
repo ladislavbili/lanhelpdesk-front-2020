@@ -23,6 +23,7 @@ import Reroute from 'reroute';
 import HelpdeskNavigation from 'helpdesk/navigation';
 import InvoicesNavigation from 'invoices/navigation';
 import LanwikiNavigation from 'lanwiki/navigation';
+import LanpassNavigation from 'lanpass/navigation';
 import CMDBNavigation from 'cmdb/navigation';
 
 import {
@@ -71,6 +72,8 @@ export default function Navigation( props ) {
         <Route path='/helpdesk' component={HelpdeskNavigation} />
         <Route path='/invoices' component={InvoicesNavigation} />
         { userDataData.getMyData.role.accessRights.lanwiki && <Route path='/lanwiki' component={LanwikiNavigation} />}
+        //// FIXME: true prec
+        { (true || userDataData.getMyData.role.accessRights.pass) && <Route path='/lanpass' component={LanpassNavigation} />}
         { userDataData.getMyData.role.accessRights.cmdb && <Route path='/cmdb' component={CMDBNavigation} />}
       </Switch>
     </BrowserRouter>

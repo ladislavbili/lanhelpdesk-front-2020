@@ -113,6 +113,11 @@ export default function RoleEdit( props ) {
       key: 'cmdb',
       label: t( 'cmdb' ),
     },
+    {
+      state: React.useState( false ),
+      key: 'pass',
+      label: t( 'lanpass' ),
+    },
   ];
   const settings = [
     {

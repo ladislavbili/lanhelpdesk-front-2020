@@ -34,6 +34,9 @@ export default function PageHeader( props ) {
   if ( window.location.pathname.includes( '/cmdb' ) ) {
     subpage = 3;
   }
+  if ( window.location.pathname.includes( '/lanpass' ) ) {
+    subpage = 4;
+  }
 
   const selectSubpageTitle = () => {
     let subpageTitle = t( 'lanhelpdesk' );
@@ -41,6 +44,8 @@ export default function PageHeader( props ) {
       subpageTitle = t( 'lanwiki' );
     } else if ( subpage === 3 ) {
       subpageTitle = t( 'cmdb' );
+    } else if ( subpage === 4 ) {
+      subpageTitle = t( 'lanpass' );
     }
     return subpageTitle;
   }
@@ -50,13 +55,15 @@ export default function PageHeader( props ) {
       subpageLink = '/lanwiki/i/all';
     } else if ( subpage === 3 ) {
       subpageLink = '/cmdb/i/all';
+    } else if ( subpage === 4 ) {
+      subpageLink = '/lanpass/i/all';
     }
     return subpageLink;
   }
 
   return (
     <div className="width-270 page-header row">
-      { (accessRights.lanwiki || accessRights.cmdb) &&
+      { (accessRights.lanwiki || accessRights.pass || accessRights.cmdb) &&
         <GeneralPopover
           placement="bottom-start"
           className="overflow-auto max-height-200 min-width-0"
@@ -85,12 +92,18 @@ export default function PageHeader( props ) {
                 { t( 'cmdb' ) }
               </label>
             }
-
+            {/* FIXME: true prec */ }
+            { (true || accessRights.pass) &&
+              <label className={classnames({'active':subpage === 4}, "btn btn-link text-left")}>
+                <input type="radio" name="options" checked={subpage === 4} onChange={() => {history.push('/lanpass/i/all'); setOpen(false); }}/>
+                { t( 'lanpass' ) }
+              </label>
+            }
           </div>
         </GeneralPopover>
       }
       <div className="lansystems-title">
-        { (accessRights.lanwiki || accessRights.cmdb) &&
+        { (accessRights.lanwiki || accessRights.lanpass || accessRights.cmdb) &&
           <button className="btn btn-link color-white center-hor" id="page-select-popover" onClick={ () => setOpen(true) } >
             <i className="m-r-15 fa fa-th font-size-16-f"/>
           </button>

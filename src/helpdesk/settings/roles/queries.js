@@ -10,6 +10,7 @@ export const accessRights = `
   viewErrors
   lanwiki
   cmdb
+  pass
 
   users
   companies

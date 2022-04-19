@@ -6,6 +6,7 @@ import general from './general';
 import invoices from './invoices';
 import helpdesk from './helpdesk';
 import lanwiki from './lanwiki';
+import lanpass from './lanpass';
 import cmdb from './cmdb';
 
 const resources = {
@@ -14,6 +15,7 @@ const resources = {
   ...invoices,
   ...helpdesk,
   ...lanwiki,
+  ...lanpass,
   ...cmdb,
 }
 
@@ -26,6 +28,7 @@ if ( testingTranslations ) {
     ...Object.keys( invoices ),
     ...Object.keys( helpdesk ),
     ...Object.keys( lanwiki ),
+    ...Object.keys( lanpass ),
     ...Object.keys( cmdb ),
   ]
   //console.log( test.length );
