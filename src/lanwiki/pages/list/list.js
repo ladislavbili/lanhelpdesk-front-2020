@@ -109,7 +109,7 @@ export default function PagesList( props ) {
                         }}
                         />
                     </div>
-                    <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+                    <button className="btn m-l-10" style={{height: "32px"}} onClick={ setGlobalStringFilter } >
                       {t('search')}
                     </button>
                   </div>
@@ -124,7 +124,7 @@ export default function PagesList( props ) {
                 <td className="font-14-f">
                   {page.title}
                 </td>
-                <td>
+                <td className="p-l-0">
                   {page.tags.map((tag) => (
                     <div key={tag.id} style={{ background: tag.color, color: 'white', borderRadius: 3 }} className="m-r-5 m-t-5 p-l-5 p-r-5">
                       {tag.title}
@@ -132,7 +132,7 @@ export default function PagesList( props ) {
                   ))}
                 </td>
                 { folderId === null &&
-                  <td>
+                  <td className="p-l-0">
                     {page.folder.title}
                   </td>
                 }

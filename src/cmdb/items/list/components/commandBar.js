@@ -61,7 +61,7 @@ export default function CommandBar( props ) {
     {
       type: 'category',
       data: category,
-      show: category.id !== null,
+      show: true,
       label: t( category.title ),
       onClick: () => {},
     }
@@ -69,7 +69,7 @@ export default function CommandBar( props ) {
 
   return (
     <div className="task-list-commandbar m-l-30 m-r-45">
-      <div className="center-hor flex row">
+      <div className="center-hor flex row no-before no-after">
         <div className="flex-row breadcrumbs">
           { filteredBreadcrums.filter((breadcrum) => breadcrum.show ).map( (breadcrum, index) =>(
             <h2

@@ -54,7 +54,7 @@ export default function PasswordsList( props ) {
             setLocalStringFilter('title', e.target.value );
           }}
           />
-          <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+          <button className="btn" style={{height: "32px"}} onClick={ setGlobalStringFilter } >
             {t('search')}
           </button>
         </div>
@@ -62,16 +62,16 @@ export default function PasswordsList( props ) {
         <table className="table">
           <thead>
               <tr>
-                <th>
+                <th style={{paddingBottom: "12px", paddingTop: "12px"}}>
                   {t('title')}
                 </th>
-                <th width="250">
+                <th width="250" style={{paddingBottom: "12px", paddingTop: "12px"}}>
                   {t('url')}
                 </th>
-                <th width="250">
+                <th width="250" style={{paddingBottom: "12px", paddingTop: "12px"}}>
                   {t('login2')}
                 </th>
-                <th width="250">
+                <th width="250" style={{paddingBottom: "12px", paddingTop: "12px"}}>
                   {t('expireDate')}
                 </th>
               </tr>
@@ -83,22 +83,26 @@ export default function PasswordsList( props ) {
             { passwords.map((password) => (
               <tr key={password.id} className="clickable noselect" onClick={() => history.push(`${path}/${password.id}`)}>
                 <td className="font-14-f">
+                  {
+                    password.isPrivate &&
+                     <i className="fa fa-solid fa-user-secret"></i>
+                   }
                   {password.title}
                 </td>
-                <td>
+                <td className="p-l-0">
                     <a href={`//${password.url}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{password.url}</a>
                 </td>
-                <td>
+                <td className="p-l-0">
                   {password.login.length > 0 ? password.login : t('noLogin') }
                 </td>
-                <td>
+                <td className="p-l-0">
                   {password.expireDate ? timestampToString(password.expireDate) : t('noExpireDate') }
                 </td>
               </tr>
             ))}
             { passwords.length === 0 &&
-              <tr>
-                <td colSpan="10">
+              <tr className="clickable noselect">
+                <td colSpan="10" className="font-14-f">
                   {t('noData')}
                 </td>
               </tr>

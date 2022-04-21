@@ -196,13 +196,16 @@ export default function ItemForm( props ) {
             setAddresses={setAddresses}
             disabled={disabled}
             />
-          <Passwords
-            itemId={edit ? item.id : null}
-            edit={edit}
-            passwords={passwords}
-            setPasswords={setPasswords}
-            disabled={disabled}
-            />
+          {
+            false &&
+            <Passwords
+              itemId={edit ? item.id : null}
+              edit={edit}
+              passwords={passwords}
+              setPasswords={setPasswords}
+              disabled={disabled}
+              />
+          }
           <FormGroup>
             <Label htmlFor="description">{t('description')}</Label>
             {disabled &&

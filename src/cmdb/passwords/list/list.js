@@ -51,11 +51,11 @@ export default function PasswordsList( props ) {
           onChange={(e) => {setLocalStringFilter('title', e.target.value );
           }}
           />
-          <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+          <button className="btn" style={{height: "32px"}} onClick={ setGlobalStringFilter } >
             {t('search')}
           </button>
           <button
-            className="btn-link center-hor commandbar-addon m-l-15"
+            className="btn-link center-hor commandbar-addon m-l-5"
             onClick={()=> history.push(`/cmdb/passwords/${company.id === null ? 'all' : company.id}/add`)}>
             <i className="fa fa-plus p-l-5 p-r-5"/>
             {t('password')}
@@ -64,16 +64,16 @@ export default function PasswordsList( props ) {
         <table className="table">
           <thead>
             <tr>
-              <th>
+              <th style={{paddingBottom: "12px", paddingTop: "12px"}}>
                 {t('title')}
               </th>
-              <th width="250">
+              <th width="250" style={{paddingBottom: "12px", paddingTop: "12px"}}>
                 {t('url')}
               </th>
-              <th width="250">
+              <th width="250" style={{paddingBottom: "12px", paddingTop: "12px"}}>
                 {t('login2')}
               </th>
-              <th width="250">
+              <th width="250" style={{paddingBottom: "12px", paddingTop: "12px"}}>
                 {t('expireDate')}
               </th>
             </tr>

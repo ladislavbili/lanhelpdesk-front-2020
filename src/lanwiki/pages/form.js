@@ -121,7 +121,7 @@ export default function LanwikiPageForm( props ) {
                   </div>
                 </div>
               </div>
-              <hr/>
+              <hr className="m-b-20"/>
             </div>
           }
           { !disabled &&

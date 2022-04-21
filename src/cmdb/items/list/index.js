@@ -68,7 +68,7 @@ export default function CmdbItemsLoader( props ) {
   const category = (
     sidebarCategoryData.cmdbSidebarCategory === null ? {
       id: null,
-      title: t( 'allCategory' )
+      title: t( 'allCategories' )
     } :
     sidebarCategoryData.cmdbSidebarCategory
   );

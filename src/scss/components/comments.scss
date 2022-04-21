@@ -1,3 +1,8 @@
-.comment:nth-child(2) {
-  background-color: $form-background-color;
+.comment>div>div.media {
+  border-top: 1px solid #d9d8d8;
+  padding-top: 10px;
+}
+
+.comment:last-of-type {
+  border-bottom: 1px solid #d9d8d8;
 }

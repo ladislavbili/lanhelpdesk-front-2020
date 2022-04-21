@@ -408,8 +408,9 @@ export default function Comments( props ) {
           </div>
         </div>
       }
+      <div>
       { !isMulti && comments.map((comment) => (
-        <div key={comment.id} >
+        <div key={comment.id} className="comment">
           { comment.isEmail &&
             <Email
               openedComments={openedComments}
@@ -429,6 +430,7 @@ export default function Comments( props ) {
           }
         </div>
       ))}
+    </div>
       <Pagination count={comments.length === 0 ? 0 : comments[0].messageCount } limit={limit} page={page} setPage={setPage} loading={commentsLoading} />
     </div>
   );

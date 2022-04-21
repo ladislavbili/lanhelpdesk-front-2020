@@ -191,6 +191,8 @@ export default function Sidebar( props ) {
               {t('manuals')}
             </span>
           </NavItem>
+          {
+            false &&
           <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/cmdb/passwords' ) }) }>
             <span
               className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/cmdb/passwords' ) }) }
@@ -199,6 +201,7 @@ export default function Sidebar( props ) {
               {t('passwords')}
             </span>
           </NavItem>
+        }
         </Nav>
         <hr className = "m-l-15 m-r-15 m-t-15" />
 
@@ -226,23 +229,23 @@ export default function Sidebar( props ) {
           </div>
           { showCategories &&
             <Empty>
-              <NavItem className={classnames("row full-width sidebar-item", { "active": category === null }) }>
+              <NavItem className={classnames("row full-width sidebar-item", { "active": category === null && !location.pathname.includes(`repeats`) }) }>
                 <span
-                  className={ classnames("clickable sidebar-menu-item link", { "active": category === null }) }
-                  onClick={() => { history.push(`/cmdb/i/all`); setCmdbSidebarCompany(translateSelectItem(allCompanies, t));  }}
+                  className={ classnames("clickable sidebar-menu-item link", { "active": category === null && !location.pathname.includes(`repeats`)}) }
+                  onClick={() => { history.push(`/cmdb/i/all`);  }}
                   >
                   {t('allCategories')}
                 </span>
               </NavItem>
               { categories.map((sidebarCategory) => (
-                <NavItem key={sidebarCategory.id} className={classnames("row full-width sidebar-item", { "active": category !== null && category.id === sidebarCategory.id }) }>
+                <NavItem key={sidebarCategory.id} className={classnames("row full-width sidebar-item", { "active": category !== null && category.id === sidebarCategory.id && !location.pathname.includes(`repeats`)}) }>
                   <span
-                    className={ classnames("clickable sidebar-menu-item link", { "active": category !== null && category.id === sidebarCategory.id }) }
-                    onClick={() => { history.push(`/cmdb/i/${sidebarCategory.id}`); setCmdbSidebarCompany(translateSelectItem(allCompanies, t)); }}
+                    className={ classnames("clickable sidebar-menu-item link", { "active": category !== null && category.id === sidebarCategory.id && !location.pathname.includes(`repeats`)}) }
+                    onClick={() => { history.push(`/cmdb/i/${sidebarCategory.id}`); }}
                     >
                     {sidebarCategory.title}
                   </span>
-                  { category !== null && sidebarCategory.id === category.id &&
+                  { category !== null && sidebarCategory.id === category.id && !location.pathname.includes(`repeats`) &&
                     <CategoryEdit id={sidebarCategory.id} folders={categories} history={history} />
                   }
                 </NavItem>

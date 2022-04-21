@@ -12,6 +12,7 @@ export default function Checkbox( props ) {
     className,
     style,
     labelClassName,
+    labelPrefix,
     label,
     addition,
     value,
@@ -65,6 +66,7 @@ export default function Checkbox( props ) {
           "noselect"
         )}
         >
+        { labelPrefix ? labelPrefix : "" }
         { label ? label : '' }
         { addition ? addition : "" }
       </label>

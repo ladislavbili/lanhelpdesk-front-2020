@@ -47,10 +47,10 @@ export default function CommandBar( props ) {
   ];
 
   return (
-    <div className="m-l-30 m-r-30">
+    <div className="m-l-30 m-r-30 m-b-12">
     <div className="task-list-commandbar">
         <div className="flex-row breadcrumbs center-hor">
-          <h2>{company.id === null ? t('allCompanies') :company.title }</h2>
+          <h2>{`${company.id === null ? t('allCompanies') :company.title}\\${t("manuals")} `}</h2>
         </div>
         <div className="ml-auto center-hor row">
           <div className="color-basic m-r-5 m-l-5 center-hor">

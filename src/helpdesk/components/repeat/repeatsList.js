@@ -170,7 +170,7 @@ export default function RepeatList( props ) {
               <div className="breadcrum-bar center-hor">
                 <div className="breadcrumbs">
                   <h2>
-                    {t('repetitiveTasks')}
+                    {`${!location.pathname.includes( 'cmdb' ) ? null : t(companyData.cmdbSidebarCompany.title)}\\${t('repetitiveTasks')}`}
                   </h2>
                 </div>
               </div>

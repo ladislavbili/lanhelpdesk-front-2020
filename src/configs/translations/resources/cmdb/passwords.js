@@ -62,7 +62,7 @@ export default {
   },
   login2: {
     en: 'Login',
-    sk: 'Prihásenie',
+    sk: 'Prihlásenie',
   },
   login2Placeholder: {
     en: 'Enter login',

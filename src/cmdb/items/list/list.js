@@ -171,7 +171,7 @@ export default function ItemsList( props ) {
                       }}
                       />
                   </div>
-                  <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+                  <button  className="btn m-l-10" style={{height: "32px"}} onClick={ setGlobalStringFilter } >
                     {t('search')}
                   </button>
                 </div>
@@ -185,20 +185,20 @@ export default function ItemsList( props ) {
                 <td className="font-14-f">
                   {item.title}
                 </td>
-                <td>
+                <td className="p-l-0">
                   { !item.active ? t('inactive2') : t('active2') }
                 </td>
                 { companyId === null &&
-                  <td>
+                  <td className="p-l-0">
                     {item.company.title}
                   </td>
                 }
                 { categoryId === null &&
-                  <td>
+                  <td className="p-l-0">
                     {item.category.title}
                   </td>
                 }
-                <td>
+                <td className="p-l-0">
                   {item.addresses.map((address) => (
                     <div key={address.id} className="m-r-5 m-t-5 p-l-5 p-r-5">
                       {address.ip}

@@ -25,15 +25,15 @@ export default {
   },
   backup: {
     en: 'Backup',
-    sk: 'Záloha',
+    sk: 'Zálohovanie',
   },
   backupLabel: {
     en: 'Backup label',
-    sk: 'Poznámka k zálohe',
+    sk: 'Poznámka k zálohovaniu',
   },
   backupLabelPlaceholder: {
     en: 'Enter backup label',
-    sk: 'Zadajte poznámku k zálohe',
+    sk: 'Zadajte poznámku k zálohovaniu',
   },
   monitoring: {
     en: 'Monitoring',

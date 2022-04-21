@@ -1,4 +1,6 @@
-import React from 'react';
+import React, {
+  useState
+} from 'react';
 import {
   useQuery,
   useSubscription,
@@ -45,6 +47,9 @@ import {
   FOLDERS_SUBSCRIPTION,
 } from 'lanwiki/folders/queries';
 
+const FOLDERS = "folders";
+const TAGS = "tags";
+
 export default function Sidebar( props ) {
 
   const {
@@ -56,6 +61,8 @@ export default function Sidebar( props ) {
   const {
     t
   } = useTranslation();
+
+  const [ navHighlight, setNavHighlight ] = useState(FOLDERS);
 
   const {
     data: sidebarTagData,
@@ -141,19 +148,19 @@ export default function Sidebar( props ) {
           </div>
           { showFolders &&
             <Empty>
-              <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/lanwiki/i/all' ) }) }>
+              <NavItem className={classnames("row full-width sidebar-item", { "active": navHighlight === FOLDERS && window.location.pathname.includes( '/lanwiki/i/all' ) }) }>
                 <span
-                  className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/lanwiki/i/all' ) }) }
-                  onClick={() => { history.push('/lanwiki/i/all'); setLSidebarTag(null); }}
+                  className={ classnames("clickable sidebar-menu-item link", { "active": navHighlight === FOLDERS && window.location.pathname.includes( '/lanwiki/i/all' ) }) }
+                  onClick={() => { history.push('/lanwiki/i/all'); setLSidebarTag(null); setLSidebarFolder(null); setNavHighlight(FOLDERS);}}
                   >
                   {t('allFolders')}
                 </span>
               </NavItem>
               { folders.filter((folder) => !folder.archived ).map((folder) => (
-                <NavItem key={folder.id} className={classnames("row full-width sidebar-item", { "active": parseInt(match.params.folderID) === folder.id }) }>
+                <NavItem key={folder.id} className={classnames("row full-width sidebar-item", { "active": navHighlight === FOLDERS && folderId === folder.id }) }>
                   <span
-                    className={ classnames("clickable sidebar-menu-item link", { "active": parseInt(match.params.folderID) === folder.id }) }
-                    onClick={() => { history.push(`/lanwiki/i/${folder.id}`); setLSidebarTag(null); }}
+                    className={ classnames("clickable sidebar-menu-item link", { "active": navHighlight === FOLDERS && folderId === folder.id }) }
+                    onClick={() => { history.push(`/lanwiki/i/${folder.id}`); setLSidebarTag(null); setLSidebarFolder(folder); setNavHighlight(FOLDERS);}}
                     >
                     {folder.title}
                   </span>
@@ -194,10 +201,10 @@ export default function Sidebar( props ) {
           </div>
           { showTags &&
             <Empty>
-              <NavItem className={classnames("row full-width sidebar-item", { "active": tagId === null }) }>
+              <NavItem className={classnames("row full-width sidebar-item", { "active": navHighlight === TAGS && tagId === null }) }>
                 <span
-                  className={ classnames("clickable sidebar-menu-item link", { "active": tagId === null }) }
-                  onClick={() => { setLSidebarTag(null); history.push('/lanwiki/i/all'); }}
+                  className={ classnames("clickable sidebar-menu-item link", { "active": navHighlight === TAGS && tagId === null }) }
+                  onClick={() => { setLSidebarTag(null); history.push('/lanwiki/i/all'); setNavHighlight(TAGS); setLSidebarFolder(null);}}
                   >
                   {t('allTags')}
                 </span>
@@ -205,8 +212,8 @@ export default function Sidebar( props ) {
               { tags.map((tag) => (
                 <NavItem key={tag.id} className={classnames("row full-width sidebar-item", { "active": tagId === tag.id }) }>
                   <span
-                    className={ classnames("clickable sidebar-menu-item link", { "active": tagId === tag.id }) }
-                    onClick={() => { setLSidebarTag(tag); history.push('/lanwiki/i/all') }}
+                    className={ classnames("clickable sidebar-menu-item link", { "active": navHighlight === TAGS && tagId === tag.id }) }
+                    onClick={() => { history.push('/lanwiki/i/all'); setNavHighlight(TAGS); setLSidebarTag(tag); setLSidebarFolder(null); }}
                     >
                     {tag.title}
                   </span>

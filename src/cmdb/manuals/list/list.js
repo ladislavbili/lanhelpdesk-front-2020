@@ -51,11 +51,11 @@ export default function ManualsList( props ) {
           onChange={(e) => {setLocalStringFilter('title', e.target.value );
           }}
           />
-          <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+        <button className="btn" style={{height: "32px"}} onClick={ setGlobalStringFilter } >
             {t('search')}
           </button>
           <button
-            className="btn-link center-hor commandbar-addon m-l-15"
+            className="btn-link center-hor commandbar-addon m-l-5"
             onClick={()=> history.push(`/cmdb/manuals/${company.id === null ? 'all' : company.id}/add`)}>
             <i className="fa fa-plus p-l-5 p-r-5"/>
             {t('manual')}
@@ -64,13 +64,13 @@ export default function ManualsList( props ) {
         <table className="table">
           <thead>
             <tr>
-              <th>
+              <th style={{paddingBottom: "12px", paddingTop: "12px"}}>
                 {t('title')}
               </th>
-              <th width="250">
+              <th width="250" style={{paddingBottom: "12px", paddingTop: "12px"}}>
                 {t('updatedAt')}
               </th>
-              <th width="350">
+              <th width="350" style={{paddingBottom: "12px", paddingTop: "12px"}}>
                 {t('createdAt')}
               </th>
             </tr>
@@ -84,7 +84,7 @@ export default function ManualsList( props ) {
                 <td className="font-14-f">
                   {manual.title}
                 </td>
-                <td>
+                <td className="p-l-0">
                   <span className="">
                     {manual.createdBy ? `${t('createdBy')} ` : ""}
                   </span>
@@ -98,7 +98,7 @@ export default function ManualsList( props ) {
                     {manual.createdAt ? (timestampToString(manual.createdAt)) : ''}
                   </span>
                 </td>
-                <td>
+                <td className="p-l-0">
                   <span className="">
                     {manual.updatedBy ? `${t('changedBy')} ` : ""}
                   </span>

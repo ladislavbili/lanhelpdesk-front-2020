@@ -274,7 +274,7 @@ export default function PasswordForm( props ) {
           <Label htmlFor="content">{t('note')}</Label>
           { disabled &&
             <FormGroup>
-              <div className="task-edit-popis p-t-10 min-height-300-f" dangerouslySetInnerHTML={{ __html: note }} />
+              <div className="task-edit-popis p-t-10" style={{minHeight: "100px"}} dangerouslySetInnerHTML={{ __html: note }} />
             </FormGroup>
           }
           { !disabled &&
@@ -288,6 +288,7 @@ export default function PasswordForm( props ) {
               <Checkbox
                 className=""
                 label={t('private')}
+                labelPrefix={<i className="fa fa-solid fa-user-secret"></i>}
                 value = { isPrivate }
                 centerHor
                 onChange={() =>{
@@ -299,7 +300,7 @@ export default function PasswordForm( props ) {
         {
           disabled &&
           <FormGroup>
-              <Label>{isPrivate ? t('passwordIsPrivate') : t('passwordIsPublic')}</Label>
+              <Label>{isPrivate ? <span><i className="fa fa-solid fa-user-secret"></i>{ t('passwordIsPrivate')}</span> : t('passwordIsPublic')}</Label>
           </FormGroup>
         }
 
