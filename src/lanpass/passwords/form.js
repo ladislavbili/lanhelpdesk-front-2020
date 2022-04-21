@@ -14,6 +14,7 @@ import Select from "react-select";
 import {
   pickSelectStyle
 } from "configs/components/select";
+import Checkbox from 'components/checkbox';
 
 import Empty from 'components/Empty';
 import AddPasswordErrors from './add/showErrors';
@@ -59,6 +60,7 @@ export default function PasswordForm( props ) {
   const [ url, setUrl ] = React.useState( passwordData ? passwordData.url : '' );
   const [ expireDate, setExpireDate ] = React.useState( passwordData && passwordData.expireDate ? moment( parseInt( passwordData.expireDate ) ) : null );
   const [ note, setNote ] = React.useState( passwordData ? passwordData.note : '' );
+  const [ isPrivate, setIsPrivate ] = React.useState( passwordData ? passwordData.isPrivate : false );
 
   const [ updatedAt, setUpdatedAt ] = React.useState( passwordData ? passwordData.updatedAt : '' );
   const [ updatedBy, setUpdatedBy ] = React.useState( passwordData ? passwordData.updatedBy : '' );
@@ -98,6 +100,7 @@ export default function PasswordForm( props ) {
         url,
         expireDate: expireDate ? expireDate.valueOf() + "" : null,
         note,
+        isPrivate,
       };
       if ( edit ) {
         setUpdatedAt(moment().valueOf());
@@ -140,7 +143,6 @@ export default function PasswordForm( props ) {
             <div>
               <div className="row">
                 <div>
-                  <Label htmlFor="name">{t('title')}</Label>
                   <h2>
                     {title}
                   </h2>
@@ -279,6 +281,27 @@ export default function PasswordForm( props ) {
             <Textarea className="form-control" id="descriptionLabel" placeholder={t('enterNote')} minRows={4} value={note} onChange={(e) => setNote(e.target.value)} />
           }
         </FormGroup>
+        {
+          (!edit || passwordData.createdBy.id === currentUser.id) &&
+          !disabled &&
+          <FormGroup>
+              <Checkbox
+                className=""
+                label={t('private')}
+                value = { isPrivate }
+                centerHor
+                onChange={() =>{
+                  setIsPrivate(!isPrivate );
+                }}
+                />
+          </FormGroup>
+        }
+        {
+          disabled &&
+          <FormGroup>
+              <Label>{isPrivate ? t('passwordIsPrivate') : t('passwordIsPublic')}</Label>
+          </FormGroup>
+        }
 
         { !edit && <AddPasswordErrors title={title} login={login} password={password} passwordCheck={passwordCheck} show={showErrors} />}
         { edit && <EditPasswordErrors title={title} login={login} password={password} passwordCheck={passwordCheck} show={showErrors} />}

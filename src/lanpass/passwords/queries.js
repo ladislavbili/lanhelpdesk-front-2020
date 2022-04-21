@@ -25,6 +25,7 @@ export const GET_PASSWORDS = gql `
         password
         url
         expireDate
+        isPrivate
       }
     }
   }
@@ -44,6 +45,7 @@ export const GET_PASSWORD = gql `
       url
       expireDate
       note
+      isPrivate
       createdAt
       createdBy{
         id
@@ -71,6 +73,7 @@ export const ADD_PASSWORD = gql `
     $url: String
     $expireDate: String
     $note: String
+    $isPrivate: Boolean
   ) {
     addPassEntry(
       folderId: $folderId
@@ -80,6 +83,7 @@ export const ADD_PASSWORD = gql `
       url: $url
       expireDate: $expireDate
       note: $note
+      isPrivate: $isPrivate
     ){
       id
     }
@@ -95,6 +99,7 @@ export const UPDATE_PASSWORD = gql `
     $url: String
     $expireDate: String
     $note: String
+    $isPrivate: Boolean
   ) {
     updatePassEntry(
       id: $id
@@ -104,6 +109,7 @@ export const UPDATE_PASSWORD = gql `
       url: $url
       expireDate: $expireDate
       note: $note
+      isPrivate: $isPrivate
     ){
       id
     }
