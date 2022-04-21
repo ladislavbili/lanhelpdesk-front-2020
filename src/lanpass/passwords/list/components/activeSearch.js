@@ -11,12 +11,12 @@ export default function ActiveSearch( props ) {
   const {
     history,
     loading,
-    pagesRefetch,
+    passwordsRefetch,
     globalStringFilter,
     clearLocalStringFilter,
     setGlobalStringFilter,
   } = props;
-
+  
   const {
     t
   } = useTranslation();
@@ -72,7 +72,7 @@ export default function ActiveSearch( props ) {
           <Button
             disabled={loading}
             className="btn center-hor m-l-10"
-            onClick={pagesRefetch}
+            onClick={passwordsRefetch}
             >
             <i className="fa fa-redo-alt" />
           {t('repeatSearch')}

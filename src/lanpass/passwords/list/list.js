@@ -6,6 +6,10 @@ import Pagination from './components/pagination';
 import ActiveSearch from './components/activeSearch';
 
 import {
+  timestampToString,
+} from 'helperFunctions';
+
+import {
   useTranslation
 } from "react-i18next";
 
@@ -19,6 +23,7 @@ export default function PasswordsList( props ) {
     setLocalStringFilter,
     localStringFilter,
     setGlobalStringFilter,
+    globalStringFilter,
   } = props;
 
   const {
@@ -33,63 +38,47 @@ export default function PasswordsList( props ) {
         {...props}
         />
       <div className="full-width scroll-visible fit-with-header-and-commandbar-list task-container">
+        <div className="row m-l-30">
+        <input
+          type="text"
+          value={ localStringFilter.title }
+          placeholder={t('title')}
+          className="form-control width-250"
+          style={{fontSize: "12px", marginRight: "10px"}}
+          onKeyPress={(e) => {
+            if( e.charCode === 13 && !loading){
+              setGlobalStringFilter();
+            }
+          }}
+          onChange={(e) => {
+            console.log("HEJ");
+            setLocalStringFilter('title', e.target.value );
+          }}
+          />
+          <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
+            {t('search')}
+          </button>
+        </div>
+
         <table className="table">
           <thead>
-            <tr>
-              <th>
-                {t('title')}
-              </th>
-              { folderId === null &&
-                <th width="350">
-                  {t('folder')}
+              <tr>
+                <th>
+                  {t('title')}
                 </th>
-              }
-            </tr>
+                <th width="250">
+                  {t('url')}
+                </th>
+                <th width="250">
+                  {t('login2')}
+                </th>
+                <th width="250">
+                  {t('expireDate')}
+                </th>
+              </tr>
           </thead>
 
           <tbody>
-            <tr>
-              <th>
-                <input
-                  type="text"
-                  value={ localStringFilter.title }
-                  className="form-control"
-                  style={{fontSize: "12px", marginRight: "10px"}}
-                  onKeyPress={(e) => {
-                    if( e.charCode === 13 && !loading){
-                      setGlobalStringFilter();
-                    }
-                  }}
-                  onChange={(e) => {setLocalStringFilter('title', e.target.value );
-                  }}
-                  />
-              </th>
-              { folderId === null &&
-                <th>
-                  <div className="row">
-                    <div className="flex">
-                      <input
-                        type="text"
-                        value={ localStringFilter.folder }
-                        className="form-control"
-                        style={{fontSize: "12px", marginRight: "10px"}}
-                        onKeyPress={(e) => {
-                          if( e.charCode === 13 && !loading){
-                            setGlobalStringFilter();
-                          }
-                        }}
-                        onChange={(e) => {setLocalStringFilter('folder', e.target.value );
-                        }}
-                        />
-                    </div>
-                    <button className="btn m-l-5" onClick={ setGlobalStringFilter } >
-                      {t('search')}
-                    </button>
-                  </div>
-                </th>
-              }
-            </tr>
-
             <ActiveSearch {...props} />
 
             { passwords.map((password) => (
@@ -97,11 +86,15 @@ export default function PasswordsList( props ) {
                 <td className="font-14-f">
                   {password.title}
                 </td>
-                { folderId === null &&
-                  <td>
-                    {password.folder.title}
-                  </td>
-                }
+                <td>
+                    <a href={`//${password.url}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{password.url}</a>
+                </td>
+                <td>
+                  {password.login.length > 0 ? password.login : t('noLogin') }
+                </td>
+                <td>
+                  {password.expireDate ? timestampToString(password.expireDate) : t('noExpireDate') }
+                </td>
               </tr>
             ))}
             { passwords.length === 0 &&

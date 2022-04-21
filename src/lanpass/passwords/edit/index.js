@@ -21,18 +21,18 @@ import {
   REST_URL,
 } from 'configs/restAPI';
 
-/*
+
 import {
   GET_FOLDERS,
   FOLDERS_SUBSCRIPTION,
 } from 'lanpass/folders/queries';
 
 import {
-  GET_PAGE,
-  UPDATE_PAGE,
-  DELETE_PAGE,
+  GET_PASSWORD,
+  UPDATE_PASSWORD,
+  DELETE_PASSWORD,
 } from 'lanpass/passwords/queries';
-*/
+
 
 export default function PasswordEditContainer( props ) {
   const {
@@ -42,7 +42,7 @@ export default function PasswordEditContainer( props ) {
   const {
     t
   } = useTranslation();
-/*
+
   const {
     data: foldersData,
     loading: foldersLoading,
@@ -61,17 +61,16 @@ export default function PasswordEditContainer( props ) {
     data: passwordData,
     loading: passwordLoading,
     refetch: passwordRefetch,
-  } = useQuery( GET_PAGE, {
+  } = useQuery( GET_PASSWORD, {
     variables: {
       id: parseInt( match.params.passwordID )
     },
     fetchPolicy: 'network-only'
   } );
-*/
 
   //mutations
-  /*const [ updatePassword ] = useMutation( UPDATE_PAGE );
-  const [ deletePassword ] = useMutation( DELETE_PAGE );*/
+  const [ updatePassword ] = useMutation( UPDATE_PASSWORD );
+  const [ deletePassword ] = useMutation( DELETE_PASSWORD );
   const [ showEdit, setShowEdit ] = React.useState( false );
   const [ saving, setSaving ] = React.useState( false );
 
@@ -84,9 +83,9 @@ export default function PasswordEditContainer( props ) {
     return ( <Loading/> )
   }
 
-  const folders = []; // foldersData.lanpassFolders;
-  const password = {}; // passwordData.lanpassPassword;
-  const myRights = {}; // password.myRights;
+  const folders = foldersData.passFolders;
+  const password = passwordData.passEntry;
+  const myRights = password.myRights;
 
   return (
     <div>
@@ -140,41 +139,10 @@ export default function PasswordEditContainer( props ) {
       <LanpassPasswordForm
         id={password.id}
         edit={true}
-        disabled={!myRights.write || password.folder.archived || !showEdit}
+        disabled={!myRights.write || !showEdit}
         close={(() => setShowEdit(false) )}
         savePassword={(data, setSaving, afterUpdate) => {
           setSaving(true);
-          data.deletedImages = getDeletedImages(data.body, password.images, 'get-lw-file');
-          const separatedData = extractImages(data.body);
-          if(separatedData.files.length > 0){
-            const formData = new FormData();
-            separatedData.files.forEach( ( file ) => formData.append( `file`, file ) );
-            formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
-            formData.append( "lanpassId", data.id );
-            axios.post( `${REST_URL}/lw-upload-text-images`, formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            } ).then((response) => {
-              if(!response.data.ok){
-                console.log(response.data);
-                setSaving(false);
-                return;
-              }
-              const newBody = replacePlaceholdersWithLinks(separatedData.value, response.data.attachments, 'get-lw-file');
-              data.body = newBody;
-              /*
-              updatePassword({variables: data}).then(() => {
-                setSaving(false);
-                afterUpdate();
-              }).catch((e) => {
-                console.log(e);
-                setSaving(false);
-              })
-              */
-            })
-          }else{
-            /*
             updatePassword({variables: data}).then(() => {
               setSaving(false);
               afterUpdate();
@@ -182,8 +150,6 @@ export default function PasswordEditContainer( props ) {
               console.log(e);
               setSaving(false);
             })
-            */
-          }
         }}
         deletePassword={(setSaving) => {
           if(window.confirm(t('comfirmDeletingLanpassPassword'))){
@@ -200,7 +166,7 @@ export default function PasswordEditContainer( props ) {
           }
         }}
         allFolders={toSelArr(folders)}
-        password={password}
+        passwordData={password}
         />
     </div>
   );

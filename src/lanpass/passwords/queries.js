@@ -2,81 +2,48 @@ import {
   gql
 } from '@apollo/client';
 
-export const GET_PAGES = gql `
-  query lanwikiPages(
+export const GET_PASSWORDS = gql `
+  query passEntries(
     $folderId: Int
-    $tagId: Int
+    $order: EnumPassEntrySort!
     $limit: Int
     $page: Int
-    $stringFilter: LanwikiPageStringFilterInput
-    $archived: Boolean
+    $stringFilter: PassEntryStringFilterInput
   ){
-    lanwikiPages (
+    passEntries (
       folderId: $folderId
-      tagId: $tagId
+      order: $order
       limit: $limit
       page: $page
       stringFilter: $stringFilter
-      archived: $archived
     ){
       count
-      pages{
+      passwords{
         id
         title
-        tags{
-          id
-          title
-          color
-        }
-        folder{
-          id
-          title
-        }
-        myRights{
-          active
-          read
-          write
-          manage
-        }
+        login
+        password
+        url
+        expireDate
       }
     }
   }
 `;
 
-export const GET_PAGE = gql `
-  query lanwikiPage(
+export const GET_PASSWORD = gql `
+  query passEntry(
     $id: Int!
   ){
-    lanwikiPage(
+    passEntry(
       id: $id
     ){
       id
       title
-      body
-      tags{
-        id
-        title
-        color
-      }
-      folder{
-        id
-        title
-        archived
-      }
-      myRights{
-        active
-        read
-        write
-        manage
-      }
-      images{
-        id
-        filename
-        path
-        mimetype
-        encoding
-        size
-      }
+      login
+      password
+      url
+      expireDate
+      note
       createdAt
       createdBy{
         id
@@ -87,55 +54,67 @@ export const GET_PAGE = gql `
         id
         fullName
       }
+      myRights{
+        read
+        write
+      }
     }
   }
 `;
 
-export const ADD_PAGE = gql `
-  mutation addLanwikiPage(
-    $title: String!
-    $body: String!
+export const ADD_PASSWORD = gql `
+  mutation addPassEntry(
     $folderId: Int!
-    $tags: [Int]!
-  ) {
-    addLanwikiPage(
-      title: $title
-      body: $body
-      folderId: $folderId
-      tags: $tags
-    ){
-      id
-    }
-  }
-`;
-
-export const UPDATE_PAGE = gql `
-  mutation updateLanwikiPage(
-    $id: Int!
     $title: String!
-    $body: String!
-    $folderId: Int
-    $tags: [Int]
-    $deletedImages: [Int]
+    $login: String!
+    $password: String!
+    $url: String
+    $expireDate: String
+    $note: String
   ) {
-    updateLanwikiPage(
+    addPassEntry(
+      folderId: $folderId
+      title: $title
+      login: $login
+      password: $password
+      url: $url
+      expireDate: $expireDate
+      note: $note
+    ){
+      id
+    }
+  }
+`;
+
+export const UPDATE_PASSWORD = gql `
+  mutation updatePassEntry(
+    $id: Int!
+    $title: String
+    $login: String
+    $password: String
+    $url: String
+    $expireDate: String
+    $note: String
+  ) {
+    updatePassEntry(
       id: $id
       title: $title
-      body: $body
-      folderId: $folderId
-      tags: $tags
-      deletedImages: $deletedImages
+      login: $login
+      password: $password
+      url: $url
+      expireDate: $expireDate
+      note: $note
     ){
       id
     }
   }
 `;
 
-export const DELETE_PAGE = gql `
-  mutation deleteLanwikiPage(
+export const DELETE_PASSWORD = gql `
+  mutation deletePassEntry(
     $id: Int!
   ) {
-    deleteLanwikiPage(
+    deletePassEntry(
       id: $id
     ){
       id
@@ -143,8 +122,12 @@ export const DELETE_PAGE = gql `
   }
 `;
 
-export const PAGES_SUBSCRIPTION = gql `
-  subscription lanwikiPagesSubscription {
-    lanwikiPagesSubscription
+export const PASSWORDS_SUBSCRIPTION = gql `
+  subscription passEntriesSubscription (
+    $folderId: Int
+  ){
+    passEntriesSubscription (
+      folderId: $folderId
+    )
   }
 `;

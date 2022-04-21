@@ -9,11 +9,11 @@ import {
   getMyData,
 } from 'helperFunctions';
 import {
-  GET_LANWIKI_USERS,
+  GET_PASS_USERS,
   GET_FOLDER,
   UPDATE_FOLDER,
   DELETE_FOLDER,
-} from 'lanwiki/folders/queries';
+} from 'lanpass/folders/queries';
 
 export default function EditFolderLoader( props ) {
   const {
@@ -26,7 +26,7 @@ export default function EditFolderLoader( props ) {
     data: usersData,
     loading: usersLoading,
     refetch: usersRefetch,
-  } = useQuery( GET_LANWIKI_USERS, {
+  } = useQuery( GET_PASS_USERS, {
     variables: {
       id
     },
@@ -43,7 +43,7 @@ export default function EditFolderLoader( props ) {
     },
     fetchPolicy: 'network-only',
   } );
-
+  
   const [ updateFolder ] = useMutation( UPDATE_FOLDER );
   const [ deleteFolder ] = useMutation( DELETE_FOLDER );
 
@@ -56,8 +56,8 @@ export default function EditFolderLoader( props ) {
       {...props}
       updateFolder={updateFolder}
       deleteFolder={deleteFolder}
-      users={usersData.lanwikiUsers}
-      folder={folderData.lanwikiFolder}
+      users={usersData.passUsers}
+      folder={folderData.passFolder}
       folders={folders}
       currentUser={currentUser}
       />

@@ -51,7 +51,6 @@ export const GET_PASS_USERS = gql `
   }
 `;
 
-
 export const ADD_FOLDER = gql `
   mutation addPassFolder(
     $title: String!
@@ -79,6 +78,7 @@ export const UPDATE_FOLDER = gql `
     $folderRights: [PassFolderRightInput]!
   ) {
     updatePassFolder(
+      id: $id
       title: $title
       order: $order
       description: $description
@@ -88,7 +88,6 @@ export const UPDATE_FOLDER = gql `
     }
   }
 `;
-
 
 export const DELETE_FOLDER = gql `
   mutation deletePassFolder(

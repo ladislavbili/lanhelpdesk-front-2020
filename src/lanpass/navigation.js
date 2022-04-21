@@ -42,8 +42,8 @@ export default function LanpassNavigation( props ) {
             <Route exact path="/lanpass/notifications" component={NotificationList} />
             <Route exact path="/lanpass/notifications/:notificationID" component={NotificationList} />
             <Route exact path='/lanpass/i/:folderID' component={PasswordsList} />
-            <Route exact path='/lanpass/i/:folderID/p/:password' component={PasswordsList} />
-            <Route exact path='/lanpass/i/:folderID/p/:password/:passwordID' component={PasswordView} />
+            <Route exact path='/lanpass/i/:folderID/p/:page' component={PasswordsList} />
+            <Route exact path='/lanpass/i/:folderID/p/:page/:passwordID' component={PasswordView} />
           </div>
       </div>
     </div>

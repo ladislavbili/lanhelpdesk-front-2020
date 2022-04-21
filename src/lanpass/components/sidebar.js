@@ -28,7 +28,7 @@ import {
 } from 'apollo/localSchema/actions';
 
 import {
-  L_SIDEBAR_FOLDER,
+  P_SIDEBAR_FOLDER,
 } from 'apollo/localSchema/queries';
 
 import {
@@ -51,7 +51,7 @@ export default function Sidebar( props ) {
 
   const {
     data: sidebarFolderData,
-  } = useQuery( L_SIDEBAR_FOLDER );
+  } = useQuery( P_SIDEBAR_FOLDER );
 
   const {
     data: foldersData,
@@ -70,18 +70,18 @@ export default function Sidebar( props ) {
   const [ showFolders, setShowFolders ] = React.useState( true );
   const [ showArchived, setShowArchived ] = React.useState( false );
 
-  const folderId = sidebarFolderData.lSidebarFolder === null ? null : sidebarFolderData.lSidebarFolder.id;
+  const folderId = sidebarFolderData.pSidebarFolder === null ? null : sidebarFolderData.pSidebarFolder.id;
 
   React.useEffect( () => {
     if ( !foldersLoading && match.params.folderID !== undefined ) {
-      setLSidebarFolder( match.params.folderID === 'all' ? null : foldersData.lanpassFolders.find( ( folder ) => folder.id === parseInt( match.params.folderID ) ) );
+      setLSidebarFolder( match.params.folderID === 'all' ? null : foldersData.passFolders.find( ( folder ) => folder.id === parseInt( match.params.folderID ) ) );
     }
   }, [ match.params.folderID, foldersLoading ] );
 
   if ( foldersLoading ) {
     return ( <Loading /> );
   }
-  
+
   const folders = foldersData.passFolders;
 
   return (

@@ -35,7 +35,7 @@ export default function DeleteFolderModal( props ) {
   const deleteAllPages = {
     id: null,
     value: null,
-    label: t( 'deleteAllLanwikiPages' ),
+    label: t( 'deleteAllLanpassPages' ),
   }
 
   const [ open, setOpen ] = React.useState( false );
@@ -52,7 +52,7 @@ export default function DeleteFolderModal( props ) {
       } )
       .then( () => {
         setDeleting( false );
-        history.push( `/lanwiki/i/${ replacement.id === null ? 'all' : replacement.id }` )
+        history.push( `/lanpass/i/${ replacement.id === null ? 'all' : replacement.id }` )
       } )
       .catch( ( e ) => {
         console.log( e );

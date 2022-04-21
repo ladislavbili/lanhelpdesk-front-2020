@@ -23,17 +23,17 @@ import {
 import {
   REST_URL,
 } from 'configs/restAPI';
-/*
+
 import {
   GET_FOLDERS,
   FOLDERS_SUBSCRIPTION,
 } from 'lanpass/folders/queries';
 
 import {
-  ADD_PAGE,
-  UPDATE_PAGE,
+  ADD_PASSWORD,
+  UPDATE_PASSWORD,
 } from 'lanpass/passwords/queries';
-*/
+
 
 export default function PasswordAddContainer( props ) {
   const {
@@ -43,7 +43,7 @@ export default function PasswordAddContainer( props ) {
   const {
     t
   } = useTranslation();
-/*
+
   const {
     data: foldersData,
     loading: foldersLoading,
@@ -60,16 +60,15 @@ export default function PasswordAddContainer( props ) {
       foldersRefetch();
     }
   } );
-*/
+
   //mutations
-  /*
-  const [ addPassword ] = useMutation( ADD_PAGE );
-  const [ updatePassword ] = useMutation( UPDATE_PAGE );
-*/
+  const [ addPassword ] = useMutation( ADD_PASSWORD );
+  const [ updatePassword ] = useMutation( UPDATE_PASSWORD );
+
   //state
   const [ open, setOpen ] = React.useState( false );
 
-  const folders = []; // foldersLoading ? [] : foldersData.lanpassFolders;
+  const folders = foldersLoading ? [] : foldersData.passFolders;
 
   return (
     <Empty>
@@ -89,44 +88,17 @@ export default function PasswordAddContainer( props ) {
               edit={false}
               addPassword={(data, setSaving, afterAdd) => {
                 setSaving(true);
-                const separatedData = extractImages(data.body);
-                data.body = separatedData.value;
-                /*
-                addPassword({variables: data}).then((response1) => {
-                  const id = response1.data.addLanpassPassword.id;
-                  if(separatedData.files.length > 0){
-                    const formData = new FormData();
-                    separatedData.files.forEach( ( file ) => formData.append( `file`, file ) );
-                    formData.append( "token", `Bearer ${sessionStorage.getItem( "acctok" )}` );
-                    formData.append( "lanpassId", id );
-                    axios.post( `${REST_URL}/lw-upload-text-images`, formData, {
-                        headers: {
-                          'Content-Type': 'multipart/form-data'
-                        }
-                      } ).then((response2) => {
-                        if(!response2.data.ok){
-                          console.log(response.data);
-                          setSaving(false);
-                          return;
-                        }
-                        const newBody = replacePlaceholdersWithLinks(separatedData.value, response2.data.attachments, 'get-lw-file');
-                        updatePassword({variables: { id, body: newBody, title: data.title }}).then(() => {
-                          setSaving(false);
-                          afterAdd();
-                        }).catch((e) => {
-                          console.log(e);
-                          setSaving(false);
-                        })
-                      })
-                    }else{
+                addPassword({
+                  variables: {
+                    ...data
+                  }
+                }).then((response1) => {
                       setSaving(false);
                       afterAdd();
-                    }
                 }).catch((e) => {
                   console.log(e);
                   setSaving(false);
                 })
-                */
               }}
               close={(() => setOpen(false) )}
               allFolders={toSelArr(folders)}

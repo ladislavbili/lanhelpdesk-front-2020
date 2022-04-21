@@ -8,4 +8,5 @@ export * from './reports/queries';
 export * from './tasklist/queries';
 export * from './calendar/queries';
 export * from './lanwiki/queries';
+export * from './lanpass/queries';
 export * from './cmdb/queries';

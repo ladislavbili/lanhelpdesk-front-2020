@@ -35,7 +35,7 @@ export default function FolderEdit( props ) {
   const [ order, setOrder ] = React.useState( folder.order );
   const [ description, setDescription ] = React.useState( folder.description );
   const [ folderRights, setFolderRights ] = React.useState( folder.folderRights.map( ( folderRight ) => ( {
-    active: folderRight.active,
+    active: true,
     read: folderRight.read,
     write: folderRight.write,
     manage: folderRight.manage,
@@ -44,16 +44,16 @@ export default function FolderEdit( props ) {
   const [ saving, setSaving ] = React.useState( false );
 
   const updateFolderFunc = () => {
+    const variables = {
+      id,
+      title,
+      order: parseInt( order ),
+      description,
+      folderRights,
+    };
     setSaving( true );
     updateFolder( {
-        variables: {
-          id,
-          archived,
-          title,
-          order: parseInt( order ),
-          description,
-          folderRights,
-        },
+        variables
       } )
       .then( () => {
         setSaving( false );
@@ -67,12 +67,6 @@ export default function FolderEdit( props ) {
 
   return (
     <div className='p-20'>
-
-      <Checkbox
-        value={archived}
-        onChange={() => setArchived(!archived) }
-        label={t('archived')}
-        />
 
       <FormGroup>
         <Label htmlFor="name">{t('title')}</Label>

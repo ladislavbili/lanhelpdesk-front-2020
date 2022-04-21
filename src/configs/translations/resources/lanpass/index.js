@@ -2,14 +2,14 @@ import {
   testingTranslations
 } from 'configs/restAPI';
 /*import tags from './tags';
-import folders from './folders';
-import pages from './pages';*/
+import folders from './folders';*/
+import pages from './pages';
 import general from './general';
 
 const invoices = {
 /*  ...tags,
-  ...folders,
-  ...pages,*/
+  ...folders,*/
+  ...pages,
   ...general,
 }
 
@@ -18,8 +18,8 @@ if ( testingTranslations ) {
   //get keys of all objects, filter duplicates, throw them in error
   const test = [
   /*...Object.keys( tags ),
-  ...Object.keys( folders ),
-  ...Object.keys( pages ),*/
+  ...Object.keys( folders ),*/
+  ...Object.keys( pages ),
   ...Object.keys( general ),
 ]
 

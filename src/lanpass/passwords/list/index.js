@@ -11,24 +11,24 @@ import {
 import Loading from 'components/loading';
 import PasswordsList from './list';
 import {
-  setLGlobalStringFilter,
-  setLLocalStringFilter,
-  clearLLocalStringFilter,
+  setPGlobalStringFilter,
+  setPLocalStringFilter,
+  clearPLocalStringFilter,
 } from 'apollo/localSchema/actions';
-/*
+
 import {
-  L_SIDEBAR_FOLDER,
-  L_LOCAL_STRING_FILTER,
-  L_GLOBAL_STRING_FILTER,
+  P_SIDEBAR_FOLDER,
+  P_LOCAL_STRING_FILTER,
+  P_GLOBAL_STRING_FILTER,
 } from 'apollo/localSchema/queries';
 
 import {
-  GET_PAGES,
-  PAGES_SUBSCRIPTION,
-} from 'lanwiki/passwords/queries';
-*/
+  GET_PASSWORDS,
+  PASSWORDS_SUBSCRIPTION,
+} from 'lanpass/passwords/queries';
 
-export default function LanwikiPasswordsLoader( props ) {
+
+export default function LanpassPasswordsLoader( props ) {
   const {
     match,
   } = props;
@@ -38,78 +38,76 @@ export default function LanwikiPasswordsLoader( props ) {
 
   const password = match.params.password ? parseInt( match.params.password ) : 1;
   const limit = 30;
-/*
+  const order = "id";
+  const page = match.params.page ? parseInt( match.params.page ) : 1;
+
   const {
     data: sidebarFolderData,
-  } = useQuery( L_SIDEBAR_FOLDER );
+  } = useQuery( P_SIDEBAR_FOLDER );
   const {
     data: localStringFilterData,
-  } = useQuery( L_LOCAL_STRING_FILTER );
+  } = useQuery( P_LOCAL_STRING_FILTER );
   const {
     data: globalStringFilterData,
-  } = useQuery( L_GLOBAL_STRING_FILTER );
-*/
-  const folder = {
-    id: null,
-    title: t( 'allFolders' )
-  };
-  /*(
-    sidebarFolderData.lSidebarFolder == null ? {
+  } = useQuery( P_GLOBAL_STRING_FILTER );
+
+  const folder = (
+    sidebarFolderData.pSidebarFolder == null ? {
       id: null,
       title: t( 'allFolders' )
     } :
-    sidebarFolderData.lSidebarFolder
+    sidebarFolderData.pSidebarFolder
   );
-  */
 
   const folderId = folder.id;
-  const localStringFilter = {}; //localStringFilterData.lLocalStringFilter;
-  const globalStringFilter = {}; // globalStringFilterData.lGlobalStringFilter;
+  const localStringFilter = localStringFilterData.pLocalStringFilter;
+  const globalStringFilter = globalStringFilterData.pGlobalStringFilter;
 
-/*
   const {
     data: passwordsData,
     loading: passwordsLoading,
     refetch: passwordsRefetch,
-  } = useQuery( GET_PAGES, {
+  } = useQuery( GET_PASSWORDS, {
     variables: {
       folderId,
-      archived: folderId === null ? false : folder.archived,
+      order,
       password: match.params.password ? parseInt( match.params.password ) : 1,
       limit,
+      page,
       stringFilter: globalStringFilter,
     },
     fetchPolicy: 'network-only',
   } );
 
-  useSubscription( PAGES_SUBSCRIPTION, {
+  useSubscription( PASSWORDS_SUBSCRIPTION, {
+    variables: {
+      folderId,
+    },
     onSubscriptionData: () => {
-      passwordsRefetch( {
-        variables: {
+      passwordsRefetch({
           folderId,
+          order,
           password: match.params.password ? parseInt( match.params.password ) : 1,
           limit,
+          page,
           stringFilter: globalStringFilter,
-        }
-      } )
+        })
     }
   } );
 
   React.useEffect( () => {
     passwordsRefetch( {
-      variables: {
         folderId,
+        order,
         password: match.params.password ? parseInt( match.params.password ) : 1,
         limit,
+        page,
         stringFilter: globalStringFilter,
-      }
-    } )
+      })
   }, [ folderId, match.params.password, globalStringFilter ] );
-*/
 
-
-  const passwords = []; // passwordsLoading ? [] : passwordsData.lanwikiPasswords.passwords;
-  const count = 0; //passwordsLoading ? 0 : passwordsData.lanwikiPasswords.count;
+  const passwords = passwordsLoading ? [] : passwordsData.passEntries.passwords;
+  const count = passwordsLoading ? 0 : passwordsData.passEntries.count;
 
   return (
     <PasswordsList
@@ -119,21 +117,20 @@ export default function LanwikiPasswordsLoader( props ) {
       count={count}
       password={password}
       limit={limit}
+      page={page}
       folderId={folderId}
       folder={folder}
       passwordsRefetch={() => {
         passwordsRefetch( {
-          variables: {
             folderId,
             password: match.params.password ? parseInt( match.params.password ) : 1,
             limit,
             stringFilter: globalStringFilter,
-          }
-        } );
+          });
       }}
-      setGlobalStringFilter={setLGlobalStringFilter}
-      setLocalStringFilter={setLLocalStringFilter}
-      clearLocalStringFilter={clearLLocalStringFilter}
+      setGlobalStringFilter={setPGlobalStringFilter}
+      setLocalStringFilter={setPLocalStringFilter}
+      clearLocalStringFilter={clearPLocalStringFilter}
       localStringFilter={localStringFilter}
       globalStringFilter={globalStringFilter}
 

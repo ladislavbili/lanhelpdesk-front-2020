@@ -8,6 +8,11 @@ import {
   InputGroupText,
 } from 'reactstrap';
 
+import Select from "react-select";
+import {
+  pickSelectStyle
+} from "configs/components/select";
+
 import Empty from 'components/Empty';
 import AddPasswordErrors from './add/showErrors';
 import EditPasswordErrors from './edit/showErrors';
@@ -18,6 +23,7 @@ import moment from 'moment';
 
 import {
   timestampToString,
+  toSelArr
 } from 'helperFunctions';
 import {
   useTranslation
@@ -25,19 +31,22 @@ import {
 
 export default function PasswordForm( props ) {
   const {
+    folderId,
     edit,
     close,
     addPassword,
     savePassword,
     disabled,
     passwordData,
+    allFolders,
   } = props;
   const {
     t
   } = useTranslation();
-
+  console.log(passwordData);
   const [ title, setTitle ] = React.useState( passwordData ? passwordData.title : '' );
   const [ login, setLogin ] = React.useState( passwordData ? passwordData.login : '' );
+  const [ folder, setFolder ] = React.useState( null );
   const [ password, setPassword ] = React.useState( passwordData ? passwordData.password : '' );
   const [ passwordCheck, setPasswordCheck ] = React.useState( passwordData ? passwordData.password : '' );
   const [ url, setUrl ] = React.useState( passwordData ? passwordData.url : '' );
@@ -54,7 +63,8 @@ export default function PasswordForm( props ) {
     return (
       saving ||
       title.length === 0 ||
-      password !== passwordCheck
+      password !== passwordCheck ||
+      (!folderId && !folder && !edit)
     );
   }
 
@@ -70,13 +80,20 @@ export default function PasswordForm( props ) {
         login,
         password,
         url,
-        expireDate,
+        expireDate: expireDate ? expireDate.valueOf() + "" : null,
         note,
       };
       if ( edit ) {
-        savePassword( data, setSaving );
+        savePassword( {
+          ...data,
+          id: passwordData.id
+        }, setSaving, close );
       } else {
-        addPassword( data, setSaving );
+        addPassword( {
+          ...data,
+          folderId: folderId ? folderId : folder.id
+        },
+        setSaving, close );
       }
     }
   }
@@ -86,8 +103,21 @@ export default function PasswordForm( props ) {
       <div className={classnames({"fit-with-header-and-lanwiki-commandbar scroll-visible": edit, "p-b-20":  disabled || !edit },"p-t-20 p-l-20 p-r-20 p-b-0")} style={{backgroundColor: "#eaeaea"}}
         >
 
-        <div className="row">
-        </div>
+        {
+          !disabled &&
+          !folderId &&
+          !edit &&
+          <FormGroup>
+            <Label>{t('folder')}<span className="warning-big">*</span></Label>
+            <Select
+              value={folder}
+              styles={pickSelectStyle()}
+              onChange={ (e)=> setFolder(e) }
+              options={toSelArr(allFolders)}
+              />
+          </FormGroup>
+        }
+
         <FormGroup>
           { !disabled && <Label htmlFor="name">{t('title')}<span className="warning-big">*</span></Label> }
           { disabled &&
@@ -133,6 +163,7 @@ export default function PasswordForm( props ) {
               <hr />
             </div>
           }
+
           { !disabled &&
             <Input id="name" className="form-control" placeholder={t('titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)}/>
           }
