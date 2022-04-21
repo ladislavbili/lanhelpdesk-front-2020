@@ -86,7 +86,7 @@ export default function PasswordEditContainer( props ) {
   const folders = foldersData.passFolders;
   const password = passwordData.passEntry;
   const myRights = password.myRights;
-
+  
   return (
     <div>
       { !showEdit &&
@@ -154,7 +154,6 @@ export default function PasswordEditContainer( props ) {
         deletePassword={(setSaving) => {
           if(window.confirm(t('comfirmDeletingLanpassPassword'))){
             setSaving(true);
-            /*
             deletePassword({variables: {id: password.id }}).then(() => {
               setSaving(false);
               history.back();
@@ -162,7 +161,7 @@ export default function PasswordEditContainer( props ) {
               setSaving(false);
               console.log(e);
             })
-            */
+
           }
         }}
         allFolders={toSelArr(folders)}

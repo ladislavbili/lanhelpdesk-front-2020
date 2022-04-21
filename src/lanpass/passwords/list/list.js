@@ -51,7 +51,6 @@ export default function PasswordsList( props ) {
             }
           }}
           onChange={(e) => {
-            console.log("HEJ");
             setLocalStringFilter('title', e.target.value );
           }}
           />

@@ -1,4 +1,6 @@
-import React from 'react';
+import React, {
+  useEffect
+} from 'react';
 import {
   FormGroup,
   Label,
@@ -23,7 +25,9 @@ import moment from 'moment';
 
 import {
   timestampToString,
-  toSelArr
+  toSelArr,
+  toSelItem,
+  getMyData,
 } from 'helperFunctions';
 import {
   useTranslation
@@ -43,21 +47,33 @@ export default function PasswordForm( props ) {
   const {
     t
   } = useTranslation();
-  console.log(passwordData);
+
+  const currentUser = getMyData();
+
+  const potentialFolder = allFolders.find((f) => f.id === folderId);
   const [ title, setTitle ] = React.useState( passwordData ? passwordData.title : '' );
   const [ login, setLogin ] = React.useState( passwordData ? passwordData.login : '' );
-  const [ folder, setFolder ] = React.useState( null );
+  const [ folder, setFolder ] = React.useState( folderId && potentialFolder ? toSelItem(potentialFolder) : null );
   const [ password, setPassword ] = React.useState( passwordData ? passwordData.password : '' );
   const [ passwordCheck, setPasswordCheck ] = React.useState( passwordData ? passwordData.password : '' );
   const [ url, setUrl ] = React.useState( passwordData ? passwordData.url : '' );
   const [ expireDate, setExpireDate ] = React.useState( passwordData && passwordData.expireDate ? moment( parseInt( passwordData.expireDate ) ) : null );
   const [ note, setNote ] = React.useState( passwordData ? passwordData.note : '' );
 
+  const [ updatedAt, setUpdatedAt ] = React.useState( passwordData ? passwordData.updatedAt : '' );
+  const [ updatedBy, setUpdatedBy ] = React.useState( passwordData ? passwordData.updatedBy : '' );
   const [ showPassword, setShowPassword ] = React.useState( false );
   const [ viewPassword, setViewPassword ] = React.useState( false );
   const [ showPasswordCheck, setShowPasswordCheck ] = React.useState( false );
   const [ showErrors, setShowErrors ] = React.useState( false );
   const [ saving, setSaving ] = React.useState( false );
+
+  useEffect(() => {
+      const potentialFolder = allFolders.find((f) => f.id === folderId);
+      if (folderId && potentialFolder){
+        setFolder(toSelItem(potentialFolder));
+      }
+  }, [folderId, allFolders]);
 
   const cannotSave = () => {
     return (
@@ -84,6 +100,8 @@ export default function PasswordForm( props ) {
         note,
       };
       if ( edit ) {
+        setUpdatedAt(moment().valueOf());
+        setUpdatedBy({...currentUser});
         savePassword( {
           ...data,
           id: passwordData.id
@@ -104,8 +122,6 @@ export default function PasswordForm( props ) {
         >
 
         {
-          !disabled &&
-          !folderId &&
           !edit &&
           <FormGroup>
             <Label>{t('folder')}<span className="warning-big">*</span></Label>
@@ -146,16 +162,16 @@ export default function PasswordForm( props ) {
                   </div>
                   <div className="text-right">
                     <span>
-                      {passwordData.updatedBy ? `${t('changedBy')} ` : ""}
+                      {updatedBy ? `${t('changedBy')} ` : ""}
                     </span>
                     <span className="bolder">
-                      {passwordData.updatedBy ? `${passwordData.updatedBy.fullName}` :''}
+                      {updatedBy ? `${updatedBy.fullName}` :''}
                     </span>
                     <span>
-                      {passwordData.updatedBy ?` ${t('atDate')} `: t('changedAt')}
+                      {updatedBy ?` ${t('atDate')} `: t('changedAt')}
                     </span>
                     <span className="bolder">
-                      {passwordData.createdAt ? (timestampToString(passwordData.updatedAt)) : ''}
+                      {updatedAt ? (timestampToString(updatedAt)) : ''}
                     </span>
                   </div>
                 </div>
@@ -315,189 +331,3 @@ export default function PasswordForm( props ) {
     </Empty>
   );
 }
-/*
-  const [ title, setTitle ] = React.useState( password ? password.title : '' );
-  const [ folder, setFolder ] = React.useState( password ? allFolders.find( ( folder ) => folder.id === password.folder.id ) : ( folderId === null ? allFolders[ 0 ] : allFolders.find( ( folder ) => folder.id === folderId ) ) );
-  const [ body, setBody ] = React.useState( password ? password.body : '' );
-  const [ bodyImages, setBodyImages ] = React.useState( [] );
-
-  const [ showErrors, setShowErrors ] = React.useState( false );
-  const [ saving, setSaving ] = React.useState( false );
-
-  const cannotSave = () => {
-    return (
-      saving ||
-      title.length === 0 ||
-      !folder ||
-      !folder.id
-    );
-  }
-
-  const saveOrAddPassword = () => {
-    if ( disabled ) {
-      return;
-    };
-    if ( cannotSave() ) {
-      setShowErrors( true );
-    } else {
-      let data = {
-        title,
-        folderId: folder.id,
-        body,
-      };
-      if ( edit ) {
-        data.id = id;
-        savePassword( data, setSaving, close );
-      } else {
-        addPassword( data, setSaving, close );
-      }
-    }
-  }
-
-  return (
-    <Empty>
-      <div className={classnames({"fit-with-header-and-lanwiki-commandbar scroll-visible": edit },"row")} style={{backgroundColor: "#eaeaea"}}>
-
-        <div className="task-edit-left">
-          { disabled &&
-            <div>
-              <div className="row">
-                <h2>
-                  {title}
-                </h2>
-                <div className="ml-auto">
-                  <div className="text-right">
-                    <span>
-                      {password.createdBy ? `${t('createdBy')} ` : ""}
-                    </span>
-                    <span className="bolder">
-                      {password.createdBy ? `${password.createdBy.fullName}` :''}
-                    </span>
-                    <span>
-                      {` ${password.createdBy ? t('atDate') : t('createdAt')} `}
-                    </span>
-                    <span className="bolder">
-                      {password.createdAt ? (timestampToString(password.createdAt)) : ''}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span>
-                      {password.updatedBy ? `${t('changedBy')} ` : ""}
-                    </span>
-                    <span className="bolder">
-                      {password.updatedBy ? `${password.updatedBy.fullName}` :''}
-                    </span>
-                    <span>
-                      {password.updatedBy ?` ${t('atDate')} `: t('changedAt')}
-                    </span>
-                    <span className="bolder">
-                      {password.createdAt ? (timestampToString(password.updatedAt)) : ''}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <hr/>
-            </div>
-          }
-          { !disabled &&
-            <FormGroup>
-              <Empty>
-                <Label htmlFor="name">{t('title')}</Label>
-                <Input id="name" className="form-control" placeholder={t('titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)}/>
-              </Empty>
-            </FormGroup>
-          }
-          <FormGroup>
-            { !disabled &&
-              <CKEditor
-                value={body}
-                type="imageUpload"
-                onChange={(body) => {
-                  setBody(body);
-                }}
-                uploadImage={ (images) => {
-                  setBodyImages([...bodyImages, ...images]);
-                }}
-                images={bodyImages}
-                />
-            }
-            { disabled &&
-              <div className="task-edit-popis p-t-10 min-height-300-f" dangerouslySetInnerHTML={{ __html: body }} />
-            }
-          </FormGroup>
-          { !edit && <AddPasswordErrors title={title} body={body} folder={folder} show={showErrors} />}
-          { edit && <EditPasswordErrors title={title} body={body} folder={folder} show={showErrors} />}
-        </div>
-
-        <div className="task-edit-right">
-          <FormGroup>
-            <Label htmlFor="name">{t('folder')}</Label>
-            { disabled &&
-              <div>
-                {folder.title}
-              </div>
-            }
-            {! disabled &&
-              <Select
-                placeholder={t('selectFolder')}
-                value={folder}
-                options={allFolders.filter((folder) => folder.myRights.write )}
-                onChange={(folder)=>{
-                  setFolder(folder);
-                }}
-                styles={pickSelectStyle( [ 'noArrow', 'required', ] )}
-                />
-            }
-          </FormGroup>
-        </div>
-
-
-        { !edit &&
-          <div className="row m-t-20">
-            <button className="btn-red" onClick={close}>
-              <i className="fas fa-ban commandbar-command-icon" />
-              {t('cancel')}
-            </button>
-            { !disabled &&
-              <div className="ml-auto">
-                <button
-                  className="btn"
-                  disabled={cannotSave() && showErrors}
-                  onClick={saveOrAddPassword}
-                  >
-                  {saving ? `${t('adding')}...` : `${t('add')}`}
-                </button>
-              </div>
-            }
-          </div>
-        }
-      </div>
-      { !disabled && edit &&
-        <div className="button-bar row stick-to-bottom">
-          <div className="center-ver row">
-            <div>
-              <button
-                className="btn-red btn-distance center-hor"
-                onClick={close}
-                >
-                <i className="fas fa-ban commandbar-command-icon" />
-                {t('cancel')}
-              </button>
-            </div>
-            <div>
-              <button
-                className="btn btn-distance center-hor"
-                disabled={cannotSave() && showErrors}
-                onClick={saveOrAddPassword}
-                >
-                <i className="fas fa-save commandbar-command-icon" />
-                {saving ? `${t('saving')}...` : `${t('save')}`}
-              </button>
-            </div>
-          </div>
-        </div>
-      }
-    </Empty>
-  );
-}
-*/

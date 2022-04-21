@@ -24,7 +24,7 @@ import {
 } from "react-i18next";
 
 import {
-  setLSidebarFolder,
+  setPSidebarFolder,
 } from 'apollo/localSchema/actions';
 
 import {
@@ -74,7 +74,7 @@ export default function Sidebar( props ) {
 
   React.useEffect( () => {
     if ( !foldersLoading && match.params.folderID !== undefined ) {
-      setLSidebarFolder( match.params.folderID === 'all' ? null : foldersData.passFolders.find( ( folder ) => folder.id === parseInt( match.params.folderID ) ) );
+      setPSidebarFolder( match.params.folderID === 'all' ? null : foldersData.passFolders.find( ( folder ) => folder.id === parseInt( match.params.folderID ) ) );
     }
   }, [ match.params.folderID, foldersLoading ] );
 
@@ -83,7 +83,7 @@ export default function Sidebar( props ) {
   }
 
   const folders = foldersData.passFolders;
-
+  
   return (
     <div className="sidebar">
       <div className="scrollable fit-with-header">
@@ -116,7 +116,7 @@ export default function Sidebar( props ) {
               <NavItem className={classnames("row full-width sidebar-item", { "active": window.location.pathname.includes( '/lanpass/i/all' ) }) }>
                 <span
                   className={ classnames("clickable sidebar-menu-item link", { "active": window.location.pathname.includes( '/lanpass/i/all' ) }) }
-                  onClick={() => { history.push('/lanpass/i/all'); }}
+                  onClick={() => { history.push('/lanpass/i/all'); setPSidebarFolder(null);}}
                   >
                   {t('allFolders')}
                 </span>
@@ -125,7 +125,7 @@ export default function Sidebar( props ) {
                 <NavItem key={folder.id} className={classnames("row full-width sidebar-item", { "active": parseInt(match.params.folderID) === folder.id }) }>
                   <span
                     className={ classnames("clickable sidebar-menu-item link", { "active": parseInt(match.params.folderID) === folder.id }) }
-                    onClick={() => { history.push(`/lanpass/i/${folder.id}`); }}
+                    onClick={() => { history.push(`/lanpass/i/${folder.id}`); setPSidebarFolder(folder)}}
                     >
                     {folder.title}
                   </span>
