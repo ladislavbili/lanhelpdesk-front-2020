@@ -91,9 +91,8 @@ export default function PageHeader( props ) {
                 <input type="radio" name="options" checked={subpage === 3} onChange={() => {history.push('/cmdb/i/all'); setOpen(false); }}/>
                 { t( 'cmdb' ) }
               </label>
-            }
-            {/* FIXME: true prec */ }
-            { (true || accessRights.pass) &&
+            }            
+            { accessRights.pass &&
               <label className={classnames({'active':subpage === 4}, "btn btn-link text-left")}>
                 <input type="radio" name="options" checked={subpage === 4} onChange={() => {history.push('/lanpass/i/all'); setOpen(false); }}/>
                 { t( 'lanpass' ) }
