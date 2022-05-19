@@ -17,7 +17,7 @@ export default {
   },
   May: {
     en: 'May',
-    sk: 'Marec',
+    sk: 'Máj',
   },
   June: {
     en: 'June',

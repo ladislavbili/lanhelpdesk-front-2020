@@ -29,12 +29,13 @@ export default function ExcelExport( props ) {
     data: invoiceData,
     loading: invoiceLoading,
   } ] = useLazyQuery( INVOICE, {
-    onCompleted: () => {
+    onCompleted: ( invoiceData ) => {
       downloadExcel( invoiceData.invoice )
     },
   } );
 
   const downloadExcel = async ( invoice ) => {
+    console.log( 'aaaa' );
     const filename = `Výkaz ${company.title} ${moment(variables.dateFrom).year()}/${moment(variables.dateFrom).month()}`;
 
     const h1 = {
@@ -473,7 +474,7 @@ export default function ExcelExport( props ) {
         if(invoiceData && !invoiceLoading){
           downloadExcel(invoiceData.invoice)
         }else{
-          fetchInvoice({variables})
+          fetchInvoice({variables});
         }
       }}
       >
