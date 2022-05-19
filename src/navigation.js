@@ -72,8 +72,7 @@ export default function Navigation( props ) {
         <Route path='/helpdesk' component={HelpdeskNavigation} />
         <Route path='/invoices' component={InvoicesNavigation} />
         { userDataData.getMyData.role.accessRights.lanwiki && <Route path='/lanwiki' component={LanwikiNavigation} />}
-        //// FIXME: true prec
-        { (true || userDataData.getMyData.role.accessRights.pass) && <Route path='/lanpass' component={LanpassNavigation} />}
+        { userDataData.getMyData.role.accessRights.pass && <Route path='/lanpass' component={LanpassNavigation} />}
         { userDataData.getMyData.role.accessRights.cmdb && <Route path='/cmdb' component={CMDBNavigation} />}
       </Switch>
     </BrowserRouter>
